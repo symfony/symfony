@@ -63,7 +63,6 @@ class SwitchUserToken extends UsernamePasswordToken
         } else {
             [$this->originalToken, $this->originatedFromUri, $parentData] = $data;
         }
-        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

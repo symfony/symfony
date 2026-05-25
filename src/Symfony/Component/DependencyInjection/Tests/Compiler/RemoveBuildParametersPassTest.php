@@ -46,6 +46,10 @@ class RemoveBuildParametersPassTest extends TestCase
         $this->assertTrue($builder->hasParameter('.array'), '".array" parameter must be preserved.');
         $this->assertSame(['baz' => 'qux'], $builder->getParameter('.array'), '".array" parameter must retain its value.');
         $this->assertSame(['.scalar' => 'Bar'], $pass->getRemovedParameters(), 'Only ".scalar" parameter must be returned as removed.');
+
+        $log = $builder->getCompiler()->getLog();
+        $this->assertContains(RemoveBuildParametersPass::class.': Removing build parameter ".scalar".', $log);
+        $this->assertContains(RemoveBuildParametersPass::class.': Keeping array build parameter ".array" for placeholder resolution.', $log);
     }
 
     public function testNonArrayBuildParametersAreAlwaysRemoved()

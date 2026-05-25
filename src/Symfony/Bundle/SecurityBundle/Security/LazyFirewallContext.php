@@ -50,7 +50,7 @@ class LazyFirewallContext extends FirewallContext implements FirewallListenerInt
     {
         $listeners = [];
         $request = $event->getRequest();
-        $lazy = $request->isMethodCacheable();
+        $lazy = true;
 
         foreach (parent::getListeners() as $listener) {
             if (false !== $supports = $listener->supports($request)) {

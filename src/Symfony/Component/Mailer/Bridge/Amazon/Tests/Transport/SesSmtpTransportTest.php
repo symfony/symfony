@@ -32,4 +32,22 @@ class SesSmtpTransportTest extends TestCase
         $this->assertTrue($email->getHeaders()->has('X-SES-MESSAGE-TAGS'));
         $this->assertSame('X-SES-MESSAGE-TAGS: tagName1=tag Value1, tagName2=tag Value2', $email->getHeaders()->get('X-SES-MESSAGE-TAGS')->toString());
     }
+
+    public function testImplicitTlsPortDoesNotRequireStartTls()
+    {
+        $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 465);
+        $this->assertFalse($transport->isTlsRequired());
+
+        $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 2465);
+        $this->assertFalse($transport->isTlsRequired());
+    }
+
+    public function testStartTlsPortRequiresTls()
+    {
+        $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 587);
+        $this->assertTrue($transport->isTlsRequired());
+
+        $transport = new SesSmtpTransport('user', 'pass', 'eu-west-1', null, null, 'default', 2587);
+        $this->assertTrue($transport->isTlsRequired());
+    }
 }

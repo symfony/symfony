@@ -84,18 +84,20 @@ class FragmentHandlerTest extends TestCase
 
     protected function getHandler($returnValue, $arguments = [])
     {
-        $renderer = $this->createStub(FragmentRendererInterface::class);
-        $renderer
-            ->method('getName')
-            ->willReturn('foo')
-        ;
-        $e = $renderer
-            ->method('render')
-            ->willReturn($returnValue)
-        ;
-
         if ($arguments) {
-            $e->with(...$arguments);
+            $renderer = $this->createMock(FragmentRendererInterface::class);
+            $renderer->method('getName')->willReturn('foo');
+            $renderer
+                ->expects($this->once())
+                ->method('render')
+                ->with(...$arguments)
+                ->willReturn($returnValue);
+        } else {
+            $renderer = $this->createStub(FragmentRendererInterface::class);
+            $renderer->method('getName')->willReturn('foo');
+            $renderer
+                ->method('render')
+                ->willReturn($returnValue);
         }
 
         $handler = new FragmentHandler($this->requestStack);

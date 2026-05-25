@@ -34,18 +34,14 @@ class TraceableHttpClientTest extends TestCase
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient
             ->method('request')
-            ->with(
-                'GET',
-                '/foo/bar',
-                $this->callback(function ($subject) {
-                    $onprogress = $subject['on_progress'];
-                    unset($subject['on_progress'], $subject['extra']);
-                    $this->assertEquals(['options1' => 'foo'], $subject);
+            ->willReturnCallback(function (string $method, string $url, array $options = []) {
+                $this->assertSame('GET', $method);
+                $this->assertSame('/foo/bar', $url);
+                unset($options['on_progress'], $options['extra']);
+                $this->assertEquals(['options1' => 'foo'], $options);
 
-                    return true;
-                })
-            )
-            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello')))
+                return MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello'));
+            })
         ;
 
         $sut = new TraceableHttpClient($httpClient);

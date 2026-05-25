@@ -130,6 +130,41 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertSame('mr_robot', $field->getValue(), '->addChoice() changes the value to added choice if selected attribute is set');
     }
 
+    public function testAddChoiceToMultipleSelectAppendsSelectedValue()
+    {
+        $node = $this->createSelectNode(['foo' => true, 'bar' => false], ['multiple' => 'multiple']);
+        $field = new ChoiceFormField($node);
+
+        $this->assertSame(['foo'], $field->getValue());
+
+        $option = $this->createNode('option', '', ['value' => 'baz', 'selected' => true]);
+        $field->addChoice($option);
+
+        $this->assertSame(['foo', 'baz'], $field->getValue(), '->addChoice() appends to the value array for a multiple select');
+    }
+
+    public function testAddChoiceRejectsMismatchedTagForSelect()
+    {
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('expected an "option" tag, got "input"');
+
+        $field->addChoice($this->createNode('input', '', ['value' => 'baz']));
+    }
+
+    public function testAddChoiceRejectsMismatchedTagForRadio()
+    {
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
+        $field = new ChoiceFormField($node);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('expected an "input" tag, got "option"');
+
+        $field->addChoice($this->createNode('option', '', ['value' => 'bar']));
+    }
+
     public function testSelectWithEmptyBooleanAttribute()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => true], [], '');
@@ -144,6 +179,22 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $field = new ChoiceFormField($node);
 
         $this->assertTrue($field->isDisabled(), '->isDisabled() returns true for selects with a disabled attribute');
+    }
+
+    public function testAddChoiceOnMultipleSelectKeepsExistingValues()
+    {
+        $node = $this->createSelectNode(['foo' => true, 'bar' => false], ['multiple' => 'multiple']);
+        $field = new ChoiceFormField($node);
+
+        $this->assertEquals(['foo'], $field->getValue());
+
+        $document = new \DOMDocument();
+        $newOption = $document->createElement('option', 'baz');
+        $newOption->setAttribute('value', 'baz');
+        $newOption->setAttribute('selected', 'selected');
+        $field->addChoice($newOption);
+
+        $this->assertEquals(['foo', 'baz'], $field->getValue());
     }
 
     public function testMultipleSelects()

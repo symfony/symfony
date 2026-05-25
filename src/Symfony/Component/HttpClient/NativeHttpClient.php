@@ -225,6 +225,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 'curl_verify_ssl_peer' => $options['verify_peer'],
                 'curl_verify_ssl_host' => $options['verify_host'],
                 'auto_decode' => false, // Disable dechunk filter, it's incompatible with stream_select()
+                // PHP's stream context "timeout" is a read timeout, not a connect-only deadline; on this backend
+                // "max_connect_duration" is therefore best-effort and also caps subsequent socket reads at that
+                // duration. The curl and amp backends enforce the connect phase precisely.
                 'timeout' => 0 < $options['max_connect_duration'] ? min($options['timeout'], $options['max_connect_duration']) : $options['timeout'],
                 'follow_location' => false, // We follow redirects ourselves - the native logic is too limited
             ],
@@ -327,6 +330,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
     /**
      * Resolves the IP of the host using the local DNS cache if possible.
+     *
+     * @param-immediately-invoked-callable $onProgress
      */
     private static function dnsResolve(string $host, NativeClientState $multi, array &$info, ?\Closure $onProgress): string
     {

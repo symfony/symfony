@@ -24,6 +24,13 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class MailerSendRequestParser extends AbstractRequestParser
 {
+    /**
+     * Fixed secret that is used by MailerSend when doing a webhook.test request.
+     *
+     * @see https://developers.mailersend.com/api/v1/webhooks.html#webhooks-overview
+     */
+    public const TEST_SECRET = 'test_Am3L1GuOIc4blLUuHqAPxxwkZaJyEk8G';
+
     public function __construct(
         private readonly MailerSendPayloadConverter $converter,
     ) {
@@ -39,6 +46,14 @@ final class MailerSendRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
+        $content = $request->toArray();
+
+        if ('webhook.test' === ($content['type'] ?? null)) {
+            $secret = self::TEST_SECRET;
+        } elseif (!isset($content['type'], $content['data']['email']['message']['id'], $content['data']['email']['recipient']['email'])) {
+            throw new RejectWebhookException(406, 'Payload is malformed.');
+        }
+
         if ($secret) {
             if (!$request->headers->get('Signature')) {
                 throw new RejectWebhookException(406, 'Signature is required.');
@@ -49,11 +64,10 @@ final class MailerSendRequestParser extends AbstractRequestParser
                 $request->getContent(),
                 $secret,
             );
-        }
 
-        $content = $request->toArray();
-        if (!isset($content['type'], $content['data']['email']['message']['id'], $content['data']['email']['recipient']['email'])) {
-            throw new RejectWebhookException(406, 'Payload is malformed.');
+            if (self::TEST_SECRET === $secret) {
+                throw new RejectWebhookException(202);
+            }
         }
 
         try {

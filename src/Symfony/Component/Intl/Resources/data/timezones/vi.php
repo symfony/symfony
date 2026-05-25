@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Giờ Trung Âu (Büsingen)',
         'Europe/Chisinau' => 'Giờ Đông Âu (Chișinău)',
         'Europe/Copenhagen' => 'Giờ Trung Âu (Copenhagen)',
-        'Europe/Dublin' => 'Giờ Ireland (Dublin)',
+        'Europe/Dublin' => 'Giờ Trung bình Greenwich (Dublin)',
         'Europe/Gibraltar' => 'Giờ Trung Âu (Gibraltar)',
         'Europe/Guernsey' => 'Giờ Trung bình Greenwich (Guernsey)',
         'Europe/Helsinki' => 'Giờ Đông Âu (Helsinki)',

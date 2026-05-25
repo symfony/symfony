@@ -123,7 +123,7 @@ class XliffLintCommand extends Command
         $internal = libxml_use_internal_errors(true);
 
         $document = new \DOMDocument();
-        $document->loadXML($content);
+        $document->loadXML($content, \LIBXML_NONET);
 
         if (null !== $targetLanguage = $this->getTargetLanguageFromFile($document)) {
             $normalizedLocalePattern = \sprintf('(%s|%s)', preg_quote($targetLanguage, '/'), preg_quote(str_replace('-', '_', $targetLanguage), '/'));

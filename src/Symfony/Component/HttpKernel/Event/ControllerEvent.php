@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -20,8 +22,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  * You can call getController() to retrieve the current controller. With
  * setController() you can set a new controller that is used in the processing
  * of the request.
- *
- * Controllers should be callables.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
@@ -124,5 +124,33 @@ final class ControllerEvent extends KernelEvent
         }
 
         return $grouped;
+    }
+
+    public function evaluate(mixed $value, ?ExpressionLanguage $expressionLanguage, array $args = []): mixed
+    {
+        if (!$value instanceof \Closure && !$value instanceof Expression) {
+            return $value;
+        }
+
+        $controller = $this->getController();
+        $controller = match (true) {
+            \is_object($controller) && !$controller instanceof \Closure => $controller,
+            \is_array($controller) && \is_object($controller[0]) => $controller[0],
+            default => null,
+        };
+
+        if ($value instanceof \Closure) {
+            return $value($args, $this->getRequest(), $controller);
+        }
+
+        if (!$expressionLanguage) {
+            throw new \LogicException('Cannot evaluate Expression for controllers since no ExpressionLanguage service was configured.');
+        }
+
+        return $expressionLanguage->evaluate($value, [
+            'request' => $this->getRequest(),
+            'args' => $args,
+            'this' => $controller,
+        ]);
     }
 }

@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Sentraal-Europese tyd (Büsingen)',
         'Europe/Chisinau' => 'Oos-Europese tyd (Chișinău)',
         'Europe/Copenhagen' => 'Sentraal-Europese tyd (Kopenhagen)',
-        'Europe/Dublin' => 'Ierland-tyd (Dublin)',
+        'Europe/Dublin' => 'Greenwich-tyd (Dublin)',
         'Europe/Gibraltar' => 'Sentraal-Europese tyd (Gibraltar)',
         'Europe/Guernsey' => 'Greenwich-tyd (Guernsey)',
         'Europe/Helsinki' => 'Oos-Europese tyd (Helsinki)',

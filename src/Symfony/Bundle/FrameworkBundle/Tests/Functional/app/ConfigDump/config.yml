@@ -9,8 +9,22 @@ framework:
         storage_factory_id: session.storage.factory.native
         cookie_httponly: '%env(bool:COOKIE_HTTPONLY)%'
 
+foo:
+    vault_test_secret: '%env(TEST_VAULT_SECRET)%'
+
 parameters:
     env(LOCALE): en
     env(COOKIE_HTTPONLY): '1'
+    env(TEST_VAULT_SECRET): ''
     secret: test
     default_config_test_foo: bar
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\EnvVarLoader\StatefulEnvVarLoader:
+        tags:
+            - container.env_var_loader
+
+    test.vault_env_var_primer:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\EnvVarLoader\VaultEnvVarPrimer
+        arguments: ['%env(TEST_VAULT_SECRET)%']
+        public: true

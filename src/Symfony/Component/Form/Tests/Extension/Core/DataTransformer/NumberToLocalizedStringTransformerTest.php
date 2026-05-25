@@ -648,7 +648,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    #[RequiresPhp('< 8.5')]
+    #[RequiresPhp('< 8.5.0')]
     public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
     {
         $errorLevel = ini_set('intl.error_level', \E_WARNING);
@@ -677,7 +677,7 @@ class NumberToLocalizedStringTransformerTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    #[RequiresPhp('< 8.5')]
+    #[RequiresPhp('< 8.5.0')]
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
     {
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);

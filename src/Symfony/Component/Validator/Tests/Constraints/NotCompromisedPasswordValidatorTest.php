@@ -53,14 +53,14 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new NotCompromisedPassword());
+        $this->validate(null, new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new NotCompromisedPassword());
+        $this->validate('', new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
@@ -70,7 +70,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $r = new \ReflectionProperty($this->validator, 'enabled');
         $r->setValue($this->validator, false);
 
-        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
+        $this->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
@@ -78,7 +78,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidPassword()
     {
         $constraint = new NotCompromisedPassword();
-        $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
+        $this->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->buildViolation($constraint->message)
             ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
@@ -88,7 +88,7 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testThresholdReached()
     {
         $constraint = new NotCompromisedPassword(threshold: 3);
-        $this->validator->validate(self::PASSWORD_LEAKED, $constraint);
+        $this->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->buildViolation($constraint->message)
             ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
@@ -97,22 +97,23 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
 
     public function testThresholdNotReached()
     {
-        $this->validator->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(threshold: 10));
+        $this->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(threshold: 10));
 
         $this->assertNoViolation();
     }
 
     public function testValidPassword()
     {
-        $this->validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
+        $this->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
 
     public function testNonUtf8CharsetValid()
     {
-        $validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
-        $validator->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_NOT_LEAKED, 'ISO-8859-5', 'UTF-8'), new NotCompromisedPassword());
+        $this->validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
+
+        $this->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_NOT_LEAKED, 'ISO-8859-5', 'UTF-8'), new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
@@ -121,11 +122,9 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new NotCompromisedPassword();
 
-        $this->context = $this->createContext();
+        $this->validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
 
-        $validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
-        $validator->initialize($this->context);
-        $validator->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_LEAKED, 'ISO-8859-5', 'UTF-8'), $constraint);
+        $this->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_LEAKED, 'ISO-8859-5', 'UTF-8'), $constraint);
 
         $this->buildViolation($constraint->message)
             ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
@@ -139,16 +138,13 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
         $expectedEndpointUrl = 'https://password-check.internal.example.com/range/50D74';
         $constraint = new NotCompromisedPassword();
 
-        $this->context = $this->createContext();
-
-        $validator = new NotCompromisedPasswordValidator(
+        $this->validator = new NotCompromisedPasswordValidator(
             $this->createHttpClientStubCustomEndpoint($expectedEndpointUrl),
             'UTF-8',
             true,
             $endpoint
         );
-        $validator->initialize($this->context);
-        $validator->validate(self::PASSWORD_LEAKED, $constraint);
+        $this->validate(self::PASSWORD_LEAKED, $constraint);
 
         $this->buildViolation($constraint->message)
             ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
@@ -168,14 +164,14 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
             ]
         );
 
-        $validator = new NotCompromisedPasswordValidator(
+        $this->validator = new NotCompromisedPasswordValidator(
             $this->createHttpClientStub($returnValue),
             'UTF-8',
             true,
             'https://password-check.internal.example.com/range/%s'
         );
 
-        $validator->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
+        $this->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
 
         $this->assertNoViolation();
     }
@@ -183,26 +179,26 @@ class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidConstraint()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->validator->validate(null, new Luhn());
+        $this->validate(null, new Luhn());
     }
 
     public function testInvalidValue()
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->validator->validate([], new NotCompromisedPassword());
+        $this->validate([], new NotCompromisedPassword());
     }
 
     public function testApiError()
     {
         $this->expectException(ExceptionInterface::class);
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
+        $this->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
     }
 
     public function testApiErrorSkipped()
     {
         $this->expectNotToPerformAssertions();
 
-        $this->validator->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(skipOnError: true));
+        $this->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(skipOnError: true));
     }
 
     private function createHttpClientStub(?string $returnValue = null): HttpClientInterface

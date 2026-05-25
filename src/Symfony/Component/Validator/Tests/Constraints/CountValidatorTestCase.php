@@ -32,7 +32,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Count(6));
+        $this->validate(null, new Count(6));
 
         $this->assertNoViolation();
     }
@@ -40,7 +40,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     public function testExpectsCountableType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Count(5));
+        $this->validate(new \stdClass(), new Count(5));
     }
 
     public static function getThreeOrLessElements()
@@ -74,7 +74,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     public function testValidValuesMaxNamed($value)
     {
         $constraint = new Count(max: 3);
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -83,7 +83,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     public function testValidValuesMinNamed($value)
     {
         $constraint = new Count(min: 5);
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -92,7 +92,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     public function testValidValuesExactNamed($value)
     {
         $constraint = new Count(exactly: 4);
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -102,7 +102,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     {
         $constraint = new Count(max: 4, maxMessage: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ count }}', \count($value))
@@ -118,7 +118,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     {
         $constraint = new Count(min: 4, minMessage: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ count }}', \count($value))
@@ -134,7 +134,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     {
         $constraint = new Count(exactly: 4, exactMessage: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ count }}', \count($value))
@@ -154,7 +154,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
             exactMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ count }}', \count($value))
@@ -196,7 +196,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
             message: 'foo {{ compared_value }}',
         )], $this->group);
 
-        $this->validator->validate(['foo', 'bar', 'ccc'], $constraint);
+        $this->validate(['foo', 'bar', 'ccc'], $constraint);
 
         $this->assertNoViolation();
     }

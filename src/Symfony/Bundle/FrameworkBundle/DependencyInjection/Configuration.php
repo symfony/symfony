@@ -244,6 +244,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addFormSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -302,7 +305,9 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('allow_revalidate')->end()
                         ->integerNode('stale_while_revalidate')->end()
                         ->integerNode('stale_if_error')->end()
-                        ->booleanNode('terminate_on_cache_hit')->end()
+                        ->booleanNode('terminate_on_cache_hit')
+                            ->setDeprecated('symfony/framework-bundle', '8.1', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 9.0.')
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -551,6 +556,7 @@ class Configuration implements ConfigurationInterface
                                                     ->cannotBeEmpty()
                                                 ->end()
                                                 ->arrayNode('metadata')
+                                                    ->useAttributeAsKey('key')
                                                     ->normalizeKeys(false)
                                                     ->defaultValue([])
                                                     ->example(['color' => 'blue', 'description' => 'Workflow to manage article.'])
@@ -677,6 +683,7 @@ class Configuration implements ConfigurationInterface
                                                     ->end()
                                                 ->end()
                                                 ->arrayNode('metadata')
+                                                    ->useAttributeAsKey('key')
                                                     ->normalizeKeys(false)
                                                     ->defaultValue([])
                                                     ->example(['color' => 'blue', 'description' => 'Workflow to manage article.'])
@@ -687,6 +694,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                     ->end()
                                     ->arrayNode('metadata')
+                                        ->useAttributeAsKey('key')
                                         ->normalizeKeys(false)
                                         ->defaultValue([])
                                         ->example(['color' => 'blue', 'description' => 'Workflow to manage article.'])
@@ -824,6 +832,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addAssetsSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -905,6 +916,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addAssetMapperSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1026,6 +1040,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addTranslatorSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1113,6 +1130,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1148,6 +1168,10 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->booleanNode('disable_translation')
+                            ->defaultFalse()
+                        ->end()
+                        ->booleanNode('property_metadata_existence_check')
+                            ->info('When enabled, validateProperty() and validatePropertyValue() throw an exception if no metadata is found for the given property.')
                             ->defaultFalse()
                         ->end()
                         ->arrayNode('auto_mapping')
@@ -1199,10 +1223,14 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $defaultContextNode = fn () => (new NodeBuilder())
             ->arrayNode('default_context')
+                ->useAttributeAsKey('key')
                 ->normalizeKeys(false)
                 ->validate()
                     ->ifTrue(fn () => $this->debug && class_exists(JsonParser::class))
@@ -1266,6 +1294,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $willBeAvailable
+     */
     private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
@@ -1286,6 +1317,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addPropertyInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1304,6 +1338,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addTypeInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1326,6 +1363,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $willBeAvailable
+     */
     private function addCacheSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
@@ -1404,6 +1444,9 @@ class Configuration implements ConfigurationInterface
                                         ->example('"messenger.default_bus" to send early expiration events to the default Messenger bus.')
                                     ->end()
                                     ->scalarNode('clearer')->end()
+                                    ->scalarNode('marshaller')
+                                        ->info('The marshaller service to use for this pool.')
+                                    ->end()
                                 ->end()
                             ->end()
                             ->validate()
@@ -1505,6 +1548,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1571,6 +1617,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addSemaphoreSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1626,6 +1675,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1638,6 +1690,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addMessengerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1660,36 +1715,22 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->ifArray()
                                 ->then(static function ($config) {
-                                    // If XML config with only one routing attribute
-                                    if (2 === \count($config) && isset($config['message-class']) && isset($config['sender'])) {
-                                        $config = [0 => $config];
-                                    }
-
                                     $newConfig = [];
                                     foreach ($config as $k => $v) {
-                                        if (!\is_int($k)) {
-                                            $newConfig[$k] = [
-                                                'senders' => $v['senders'] ?? (\is_array($v) ? array_values($v) : [$v]),
-                                            ];
-                                        } else {
-                                            $newConfig[$v['message-class']]['senders'] = array_map(
-                                                static fn ($a) => \is_string($a) ? $a : $a['service'],
-                                                array_values($v['sender'])
-                                            );
+                                        if (isset($v['senders'])) {
+                                            trigger_deprecation('symfony/framework-bundle', '8.1', 'Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
                                         }
+                                        $newConfig[$k] = $v['senders'] ?? (\is_array($v) ? array_values($v) : [$v]);
                                     }
 
                                     return $newConfig;
                                 })
                             ->end()
-                            ->prototype('array')
+                            ->arrayPrototype()
+                                ->requiresAtLeastOneElement()
+                                ->acceptAndWrap(['string'])
                                 ->performNoDeepMerging()
-                                ->children()
-                                    ->arrayNode('senders')
-                                        ->requiresAtLeastOneElement()
-                                        ->prototype('scalar')->end()
-                                    ->end()
-                                ->end()
+                                ->scalarPrototype()->end()
                             ->end()
                         ->end()
                         ->arrayNode('serializer')
@@ -1723,6 +1764,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('dsn')->end()
                                     ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
                                     ->arrayNode('options', 'option')
+                                        ->useAttributeAsKey('key')
                                         ->normalizeKeys(false)
                                         ->defaultValue([])
                                         ->prototype('variable')
@@ -1856,6 +1898,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addSchedulerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1881,6 +1926,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addHttpClientSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2029,7 +2077,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('mock_response_factory')
-                            ->info('The id of the service that should generate mock responses. It should be either an invokable or an iterable.')
+                            ->info('`true` to always return empty 200 responses, or the id of the service to use to generate mock responses - which should be either an invokable or an iterable.')
                         ->end()
                         ->arrayNode('scoped_clients', 'scoped_client')
                             ->useAttributeAsKey('name')
@@ -2161,6 +2209,9 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('crypto_method')
                                         ->info('The minimum version of TLS to accept; must be one of STREAM_CRYPTO_METHOD_TLSv*_CLIENT constants.')
                                     ->end()
+                                    ->scalarNode('mock_response_factory')
+                                        ->info('`true` to always return empty 200 responses, `false` to disable mocking, or the id of the service to use to generate mock responses (invokable or iterable).')
+                                    ->end()
                                     ->arrayNode('extra')
                                         ->info('Extra options for specific HTTP client.')
                                         ->useAttributeAsKey('name')
@@ -2202,9 +2253,17 @@ class Configuration implements ConfigurationInterface
                         ->defaultTrue()
                     ->end()
                     ->integerNode('max_ttl')
-                        ->info('The maximum TTL (in seconds) allowed for cached responses. Null means no cap.')
-                        ->defaultNull()
-                        ->min(0)
+                        ->info('The maximum TTL (in seconds) allowed for cached responses.')
+                        ->defaultValue(86400)
+                        ->min(1)
+                        ->beforeNormalization()
+                            ->ifNull()
+                            ->then(static function () {
+                                trigger_deprecation('symfony/framework-bundle', '8.1', 'Setting "framework.http_client.default_options.caching.max_ttl" to "null" is deprecated, use a positive integer instead.');
+
+                                return 86400;
+                            })
+                        ->end()
                     ->end()
                 ->end();
     }
@@ -2279,6 +2338,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addMailerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2421,6 +2483,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addNotifierSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2460,6 +2525,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addWebhookSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2469,6 +2537,10 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/webhook', WebhookController::class)}()
                     ->children()
                         ->scalarNode('message_bus')->defaultValue('messenger.default_bus')->info('The message bus to use.')->end()
+                        ->scalarNode('event_header_name')->defaultValue('Webhook-Event')->end()
+                        ->scalarNode('id_header_name')->defaultValue('Webhook-Id')->end()
+                        ->scalarNode('signature_header_name')->defaultValue('Webhook-Signature')->end()
+                        ->scalarNode('signing_algorithm')->defaultValue('sha256')->end()
                         ->arrayNode('routing')
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('type')
@@ -2489,6 +2561,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2501,6 +2576,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addRateLimiterSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2564,10 +2642,22 @@ class Configuration implements ConfigurationInterface
                                             ->integerNode('amount')->info('Amount of tokens to add each interval.')->defaultValue(1)->end()
                                         ->end()
                                     ->end()
+                                    ->scalarNode('anchor_at')
+                                        ->info('Aligns the "fixed_window" policy to a calendar (e.g. "2024-01-05 00:00:00 UTC" combined with `interval: 1 month` resets the counter on the 5th of each month). UTC if not specified.')
+                                        ->defaultNull()
+                                    ->end()
                                 ->end()
                                 ->validate()
                                     ->ifTrue(static fn ($v) => !\in_array($v['policy'], ['no_limit', 'compound'], true) && !isset($v['limit']))
                                     ->thenInvalid('A limit must be provided when using a policy different than "compound" or "no_limit".')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => isset($v['anchor_at']) && 'fixed_window' !== $v['policy'])
+                                    ->thenInvalid('The "anchor_at" option is only supported with the "fixed_window" policy.')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => isset($v['anchor_at']) && isset($v['interval']) && !preg_match('/\b(months?|years?)\b/i', $v['interval']))
+                                    ->thenInvalid('The "anchor_at" option requires an "interval" of at least one month.')
                                 ->end()
                             ->end()
                         ->end()
@@ -2577,6 +2667,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2604,12 +2697,19 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('time_based_uuid_node')
                             ->cannotBeEmpty()
                         ->end()
+                        ->scalarNode('uuid47_secret')
+                            ->info('A high-entropy secret used by the "uuid47_transformer" service. Defaults to "kernel.secret".')
+                            ->defaultNull()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addHtmlSanitizerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2746,6 +2846,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addJsonStreamerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode

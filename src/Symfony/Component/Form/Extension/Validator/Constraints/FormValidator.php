@@ -29,6 +29,9 @@ class FormValidator extends ConstraintValidator
      */
     private \SplObjectStorage $resolvedGroups;
 
+    /**
+     * @psalm-suppress ParamNameMismatch
+     */
     public function validate(mixed $form, Constraint $formConstraint): void
     {
         if (!$formConstraint instanceof Form) {
@@ -243,6 +246,8 @@ class FormValidator extends ConstraintValidator
      * Post-processes the validation groups option for a given form.
      *
      * @param string|GroupSequence|array<string|GroupSequence>|callable $groups The validation groups
+     *
+     * @param-immediately-invoked-callable $groups
      *
      * @return GroupSequence|array<string|GroupSequence>
      */

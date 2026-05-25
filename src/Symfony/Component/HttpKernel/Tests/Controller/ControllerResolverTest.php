@@ -200,7 +200,7 @@ class ControllerResolverTest extends TestCase
             // expected
         }
 
-        $resolver->allowControllers(types: [ControllerTest::class]);
+        $resolver->allowControllers([ControllerTest::class]);
 
         $this->assertSame([$controller, 'publicAction'], $resolver->getController($request));
 
@@ -224,7 +224,7 @@ class ControllerResolverTest extends TestCase
             // expected
         }
 
-        $resolver->allowControllers(attributes: [DummyController::class]);
+        $resolver->allowControllers([], [DummyController::class]);
 
         $this->assertSame($controller, $resolver->getController($request));
 

@@ -13,6 +13,8 @@ namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Filesystem\Exception\InvalidArgumentException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Path;
@@ -1182,18 +1184,18 @@ class FilesystemTest extends FilesystemTestCase
             ['/aa/bb/../../cc', '/aa/../dd/..', 'cc/'],
             ['/../aa/bb/cc', '/aa/dd/..', 'bb/cc/'],
             ['/../../aa/../bb/cc', '/aa/dd/..', '../bb/cc/'],
-            ['C:/aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'],
-            ['C:/aa/bb/cc', 'c:/aa/dd/..', 'bb/cc/'],
-            ['c:/aa/../bb/cc', 'c:/aa/dd/..', '../bb/cc/'],
-            ['C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'],
-            ['C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'],
-            ['C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'],
-            ['D:/', 'C:/aa/../bb/cc', 'D:/'],
-            ['D:/aa/bb', 'C:/aa', 'D:/aa/bb/'],
-            ['D:/../../aa/../bb/cc', 'C:/aa/dd/..', 'D:/bb/cc/'],
         ];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
+            $paths[] = ['C:/aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'];
+            $paths[] = ['C:/aa/bb/cc', 'c:/aa/dd/..', 'bb/cc/'];
+            $paths[] = ['c:/aa/../bb/cc', 'c:/aa/dd/..', '../bb/cc/'];
+            $paths[] = ['C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'];
+            $paths[] = ['C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'];
+            $paths[] = ['C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'];
+            $paths[] = ['D:/', 'C:/aa/../bb/cc', 'D:/'];
+            $paths[] = ['D:/aa/bb', 'C:/aa', 'D:/aa/bb/'];
+            $paths[] = ['D:/../../aa/../bb/cc', 'C:/aa/dd/..', 'D:/bb/cc/'];
             $paths[] = ['c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/'];
         }
 
@@ -1212,6 +1214,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The end path "var/lib/symfony/" is not absolute.');
         $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', '/var/lib/symfony/src/Symfony/Component'));
+    }
+
+    public function testMakePathRelativeWithExistingFile()
+    {
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar';
+        mkdir($dir, 0o777, true);
+        $file = $dir.\DIRECTORY_SEPARATOR.'test.txt';
+        touch($file);
+
+        // File path must not get a trailing slash
+        $this->assertSame('foo/bar/test.txt', $this->filesystem->makePathRelative($file, $this->workspace));
+        // Directory path must still get a trailing slash
+        $this->assertSame('foo/bar/', $this->filesystem->makePathRelative($dir, $this->workspace));
     }
 
     public function testMirrorCopiesFilesAndDirectoriesRecursively()
@@ -1282,6 +1297,69 @@ class FilesystemTest extends FilesystemTestCase
         $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
 
         $this->filesystem->mirror($sourcePath, $targetPath);
+
+        $this->assertDirectoryExists($targetPath);
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
+        $this->assertTrue(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
+    }
+
+    public function testMirrorCopiesLinksByFollowingSymlinks()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        file_put_contents($sourcePath.'file1', 'FILE1');
+        symlink($sourcePath.'file1', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['follow_symlinks' => true]);
+
+        $this->assertDirectoryExists($targetPath);
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
+        $this->assertFalse(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testMirrorCopyOnWindowsOptionTriggersDeprecation()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $this->expectUserDeprecationMessage('Since symfony/filesystem 8.1: Calling "Symfony\Component\Filesystem\Filesystem::mirror()" with option "copy_on_windows" is deprecated, use option "follow_symlinks" instead.');
+
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        file_put_contents($sourcePath.'file1', 'FILE1');
+        symlink($sourcePath.'file1', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['copy_on_windows' => true]);
+
+        $this->assertDirectoryExists($targetPath);
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
+        $this->assertFalse(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testMirrorFollowSymlinksOverridesCopyOnWindows()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        file_put_contents($sourcePath.'file1', 'FILE1');
+        symlink($sourcePath.'file1', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['follow_symlinks' => false, 'copy_on_windows' => true]);
 
         $this->assertDirectoryExists($targetPath);
         $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
@@ -1436,14 +1514,19 @@ class FilesystemTest extends FilesystemTestCase
 
     public static function providePathsForIsAbsolutePath()
     {
-        return [
+        $paths = [
             ['/var/lib', true],
-            ['c:\\\\var\\lib', true],
-            ['\\var\\lib', true],
             ['var/lib', false],
             ['../var/lib', false],
             ['', false],
         ];
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $paths[] = ['c:\\\\var\\lib', true];
+            $paths[] = ['\\var\\lib', true];
+        }
+
+        return $paths;
     }
 
     public function testTempnam()
@@ -1872,7 +1955,22 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->copy($sourceFilePath, $targetFilePath);
 
-        $this->assertFilePermissions(767, $targetFilePath);
+        $this->assertFilePermissions(745, $targetFilePath);
+    }
+
+    public function testCopyShouldKeepRestrictivePermissions()
+    {
+        $this->markAsSkippedIfChmodIsMissing();
+
+        $sourceFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_source_file';
+        $targetFilePath = $this->workspace.\DIRECTORY_SEPARATOR.'copy_target_file';
+
+        file_put_contents($sourceFilePath, 'SOURCE FILE');
+        chmod($sourceFilePath, 0o600);
+
+        $this->filesystem->copy($sourceFilePath, $targetFilePath);
+
+        $this->assertFilePermissions(600, $targetFilePath);
     }
 
     public function testDumpToProtectedDirectory()

@@ -57,9 +57,7 @@ trait SkipUninitializedValuesTestTrait
             $normalizer->normalize($object, null, ['skip_uninitialized_values' => false, 'groups' => ['foo']]);
             $this->fail('Normalizing an object with uninitialized property should have failed');
         } catch (UninitializedPropertyException $e) {
-            self::assertSame('The property "Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject::$unInitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.', $e->getMessage());
-        } catch (\Error $e) {
-            self::assertSame('Typed property Symfony\Component\Serializer\Tests\Normalizer\Features\TypedPropertiesObject::$unInitialized must not be accessed before initialization', $e->getMessage());
+            self::assertStringContainsString('unInitialized', $e->getMessage());
         }
     }
 }

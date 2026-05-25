@@ -96,4 +96,14 @@ class TraceableWorkflowTest extends TestCase
 
         yield ['getEnabledTransition', [$subject, 'foo'], null];
     }
+
+    public function testReset()
+    {
+        $this->innerWorkflow->expects($this->once())->method('can')->willReturn(true);
+        $this->traceableWorkflow->can(new \stdClass(), 'foo');
+        $this->assertCount(1, $this->traceableWorkflow->getCalls());
+
+        $this->traceableWorkflow->reset();
+        $this->assertCount(0, $this->traceableWorkflow->getCalls());
+    }
 }

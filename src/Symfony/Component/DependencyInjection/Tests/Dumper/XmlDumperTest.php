@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -284,6 +285,20 @@ class XmlDumperTest extends TestCase
 
         $dumper = new XmlDumper($container);
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_service_closure.xml', $dumper->dump());
+    }
+
+    public function testEnvClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new EnvClosureArgument('%env(FOO)%'))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', null, true))
+            ->addArgument(new EnvClosureArgument('%env(BAR)%', 'def', true))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', 42))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_env_closure.xml', $dumper->dump());
     }
 
     public function testDumpAbstractServices()

@@ -39,6 +39,7 @@ final class CustomUser implements UserInterface, PasswordAuthenticatedUserInterf
         return $this->password ?? null;
     }
 
+    #[\Deprecated]
     public function eraseCredentials(): void
     {
     }

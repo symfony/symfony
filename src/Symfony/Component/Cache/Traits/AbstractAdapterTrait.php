@@ -127,6 +127,10 @@ trait AbstractAdapterTrait
                 $this->namespaceVersion = $namespaceVersion;
                 $this->ids = [];
             }
+        } elseif (preg_match('#[^-+.:_A-Za-z0-9]#', $prefix)) {
+            CacheItem::log($this->logger, 'Failed to clear the cache: Namespace-prefix contains invalid characters.', ['cache-adapter' => get_debug_type($this)]);
+
+            return false;
         } else {
             $namespaceToClear = $this->namespace.$prefix;
         }

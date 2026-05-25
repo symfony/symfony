@@ -43,14 +43,14 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Country());
+        $this->validate(null, new Country());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Country());
+        $this->validate('', new Country());
 
         $this->assertNoViolation();
     }
@@ -58,13 +58,13 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Country());
+        $this->validate(new \stdClass(), new Country());
     }
 
     #[DataProvider('getValidCountries')]
     public function testValidCountries($country)
     {
-        $this->validator->validate($country, new Country());
+        $this->validate($country, new Country());
 
         $this->assertNoViolation();
     }
@@ -83,7 +83,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Country(message: 'myMessage');
 
-        $this->validator->validate($country, $constraint);
+        $this->validate($country, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$country.'"')
@@ -102,7 +102,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidAlpha3Countries')]
     public function testValidAlpha3Countries($country)
     {
-        $this->validator->validate($country, new Country(alpha3: true));
+        $this->validate($country, new Country(alpha3: true));
 
         $this->assertNoViolation();
     }
@@ -124,7 +124,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($country, $constraint);
+        $this->validate($country, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$country.'"')
@@ -144,7 +144,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidAlpha3CountryNamed()
     {
-        $this->validator->validate(
+        $this->validate(
             'DE',
             new Country(alpha3: true, message: 'myMessage')
         );
@@ -164,7 +164,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
 
         $existingCountry = 'GB';
 
-        $this->validator->validate($existingCountry, new Country());
+        $this->validate($existingCountry, new Country());
 
         $this->assertNoViolation();
     }

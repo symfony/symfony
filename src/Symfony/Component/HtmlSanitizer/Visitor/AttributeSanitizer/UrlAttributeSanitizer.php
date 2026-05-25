@@ -27,12 +27,12 @@ final class UrlAttributeSanitizer implements AttributeSanitizerInterface
 
     public function getSupportedAttributes(): ?array
     {
-        return ['src', 'href', 'lowsrc', 'background', 'ping'];
+        return ['src', 'href', 'lowsrc', 'background', 'ping', 'action', 'formaction', 'poster', 'cite'];
     }
 
     public function sanitizeAttribute(string $element, string $attribute, string $value, HtmlSanitizerConfig $config): ?string
     {
-        if ('a' === $element) {
+        if (\in_array($element, ['a', 'area'], true) || \in_array($attribute, ['action', 'formaction', 'cite'], true)) {
             return UrlSanitizer::sanitize(
                 $value,
                 $config->getAllowedLinkSchemes(),

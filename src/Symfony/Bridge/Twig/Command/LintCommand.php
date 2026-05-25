@@ -75,6 +75,7 @@ class LintCommand extends Command
                 The <info>--format</info> option specifies the format of the command output:
 
                   <info>php %command.full_name% dirname --format=json</info>
+
                 EOF
             )
         ;

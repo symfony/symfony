@@ -67,22 +67,34 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
             if ($exception instanceof PartialDenormalizationException) {
                 $trans = $this->translator ? $this->translator->trans(...) : static fn ($m, $p) => strtr($m, $p);
                 $template = 'This value should be of type {{ type }}.';
+                $violations = array_map(
+                    static fn ($e) => [
+                        'propertyPath' => $e->getPath(),
+                        'title' => $trans($template, [
+                            '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
+                        ], 'validators'),
+                        'template' => $template,
+                        'parameters' => [
+                            '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
+                        ],
+                    ] + ($debug || $e->canUseMessageForUser() ? ['hint' => $e->getMessage()] : []),
+                    $exception->getNotNormalizableValueErrors()
+                );
+                if (null !== $extraAttributesError = $exception->getExtraAttributesError()) {
+                    $extraTemplate = 'This attribute was not expected.';
+                    foreach ($extraAttributesError->getExtraAttributes() as $extraAttribute) {
+                        $violations[] = [
+                            'propertyPath' => $extraAttribute,
+                            'title' => $trans($extraTemplate, [], 'validators'),
+                            'template' => $extraTemplate,
+                            'parameters' => [],
+                        ];
+                    }
+                }
                 $error = [
                     self::TYPE => 'https://symfony.com/errors/validation',
                     self::TITLE => 'Validation Failed',
-                    'violations' => array_map(
-                        static fn ($e) => [
-                            'propertyPath' => $e->getPath(),
-                            'title' => $trans($template, [
-                                '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
-                            ], 'validators'),
-                            'template' => $template,
-                            'parameters' => [
-                                '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
-                            ],
-                        ] + ($debug || $e->canUseMessageForUser() ? ['hint' => $e->getMessage()] : []),
-                        $exception->getErrors()
-                    ),
+                    'violations' => $violations,
                 ];
                 $error['detail'] = implode("\n", array_map(static fn ($e) => $e['propertyPath'].': '.$e['title'], $error['violations']));
             } elseif (($exception instanceof ValidationFailedException || $exception instanceof MessageValidationFailedException)

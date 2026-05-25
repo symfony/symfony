@@ -50,7 +50,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Invalid timestamp.');
         }
         $expectedSignature = $this->sign($eventID, $timestamp, $request->getContent(), $secret);
-        if ($signature !== $expectedSignature) {
+        if (!hash_equals($expectedSignature, $signature)) {
             throw new RejectWebhookException(406, 'Invalid signature');
         }
         if (!isset($payload['type']) || !isset($payload['timestamp']) || !(isset($payload['data']))) {

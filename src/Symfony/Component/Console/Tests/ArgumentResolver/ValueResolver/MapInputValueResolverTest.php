@@ -20,10 +20,12 @@ use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
+use Symfony\Component\Console\Exception\InputValidationFailedException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Validator\Validation;
 
 class MapInputValueResolverTest extends TestCase
 {
@@ -122,6 +124,139 @@ class MapInputValueResolverTest extends TestCase
         $this->assertSame('2024-01-15', $result[0]->createdAt->format('Y-m-d'));
         $this->assertSame(DummyStatus::Active, $result[0]->status);
     }
+
+    public function testValidationPassesWithValidInput()
+    {
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+        $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver(), $validator);
+
+        $input = new ArrayInput(['username' => 'john', '--email' => 'john@example.com'], new InputDefinition([
+            new InputArgument('username'),
+            new InputOption('email'),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[MapInput]
+                DummyValidatedInput $input,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $member = new ReflectionMember($reflection->getParameters()[0]);
+
+        $result = $resolver->resolve('input', $input, $member);
+
+        $this->assertCount(1, $result);
+        $this->assertSame('john', $result[0]->username);
+        $this->assertSame('john@example.com', $result[0]->email);
+    }
+
+    public function testValidationFailsWithInvalidInput()
+    {
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+        $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver(), $validator);
+
+        $input = new ArrayInput(['username' => '', '--email' => 'not-an-email'], new InputDefinition([
+            new InputArgument('username'),
+            new InputOption('email'),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[MapInput]
+                DummyValidatedInput $input,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $member = new ReflectionMember($reflection->getParameters()[0]);
+
+        try {
+            $resolver->resolve('input', $input, $member);
+            $this->fail('Expected InputValidationFailedException was not thrown.');
+        } catch (InputValidationFailedException $e) {
+            $this->assertGreaterThan(0, \count($e->getViolations()));
+            $this->assertStringContainsString('username:', $e->getMessage());
+            $this->assertStringContainsString('--email:', $e->getMessage());
+            $this->assertStringNotContainsString('Object(', $e->getMessage());
+        }
+    }
+
+    public function testValidationSkippedWhenNoValidator()
+    {
+        $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver());
+
+        $input = new ArrayInput(['username' => '', '--email' => 'not-an-email'], new InputDefinition([
+            new InputArgument('username'),
+            new InputOption('email'),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[MapInput]
+                DummyValidatedInput $input,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $member = new ReflectionMember($reflection->getParameters()[0]);
+
+        $result = $resolver->resolve('input', $input, $member);
+
+        $this->assertCount(1, $result);
+        $this->assertSame('', $result[0]->username);
+    }
+
+    public function testValidationWithGroupsSkipsNonMatchingConstraints()
+    {
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+        $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver(), $validator);
+
+        $input = new ArrayInput(['username' => '', '--email' => 'john@example.com'], new InputDefinition([
+            new InputArgument('username'),
+            new InputOption('email'),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[MapInput(validationGroups: ['strict'])]
+                DummyGroupValidatedInput $input,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $member = new ReflectionMember($reflection->getParameters()[0]);
+
+        $result = $resolver->resolve('input', $input, $member);
+
+        $this->assertCount(1, $result);
+        $this->assertSame('', $result[0]->username);
+    }
+
+    public function testValidationWithGroupsEnforcesMatchingConstraints()
+    {
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+        $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver(), $validator);
+
+        $input = new ArrayInput(['username' => '', '--email' => 'not-an-email'], new InputDefinition([
+            new InputArgument('username'),
+            new InputOption('email'),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[MapInput(validationGroups: ['strict'])]
+                DummyGroupValidatedInput $input,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $member = new ReflectionMember($reflection->getParameters()[0]);
+
+        $this->expectException(InputValidationFailedException::class);
+        $resolver->resolve('input', $input, $member);
+    }
 }
 
 class DummyInput
@@ -147,4 +282,26 @@ enum DummyStatus: string
     case Pending = 'pending';
     case Active = 'active';
     case Inactive = 'inactive';
+}
+
+class DummyValidatedInput
+{
+    #[Argument]
+    #[\Symfony\Component\Validator\Constraints\NotBlank]
+    public string $username;
+
+    #[Option]
+    #[\Symfony\Component\Validator\Constraints\Email]
+    public ?string $email = null;
+}
+
+class DummyGroupValidatedInput
+{
+    #[Argument]
+    #[\Symfony\Component\Validator\Constraints\NotBlank]
+    public string $username;
+
+    #[Option]
+    #[\Symfony\Component\Validator\Constraints\Email(groups: ['strict'])]
+    public ?string $email = null;
 }

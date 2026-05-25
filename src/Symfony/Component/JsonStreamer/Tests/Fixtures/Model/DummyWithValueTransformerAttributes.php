@@ -4,8 +4,8 @@ namespace Symfony\Component\JsonStreamer\Tests\Fixtures\Model;
 
 use Symfony\Component\JsonStreamer\Attribute\ValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Attribute\BooleanStringValueTransformer;
-use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DivideStringAndCastToIntValueTransformer;
-use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DoubleIntAndCastToStringValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DivideStringAndCastToIntValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DoubleIntAndCastToStringValueTransformer;
 
 class DummyWithValueTransformerAttributes
 {

@@ -6,14 +6,14 @@ if (!file_exists(__DIR__.'/vendor/symfony/phpunit-bridge/bin/simple-phpunit')) {
     exit(1);
 }
 if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
-    if (\PHP_VERSION_ID >= 80300) {
-        putenv('SYMFONY_PHPUNIT_VERSION=12');
+    putenv('SYMFONY_PHPUNIT_VERSION=13');
 
-        if (!in_array('--fail-on-phpunit-notice', $_SERVER['argv'], true) && !in_array('--do-not-fail-on-phpunit-notice', $_SERVER['argv'], true)) {
-            $_SERVER['argv'][] = '--fail-on-phpunit-notice';
-        }
-    } else {
-        putenv('SYMFONY_PHPUNIT_VERSION=11.5');
+    if (!in_array('--fail-on-empty-test-suite', $_SERVER['argv'], true) && !in_array('--do-not-fail-on-empty-test-suite', $_SERVER['argv'], true)) {
+        $_SERVER['argv'][] = '--do-not-fail-on-empty-test-suite';
+    }
+
+    if (!in_array('--fail-on-phpunit-notice', $_SERVER['argv'], true) && !in_array('--do-not-fail-on-phpunit-notice', $_SERVER['argv'], true)) {
+        $_SERVER['argv'][] = '--fail-on-phpunit-notice';
     }
 }
 if (!getenv('SYMFONY_PATCH_TYPE_DECLARATIONS')) {

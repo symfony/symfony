@@ -24,6 +24,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButtonBuilder;
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -62,7 +63,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -88,7 +89,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->expectValidateValueAt(1, 'data', $object, [$constraint1], 'group1');
         $this->expectValidateValueAt(2, 'data', $object, [$constraint2, $constraint3], 'group2');
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -111,7 +112,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -135,7 +136,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -148,7 +149,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['Default']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -174,7 +175,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->expectValidateValueAt(0, 'data', $object, [$constraint1], 'group1');
         $this->expectValidateValueAt(1, 'data', $object, [$constraint2], 'group2');
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -198,7 +199,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -222,7 +223,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -246,7 +247,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -276,7 +277,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertFalse($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
@@ -313,7 +314,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertFalse($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
@@ -346,7 +347,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->buildViolation('invalid_message_key')
             ->setParameter('{{ value }}', 'foo')
@@ -382,7 +383,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->buildViolation('safe message to be used')
             ->setParameters([
@@ -407,7 +408,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->expectValidateAt(0, 'data', $object, 'group1');
         $this->expectValidateAt(1, 'data', $object, 'group2');
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -421,7 +422,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -435,7 +436,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['header']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -449,7 +450,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -476,7 +477,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['button_group']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -503,7 +504,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['form_group']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -524,7 +525,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -545,7 +546,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -568,7 +569,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['group1', 'group2']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -581,7 +582,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateAt(0, 'data', $object, ['Default']);
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -597,7 +598,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue($form->isSynchronized());
         $this->expectNoValidate();
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->assertNoViolation();
     }
@@ -617,7 +618,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->buildViolation('Extra!|Extras!')
             ->setParameter('{{ extra_fields }}', '"foo"')
@@ -642,7 +643,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, 'children[child]', $form->get('child'), new Form());
 
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
         $this->buildViolation('Extra!|Extras!!')
             ->setParameter('{{ extra_fields }}', '"foo", "baz", "quux"')
@@ -661,14 +662,13 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->add($this->getBuilder('child'))
             ->getForm();
 
-        $context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
+        $this->context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
 
         $form->submit(['foo' => 'bar']);
 
-        $this->validator->initialize($context);
-        $this->validator->validate($form, new Form());
+        $this->validate($form, new Form());
 
-        $this->assertCount(0, $context->getViolations());
+        $this->assertCount(0, $this->context->getViolations());
     }
 
     /**
@@ -692,14 +692,13 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             'extra_data' => 'foo',
         ]);
 
-        $context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
+        $this->context = new ExecutionContext(Validation::createValidator(), $form, new IdentityTranslator());
         $constraint = new Form();
 
-        $this->validator->initialize($context);
-        $this->validator->validate($form, $constraint);
+        $this->validate($form, $constraint);
 
-        $this->assertCount(1, $context->getViolations());
-        $this->assertSame($constraint, $context->getViolations()->get(0)->getConstraint());
+        $this->assertCount(1, $this->context->getViolations());
+        $this->assertSame($constraint, $this->context->getViolations()->get(0)->getConstraint());
     }
 
     protected function createValidator(): FormValidator
@@ -736,5 +735,16 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $builder = new SubmitButtonBuilder($name, $options);
 
         return $builder->getForm();
+    }
+
+    // TODO remove this in Symfony 9.0 (or earlier, when dropping support for symfony/validator < 8.1)
+    protected function validate(mixed $value, Constraint $constraint): void
+    {
+        if (method_exists(parent::class, 'validate')) {
+            parent::validate($value, $constraint);
+        } else {
+            $this->validator->initialize($this->context);
+            $this->validator->validate($value, $constraint);
+        }
     }
 }

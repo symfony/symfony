@@ -117,6 +117,10 @@ final class ServerLogHandler extends AbstractProcessingHandler
             }
         }
 
+        if (isset($recordFormatted['datetime']) && $recordFormatted['datetime'] instanceof \DateTimeInterface) {
+            $recordFormatted['datetime'] = $recordFormatted['datetime']->format('Y-m-d\TH:i:s.uP');
+        }
+
         return base64_encode(serialize($recordFormatted))."\n";
     }
 }

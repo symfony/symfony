@@ -132,6 +132,47 @@ class PostmarkApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
+    public function testSendThrowsForRequestSizeLimitExceededResponse()
+    {
+        // Postmark returns this alternate payload shape (lowercase "message",
+        // no "ErrorCode") when the request exceeds the service-wide size limit.
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse([
+            'message' => 'Request size limit exceeded',
+            'request_id' => 'abc-123',
+        ], ['http_code' => 413]));
+        $transport = new PostmarkApiTransport('KEY', $client);
+        $transport->setPort(8984);
+
+        $mail = (new Email())
+            ->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email: Request size limit exceeded (code 0).');
+        $transport->send($mail);
+    }
+
+    public function testSendThrowsWithStatusCodeFallbackWhenResponseHasNoMessage()
+    {
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse([
+            'request_id' => 'abc-123',
+        ], ['http_code' => 502]));
+        $transport = new PostmarkApiTransport('KEY', $client);
+        $transport->setPort(8984);
+
+        $mail = (new Email())
+            ->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Unable to send an email: HTTP 502 (code 0).');
+        $transport->send($mail);
+    }
+
     public function testSendDeliveryEventIsDispatched()
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['Message' => 'Inactive recipient', 'ErrorCode' => 406], [

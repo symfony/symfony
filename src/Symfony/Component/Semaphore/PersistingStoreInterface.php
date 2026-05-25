@@ -37,6 +37,14 @@ interface PersistingStoreInterface
 
     /**
      * Returns whether or not the resource exists in the storage.
+     *
+     * Implementations may have side effects on the {@see Key}'s opaque state
+     * (e.g. dropping references to slots that were lost on the backend) and
+     * may issue more than one backend round-trip. Callers in hot paths or
+     * destructors should expect O(weight) cost on stores that track each
+     * slot individually (see {@see Store\LockStore})
+     * versus O(1) on stores that maintain a single token per key (see
+     * {@see Store\RedisStore}).
      */
     public function exists(Key $key): bool;
 

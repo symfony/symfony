@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'houa fakaʻeulope-loto (Büsingen)',
         'Europe/Chisinau' => 'houa fakaʻeulope-hahake (Chișinău)',
         'Europe/Copenhagen' => 'houa fakaʻeulope-loto (Copenhagen)',
-        'Europe/Dublin' => 'Taimi ʻAealani (Dublin)',
+        'Europe/Dublin' => 'houa fakakiliniuisi mālie (Dublin)',
         'Europe/Gibraltar' => 'houa fakaʻeulope-loto (Gibraltar)',
         'Europe/Guernsey' => 'houa fakakiliniuisi mālie (Guernsey)',
         'Europe/Helsinki' => 'houa fakaʻeulope-hahake (Helsinki)',

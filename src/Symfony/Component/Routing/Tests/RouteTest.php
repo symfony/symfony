@@ -18,6 +18,18 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\Tests\Fixtures\CustomCompiledRoute;
 use Symfony\Component\Routing\Tests\Fixtures\CustomRouteCompiler;
 
+class RouteTestToStringGadget
+{
+    public static bool $fired = false;
+
+    public function __toString(): string
+    {
+        self::$fired = true;
+
+        return '';
+    }
+}
+
 class RouteTest extends TestCase
 {
     public function testConstructor()
@@ -223,6 +235,43 @@ class RouteTest extends TestCase
 
         $this->assertEquals($route, $unserialized);
         $this->assertNotSame($route, $unserialized);
+    }
+
+    #[DataProvider('provideTrampolineProperties')]
+    public function testUnserializeRejectsObjectInTypedScalarProperty(string $property)
+    {
+        $data = [
+            'path' => '/',
+            'host' => '',
+            'defaults' => [],
+            'requirements' => [],
+            'options' => [],
+            'schemes' => [],
+            'methods' => [],
+            'condition' => '',
+        ];
+        $data[$property] = new RouteTestToStringGadget();
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(Route::class), Route::class, \count($data));
+        foreach ($data as $key => $value) {
+            $payload .= serialize($key).serialize($value);
+        }
+        $payload .= '}';
+        RouteTestToStringGadget::$fired = false;
+
+        try {
+            unserialize($payload);
+            $this->fail('Expected BadMethodCallException.');
+        } catch (\BadMethodCallException $e) {
+        }
+
+        $this->assertFalse(RouteTestToStringGadget::$fired, '__toString gadget must not fire during unserialize');
+    }
+
+    public static function provideTrampolineProperties(): iterable
+    {
+        yield ['path'];
+        yield ['host'];
+        yield ['condition'];
     }
 
     #[DataProvider('provideInlineDefaultAndRequirementCases')]

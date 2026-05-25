@@ -20,7 +20,7 @@ class RunProcessMessageHandlerTest extends TestCase
 {
     public function testRunSuccessfulProcess()
     {
-        $context = (new RunProcessMessageHandler())(new RunProcessMessage(['ls'], cwd: __DIR__));
+        $context = (new RunProcessMessageHandler())(new RunProcessMessage(['ls'], __DIR__));
 
         $this->assertSame(['ls'], $context->message->command);
         $this->assertSame(0, $context->exitCode);
@@ -47,7 +47,7 @@ class RunProcessMessageHandlerTest extends TestCase
 
     public function testRunSuccessfulProcessFromShellCommandline()
     {
-        $context = (new RunProcessMessageHandler())(RunProcessMessage::fromShellCommandline('ls | grep Test', cwd: __DIR__));
+        $context = (new RunProcessMessageHandler())(RunProcessMessage::fromShellCommandline('ls | grep Test', __DIR__));
 
         $this->assertSame('ls | grep Test', $context->message->commandLine);
         $this->assertSame(0, $context->exitCode);

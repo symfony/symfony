@@ -206,10 +206,10 @@ class SecurityDataCollectorTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $firewallMap
-            ->expects($this->any())
             ->method('getFirewallConfig')
-            ->with($request)
-            ->willReturn(null);
+            ->willReturnMap([
+                [$request, null],
+            ]);
         $firewallMap
             ->expects($this->once())
             ->method('getListeners')

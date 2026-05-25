@@ -26,14 +26,14 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Isin());
+        $this->validate(null, new Isin());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Isin());
+        $this->validate('', new Isin());
 
         $this->assertNoViolation();
     }
@@ -41,7 +41,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIsin')]
     public function testValidIsin($isin)
     {
-        $this->validator->validate($isin, new Isin());
+        $this->validate($isin, new Isin());
         $this->expectViolationsAt(0, $isin, new Luhn());
         $this->assertNoViolation();
     }
@@ -125,7 +125,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Isin(message: 'myMessage');
 
-        $this->validator->validate($isin, $constraint);
+        $this->validate($isin, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$isin.'"')

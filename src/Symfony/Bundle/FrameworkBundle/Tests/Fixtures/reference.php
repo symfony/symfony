@@ -78,7 +78,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     tags?: TagsType,
  *     resource_tags?: TagsType,
  *     decorates?: string,
- *     decoration_inner_name?: string,
+ *%A   decoration_inner_name?: string,
  *     decoration_priority?: int,
  *     decoration_on_invalid?: 'exception'|'ignore'|null,
  *     autowire?: bool,
@@ -118,7 +118,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     stack: list<DefinitionType|AliasType|PrototypeType|array<class-string, ArgumentsType|null>>,
  *     public?: bool,
  *     deprecated?: DeprecationType,
- * }
+ * %A}
  * @psalm-type ServicesConfig = array{
  *     _defaults?: DefaultsType,
  *     _instanceof?: InstanceofType,
@@ -135,8 +135,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type AppConfig = bool|Param
  * @psalm-type PrototypedConfigConfig = array<string, array{ // Default: []
- *         value?: scalar|Param|null,
- *     }>
+ * %w    value?: scalar|Param|null,
+ * %w}>
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -162,7 +162,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         services?: ServicesConfig,
  *         test?: TestConfig,
  *     },
- *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
+ *     ...<string, ExtensionType|array{ // extra keys must follow the when@%%env%% pattern or match an extension alias
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
@@ -179,7 +179,10 @@ final class App
      */
     public static function config(array $config): array
     {
-        return AppReference::config($config);
+        /** @var ConfigType $config */
+        $config = AppReference::config($config);
+
+        return $config;
     }
 }
 

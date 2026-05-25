@@ -19,6 +19,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassCont
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasInvokableController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DefaultValueController;
@@ -384,6 +385,22 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame('/path', $route->getPath());
         $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('alias'));
         $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('completely_different_name'));
+    }
+
+    public function testLocalizedRouteWithAliases()
+    {
+        $routes = $this->loader->load(AliasLocalizedRouteController::class);
+        $this->assertCount(2, $routes);
+
+        $routeNl = $routes->get('localized_route.nl_NL');
+        $routeFr = $routes->get('localized_route.fr_FR');
+
+        $this->assertSame('/nl/localized', $routeNl->getPath());
+        $this->assertSame('/fr/localized', $routeFr->getPath());
+
+        $this->assertNull($routes->getAlias('localized_alias'));
+        $this->assertEquals(new Alias('localized_route.nl_NL'), $routes->getAlias('localized_alias.nl_NL'));
+        $this->assertEquals(new Alias('localized_route.fr_FR'), $routes->getAlias('localized_alias.fr_FR'));
     }
 
     public function testThrowsWithAliasesOnClass()

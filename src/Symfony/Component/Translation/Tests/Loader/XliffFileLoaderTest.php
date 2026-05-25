@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Translation\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class XliffFileLoaderTest extends TestCase
 {
@@ -258,6 +260,42 @@ class XliffFileLoaderTest extends TestCase
         $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
     }
 
+    public function testLoadVersion21()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../Fixtures/resources-2.1.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        $this->assertSame([], libxml_get_errors());
+
+        $domains = $catalogue->all();
+        $this->assertCount(3, $domains['domain1']);
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
+
+        // target attributes
+        $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
+    }
+
+    public function testLoadVersion22()
+    {
+        $loader = new XliffFileLoader();
+        $resource = __DIR__.'/../Fixtures/resources-2.2.xlf';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals('en', $catalogue->getLocale());
+        $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
+        $this->assertSame([], libxml_get_errors());
+
+        $domains = $catalogue->all();
+        $this->assertCount(3, $domains['domain1']);
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
+
+        // target attributes
+        $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));
+    }
+
     public function testLoadVersion2WithNoteMeta()
     {
         $loader = new XliffFileLoader();
@@ -386,5 +424,144 @@ class XliffFileLoaderTest extends TestCase
         $this->assertSame('translated', $metadata['segment-attributes']['state']);
         $this->assertArrayHasKey('subState', $metadata['segment-attributes']);
         $this->assertSame('My Value', $metadata['segment-attributes']['subState']);
+    }
+
+    public function testLoadVersion22WithPgsPlural()
+    {
+        $catalogue = new XliffFileLoader()->load(__DIR__.'/../Fixtures/resources-2.2-pgs-plural.xlf', 'fr', 'domain1');
+
+        $intlDomain = 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+
+        $this->assertTrue($catalogue->defines('file_deleted', $intlDomain));
+        $this->assertSame(
+            '{file_count, plural, =0 {Vous n\'avez supprimé aucun fichier.} =1 {Vous avez supprimé un fichier.} other {Vous avez supprimé # fichiers.}}',
+            $catalogue->get('file_deleted', $intlDomain)
+        );
+
+        $this->assertSame('plural:file_count', $catalogue->getMetadata('file_deleted', $intlDomain)['pgs-switch']);
+    }
+
+    public function testLoadVersion22WithPgsGender()
+    {
+        $catalogue = new XliffFileLoader()->load(__DIR__.'/../Fixtures/resources-2.2-pgs-gender.xlf', 'fr', 'domain1');
+
+        $intlDomain = 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+
+        $this->assertTrue($catalogue->defines('party_invite', $intlDomain));
+        $this->assertSame(
+            '{host_gender, select, feminine {Vous êtes invité à sa fête} masculine {Vous êtes invité à sa fête} other {Vous êtes invité à leur fête}}',
+            $catalogue->get('party_invite', $intlDomain)
+        );
+    }
+
+    public function testLoadVersion22WithPgsCombined()
+    {
+        $catalogue = new XliffFileLoader()->load(__DIR__.'/../Fixtures/resources-2.2-pgs-combined.xlf', 'fr', 'domain1');
+
+        $intlDomain = 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+
+        $this->assertTrue($catalogue->defines('party_host', $intlDomain));
+
+        $expected = <<<ICU
+            {host_gender, select, feminine {{guest_count, plural, =0 {{host_name} n'a invité personne à sa fête.} =1 {{host_name} a invité un convive à sa fête.} other {{host_name} a invité # convives à sa fête.}}} masculine {{guest_count, plural, =0 {{host_name} n'a invité personne à sa fête.} =1 {{host_name} a invité un convive à sa fête.} other {{host_name} a invité # convives à sa fête.}}} other {{guest_count, plural, =0 {{host_name} n'a invité personne à leur fête.} =1 {{host_name} a invité un convive à leur fête.} other {{host_name} a invité # convives à leur fête.}}}}
+            ICU;
+
+        $this->assertSame($expected, $catalogue->get('party_host', $intlDomain));
+    }
+
+    public static function provideMalformedPgsSwitchValues(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'whitespace' => ['   '];
+        yield 'missing variable' => ['plural'];
+        yield 'trailing colon' => ['plural:'];
+        yield 'leading colon' => [':file_count'];
+    }
+
+    #[DataProvider('provideMalformedPgsSwitchValues')]
+    public function testLoadVersion22RejectsMalformedPgsSwitch(string $pgsSwitch)
+    {
+        $xml = <<<XLIFF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+                   version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <unit id="tu1" name="file_deleted" pgs:switch="$pgsSwitch">
+                        <segment id="seg1" pgs:case="other">
+                            <source>You deleted files.</source>
+                            <target>Vous avez supprimé des fichiers.</target>
+                        </segment>
+                    </unit>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $this->expectException(InvalidResourceException::class);
+
+        new XliffFileLoader()->load($xml, 'fr', 'domain1');
+    }
+
+    public function testExtractPgsSegmentPreservesInlineElements()
+    {
+        $xml = <<<XLIFF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+                   version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <unit id="tu1" name="greeting" pgs:switch="select:audience">
+                        <segment id="seg1" pgs:case="formal">
+                            <source>Hello there</source>
+                            <target>Bonjour <pc id="1">Madame</pc> <mrk id="m1" type="term">Dupont</mrk><cp hex="00A0"/>!</target>
+                        </segment>
+                    </unit>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $catalogue = new XliffFileLoader()->load($xml, 'fr', 'domain1');
+        $intlDomain = 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+
+        $this->assertSame(
+            "{audience, select, formal {Bonjour Madame Dupont\u{00A0}!}}",
+            $catalogue->get('greeting', $intlDomain)
+        );
+    }
+
+    public function testExtractPgsSegmentSkipsInvalidCpCodepoints()
+    {
+        $xml = <<<XLIFF
+            <?xml version="1.0" encoding="UTF-8"?>
+            <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+                   version="2.2" srcLang="en" trgLang="fr">
+                <file id="f1">
+                    <unit id="tu1" name="greeting" pgs:switch="select:audience">
+                        <segment id="seg1" pgs:case="formal">
+                            <source>Hello there</source>
+                            <target>Bonjour<cp hex="D800"/><cp hex="DFFF"/>!</target>
+                        </segment>
+                    </unit>
+                </file>
+            </xliff>
+            XLIFF;
+
+        $errors = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$errors) {
+            $errors[] = $errstr;
+
+            return true;
+        });
+
+        try {
+            $catalogue = new XliffFileLoader()->load($xml, 'fr', 'domain1');
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $errors);
+        $intlDomain = 'domain1'.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+        $this->assertSame(
+            '{audience, select, formal {Bonjour!}}',
+            $catalogue->get('greeting', $intlDomain)
+        );
     }
 }

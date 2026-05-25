@@ -80,7 +80,12 @@ final class TokenBucket implements LimiterStateInterface
 
     public function getExpirationTime(): int
     {
-        return $this->rate->calculateTimeForTokens($this->burstSize);
+        // The bucket must persist long enough to cover both a natural refill
+        // back to the burst size and any outstanding reservation debt — the
+        // latter is tracked by a negative token count. Evicting early would
+        // lose the debt and let a fresh bucket hand out already-reserved
+        // tokens.
+        return $this->rate->calculateTimeForTokens(max($this->burstSize, $this->burstSize - $this->tokens));
     }
 
     public function __serialize(): array
@@ -96,6 +101,9 @@ final class TokenBucket implements LimiterStateInterface
         // BC layer for old objects serialized via __sleep
         if (5 === \count($data)) {
             $data = array_values($data);
+            if ($data[0] instanceof \Stringable || $data[4] instanceof \Stringable) {
+                throw new \BadMethodCallException('Cannot unserialize '.self::class);
+            }
             $this->id = $data[0];
             $this->tokens = $data[1];
             $this->timer = $data[2];

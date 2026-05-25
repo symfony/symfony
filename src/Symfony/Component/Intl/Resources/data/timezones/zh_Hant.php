@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => '中歐時間（布辛根）',
         'Europe/Chisinau' => '東歐時間（基西紐）',
         'Europe/Copenhagen' => '中歐時間（哥本哈根）',
-        'Europe/Dublin' => '愛爾蘭時間（都柏林）',
+        'Europe/Dublin' => '格林威治標準時間（都柏林）',
         'Europe/Gibraltar' => '中歐時間（直布羅陀）',
         'Europe/Guernsey' => '格林威治標準時間（根息島）',
         'Europe/Helsinki' => '東歐時間（赫爾辛基）',

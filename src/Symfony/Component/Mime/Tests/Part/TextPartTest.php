@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests\Part;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Encoder\ContentEncoderInterface;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
@@ -21,8 +22,50 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\TextPart;
 
+class TextPartTestToStringGadget
+{
+    public static bool $fired = false;
+
+    public function __toString(): string
+    {
+        self::$fired = true;
+
+        return '';
+    }
+}
+
 class TextPartTest extends TestCase
 {
+    #[DataProvider('provideTrampolineKeys')]
+    public function testUnserializeRejectsObjectInTypedStringProperty(string $key)
+    {
+        $template = (new TextPart('body content'))->__serialize();
+        $template[$key] = new TextPartTestToStringGadget();
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(TextPart::class), TextPart::class, \count($template));
+        foreach ($template as $k => $v) {
+            $payload .= serialize($k).serialize($v);
+        }
+        $payload .= '}';
+        TextPartTestToStringGadget::$fired = false;
+
+        try {
+            unserialize($payload);
+            $this->fail('Expected BadMethodCallException.');
+        } catch (\BadMethodCallException $e) {
+        }
+
+        $this->assertFalse(TextPartTestToStringGadget::$fired, '__toString gadget must not fire during unserialize');
+    }
+
+    public static function provideTrampolineKeys(): iterable
+    {
+        yield ['charset'];
+        yield ['subtype'];
+        yield ['disposition'];
+        yield ['name'];
+        yield ['encoding'];
+    }
+
     public function testConstructor()
     {
         $p = new TextPart('content');

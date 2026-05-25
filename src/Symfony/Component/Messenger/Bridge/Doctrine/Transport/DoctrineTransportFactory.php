@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\Persistence\ConnectionRegistry;
+use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlNotifyOnIdleListener;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
@@ -27,6 +28,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
         private ConnectionRegistry $registry,
+        private ?PostgreSqlNotifyOnIdleListener $notifyOnIdleListener = null,
     ) {
     }
 
@@ -36,6 +38,7 @@ class DoctrineTransportFactory implements TransportFactoryInterface
     public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
     {
         $useNotify = $options['use_notify'] ?? true;
+        $transportName = $options['transport_name'] ?? null;
         unset($options['transport_name'], $options['use_notify']);
         // Always allow PostgreSQL-specific keys, to be able to transparently fallback to the native driver when LISTEN/NOTIFY isn't available
         $configuration = PostgreSqlConnection::buildConfiguration($dsn, $options);
@@ -48,6 +51,10 @@ class DoctrineTransportFactory implements TransportFactoryInterface
 
         if ($useNotify && $driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
             $connection = new PostgreSqlConnection($configuration, $driverConnection);
+
+            if (null !== $transportName) {
+                $this->notifyOnIdleListener?->addConnection($transportName, $connection);
+            }
         } else {
             $connection = new Connection($configuration, $driverConnection);
         }

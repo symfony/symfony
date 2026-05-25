@@ -2,6 +2,7 @@ name: Lint PhpUnitBridge
 
 on:
   push:
+    branches: [ '*.*' ]
     paths:
       - 'src/Symfony/Bridge/PhpUnit/**'
   pull_request:

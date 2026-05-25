@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'ናይ ማእከላይ ኤውሮጳ ግዘ (ቡሲንገን)',
         'Europe/Chisinau' => 'ናይ ምብራቕ ኤውሮጳ ግዘ (ኪሺናው)',
         'Europe/Copenhagen' => 'ናይ ማእከላይ ኤውሮጳ ግዘ (ኮፐንሃገን)',
-        'Europe/Dublin' => 'ግዘ ኣየርላንድ (ደብሊን)',
+        'Europe/Dublin' => 'GMT (ደብሊን)',
         'Europe/Gibraltar' => 'ናይ ማእከላይ ኤውሮጳ ግዘ (ጂብራልታር)',
         'Europe/Guernsey' => 'GMT (ገርንዚ)',
         'Europe/Helsinki' => 'ናይ ምብራቕ ኤውሮጳ ግዘ (ሄልሲንኪ)',

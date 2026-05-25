@@ -208,8 +208,8 @@ class FailedMessagesRetryCommandTest extends TestCase
     public function testSuccessMessageGoesToStdout()
     {
         $envelope = new Envelope(new \stdClass(), [new TransportMessageIdStamp('some_id')]);
-        $receiver = $this->createStub(ListableReceiverInterface::class);
-        $receiver->method('find')->with('some_id')->willReturn($envelope);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with('some_id')->willReturn($envelope);
 
         $command = new FailedMessagesRetryCommand(
             'failure_receiver',
@@ -232,8 +232,8 @@ class FailedMessagesRetryCommandTest extends TestCase
     public function testCommentsGoToStderr()
     {
         $envelope = new Envelope(new \stdClass(), [new TransportMessageIdStamp('some_id')]);
-        $receiver = $this->createStub(ListableReceiverInterface::class);
-        $receiver->method('find')->with('some_id')->willReturn($envelope);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with('some_id')->willReturn($envelope);
 
         $command = new FailedMessagesRetryCommand(
             'failure_receiver',

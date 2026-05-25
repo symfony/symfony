@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**
@@ -42,6 +43,9 @@ class BinaryFileResponse extends Response
      * @param string|null         $contentDisposition The type of Content-Disposition to set automatically with the filename
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
+     *
+     * @throws FileNotFoundException If the given path is not a file
+     * @throws FileException         If the file is not readable
      */
     public function __construct(\SplFileInfo|string $file, int $status = 200, array $headers = [], bool $public = true, ?string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true)
     {
@@ -59,7 +63,8 @@ class BinaryFileResponse extends Response
      *
      * @return $this
      *
-     * @throws FileException
+     * @throws FileNotFoundException If the given path is not a file
+     * @throws FileException         If the file is not readable
      */
     public function setFile(\SplFileInfo|string $file, ?string $contentDisposition = null, bool $autoEtag = false, bool $autoLastModified = true): static
     {
@@ -268,7 +273,7 @@ class BinaryFileResponse extends Response
                         if ($start < 0 || $start > $end) {
                             $this->setStatusCode(416);
                             $this->headers->set('Content-Range', \sprintf('bytes */%s', $fileSize));
-                        } elseif ($end - $start < $fileSize - 1) {
+                        } else {
                             $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
                             $this->offset = $start;
 
@@ -392,5 +397,13 @@ class BinaryFileResponse extends Response
         $this->deleteFileAfterSend = $shouldDelete;
 
         return $this;
+    }
+
+    /**
+     * Returns whether the file will be unlinked after the request is sent.
+     */
+    public function shouldDeleteFileAfterSend(): bool
+    {
+        return $this->deleteFileAfterSend;
     }
 }

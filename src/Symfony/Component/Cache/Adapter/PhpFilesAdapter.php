@@ -41,7 +41,8 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
      * @param bool $appendOnly Set to `true` to gain extra performance when the items stored in this pool never expire.
      *                         Doing so is encouraged because it fits perfectly OPcache's memory model.
      *
-     * @throws CacheException if OPcache is not enabled
+     * @throws InvalidArgumentException When $namespace contains invalid characters, exceeds the adapter's max length
+     *                                  or when the resolved cache directory path is too long on Windows
      */
     public function __construct(
         string $namespace = '',

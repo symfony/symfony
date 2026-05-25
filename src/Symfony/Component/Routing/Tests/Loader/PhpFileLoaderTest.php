@@ -281,6 +281,37 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedCollection, $routeCollection);
     }
 
+    public function testCollectionPrefixCanDisableTrailingSlashOnRoot()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_collection_prefix_no_trailing_slash.php');
+
+        $expectedCollection = new RouteCollection();
+        $expectedCollection->add('c_slash', new Route('/categories'));
+        $expectedCollection->add('c_empty', new Route('/categories'));
+        $expectedCollection->add('c_show', new Route('/categories/{id}'));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_collection_prefix_no_trailing_slash.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testCollectionLocalizedPrefixCanDisableTrailingSlashOnRoot()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_collection_localized_prefix_no_trailing_slash.php');
+
+        $expectedCollection = new RouteCollection();
+        $expectedCollection->add('c_slash.en', (new Route('/categories'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'c_slash'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_slash.fr', (new Route('/categorias'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_slash'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->add('c_show.en', (new Route('/categories/{id}'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'c_show'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_show.fr', (new Route('/categorias/{id}'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_show'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_collection_localized_prefix_no_trailing_slash.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
     public function testImportingRoutesWithHostsInImporter()
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
@@ -367,6 +398,25 @@ class PhpFileLoaderTest extends TestCase
         $routes = $loader->load('array_when_env.php');
         $this->assertSame('/a', $routes->get('a')->getPath());
         $this->assertSame('/x', $routes->get('x')->getPath());
+    }
+
+    public function testLoadsArrayRoutesWithHostControllerLocaleConditionRequirementsAndLocalizedPathsAndAlias()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('array_routes_full.php');
+
+        $a = $routes->get('a');
+        $this->assertSame('/a', $a->getPath());
+        $this->assertSame('example.com', $a->getHost());
+        $this->assertSame('AppBundle:Blog:show', $a->getDefault('_controller'));
+        $this->assertSame('en', $a->getDefault('_locale'));
+        $this->assertSame("request.headers.get('User-Agent') matches '/firefox/i'", $a->getCondition());
+        $this->assertSame('[a-z]+', $a->getRequirement('slug'));
+
+        $this->assertSame('/b-en', $routes->get('b.en')->getPath());
+        $this->assertSame('/b-fr', $routes->get('b.fr')->getPath());
+
+        $this->assertSame('a', $routes->getAlias('c_alias')->getId());
     }
 
     public function testYamlImportsAreResolvedWhenProcessingPhpReturnedArrays()

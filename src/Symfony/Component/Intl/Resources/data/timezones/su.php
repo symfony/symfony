@@ -194,6 +194,7 @@ return [
         'Europe/Busingen' => 'Waktu Éropa Tengah (Büsingen)',
         'Europe/Chisinau' => 'Waktu Éropa Timur (Chișinău)',
         'Europe/Copenhagen' => 'Waktu Éropa Tengah (Copenhagen)',
+        'Europe/Dublin' => 'Waktu Greenwich (Dublin)',
         'Europe/Gibraltar' => 'Waktu Éropa Tengah (Gibraltar)',
         'Europe/Guernsey' => 'Waktu Greenwich (Guernsey)',
         'Europe/Helsinki' => 'Waktu Éropa Timur (Helsinki)',

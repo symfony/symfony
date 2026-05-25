@@ -36,6 +36,13 @@ final class Lox24RequestParser extends AbstractRequestParser
      */
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): SmsEvent|RemoteEvent|null
     {
+        if ('' !== $secret) {
+            $provided = $request->headers->get('X-LOX24-Token');
+            if (null === $provided || !hash_equals($secret, $provided)) {
+                throw new RejectWebhookException(406, 'Invalid or missing webhook token.');
+            }
+        }
+
         $payload = $request->request->all() ?? [];
         $name = $payload['name'] ?? null;
         $data = $payload['data'] ?? null;

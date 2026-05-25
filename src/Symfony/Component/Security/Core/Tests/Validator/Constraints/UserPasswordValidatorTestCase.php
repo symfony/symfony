@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
@@ -57,7 +58,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(true);
 
-        $this->validator->validate('secret', $constraint);
+        $this->validate('secret', $constraint);
 
         $this->assertNoViolation();
     }
@@ -70,7 +71,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
             ->with(static::PASSWORD, 'secret', static::SALT)
             ->willReturn(false);
 
-        $this->validator->validate('secret', $constraint);
+        $this->validate('secret', $constraint);
 
         $this->buildViolation('myMessage')
             ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
@@ -91,7 +92,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
             'message' => 'myMessage',
         ]);
 
-        $this->validator->validate($password, $constraint);
+        $this->validate($password, $constraint);
 
         $this->buildViolation('myMessage')
             ->setCode(UserPassword::INVALID_PASSWORD_ERROR)
@@ -112,11 +113,10 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->tokenStorage = $this->createTokenStorage($user);
         $this->validator = $this->createValidator();
-        $this->validator->initialize($this->context);
 
         $this->expectException(ConstraintDefinitionException::class);
 
-        $this->validator->validate('secret', new UserPassword());
+        $this->validate('secret', new UserPassword());
     }
 
     protected function createUser()
@@ -175,5 +175,16 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         ;
 
         return $mock;
+    }
+
+    // TODO remove this in Symfony 9.0 (or earlier, when dropping support for symfony/validator < 8.1)
+    protected function validate(mixed $value, Constraint $constraint): void
+    {
+        if (method_exists(parent::class, 'validate')) {
+            parent::validate($value, $constraint);
+        } else {
+            $this->validator->initialize($this->context);
+            $this->validator->validate($value, $constraint);
+        }
     }
 }

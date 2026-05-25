@@ -47,7 +47,13 @@ class X509Authenticator extends AbstractPreAuthenticatedAuthenticator
             $username = $request->server->get($this->userKey);
         } elseif (
             $request->server->has($this->credentialsKey)
-            && preg_match('#'.preg_quote($this->credentialUserIdentifier, '#').'=([^,/]++)#', $request->server->get($this->credentialsKey), $matches)
+            && preg_match(
+                'emailAddress' === $this->credentialUserIdentifier
+                    ? '#(?:^|[,/])\s*(?:emailAddress|1\.2\.840\.113549\.1\.9\.1)=([^,/@]++@[^,/]++)#'
+                    : '#(?:^|[,/])\s*'.preg_quote($this->credentialUserIdentifier, '#').'=([^,/]++)#',
+                $request->server->get($this->credentialsKey),
+                $matches,
+            )
         ) {
             $username = trim($matches[1]);
         }

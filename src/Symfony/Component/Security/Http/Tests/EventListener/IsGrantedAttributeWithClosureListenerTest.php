@@ -28,7 +28,7 @@ use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeMethodsWithClosureController;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeWithClosureController;
 
-#[RequiresPhp('>=8.5')]
+#[RequiresPhp('>=8.5.0')]
 class IsGrantedAttributeWithClosureListenerTest extends TestCase
 {
     public function testAttribute()

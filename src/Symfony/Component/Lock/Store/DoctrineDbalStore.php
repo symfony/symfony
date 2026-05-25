@@ -102,11 +102,24 @@ class DoctrineDbalStore implements PersistingStoreInterface
     {
         $key->reduceLifetime($this->initialTtl);
 
+        $platform = $this->conn->getDatabasePlatform();
+        if ($platform instanceof PostgreSQLPlatform) {
+            $this->doSavePostgres($key);
+        } else {
+            $this->doSave($key);
+        }
+
+        $this->randomlyPrune();
+        $this->checkNotExpired($key);
+    }
+
+    private function doSave(Key $key): void
+    {
         $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (?, ?, {$this->getCurrentTimestampStatement()} + $this->initialTtl)";
 
         try {
             $this->conn->executeStatement($sql, [
-                $this->getHashedKey($key),
+                $this->getKeyName($key),
                 $this->getUniqueToken($key),
             ], [
                 ParameterType::STRING,
@@ -119,7 +132,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
             try {
                 $this->conn->executeStatement($sql, [
-                    $this->getHashedKey($key),
+                    $this->getKeyName($key),
                     $this->getUniqueToken($key),
                 ], [
                     ParameterType::STRING,
@@ -132,9 +145,43 @@ class DoctrineDbalStore implements PersistingStoreInterface
             // the lock is already acquired. It could be us. Let's try to put off.
             $this->putOffExpiration($key, $this->initialTtl);
         }
+    }
 
-        $this->randomlyPrune();
-        $this->checkNotExpired($key);
+    /**
+     * On PostgreSQL a constraint violation aborts the surrounding transaction (SQLSTATE 25P02), so
+     * the legacy "try INSERT, catch, fall back to UPDATE" path turns a benign lock contention into
+     * a fatal error for any caller wrapped in a transaction (Messenger doctrine_transaction
+     * middleware, functional tests using DAMADoctrineTestBundle, ...). Using atomic
+     * INSERT ... ON CONFLICT keeps the conflict resolution server-side and never raises,
+     * preserving the outer transaction.
+     */
+    private function doSavePostgres(Key $key): void
+    {
+        $now = $this->getCurrentTimestampStatement();
+        $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (?, ?, $now + $this->initialTtl)"
+            ." ON CONFLICT ($this->idCol) DO UPDATE SET $this->tokenCol = EXCLUDED.$this->tokenCol, $this->expirationCol = EXCLUDED.$this->expirationCol"
+            ." WHERE $this->table.$this->tokenCol = EXCLUDED.$this->tokenCol OR $this->table.$this->expirationCol <= $now";
+
+        $params = [
+            $this->getKeyName($key),
+            $this->getUniqueToken($key),
+        ];
+        $types = [
+            ParameterType::STRING,
+            ParameterType::STRING,
+        ];
+
+        try {
+            $rows = (int) $this->conn->executeStatement($sql, $params, $types);
+        } catch (TableNotFoundException) {
+            // PostgreSQL supports DDL inside a transaction, so we can always create the table.
+            $this->createTable();
+            $rows = (int) $this->conn->executeStatement($sql, $params, $types);
+        }
+
+        if (0 === $rows) {
+            throw new LockConflictedException();
+        }
     }
 
     public function putOffExpiration(Key $key, $ttl): void
@@ -151,7 +198,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
         $result = $this->conn->executeQuery($sql, [
             $ttl,
             $uniqueToken,
-            $this->getHashedKey($key),
+            $this->getKeyName($key),
             $uniqueToken,
         ], [
             ParameterType::INTEGER,
@@ -171,7 +218,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     public function delete(Key $key): void
     {
         $this->conn->delete($this->table, [
-            $this->idCol => $this->getHashedKey($key),
+            $this->idCol => $this->getKeyName($key),
             $this->tokenCol => $this->getUniqueToken($key),
         ]);
     }
@@ -180,7 +227,7 @@ class DoctrineDbalStore implements PersistingStoreInterface
     {
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND $this->tokenCol = ? AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $result = $this->conn->fetchOne($sql, [
-            $this->getHashedKey($key),
+            $this->getKeyName($key),
             $this->getUniqueToken($key),
         ], [
             ParameterType::STRING,
@@ -207,6 +254,8 @@ class DoctrineDbalStore implements PersistingStoreInterface
 
     /**
      * Adds the Table to the Schema if it doesn't exist.
+     *
+     * @param-immediately-invoked-callable $isSameDatabase
      */
     public function configureSchema(Schema $schema, \Closure $isSameDatabase): void
     {

@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\JsonStreamer\Mapping\Read;
 
-use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
-use Symfony\Component\TypeInfo\Type\ObjectType;
+
+trigger_deprecation('symfony/json-streamer', '8.1', 'The "%s" class is deprecated, Date times are handled as value objects.', DateTimeTypePropertyMetadataLoader::class);
 
 /**
- * Transforms string to DateTimeInterface for properties with DateTimeInterface type.
- *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+ *
+ * @deprecated since Symfony 8.1, Date times are handled as value objects
  *
  * @internal
  */
@@ -32,22 +31,6 @@ final class DateTimeTypePropertyMetadataLoader implements PropertyMetadataLoader
 
     public function load(string $className, array $options = [], array $context = []): array
     {
-        $result = $this->decorated->load($className, $options, $context);
-
-        foreach ($result as &$metadata) {
-            $type = $metadata->getType();
-
-            if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
-                if (is_a($type->getClassName(), \DateTime::class, true)) {
-                    throw new InvalidArgumentException('The "DateTime" class is not supported. Use "DateTimeImmutable" instead.');
-                }
-
-                $metadata = $metadata
-                    ->withType(StringToDateTimeValueTransformer::getStreamValueType())
-                    ->withAdditionalValueTransformer('json_streamer.value_transformer.string_to_date_time');
-            }
-        }
-
-        return $result;
+        return $this->decorated->load($className, $options, $context);
     }
 }

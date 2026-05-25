@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => '중부유럽 시간(뷔지겐)',
         'Europe/Chisinau' => '동유럽 시간(키시나우)',
         'Europe/Copenhagen' => '중부유럽 시간(코펜하겐)',
-        'Europe/Dublin' => '아일랜드 시간(더블린)',
+        'Europe/Dublin' => '그리니치 표준시(더블린)',
         'Europe/Gibraltar' => '중부유럽 시간(지브롤터)',
         'Europe/Guernsey' => '그리니치 표준시(건지)',
         'Europe/Helsinki' => '동유럽 시간(헬싱키)',

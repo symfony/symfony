@@ -137,6 +137,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
+        $container->deprecateParameter('security.authentication.manager.erase_credentials', 'symfony/security-bundle', '8.1', 'The "%s" parameter is deprecated since Symfony 8.1. It will be removed in Symfony 9.0, as the "eraseCredentials()" method was removed in Symfony 8.0.');
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 
         if (isset($config['access_decision_manager']['service'])) {
@@ -304,7 +305,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         // load firewall map
         $mapDef = $container->getDefinition('security.firewall.map');
-        $map = $authenticationProviders = $contextRefs = $authenticators = [];
+        $map = $authenticationProviders = $contextRefs = $authenticators = $firewallConfigRefs = [];
         foreach ($firewalls as $name => $firewall) {
             if (isset($firewall['user_checker']) && 'security.user_checker' !== $firewall['user_checker']) {
                 $customUserChecker = true;
@@ -336,6 +337,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
             $contextRefs[$contextId] = new Reference($contextId);
             $map[$contextId] = $matcher;
+            $firewallConfigRefs[$name] = new Reference($configId);
         }
         $container
             ->getDefinition('security.helper')
@@ -343,6 +345,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         ;
 
         $container->setAlias('security.firewall.context_locator', (string) ServiceLocatorTagPass::register($container, $contextRefs));
+        $container->setAlias('security.firewall_config_locator', (string) ServiceLocatorTagPass::register($container, $firewallConfigRefs));
 
         $mapDef->replaceArgument(0, new Reference('security.firewall.context_locator'));
         $mapDef->replaceArgument(1, new IteratorArgument($map));
@@ -512,7 +515,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(0, $authenticators)
             ->replaceArgument(2, new Reference($firewallEventDispatcherId))
             ->replaceArgument(3, $id)
-            ->replaceArgument(7, $firewall['required_badges'] ?? [])
+            ->replaceArgument(6, $firewall['required_badges'] ?? [])
             ->addTag('monolog.logger', ['channel' => 'security'])
         ;
 
@@ -855,7 +858,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         foreach ($this->userProviderFactories as $factory) {
             $key = str_replace('-', '_', $factory->getKey());
 
-            if (!empty($provider[$key])) {
+            if (\array_key_exists($key, $provider)) {
                 $factory->create($container, $name, $provider[$key]);
 
                 return $name;

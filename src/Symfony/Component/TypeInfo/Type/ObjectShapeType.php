@@ -17,17 +17,28 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 /**
  * Represents the exact shape of an anonymous object.
  *
+ * The shape is stored sorted by key; two instances built from the same entries in
+ * a different order compare equal through getShape() and produce the same string
+ * representation. Object shapes are always sealed: unlike ArrayShapeType, no
+ * extra-key/extra-value type is supported because the underlying
+ * phpstan-phpdoc-parser AST node has no such notion.
+ *
+ * Presence and value checks in accepts() both look at the public, initialized
+ * properties returned by get_object_vars(); non-public properties, uninitialized
+ * typed properties and state exposed only through __get() or other magic
+ * accessors are not visible.
+ *
  * @author Benjamin Franzke <ben@bnf.dev>
  */
 final class ObjectShapeType extends Type
 {
     /**
-     * @var array<string, array{type: Type, optional: bool}>
+     * @var array<string, array{type: Type, optional?: bool}>
      */
     private readonly array $shape;
 
     /**
-     * @param array<string, array{type: Type, optional: bool}> $shape
+     * @param array<string, array{type: Type, optional?: bool}> $shape
      */
     public function __construct(
         array $shape,
@@ -44,11 +55,22 @@ final class ObjectShapeType extends Type
     }
 
     /**
-     * @return array<string, array{type: Type, optional: bool}>
+     * @return array<string, array{type: Type, optional?: bool}>
      */
     public function getShape(): array
     {
         return $this->shape;
+    }
+
+    public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
+    {
+        foreach ($identifiers as $identifier) {
+            if (TypeIdentifier::OBJECT === $identifier || TypeIdentifier::OBJECT->value === $identifier) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function accepts(mixed $value): bool
@@ -57,13 +79,15 @@ final class ObjectShapeType extends Type
             return false;
         }
 
+        $vars = get_object_vars($value);
+
         foreach ($this->shape as $key => $shapeValue) {
-            if (!($shapeValue['optional'] ?? false) && !property_exists($value, $key)) {
+            if (!($shapeValue['optional'] ?? false) && !\array_key_exists($key, $vars)) {
                 return false;
             }
         }
 
-        foreach (get_object_vars($value) as $key => $itemValue) {
+        foreach ($vars as $key => $itemValue) {
             $valueType = $this->shape[$key]['type'] ?? false;
             if (!$valueType) {
                 return false;

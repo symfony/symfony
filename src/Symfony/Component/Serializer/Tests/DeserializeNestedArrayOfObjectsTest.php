@@ -101,6 +101,30 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         self::assertArrayHasKey(3, $zoo->animalsGenerics);
         self::assertInstanceOf(Animal::class, $zoo->animalsGenerics[3]);
     }
+
+    public function testNestedArrayWithStringKeyUnderList()
+    {
+        $json = <<<EOF
+            {
+                "foos": [{"operators": {"something": [{"name": "Bug"}]}}]
+            }
+            EOF;
+        $serializer = new Serializer([
+            new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+            new ArrayDenormalizer(),
+        ], ['json' => new JsonEncoder()]);
+
+        /** @var BarWithNestedKeyTypes $bar */
+        $bar = $serializer->deserialize($json, BarWithNestedKeyTypes::class, 'json');
+
+        self::assertCount(1, $bar->foos);
+        self::assertInstanceOf(FooWithStringKeyedList::class, $bar->foos[0]);
+        self::assertCount(1, $bar->foos[0]->operators);
+        self::assertArrayHasKey('something', $bar->foos[0]->operators);
+        self::assertCount(1, $bar->foos[0]->operators['something']);
+        self::assertInstanceOf(Animal::class, $bar->foos[0]->operators['something'][0]);
+        self::assertSame('Bug', $bar->foos[0]->operators['something'][0]->getName());
+    }
 }
 
 class Zoo
@@ -175,5 +199,21 @@ class Animal
     public function setName($name)
     {
         $this->name = $name;
+    }
+}
+
+class FooWithStringKeyedList
+{
+    /** @param array<string, list<Animal>> $operators */
+    public function __construct(public array $operators = [])
+    {
+    }
+}
+
+class BarWithNestedKeyTypes
+{
+    /** @param list<FooWithStringKeyedList> $foos */
+    public function __construct(public array $foos = [])
+    {
     }
 }

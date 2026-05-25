@@ -90,6 +90,48 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
 
+    public function testSortRoutesByPath()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['--sort' => 'path']);
+        $display = $tester->getDisplay();
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $sessionPos = strpos($display, '/session ');
+        $sessionNamePos = strpos($display, '/session/{name}');
+        $logoutPos = strpos($display, '/session_logout');
+        $testPos = strpos($display, '/test');
+        $this->assertLessThan($sessionNamePos, $sessionPos);
+        $this->assertLessThan($logoutPos, $sessionNamePos);
+        $this->assertLessThan($testPos, $logoutPos);
+    }
+
+    public function testSortRoutesByName()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['--sort' => 'name']);
+        $display = $tester->getDisplay();
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $logoutPos = strpos($display, 'routerdebug_session_logout');
+        $welcomePos = strpos($display, 'routerdebug_session_welcome ');
+        $welcomeNamePos = strpos($display, 'routerdebug_session_welcome_name');
+        $testPos = strpos($display, 'routerdebug_test');
+        $this->assertLessThan($welcomePos, $logoutPos);
+        $this->assertLessThan($welcomeNamePos, $welcomePos);
+        $this->assertLessThan($testPos, $welcomeNamePos);
+    }
+
+    public function testSortRoutesInvalidColumn()
+    {
+        $tester = $this->createCommandTester();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The sort column "invalid" is not supported');
+
+        $tester->execute(['--sort' => 'invalid']);
+    }
+
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
@@ -114,6 +156,11 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         yield 'option --format' => [
             ['--format', ''],
             ['txt', 'xml', 'json', 'md'],
+        ];
+
+        yield 'option --sort' => [
+            ['--sort', ''],
+            ['name', 'path', 'method', 'scheme', 'host'],
         ];
 
         yield 'route_name' => [

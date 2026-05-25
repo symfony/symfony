@@ -29,6 +29,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tester\ConsoleAssertionsTrait;
 use Symfony\Component\Console\Tests\Fixtures\InvokableExtendingCommandTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputTestCommand;
@@ -39,6 +40,8 @@ use Symfony\Component\Console\Tests\Fixtures\MethodBasedTestCommand;
 
 class CommandTesterTest extends TestCase
 {
+    use ConsoleAssertionsTrait;
+
     protected Command $command;
     protected CommandTester $tester;
 
@@ -638,5 +641,107 @@ class CommandTesterTest extends TestCase
         ): int => 0);
 
         $command->getDefinition();
+    }
+
+    public function testItExecutesTheTestedCommandWithTheSameConfigAsThePreviousApiByDefault()
+    {
+        $oldConfig = [];
+        $newConfig = [];
+
+        $oldTesterCommand = self::createDisplayConfigurationCommand($oldConfig);
+        $newTesterCommand = self::createDisplayConfigurationCommand($newConfig);
+
+        $oldTester = new CommandTester($oldTesterCommand);
+        $oldTester->execute([]);
+
+        $newTester = new CommandTester($newTesterCommand);
+        $newTester->run();
+
+        // Sanity check
+        $this->assertNotEquals([], $oldConfig);
+        $this->assertEquals($oldConfig, $newConfig);
+    }
+
+    public function testItCanConfigureTheExecutedCommand()
+    {
+        $config = [];
+
+        $test = new CommandTester(
+            self::createDisplayConfigurationCommand($config),
+        );
+        $test->run(
+            interactive: true,
+            decorated: false,
+            verbosity: OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
+
+        $expectedConfig = [
+            'interactive' => true,
+            'decorated' => false,
+            'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        ];
+
+        $this->assertEquals($expectedConfig, $config);
+    }
+
+    public function testItCanTestTheExecutionResult()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $output->writeln('bar');
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run();
+
+        $this->assertCommandIsSuccessful($result);
+        $this->assertSame(0, $result->statusCode);
+        $this->assertSame("bar\n", $result->getDisplay());
+    }
+
+    public function testItProvidesUserInputs()
+    {
+        $questions = [
+            'What\'s your name?',
+            'How are you?',
+            'Where do you come from?',
+        ];
+
+        $command = new Command('foo');
+        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) use ($questions, $command): int {
+            $helper = $command->getHelper('question');
+            $helper->ask($input, $output, new Question($questions[0]));
+            $helper->ask($input, $output, new Question($questions[1]));
+            $helper->ask($input, $output, new Question($questions[2]));
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $result = $tester->run(interactiveInputs: ['Bobby', 'Fine', 'France']);
+
+        $this->assertCommandResultEquals(
+            $result,
+            0,
+            '',
+            implode('', $questions),
+            implode('', $questions),
+        );
+    }
+
+    private static function createDisplayConfigurationCommand(array &$config): Command
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) use (&$config) {
+            $config['interactive'] = $input->isInteractive();
+            $config['verbosity'] = $output->getVerbosity();
+            $config['decorated'] = $output->isDecorated();
+
+            return 0;
+        });
+
+        return $command;
     }
 }

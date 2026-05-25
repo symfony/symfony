@@ -151,11 +151,13 @@ function iterator(array $values): IteratorArgument
  */
 function tagged_iterator(string $tag, ?string $indexAttribute = null, string|array|null $exclude = [], bool|string|null $excludeSelf = true, ...$_): TaggedIteratorArgument
 {
-    if (\func_num_args() > 4 || !\is_bool($excludeSelf) || null === $exclude || (\is_string($exclude) && str_starts_with($exclude, 'get') && !\array_key_exists('defaultIndexMethod', $_))) {
+    if (\func_num_args() > 4 || !\is_bool($excludeSelf) || \array_key_exists('defaultIndexMethod', $_) || \array_key_exists('defaultPriorityMethod', $_) || (\is_string($exclude) && str_starts_with($exclude, 'get') && ctype_upper($exclude[3] ?? ''))) {
         [, , $defaultIndexMethod, $defaultPriorityMethod, $exclude, $excludeSelf] = \func_get_args() + [2 => null, null, [], true];
+        $defaultIndexMethod = $_['defaultIndexMethod'] ?? $defaultIndexMethod;
+        $defaultPriorityMethod = $_['defaultPriorityMethod'] ?? $defaultPriorityMethod;
     } else {
-        $defaultIndexMethod = \array_key_exists('defaultIndexMethod', $_) ? $_['defaultIndexMethod'] : false;
-        $defaultPriorityMethod = \array_key_exists('defaultPriorityMethod', $_) ? $_['defaultPriorityMethod'] : false;
+        $defaultIndexMethod = false;
+        $defaultPriorityMethod = false;
     }
 
     if (false !== $defaultIndexMethod || false !== $defaultPriorityMethod) {
@@ -175,11 +177,13 @@ function tagged_iterator(string $tag, ?string $indexAttribute = null, string|arr
  */
 function tagged_locator(string $tag, ?string $indexAttribute = null, string|array|null $exclude = [], bool|string|null $excludeSelf = true, ...$_): ServiceLocatorArgument
 {
-    if (\func_num_args() > 4 || !\is_bool($excludeSelf) || null === $exclude || (\is_string($exclude) && str_starts_with($exclude, 'get') && !\array_key_exists('defaultIndexMethod', $_))) {
+    if (\func_num_args() > 4 || !\is_bool($excludeSelf) || \array_key_exists('defaultIndexMethod', $_) || \array_key_exists('defaultPriorityMethod', $_) || (\is_string($exclude) && str_starts_with($exclude, 'get') && ctype_upper($exclude[3] ?? ''))) {
         [, , $defaultIndexMethod, $defaultPriorityMethod, $exclude, $excludeSelf] = \func_get_args() + [2 => null, null, [], true];
+        $defaultIndexMethod = $_['defaultIndexMethod'] ?? $defaultIndexMethod;
+        $defaultPriorityMethod = $_['defaultPriorityMethod'] ?? $defaultPriorityMethod;
     } else {
-        $defaultIndexMethod = \array_key_exists('defaultIndexMethod', $_) ? $_['defaultIndexMethod'] : false;
-        $defaultPriorityMethod = \array_key_exists('defaultPriorityMethod', $_) ? $_['defaultPriorityMethod'] : false;
+        $defaultIndexMethod = false;
+        $defaultPriorityMethod = false;
     }
 
     if (false !== $defaultIndexMethod || false !== $defaultPriorityMethod) {

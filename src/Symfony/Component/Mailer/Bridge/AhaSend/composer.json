@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "psr/event-dispatcher": "^1",
         "symfony/mailer": "^7.4|^8.0"
     },

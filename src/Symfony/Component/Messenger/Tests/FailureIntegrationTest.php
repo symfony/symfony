@@ -172,7 +172,7 @@ class FailureIntegrationTest extends TestCase
         /** @var ErrorDetailsStamp $errorDetailsStamp */
         $errorDetailsStamp = $failedEnvelope->last(ErrorDetailsStamp::class);
         $this->assertNotNull($errorDetailsStamp);
-        $this->assertSame('Failure from call 2', $errorDetailsStamp->getExceptionMessage());
+        $this->assertSame('Failure from call 1', $errorDetailsStamp->getExceptionMessage());
 
         /*
          * Failed message is handled, fails, and sent for a retry

@@ -74,20 +74,19 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         }
 
         if ($input->getOption('stats')) {
-            $this->listMessagesPerClass($failureTransportName, $io, $input->getOption('max'));
+            $max = $input->hasParameterOption(['--max'], true) ? $input->getOption('max') : null;
+            $this->listMessagesPerClass($receiver, $io, $max);
         } elseif (null === $id = $input->getArgument('id')) {
-            $this->listMessages($failureTransportName, $io, $errorIo, $input->getOption('max'), $input->getOption('class-filter'));
+            $this->listMessages($receiver, $failureTransportName, $io, $errorIo, $input->getOption('max'), $input->getOption('class-filter'));
         } else {
-            $this->showMessage($failureTransportName, $id, $io, $errorIo);
+            $this->showMessage($receiver, $failureTransportName, $id, $io, $errorIo);
         }
 
         return 0;
     }
 
-    private function listMessages(?string $failedTransportName, SymfonyStyle $io, SymfonyStyle $errorIo, int $max, ?string $classFilter = null): void
+    private function listMessages(ListableReceiverInterface $receiver, string $failedTransportName, SymfonyStyle $io, SymfonyStyle $errorIo, int $max, ?string $classFilter = null): void
     {
-        /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $rows = [];
@@ -105,9 +104,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                     continue;
                 }
 
-                /** @var RedeliveryStamp|null $lastRedeliveryStamp */
                 $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
-                /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
                 $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
 
                 $rows[] = [
@@ -140,10 +137,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         $errorIo->comment(\sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
     }
 
-    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io, int $max): void
+    private function listMessagesPerClass(ListableReceiverInterface $receiver, SymfonyStyle $io, ?int $max): void
     {
-        /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $countPerClass = [];
@@ -172,10 +167,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         $io->table(['Class', 'Count'], $countPerClass);
     }
 
-    private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io, SymfonyStyle $errorIo): void
+    private function showMessage(ListableReceiverInterface $receiver, string $failedTransportName, string $id, SymfonyStyle $io, SymfonyStyle $errorIo): void
     {
-        /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransportName);
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             $envelope = $receiver->find($id);

@@ -413,6 +413,7 @@ class Theme {
             'doctrine': '#fd8c73',
             'messenger_middleware': '#ff8182',
             'controller.argument_value_resolver': '#c297ff',
+            'command.argument_value_resolver': '#b87ce8',
             'http_client': '#d4a72c',
         };
 
@@ -445,8 +446,8 @@ class Theme {
 
     // copied from https://github.com/darkskyapp/string-hash
     hash(string) {
-        var hash = 5381;
-        var i = string.length;
+        let hash = 5381;
+        let i = string.length;
 
         while(i) {
             hash = (hash * 33) ^ string.charCodeAt(--i);

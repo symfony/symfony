@@ -41,6 +41,21 @@ abstract class AbstractRequestParser implements RequestParserInterface
 
     abstract protected function getRequestMatcher(): RequestMatcherInterface;
 
+    /**
+     * Parses and authenticates the request, returning the resulting RemoteEvent(s).
+     *
+     * When the protocol requires it, implementations are responsible for verifying
+     * the request's authenticity (typically by comparing an HMAC of the raw body
+     * against a header value using hash_equals()) and for any replay protection
+     * (e.g. timestamp window). They must throw RejectWebhookException on any
+     * verification failure.
+     *
+     * The $request argument has already been matched by getRequestMatcher().
+     *
+     * @return RemoteEvent|RemoteEvent[]|null Returns null when the webhook must be ignored
+     *
+     * @throws RejectWebhookException On signature mismatch, malformed payload, replay, or unsupported event
+     */
     abstract protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null;
 
     protected function validate(Request $request): void

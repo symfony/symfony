@@ -270,6 +270,16 @@ class MarkdownDescriptor extends Descriptor
         $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];
         $output .= "\n".'- Usages: '.($inEdges ? implode(', ', $inEdges) : 'none');
 
+        if (isset($options['id']) && $container) {
+            $stack = $this->getDecorationStack($container, $options['id']);
+            if (\count($stack) > 1) {
+                $output .= "\n- Decoration Stack:\n";
+                foreach ($stack as $item) {
+                    $output .= \sprintf("  - Id: `%s`\n    Class: `%s`\n    Priority: %d\n", $item['id'], $item['class'], $item['priority']);
+                }
+            }
+        }
+
         $this->write(isset($options['id']) ? \sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }
 

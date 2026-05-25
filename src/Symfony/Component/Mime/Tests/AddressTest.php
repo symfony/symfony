@@ -39,6 +39,24 @@ class AddressTest extends TestCase
         new Address('fab   pot@symfony.com');
     }
 
+    #[DataProvider('provideAddressesWithControlCharacters')]
+    public function testConstructorRejectsControlCharactersInAddress(string $address)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        new Address($address);
+    }
+
+    public static function provideAddressesWithControlCharacters(): iterable
+    {
+        yield 'CRLF in quoted-string' => ["\"x\r\nBcc: attacker@evil\"@example.com"];
+        yield 'CR only' => ["foo\r@example.com"];
+        yield 'LF only' => ["foo\n@example.com"];
+        yield 'NUL byte' => ["foo\x00@example.com"];
+        yield 'HTAB' => ["foo\t@example.com"];
+        yield 'DEL (0x7F)' => ["foo\x7F@example.com"];
+        yield 'control char in domain' => ["foo@example\x01.com"];
+    }
+
     public function testCreate()
     {
         $this->assertSame($a = new Address('fabien@symfony.com'), Address::create($a));

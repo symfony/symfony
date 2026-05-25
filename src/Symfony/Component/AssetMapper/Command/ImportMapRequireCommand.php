@@ -81,6 +81,7 @@ final class ImportMapRequireCommand extends Command
                     <info>php %command.full_name% "any_module_name" --dry-run -v</info>
 
                 When this option is enabled, this command does not perform any write operations to the filesystem.
+
                 EOT
             );
     }

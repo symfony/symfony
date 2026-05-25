@@ -12,10 +12,13 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -338,18 +341,20 @@ class IsGrantedAttributeListenerTest extends TestCase
             ->with(new Expression('user === subject'), 'author')
             ->willReturn(true);
 
+        $controllerInstance = new IsGrantedAttributeMethodsController();
         $expressionLanguage = $this->createMock(ExpressionLanguage::class);
         $expressionLanguage->expects($this->once())
             ->method('evaluate')
             ->with(new Expression('args["post"].getAuthor()'), [
                 'args' => ['post' => 'postVal'],
                 'request' => $request,
+                'this' => $controllerInstance,
             ])
             ->willReturn('author');
 
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            [new IsGrantedAttributeMethodsController(), 'withExpressionInSubject'],
+            [$controllerInstance, 'withExpressionInSubject'],
             ['postVal'],
             $request,
             null
@@ -369,18 +374,20 @@ class IsGrantedAttributeListenerTest extends TestCase
             ->with(new Expression('user === subject["author"]'), ['author' => 'author', 'alias' => 'arg2Val'])
             ->willReturn(true);
 
+        $controllerInstance = new IsGrantedAttributeMethodsController();
         $expressionLanguage = $this->createMock(ExpressionLanguage::class);
         $expressionLanguage->expects($this->once())
             ->method('evaluate')
             ->with(new Expression('args["post"].getAuthor()'), [
                 'args' => ['post' => 'postVal', 'arg2Name' => 'arg2Val'],
                 'request' => $request,
+                'this' => $controllerInstance,
             ])
             ->willReturn('author');
 
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            [new IsGrantedAttributeMethodsController(), 'withNestedExpressionInSubject'],
+            [$controllerInstance, 'withNestedExpressionInSubject'],
             ['postVal', 'arg2Val'],
             $request,
             null
@@ -406,6 +413,49 @@ class IsGrantedAttributeListenerTest extends TestCase
             [],
             $request,
             null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsGrantedWithControllerPropertyAsSubject()
+    {
+        $controller = [new IsGrantedAttributeMethodsController(), 'withControllerPropertyAsSubject'];
+
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('SOME_VOTER', 42)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            $controller,
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsGrantedWithNonClassController()
+    {
+        $controller = #[IsGranted('SOME_VOTER', new Expression('this'))] static fn () => true;
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('SOME_VOTER', null)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            $controller,
+            [],
+            new Request(),
+            null,
         );
 
         $listener = new IsGrantedAttributeListener($authChecker, new ExpressionLanguage());
@@ -538,6 +588,24 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
+    public function testThrowsAccessDeniedExceptionWhenHeadMethodMatchesGetConstraint()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())->method('isGranted')->willReturn(false);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'adminWithMethodGet'],
+            [],
+            new Request([], [], [], [], [], ['REQUEST_METHOD' => 'HEAD']),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $this->expectException(AccessDeniedException::class);
+        $listener->onKernelControllerArguments($event);
+    }
+
     public function testFiltersOnlyIsGrantedAttributesUsingInstanceof()
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -556,7 +624,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         );
 
         // Inject mixed attributes: one IsGranted and one unrelated object; only IsGranted should be processed
-        $event->setController($controller, property_exists(ResponseEvent::class, 'controllerArgumentsEvent') ? [
+        $event->setController($controller, property_exists(ResponseEvent::class, 'controllerMetadata') ? [
             new IsGranted('ROLE_ADMIN'),
             new \stdClass(),
         ] : [
@@ -588,7 +656,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $custom = new class('ROLE_ADMIN') extends IsGranted {};
 
         // Inject subclass instance; instanceof IsGranted should match
-        $event->setController($controller, property_exists(ResponseEvent::class, 'controllerArgumentsEvent') ? [
+        $event->setController($controller, property_exists(ResponseEvent::class, 'controllerMetadata') ? [
             $custom,
         ] : [
             $custom::class => [$custom],
@@ -596,5 +664,43 @@ class IsGrantedAttributeListenerTest extends TestCase
 
         $listener = new IsGrantedAttributeListener($authChecker);
         $listener->onKernelControllerArguments($event);
+    }
+
+    #[RequiresMethod(ControllerAttributeEvent::class, '__construct')]
+    public function testonKernelControllerAttributeDelegatesControllerArgumentsEvent()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeController(), 'foo'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent(new IsGranted('ROLE_ADMIN'), $event));
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent(new IsGranted('ROLE_USER'), $event));
+    }
+
+    #[RequiresMethod(ControllerAttributeEvent::class, '__construct')]
+    public function testonKernelControllerAttributeIgnoresResponseEvent()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->never())->method('isGranted');
+
+        $event = new ResponseEvent(
+            $this->createStub(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            new Response()
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent(new IsGranted('ROLE_ADMIN'), $event));
     }
 }

@@ -26,14 +26,14 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Regex(pattern: '/^[0-9]+$/'));
+        $this->validate(null, new Regex(pattern: '/^[0-9]+$/'));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Regex(pattern: '/^[0-9]+$/'));
+        $this->validate('', new Regex(pattern: '/^[0-9]+$/'));
 
         $this->assertNoViolation();
     }
@@ -41,14 +41,14 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Regex(pattern: '/^[0-9]+$/'));
+        $this->validate(new \stdClass(), new Regex(pattern: '/^[0-9]+$/'));
     }
 
     #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
         $constraint = new Regex(pattern: '/^[0-9]+$/');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -57,7 +57,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     public function testValidValuesWithWhitespacesNamed($value)
     {
         $constraint = new Regex(pattern: '/^[0-9]+$/', normalizer: 'trim');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -95,7 +95,7 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Regex(pattern: '/^[0-9]+$/', message: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
@@ -116,5 +116,20 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
                 }
             }],
         ];
+    }
+
+    public function testMatchFalseWithTooManyBacktrackingShouldNotPass()
+    {
+        $value = '<'.str_repeat('a', 1000000).'<a href="javascript:alert(1)">test</a>';
+        $pattern = '/<script|([^>]*?)(on\w+\s*=\s*(["\']).*?\3|href\s*=\s*(["\'])javascript:.*?\4)[^>]*?>/is';
+        $constraint = new Regex(pattern: $pattern, message: 'myMessage', match: false);
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$value.'"')
+            ->setParameter('{{ pattern }}', $pattern)
+            ->setCode(Regex::REGEX_FAILED_ERROR)
+            ->assertRaised();
     }
 }

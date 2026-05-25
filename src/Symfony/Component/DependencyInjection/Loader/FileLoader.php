@@ -20,6 +20,7 @@ use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -28,6 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\VarExporter\DeepCloner;
 
 /**
  * FileLoader is the abstract class used by all built-in loaders that are file based.
@@ -36,7 +38,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  */
 abstract class FileLoader extends BaseFileLoader
 {
-    public const ANONYMOUS_ID_REGEXP = '/^\.\d+_[^~]*+~[._a-zA-Z\d]{7}$/';
+    public const ANONYMOUS_ID_REGEXP = ContainerBuilder::ANONYMOUS_ID_REGEXP;
 
     protected bool $isLoadingInstanceof = false;
     protected array $instanceof = [];
@@ -129,26 +131,7 @@ abstract class FileLoader extends BaseFileLoader
         $autoconfigureAttributes = new RegisterAutoconfigureAttributesPass();
         $autoconfigureAttributes = $autoconfigureAttributes->accept($prototype) ? $autoconfigureAttributes : null;
         $classes = $this->findClasses($namespace, $resource, (array) $exclude, $source);
-
-        $getPrototype = static fn () => clone $prototype;
-        $serialized = serialize($prototype);
-
-        // avoid deep cloning if no definitions are nested
-        if (strpos($serialized, 'O:48:"Symfony\Component\DependencyInjection\Definition"', 55)
-            || strpos($serialized, 'O:53:"Symfony\Component\DependencyInjection\ChildDefinition"', 55)
-        ) {
-            // prepare for deep cloning
-            foreach (['Arguments', 'Properties', 'MethodCalls', 'Configurator', 'Factory', 'Bindings'] as $key) {
-                $serialized = serialize($prototype->{'get'.$key}());
-
-                if (strpos($serialized, 'O:48:"Symfony\Component\DependencyInjection\Definition"')
-                    || strpos($serialized, 'O:53:"Symfony\Component\DependencyInjection\ChildDefinition"')
-                ) {
-                    $getPrototype = static fn () => $getPrototype()->{'set'.$key}(unserialize($serialized));
-                }
-            }
-        }
-        unset($serialized);
+        $getPrototype = (new DeepCloner($prototype))->clone(...);
 
         foreach ($classes as $class => $errorMessage) {
             if (null === $errorMessage && $autoconfigureAttributes) {
@@ -246,7 +229,8 @@ abstract class FileLoader extends BaseFileLoader
                     throw new LogicException(\sprintf('#[AsAlias] attributes with a target cannot be public in "%s".', $class));
                 }
                 $this->container->registerAliasForArgument($class, $alias, $attribute->target);
-                $alias = array_key_last($this->container->getAliases());
+                $parsedName = (new Target($attribute->target))->getParsedName();
+                $alias = $alias.' $'.$parsedName;
                 if (isset($this->aliasedTargets[$alias])) {
                     throw new LogicException(\sprintf('The "%s" alias has already been defined with the #[AsAlias] attribute in "%s".', $alias, $class));
                 }

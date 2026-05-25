@@ -129,13 +129,8 @@ trait EntityValueResolverTrait
         }
 
         $criteria = [];
-        $metadata = null === $options->mapping ? $manager->getClassMetadata($options->class) : false;
 
         foreach ($mapping as $attribute => $field) {
-            if ($metadata && !$metadata->hasField($field) && (!$metadata->hasAssociation($field) || !$metadata->isSingleValuedAssociation($field))) {
-                continue;
-            }
-
             if (!\array_key_exists($attribute, $values)) {
                 continue;
             }

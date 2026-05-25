@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -298,6 +299,20 @@ class XmlDumper extends Dumper
         $withKeys = !array_is_list($parameters);
         foreach ($parameters as $key => $value) {
             $xmlAttr = $withKeys ? \sprintf(' %s="%s"', $keyAttribute, $this->encode($key)) : '';
+
+            if ($value instanceof EnvClosureArgument) {
+                $xmlAttr .= ' type="env_closure"';
+                if ($value->isStringable()) {
+                    $xmlAttr .= ' stringable="true"';
+                }
+                if (null !== $default = $value->getDefault()) {
+                    $xmlAttr .= \sprintf(' default="%s"', $this->encode(self::phpToXml($default)));
+                }
+                $envExpr = $this->container->resolveEnvPlaceholders($value->getValue());
+                yield \sprintf('<%s%s>%s</%1$s>', $type, $xmlAttr, $this->encode($envExpr, 0));
+
+                continue;
+            }
 
             if (($value instanceof TaggedIteratorArgument && $tag = $value)
                 || ($value instanceof ServiceLocatorArgument && $tag = $value->getTaggedIteratorArgument())

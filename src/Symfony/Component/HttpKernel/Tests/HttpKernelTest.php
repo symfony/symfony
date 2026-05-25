@@ -31,6 +31,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Bar;
 
 class HttpKernelTest extends TestCase
 {
@@ -490,6 +491,83 @@ class HttpKernelTest extends TestCase
         $kernel->handle($request, $kernel::MAIN_REQUEST, false);
 
         Request::setTrustedProxies([], -1);
+    }
+
+    public function testResponseEventCanAccessControllerAttributes()
+    {
+        $dispatcher = new EventDispatcher();
+        $capturedAttributes = null;
+
+        $dispatcher->addListener(KernelEvents::CONTROLLER, static function ($event) {
+            $event->setController($event->getController(), [new Bar('test')]);
+        });
+
+        $dispatcher->addListener(KernelEvents::RESPONSE, static function ($event) use (&$capturedAttributes) {
+            $capturedAttributes = $event->controllerMetadata->getAttributes('*');
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher);
+
+        $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertEquals([new Bar('test')], $capturedAttributes);
+    }
+
+    public function testViewEventProvidesControllerArgumentsViaMetadata()
+    {
+        $dispatcher = new EventDispatcher();
+        $capturedArguments = $capturedNamedArguments = null;
+
+        $dispatcher->addListener(KernelEvents::VIEW, static function ($event) use (&$capturedArguments, &$capturedNamedArguments) {
+            $capturedArguments = $event->controllerMetadata->getArguments();
+            $capturedNamedArguments = $event->controllerMetadata->getNamedArguments();
+            $event->setResponse(new Response('ok'));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, static fn ($value) => $value, arguments: ['resolved']);
+
+        $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame(['resolved'], $capturedArguments);
+        $this->assertSame(['value' => 'resolved'], $capturedNamedArguments);
+    }
+
+    public function testExceptionEventProvidesControllerMetadata()
+    {
+        $dispatcher = new EventDispatcher();
+        $capturedController = $capturedArguments = null;
+        $controller = static fn (string $value) => throw new \RuntimeException('boom');
+
+        $dispatcher->addListener(KernelEvents::EXCEPTION, static function ($event) use (&$capturedController, &$capturedArguments) {
+            $capturedController = $event->controllerMetadata->getController();
+            $capturedArguments = $event->controllerMetadata->getArguments();
+            $event->setResponse(new Response('handled'));
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, $controller, arguments: ['meta']);
+
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, true);
+
+        $this->assertSame('handled', $response->getContent());
+        $this->assertSame($controller, $capturedController);
+        $this->assertSame(['meta'], $capturedArguments);
+    }
+
+    public function testFinishRequestEventKeepsControllerMetadata()
+    {
+        $dispatcher = new EventDispatcher();
+        $capturedArguments = null;
+
+        $dispatcher->addListener(KernelEvents::FINISH_REQUEST, static function ($event) use (&$capturedArguments) {
+            $capturedArguments = $event->controllerMetadata->getArguments();
+        });
+
+        $kernel = $this->getHttpKernel($dispatcher, static fn ($value) => new Response($value), arguments: ['done']);
+
+        $response = $kernel->handle(new Request(), HttpKernelInterface::MAIN_REQUEST, false);
+
+        $this->assertSame('done', $response->getContent());
+        $this->assertSame(['done'], $capturedArguments);
     }
 
     private function getHttpKernel(EventDispatcherInterface $eventDispatcher, $controller = null, ?RequestStack $requestStack = null, array $arguments = [], bool $handleAllThrowables = false)

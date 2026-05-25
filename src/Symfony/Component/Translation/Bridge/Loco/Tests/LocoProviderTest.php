@@ -88,29 +88,6 @@ class LocoProviderTest extends ProviderTestCase
 
                 return new MockResponse('{"id": "messages__a"}', ['http_code' => 201]);
             },
-            'getTags1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
-                $this->assertSame('GET', $method);
-                $this->assertSame('https://localise.biz/api/tags.json', $url);
-                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
-
-                return new MockResponse('[]');
-            },
-            'createTag1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
-                $this->assertSame('POST', $method);
-                $this->assertSame('https://localise.biz/api/tags.json', $url);
-                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
-                $this->assertSame(http_build_query(['name' => 'messages']), $options['body']);
-
-                return new MockResponse('', ['http_code' => 201]);
-            },
-            'tagAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
-                $this->assertSame('POST', $method);
-                $this->assertSame('https://localise.biz/api/tags/messages.json', $url);
-                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
-                $this->assertSame('messages__a', $options['body']);
-
-                return new MockResponse();
-            },
             'createAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $expectedBody = http_build_query([
                     'id' => 'validators__post.num_comments',
@@ -125,12 +102,20 @@ class LocoProviderTest extends ProviderTestCase
 
                 return new MockResponse('{"id": "validators__post.num_comments"}', ['http_code' => 201]);
             },
-            'getTags2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+            'getTags' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $this->assertSame('GET', $method);
                 $this->assertSame('https://localise.biz/api/tags.json', $url);
                 $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
 
-                return new MockResponse('["messages"]');
+                return new MockResponse('[]');
+            },
+            'createTag1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame(http_build_query(['name' => 'messages']), $options['body']);
+
+                return new MockResponse('', ['http_code' => 201]);
             },
             'createTag2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $this->assertSame('POST', $method);
@@ -139,6 +124,14 @@ class LocoProviderTest extends ProviderTestCase
                 $this->assertSame(http_build_query(['name' => 'validators']), $options['body']);
 
                 return new MockResponse('', ['http_code' => 201]);
+            },
+            'tagAsset1' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
+                $this->assertSame('POST', $method);
+                $this->assertSame('https://localise.biz/api/tags/messages.json', $url);
+                $this->assertSame($expectedAuthHeader, $options['normalized_headers']['authorization'][0]);
+                $this->assertSame('messages__a', $options['body']);
+
+                return new MockResponse();
             },
             'tagAsset2' => function (string $method, string $url, array $options = []) use ($expectedAuthHeader): ResponseInterface {
                 $this->assertSame('POST', $method);
@@ -726,24 +719,20 @@ class LocoProviderTest extends ProviderTestCase
     public function testReadForManyLocalesAndManyDomains(array $locales, array $domains, array $responseContents, TranslatorBag $expectedTranslatorBag)
     {
         $responses = [];
-        $consecutiveLoadArguments = [];
-        $consecutiveLoadReturns = [];
 
         foreach ($locales as $locale) {
             foreach ($domains as $domain) {
                 $responses[] = new MockResponse($responseContents[$locale][$domain]);
-                $consecutiveLoadArguments[] = [$responseContents[$locale][$domain], $locale, $domain];
-                $consecutiveLoadReturns[] = (new XliffFileLoader())->load($responseContents[$locale][$domain], $locale, $domain);
             }
         }
 
         $this->loader = $this->createMock(LoaderInterface::class);
-        $this->loader->expects($this->exactly(\count($consecutiveLoadArguments)))
+        $this->loader->expects($this->exactly(\count($responses)))
             ->method('load')
-            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
-                $this->assertSame(array_shift($consecutiveLoadArguments), $args);
+            ->willReturnCallback(function (string $resource, string $locale, string $domain) use ($responseContents) {
+                $this->assertSame($responseContents[$locale][$domain], $resource);
 
-                return array_shift($consecutiveLoadReturns);
+                return (new XliffFileLoader())->load($resource, $locale, $domain);
             });
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
@@ -765,8 +754,6 @@ class LocoProviderTest extends ProviderTestCase
     public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag)
     {
         $responses = [];
-        $consecutiveLoadArguments = [];
-        $consecutiveLoadReturns = [];
 
         foreach ($locales as $locale) {
             foreach ($domains as $domain) {
@@ -782,18 +769,16 @@ class LocoProviderTest extends ProviderTestCase
                         ],
                     ]);
                 };
-                $consecutiveLoadArguments[] = [$responseContents[$locale][$domain], $locale, $domain];
-                $consecutiveLoadReturns[] = (new XliffFileLoader())->load($responseContents[$locale][$domain], $locale, $domain);
             }
         }
 
         $this->loader = $this->createMock(LoaderInterface::class);
-        $this->loader->expects($this->exactly(\count($consecutiveLoadArguments)))
+        $this->loader->expects($this->exactly(\count($responses)))
             ->method('load')
-            ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
-                $this->assertSame(array_shift($consecutiveLoadArguments), $args);
+            ->willReturnCallback(function (string $resource, string $locale, string $domain) use ($responseContents) {
+                $this->assertSame($responseContents[$locale][$domain], $resource);
 
-                return array_shift($consecutiveLoadReturns);
+                return (new XliffFileLoader())->load($resource, $locale, $domain);
             });
 
         $provider = self::createProvider(
@@ -854,25 +839,11 @@ class LocoProviderTest extends ProviderTestCase
 
         $provider = self::createProvider(
             new MockHttpClient([
-                function (string $method, string $url, array $options = []): ResponseInterface {
-                    $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/assets?filter=messages', $url);
-                    $this->assertSame(['filter' => 'messages'], $options['query']);
-
-                    return new MockResponse('[{"id":"messages__a"}]');
-                },
                 function (string $method, string $url): MockResponse {
                     $this->assertSame('DELETE', $method);
                     $this->assertSame('https://localise.biz/api/assets/messages__a.json', $url);
 
                     return new MockResponse();
-                },
-                function (string $method, string $url, array $options = []): ResponseInterface {
-                    $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/assets?filter=validators', $url);
-                    $this->assertSame(['filter' => 'validators'], $options['query']);
-
-                    return new MockResponse('[{"id":"validators__post.num_comments"}]');
                 },
                 function (string $method, string $url): MockResponse {
                     $this->assertSame('DELETE', $method);
@@ -899,13 +870,6 @@ class LocoProviderTest extends ProviderTestCase
 
         $provider = self::createProvider(
             new MockHttpClient([
-                function (string $method, string $url, array $options = []): ResponseInterface {
-                    $this->assertSame('GET', $method);
-                    $this->assertSame('https://localise.biz/api/assets?filter=messages', $url);
-                    $this->assertSame(['filter' => 'messages'], $options['query']);
-
-                    return new MockResponse('[{"id":"messages__a"}]');
-                },
                 function (string $method, string $url): MockResponse {
                     $this->assertSame('DELETE', $method);
                     $this->assertSame('https://localise.biz/api/assets/messages__a.json', $url);

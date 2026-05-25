@@ -23,6 +23,7 @@ return [
         'Atlantic/Reykjavik' => 'ora al meridian de Greenwich (Reykjavik)',
         'Atlantic/St_Helena' => 'ora al meridian de Greenwich (St. Helena)',
         'Etc/GMT' => 'ora al meridian de Greenwich',
+        'Europe/Dublin' => 'ora al meridian de Greenwich (Dublin)',
         'Europe/Guernsey' => 'ora al meridian de Greenwich (Guernsey)',
         'Europe/Isle_of_Man' => 'ora al meridian de Greenwich (Isle of Man)',
         'Europe/Jersey' => 'ora al meridian de Greenwich (Jersey)',

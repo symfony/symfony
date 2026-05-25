@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Waqtiga Bartamaha Yurub (Busingeen)',
         'Europe/Chisinau' => 'Waqtiga Bariga Yurub (Jisinaaw)',
         'Europe/Copenhagen' => 'Waqtiga Bartamaha Yurub (Kobenhaagan)',
-        'Europe/Dublin' => 'Waqtiga Ayrlaand (Dhaablin)',
+        'Europe/Dublin' => 'Wakhtiga Giriinwij (Dhaablin)',
         'Europe/Gibraltar' => 'Waqtiga Bartamaha Yurub (Gibraltar)',
         'Europe/Guernsey' => 'Wakhtiga Giriinwij (Geernisi)',
         'Europe/Helsinki' => 'Waqtiga Bariga Yurub (Heleniski)',

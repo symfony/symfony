@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'temp da l’Europa Centrala (Büsingen)',
         'Europe/Chisinau' => 'temp da l’Europa Orientala (Chișinău)',
         'Europe/Copenhagen' => 'temp da l’Europa Centrala (Copenhagen)',
-        'Europe/Dublin' => 'Irlanda (temp local) (Dublin)',
+        'Europe/Dublin' => 'temp dal meridian da Greenwich (Dublin)',
         'Europe/Gibraltar' => 'temp da l’Europa Centrala (Gibraltar)',
         'Europe/Guernsey' => 'temp dal meridian da Greenwich (Guernsey)',
         'Europe/Helsinki' => 'temp da l’Europa Orientala (Helsinki)',

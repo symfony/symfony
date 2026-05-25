@@ -98,10 +98,11 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider
             ->method('loadTokenBySeries')
-            ->with('series1')
-            ->willReturn($persistentToken)
+            ->willReturnMap([
+                ['series1', $persistentToken],
+            ])
         ;
 
         $tokenProvider->expects($this->once())->method('updateToken')->with('series1');
@@ -132,8 +133,9 @@ class PersistentRememberMeHandlerTest extends TestCase
             $persistentToken = new PersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min'));
         }
 
-        $tokenProvider = $this->createStub(TokenProviderInterface::class);
+        $tokenProvider = $this->createMock(TokenProviderInterface::class);
         $tokenProvider
+            ->expects($this->once())
             ->method('loadTokenBySeries')
             ->with('series1')
             ->willReturn($persistentToken)
@@ -165,7 +167,7 @@ class PersistentRememberMeHandlerTest extends TestCase
 
     public function testConsumeRememberMeCookieValidByValidatorWithoutUpdate()
     {
-        $verifier = $this->createStub(TokenVerifierInterface::class);
+        $verifier = $this->createMock(TokenVerifierInterface::class);
         $handler = new PersistentRememberMeHandler($this->tokenProvider, $this->userProvider, $this->requestStack, [], null, $verifier);
 
         if (method_exists(PersistentToken::class, 'getClass')) {
@@ -177,6 +179,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->tokenProvider->createNewToken($persistentToken);
 
         $verifier
+            ->expects($this->once())
             ->method('verifyToken')
             ->with($persistentToken, 'oldTokenValue')
             ->willReturn(true)
@@ -197,10 +200,11 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider
             ->method('loadTokenBySeries')
-            ->with('series1')
-            ->willReturn($persistentToken);
+            ->willReturnMap([
+                ['series1', $persistentToken],
+            ]);
 
         $tokenProvider->expects($this->never())->method('updateToken')->with('series1');
 
@@ -218,10 +222,11 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider
             ->method('loadTokenBySeries')
-            ->with('series1')
-            ->willReturn($persistentToken);
+            ->willReturnMap([
+                ['series1', $persistentToken],
+            ]);
 
         $tokenProvider->expects($this->never())->method('updateToken')->with('series1');
 
@@ -240,10 +245,11 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider
             ->method('loadTokenBySeries')
-            ->with('series1')
-            ->willReturn($persistentToken)
+            ->willReturnMap([
+                ['series1', $persistentToken],
+            ])
         ;
 
         $tokenProvider->expects($this->once())->method('updateToken')->with('series1');
@@ -264,10 +270,11 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider
             ->method('loadTokenBySeries')
-            ->with('series1')
-            ->willReturn($persistentToken)
+            ->willReturnMap([
+                ['series1', $persistentToken],
+            ])
         ;
 
         $tokenProvider->expects($this->once())->method('updateToken')->with('series1');

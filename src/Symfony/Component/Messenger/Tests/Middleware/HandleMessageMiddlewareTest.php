@@ -356,12 +356,12 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $message = new DummyMessage('Hey');
         $envelope = $middleware->handle(new Envelope($message, [new AckStamp($ack)]), new StackMiddleware());
 
-        $this->assertEmpty($handler->processedMessages);
+        $this->assertSame([], $handler->processedMessages);
         $this->assertCount(1, $envelope->all(NoAutoAckStamp::class));
 
         $handler->flush(false);
 
-        $this->assertEmpty($handler->processedMessages);
+        $this->assertSame([], $handler->processedMessages);
 
         $handler->flush(true);
 

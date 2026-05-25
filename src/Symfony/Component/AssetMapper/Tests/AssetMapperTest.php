@@ -93,7 +93,6 @@ class AssetMapperTest extends TestCase
         $compiledConfigReader = $this->createStub(CompiledAssetMapperConfigReader::class);
         $compiledConfigReader
             ->method('configExists')
-            ->with(AssetMapper::MANIFEST_FILE_NAME)
             ->willReturn(true);
         $compiledConfigReader
             ->method('loadConfig')

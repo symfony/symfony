@@ -222,4 +222,16 @@ class DataPartTest extends TestCase
         $expected = clone $p;
         $this->assertEquals($expected->toString(), unserialize(serialize($p))->toString());
     }
+
+    public function testSerializePreservesContentId()
+    {
+        $p = new DataPart('content', 'image.jpg', 'image/jpeg');
+        $p->asInline();
+        $cid = $p->getContentId();
+
+        $unserialized = unserialize(serialize($p));
+
+        $this->assertTrue($unserialized->hasContentId());
+        $this->assertSame($cid, $unserialized->getContentId());
+    }
 }

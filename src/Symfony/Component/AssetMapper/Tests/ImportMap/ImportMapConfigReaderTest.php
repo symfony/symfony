@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -153,5 +154,60 @@ class ImportMapConfigReaderTest extends TestCase
         $entry = $configReader->findRootImportMapEntry('file2');
         $this->assertSame('file2', $entry->importName);
         $this->assertSame('file2.js', $entry->path);
+    }
+
+    public function testGetEntriesThrowsWhenImportmapDoesNotReturnArray()
+    {
+        $configPath = __DIR__.'/../Fixtures/importmap_config_reader/importmap.php';
+        file_put_contents($configPath, "<?php\n");
+
+        $reader = new ImportMapConfigReader($configPath, $this->createStub(RemotePackageStorage::class));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('The "%s" file must return an array, got "int".', $configPath));
+
+        $reader->getEntries();
+    }
+
+    public function testGetEntriesThrowsOnUnknownTypeValue()
+    {
+        $configPath = __DIR__.'/../Fixtures/importmap_config_reader/importmap.php';
+        file_put_contents($configPath, <<<'EOF'
+            <?php
+            return [
+                'app' => [
+                    'path' => 'app.js',
+                    'type' => 'wat',
+                ],
+            ];
+            EOF);
+
+        $reader = new ImportMapConfigReader($configPath, $this->createStub(RemotePackageStorage::class));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The importmap entry "app" has an invalid "type" value "wat". Valid values are: "js", "css", "json".');
+
+        $reader->getEntries();
+    }
+
+    public function testGetEntriesRunsImportmapWithoutClassScope()
+    {
+        $configPath = __DIR__.'/../Fixtures/importmap_config_reader/importmap.php';
+        file_put_contents($configPath, <<<'EOF'
+            <?php
+            $scope = (new \ReflectionFunction(static fn () => null))->getClosureScopeClass();
+
+            return [
+                'app' => [
+                    'path' => null === $scope ? 'no-scope' : $scope->name,
+                ],
+            ];
+            EOF);
+
+        $reader = new ImportMapConfigReader($configPath, $this->createStub(RemotePackageStorage::class));
+        $entries = iterator_to_array($reader->getEntries());
+
+        $this->assertCount(1, $entries);
+        $this->assertSame('no-scope', $entries[0]->path);
     }
 }

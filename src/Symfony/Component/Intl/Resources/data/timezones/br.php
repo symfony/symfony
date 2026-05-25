@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'eur Kreizeuropa (Büsingen)',
         'Europe/Chisinau' => 'eur Europa ar Reter (Chișinău)',
         'Europe/Copenhagen' => 'eur Kreizeuropa (Kopenhagen)',
-        'Europe/Dublin' => 'eur Iwerzhon (Dulenn)',
+        'Europe/Dublin' => 'amzer keitat Greenwich (AKG) (Dulenn)',
         'Europe/Gibraltar' => 'eur Kreizeuropa (Jibraltar)',
         'Europe/Guernsey' => 'amzer keitat Greenwich (AKG) (Gwernenez)',
         'Europe/Helsinki' => 'eur Europa ar Reter (Helsinki)',

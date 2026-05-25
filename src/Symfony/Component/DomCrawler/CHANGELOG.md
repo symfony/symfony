@@ -4,7 +4,8 @@ CHANGELOG
 8.1
 ---
 
- * Allow to add choices to single select
+ * Make `ChoiceFormField::addChoice()` part of the supported public API
+ * Always set `LIBXML_NONET` in `Crawler::addXmlContent()` so external entities cannot trigger network requests
 
 8.0
 ---

@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -19,8 +21,13 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\FileBag;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
@@ -2713,6 +2720,7 @@ b'])]
             ["https\x80://example.com", 'Invalid URI: Scheme is malformed.'],
             ['http>://example.com', 'Invalid URI: Scheme is malformed.'],
             ['0http://example.com', 'Invalid URI: Scheme is malformed.'],
+            [':path', 'Invalid URI: Path is malformed.'],
         ];
     }
 
@@ -2739,7 +2747,6 @@ b'])]
             ['http://[2001:db8::1]/path'],
             ['http://[::1]'],
             ['http://example.com/path'],
-            [':path'],
         ];
     }
 
@@ -2998,6 +3005,43 @@ b'])]
             'atom',
             'html',
         ];
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: object, 2: string}>
+     */
+    public static function provideDirectPropertyWrites(): iterable
+    {
+        yield 'attributes' => ['attributes', new ParameterBag(['k' => 'v']), 'pass attributes as a constructor argument or call "initialize()" instead.'];
+        yield 'request' => ['request', new InputBag(['k' => 'v']), 'pass the POST data as a constructor argument or call "initialize()" instead.'];
+        yield 'query' => ['query', new InputBag(['k' => 'v']), 'pass query parameters as a constructor argument or call "initialize()" instead.'];
+        yield 'server' => ['server', new ServerBag(['k' => 'v']), 'pass server parameters as a constructor argument or call "initialize()" instead.'];
+        yield 'files' => ['files', new FileBag(), 'pass files as a constructor argument or call "initialize()" instead.'];
+        yield 'cookies' => ['cookies', new InputBag(['k' => 'v']), 'pass cookies as a constructor argument or call "initialize()" instead.'];
+        yield 'headers' => ['headers', new HeaderBag(['k' => 'v']), 'pass header parameters as a constructor argument or call "initialize()" instead.'];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideDirectPropertyWrites')]
+    public function testDirectPropertyWriteIsDeprecated(string $property, object $value, string $extra)
+    {
+        $request = new Request();
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/http-foundation 8.1: Directly setting property "%s" of "Symfony\Component\HttpFoundation\Request" is deprecated; %s', $property, $extra));
+
+        $request->{$property} = $value;
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDirectPropertyWriteFromSubclassReportsSubclass()
+    {
+        $request = new NewRequest();
+
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.1: Directly setting property "query" of "Symfony\Component\HttpFoundation\Tests\NewRequest" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.');
+
+        $request->query = new InputBag(['k' => 'v']);
     }
 }
 

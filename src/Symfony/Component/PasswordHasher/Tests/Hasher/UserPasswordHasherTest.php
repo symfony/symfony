@@ -27,8 +27,9 @@ class UserPasswordHasherTest extends TestCase
     {
         $user = new TestLegacyPasswordAuthenticatedUser('name', null, 'userSalt');
 
-        $passwordHasher = $this->createStub(PasswordHasherInterface::class);
+        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $passwordHasher
+            ->expects($this->once())
             ->method('hash')
             ->with($this->equalTo('plainPassword'), $this->equalTo('userSalt'))
             ->willReturn('hash');
@@ -47,8 +48,9 @@ class UserPasswordHasherTest extends TestCase
     {
         $user = new TestPasswordAuthenticatedUser();
 
-        $passwordHasher = $this->createStub(PasswordHasherInterface::class);
+        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $passwordHasher
+            ->expects($this->once())
             ->method('hash')
             ->with($this->equalTo('plainPassword'), $this->equalTo(null))
             ->willReturn('hash');
@@ -68,8 +70,9 @@ class UserPasswordHasherTest extends TestCase
     {
         $user = new TestLegacyPasswordAuthenticatedUser('user', 'hash', 'userSalt');
 
-        $passwordHasher = $this->createStub(PasswordHasherInterface::class);
+        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $passwordHasher
+            ->expects($this->once())
             ->method('verify')
             ->with($this->equalTo('hash'), $this->equalTo('plainPassword'), $this->equalTo('userSalt'))
             ->willReturn(true);
@@ -88,8 +91,9 @@ class UserPasswordHasherTest extends TestCase
     {
         $user = new TestPasswordAuthenticatedUser('hash');
 
-        $passwordHasher = $this->createStub(PasswordHasherInterface::class);
+        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $passwordHasher
+            ->expects($this->once())
             ->method('verify')
             ->with($this->equalTo('hash'), $this->equalTo('plainPassword'), $this->equalTo(null))
             ->willReturn(true);
@@ -109,8 +113,9 @@ class UserPasswordHasherTest extends TestCase
         $user = new InMemoryUser('username', null);
         $hasher = new NativePasswordHasher(4, 20000, 4);
 
-        $passwordHasherFactory = $this->createStub(PasswordHasherFactoryInterface::class);
+        $passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $passwordHasherFactory
+            ->expects($this->exactly(4))
             ->method('getPasswordHasher')
             ->with($user)
             ->willReturn($hasher, $hasher, new NativePasswordHasher(5, 20000, 5), $hasher);

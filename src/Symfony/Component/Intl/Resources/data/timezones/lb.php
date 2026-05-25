@@ -342,7 +342,7 @@ return [
         'Europe/Busingen' => 'Mëtteleuropäesch Zäit (Büsingen)',
         'Europe/Chisinau' => 'Osteuropäesch Zäit (Kischinau)',
         'Europe/Copenhagen' => 'Mëtteleuropäesch Zäit (Kopenhagen)',
-        'Europe/Dublin' => 'Irland Zäit (Dublin)',
+        'Europe/Dublin' => 'Mëttler Greenwich-Zäit (Dublin)',
         'Europe/Gibraltar' => 'Mëtteleuropäesch Zäit (Gibraltar)',
         'Europe/Guernsey' => 'Mëttler Greenwich-Zäit (Guernsey)',
         'Europe/Helsinki' => 'Osteuropäesch Zäit (Helsinki)',

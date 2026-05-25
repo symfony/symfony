@@ -1,7 +1,7 @@
 name: Integration
 
 on:
-  push:
+  push: { branches: [ '*.*' ] }
   pull_request:
 
 defaults:
@@ -139,7 +139,7 @@ jobs:
           KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
         options: --name=kafka
       frankenphp:
-        image: dunglas/frankenphp:1.1.0
+        image: dunglas/frankenphp:1.12.1-php8.4
         ports:
           - 80:80
           - 8681:81
@@ -208,7 +208,7 @@ jobs:
         with:
           coverage: "none"
           extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis,rdkafka,xsl,ldap,relay"
-          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
+          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1,intl.default_locale=en,intl.error_level=0
           php-version: "${{ matrix.php }}"
           tools: pecl
 

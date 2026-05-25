@@ -11,6 +11,13 @@
 
 namespace Symfony\Component\ErrorHandler\Error;
 
+/**
+ * Raised on shutdown when PHP exhausts its memory_limit.
+ *
+ * Instances bypass http_response_code() and header() calls in the default
+ * renderer to avoid PHP 8.5+ warnings when adjusting response state after
+ * the fatal error has fired.
+ */
 class OutOfMemoryError extends FatalError
 {
 }

@@ -33,6 +33,7 @@ ini_set('session.cookie_path', '/');
 ini_set('session.cookie_domain', '');
 ini_set('session.cookie_secure', 1);
 ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.use_strict_mode', 1);
 ini_set('session.lazy_write', 1);
 ini_set('session.name', 'sid');
@@ -86,7 +87,7 @@ class TestSessionHandler extends AbstractSessionHandler
     {
         echo __FUNCTION__, "\n";
 
-        return true;
+        return parent::updateTimestamp($sessionId, $data);
     }
 
     public function write(string $sessionId, string $data): bool

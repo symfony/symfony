@@ -77,7 +77,7 @@ class DebugFirewallCommandTest extends TestCase
             switchUser: null
         );
 
-        $context = new FirewallContext([], config: $config);
+        $context = new FirewallContext([], null, null, $config);
 
         $contexts = new Container();
         $contexts->set('security.firewall.map.context.main', $context);
@@ -108,7 +108,7 @@ class DebugFirewallCommandTest extends TestCase
             accessDeniedUrl: '/access-denied',
         );
 
-        $context = new FirewallContext([], config: $config);
+        $context = new FirewallContext([], null, null, $config);
 
         $contexts = new Container();
         $contexts->set('security.firewall.map.context.main', $context);
@@ -156,7 +156,7 @@ class DebugFirewallCommandTest extends TestCase
             switchUser: $switchUserConfig,
         );
 
-        $context = new FirewallContext([], config: $config);
+        $context = new FirewallContext([], null, null, $config);
 
         $contexts = new Container();
         $contexts->set('security.firewall.map.context.main', $context);

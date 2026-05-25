@@ -1,0 +1,58 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\DependencyInjection\Kernel;
+
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ */
+interface BundleInterface
+{
+    /**
+     * Boots the Bundle.
+     */
+    public function boot(): void;
+
+    /**
+     * Shutdowns the Bundle.
+     */
+    public function shutdown(): void;
+
+    /**
+     * Builds the bundle.
+     *
+     * It is only ever called once when the cache is empty.
+     */
+    public function build(ContainerBuilder $container): void;
+
+    /**
+     * Returns the container extension that should be implicitly loaded.
+     */
+    public function getContainerExtension(): ?ExtensionInterface;
+
+    /**
+     * Returns the bundle name (the class short name).
+     */
+    public function getName(): string;
+
+    /**
+     * Gets the Bundle directory path.
+     *
+     * The path should always be returned as a Unix path (with /).
+     */
+    public function getPath(): string;
+
+    public function setContainer(?ContainerInterface $container): void;
+}

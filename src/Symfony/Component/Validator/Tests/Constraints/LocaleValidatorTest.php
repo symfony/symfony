@@ -26,14 +26,14 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Locale());
+        $this->validate(null, new Locale());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Locale());
+        $this->validate('', new Locale());
 
         $this->assertNoViolation();
     }
@@ -41,13 +41,13 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Locale());
+        $this->validate(new \stdClass(), new Locale());
     }
 
     #[DataProvider('getValidLocales')]
     public function testValidLocales($locale)
     {
-        $this->validator->validate($locale, new Locale());
+        $this->validate($locale, new Locale());
 
         $this->assertNoViolation();
     }
@@ -70,7 +70,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Locale(message: 'myMessage');
 
-        $this->validator->validate($locale, $constraint);
+        $this->validate($locale, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$locale.'"')
@@ -91,7 +91,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Locale(message: 'myMessage');
 
         $locale = str_repeat('a', (\defined('INTL_MAX_LOCALE_LEN') ? \INTL_MAX_LOCALE_LEN : 85) + 1);
-        $this->validator->validate($locale, $constraint);
+        $this->validate($locale, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$locale.'"')
@@ -104,7 +104,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Locale(message: 'myMessage');
 
-        $this->validator->validate($locale, $constraint);
+        $this->validate($locale, $constraint);
 
         $this->assertNoViolation();
     }
@@ -117,7 +117,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             canonicalize: false,
         );
 
-        $this->validator->validate($locale, $constraint);
+        $this->validate($locale, $constraint);
 
         $this->assertNoViolation();
     }
@@ -130,7 +130,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             canonicalize: false,
         );
 
-        $this->validator->validate($locale, $constraint);
+        $this->validate($locale, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$locale.'"')
@@ -140,7 +140,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidLocaleWithoutCanonicalizationNamed()
     {
-        $this->validator->validate(
+        $this->validate(
             'en-US',
             new Locale(message: 'myMessage', canonicalize: false)
         );

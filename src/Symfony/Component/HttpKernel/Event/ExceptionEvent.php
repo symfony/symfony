@@ -38,6 +38,7 @@ final class ExceptionEvent extends RequestEvent
         int $requestType,
         \Throwable $e,
         private bool $isKernelTerminating = false,
+        public readonly ?ControllerMetadata $controllerMetadata = null,
     ) {
         parent::__construct($kernel, $request, $requestType);
 

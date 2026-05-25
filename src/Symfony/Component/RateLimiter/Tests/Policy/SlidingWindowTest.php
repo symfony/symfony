@@ -17,6 +17,18 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\InvalidIntervalException;
 use Symfony\Component\RateLimiter\Policy\SlidingWindow;
 
+class SlidingWindowTestToStringGadget
+{
+    public static bool $fired = false;
+
+    public function __toString(): string
+    {
+        self::$fired = true;
+
+        return '';
+    }
+}
+
 #[Group('time-sensitive')]
 class SlidingWindowTest extends TestCase
 {
@@ -119,5 +131,30 @@ class SlidingWindowTest extends TestCase
         $window = SlidingWindow::createFromPreviousWindow($window, 10);
         sleep(10);
         $this->assertEquals(40, $window->calculateTimeForTokens(1, 4));
+    }
+
+    public function testUnserializeRejectsObjectInTypedIdProperty()
+    {
+        $data = [
+            'id' => new SlidingWindowTestToStringGadget(),
+            'hitCount' => 0,
+            'intervalInSeconds' => 1,
+            'hitCountForLastWindow' => 0,
+            'windowEndAt' => 0.0,
+        ];
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(SlidingWindow::class), SlidingWindow::class, \count($data));
+        foreach ($data as $key => $value) {
+            $payload .= serialize($key).serialize($value);
+        }
+        $payload .= '}';
+        SlidingWindowTestToStringGadget::$fired = false;
+
+        try {
+            unserialize($payload);
+            $this->fail('Expected BadMethodCallException.');
+        } catch (\BadMethodCallException $e) {
+        }
+
+        $this->assertFalse(SlidingWindowTestToStringGadget::$fired, '__toString gadget must not fire during unserialize');
     }
 }

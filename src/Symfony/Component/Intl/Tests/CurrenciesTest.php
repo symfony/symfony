@@ -809,42 +809,42 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testBefCurrencyNoLongerExistIn2025()
     {
-        $this->assertFalse(Currencies::isValidInAnyCountry('BEF', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertFalse(Currencies::isValidInAnyCountry('BEF', true, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testUsdCurrencyExistsInAtLeastOneCountryIn2025()
     {
-        $this->assertTrue(Currencies::isValidInAnyCountry('USD', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertTrue(Currencies::isValidInAnyCountry('USD', true, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testCheCurrencyIsNotRecognizedLegallyAnywhere()
     {
-        $this->assertTrue(Currencies::isValidInAnyCountry('CHE', null, active: null));
+        $this->assertTrue(Currencies::isValidInAnyCountry('CHE', null, null));
     }
 
     public function testEsbCurrencyIsNotLegalTenderSomewhere()
     {
-        $this->assertFalse(Currencies::isValidInAnyCountry('ESB', active: null));
+        $this->assertFalse(Currencies::isValidInAnyCountry('ESB', true, null));
     }
 
     public function testCurrenciesOfSwitzerlandIn2025()
     {
-        $this->assertSame(['CHF'], Currencies::forCountry('CH', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertSame(['CHF'], Currencies::forCountry('CH', true, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testBefCurrencyExistedLegallyInTheHistory()
     {
-        $this->assertContains('BEF', Currencies::forCountry('BE', active: null));
+        $this->assertContains('BEF', Currencies::forCountry('BE', true, null));
     }
 
     public function testBefCurrencyWasValidIn2001InBelgium()
     {
-        $this->assertTrue(Currencies::isValidInCountry('BE', 'BEF', date: new \DateTimeImmutable('2001-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertTrue(Currencies::isValidInCountry('BE', 'BEF', true, true, new \DateTimeImmutable('2001-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testEurCurrencyIsValidIn2025InFrance()
     {
-        $this->assertTrue(Currencies::isValidInCountry('FR', 'EUR', date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertTrue(Currencies::isValidInCountry('FR', 'EUR', true, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testCheCurrencyIsValidInSwitzerland()
@@ -859,7 +859,7 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testUsdCurrencyDoesNotExistInFranceIn2025()
     {
-        $this->assertFalse(Currencies::isValidInCountry('FR', 'USD', active: null, date: new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+        $this->assertFalse(Currencies::isValidInCountry('FR', 'USD', true, null, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
     }
 
     public function testChfCurrencyNotConsideredLegalTender()
@@ -869,12 +869,12 @@ class CurrenciesTest extends ResourceBundleTestCase
 
     public function testCheCurrencyIncluded()
     {
-        $this->assertTrue(Currencies::isValidInCountry('CH', 'CHE', false, true, includeUndated: true));
+        $this->assertTrue(Currencies::isValidInCountry('CH', 'CHE', false, true, new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), true));
     }
 
     public function testCheCurrencyExcluded()
     {
-        $this->assertFalse(Currencies::isValidInCountry('CH', 'CHE', false, true, includeUndated: false));
+        $this->assertFalse(Currencies::isValidInCountry('CH', 'CHE', false, true, new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), false));
     }
 
     /**

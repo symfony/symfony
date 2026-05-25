@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
@@ -770,6 +772,7 @@ class ConfigurationTest extends TestCase
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'disable_translation' => false,
+                'property_metadata_existence_check' => false,
                 'mapping' => [
                     'paths' => [],
                 ],
@@ -969,6 +972,7 @@ class ConfigurationTest extends TestCase
                 'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 7,
+                'uuid47_secret' => null,
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
@@ -982,6 +986,10 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(WebhookController::class),
                 'routing' => [],
                 'message_bus' => 'messenger.default_bus',
+                'event_header_name' => 'Webhook-Event',
+                'id_header_name' => 'Webhook-Id',
+                'signature_header_name' => 'Webhook-Signature',
+                'signing_algorithm' => 'sha256',
             ],
             'remote-event' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
@@ -1009,6 +1017,18 @@ class ConfigurationTest extends TestCase
                     'default' => ['include_built_in_normalizers' => false],
                 ],
             ],
+        ]]);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testTerminateOnCacheHitDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Setting the "framework.http_cache.terminate_on_cache_hit" configuration option is deprecated. It will be removed in version 9.0.');
+
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration(true), [[
+            'http_cache' => ['terminate_on_cache_hit' => true],
         ]]);
     }
 }

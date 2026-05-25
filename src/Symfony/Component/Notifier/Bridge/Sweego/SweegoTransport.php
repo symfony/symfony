@@ -91,7 +91,7 @@ final class SweegoTransport extends AbstractTransport
             'headers' => [
                 'Api-Key' => $this->apiKey,
             ],
-            'json' => array_filter($body),
+            'json' => array_filter($body, static fn ($value) => null !== $value),
         ]);
 
         try {
@@ -114,7 +114,7 @@ final class SweegoTransport extends AbstractTransport
 
     private function setBat(array $body, array $options): array
     {
-        $body['bat'] = (bool) ($options[SweegoOptions::BAT] ?? $this->bat);
+        $body['bat'] = $options[SweegoOptions::BAT] ?? $this->bat;
 
         return $body;
     }
@@ -143,14 +143,14 @@ final class SweegoTransport extends AbstractTransport
 
     private function setShortenUrls(array $body, array $options): array
     {
-        $body['shorten_urls'] = (bool) ($options[SweegoOptions::SHORTEN_URLS] ?? $this->shortenUrls);
+        $body['shorten_urls'] = $options[SweegoOptions::SHORTEN_URLS] ?? $this->shortenUrls;
 
         return $body;
     }
 
     private function setShortenWithProtocol(array $body, array $options): array
     {
-        $body['shorten_with_protocol'] = (bool) ($options[SweegoOptions::SHORTEN_WITH_PROTOCOL] ?? $this->shortenWithProtocol);
+        $body['shorten_with_protocol'] = $options[SweegoOptions::SHORTEN_WITH_PROTOCOL] ?? $this->shortenWithProtocol;
 
         return $body;
     }

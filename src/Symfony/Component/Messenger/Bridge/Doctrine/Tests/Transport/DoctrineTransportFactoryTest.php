@@ -15,6 +15,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\Persistence\ConnectionRegistry;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\Bridge\Doctrine\EventListener\PostgreSqlNotifyOnIdleListener;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransportFactory;
@@ -88,5 +89,62 @@ class DoctrineTransportFactoryTest extends TestCase
 
         $factory = new DoctrineTransportFactory($registry);
         $factory->createTransport('doctrine://default', [], $this->createStub(SerializerInterface::class));
+    }
+
+    public function testCreateTransportRegistersConnectionWithListener()
+    {
+        $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $platform = $this->createStub(PostgreSQLPlatform::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('executeStatement')->willReturn(1);
+
+        $registry = $this->createStub(ConnectionRegistry::class);
+        $registry->method('getConnection')->willReturn($driverConnection);
+
+        $listener = $this->createMock(PostgreSqlNotifyOnIdleListener::class);
+        $listener->expects($this->once())
+            ->method('addConnection')
+            ->with('my_transport', $this->isInstanceOf(PostgreSqlConnection::class));
+
+        $factory = new DoctrineTransportFactory($registry, $listener);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $factory->createTransport('doctrine://default', ['transport_name' => 'my_transport'], $serializer);
+    }
+
+    public function testCreateTransportDoesNotRegisterWithoutTransportName()
+    {
+        $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $platform = $this->createStub(PostgreSQLPlatform::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('executeStatement')->willReturn(1);
+
+        $registry = $this->createStub(ConnectionRegistry::class);
+        $registry->method('getConnection')->willReturn($driverConnection);
+
+        $listener = $this->createMock(PostgreSqlNotifyOnIdleListener::class);
+        $listener->expects($this->never())->method('addConnection');
+
+        $factory = new DoctrineTransportFactory($registry, $listener);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $factory->createTransport('doctrine://default', [], $serializer);
+    }
+
+    public function testCreateTransportWorksWithoutListener()
+    {
+        $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
+        $platform = $this->createStub(PostgreSQLPlatform::class);
+        $driverConnection->method('getDatabasePlatform')->willReturn($platform);
+        $driverConnection->method('executeStatement')->willReturn(1);
+
+        $registry = $this->createStub(ConnectionRegistry::class);
+        $registry->method('getConnection')->willReturn($driverConnection);
+
+        $factory = new DoctrineTransportFactory($registry);
+        $serializer = $this->createStub(SerializerInterface::class);
+
+        $transport = $factory->createTransport('doctrine://default', ['transport_name' => 'my_transport'], $serializer);
+        $this->assertInstanceOf(DoctrineTransport::class, $transport);
     }
 }

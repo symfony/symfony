@@ -30,14 +30,14 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Cidr());
+        $this->validate(null, new Cidr());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Cidr());
+        $this->validate('', new Cidr());
 
         $this->assertNoViolation();
     }
@@ -46,20 +46,20 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->validator->validate('neko', new NotNull());
+        $this->validate('neko', new NotNull());
     }
 
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
 
-        $this->validator->validate(123456, new Cidr());
+        $this->validate(123456, new Cidr());
     }
 
     #[DataProvider('getWithInvalidNetmask')]
     public function testInvalidNetmask(string $cidr)
     {
-        $this->validator->validate($cidr, new Cidr());
+        $this->validate($cidr, new Cidr());
 
         $this
             ->buildViolation('This value is not a valid CIDR notation.')
@@ -70,7 +70,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getWithInvalidIps')]
     public function testInvalidIpValue(string $cidr)
     {
-        $this->validator->validate($cidr, new Cidr());
+        $this->validate($cidr, new Cidr());
 
         $this
             ->buildViolation('This value is not a valid CIDR notation.')
@@ -81,7 +81,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValid')]
     public function testValidCidr(string|\Stringable $cidr, string $version)
     {
-        $this->validator->validate($cidr, new Cidr(version: $version));
+        $this->validate($cidr, new Cidr(version: $version));
 
         $this->assertNoViolation();
     }
@@ -89,7 +89,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getWithInvalidMasksAndIps')]
     public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr)
     {
-        $this->validator->validate($cidr, new Cidr());
+        $this->validate($cidr, new Cidr());
         $this
             ->buildViolation('This value is not a valid CIDR notation.')
             ->setCode(Cidr::INVALID_CIDR_ERROR)
@@ -104,7 +104,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
             netmaskMin: $min,
             netmaskMax: $max,
         );
-        $this->validator->validate($cidr, $cidrConstraint);
+        $this->validate($cidr, $cidrConstraint);
 
         $this
             ->buildViolation('The value of the netmask should be between {{ min }} and {{ max }}.')
@@ -117,7 +117,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getWithWrongVersion')]
     public function testWrongVersion(string $cidr, string $version)
     {
-        $this->validator->validate($cidr, new Cidr(version: $version));
+        $this->validate($cidr, new Cidr(version: $version));
 
         $this
             ->buildViolation('This value is not a valid CIDR notation.')
@@ -249,11 +249,11 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Cidr();
 
-        $this->validator->validate('1.2.3.4/28', $constraint);
+        $this->validate('1.2.3.4/28', $constraint);
 
         $this->assertNoViolation();
 
-        $this->validator->validate('::1/64', $constraint);
+        $this->validate('::1/64', $constraint);
 
         $this->assertNoViolation();
     }

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
+use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
 
 class RequestValueResolverTest extends TestCase
 {
@@ -43,5 +44,36 @@ class RequestValueResolverTest extends TestCase
         $expectedRequest = Request::create('/');
         $this->expectException(NearMissValueResolverException::class);
         $resolver->resolve($expectedRequest, new ArgumentMetadata('request', RandomRequest::class, false, false, null));
+    }
+
+    public function testResolveSupportsExtendingRequest()
+    {
+        $resolver = new RequestValueResolver();
+        $request = new ExtendingRequest();
+        $metadata = new ArgumentMetadata('request', ExtendingRequest::class, false, false, null);
+
+        $this->assertSame([$request], $resolver->resolve($request, $metadata));
+    }
+
+    public function testResolveDefersWhenMatchingNamedAttributeExists()
+    {
+        $resolver = new RequestValueResolver();
+        $request = Request::create('/');
+        $request->attributes->set('request', Request::create('/other'));
+
+        $metadata = new ArgumentMetadata('request', Request::class, false, false, null);
+
+        $this->assertSame([], $resolver->resolve($request, $metadata));
+    }
+
+    public function testResolveIgnoresUnrelatedAttributeName()
+    {
+        $resolver = new RequestValueResolver();
+        $request = Request::create('/');
+        $request->attributes->set('foo', Request::create('/other'));
+
+        $metadata = new ArgumentMetadata('request', Request::class, false, false, null);
+
+        $this->assertSame([$request], $resolver->resolve($request, $metadata));
     }
 }

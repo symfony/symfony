@@ -40,7 +40,7 @@ class TerminalTest extends TestCase
 
     private function resetStatics()
     {
-        foreach (['height', 'width', 'stty'] as $name) {
+        foreach (['height', 'width', 'stty', 'kittyGraphics', 'iterm2Images'] as $name) {
             $property = new \ReflectionProperty(Terminal::class, $name);
             $property->setValue(null, null);
         }
@@ -146,5 +146,115 @@ class TerminalTest extends TestCase
             (false !== $oriTerm) ? putenv('TERM='.$oriTerm) : putenv('TERM');
             Terminal::setColorMode(null);
         }
+    }
+
+    #[DataProvider('provideKittyGraphicsEnv')]
+    public function testSupportsKittyGraphics(?string $termProgram, ?string $term, ?string $ghosttyResources, ?string $konsoleVersion, bool $expected)
+    {
+        $oriTermProgram = getenv('TERM_PROGRAM');
+        $oriTerm = getenv('TERM');
+        $oriGhostty = getenv('GHOSTTY_RESOURCES_DIR');
+        $oriKonsole = getenv('KONSOLE_VERSION');
+
+        try {
+            putenv($termProgram ? "TERM_PROGRAM={$termProgram}" : 'TERM_PROGRAM');
+            putenv($term ? "TERM={$term}" : 'TERM');
+            putenv($ghosttyResources ? "GHOSTTY_RESOURCES_DIR={$ghosttyResources}" : 'GHOSTTY_RESOURCES_DIR');
+            putenv($konsoleVersion ? "KONSOLE_VERSION={$konsoleVersion}" : 'KONSOLE_VERSION');
+
+            $this->assertSame($expected, Terminal::supportsKittyGraphics());
+        } finally {
+            (false !== $oriTermProgram) ? putenv('TERM_PROGRAM='.$oriTermProgram) : putenv('TERM_PROGRAM');
+            (false !== $oriTerm) ? putenv('TERM='.$oriTerm) : putenv('TERM');
+            (false !== $oriGhostty) ? putenv('GHOSTTY_RESOURCES_DIR='.$oriGhostty) : putenv('GHOSTTY_RESOURCES_DIR');
+            (false !== $oriKonsole) ? putenv('KONSOLE_VERSION='.$oriKonsole) : putenv('KONSOLE_VERSION');
+            Terminal::setKittyGraphicsSupport(null);
+        }
+    }
+
+    public static function provideKittyGraphicsEnv(): \Generator
+    {
+        // TERM_PROGRAM checks
+        yield 'kitty terminal' => ['kitty', null, null, null, true];
+        yield 'WezTerm terminal' => ['WezTerm', null, null, null, true];
+        yield 'ghostty terminal' => ['ghostty', null, null, null, true];
+        yield 'other terminal program' => ['iTerm.app', null, null, null, false];
+
+        // TERM checks
+        yield 'kitty in TERM' => [null, 'xterm-kitty', null, null, true];
+        yield 'other TERM' => [null, 'xterm-256color', null, null, false];
+
+        // GHOSTTY_RESOURCES_DIR check
+        yield 'ghostty resources' => [null, null, '/some/path', null, true];
+
+        // KONSOLE_VERSION check
+        yield 'konsole' => [null, null, null, '22.12.3', true];
+
+        // None
+        yield 'no support' => [null, null, null, null, false];
+    }
+
+    #[DataProvider('provideITerm2ImagesEnv')]
+    public function testSupportsITerm2Images(?string $termProgram, bool $expected)
+    {
+        $oriTermProgram = getenv('TERM_PROGRAM');
+
+        try {
+            putenv($termProgram ? "TERM_PROGRAM={$termProgram}" : 'TERM_PROGRAM');
+
+            $this->assertSame($expected, Terminal::supportsITerm2Images());
+        } finally {
+            (false !== $oriTermProgram) ? putenv('TERM_PROGRAM='.$oriTermProgram) : putenv('TERM_PROGRAM');
+            Terminal::setITerm2ImagesSupport(null);
+        }
+    }
+
+    public static function provideITerm2ImagesEnv(): \Generator
+    {
+        yield 'iTerm.app' => ['iTerm.app', true];
+        yield 'other terminal' => ['Terminal.app', false];
+        yield 'kitty' => ['kitty', false];
+        yield 'no terminal program' => [null, false];
+    }
+
+    public function testSupportsImageProtocol()
+    {
+        Terminal::setKittyGraphicsSupport(false);
+        Terminal::setITerm2ImagesSupport(false);
+        $this->assertFalse(Terminal::supportsImageProtocol());
+
+        Terminal::setKittyGraphicsSupport(true);
+        Terminal::setITerm2ImagesSupport(false);
+        $this->assertTrue(Terminal::supportsImageProtocol());
+
+        Terminal::setKittyGraphicsSupport(false);
+        Terminal::setITerm2ImagesSupport(true);
+        $this->assertTrue(Terminal::supportsImageProtocol());
+
+        Terminal::setKittyGraphicsSupport(true);
+        Terminal::setITerm2ImagesSupport(true);
+        $this->assertTrue(Terminal::supportsImageProtocol());
+    }
+
+    public function testSetKittyGraphicsSupport()
+    {
+        Terminal::setKittyGraphicsSupport(true);
+        $this->assertTrue(Terminal::supportsKittyGraphics());
+
+        Terminal::setKittyGraphicsSupport(false);
+        $this->assertFalse(Terminal::supportsKittyGraphics());
+
+        Terminal::setKittyGraphicsSupport(null);
+    }
+
+    public function testSetITerm2ImagesSupport()
+    {
+        Terminal::setITerm2ImagesSupport(true);
+        $this->assertTrue(Terminal::supportsITerm2Images());
+
+        Terminal::setITerm2ImagesSupport(false);
+        $this->assertFalse(Terminal::supportsITerm2Images());
+
+        Terminal::setITerm2ImagesSupport(null);
     }
 }

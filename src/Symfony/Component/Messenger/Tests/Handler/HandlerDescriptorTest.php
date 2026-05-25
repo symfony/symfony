@@ -37,7 +37,7 @@ class HandlerDescriptorTest extends TestCase
         ];
         yield [\Closure::fromCallable(static function () {}), 'Closure'];
         yield [\Closure::fromCallable(new DummyCommandHandler()), DummyCommandHandler::class.'::__invoke'];
-        yield [\Closure::bind(\Closure::fromCallable(function () {}), new \stdClass()), 'Closure'];
+        yield [\Closure::bind(\Closure::fromCallable(function () { \assert(null !== $this); }), new \stdClass()), 'Closure'];
         yield [new class {
             public function __invoke()
             {

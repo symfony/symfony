@@ -45,7 +45,6 @@ class TooManyLoginAttemptsAuthenticationException extends AuthenticationExceptio
     public function __unserialize(array $data): void
     {
         [$this->threshold, $parentData] = $data;
-        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

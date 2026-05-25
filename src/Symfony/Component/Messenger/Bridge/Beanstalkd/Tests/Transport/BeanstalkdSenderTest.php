@@ -34,8 +34,8 @@ final class BeanstalkdSenderTest extends TestCase
             ->willReturn('1')
         ;
 
-        $serializer = $this->createStub(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new BeanstalkdSender($connection, $serializer);
         $actualEnvelope = $sender->send($envelope);
@@ -54,8 +54,8 @@ final class BeanstalkdSenderTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 500, null);
 
-        $serializer = $this->createStub(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new BeanstalkdSender($connection, $serializer);
         $sender->send($envelope);
@@ -69,8 +69,8 @@ final class BeanstalkdSenderTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('send')->with($encoded['body'], $encoded['headers'], 0, 2);
 
-        $serializer = $this->createStub(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new BeanstalkdSender($connection, $serializer);
         $sender->send($envelope);

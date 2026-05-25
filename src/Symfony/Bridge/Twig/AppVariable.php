@@ -61,7 +61,7 @@ class AppVariable
 
     public function setEnabledLocales(array $enabledLocales): void
     {
-        $this->enabledLocales = array_filter($enabledLocales);
+        $this->enabledLocales = array_values(array_filter($enabledLocales, static fn ($l): bool => '' !== (string) $l));
     }
 
     /**

@@ -141,9 +141,18 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
                 continue;
             }
 
+            $value = $header->getBodyAsString();
+
+            // AWS SES Simple message headers only accept printable ASCII (char codes 32-126).
+            // getBodyAsString() may produce encoded words with \r\n line folding, so we
+            // re-encode using RFC 2047 base64 encoding when non-printable characters are present.
+            if (preg_match('/[^\x20-\x7E]/', $value)) {
+                $value = '=?UTF-8?B?'.base64_encode($header->getBody()).'?=';
+            }
+
             $headersPrepared[] = [
                 'Name' => $header->getName(),
-                'Value' => $header->getBodyAsString(),
+                'Value' => $value,
             ];
         }
 

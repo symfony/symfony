@@ -582,7 +582,7 @@ class Command implements SignalableCommandInterface
             $list[] = $alias;
         }
 
-        $this->aliases = \is_array($aliases) ? $aliases : $list;
+        $this->aliases = $list;
 
         return $this;
     }

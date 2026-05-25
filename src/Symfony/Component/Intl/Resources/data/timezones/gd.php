@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Àm Meadhan na Roinn-Eòrpa (Büsingen)',
         'Europe/Chisinau' => 'Àm na Roinn-Eòrpa an Ear (Chișinău)',
         'Europe/Copenhagen' => 'Àm Meadhan na Roinn-Eòrpa (Beirbh)',
-        'Europe/Dublin' => 'Èirinn (Baile Àtha Cliath)',
+        'Europe/Dublin' => 'Greenwich Mean Time (Baile Àtha Cliath)',
         'Europe/Gibraltar' => 'Àm Meadhan na Roinn-Eòrpa (Diobraltar)',
         'Europe/Guernsey' => 'Greenwich Mean Time (Geàrnsaidh)',
         'Europe/Helsinki' => 'Àm na Roinn-Eòrpa an Ear (Helsinki)',

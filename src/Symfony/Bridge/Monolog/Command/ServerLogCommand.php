@@ -25,6 +25,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
@@ -58,7 +60,7 @@ class ServerLogCommand extends Command
         }
 
         $this
-            ->addOption('host', null, InputOption::VALUE_REQUIRED, 'The server host', '0.0.0.0:9911')
+            ->addOption('host', null, InputOption::VALUE_REQUIRED, 'The server host', '127.0.0.1:9911')
             ->addOption('format', null, InputOption::VALUE_REQUIRED, 'The line format', ConsoleFormatter::SIMPLE_FORMAT)
             ->addOption('date-format', null, InputOption::VALUE_REQUIRED, 'The date format', ConsoleFormatter::SIMPLE_DATE)
             ->addOption('filter', null, InputOption::VALUE_REQUIRED, 'An expression to filter log. Example: "level > 200 or channel in [\'app\', \'doctrine\']"')
@@ -106,11 +108,16 @@ class ServerLogCommand extends Command
         }
 
         foreach ($this->getLogs($socket) as $clientId => $message) {
-            $record = unserialize(base64_decode($message));
+            $record = @unserialize(base64_decode($message), [
+                'allowed_classes' => [Data::class, Stub::class],
+            ]);
 
-            // Impossible to decode the message, give up.
-            if (false === $record) {
+            if (!\is_array($record)) {
                 continue;
+            }
+
+            if (isset($record['datetime']) && \is_string($record['datetime'])) {
+                $record['datetime'] = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $record['datetime']) ?: $record['datetime'];
             }
 
             if ($filter && !$this->el->evaluate($filter, $record)) {

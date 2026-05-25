@@ -52,6 +52,9 @@ final class TemplateType extends Type implements WrappingTypeInterface
         return $this->bound;
     }
 
+    /**
+     * @param-immediately-invoked-callable $specification
+     */
     public function wrappedTypeIsSatisfiedBy(callable $specification): bool
     {
         return $this->getWrappedType()->isSatisfiedBy($specification);

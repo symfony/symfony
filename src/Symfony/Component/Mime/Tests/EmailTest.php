@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
@@ -31,8 +32,51 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
+class EmailTestToStringGadget
+{
+    public static bool $fired = false;
+
+    public function __toString(): string
+    {
+        self::$fired = true;
+
+        return '';
+    }
+}
+
 class EmailTest extends TestCase
 {
+    #[DataProvider('provideTrampolineSlots')]
+    public function testUnserializeRejectsObjectInTypedCharsetProperty(int $slot)
+    {
+        $email = new Email();
+        $email->text('text body');
+        $email->html('html body');
+        $data = $email->__serialize();
+        $data[$slot] = new EmailTestToStringGadget();
+        $payload = \sprintf('O:%d:"%s":%d:{', \strlen(Email::class), Email::class, \count($data));
+        foreach ($data as $key => $value) {
+            $payload .= serialize($key).serialize($value);
+        }
+        $payload .= '}';
+        EmailTestToStringGadget::$fired = false;
+
+        try {
+            unserialize($payload);
+            $this->fail('Expected BadMethodCallException.');
+        } catch (\BadMethodCallException $e) {
+        }
+
+        $this->assertFalse(EmailTestToStringGadget::$fired, '__toString gadget must not fire during unserialize');
+    }
+
+    public static function provideTrampolineSlots(): iterable
+    {
+        // [text, textCharset, html, htmlCharset, attachments, parentData]
+        yield 'textCharset' => [1];
+        yield 'htmlCharset' => [3];
+    }
+
     public function testSubject()
     {
         $e = new Email();
@@ -462,6 +506,24 @@ class EmailTest extends TestCase
         $this->assertInstanceOf(RelatedPart::class, $body);
         $this->assertCount(2, $parts = $body->getParts());
         $this->assertStringMatchesFormat('<div background=3D"cid:%s@symfony"></div>', $parts[0]->bodyToString());
+    }
+
+    public function testInlinedPartReferencedViaCidPreservesFilename()
+    {
+        $image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r');
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:logo-image.gif">');
+        $e->addPart((new DataPart($image, 'logo-image.gif'))->asInline());
+
+        $body = $e->getBody();
+        $this->assertInstanceOf(RelatedPart::class, $body);
+        $parts = $body->getParts();
+        $inlinePart = $parts[1];
+
+        $this->assertSame('logo-image.gif', $inlinePart->getName());
+        $headers = $inlinePart->getPreparedHeaders()->toString();
+        $this->assertStringContainsString('name=logo-image.gif', $headers);
+        $this->assertStringNotContainsString('name='.$inlinePart->getContentId(), $headers);
     }
 
     private function generateSomeParts(): array

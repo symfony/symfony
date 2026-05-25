@@ -42,8 +42,9 @@ class MigratingPasswordHasherTest extends TestCase
     {
         $bestHasher = new NativePasswordHasher(4, 12000, 4);
 
-        $extraHasher1 = $this->createStub(PasswordHasherInterface::class);
+        $extraHasher1 = $this->createMock(PasswordHasherInterface::class);
         $extraHasher1
+            ->expects($this->atLeastOnce())
             ->method('verify')
             ->with('abc', 'foo', 'salt')
             ->willReturn(true);

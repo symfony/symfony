@@ -15,7 +15,6 @@ use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\RouteProcessor;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -151,10 +150,7 @@ class RouteProcessorTest extends TestCase
 
     private function mockRequest(array $attributes): Request
     {
-        $request = new Request();
-        $request->attributes = new ParameterBag($attributes);
-
-        return $request;
+        return new Request([], [], $attributes);
     }
 
     private function createRecord(): LogRecord

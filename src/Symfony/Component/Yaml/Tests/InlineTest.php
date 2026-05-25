@@ -115,6 +115,13 @@ class InlineTest extends TestCase
         Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
     }
 
+    public function testParsePhpObjectThrowsExceptionOnNonStringScalar()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The "!php/object" tag only supports a string value, got "array"');
+        Inline::parse('!php/object !php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum', Yaml::PARSE_OBJECT | Yaml::PARSE_CONSTANT);
+    }
+
     #[DataProvider('getTestsForDump')]
     public function testDump($yaml, $value, $parseFlags = 0)
     {
@@ -201,6 +208,14 @@ class InlineTest extends TestCase
     {
         $this->expectException(ParseException::class);
         Inline::parse('{ foo: bar } bar');
+    }
+
+    public function testParseEmbeddedMappingWithDuplicateKeysShouldThrowException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/Duplicate key "bar" detected/');
+
+        Inline::parse('[ foo: { bar: 1, bar: 2 } ]');
     }
 
     public function testParseInvalidTaggedSequenceShouldThrowException()
@@ -391,6 +406,10 @@ class InlineTest extends TestCase
             ['[foo, bar: { foo: bar }]', ['foo', '1' => ['bar' => ['foo' => 'bar']]]],
             ['[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', ['foo', '@foo.baz', ['%foo%' => 'foo is %foo%', 'bar' => '%foo%'], true, '@service_container']],
 
+            ['[ foo: { bar: [ \'foobar\', 12 ] } ]', [['foo' => ['bar' => ['foobar', 12]]]]],
+            ['[ foo: { bar: \'foobar\', baz: false } ]', [['foo' => ['bar' => 'foobar', 'baz' => false]]]],
+            ['[ foo: { bar: [ \'foobar\', 12 ], baz: true } ]', [['foo' => ['bar' => ['foobar', 12], 'baz' => true]]]],
+
             // Binary string not utf8-compliant but starting with and utf8-equivalent "&" character
             ['{ uid: !!binary Ju0Yh+uqSXOagJZFTlUt8g== }', ['uid' => hex2bin('26ed1887ebaa49739a8096454e552df2')]],
         ];
@@ -474,6 +493,10 @@ class InlineTest extends TestCase
             ['[foo, [[], {}]]', ['foo', [[], new \stdClass()]]],
             ['[foo, [[{}, {}], {}]]', ['foo', [[new \stdClass(), new \stdClass()], new \stdClass()]]],
             ['[foo, {bar: {}}]', ['foo', '1' => (object) ['bar' => new \stdClass()]]],
+
+            ['[ foo: { bar: [ \'foobar\', 12 ] } ]', [(object) ['foo' => (object) ['bar' => ['foobar', 12]]]]],
+            ['[ foo: { bar: \'foobar\', baz: false } ]', [(object) ['foo' => (object) ['bar' => 'foobar', 'baz' => false]]]],
+            ['[ foo: { bar: [ \'foobar\', 12 ], baz: true } ]', [(object) ['foo' => (object) ['bar' => ['foobar', 12], 'baz' => true]]]],
         ];
     }
 
@@ -524,6 +547,8 @@ class InlineTest extends TestCase
             ['[\'foo,bar\', \'foo bar\']', ['foo,bar', 'foo bar']],
 
             // mappings
+            ['{}', []],
+            ['{ foo: {} }', ['foo' => []]],
             ['{ foo: bar, bar: foo, \'false\': false, \'null\': null, integer: 12 }', ['foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12]],
             ['{ foo: bar, bar: \'foo: bar\' }', ['foo' => 'bar', 'bar' => 'foo: bar']],
 
@@ -768,6 +793,7 @@ class InlineTest extends TestCase
             'invalid characters' => ['!!binary "SGVsbG8#d29ybGQ="', '/The base64 encoded data \(.*\) contains invalid characters/'],
             'too many equals characters' => ['!!binary "SGVsbG8gd29yb==="', '/The base64 encoded data \(.*\) contains invalid characters/'],
             'misplaced equals character' => ['!!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'],
+            'unparsable scalar value' => ['!!binary !php/object a', '/The base64 encoded data \(\) contains invalid characters/'],
         ];
     }
 
@@ -1098,5 +1124,26 @@ class InlineTest extends TestCase
         $this->assertSame(['foo', null, 'bar'], Inline::parse('[foo, , bar]'));
         $this->assertSame([null, 'foo', 'bar'], Inline::parse('[, foo, bar]'));
         $this->assertSame(['foo', 'bar'], Inline::parse('[foo, bar, ]'));
+    }
+
+    public function testFlowAndBlockProduceSameOutputForAmpersandPrefixedItems()
+    {
+        $this->assertSame([null], Inline::parse('[&string4]'));
+        $this->assertSame(['foo' => null], Inline::parse('{foo: &string4}'));
+
+        $this->assertSame(['&string3'], Inline::parse('[!!str &string3]'));
+        $this->assertSame(['foo' => '&string3'], Inline::parse('{foo: !!str &string3}'));
+
+        $yaml = <<<YAML
+            block:
+                - '&string1'
+                - "&string2"
+                - !!str &string3
+                - &string4
+            flow: ['&string1', "&string2", !!str &string3, &string4 ]
+            YAML;
+        $parsed = Yaml::parse($yaml);
+        $this->assertSame(['&string1', '&string2', '&string3', null], $parsed['block']);
+        $this->assertSame($parsed['block'], $parsed['flow']);
     }
 }

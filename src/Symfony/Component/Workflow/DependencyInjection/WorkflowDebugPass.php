@@ -32,7 +32,9 @@ class WorkflowDebugPass implements CompilerPassInterface
                     new Reference("debug.{$id}.inner"),
                     new Reference('debug.stopwatch'),
                     new Reference('profiler.is_disabled_state_checker', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE),
-                ]);
+                ])
+                ->addTag('kernel.reset', ['method' => 'reset'])
+            ;
         }
     }
 }

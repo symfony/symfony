@@ -33,8 +33,8 @@ class AmqpTransportTest extends TestCase
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->createStub(SerializerInterface::class),
-            $connection = $this->createStub(Connection::class)
+            $serializer = $this->createMock(SerializerInterface::class),
+            $connection = $this->createMock(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
@@ -43,9 +43,9 @@ class AmqpTransportTest extends TestCase
         $amqpEnvelope->method('getBody')->willReturn('body');
         $amqpEnvelope->method('getHeaders')->willReturn(['my' => 'header']);
 
-        $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
         $connection->method('getQueueNames')->willReturn(['queueName']);
-        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+        $connection->expects($this->once())->method('get')->with('queueName')->willReturn($amqpEnvelope);
 
         $envelopes = iterator_to_array($transport->get());
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());

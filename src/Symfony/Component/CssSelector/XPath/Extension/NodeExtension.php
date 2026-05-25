@@ -19,7 +19,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * XPath expression translator node extension.
  *
  * This component is a port of the Python cssselect library,
- * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  *
@@ -71,6 +71,7 @@ class NodeExtension extends AbstractExtension
             'Class' => $this->translateClass(...),
             'Hash' => $this->translateHash(...),
             'Element' => $this->translateElement(...),
+            'Relation' => $this->translateRelation(...),
         ];
     }
 
@@ -99,29 +100,32 @@ class NodeExtension extends AbstractExtension
 
     public function translateMatching(Node\MatchingNode $node, Translator $translator): XPathExpr
     {
-        $xpath = $translator->nodeToXPath($node->selector);
-
-        foreach ($node->arguments as $argument) {
-            $expr = $translator->nodeToXPath($argument);
-            $expr->addNameTest();
-            if ($condition = $expr->getCondition()) {
-                $xpath->addCondition($condition, 'or');
-            }
-        }
-
-        return $xpath;
+        return $this->translateMatchingOrSpecificityAdjustment($node->selector, $node->arguments, $translator);
     }
 
     public function translateSpecificityAdjustment(Node\SpecificityAdjustmentNode $node, Translator $translator): XPathExpr
     {
-        $xpath = $translator->nodeToXPath($node->selector);
+        return $this->translateMatchingOrSpecificityAdjustment($node->selector, $node->arguments, $translator);
+    }
 
-        foreach ($node->arguments as $argument) {
+    /**
+     * @param array<Node\NodeInterface> $arguments
+     */
+    private function translateMatchingOrSpecificityAdjustment(Node\NodeInterface $selector, array $arguments, Translator $translator): XPathExpr
+    {
+        $xpath = $translator->nodeToXPath($selector);
+
+        $conditions = [];
+        foreach ($arguments as $argument) {
             $expr = $translator->nodeToXPath($argument);
             $expr->addNameTest();
-            if ($condition = $expr->getCondition()) {
-                $xpath->addCondition($condition, 'or');
+            if ('' !== $condition = $expr->getCondition()) {
+                $conditions[] = $condition;
             }
+        }
+
+        if ($conditions) {
+            $xpath->addCondition(1 === \count($conditions) ? $conditions[0] : '('.implode(') or (', $conditions).')');
         }
 
         return $xpath;
@@ -205,6 +209,27 @@ class NodeExtension extends AbstractExtension
         if (!$safe) {
             $xpath->addNameTest();
         }
+
+        return $xpath;
+    }
+
+    public function translateRelation(Node\RelationNode $node, Translator $translator): XPathExpr
+    {
+        $arguments = $node->getArguments();
+        if (1 === \count($arguments)) {
+            [$combinator, $subSelector] = $arguments[0];
+
+            return $translator->addRelativeCombination($combinator, $node->getSelector(), $subSelector);
+        }
+
+        $conditions = [];
+        foreach ($arguments as [$combinator, $subSelector]) {
+            $relativeXpath = (string) $translator->addRelativeCombination($combinator, new Node\ElementNode(), $subSelector);
+            $conditions[] = substr($relativeXpath, 2, -1);
+        }
+
+        $xpath = $translator->nodeToXPath($node->getSelector());
+        $xpath->addCondition('('.implode(') or (', $conditions).')');
 
         return $xpath;
     }

@@ -50,6 +50,19 @@ class UuidTest extends TestCase
         yield ['these are just thirty-six characters'];
     }
 
+    public function testInvalidUuidContainsInvalidValue()
+    {
+        $invalidUuid = 'this is not a uuid';
+
+        try {
+            Uuid::fromString($invalidUuid);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidArgumentException::class));
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Invalid UUID.', $e->getMessage());
+            $this->assertSame($invalidUuid, $e->invalidValue);
+        }
+    }
+
     #[DataProvider('provideInvalidVariant')]
     public function testInvalidVariant(string $uuid)
     {
@@ -386,6 +399,19 @@ class UuidTest extends TestCase
             ['1BVXue8CnY8ogucrHX3TeF'],
             ['0177058f-4dac-d0b2-a990-a49af02bc008'],
         ];
+    }
+
+    public function testInvalidBinaryUidContainsInvalidValue()
+    {
+        $invalidBinary = '01EW2RYKDCT2SAK454KBR2QG08';
+
+        try {
+            Uuid::fromBinary($invalidBinary);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidArgumentException::class));
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Invalid binary uid provided.', $e->getMessage());
+            $this->assertSame($invalidBinary, $e->invalidValue);
+        }
     }
 
     public function testFromBase58()

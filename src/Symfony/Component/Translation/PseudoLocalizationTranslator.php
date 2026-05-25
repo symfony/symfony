@@ -145,7 +145,7 @@ final class PseudoLocalizationTranslator implements TranslatorInterface, Transla
         $useInternalErrors = libxml_use_internal_errors(true);
 
         $dom = new \DOMDocument();
-        $dom->loadHTML('<trans>'.$html.'</trans>');
+        $dom->loadHTML('<trans>'.$html.'</trans>', \LIBXML_NONET);
 
         libxml_clear_errors();
         libxml_use_internal_errors($useInternalErrors);

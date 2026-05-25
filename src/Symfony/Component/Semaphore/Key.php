@@ -25,6 +25,7 @@ final class Key
     private ?float $expiringTime = null;
     private array $state = [];
     private bool $serializable = true;
+    private ?string $unserializableOwner = null;
 
     public function __construct(
         private string $resource,
@@ -82,9 +83,26 @@ final class Key
         $this->expiringTime = null;
     }
 
-    public function markUnserializable(): void
+    /**
+     * Marks the key as unserializable for the remainder of its in-process lifetime.
+     *
+     * This is a one-way latch: once flipped, {@see __serialize()} will throw
+     * {@see UnserializableKeyException} even after the slot has been released
+     * via {@see PersistingStoreInterface::delete()}. Stores that attach
+     * non-portable per-process state to the key (typically as
+     * {@see setState()} values that cannot be reconstructed from a payload,
+     * such as live {@see \Symfony\Component\Lock\LockInterface} instances)
+     * are expected to call this after a successful acquisition so the key
+     * cannot accidentally leave the owning process.
+     *
+     * @param string|null $owner Class name of the store that owns the
+     *                           non-portable state, surfaced in the
+     *                           {@see UnserializableKeyException} message
+     */
+    public function markUnserializable(?string $owner = null): void
     {
         $this->serializable = false;
+        $this->unserializableOwner = $owner;
     }
 
     public function reduceLifetime(float $ttlInSeconds): void
@@ -111,9 +129,12 @@ final class Key
 
     public function __unserialize(array $data): void
     {
-        $this->resource = $data['resource'] ?? $data["\0".self::class."\0resource"];
-        $this->limit = $data['limit'] ?? $data["\0".self::class."\0limit"];
-        $this->weight = $data['weight'] ?? $data["\0".self::class."\0weight"];
+        $this->__construct(
+            $data['resource'] ?? $data["\0".self::class."\0resource"],
+            $data['limit'] ?? $data["\0".self::class."\0limit"],
+            $data['weight'] ?? $data["\0".self::class."\0weight"],
+        );
+
         $this->expiringTime = $data['expiringTime'] ?? $data["\0".self::class."\0expiringTime"] ?? null;
         $this->state = $data['state'] ?? $data["\0".self::class."\0state"] ?? [];
     }
@@ -121,7 +142,8 @@ final class Key
     public function __serialize(): array
     {
         if (!$this->serializable) {
-            throw new UnserializableKeyException('The key cannot be serialized.');
+            $owner = $this->unserializableOwner;
+            throw new UnserializableKeyException(null === $owner ? 'The key cannot be serialized.' : \sprintf('The key cannot be serialized: state owned by "%s" is not portable.', $owner));
         }
 
         return [

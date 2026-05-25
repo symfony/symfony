@@ -13,7 +13,6 @@ namespace Symfony\Component\Routing\Loader;
 
 use Symfony\Component\Config\Loader\FileLoader;
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -32,7 +31,6 @@ class YamlFileLoader extends FileLoader
         parseRoute as doParseRoute;
         validate as doValidate;
     }
-    use HostTrait;
 
     private YamlParser $yamlParser;
 

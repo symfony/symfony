@@ -3,12 +3,14 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\AsTagDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\Attribute\Lazy;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -32,6 +34,13 @@ class AutowireWither
 class AutowireProperty
 {
     #[Required]
+    public Foo $foo;
+}
+
+class AutowirePropertyWithTarget
+{
+    #[Required]
+    #[Target('foo.target')]
     public Foo $foo;
 }
 
@@ -240,5 +249,25 @@ class NestedAutowireInlineAttribute
         )]
         public AutowireInlineAttributesBar $inlined,
     ) {
+    }
+}
+
+interface AsTagDecoratorInterface
+{
+}
+
+class AsTagDecoratorFoo implements AsTagDecoratorInterface
+{
+}
+
+class AsTagDecoratorBar implements AsTagDecoratorInterface
+{
+}
+
+#[AsTagDecorator('test.tag')]
+class AsTagDecoratorService implements AsTagDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsTagDecoratorInterface $inner)
+    {
     }
 }

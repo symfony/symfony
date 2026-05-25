@@ -160,6 +160,76 @@ class SignalRegistryTest extends TestCase
         $this->assertCount(0, $this->getHandlersForSignal($registry, $signal));
     }
 
+    public function testPushCurrentHandlersRestoresOriginalHandler()
+    {
+        $registry = new SignalRegistry();
+
+        $previousHandlerCalled = false;
+        pcntl_signal(\SIGUSR1, static function () use (&$previousHandlerCalled) {
+            $previousHandlerCalled = true;
+        });
+
+        $registeredHandlerCalled = false;
+        $registry->register(\SIGUSR1, static function () use (&$registeredHandlerCalled) {
+            $registeredHandlerCalled = true;
+        });
+
+        $registry->pushCurrentHandlers();
+
+        posix_kill(posix_getpid(), \SIGUSR1);
+
+        $this->assertTrue($previousHandlerCalled);
+        $this->assertFalse($registeredHandlerCalled);
+    }
+
+    public function testPopPreviousHandlersRestoresPreviousOsHandler()
+    {
+        $registry = new SignalRegistry();
+
+        $outerHandlerCalled = false;
+        $registry->register(\SIGUSR1, static function () use (&$outerHandlerCalled) {
+            $outerHandlerCalled = true;
+        });
+
+        $registry->pushCurrentHandlers();
+
+        $innerHandlerCalled = false;
+        $registry->register(\SIGUSR2, static function () use (&$innerHandlerCalled) {
+            $innerHandlerCalled = true;
+        });
+
+        $registry->popPreviousHandlers();
+
+        posix_kill(posix_getpid(), \SIGUSR1);
+
+        $this->assertTrue($outerHandlerCalled);
+        $this->assertFalse($innerHandlerCalled);
+    }
+
+    public function testPopPreviousHandlersRestoresPreviousOsHandlerForSameSignal()
+    {
+        $registry = new SignalRegistry();
+
+        $outerHandlerCalled = false;
+        $registry->register(\SIGUSR1, static function () use (&$outerHandlerCalled) {
+            $outerHandlerCalled = true;
+        });
+
+        $registry->pushCurrentHandlers();
+
+        $innerHandlerCalled = false;
+        $registry->register(\SIGUSR1, static function () use (&$innerHandlerCalled) {
+            $innerHandlerCalled = true;
+        });
+
+        $registry->popPreviousHandlers();
+
+        posix_kill(posix_getpid(), \SIGUSR1);
+
+        $this->assertTrue($outerHandlerCalled);
+        $this->assertFalse($innerHandlerCalled);
+    }
+
     public function testRestoreOriginalOnEmptyAfterPop()
     {
         if (!\extension_loaded('pcntl')) {

@@ -137,6 +137,7 @@ class DataPart extends TextPart
             '_parent' => $parent,
             'filename' => $this->filename,
             'mediaType' => $this->mediaType,
+            'cid' => $this->cid,
         ];
     }
 
@@ -145,5 +146,6 @@ class DataPart extends TextPart
         parent::__unserialize(['_headers' => $data['_headers'] ?? $data["\0*\0_headers"], ...$data['_parent'] ?? $data["\0*\0_parent"]]);
         $this->filename = $data['filename'] ?? $data["\0".self::class."\0filename"] ?? null;
         $this->mediaType = $data['mediaType'] ?? $data["\0".self::class."\0mediaType"];
+        $this->cid = $data['cid'] ?? $data["\0".self::class."\0cid"] ?? null;
     }
 }

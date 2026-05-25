@@ -29,7 +29,9 @@ class TransportsTest extends TestCase
 
         $message = new ChatMessage('subject');
 
-        $one->method('supports')->with($message)->willReturn(true);
+        $one->method('supports')->willReturnMap([
+            [$message, true],
+        ]);
 
         $one->expects($this->once())->method('send')->willReturn(new SentMessage($message, 'one'));
 
@@ -48,11 +50,12 @@ class TransportsTest extends TestCase
 
         $message = new ChatMessage('subject');
 
-        $one->method('supports')->with($message)->willReturn(false);
-        $two->method('supports')->with($message)->willReturn(true);
-
-        $one->method('send')->with($message)->willReturn(new SentMessage($message, 'one'));
-        $two->method('send')->with($message)->willReturn(new SentMessage($message, 'two'));
+        $one->method('supports')->willReturnMap([
+            [$message, false],
+        ]);
+        $two->method('supports')->willReturnMap([
+            [$message, true],
+        ]);
 
         $one->expects($this->never())->method('send');
         $two->expects($this->once())->method('send')->willReturn(new SentMessage($message, 'two'));
@@ -66,12 +69,12 @@ class TransportsTest extends TestCase
     public function testThrowExceptionIfNoSupportedTransportWasFound()
     {
         $transports = new Transports([
-            'one' => $one = $this->createStub(TransportInterface::class),
+            'one' => $one = $this->createMock(TransportInterface::class),
         ]);
 
         $message = new ChatMessage('subject');
 
-        $one->method('supports')->with($message)->willReturn(false);
+        $one->expects($this->once())->method('supports')->with($message)->willReturn(false);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('None of the available transports support the given message (available transports: "one"');
@@ -82,15 +85,15 @@ class TransportsTest extends TestCase
     public function testThrowExceptionIfTransportDefinedByMessageIsNotSupported()
     {
         $transports = new Transports([
-            'one' => $one = $this->createStub(TransportInterface::class),
-            'two' => $two = $this->createStub(TransportInterface::class),
+            'one' => $one = $this->createMock(TransportInterface::class),
+            'two' => $two = $this->createMock(TransportInterface::class),
         ]);
 
         $message = new ChatMessage('subject');
         $message->transport('one');
 
-        $one->method('supports')->with($message)->willReturn(false);
-        $two->method('supports')->with($message)->willReturn(true);
+        $one->expects($this->once())->method('supports')->with($message)->willReturn(false);
+        $two->expects($this->never())->method('supports');
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "one" transport does not support the given message.');
@@ -101,13 +104,13 @@ class TransportsTest extends TestCase
     public function testThrowExceptionIfTransportDefinedByMessageDoesNotExist()
     {
         $transports = new Transports([
-            'one' => $one = $this->createStub(TransportInterface::class),
+            'one' => $one = $this->createMock(TransportInterface::class),
         ]);
 
         $message = new ChatMessage('subject');
         $message->transport('two');
 
-        $one->method('supports')->with($message)->willReturn(false);
+        $one->expects($this->never())->method('supports');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "two" transport does not exist (available transports: "one").');

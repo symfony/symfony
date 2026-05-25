@@ -27,6 +27,8 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [
         'testClearPrefix' => 'Couchbase cannot clear by prefix',
+        'testClearPrefixWithUnderscore' => 'Couchbase cannot clear by prefix',
+        'testClearWithInvalidPrefix' => 'Couchbase cannot clear by prefix',
     ];
 
     public function createCachePool($defaultLifetime = 0): CacheItemPoolInterface

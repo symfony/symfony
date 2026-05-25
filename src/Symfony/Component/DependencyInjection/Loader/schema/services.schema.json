@@ -251,6 +251,7 @@
         "tags": { "$ref": "#/$defs/tags" },
         "resource_tags": { "$ref": "#/$defs/tags" },
         "decorates": { "type": "string" },
+        "decorates_tag": { "type": "string" },
         "decoration_inner_name": { "type": "string" },
         "decoration_priority": { "type": "integer" },
         "decoration_on_invalid": { "oneOf": [ { "enum": ["exception", "ignore"] }, { "type": "null" } ], "$comment": "Use null (without quotes) for NULL_ON_INVALID_REFERENCE." },
@@ -313,7 +314,12 @@
           }
         },
         "public": { "type": "boolean" },
-        "deprecated": { "$ref": "#/$defs/deprecation" }
+        "deprecated": { "$ref": "#/$defs/deprecation" },
+        "decorates": { "type": "string" },
+        "decorates_tag": { "type": "string" },
+        "decoration_inner_name": { "type": "string" },
+        "decoration_priority": { "type": "integer" },
+        "decoration_on_invalid": { "oneOf": [ { "enum": ["exception", "ignore"] }, { "type": "null" } ], "$comment": "Use null (without quotes) for NULL_ON_INVALID_REFERENCE." }
       },
       "required": ["stack"],
       "additionalProperties": false

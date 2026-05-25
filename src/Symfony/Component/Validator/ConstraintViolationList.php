@@ -131,11 +131,6 @@ class ConstraintViolationList implements \IteratorAggregate, ConstraintViolation
         $this->remove($offset);
     }
 
-    /**
-     * Creates iterator for errors with specific codes.
-     *
-     * @param string|string[] $codes The codes to find
-     */
     public function findByCodes(string|array $codes): static
     {
         $codes = (array) $codes;

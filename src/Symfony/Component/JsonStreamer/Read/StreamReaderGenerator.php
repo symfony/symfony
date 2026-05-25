@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Read;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\JsonStreamer\DataModel\Read\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\CollectionNode;
@@ -28,6 +29,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
@@ -45,6 +47,7 @@ final class StreamReaderGenerator
 
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
+        private ContainerInterface $transformers,
         private string $streamReadersDir,
         ?ConfigCacheFactoryInterface $cacheFactory = null,
     ) {
@@ -60,7 +63,7 @@ final class StreamReaderGenerator
     {
         $path = \sprintf('%s%s%s.json%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), $decodeFromStream ? '.stream' : '');
         $generateContent = function () use ($type, $decodeFromStream, $options): string {
-            $this->phpGenerator ??= new PhpGenerator();
+            $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
             return $this->phpGenerator->generate($this->createDataModel($type, $options), $decodeFromStream, $options);
         };
@@ -74,9 +77,13 @@ final class StreamReaderGenerator
      * @param array<string, mixed> $options
      * @param array<string, mixed> $context
      */
-    private function createDataModel(Type $type, array $options = [], array $context = []): DataModelNodeInterface
+    private function createDataModel(Type $type, array $options = [], array &$context = []): DataModelNodeInterface
     {
         $context['original_type'] ??= $type;
+
+        if ($type instanceof IntersectionType) {
+            throw new UnsupportedException(\sprintf('Intersection types are not supported ("%s").', (string) $type));
+        }
 
         if ($type instanceof UnionType) {
             return new CompositeNode(array_map(fn (Type $t): DataModelNodeInterface => $this->createDataModel($t, $options, $context), $type->getTypes()));
@@ -118,7 +125,7 @@ final class StreamReaderGenerator
                     'accessor' => static function (string $accessor) use ($propertyMetadata): string {
                         foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                             if (\is_string($valueTransformer)) {
-                                $accessor = "\$valueTransformers->get('$valueTransformer')->transform($accessor, \$options)";
+                                $accessor = '$transformers->get('.var_export($valueTransformer, true).")->transform($accessor, \$options)";
 
                                 continue;
                             }
@@ -127,6 +134,10 @@ final class StreamReaderGenerator
                                 $functionReflection = new \ReflectionFunction($valueTransformer);
                             } catch (\ReflectionException $e) {
                                 throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+                            }
+
+                            if ($functionReflection->isAnonymous()) {
+                                throw new RuntimeException(\sprintf('Cannot generate accessor for anonymous function "%s".', $functionReflection->getName()));
                             }
 
                             $functionName = !$functionReflection->getClosureCalledClass()

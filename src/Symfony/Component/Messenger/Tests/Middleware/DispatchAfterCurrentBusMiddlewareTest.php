@@ -232,8 +232,9 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
             $eventHandlingMiddleware,
         ]);
 
-        $fakePutMessageOnQueue = $this->createStub(MiddlewareInterface::class);
+        $fakePutMessageOnQueue = $this->createMock(MiddlewareInterface::class);
         $fakePutMessageOnQueue
+            ->expects($this->once())
             ->method('handle')
             ->with($this->callback(static function ($envelope) use ($messageBusAfterQueue) {
                 // Fake putting the message on the queue
@@ -274,9 +275,10 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $event = new DummyEvent('First event');
 
         $middleware = new DispatchAfterCurrentBusMiddleware();
-        $handlingMiddleware = $this->createStub(MiddlewareInterface::class);
+        $handlingMiddleware = $this->createMock(MiddlewareInterface::class);
 
         $handlingMiddleware
+            ->expects($this->once())
             ->method('handle')
             ->with($this->expectHandledMessage($event))
             ->willReturnCallback($this->handleMessageCallback());

@@ -35,6 +35,14 @@ final class MapInput
     private array $interactiveAttributes = [];
 
     /**
+     * @param string[]|null $validationGroups
+     */
+    public function __construct(
+        public readonly ?array $validationGroups = null,
+    ) {
+    }
+
+    /**
      * @internal
      */
     public static function tryFrom(\ReflectionParameter|\ReflectionProperty $member): ?self

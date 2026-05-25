@@ -19,7 +19,7 @@ use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 class ConfigurationTest extends TestCase
 {
     private $files;
@@ -524,7 +524,7 @@ class ConfigurationTest extends TestCase
     public function testBaselineFileWriteError()
     {
         $filename = $this->createFile();
-        chmod($filename, 0444);
+        chmod($filename, 0o444);
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
 
         $this->expectException(\ErrorException::class);

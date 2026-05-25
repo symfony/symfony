@@ -496,19 +496,19 @@
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>O vídeo tem poucos píxeis ({{ pixels }}). A quantidade mínima esperada é {{ min_pixels }}.</target>
+                <target>O vídeo tem poucos píxeis ({{ pixels }} píxeis). A quantidade mínima esperada é {{ min_pixels }} píxeis.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>O vídeo tem píxeis a mais ({{ pixels }}). A quantidade máxima esperada é {{ max_pixels }}.</target>
+                <target>O vídeo tem demasiados píxeis ({{ pixels }} píxeis). A quantidade máxima esperada é {{ max_pixels }} píxeis.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>A proporção do vídeo é demasiado grande ({{ ratio }}). A proporção máxima permitida é {{ max_ratio }}.</target>
+                <target>O rácio do vídeo é demasiado grande ({{ ratio }}). O rácio máximo permitido é {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>A proporção do vídeo é demasiado pequena ({{ ratio }}). A proporção mínima esperada é {{ min_ratio }}.</target>
+                <target>O rácio do vídeo é demasiado pequeno ({{ ratio }}). O rácio mínimo esperado é {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
@@ -516,11 +516,11 @@
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target>O vídeo está em orientação horizontal ({{ width }}x{{ height }}px). Vídeos em orientação horizontal não são permitidos.</target>
+                <target>O vídeo está orientado na horizontal ({{ width }}x{{ height }}px). Vídeos orientados na horizontal não são permitidos.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target>O vídeo está em orientação vertical ({{ width }}x{{ height }}px). Vídeos em orientação vertical não são permitidos.</target>
+                <target>O vídeo está orientado na vertical ({{ width }}x{{ height }}px). Vídeos orientados na vertical não são permitidos.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
@@ -528,15 +528,15 @@
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target>O vídeo contém vários fluxos. Apenas é permitido um fluxo.</target>
+                <target>O vídeo contém múltiplos fluxos. Apenas é permitido um fluxo.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target>Codec de vídeo não suportado «{{ codec }}».</target>
+                <target>Codec de vídeo "{{ codec }}" não suportado.</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target>Contentor de vídeo não suportado «{{ container }}».</target>
+                <target>Contentor de vídeo "{{ container }}" não suportado.</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
@@ -544,15 +544,15 @@
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>A imagem tem píxeis a menos ({{ pixels }}). A quantidade mínima esperada é {{ min_pixels }}.</target>
+                <target>A imagem tem poucos píxeis ({{ pixels }} píxeis). A quantidade mínima esperada é {{ min_pixels }} píxeis.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>A imagem tem píxeis a mais ({{ pixels }}). A quantidade máxima esperada é {{ max_pixels }}.</target>
+                <target>A imagem tem demasiados píxeis ({{ pixels }} píxeis). A quantidade máxima esperada é {{ max_pixels }} píxeis.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target>Este nome de ficheiro não corresponde ao conjunto de caracteres esperado.</target>
+                <target>O nome do ficheiro não corresponde ao conjunto de caracteres esperado.</target>
             </trans-unit>
         </body>
     </file>

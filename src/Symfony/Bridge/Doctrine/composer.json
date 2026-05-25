@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "doctrine/event-manager": "^2",
         "doctrine/persistence": "^3.1|^4",
         "symfony/deprecation-contracts": "^2.5|^3",
@@ -32,6 +32,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/cache": "^7.4|^8.0",
         "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^8.1",
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/doctrine-messenger": "^7.4|^8.0",
         "symfony/expression-language": "^7.4|^8.0",

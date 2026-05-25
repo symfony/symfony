@@ -12,18 +12,23 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
@@ -35,8 +40,10 @@ use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -46,6 +53,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyWithIsPrefi
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion;
+use Symfony\Component\Serializer\Tests\Fixtures\MagicSetDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\OtherSerializedNameDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74DummyPrivate;
@@ -187,6 +195,29 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testNormalizeWithDisabledMagicMethodsExtractionInContext()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $propertyInfoExtractor = $this->createMock(PropertyInfoExtractorInterface::class);
+        $propertyInfoExtractor
+            ->expects($this->once())
+            ->method('isReadable')
+            ->with(ObjectWithGroupedMagicGetPrivateProperty::class, 'foo', ['enable_magic_methods_extraction' => 0])
+            ->willReturn(false);
+        $propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+        $propertyAccessor
+            ->expects($this->once())
+            ->method('isReadable')
+            ->with($this->isInstanceOf(ObjectWithGroupedMagicGetPrivateProperty::class), 'foo')
+            ->willReturn(false);
+        $normalizer = new ObjectNormalizer($classMetadataFactory, null, $propertyAccessor, null, null, null, [], $propertyInfoExtractor);
+
+        $this->assertSame([], $normalizer->normalize(new ObjectWithGroupedMagicGetPrivateProperty(), null, [
+            'groups' => ['read'],
+            'enable_magic_methods_extraction' => 0,
+        ]));
+    }
+
     public function testNormalizeObjectWithUninitializedPrivateProperties()
     {
         $obj = new Php74DummyPrivate();
@@ -312,6 +343,98 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
+    public function testConstructorParameterTypeIsUsedWhenPropertyTypeExtractorReturnsDifferentType()
+    {
+        $propertyInfoExtractor = new class implements PropertyInfoExtractorInterface {
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                if (SerializerConstructorTypeConversionDummy::class === $class && 'attributes' === $property) {
+                    return Type::list(Type::string());
+                }
+
+                return null;
+            }
+
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return null;
+            }
+
+            public function getProperties(string $class, array $context = []): ?array
+            {
+                return null;
+            }
+
+            public function isReadable(string $class, string $property, array $context = []): ?bool
+            {
+                return null;
+            }
+
+            public function isWritable(string $class, string $property, array $context = []): ?bool
+            {
+                return !(SerializerConstructorTypeConversionDummy::class === $class && 'attributes' === $property);
+            }
+
+            public function getShortDescription(string $class, string $property, array $context = []): ?string
+            {
+                return null;
+            }
+
+            public function getLongDescription(string $class, string $property, array $context = []): ?string
+            {
+                return null;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, $propertyInfoExtractor, null, null, [], $propertyInfoExtractor);
+        $serializer = new Serializer([$normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $obj = $normalizer->denormalize(
+            ['attributes' => 'displayName,userName'],
+            SerializerConstructorTypeConversionDummy::class,
+            'csv',
+            [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]
+        );
+
+        $this->assertInstanceOf(SerializerConstructorTypeConversionDummy::class, $obj);
+        $this->assertFalse($obj->isAttributeAllowed('displayName'));
+        $this->assertFalse($obj->isAttributeAllowed('userName'));
+    }
+
+    public function testCollectionPropertyTypeNotOverriddenByNullableConstructorParameterType()
+    {
+        $extractor = new class implements PropertyTypeExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return null;
+            }
+
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                if (NullableArrayWithObjectsDummy::class === $class && 'items' === $property) {
+                    return Type::array(Type::object(NullableArrayItemDummy::class));
+                }
+
+                return null;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), $normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $obj = $normalizer->denormalize(
+            ['items' => [['name' => 'foo']]],
+            NullableArrayWithObjectsDummy::class,
+        );
+
+        $this->assertInstanceOf(NullableArrayWithObjectsDummy::class, $obj);
+        $this->assertCount(1, $obj->items);
+        $this->assertInstanceOf(NullableArrayItemDummy::class, $obj->items[0]);
+        $this->assertSame('foo', $obj->items[0]->name);
+    }
+
     public function testConstructorWithObjectTypeHintDenormalize()
     {
         $data = [
@@ -385,6 +508,33 @@ class ObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DummyWithUnion::class, 'xml', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
         ]);
+    }
+
+    public function testTypeMismatchOnTypedPropertyIsCollectedAsDenormalizationError()
+    {
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, $extractor)]);
+
+        try {
+            $serializer->denormalize(
+                ['name' => ['oops']],
+                ObjectTypedDummy::class,
+                null,
+                [
+                    DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+                    AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
+                ],
+            );
+
+            $this->fail(\sprintf('Expected a "%s".', PartialDenormalizationException::class));
+        } catch (PartialDenormalizationException $e) {
+            $this->assertCount(1, $e->getNotNormalizableValueErrors());
+            $error = $e->getNotNormalizableValueErrors()[0];
+            $this->assertInstanceOf(NotNormalizableValueException::class, $error);
+            $this->assertSame('name', $error->getPath());
+            $this->assertSame('array', $error->getCurrentType());
+            $this->assertSame([class_exists(InvalidTypeException::class) ? 'string' : 'unknown'], $error->getExpectedTypes());
+        }
     }
 
     // attributes
@@ -712,6 +862,19 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testDenormalizeMagicSet()
+    {
+        $obj = $this->normalizer->denormalize(
+            ['param1' => 'test', 'param2' => 42],
+            MagicSetDummy::class,
+            'any',
+            [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => true]
+        );
+
+        $this->assertSame('test', $obj->params['param1']);
+        $this->assertSame(42, $obj->params['param2']);
+    }
+
     public function testNoTraversableSupport()
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
@@ -720,6 +883,13 @@ class ObjectNormalizerTest extends TestCase
     public function testNormalizeStatic()
     {
         $this->assertEquals(['foo' => 'K'], $this->normalizer->normalize(new ObjectWithStaticPropertiesAndMethods()));
+    }
+
+    public function testNormalizeStaticWithGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $this->createNormalizer([], $classMetadataFactory);
+        $this->assertEquals(['baz' => 'L'], $this->normalizer->normalize(new ObjectWithStaticMethodWithGroups(), null, [AbstractNormalizer::GROUPS => ['test']]));
     }
 
     public function testNormalizeUpperCaseAttributes()
@@ -1019,7 +1189,8 @@ class ObjectNormalizerTest extends TestCase
 
         return new ObjectNormalizer(
             $classMetadataFactory,
-            propertyAccessor: $propertyAccessorBuilder->getPropertyAccessor(),
+            null,
+            $propertyAccessorBuilder->getPropertyAccessor(),
         );
     }
 
@@ -1484,6 +1655,15 @@ class ObjectWithStaticPropertiesAndMethods
     }
 }
 
+class ObjectWithStaticMethodWithGroups
+{
+    #[Groups('test')]
+    public static function getBaz()
+    {
+        return 'L';
+    }
+}
+
 class ObjectTypeHinted
 {
     public function setFoo(array $f)
@@ -1555,6 +1735,17 @@ class LazyObjectInner extends ObjectInner
     public function __isset($name): bool
     {
         return 'foo' === $name;
+    }
+}
+
+class ObjectWithGroupedMagicGetPrivateProperty
+{
+    #[Groups(['read'])]
+    private string $foo = 'foo';
+
+    public function __get($name)
+    {
+        return 'foo';
     }
 }
 
@@ -2018,6 +2209,22 @@ class NameConverterTestDummyMultiple
     }
 }
 
+class SerializerConstructorTypeConversionDummy
+{
+    /** @var list<string> */
+    private array $attributes;
+
+    public function __construct(string $attributes = '')
+    {
+        $this->attributes = $attributes ? explode(',', $attributes) : [];
+    }
+
+    public function isAttributeAllowed(string $attribute): bool
+    {
+        return !\in_array($attribute, $this->attributes, true);
+    }
+}
+
 class ObjectWithMetadata
 {
     private int $foo;
@@ -2049,4 +2256,26 @@ class ObjectWithMetadata
     {
         return 'Hello i am '.$this->getName();
     }
+}
+
+class NullableArrayWithObjectsDummy
+{
+    public function __construct(
+        /** @var NullableArrayItemDummy[] */
+        public ?array $items = null,
+    ) {
+    }
+}
+
+class NullableArrayItemDummy
+{
+    public function __construct(
+        public string $name,
+    ) {
+    }
+}
+
+class ObjectTypedDummy
+{
+    public string $name;
 }

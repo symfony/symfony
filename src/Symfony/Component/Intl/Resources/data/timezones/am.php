@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'የመካከለኛው አውሮፓ ሰዓት (ቡሲንገን)',
         'Europe/Chisinau' => 'የምስራቃዊ አውሮፓ ሰዓት (ቺስናኡ)',
         'Europe/Copenhagen' => 'የመካከለኛው አውሮፓ ሰዓት (ኮፐንሃገን)',
-        'Europe/Dublin' => 'አየርላንድ ሰዓት (ደብሊን)',
+        'Europe/Dublin' => 'ግሪንዊች ማዕከላዊ ሰዓት (ደብሊን)',
         'Europe/Gibraltar' => 'የመካከለኛው አውሮፓ ሰዓት (ጂብራልታር)',
         'Europe/Guernsey' => 'ግሪንዊች ማዕከላዊ ሰዓት (ጉርነሲ)',
         'Europe/Helsinki' => 'የምስራቃዊ አውሮፓ ሰዓት (ሄልሲንኪ)',

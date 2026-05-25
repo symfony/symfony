@@ -46,6 +46,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     private ?AlgorithmManager $decryptionAlgorithms = null;
     private bool $enforceEncryption = false;
 
+    private bool $enforceKeyUsageVerification = true;
     private ?CacheInterface $discoveryCache = null;
     private ?string $oidcConfigurationCacheKey = null;
 
@@ -74,12 +75,19 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
     /**
      * @param HttpClientInterface|HttpClientInterface[] $client
+     * @param bool                                      $enforceKeyUsageVerification When true (default, strict), only JWKs whose `use` is "sig" or whose
+     *                                                                               `key_ops` contains "sign"/"verify" are accepted for signature verification.
+     *                                                                               When false (lax), JWKs missing both `use` and `key_ops` are also accepted;
+     *                                                                               JWKs explicitly scoped to encryption (`use=enc` or only encryption-related
+     *                                                                               `key_ops`) are still rejected. Use the lax mode only with providers known
+     *                                                                               to omit `use`/`key_ops` on signing keys.
      */
-    public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey): void
+    public function enableDiscovery(CacheInterface $cache, array|HttpClientInterface $client, string $oidcConfigurationCacheKey, bool $enforceKeyUsageVerification = true): void
     {
         $this->discoveryCache = $cache;
         $this->discoveryClients = \is_array($client) ? $client : [$client];
         $this->oidcConfigurationCacheKey = $oidcConfigurationCacheKey;
+        $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -117,6 +125,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         } catch (\Exception $e) {
             $this->logger?->error('An error occurred while decoding and validating the token.', [
                 'error' => $e->getMessage(),
+                'exception' => $e::class,
                 'trace' => $e->getTraceAsString(),
             ]);
 
@@ -140,7 +149,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         }
         $logger = $this->logger;
         try {
-            $keys = [];
+            $discoveredKeys = [];
             $minTtl = null;
             $configResponses = [];
             $jwkSetResponses = [];
@@ -173,10 +182,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                     $minTtl = $currentTtl;
                 }
 
-                foreach ($response->toArray()['keys'] as $key) {
-                    if ('sig' === ($key['use'] ?? null)) {
-                        $keys[] = $key;
-                    }
+                $keys = $response->toArray()['keys'];
+                foreach ($this->filterSignatureKeys($keys) as $key) {
+                    $discoveredKeys[] = $key;
                 }
             }
 
@@ -185,7 +193,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
             }
 
-            return $keys;
+            return $discoveredKeys;
         } catch (\Exception $e) {
             $logger?->error('An error occurred while requesting OIDC certs.', [
                 'error' => $e->getMessage(),
@@ -194,6 +202,37 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
 
             throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
         }
+    }
+
+    private function filterSignatureKeys(array $keys): array
+    {
+        return array_values(array_filter($keys, function (array $jwk): bool {
+            if ($this->enforceKeyUsageVerification) {
+                if (isset($jwk['use']) && 'sig' === $jwk['use']) {
+                    return true;
+                }
+                if (isset($jwk['key_ops']) && \is_array($jwk['key_ops'])) {
+                    return !empty(array_intersect($jwk['key_ops'], ['sign', 'verify']));
+                }
+
+                return false;
+            }
+
+            if (isset($jwk['use']) && 'enc' === $jwk['use']) {
+                return false;
+            }
+            if (isset($jwk['key_ops']) && \is_array($jwk['key_ops'])) {
+                $encOps = ['encrypt', 'decrypt', 'wrapKey', 'unwrapKey', 'deriveKey', 'deriveBits'];
+                $sigOps = ['sign', 'verify'];
+                $hasEnc = !empty(array_intersect($jwk['key_ops'], $encOps));
+                $hasSig = !empty(array_intersect($jwk['key_ops'], $sigOps));
+                if ($hasEnc && !$hasSig) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
     }
 
     private function loadAndVerifyJws(string $accessToken, JWKSet $jwkset): array
@@ -223,16 +262,16 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     {
         // Verify the claims
         $checkers = [
-            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0),
+            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0),
+            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0),
             new Checker\AudienceChecker($this->audience),
             new Checker\IssuerChecker($this->issuers),
         ];
         $claimCheckerManager = new ClaimCheckerManager($checkers);
 
         // if this check fails, an InvalidClaimException is thrown
-        return $claimCheckerManager->check($claims);
+        return $claimCheckerManager->check($claims, ['iat', 'exp', 'aud', 'iss']);
     }
 
     private function decryptIfNeeded(string $accessToken): string

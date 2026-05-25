@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Wektu Eropa Tengah (Büsingen)',
         'Europe/Chisinau' => 'Wektu Eropa sisih Wetan (Chișinău)',
         'Europe/Copenhagen' => 'Wektu Eropa Tengah (Kopenhagen)',
-        'Europe/Dublin' => 'Wektu Républik Irlan (Dublin)',
+        'Europe/Dublin' => 'Wektu Rerata Greenwich (Dublin)',
         'Europe/Gibraltar' => 'Wektu Eropa Tengah (Gibraltar)',
         'Europe/Guernsey' => 'Wektu Rerata Greenwich (Guernsey)',
         'Europe/Helsinki' => 'Wektu Eropa sisih Wetan (Helsinki)',

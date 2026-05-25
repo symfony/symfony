@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Sweego\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\Notifier\Bridge\Sweego\SweegoOptions;
 use Symfony\Component\Notifier\Bridge\Sweego\SweegoTransport;
 use Symfony\Component\Notifier\Exception\UnsupportedMessageTypeException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -84,6 +85,44 @@ final class SweegoTransportTest extends TransportTestCase
 
         $transport = self::createTransport($client);
         $sentMessage = $transport->send(new SmsMessage('0611223344', 'Hello!'));
+
+        $this->assertSame('123', $sentMessage->getMessageId());
+    }
+
+    public function testSendSmsMessageWithOptions()
+    {
+        $client = new MockHttpClient(function ($method, $url, $options) {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://api.sweego.io/send', $url);
+
+            $body = json_decode($options['body'], true);
+            $this->assertSame('sms', $body['channel']);
+            $this->assertFalse(isset($body['bat']));
+            $this->assertTrue($body['shorten_urls']);
+            $this->assertFalse($body['shorten_with_protocol']);
+
+            return new JsonMockResponse(['swg_uids' => ['123']]);
+        });
+
+        $transport = new SweegoTransport(
+            'apiKey',
+            'REGION',
+            'CAMPAIGN_TYPE',
+            null,
+            'CAMPAIGN_ID',
+            null,
+            null,
+            $client,
+        );
+
+        $options = new SweegoOptions([
+            'bat' => null,
+            'shorten_urls' => true,
+            'shorten_with_protocol' => false,
+        ]);
+
+        $smsMessage = new SmsMessage('0611223344', 'Hello!', '', $options);
+        $sentMessage = $transport->send($smsMessage);
 
         $this->assertSame('123', $sentMessage->getMessageId());
     }

@@ -28,8 +28,22 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
         if (null !== $envelope->last(ConsumedByWorkerStamp::class)) {
+            // In multi-EM mode (no explicit entityManagerName), ping every manager and let healthy ones
+            // proceed even if a secondary connection failed. The first failure is rethrown at the end.
+            $firstFailure = null;
             foreach ($this->getTargetEntityManagers($entityManager) as $name => $targetEntityManager) {
-                $this->pingConnection($targetEntityManager, $name);
+                try {
+                    $this->pingConnection($targetEntityManager, $name);
+                } catch (DBALException $e) {
+                    if (null !== $this->entityManagerName) {
+                        throw $e;
+                    }
+                    $firstFailure ??= $e;
+                }
+            }
+
+            if (null !== $firstFailure) {
+                throw $firstFailure;
             }
         }
 

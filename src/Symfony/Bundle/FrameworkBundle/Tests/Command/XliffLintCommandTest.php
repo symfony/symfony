@@ -90,7 +90,6 @@ class XliffLintCommandTest extends TestCase
             ->willReturn(new HelperSet());
 
         $application
-            ->expects($this->any())
             ->method('getDefinition')
             ->willReturn(new InputDefinition());
 

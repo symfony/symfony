@@ -32,13 +32,15 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class CrowdinProvider implements ProviderInterface
 {
+    private const IMPORT_POLL_TIMEOUT_SECONDS = 300;
+
     public function __construct(
-        private HttpClientInterface $client,
-        private LoaderInterface $loader,
-        private LoggerInterface $logger,
-        private XliffFileDumper $xliffFileDumper,
-        private string $defaultLocale,
-        private string $endpoint,
+        private readonly HttpClientInterface $client,
+        private readonly LoaderInterface $loader,
+        private readonly LoggerInterface $logger,
+        private readonly XliffFileDumper $xliffFileDumper,
+        private readonly string $defaultLocale,
+        private readonly string $endpoint,
     ) {
     }
 
@@ -63,7 +65,6 @@ final class CrowdinProvider implements ProviderInterface
                 }
 
                 $content = $this->xliffFileDumper->formatCatalogue($catalogue, $domain, ['default_locale' => $this->defaultLocale]);
-
                 $fileId = $this->getFileIdByDomain($fileList, $domain);
 
                 if ($catalogue->getLocale() === $this->defaultLocale) {
@@ -102,19 +103,76 @@ final class CrowdinProvider implements ProviderInterface
                         continue;
                     }
 
-                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
+                    $responses[] = $this->importTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
                 }
             }
         }
 
-        foreach ($responses as $response) {
-            if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
+        $this->waitForImportCompletion($responses);
+    }
 
-                if (500 <= $statusCode) {
-                    throw new ProviderException('Unable to upload translations to Crowdin.', $response);
+    private function waitForImportCompletion(array $responses): void
+    {
+        $deadline = hrtime(true) + self::IMPORT_POLL_TIMEOUT_SECONDS * 1_000_000_000;
+
+        while ($responses) {
+            foreach ($responses as $index => $response) {
+                if (202 !== $statusCode = $response->getStatusCode()) {
+                    $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
+
+                    if (500 <= $statusCode) {
+                        throw new ProviderException('Unable to upload translations to Crowdin.', $response);
+                    }
+
+                    unset($responses[$index]);
+                    continue;
+                }
+
+                $importStatusResponse = $this->checkImportTranslationsStatus($response->toArray()['data']['identifier']);
+
+                if (200 !== $importStatusResponse->getStatusCode()) {
+                    $this->logger->error(\sprintf('Unable to check import translations status: "%s".', $importStatusResponse->getContent(false)));
+
+                    unset($responses[$index]);
+                    continue;
+                }
+
+                $importStatusData = $importStatusResponse->toArray()['data'];
+                $status = $importStatusData['status'] ?? 'unknown';
+
+                if ('finished' === $status) {
+                    unset($responses[$index]);
+                    continue;
+                }
+
+                if ('failed' === $status) {
+                    $message = $importStatusData['attributes']['error']['message'] ?? null;
+
+                    if ($message) {
+                        $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $message));
+                    } else {
+                        $this->logger->error('Unable to upload translations to Crowdin.');
+                    }
+
+                    unset($responses[$index]);
+                    continue;
+                }
+
+                if (!\in_array($status, ['in_progress', 'created'], true)) {
+                    $this->logger->error(\sprintf('Unable to upload translations to Crowdin: unexpected import status "%s".', $status));
+                    unset($responses[$index]);
                 }
             }
+
+            if (!$responses) {
+                break;
+            }
+
+            if (hrtime(true) >= $deadline) {
+                throw new ProviderException(\sprintf('Timed out after %d seconds while waiting for Crowdin to finish importing translations.', self::IMPORT_POLL_TIMEOUT_SECONDS), reset($responses));
+            }
+
+            sleep(1);
         }
     }
 
@@ -187,8 +245,6 @@ final class CrowdinProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $fileList = $this->getFileList();
-        $responses = [];
-
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
         foreach ($defaultCatalogue->all() as $domain => $messages) {
@@ -198,28 +254,28 @@ final class CrowdinProvider implements ProviderInterface
                 continue;
             }
 
-            $stringsMap = $this->mapStrings($fileId);
+            $sourceFileInfo = $this->downloadSourceFile($fileId);
+            $sourceFile = $this->client->request('GET', $sourceFileInfo->toArray()['data']['url']);
 
-            foreach ($messages as $id => $message) {
-                if (!\array_key_exists($id, $stringsMap)) {
-                    continue;
+            $providerCatalogue = $this->loader->load($sourceFile->getContent(), $this->defaultLocale, $domain);
+            $existingMessages = array_diff($providerCatalogue->all($domain), $messages);
+
+            $content = $this->xliffFileDumper->formatCatalogue(
+                new MessageCatalogue($this->defaultLocale, [$domain => $existingMessages]),
+                $domain,
+                ['default_locale' => $this->defaultLocale],
+            );
+
+            try {
+                $file = $this->updateFile($fileId, $domain, $content);
+
+                if (null === $file) {
+                    $this->logger->warning(
+                        \sprintf('Unable to update file "%d" and domain "%s".', $fileId, $domain)
+                    );
                 }
-
-                $responses[] = $this->deleteString($stringsMap[$id]);
-            }
-        }
-
-        foreach ($responses as $response) {
-            if (404 === $response->getStatusCode()) {
-                continue;
-            }
-
-            if (204 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->warning(\sprintf('Unable to delete string: "%s".', $response->getContent(false)));
-
-                if (500 <= $statusCode) {
-                    throw new ProviderException('Unable to delete string.', $response);
-                }
+            } catch (ProviderException $e) {
+                throw new ProviderException(\sprintf('Unable to update file "%d" and domain "%s": "%s".', $fileId, $domain, $e->getMessage()), $e->getResponse(), previous: $e);
             }
         }
     }
@@ -227,26 +283,6 @@ final class CrowdinProvider implements ProviderInterface
     private function getFileIdByDomain(array $filesMap, string $domain): ?int
     {
         return $filesMap[\sprintf('%s.%s', $domain, 'xlf')] ?? null;
-    }
-
-    private function mapStrings(int $fileId): array
-    {
-        $result = [];
-
-        $limit = 500;
-        $offset = 0;
-
-        do {
-            $strings = $this->listStrings($fileId, $limit, $offset);
-
-            foreach ($strings as $string) {
-                $result[$string['data']['text']] = $string['data']['id'];
-            }
-
-            $offset += $limit;
-        } while (\count($strings) > 0);
-
-        return $result;
     }
 
     private function addFile(string $domain, string $content): ?array
@@ -304,20 +340,30 @@ final class CrowdinProvider implements ProviderInterface
         return $response->toArray()['data'];
     }
 
-    private function uploadTranslations(int $fileId, string $domain, string $content, string $locale): ResponseInterface
+    private function importTranslations(int $fileId, string $domain, string $content, string $locale): ResponseInterface
     {
         $storageId = $this->addStorage($domain, $content);
 
         /*
-         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.imports (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.enterprise.imports (Crowdin Enterprise API)
          */
-        return $this->client->request('POST', 'translations/'.str_replace('_', '-', $locale), [
+        return $this->client->request('POST', 'translations/imports', [
             'json' => [
                 'storageId' => $storageId,
+                'languageIds' => [str_replace('_', '-', $locale)],
                 'fileId' => $fileId,
             ],
         ]);
+    }
+
+    private function checkImportTranslationsStatus(string $importTranslationId): ResponseInterface
+    {
+        /*
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.imports.get (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.enterprise.imports.get (Crowdin Enterprise API)
+         */
+        return $this->client->request('GET', 'translations/imports/'.$importTranslationId);
     }
 
     private function exportProjectTranslations(string $languageId, int $fileId): ResponseInterface
@@ -341,36 +387,6 @@ final class CrowdinProvider implements ProviderInterface
          * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.download.get (Crowdin Enterprise API)
          */
         return $this->client->request('GET', \sprintf('files/%d/download', $fileId));
-    }
-
-    private function listStrings(int $fileId, int $limit, int $offset): array
-    {
-        /**
-         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.strings.getMany (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.strings.getMany (Crowdin Enterprise API)
-         */
-        $response = $this->client->request('GET', 'strings', [
-            'query' => [
-                'fileId' => $fileId,
-                'limit' => $limit,
-                'offset' => $offset,
-            ],
-        ]);
-
-        if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(\sprintf('Unable to list strings for file "%d".', $fileId), $response);
-        }
-
-        return $response->toArray()['data'];
-    }
-
-    private function deleteString(int $stringId): ResponseInterface
-    {
-        /*
-         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.strings.delete (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2#operation/api.projects.strings.delete (Crowdin Enterprise API)
-         */
-        return $this->client->request('DELETE', 'strings/'.$stringId);
     }
 
     private function addStorage(string $domain, string $content): int

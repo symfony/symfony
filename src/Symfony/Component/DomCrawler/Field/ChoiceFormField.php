@@ -141,19 +141,29 @@ class ChoiceFormField extends FormField
     /**
      * Adds a choice to the current ones.
      *
-     * @throws \LogicException When choice provided is neither multiple, radio nor select
+     * @throws \LogicException When choice provided is neither multiple, radio nor select,
+     *                         or when the node tag does not match the field type
      */
     final public function addChoice(\DOMElement $node): void
     {
         if (!$this->multiple && !\in_array($this->type, ['radio', 'select'], true)) {
-            throw new \LogicException(\sprintf('Unable to add a choice for "%s" as it is neither multiple, a radio button nor a select field.', $this->name));
+            throw new \LogicException(\sprintf('Unable to add a choice for "%s" as it is neither multiple, a radio button nor a select field (type is "%s").', $this->name, $this->type));
+        }
+
+        $expectedTag = 'select' === $this->type ? 'option' : 'input';
+        if ($expectedTag !== $node->nodeName) {
+            throw new \LogicException(\sprintf('Unable to add a choice for "%s": expected an "%s" tag, got "%s".', $this->name, $expectedTag, $node->nodeName));
         }
 
         $option = $this->buildOptionValue($node);
         $this->options[] = $option;
 
         if ($node->hasAttribute('select' === $this->type ? 'selected' : 'checked')) {
-            $this->value = $option['value'];
+            if ($this->multiple) {
+                $this->value[] = $option['value'];
+            } else {
+                $this->value = $option['value'];
+            }
         }
     }
 

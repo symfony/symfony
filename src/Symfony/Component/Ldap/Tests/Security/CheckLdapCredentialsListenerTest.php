@@ -142,7 +142,9 @@ class CheckLdapCredentialsListenerTest extends TestCase
                 $this->assertSame(array_shift($series), $args);
             })
         ;
-        $ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
+        $ldap->method('escape')->willReturnMap([
+            ['Wouter', '', LdapInterface::ESCAPE_FILTER, 'wouter'],
+        ]);
         $ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
 
         $listener = $this->createListener($ldap);

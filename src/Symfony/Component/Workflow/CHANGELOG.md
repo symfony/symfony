@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for dumping listeners in Graphviz diagrams
+
 8.0
 ---
 

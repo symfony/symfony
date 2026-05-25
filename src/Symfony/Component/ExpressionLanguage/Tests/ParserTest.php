@@ -301,6 +301,14 @@ class ParserTest extends TestCase
                 'foo.123',
                 ['foo'],
             ],
+            [
+                'foo.[0]',
+                ['foo'],
+            ],
+            [
+                'foo?.[]',
+                ['foo'],
+            ],
         ];
     }
 

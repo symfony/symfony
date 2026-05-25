@@ -263,6 +263,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
             ['received', 'from localhost'],
             ['dkim-signature', 'signature'],
             ['content-transfer-encoding', 'quoted-printable'],
+            ['sender', 'hugo@example.com'],
             ['cc', 'alice@example.com'],
             ['bcc', 'bob@example.com'],
             ['content-type', 'text/plain'],

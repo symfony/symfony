@@ -33,13 +33,13 @@
         "symfony/translation-implementation": "2.3|3.0"
     },
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "composer-runtime-api": ">=2.1",
         "composer/semver": "^3.0",
         "ext-xml": "*",
         "doctrine/event-manager": "^2",
         "doctrine/persistence": "^3.1|^4",
-        "twig/twig": "^3.21",
+        "twig/twig": "^3.25",
         "psr/cache": "^2.0|^3.0",
         "psr/clock": "^1.0",
         "psr/container": "^1.1|^2.0",
@@ -49,6 +49,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/contracts": "^3.7",
         "symfony/polyfill-ctype": "^1.8",
+        "symfony/polyfill-deepclone": "^1.37",
         "symfony/polyfill-intl-grapheme": "^1.33",
         "symfony/polyfill-intl-icu": "^1.0",
         "symfony/polyfill-intl-idn": "^1.10",
@@ -111,6 +112,7 @@
         "symfony/stopwatch": "self.version",
         "symfony/string": "self.version",
         "symfony/translation": "self.version",
+        "symfony/tui": "self.version",
         "symfony/twig-bridge": "self.version",
         "symfony/twig-bundle": "self.version",
         "symfony/type-info": "self.version",
@@ -138,9 +140,11 @@
         "doctrine/orm": "^3.4",
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^2.1.10|^3.1|^4",
-        "guzzlehttp/promises": "^1.4|^2.0",
+        "guzzlehttp/guzzle": "^7.10",
         "jolicode/jolinotif": "^2.7.2|^3.0",
         "jsonpath-standard/jsonpath-compliance-test-suite": "*",
+        "league/commonmark": "^2.9",
+        "nst/json-test-suite": "*",
         "league/html-to-markdown": "^5.0",
         "league/uri": "^6.5|^7.0",
         "masterminds/html5": "^2.7.2",
@@ -150,21 +154,24 @@
         "pda/pheanstalk": "^5.1|^7.0|^8.0",
         "php-http/discovery": "^1.15",
         "php-http/httplug": "^1.0|^2.0",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "phpstan/phpdoc-parser": "^1.0|^2.0",
         "predis/predis": "^1.1|^2.0",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
+        "revolt/event-loop": "^1.0",
         "seld/jsonlint": "^1.10",
         "symfony/mercure-bundle": "^0.3|^0.4",
         "symfony/phpunit-bridge": "^7.4|^8.0",
         "symfony/runtime": "self.version",
         "symfony/security-acl": "^2.8|^3.0",
         "symfony/webpack-encore-bundle": "^1.0|^2.0",
+        "tempest/highlight": "^2.16",
         "twig/cssinliner-extra": "^3",
         "twig/inky-extra": "^3",
         "twig/markdown-extra": "^3",
-        "web-token/jwt-library": "^3.3.2|^4.0"
+        "web-token/jwt-library": "^3.3.2|^4.0",
+        "yaml/yaml-test-suite": "*"
     },
     "conflict": {
         "ext-psr": "<1.1|>=2",
@@ -177,7 +184,7 @@
         "doctrine/orm": "<3.4",
         "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
-        "phpdocumentor/reflection-docblock": "<5.2|>=6",
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
         "phpunit/phpunit": "<7.5|9.1.2",
         "symfony/flex": "<2.10"
@@ -241,6 +248,30 @@
                     "type": "git",
                     "url": "https://github.com/jsonpath-standard/jsonpath-compliance-test-suite.git",
                     "reference": "b9d7153e58711ad38bb8e35ece69c13f4b2f7d63"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "nst/json-test-suite",
+                "version": "2024.12.14",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/nst/JSONTestSuite.git",
+                    "reference": "1ef36fa01286573e846ac449e8683f8833c5b26a"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "yaml/yaml-test-suite",
+                "version": "2022.01.17",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yaml/yaml-test-suite.git",
+                    "reference": "6ad3d2c62885d82fc349026c136ef560838fdf3d"
                 }
             }
         }

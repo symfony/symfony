@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -597,6 +600,71 @@ class PropertyNormalizerTest extends TestCase
 
         $this->assertInstanceOf(PropertyDiscriminatedDummyOne::class, $obj);
     }
+
+    #[DataProvider('provideTypedPropertyDummies')]
+    public function testTypeMismatchOnTypedPropertyIsCollectedAsDenormalizationError(string $class)
+    {
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer([new PropertyNormalizer(null, null, $extractor)]);
+
+        try {
+            $serializer->denormalize(
+                ['name' => ['oops']],
+                $class,
+                null,
+                [
+                    DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+                    AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
+                ],
+            );
+
+            $this->fail(\sprintf('Expected a "%s".', PartialDenormalizationException::class));
+        } catch (PartialDenormalizationException $e) {
+            $this->assertCount(1, $e->getNotNormalizableValueErrors());
+            $error = $e->getNotNormalizableValueErrors()[0];
+            $this->assertInstanceOf(NotNormalizableValueException::class, $error);
+            $this->assertSame('name', $error->getPath());
+            $this->assertSame('array', $error->getCurrentType());
+            $this->assertSame(['unknown'], $error->getExpectedTypes());
+            $this->assertInstanceOf(\TypeError::class, $error->getPrevious());
+        }
+    }
+
+    public static function provideTypedPropertyDummies(): iterable
+    {
+        yield 'readonly typed property' => [PropertyReadonlyTypedDummy::class];
+        yield 'plain typed property' => [PropertyTypedDummy::class];
+    }
+
+    public function testTypeMismatchOnTypedPropertyIsRethrownAsNotNormalizableValueException()
+    {
+        $extractor = new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]);
+        $serializer = new Serializer([new PropertyNormalizer(null, null, $extractor)]);
+
+        try {
+            $serializer->denormalize(
+                ['name' => ['oops']],
+                PropertyTypedDummy::class,
+                null,
+                [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true],
+            );
+
+            $this->fail(\sprintf('Expected a "%s".', NotNormalizableValueException::class));
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('name', $e->getPath());
+            $this->assertInstanceOf(\TypeError::class, $e->getPrevious());
+        }
+    }
+}
+
+class PropertyReadonlyTypedDummy
+{
+    public readonly string $name;
+}
+
+class PropertyTypedDummy
+{
+    public string $name;
 }
 
 class PropertyDummy

@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -458,10 +459,34 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $expected = [
             'apiKey' => new ServiceClosureArgument(new Reference('the_api_key')),
-            'service1' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'imageStorage')),
+            'service1' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'imageStorage', [new Target('image.storage')])),
             'service2' => new ServiceClosureArgument(new TypedReference(ControllerDummy::class, ControllerDummy::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service2')),
         ];
         $this->assertEquals($expected, $locator->getArgument(0));
+    }
+
+    public function testTargetAttributeUsesShortNameForControllerArguments()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('limiter.anonymous_action', DummyRateLimiterFactory::class);
+        $container->registerAliasForArgument('limiter.anonymous_action', DummyLimiterFactoryInterface::class, 'anonymous_action.limiter', 'anonymous_action');
+
+        $container->register('foo', WithTargetShortName::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+        $locator = $container->getDefinition((string) $locator['foo::fooAction']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
+
+        $argument = $locator->getArgument(0)['limiterFactory']->getValues()[0];
+        $this->assertInstanceOf(TypedReference::class, $argument);
+        $this->assertSame(DummyLimiterFactoryInterface::class, $argument->getType());
+        $this->assertSame('anonymous_action', $argument->getName());
+        $this->assertEquals([new Target('anonymous_action')], $argument->getAttributes());
     }
 
     public function testResponseArgumentIsIgnored()
@@ -512,6 +537,23 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(LazyClosure::class, $autowireCallable);
         $this->assertInstanceOf(\stdClass::class, $autowireCallable->service);
         $this->assertFalse($locator->has('service2'));
+    }
+
+    public function testAutowireAttributeInvalidReference()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('foo', WithAutowireAttributeInvalidReference::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $container->compile();
     }
 
     public function testAutowireIteratorAndAutowireLocatorAttributes()
@@ -672,6 +714,28 @@ class WithTarget
     }
 }
 
+class WithTargetShortName
+{
+    public function fooAction(
+        #[Target('anonymous_action')]
+        DummyLimiterFactoryInterface $limiterFactory,
+    ) {
+    }
+}
+
+interface DummyLimiterFactoryInterface
+{
+    public function create(mixed $key = null): object;
+}
+
+class DummyRateLimiterFactory implements DummyLimiterFactoryInterface
+{
+    public function create(mixed $key = null): object
+    {
+        throw new \BadMethodCallException('Not used in tests.');
+    }
+}
+
 class WithResponseArgument
 {
     public function fooAction(Response $response, ?Response $nullableResponse)
@@ -716,6 +780,13 @@ class WithAutowireAttribute
         string $customAutowire,
         #[AutowireCallable(service: 'some.id', method: 'bar')]
         FooInterface $autowireCallable,
+    ) {
+    }
+}
+
+class WithAutowireAttributeInvalidReference
+{
+    public function invalidReference(
         #[Autowire(service: 'invalid.id')]
         ?\stdClass $service2 = null,
     ) {

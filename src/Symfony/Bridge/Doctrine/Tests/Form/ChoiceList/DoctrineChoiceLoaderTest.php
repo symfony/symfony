@@ -53,12 +53,10 @@ class DoctrineChoiceLoaderTest extends TestCase
 
         $this->om
             ->method('getRepository')
-            ->with($this->class)
             ->willReturn($this->repository);
 
         $this->om
             ->method('getClassMetadata')
-            ->with($this->class)
             ->willReturn(new ClassMetadata($this->class));
         $this->repository
             ->method('findAll')
@@ -152,19 +150,20 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     public function testLoadValuesForChoicesDoesNotLoadIfSingleIntId()
     {
+        $idReader = $this->createMock(IdReader::class);
+        $idReader->method('isSingleId')->willReturn(true);
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader
+            $idReader
         );
 
         $this->repository->expects($this->never())
             ->method('findAll');
 
-        $this->idReader
-            ->method('getIdValue')
-            ->with($this->obj2)
-            ->willReturn('2');
+        $idReader
+            ->expects($this->never())
+            ->method('getIdValue');
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Not defining the IdReader explicitly as a value callback when the query can be optimized is not supported.');
@@ -195,18 +194,21 @@ class DoctrineChoiceLoaderTest extends TestCase
 
     public function testLoadValuesForChoicesDoesNotLoadIfValueIsIdReader()
     {
+        $idReader = $this->createMock(IdReader::class);
+        $idReader->method('isSingleId')->willReturn(true);
         $loader = new DoctrineChoiceLoader(
             $this->om,
             $this->class,
-            $this->idReader
+            $idReader
         );
 
-        $value = [$this->idReader, 'getIdValue'];
+        $value = [$idReader, 'getIdValue'];
 
         $this->repository->expects($this->never())
             ->method('findAll');
 
-        $this->idReader
+        $idReader
+            ->expects($this->once())
             ->method('getIdValue')
             ->with($this->obj2)
             ->willReturn('2');

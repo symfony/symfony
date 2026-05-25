@@ -206,7 +206,7 @@ class ImportMapRequireCommandTest extends KernelTestCase
 
     private static function createRemoteEntry(string $importName, string $version, ?string $path = null): ImportMapEntry
     {
-        return ImportMapEntry::createRemote($importName, ImportMapType::JS, path: $path, version: $version, packageModuleSpecifier: $importName, isEntrypoint: false);
+        return ImportMapEntry::createRemote($importName, ImportMapType::JS, $path, $version, $importName, false);
     }
 
     private function trimBeginEndOfEachLine(string $lines): string

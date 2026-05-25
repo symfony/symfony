@@ -32,7 +32,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $tmpProviders = [];
 
         $extension = $this->createMock(ExtensionInterface::class);
-        $extension->expects($this->any())
+        $extension
             ->method('getAlias')
             ->willReturn('foo');
         $extension->expects($this->once())

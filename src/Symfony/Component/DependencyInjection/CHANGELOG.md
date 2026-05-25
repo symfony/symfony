@@ -4,12 +4,23 @@ CHANGELOG
 8.1
 ---
 
+ * Support autowiring env vars as closures or `Stringable` when using `#[Autowire(env: 'FOO')]`
+ * Add `EnvClosureArgument` and `!env_closure` YAML tag to inject env vars as closures or `Stringable` arguments
+ * Add `AddBehaviorDescribingTagsPass` to allow bundles to extend the list of behavior-describing tags
+ * Add Kernel and Bundle infrastructure in the `Kernel\` subnamespace
+ * Add `$extensions` parameter to `MergeExtensionConfigurationPass` to ensure registered extensions are implicitly loaded
+ * Add support for using service stacks as decorators, including `decorates_tag`
+ * Add support for decorating all services with a specific tag using the `container.tag_decorator` resource tag or `#[AsTagDecorator]`
  * Add support for `SOURCE_DATE_EPOCH` environment variable
  * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`
  * Deprecate default index/priority methods when defining tagged locators/iterators; use the `#[AsTaggedItem]` attribute instead
  * Allow environment variables with `.` in them
  * Add argument `exclude` to `ContainerConfigurator::import()`
  * Add `target` parameter to `#[AsAlias]` to create target-specific autowiring aliases
+ * Deprecate named autowiring alias that don't use `#[Target]`
+ * Allow passing a `Definition` instance to `Definition::setFactory()` and `Definition::setConfigurator()`, its `__invoke()` method will be called
+ * Add `ServicesResetter`, `ServicesResetterInterface`, and `Compiler\ResettableServicePass` (moved from HttpKernel)
+ * Allow resetting non-shared services tagged with `kernel.reset`
 
 8.0
 ---

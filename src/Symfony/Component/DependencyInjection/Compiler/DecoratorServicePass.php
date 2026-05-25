@@ -64,6 +64,7 @@ class DecoratorServicePass extends AbstractRecursivePass
 
             $definition->innerServiceId = $renamedId;
             $definition->decorationOnInvalid = $invalidBehavior;
+            $definition->decorationPriority = $decoratedService[2];
 
             // we create a new alias/service for the service we are replacing
             // to be able to reference it in the new one

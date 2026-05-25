@@ -50,12 +50,12 @@ class WorkflowValidator implements DefinitionValidatorInterface
 
             foreach ($transition->getFroms(true) as $arc) {
                 if (1 < $arc->weight) {
-                    throw new InvalidDefinitionException(\sprintf('The marking store of workflow "%s" cannot store many places. But the transition "%s" has an arc from the transition to "%s" with a weight equals to %d.', $transition->getName(), $name, $arc->place, $arc->weight));
+                    throw new InvalidDefinitionException(\sprintf('The marking store of workflow "%s" cannot store many places. But the transition "%s" has an arc from place "%s" with a weight of %d.', $name, $transition->getName(), $arc->place, $arc->weight));
                 }
             }
             foreach ($transition->getTos(true) as $arc) {
                 if (1 < $arc->weight) {
-                    throw new InvalidDefinitionException(\sprintf('The marking store of workflow "%s" cannot store many places. But the transition "%s" has an arc from "%s" to the transition with a weight equals to %d.', $transition->getName(), $name, $arc->place, $arc->weight));
+                    throw new InvalidDefinitionException(\sprintf('The marking store of workflow "%s" cannot store many places. But the transition "%s" has an arc to place "%s" with a weight of %d.', $name, $transition->getName(), $arc->place, $arc->weight));
                 }
             }
         }

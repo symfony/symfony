@@ -19,6 +19,7 @@ class ResourceCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
+    #[RequiresPhp('>=8.4.2')]
     #[RequiresPhpExtension('dba')]
     public function testCastDba()
     {

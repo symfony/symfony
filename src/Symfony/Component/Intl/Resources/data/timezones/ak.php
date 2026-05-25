@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Yuropu Mfinimfini Berɛ (Busingye)',
         'Europe/Chisinau' => 'Yuropu Apueeɛ Berɛ (Kyisinau)',
         'Europe/Copenhagen' => 'Yuropu Mfinimfini Berɛ (Kopehegan)',
-        'Europe/Dublin' => 'Berɛ Aereland (Dɔblin)',
+        'Europe/Dublin' => 'Greenwich Mean Berɛ (Dɔblin)',
         'Europe/Gibraltar' => 'Yuropu Mfinimfini Berɛ (Gyebrota)',
         'Europe/Guernsey' => 'Greenwich Mean Berɛ (Guernsey)',
         'Europe/Helsinki' => 'Yuropu Apueeɛ Berɛ (Hɛlsinki)',

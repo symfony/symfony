@@ -64,6 +64,14 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->assertEquals(Type::int(), $this->resolver->resolve($reflectionFunction));
     }
 
+    public function testResolveTentative()
+    {
+        $reflectionClass = new \ReflectionClass(\DateTime::class);
+        $reflectionFunction = $reflectionClass->getMethod('getTimezone');
+
+        $this->assertEquals(Type::union(Type::object(\DateTimeZone::class), Type::false()), $this->resolver->resolve($reflectionFunction));
+    }
+
     public function testResolveSelfFromClassWithoutContext()
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);

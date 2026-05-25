@@ -4,13 +4,34 @@ CHANGELOG
 8.1
 ---
 
+ * Add `framework.validation.property_metadata_existence_check` config option
+ * Deprecate `json_streamer.value_transformer.date_time_to_string` and `json_streamer.value_transformer.string_to_date_time` services, date times are handled as value objects
+ * Deprecate `json_streamer.value_transformer` tag, use `json_streamer.property_value_transformer` instead
+ * Add `marshaller` option to cache pool configuration to allow per-pool marshaller services
+ * Add support for `lock://` DSN in semaphore configuration to use the Lock component as a semaphore store
  * Add support for configuring JsonStreamer's `default_options`
+ * Add project-scoped `flock` and `semaphore` lock store services
  * Add `createFormFlowBuilder` method to `AbstractController` and `ControllerHelper`
  * Deprecate setting the `framework.profiler.collect_serializer_data` config option
+ * Deprecate the `framework.http_cache.terminate_on_cache_hit` config option
  * Add support for `framework.secrets.decryption_env_var` to contain dots
  * Enable mocking non-shared services in tests
- * Add `KernelTestCase::executeCommand()` to execute a command in functional tests
+ * Add support for setting `mock_response_factory` per scoped HTTP client
+ * Add `ConsoleCommandAssertionsTrait` to `KernelTestCase` for running a command and asserting the result
+ * Add `assertSessionHasFlashMessage()` to `BrowserKitAssertionsTrait`
  * Add `framework.html_sanitizer.sanitizers.*.default_action` config option
+ * Deprecate parameters `router.request_context.scheme` and `router.request_context.host`;
+   use the `router.request_context.base_url` parameter or the `framework.router.default_uri` config option instead
+ * Add decoration stack to `debug:container` command output
+ * Add `MicroKernelTrait::getAllowedEnvs()` to list and enforce allowed values for `APP_ENV`
+ * Change `caching.max_ttl` option to default to `86400` (24h) instead of `null`
+ * Deprecate setting `caching.max_ttl` to `null`, use a positive integer instead
+ * Deprecate `senders` nesting level for messenger routing config; use string or a list of strings instead
+ * Allow configuring Webhook's header names and signing algo
+ * Deprecate registering console commands by overriding `Bundle::registerCommands()`, use the `#[AsCommand]` attribute or the `console.command` service tag instead
+ * Deprecate calling `FrameworkExtension::load()` directly without first loading `ServicesBundle`'s extension
+ * Add support for the `#[RateLimit]` attribute on controllers when `framework.rate_limiter` is configured
+ * Add `--sort` option to `debug:router` command to sort routes by a given column
 
 8.0
 ---

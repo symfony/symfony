@@ -33,10 +33,10 @@ class OidcTokenGeneratorTest extends TestCase
         $issuers = ['https://www.example.com'];
         $clock = new MockClock('1998-07-12T22:45:00+02:00');
 
-        $generator = new OidcTokenGenerator($algorithmManager, $this->getJWKSet(), $audience, $issuers, clock: $clock);
-        $handler = new OidcTokenHandler($algorithmManager, $this->getJWKSet(), $audience, $issuers, clock: $clock);
+        $generator = new OidcTokenGenerator($algorithmManager, $this->getJWKSet(), $audience, $issuers, 'sub', $clock);
+        $handler = new OidcTokenHandler($algorithmManager, $this->getJWKSet(), $audience, $issuers, 'sub', null, $clock);
 
-        $token = $generator->generate('john_doe');
+        $token = $generator->generate('john_doe', null, null, 3600);
 
         $badge = $handler->getUserBadgeFrom($token);
         $this->assertSame('john_doe', $badge->getUser()->getUserIdentifier());
@@ -45,6 +45,7 @@ class OidcTokenGeneratorTest extends TestCase
             'iat' => 900276300,
             'aud' => 'Symfony OIDC',
             'iss' => 'https://www.example.com',
+            'exp' => 900276300 + 3600,
         ], $badge->getAttributes());
     }
 

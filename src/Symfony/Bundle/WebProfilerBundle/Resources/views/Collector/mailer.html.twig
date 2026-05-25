@@ -155,6 +155,10 @@
             width: 18px;
             margin-right: 3px;
         }
+        .sf-profiler-mailer-scrollable {
+            max-height: 600px;
+            overflow-y: auto;
+        }
     </style>
 {% endblock %}
 
@@ -216,7 +220,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
 
         <strong>Emails</strong>
         {% if events.messages|length > 0 %}
@@ -278,24 +282,8 @@
                             {% for event in collector.events.events(transport) %}
                                 <tr class="mailer-email-summary-table-row {{ loop.first ? 'active' }}" data-target="#email-{{ loop.index }}">
                                     <td>{{ loop.index }}</td>
-                                    <td>
-                                        {% if event.message.subject is defined %}
-                                            {{ event.message.getSubject() ?? '(No subject)' }}
-                                        {% elseif event.message.headers.has('subject') %}
-                                            {{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}
-                                        {% else %}
-                                            (No subject)
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if event.message.to is defined %}
-                                            {{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
-                                        {% elseif event.message.headers.has('to') %}
-                                            {{ event.message.headers.get('to').bodyAsString()|default('(empty)') }}
-                                        {% else %}
-                                            (empty)
-                                        {% endif %}
-                                    </td>
+                                    <td>{{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}</td>
+                                    <td>{{ event.message.headers.get('to').bodyAsString()|default(event.envelope.recipients|map(addr => addr.toString())|join(', ')) }}</td>
                                     <td class="visually-hidden"><button class="mailer-email-summary-table-row-button" data-target="#email-{{ loop.index }}">View email details</button></td>
                                 </tr>
                             {% endfor %}
@@ -331,7 +319,7 @@
                 Download as EML file
             </a>
 
-            <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+            <pre class="prewrap sf-profiler-mailer-scrollable" style="margin-left: 5px">{{ message.toString() }}</pre>
         {% else %}
             <div class="sf-tabs">
                 <div class="tab">
@@ -339,34 +327,16 @@
                     <div class="tab-content">
                         <div class="card-block">
                             <p class="mailer-message-subject">
-                                {% if message.subject is defined %}
-                                    {{ message.getSubject() ?? '(No subject)' }}
-                                {% elseif message.headers.has('subject') %}
-                                    {{ message.headers.get('subject').bodyAsString()|default('(No subject)') }}
-                                {% else %}
-                                    (No subject)
-                                {% endif %}
+                                {{ message.headers.get('subject').bodyAsString()|default('(No subject)') }}
                             </p>
                             <div class="mailer-message-headers">
                                 <p>
                                     <strong>From:</strong>
-                                    {% if message.from is defined %}
-                                        {{ message.getFrom()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
-                                    {% elseif message.headers.has('from') %}
-                                        {{ message.headers.get('from').bodyAsString()|default('(empty)') }}
-                                    {% else %}
-                                        (empty)
-                                    {% endif %}
+                                    {{ message.headers.get('from').bodyAsString()|default('(empty)') }}
                                 </p>
                                 <p>
                                     <strong>To:</strong>
-                                    {% if message.to is defined %}
-                                        {{ message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
-                                    {% elseif message.headers.has('to') %}
-                                        {{ message.headers.get('to').bodyAsString()|default('(empty)') }}
-                                    {% else %}
-                                        (empty)
-                                    {% endif %}
+                                    {{ message.headers.get('to').bodyAsString()|default('(empty)') }}
                                 </p>
                                 {% for header in message.headers.all|filter(header => (header.name ?? '')|lower not in ['subject', 'from', 'to']) %}
                                     <p class="mailer-message-header-secondary">{{ header.toString }}</p>
@@ -412,7 +382,7 @@
                                     <h3 class="tab-title">Text content</h3>
                                     <div class="tab-content">
                                         {% if textBody %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body prewrap sf-profiler-mailer-scrollable">
                                                 {%- if message.textCharset() %}
                                                     {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
                                                 {%- else %}
@@ -431,7 +401,7 @@
                                     <div class="tab">
                                         <h3 class="tab-title">HTML preview</h3>
                                         <div class="tab-content">
-                                            <pre class="prewrap" style="max-height: 600px"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
+                                            <pre class="prewrap sf-profiler-mailer-scrollable"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
                                             </pre>
                                         </div>
                                     </div>
@@ -441,7 +411,7 @@
                                     <h3 class="tab-title">HTML content</h3>
                                     <div class="tab-content">
                                         {% if htmlBody %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body prewrap sf-profiler-mailer-scrollable">
                                                 {%- if message.htmlCharset() %}
                                                     {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
                                                 {%- else %}
@@ -461,7 +431,7 @@
                                     <h3 class="tab-title">Content</h3>
                                     <div class="tab-content">
                                         {% if body %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body prewrap sf-profiler-mailer-scrollable">
                                                 {{- body }}
                                             </pre>
                                         {% else %}
@@ -480,7 +450,7 @@
                 <div class="tab">
                     <h3 class="tab-title">MIME parts</h3>
                     <div class="tab-content">
-                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.body().asDebugString() }}</pre>
+                        <pre class="prewrap sf-profiler-mailer-scrollable" style="margin-left: 5px">{{ message.body().asDebugString() }}</pre>
                     </div>
                 </div>
 
@@ -492,7 +462,7 @@
                             Download as EML file
                         </a>
 
-                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+                        <pre class="prewrap sf-profiler-mailer-scrollable" style="margin-left: 5px">{{ message.toString() }}</pre>
                     </div>
                 </div>
             </div>

@@ -11,22 +11,36 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer;
 
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
 use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 
-/**
- * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- */
-class RangeToStringValueTransformer implements ValueTransformerInterface
-{
-    public function transform(mixed $value, array $options = []): string
+// BC layer for "symfony/json-streamer" < 8.1
+if (!interface_exists(PropertyValueTransformerInterface::class)) {
+    class RangeToStringValueTransformer implements ValueTransformerInterface
     {
-        return $value[0].'..'.$value[1];
-    }
+        public function transform(mixed $value, array $options = []): string
+        {
+            return $value[0].'..'.$value[1];
+        }
 
-    public static function getStreamValueType(): BuiltinType
+        public static function getStreamValueType(): BuiltinType
+        {
+            return Type::string();
+        }
+    }
+} else {
+    class RangeToStringValueTransformer implements PropertyValueTransformerInterface
     {
-        return Type::string();
+        public function transform(mixed $value, array $options = []): string
+        {
+            return $value[0].'..'.$value[1];
+        }
+
+        public static function getStreamValueType(): BuiltinType
+        {
+            return Type::string();
+        }
     }
 }

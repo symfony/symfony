@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\Serializer\SemaphoreKeyNormalizer;
 use Symfony\Component\Semaphore\Store\RedisStore;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 
 class SemaphoreKeyNormalizerTest extends TestCase
 {
@@ -31,5 +32,49 @@ class SemaphoreKeyNormalizerTest extends TestCase
         $this->assertSame(2, $copy->getWeight());
         $this->assertSame($key->getState(RedisStore::class), $copy->getState(RedisStore::class));
         $this->assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
+    }
+
+    public function testDenormalizeRejectsInvariantViolations()
+    {
+        $normalizer = new SemaphoreKeyNormalizer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $normalizer->denormalize([
+            'resource' => 'r',
+            'limit' => 2,
+            'weight' => 5,
+            'expiringTime' => null,
+            'state' => [],
+        ], Key::class);
+    }
+
+    public function testDenormalizeRejectsNonArrayPayload()
+    {
+        $normalizer = new SemaphoreKeyNormalizer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $normalizer->denormalize('not-an-array', Key::class);
+    }
+
+    public function testDenormalizeRejectsMissingFields()
+    {
+        $normalizer = new SemaphoreKeyNormalizer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $normalizer->denormalize(['resource' => 'r'], Key::class);
+    }
+
+    public function testDenormalizeRejectsWrongType()
+    {
+        $normalizer = new SemaphoreKeyNormalizer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $normalizer->denormalize([
+            'resource' => null,
+            'limit' => 1,
+            'weight' => 1,
+            'expiringTime' => null,
+            'state' => [],
+        ], Key::class);
     }
 }

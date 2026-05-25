@@ -38,7 +38,7 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Normali
             'previous' => null === $data->getPrevious() ? null : $this->normalize($data->getPrevious(), $format, $context),
             'status' => $data->getStatusCode(),
             'status_text' => $data->getStatusText(),
-            'trace' => $data->getTrace(),
+            'trace' => self::sanitizeTrace($data->getTrace()),
             'trace_as_string' => $data->getTraceAsString(),
         ];
     }
@@ -84,5 +84,16 @@ final class FlattenExceptionNormalizer implements DenormalizerInterface, Normali
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return FlattenException::class === $type && ($context[Serializer::MESSENGER_SERIALIZATION_CONTEXT] ?? false);
+    }
+
+    private static function sanitizeTrace(array $trace): array
+    {
+        foreach ($trace as &$frame) {
+            if (isset($frame['args'])) {
+                unset($frame['args']);
+            }
+        }
+
+        return $trace;
     }
 }

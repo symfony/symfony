@@ -84,6 +84,16 @@ class AbstractNormalizerTest extends TestCase
         $this->assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
     }
 
+    public function testGetAllowedAttributesWithWildcardGroupAndNoMetadata()
+    {
+        $classMetadata = new ClassMetadata('c');
+
+        $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], true);
+        $this->assertFalse($result);
+    }
+
     public function testGetAllowedAttributesAsObjects()
     {
         $classMetadata = new ClassMetadata('c');

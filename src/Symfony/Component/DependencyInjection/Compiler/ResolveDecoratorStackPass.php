@@ -14,10 +14,13 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\VarExporter\DeepCloner;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -28,8 +31,10 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
     {
         $stacks = [];
 
-        foreach ($container->findTaggedServiceIds('container.stack') as $id => $tags) {
-            $definition = $container->getDefinition($id);
+        foreach ($container->getDefinitions() as $id => $definition) {
+            if (!$definition->hasTag('container.stack')) {
+                continue;
+            }
 
             if (!$definition instanceof ChildDefinition) {
                 throw new InvalidArgumentException(\sprintf('Invalid service "%s": only definitions with a "parent" can have the "container.stack" tag.', $id));
@@ -40,6 +45,48 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
             }
 
             $stacks[$id] = $stack;
+            $definitionCloner = null;
+            $stackCloner = null;
+            $hasTagDecorator = false;
+
+            foreach ($definition->getTag('container.tag_decorator') as $tag) {
+                if (!$decoratesTag = $tag['decorates_tag'] ?? null) {
+                    continue;
+                }
+
+                if ($definition->getDecoratedService()) {
+                    throw new InvalidArgumentException(\sprintf('Service stack "%s" cannot have both "decorates" and "decorates_tag".', $id));
+                }
+
+                $priority = $tag['priority'] ?? 0;
+                $invalidBehavior = $tag['on_invalid'] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+
+                if (!$taggedServices = $container->findTaggedServiceIds($decoratesTag)) {
+                    if (ContainerInterface::IGNORE_ON_INVALID_REFERENCE === $invalidBehavior) {
+                        continue;
+                    }
+
+                    if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
+                        throw new ServiceNotFoundException($decoratesTag, $id);
+                    }
+                }
+                $definitionCloner ??= new DeepCloner($definition);
+                $stackCloner ??= new DeepCloner($stack);
+                $hasTagDecorator = true;
+
+                foreach ($taggedServices as $taggedServiceId => $_) {
+                    $cloneId = '.stack.'.$taggedServiceId.'.'.$id;
+                    $container->setDefinition($cloneId, $definitionCloner->clone())
+                        ->clearTag('container.tag_decorator')->clearTag('container.excluded')
+                        ->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior);
+                    $stacks[$cloneId] = $stackCloner->clone();
+                }
+            }
+
+            if ($hasTagDecorator) {
+                $container->removeDefinition($id);
+                unset($stacks[$id]);
+            }
         }
 
         if (!$stacks) {
@@ -54,7 +101,16 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
                 continue;
             }
 
-            foreach (array_reverse($this->resolveStack($stacks, [$id]), true) as $k => $v) {
+            $resolved = $this->resolveStack($stacks, [$id]);
+
+            if ($decoratedService = $definition->getDecoratedService()) {
+                // Propagate decoration to the innermost definition in the stack,
+                // so that DecoratorServicePass can wire it to the original service.
+                end($resolved);
+                $resolved[key($resolved)]->setDecoratedService($decoratedService[0], $decoratedService[1], $decoratedService[2], $decoratedService[3] ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+            }
+
+            foreach (array_reverse($resolved, true) as $k => $v) {
                 $resolvedDefinitions[$k] = $v;
             }
 
@@ -89,7 +145,7 @@ class ResolveDecoratorStackPass implements CompilerPassInterface
         foreach ($stacks[$id] as $k => $definition) {
             if ($definition instanceof ChildDefinition && isset($stacks[$definition->getParent()])) {
                 $path[] = $definition->getParent();
-                $definition = unserialize(serialize($definition)); // deep clone
+                $definition = DeepCloner::deepClone($definition);
             } elseif ($definition instanceof Definition) {
                 $definitions[$decoratedId = $prefix.$k] = $definition;
                 continue;

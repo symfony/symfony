@@ -141,6 +141,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_3;
         }
 
+        $ntlmOriginKey = null;
         if (isset($options['auth_ntlm'])) {
             $curlopts[\CURLOPT_HTTPAUTH] = \CURLAUTH_NTLM;
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
@@ -159,6 +160,13 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             $curlopts[\CURLOPT_USERPWD] = $options['auth_ntlm'];
+
+            $ntlmOriginKey = CurlClientState::originKey($scheme, $host, $port);
+
+            if (isset($this->multi->ntlmRequiresFreshConnection[$ntlmOriginKey])) {
+                $curlopts[\CURLOPT_FRESH_CONNECT] = true;
+                $curlopts[\CURLOPT_FORBID_REUSE] = true;
+            }
         }
 
         if (!\ZEND_THREAD_SAFE) {
@@ -316,7 +324,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if (!$pushedResponse) {
             $ch = curl_init();
             $this->logger?->info(\sprintf('Request: "%s %s"', $method, $url));
-            $curlopts += [\CURLOPT_SHARE => ($options['extra']['use_persistent_connections'] ?? false) ? $this->multi->share : $this->multi->persistentShare];
+            $curlopts += [\CURLOPT_SHARE => ($options['extra']['use_persistent_connections'] ?? false) ? $this->multi->persistentShare : $this->multi->share];
         }
 
         foreach ($curlopts as $opt => $value) {
@@ -329,7 +337,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url);
+        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url, $ntlmOriginKey);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -385,6 +393,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     /**
      * Wraps the request's body callback to allow it to return strings longer than curl requested.
+     *
+     * @param-immediately-invoked-callable $body
      */
     private static function readRequestBody(int $length, \Closure $body, string &$buffer, bool &$eof): string
     {

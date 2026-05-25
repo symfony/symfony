@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Http\Firewall;
 
+use Doctrine\Persistence\Proxy;
+use ProxyManager\Proxy\LazyLoadingInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -31,6 +33,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -174,6 +177,18 @@ class ContextListener extends AbstractListener
                 $session->remove($this->sessionKey);
             }
         } else {
+            if ($user = $token?->getUser()) {
+                if (($reflector = new \ReflectionClass($user))->isUninitializedLazyObject($user)) {
+                    $reflector->initializeLazyObject($user);
+                } elseif ($user instanceof Proxy && !$user->__isInitialized()) {
+                    $user->__load();
+                } elseif ($user instanceof LazyObjectInterface && !$user->isLazyObjectInitialized()) {
+                    $user->initializeLazyObject();
+                } elseif ($user instanceof LazyLoadingInterface && !$user->isProxyInitialized()) {
+                    $user->initializeProxy();
+                }
+            }
+
             $session->set($this->sessionKey, serialize($token));
 
             $this->logger?->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
@@ -210,11 +225,9 @@ class ContextListener extends AbstractListener
 
             try {
                 $refreshedUser = $provider->refreshUser($user);
-                $newToken = clone $token;
-                $newToken->setUser($refreshedUser, false);
 
                 // tokens can be deauthenticated if the user has been changed.
-                if ($token instanceof AbstractToken && self::hasUserChanged($user, $newToken)) {
+                if ($token instanceof AbstractToken && self::hasUserChanged($token, $user, $refreshedUser)) {
                     $userDeauthenticated = true;
 
                     $this->logger?->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => $provider::class]);
@@ -283,10 +296,8 @@ class ContextListener extends AbstractListener
         return $token;
     }
 
-    private static function hasUserChanged(UserInterface $originalUser, TokenInterface $refreshedToken): bool
+    private static function hasUserChanged(AbstractToken $token, UserInterface $originalUser, UserInterface $refreshedUser): bool
     {
-        $refreshedUser = $refreshedToken->getUser();
-
         if ($originalUser instanceof EquatableInterface) {
             return !$originalUser->isEqualTo($refreshedUser);
         }
@@ -315,12 +326,12 @@ class ContextListener extends AbstractListener
             }
         }
 
-        $refreshedRoles = array_map('strval', $refreshedUser->getRoles());
-        $originalRoles = $refreshedToken->getRoleNames(); // This comes from cloning the original token, so it still contains the roles of the original user
+        $userRoles = array_map('strval', (array) $refreshedUser->getRoles());
+        $tokenRoleNames = $token->getRoleNames();
 
         if (
-            \count($refreshedRoles) !== \count($originalRoles)
-            || \count($refreshedRoles) !== \count(array_intersect($refreshedRoles, $originalRoles))
+            \count($userRoles) !== \count($tokenRoleNames)
+            || \count($userRoles) !== \count(array_intersect($userRoles, $tokenRoleNames))
         ) {
             return true;
         }

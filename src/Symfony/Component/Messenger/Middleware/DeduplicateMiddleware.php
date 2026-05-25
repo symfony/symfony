@@ -38,12 +38,10 @@ final class DeduplicateMiddleware implements MiddlewareInterface
             $this->lockFactory->createLockFromKey($stamp->getKey())->release();
         }
 
-        try {
-            $envelope = $stack->next()->handle($envelope, $stack);
-        } finally {
-            if ($envelope->last(ReceivedStamp::class) && !$stamp->onlyDeduplicateInQueue()) {
-                $this->lockFactory->createLockFromKey($stamp->getKey())->release();
-            }
+        $envelope = $stack->next()->handle($envelope, $stack);
+
+        if ($envelope->last(ReceivedStamp::class) && !$stamp->onlyDeduplicateInQueue()) {
+            $this->lockFactory->createLockFromKey($stamp->getKey())->release();
         }
 
         return $envelope;

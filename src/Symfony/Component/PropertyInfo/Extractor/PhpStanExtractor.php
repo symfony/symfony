@@ -151,19 +151,17 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var PhpDocNode|null $docNode */
-        [$docNode] = $this->getDocBlockFromProperty($class, $property);
-        if (null === $docNode) {
+        [$docNode, $constructorDocNode] = $this->getDocBlockFromProperty($class, $property);
+        if (null === $docNode && null === $constructorDocNode) {
             return null;
         }
 
-        if ($shortDescription = $this->getDescriptionsFromDocNode($docNode)[0]) {
+        if ($docNode && $shortDescription = $this->getShortDescriptionFromDocNode($docNode, $property)) {
             return $shortDescription;
         }
 
-        foreach ($docNode->getVarTagValues() as $var) {
-            if ($var->description) {
-                return $var->description;
-            }
+        if ($constructorDocNode) {
+            return $this->getShortDescriptionFromDocNode($constructorDocNode, $property);
         }
 
         return null;
@@ -172,12 +170,16 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
         /** @var PhpDocNode|null $docNode */
-        [$docNode] = $this->getDocBlockFromProperty($class, $property);
-        if (null === $docNode) {
+        [$docNode, $constructorDocNode] = $this->getDocBlockFromProperty($class, $property);
+        if (null === $docNode && null === $constructorDocNode) {
             return null;
         }
 
-        return $this->getDescriptionsFromDocNode($docNode)[1];
+        if ($docNode && $longDescription = $this->getDescriptionsFromDocNode($docNode)[1]) {
+            return $longDescription;
+        }
+
+        return $constructorDocNode ? $this->getDescriptionsFromDocNode($constructorDocNode)[1] : null;
     }
 
     /**
@@ -266,6 +268,41 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             $shortDescription ?: null,
             $longDescription ?: null,
         ];
+    }
+
+    private function getShortDescriptionFromDocNode(PhpDocNode $docNode, string $property): ?string
+    {
+        if ($shortDescription = $this->getDescriptionsFromDocNode($docNode)[0]) {
+            return $shortDescription;
+        }
+
+        foreach ($docNode->getVarTagValues() as $var) {
+            if (!$var->description) {
+                continue;
+            }
+
+            if (null !== $var->variableName && '' !== $var->variableName && '$'.$property !== $var->variableName) {
+                continue;
+            }
+
+            return $var->description;
+        }
+
+        foreach ($docNode->getTagsByName('@param') as $tagNode) {
+            if (!$tagNode instanceof PhpDocTagNode || !$tagNode->value instanceof ParamTagValueNode) {
+                continue;
+            }
+
+            if ('$'.$property !== $tagNode->value->parameterName) {
+                continue;
+            }
+
+            if ($tagNode->value->description) {
+                return $tagNode->value->description;
+            }
+        }
+
+        return null;
     }
 
     private function getDocBlockFromConstructor(string &$class, string $property): ?ParamTagValueNode

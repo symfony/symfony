@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Merkezi Ýewropa wagty (Býuzingen)',
         'Europe/Chisinau' => 'Gündogar Ýewropa wagty (Kişinýow)',
         'Europe/Copenhagen' => 'Merkezi Ýewropa wagty (Kopengagen)',
-        'Europe/Dublin' => 'Irlandiýa wagty (Dublin)',
+        'Europe/Dublin' => 'Grinwiç ortaça wagty (Dublin)',
         'Europe/Gibraltar' => 'Merkezi Ýewropa wagty (Gibraltar)',
         'Europe/Guernsey' => 'Grinwiç ortaça wagty (Gernsi)',
         'Europe/Helsinki' => 'Gündogar Ýewropa wagty (Helsinki)',

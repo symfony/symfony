@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Messenger\Exception\ValidationFailedException as MessageValidationFailedException;
+use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
@@ -78,6 +79,39 @@ class ProblemNormalizerTest extends TestCase
         $exception = new PartialDenormalizationException('Validation Failed', [$exception]);
         $exception = new HttpException(422, 'Validation Failed', $exception);
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]));
+    }
+
+    public function testNormalizePartialDenormalizationExceptionWithExtraAttributes()
+    {
+        $this->normalizer->setSerializer(new Serializer());
+
+        $exception = new PartialDenormalizationException([], [], [new ExtraAttributesException(['foo', 'bar'])]);
+        $exception = new HttpException(422, 'Validation Failed', $exception);
+        $result = $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]);
+
+        $this->assertSame('https://symfony.com/errors/validation', $result['type']);
+        $this->assertSame('Validation Failed', $result['title']);
+        $this->assertCount(2, $result['violations']);
+        $this->assertSame('foo', $result['violations'][0]['propertyPath']);
+        $this->assertSame('This attribute was not expected.', $result['violations'][0]['title']);
+        $this->assertSame('bar', $result['violations'][1]['propertyPath']);
+        $this->assertSame("foo: This attribute was not expected.\nbar: This attribute was not expected.", $result['detail']);
+    }
+
+    public function testNormalizePartialDenormalizationExceptionWithMixedErrors()
+    {
+        $this->normalizer->setSerializer(new Serializer());
+
+        $notNormalizable = NotNormalizableValueException::createForUnexpectedDataType('Invalid', null, ['int'], 'price', true);
+        $exception = new PartialDenormalizationException([], [$notNormalizable], [new ExtraAttributesException(['extra'])]);
+        $exception = new HttpException(422, 'Validation Failed', $exception);
+        $result = $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]);
+
+        $this->assertCount(2, $result['violations']);
+        $this->assertSame('price', $result['violations'][0]['propertyPath']);
+        $this->assertSame('This value should be of type int.', $result['violations'][0]['title']);
+        $this->assertSame('extra', $result['violations'][1]['propertyPath']);
+        $this->assertSame('This attribute was not expected.', $result['violations'][1]['title']);
     }
 
     public function testNormalizeValidationFailedException()

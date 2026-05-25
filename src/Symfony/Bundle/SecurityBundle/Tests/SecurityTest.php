@@ -205,7 +205,7 @@ class SecurityTest extends TestCase
 
         $security = new Security($container, ['main' => $firewallAuthenticatorLocator]);
 
-        $security->login($user, badges: [$badge], attributes: ['foo' => 'bar']);
+        $security->login($user, null, null, [$badge], ['foo' => 'bar']);
     }
 
     public function testLoginReturnsAuthenticatorResponse()
@@ -468,7 +468,7 @@ class SecurityTest extends TestCase
         ;
 
         $firewallMap = $this->createMock(FirewallMap::class);
-        $firewallConfig = new FirewallConfig(name: 'my_firewall', userChecker: 'user_checker', logout: ['csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'logout']);
+        $firewallConfig = new FirewallConfig('my_firewall', 'user_checker', null, true, false, null, null, null, null, null, [], null, ['csrf_parameter' => '_csrf_token', 'csrf_token_id' => 'logout']);
         $firewallMap->expects($this->once())->method('getFirewallConfig')->willReturn($firewallConfig);
 
         $eventDispatcherLocator = new Container();

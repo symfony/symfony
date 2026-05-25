@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `PropertyPath::append()`, a static helper to join property path fragments
+
 7.0
 ---
 

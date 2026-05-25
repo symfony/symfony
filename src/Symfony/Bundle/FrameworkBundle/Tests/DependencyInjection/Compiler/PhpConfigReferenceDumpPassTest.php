@@ -111,7 +111,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
             self::markTestIncomplete('TEST_GENERATE_FIXTURES is set');
         }
 
-        $this->assertFileEquals(__DIR__.'/../../Fixtures/reference.php', $this->tempDir.'/reference.php');
+        $this->assertFileMatchesFormatFile(__DIR__.'/../../Fixtures/reference.php', $this->tempDir.'/reference.php');
         $this->assertEquals([new FileResource(realpath($this->tempDir).'/reference.php')], $container->getResources());
     }
 

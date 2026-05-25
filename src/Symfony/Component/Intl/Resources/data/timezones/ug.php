@@ -342,7 +342,7 @@ return [
         'Europe/Busingen' => 'ئوتتۇرا ياۋروپا ۋاقتى (Büsingen)',
         'Europe/Chisinau' => 'شەرقىي ياۋروپا ۋاقتى (Chișinău)',
         'Europe/Copenhagen' => 'ئوتتۇرا ياۋروپا ۋاقتى (Copenhagen)',
-        'Europe/Dublin' => 'ئىرېلاندىيە ۋاقتى (Dublin)',
+        'Europe/Dublin' => 'گىرىنۋىچ ۋاقتى (Dublin)',
         'Europe/Gibraltar' => 'ئوتتۇرا ياۋروپا ۋاقتى (Gibraltar)',
         'Europe/Guernsey' => 'گىرىنۋىچ ۋاقتى (Guernsey)',
         'Europe/Helsinki' => 'شەرقىي ياۋروپا ۋاقتى (Helsinki)',

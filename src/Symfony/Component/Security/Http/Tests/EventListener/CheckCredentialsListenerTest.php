@@ -39,8 +39,8 @@ class CheckCredentialsListenerTest extends TestCase
     #[DataProvider('providePasswords')]
     public function testPasswordAuthenticated(string $password, bool $passwordValid, bool $result)
     {
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verify')->with('password-hash', $password)->willReturn($passwordValid);
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->once())->method('verify')->with('password-hash', $password)->willReturn($passwordValid);
 
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => $hasher,
@@ -113,8 +113,8 @@ class CheckCredentialsListenerTest extends TestCase
 
     public function testAddsPasswordUpgradeBadge()
     {
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(true);
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->once())->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(true);
 
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => $hasher,
@@ -129,8 +129,8 @@ class CheckCredentialsListenerTest extends TestCase
 
     public function testAddsNoPasswordUpgradeBadgeIfItAlreadyExists()
     {
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(true);
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->never())->method('verify');
 
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => $hasher,
@@ -148,8 +148,8 @@ class CheckCredentialsListenerTest extends TestCase
 
     public function testAddsNoPasswordUpgradeBadgeIfPasswordIsInvalid()
     {
-        $hasher = $this->createStub(PasswordHasherInterface::class);
-        $hasher->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(false);
+        $hasher = $this->createMock(PasswordHasherInterface::class);
+        $hasher->expects($this->never())->method('verify');
 
         $hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => $hasher,

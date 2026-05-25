@@ -25,8 +25,12 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class BrevoRequestParser extends AbstractRequestParser
 {
+    // https://help.brevo.com/hc/en-us/articles/15127404548498-Brevo-IP-ranges-List-of-publicly-exposed-services
+    public const PROVIDER_IPS = ['1.179.112.0/20', '172.246.240.0/20'];
+
     public function __construct(
         private readonly BrevoPayloadConverter $converter,
+        private readonly array $allowedIPs = self::PROVIDER_IPS,
     ) {
     }
 
@@ -35,14 +39,16 @@ final class BrevoRequestParser extends AbstractRequestParser
         return new ChainRequestMatcher([
             new MethodRequestMatcher('POST'),
             new IsJsonRequestMatcher(),
-            // https://help.brevo.com/hc/en-us/articles/15127404548498-Brevo-IP-ranges-List-of-publicly-exposed-services
-            // localhost is added for testing
-            new IpsRequestMatcher(['1.179.112.0/20', '172.246.240.0/20', '127.0.0.1']),
+            new IpsRequestMatcher($this->allowedIPs),
         ]);
     }
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
+        if ($secret && !hash_equals('Basic '.base64_encode($secret), $request->headers->get('Authorization', ''))) {
+            throw new RejectWebhookException(403, 'Invalid credentials.');
+        }
+
         $content = $request->toArray();
         if (
             !isset($content['event'])

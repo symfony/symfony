@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Saa za Ulaya ya Kati (Büsingen)',
         'Europe/Chisinau' => 'Saa za Mashariki mwa Ulaya (Chișinău)',
         'Europe/Copenhagen' => 'Saa za Ulaya ya Kati (Copenhagen)',
-        'Europe/Dublin' => 'Saa za Ayalandi (Dublin)',
+        'Europe/Dublin' => 'Saa za Greenwich (Dublin)',
         'Europe/Gibraltar' => 'Saa za Ulaya ya Kati (Gibraltar)',
         'Europe/Guernsey' => 'Saa za Greenwich (Guernsey)',
         'Europe/Helsinki' => 'Saa za Mashariki mwa Ulaya (Helsinki)',

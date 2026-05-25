@@ -60,18 +60,9 @@ class XliffUtils
     {
         $xliffVersion = static::getVersionNumber($dom);
         $internalErrors = libxml_use_internal_errors(true);
-        if ($shouldEnable = self::shouldEnableEntityLoader()) {
-            $disableEntities = libxml_disable_entity_loader(false);
-        }
-        try {
-            $isValid = @$dom->schemaValidateSource(self::getSchema($xliffVersion));
-            if (!$isValid) {
-                return self::getXmlErrors($internalErrors);
-            }
-        } finally {
-            if ($shouldEnable) {
-                libxml_disable_entity_loader($disableEntities);
-            }
+
+        if (!@$dom->schemaValidateSource(self::getSchema($xliffVersion))) {
+            return self::getXmlErrors($internalErrors);
         }
 
         $dom->normalizeDocument();
@@ -80,31 +71,6 @@ class XliffUtils
         libxml_use_internal_errors($internalErrors);
 
         return [];
-    }
-
-    private static function shouldEnableEntityLoader(): bool
-    {
-        static $dom, $schema;
-        if (null === $dom) {
-            $dom = new \DOMDocument();
-            $dom->loadXML('<?xml version="1.0"?><test/>');
-
-            $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
-            register_shutdown_function(static function () use ($tmpfile) {
-                @unlink($tmpfile);
-            });
-            $schema = '<?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:include schemaLocation="file:///'.str_replace('\\', '/', $tmpfile).'" />
-</xsd:schema>';
-            file_put_contents($tmpfile, '<?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:element name="test" type="testType" />
-  <xsd:complexType name="testType"/>
-</xsd:schema>');
-        }
-
-        return !@$dom->schemaValidateSource($schema);
     }
 
     public static function getErrorsAsString(array $xmlErrors): string
@@ -125,13 +91,32 @@ class XliffUtils
         return $errorsAsString;
     }
 
+    private static function getFileUrl(string $path): string
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $parts = explode('/', str_replace('\\', '/', $path));
+            $drive = array_shift($parts).'/';
+        } else {
+            $parts = explode('/', $path);
+            $drive = '';
+        }
+
+        return 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+    }
+
     private static function getSchema(string $xliffVersion): string
     {
         if ('1.2' === $xliffVersion) {
             $schemaSource = file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-1.2-transitional.xsd');
             $xmlUri = 'http://www.w3.org/2001/xml.xsd';
-        } elseif ('2.0' === $xliffVersion) {
+        } elseif (\in_array($xliffVersion, ['2.0', '2.1'], true)) {
+            // XLIFF 2.1 adds optional modules (Change Tracking, ITS, ...) on top of 2.0.
+            // We validate 2.1 documents against the 2.0 XSD: 2.1 documents that stick to
+            // the 2.0 core load fine; documents that use 2.1-only modules will fail validation.
             $schemaSource = file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-2.0.xsd');
+            $xmlUri = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
+        } elseif ('2.2' === $xliffVersion) {
+            $schemaSource = file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-2.2.xsd');
             $xmlUri = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
         } else {
             throw new InvalidArgumentException(\sprintf('No support implemented for loading XLIFF version "%s".', $xliffVersion));
@@ -145,22 +130,21 @@ class XliffUtils
      */
     private static function fixXmlLocation(string $schemaSource, string $xmlUri): string
     {
-        $newPath = str_replace('\\', '/', __DIR__).'/../Resources/schemas/xml.xsd';
-        $parts = explode('/', $newPath);
-        $locationstart = 'file:///';
-        if (0 === stripos($newPath, 'phar://')) {
-            $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
-            if ($tmpfile) {
-                copy($newPath, $tmpfile);
-                $parts = explode('/', str_replace('\\', '/', $tmpfile));
-            } else {
-                array_shift($parts);
-                $locationstart = 'phar:///';
-            }
-        }
+        $path = __DIR__.'/../Resources/schemas/xml.xsd';
 
-        $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
-        $newPath = $locationstart.$drive.implode('/', array_map('rawurlencode', $parts));
+        if (0 === stripos($path, 'phar://')) {
+            if ($tmpfile = tempnam(sys_get_temp_dir(), 'symfony')) {
+                copy($path, $tmpfile);
+                $newPath = self::getFileUrl($tmpfile);
+            } else {
+                $parts = explode('/', '\\' === \DIRECTORY_SEPARATOR ? str_replace('\\', '/', $path) : $path);
+                array_shift($parts);
+                $drive = '\\' === \DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+                $newPath = 'phar:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+            }
+        } else {
+            $newPath = self::getFileUrl($path);
+        }
 
         return str_replace($xmlUri, $newPath, $schemaSource);
     }

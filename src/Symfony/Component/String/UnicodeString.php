@@ -268,6 +268,9 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
+    /**
+     * @param-immediately-invoked-callable $to
+     */
     public function replaceMatches(string $fromRegexp, string|callable $to): static
     {
         $str = parent::replaceMatches($fromRegexp, $to);
@@ -410,6 +413,10 @@ class UnicodeString extends AbstractUnicodeString
 
     public function __unserialize(array $data): void
     {
+        if (($data['string'] ?? null) instanceof \Stringable || ($data["\0*\0string"] ?? null) instanceof \Stringable) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
+
         $this->string = $data['string'] ?? $data["\0*\0string"];
 
         if (!\is_string($this->string)) {

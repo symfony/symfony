@@ -13,7 +13,9 @@ namespace Symfony\Component\PropertyInfo\Util;
 
 use phpDocumentor\Reflection\PseudoType;
 use phpDocumentor\Reflection\PseudoTypes\ConstExpression;
+use phpDocumentor\Reflection\PseudoTypes\Generic;
 use phpDocumentor\Reflection\PseudoTypes\List_;
+use phpDocumentor\Reflection\PseudoTypes\Scalar;
 use phpDocumentor\Reflection\Type as DocType;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Collection;
@@ -21,8 +23,10 @@ use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
+use phpDocumentor\Reflection\Types\Scalar as LegacyScalar;
 use phpDocumentor\Reflection\Types\String_;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 // Workaround for phpdocumentor/type-resolver < 1.6
@@ -89,9 +93,15 @@ final class PhpDocTypeHelper
 
         $unionTypes = [];
         foreach ($varTypes as $varType) {
-            if (null !== $t = $this->createType($varType)) {
-                $unionTypes[] = $t;
+            if (!$t = $this->createType($varType)) {
+                continue;
             }
+
+            if ($t instanceof BuiltinType && TypeIdentifier::MIXED === $t->getTypeIdentifier()) {
+                return Type::mixed();
+            }
+
+            $unionTypes[] = $t;
         }
 
         if (!$unionTypes) {
@@ -114,6 +124,40 @@ final class PhpDocTypeHelper
             $docTypeString = 'array';
         }
 
+        if ($docType instanceof Generic) {
+            $fqsen = $docType->getFqsen();
+
+            [$phpType, $class] = $this->getPhpTypeAndClass((string) $fqsen);
+
+            $collection = is_a($class, \Traversable::class, true) || is_a($class, \ArrayAccess::class, true);
+
+            // it's safer to fall back to other extractors if the generic type is too abstract
+            if (!$collection && !class_exists($class, false) && !interface_exists($class, false)) {
+                return null;
+            }
+
+            $genericTypes = $docType->getTypes();
+            $type = null !== $class ? Type::object($class) : Type::builtin($phpType);
+
+            if ($collection) {
+                if (null === $valueType = $genericTypes[1] ?? null) {
+                    $keyType = null;
+                    $valueType = $genericTypes[0] ?? null;
+                } else {
+                    $keyType = $genericTypes[0] ?? null;
+                }
+
+                $value = $valueType ? $this->getType($valueType) : null;
+                $key = $keyType ? $this->getType($keyType) : null;
+
+                return Type::collection($type, $value, $key);
+            }
+
+            $variableTypes = array_map(fn ($t) => $this->getType($t), $genericTypes);
+
+            return Type::generic($type, ...array_filter($variableTypes));
+        }
+
         if ($docType instanceof Collection) {
             $fqsen = $docType->getFqsen();
             if ($fqsen && 'list' === $fqsen->getName() && !class_exists(List_::class, false) && !class_exists((string) $fqsen)) {
@@ -123,23 +167,41 @@ final class PhpDocTypeHelper
 
             [$phpType, $class] = $this->getPhpTypeAndClass((string) $fqsen);
 
+            $collection = is_a($class, \Traversable::class, true) || is_a($class, \ArrayAccess::class, true);
+
+            // it's safer to fall back to other extractors if the generic type is too abstract
+            if (!$collection && !class_exists($class, false) && !interface_exists($class, false)) {
+                return null;
+            }
+
+            $type = null !== $class ? Type::object($class) : Type::builtin($phpType);
+
+            if ($collection) {
+                $value = $this->getType($docType->getValueType());
+                $key = $this->getType($docType->getKeyType());
+
+                return Type::collection($type, $value, $key);
+            }
+
             $variableTypes = [];
+
+            if (!$this->hasNoExplicitKeyType($docType) && null !== $keyType = $this->getType($docType->getKeyType())) {
+                $variableTypes[] = $keyType;
+            }
 
             if (null !== $valueType = $this->getType($docType->getValueType())) {
                 $variableTypes[] = $valueType;
             }
 
-            if (null !== $keyType = $this->getType($docType->getKeyType())) {
-                $variableTypes[] = $keyType;
-            }
-
-            $type = null !== $class ? Type::object($class) : Type::builtin($phpType);
-
-            return Type::collection($type, ...$variableTypes);
+            return Type::generic($type, ...$variableTypes);
         }
 
         if (!$docTypeString) {
             return null;
+        }
+
+        if ($docType instanceof Array_ && $this->hasNoExplicitKeyType($docType) && str_starts_with($docTypeString, 'array<')) {
+            return Type::list($this->getType($docType->getValueType()));
         }
 
         if (str_ends_with($docTypeString, '[]') && $docType instanceof Array_) {
@@ -176,6 +238,7 @@ final class PhpDocTypeHelper
         return match (true) {
             'array' === $docTypeString => Type::array(),
             null === $class => Type::builtin($phpType),
+            $docType instanceof LegacyScalar || $docType instanceof Scalar => Type::object('scalar'),
             $docType instanceof PseudoType => match (true) {
                 $docType->underlyingType() instanceof Integer => Type::int(),
                 $docType->underlyingType() instanceof String_ => Type::string(),
@@ -183,6 +246,17 @@ final class PhpDocTypeHelper
             },
             default => Type::object($class),
         };
+    }
+
+    private function hasNoExplicitKeyType(Array_|Collection $type): bool
+    {
+        if (method_exists($type, 'getOriginalKeyType')) {
+            return null === $type->getOriginalKeyType();
+        }
+
+        // Workaround for phpdocumentor/reflection-docblock < 6
+        // "getOriginalKeyType()" doesn't exist, so we check if key type is Compound(string, int) which is the default.
+        return $type->getKeyType() instanceof Compound;
     }
 
     private function getPhpTypeAndClass(string $docType): array

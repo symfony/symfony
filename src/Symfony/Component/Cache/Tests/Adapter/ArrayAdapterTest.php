@@ -24,6 +24,7 @@ class ArrayAdapterTest extends AdapterTestCase
         'testGetMetadata' => 'ArrayAdapter does not keep metadata.',
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
+        'testClearWithInvalidPrefix' => 'ArrayAdapter does not validate the prefix.',
     ];
 
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface

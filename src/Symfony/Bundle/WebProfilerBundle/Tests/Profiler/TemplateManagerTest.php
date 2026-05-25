@@ -57,7 +57,6 @@ class TemplateManagerTest extends TestCase
     {
         $this->profiler
             ->method('has')
-            ->withAnyParameters()
             ->willReturnCallback($this->profilerHasCallback(...));
 
         $profile = new Profile('token');

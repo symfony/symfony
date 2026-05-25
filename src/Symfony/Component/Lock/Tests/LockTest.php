@@ -211,10 +211,11 @@ class LockTest extends TestCase
     public function testIsAquired()
     {
         $key = new Key(__METHOD__);
-        $store = $this->createStub(PersistingStoreInterface::class);
+        $store = $this->createMock(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         $store
+            ->expects($this->exactly(2))
             ->method('exists')
             ->with($key)
             ->willReturn(true, false);

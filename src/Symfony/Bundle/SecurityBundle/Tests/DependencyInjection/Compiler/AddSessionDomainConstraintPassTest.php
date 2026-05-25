@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\HttpFoundation\Request;
 
 class AddSessionDomainConstraintPassTest extends TestCase
@@ -143,6 +144,10 @@ class AddSessionDomainConstraintPassTest extends TestCase
                 'router' => ['resource' => 'dummy'],
             ],
         ];
+
+        if (class_exists(ServicesBundle::class)) {
+            new ServicesBundle()->getContainerExtension()->load([], $container);
+        }
 
         $ext = new FrameworkExtension();
         $ext->load($config, $container);

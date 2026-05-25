@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Tsakiyar a lokaci turai (Büsingen)',
         'Europe/Chisinau' => 'Lokaci a turai gabas (Chișinău)',
         'Europe/Copenhagen' => 'Tsakiyar a lokaci turai (Copenhagen)',
-        'Europe/Dublin' => 'Ayalan Lokaci (Dublin)',
+        'Europe/Dublin' => 'Lokacin Greenwich a Ingila (Dublin)',
         'Europe/Gibraltar' => 'Tsakiyar a lokaci turai (Gibraltar)',
         'Europe/Guernsey' => 'Lokacin Greenwich a Ingila (Guernsey)',
         'Europe/Helsinki' => 'Lokaci a turai gabas (Helsinki)',

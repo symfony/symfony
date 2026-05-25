@@ -25,7 +25,7 @@ class CheckAliasValidityPass implements CompilerPassInterface
     {
         foreach ($container->getAliases() as $id => $alias) {
             try {
-                if (!$container->hasDefinition((string) $alias)) {
+                if ($alias->isDeprecated() || !$container->hasDefinition((string) $alias)) {
                     continue;
                 }
 

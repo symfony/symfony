@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'centreŭropa tempo (Büsingen am Hochrhein)',
         'Europe/Chisinau' => 'orienteŭropa tempo (Kiŝinevo)',
         'Europe/Copenhagen' => 'centreŭropa tempo (Kopenhago)',
-        'Europe/Dublin' => 'tempo: Irlando (Dublino)',
+        'Europe/Dublin' => 'universala tempo kunordigita (Dublino)',
         'Europe/Gibraltar' => 'centreŭropa tempo (Ĝibraltaro)',
         'Europe/Guernsey' => 'universala tempo kunordigita (Gernezejo)',
         'Europe/Helsinki' => 'orienteŭropa tempo (Helsinko)',

@@ -19,14 +19,22 @@ abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 {
     public static function provideWidth(): array
     {
-        return array_merge(
-            parent::provideWidth(),
-            [
-                [14, '<<<END
+        $unicodeWidthTests = [
+            [1, '⚠'],
+            [2, '⚠️'],
+            [14, '<<<END
 This is a
 multiline text
 END'],
-            ]
+        ];
+
+        if (\PCRE_VERSION_MAJOR > 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR >= 40) {
+            $unicodeWidthTests[] = [2, '1️⃣'];
+        }
+
+        return array_merge(
+            parent::provideWidth(),
+            $unicodeWidthTests
         );
     }
 

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Translation\Bridge\Crowdin;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
@@ -28,11 +30,11 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
     private const HOST = 'api.crowdin.com';
 
     public function __construct(
-        private HttpClientInterface $client,
-        private LoggerInterface $logger,
-        private string $defaultLocale,
-        private LoaderInterface $loader,
-        private XliffFileDumper $xliffFileDumper,
+        private readonly HttpClientInterface $client,
+        private readonly LoggerInterface $logger,
+        private readonly string $defaultLocale,
+        private readonly LoaderInterface $loader,
+        private readonly XliffFileDumper $xliffFileDumper,
     ) {
     }
 
@@ -45,7 +47,8 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
         $endpoint = preg_replace('/(^|\.)default$/', '\1'.self::HOST, $dsn->getHost());
         $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
 
-        $client = ScopingHttpClient::forBaseUri($this->client, \sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
+        $client = new RetryableHttpClient($this->client, new GenericRetryStrategy([429]), 3, $this->logger);
+        $client = ScopingHttpClient::forBaseUri($client, \sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
             'auth_bearer' => $this->getPassword($dsn),
         ], preg_quote('https://'.$endpoint.'/api/v2/'));
 

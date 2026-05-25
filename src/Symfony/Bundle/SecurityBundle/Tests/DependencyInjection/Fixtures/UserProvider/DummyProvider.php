@@ -2,22 +2,27 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider;
 
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\UserProviderFactoryInterface;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class DummyProvider implements UserProviderFactoryInterface
+class DummyProvider implements UserProviderInterface
 {
-    public function create(ContainerBuilder $container, $id, $config): void
+    public function __construct(string $foo)
     {
     }
 
-    public function getKey(): string
+    public function refreshUser(UserInterface $user): UserInterface
     {
-        return 'foo';
+        throw new \Exception('Not implemented');
     }
 
-    public function addConfiguration(NodeDefinition $node): void
+    public function supportsClass(string $class): bool
     {
+        throw new \Exception('Not implemented');
+    }
+
+    public function loadUserByIdentifier(string $identifier): UserInterface
+    {
+        throw new \Exception('Not implemented');
     }
 }

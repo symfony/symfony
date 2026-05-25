@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Kesk-Euroopa aeg (Büsingen)',
         'Europe/Chisinau' => 'Ida-Euroopa aeg (Chișinău)',
         'Europe/Copenhagen' => 'Kesk-Euroopa aeg (Kopenhaagen)',
-        'Europe/Dublin' => '(Iirimaa) (Dublin)',
+        'Europe/Dublin' => 'Greenwichi aeg (Dublin)',
         'Europe/Gibraltar' => 'Kesk-Euroopa aeg (Gibraltar)',
         'Europe/Guernsey' => 'Greenwichi aeg (Guernsey)',
         'Europe/Helsinki' => 'Ida-Euroopa aeg (Helsingi)',

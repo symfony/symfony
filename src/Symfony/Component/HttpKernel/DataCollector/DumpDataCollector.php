@@ -40,6 +40,8 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     private string $charset;
     private mixed $sourceContextProvider;
     private bool $webMode;
+    private ?string $scriptNonce = null;
+    private ?string $styleNonce = null;
 
     public function __construct(
         private ?Stopwatch $stopwatch = null,
@@ -68,6 +70,18 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     public function __clone()
     {
         $this->clonesIndex = ++$this->clonesCount;
+    }
+
+    /**
+     * Sets CSP nonces to apply to every {@see HtmlDumper} this collector creates.
+     *
+     * If $styleNonce is omitted, $scriptNonce is reused for both <script> and
+     * <style> tags emitted by the dumper.
+     */
+    public function setNonce(?string $scriptNonce, ?string $styleNonce = null): void
+    {
+        $this->scriptNonce = $scriptNonce;
+        $this->styleNonce = $styleNonce;
     }
 
     public function dump(Data $data): ?string
@@ -121,6 +135,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         ) {
             if ($response->headers->has('Content-Type') && str_contains($response->headers->get('Content-Type') ?? '', 'html')) {
                 $dumper = new HtmlDumper('php://output', $this->charset);
+                $this->applyNonceTo($dumper);
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
             }
@@ -130,6 +145,13 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
             foreach ($this->data as $dump) {
                 $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line'], $dump['label'] ?? '');
             }
+        }
+    }
+
+    private function applyNonceTo(HtmlDumper $dumper): void
+    {
+        if (null !== $this->scriptNonce || null !== $this->styleNonce) {
+            $dumper->setNonce($this->scriptNonce, $this->styleNonce);
         }
     }
 
@@ -188,6 +210,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         if ('html' === $format) {
             $dumper = new HtmlDumper($data, $this->charset);
             $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
+            $this->applyNonceTo($dumper);
         } else {
             throw new \InvalidArgumentException(\sprintf('Invalid dump format: "%s".', $format));
         }
@@ -228,6 +251,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
             if ($this->webMode) {
                 $dumper = new HtmlDumper('php://output', $this->charset);
+                $this->applyNonceTo($dumper);
             } else {
                 $dumper = new CliDumper('php://output', $this->charset);
             }

@@ -303,6 +303,23 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store...name'));
     }
 
+    #[DataProvider('provideNonSingularRelativeQueryFunctionArguments')]
+    public function testTokenizeThrowsExceptionForNonSingularRelativeQueryFunctionArgument(string $path)
+    {
+        $this->expectException(InvalidJsonPathException::class);
+        $this->expectExceptionMessage('the JsonPath function "length" argument must be a singular query.');
+
+        JsonPathTokenizer::tokenize(new JsonPath($path));
+    }
+
+    public static function provideNonSingularRelativeQueryFunctionArguments(): array
+    {
+        return [
+            ['$.store.book[?length(@.*) > 0]'],
+            ['$.store.book[?length(@..author) > 0]'],
+        ];
+    }
+
     #[DataProvider('provideValidUtf8Chars')]
     public function testUtf8ValidChars(string $propertyName)
     {

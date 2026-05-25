@@ -29,14 +29,14 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Ulid());
+        $this->validate(null, new Ulid());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Ulid());
+        $this->validate('', new Ulid());
 
         $this->assertNoViolation();
     }
@@ -44,26 +44,26 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Ulid());
+        $this->validate(new \stdClass(), new Ulid());
     }
 
     public function testValidUlid()
     {
-        $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FAV', new Ulid());
+        $this->validate('01ARZ3NDEKTSV4RRFFQ69G5FAV', new Ulid());
 
         $this->assertNoViolation();
     }
 
     public function testValidUlidAsBase58()
     {
-        $this->validator->validate('1CCD2w4mK2m455S2BAXFht', new Ulid(format: Ulid::FORMAT_BASE_58));
+        $this->validate('1CCD2w4mK2m455S2BAXFht', new Ulid(format: Ulid::FORMAT_BASE_58));
 
         $this->assertNoViolation();
     }
 
     public function testValidUlidAsRfc4122()
     {
-        $this->validator->validate('01912bf3-feff-fa6c-00f2-90d2f2e00564', new Ulid(format: Ulid::FORMAT_RFC_4122));
+        $this->validate('01912bf3-feff-fa6c-00f2-90d2f2e00564', new Ulid(format: Ulid::FORMAT_RFC_4122));
 
         $this->assertNoViolation();
     }
@@ -73,7 +73,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Ulid(message: 'testMessage');
 
-        $this->validator->validate($ulid, $constraint);
+        $this->validate($ulid, $constraint);
 
         $this->buildViolation('testMessage')
             ->setParameters([
@@ -100,7 +100,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_BASE_58);
 
-        $this->validator->validate($ulid, $constraint);
+        $this->validate($ulid, $constraint);
 
         $this->buildViolation('testMessage')
             ->setParameters([
@@ -126,7 +126,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_RFC_4122);
 
-        $this->validator->validate($ulid, $constraint);
+        $this->validate($ulid, $constraint);
 
         $this->buildViolation('testMessage')
             ->setParameters([
@@ -153,7 +153,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Ulid(message: 'testMessage');
 
-        $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FA', $constraint);
+        $this->validate('01ARZ3NDEKTSV4RRFFQ69G5FA', $constraint);
 
         $this->buildViolation('testMessage')
             ->setParameters([

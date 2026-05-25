@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
+use Jose\Component\Core\AlgorithmManager;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
@@ -26,6 +27,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenGenerator;
+use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AccessTokenFactoryTest extends TestCase
@@ -303,6 +306,7 @@ class AccessTokenFactoryTest extends TestCase
                         ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/']),
                     ],
                     'security.access_token_handler.firewall1.oidc_configuration',
+                    true,
                 ],
             ],
         ];
@@ -360,11 +364,67 @@ class AccessTokenFactoryTest extends TestCase
                             ->replaceArgument(0, ['base_uri' => 'https://www.api.com/realms/api/']),
                     ],
                     'security.access_token_handler.firewall1.oidc_configuration',
+                    true,
                 ],
             ],
         ];
         $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+    }
+
+    #[DataProvider('provideEnforceKeyUsageVerification')]
+    public function testOidcTokenHandlerEnableDiscoveryArgsMatchMethodSignature(bool $enforceKeyUsageVerification)
+    {
+        if (!class_exists(OidcTokenHandler::class)) {
+            $this->markTestSkipped('OidcTokenHandler not available.');
+        }
+        if (!interface_exists(HttpClientInterface::class)) {
+            $this->markTestSkipped('HttpClient component not available.');
+        }
+
+        $container = new ContainerBuilder();
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'discovery' => [
+                        'base_uri' => 'https://www.example.com/realms/demo/',
+                        'cache' => ['id' => 'oidc_cache'],
+                        'enforce_key_usage_verification' => $enforceKeyUsageVerification,
+                    ],
+                    'algorithms' => ['RS256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'firewall1', $finalizedConfig, 'userprovider');
+
+        $methodCalls = $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls();
+        $this->assertSame('enableDiscovery', $methodCalls[0][0]);
+
+        $reflection = new \ReflectionMethod(OidcTokenHandler::class, 'enableDiscovery');
+        $this->assertLessThanOrEqual($reflection->getNumberOfParameters(), \count($methodCalls[0][1]), 'Recorded enableDiscovery call must not pass more arguments than the method accepts.');
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([]), null, 'audience', ['https://www.example.com']);
+        $cache = $this->createStub(CacheInterface::class);
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $callArgs = $methodCalls[0][1];
+        $callArgs[0] = $cache;
+        $callArgs[1] = [$httpClient];
+
+        $handler->enableDiscovery(...$callArgs);
+
+        $reflectedProperty = new \ReflectionProperty(OidcTokenHandler::class, 'enforceKeyUsageVerification');
+        $this->assertSame($enforceKeyUsageVerification, $reflectedProperty->getValue($handler));
+    }
+
+    public static function provideEnforceKeyUsageVerification(): iterable
+    {
+        yield 'enforced' => [true];
+        yield 'not enforced' => [false];
     }
 
     public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()

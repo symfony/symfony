@@ -12,7 +12,7 @@
 namespace Symfony\Component\ObjectMapper\Exception;
 
 /**
- * Thrown when an invalid transform callable is defined.
+ * Thrown when an invalid transform or condition callable is defined.
  *
  * @author Michaël Marinetti <github@marinetti.fr>
  */

@@ -139,7 +139,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     public static function provideCompletionSuggestions(): iterable
     {
-        $name = ['foo', 'default_config_test', 'extension_without_config_test', 'framework', 'test', 'test_dump', 'DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'FrameworkBundle', 'TestBundle'];
+        $name = ['foo', 'default_config_test', 'extension_without_config_test', 'services', 'console', 'framework', 'test', 'test_dump', 'DefaultConfigTestBundle', 'ExtensionWithoutConfigTestBundle', 'ServicesBundle', 'ConsoleBundle', 'FrameworkBundle', 'TestBundle'];
         yield 'name, no debug' => [false, [''], $name];
         yield 'name, debug' => [true, [''], $name];
 

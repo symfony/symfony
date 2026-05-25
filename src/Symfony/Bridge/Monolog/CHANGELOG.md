@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `subjectMaxLength` option to `MailerHandler` to truncate long email subjects (defaults to 200)
+
 8.0
 ---
 

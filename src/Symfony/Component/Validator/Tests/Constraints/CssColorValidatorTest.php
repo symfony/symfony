@@ -27,14 +27,14 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new CssColor(CssColor::HEX_LONG));
+        $this->validate(null, new CssColor(CssColor::HEX_LONG));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new CssColor(CssColor::HEX_LONG));
+        $this->validate('', new CssColor(CssColor::HEX_LONG));
 
         $this->assertNoViolation();
     }
@@ -42,20 +42,20 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new CssColor(CssColor::HEX_LONG));
+        $this->validate(new \stdClass(), new CssColor(CssColor::HEX_LONG));
     }
 
     #[DataProvider('getValidAnyColor')]
     public function testValidAnyColor($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor());
+        $this->validate($cssColor, new CssColor());
         $this->assertNoViolation();
     }
 
     #[DataProvider('getValidAnyColor')]
     public function testValidAnyColorWithNewLine($cssColor)
     {
-        $this->validator->validate($cssColor."\n", new CssColor([], 'myMessage'));
+        $this->validate($cssColor."\n", new CssColor([], 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$cssColor."\n\"")
@@ -85,7 +85,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidHexLongColors')]
     public function testValidHexLongColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::HEX_LONG));
+        $this->validate($cssColor, new CssColor(CssColor::HEX_LONG));
         $this->assertNoViolation();
     }
 
@@ -97,7 +97,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidHexLongColorsWithAlpha')]
     public function testValidHexLongColorsWithAlpha($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::HEX_LONG_WITH_ALPHA));
+        $this->validate($cssColor, new CssColor(CssColor::HEX_LONG_WITH_ALPHA));
         $this->assertNoViolation();
     }
 
@@ -109,7 +109,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidHexShortColors')]
     public function testValidHexShortColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::HEX_SHORT));
+        $this->validate($cssColor, new CssColor(CssColor::HEX_SHORT));
         $this->assertNoViolation();
     }
 
@@ -121,7 +121,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidHexShortColorsWithAlpha')]
     public function testValidHexShortColorsWithAlpha($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::HEX_SHORT_WITH_ALPHA));
+        $this->validate($cssColor, new CssColor(CssColor::HEX_SHORT_WITH_ALPHA));
         $this->assertNoViolation();
     }
 
@@ -133,7 +133,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidBasicNamedColors')]
     public function testValidBasicNamedColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::BASIC_NAMED_COLORS));
+        $this->validate($cssColor, new CssColor(CssColor::BASIC_NAMED_COLORS));
         $this->assertNoViolation();
     }
 
@@ -148,7 +148,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidExtendedNamedColors')]
     public function testValidExtendedNamedColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::EXTENDED_NAMED_COLORS));
+        $this->validate($cssColor, new CssColor(CssColor::EXTENDED_NAMED_COLORS));
         $this->assertNoViolation();
     }
 
@@ -163,7 +163,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidSystemColors')]
     public function testValidSystemColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::SYSTEM_COLORS));
+        $this->validate($cssColor, new CssColor(CssColor::SYSTEM_COLORS));
         $this->assertNoViolation();
     }
 
@@ -179,7 +179,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidKeywords')]
     public function testValidKeywords($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::KEYWORDS));
+        $this->validate($cssColor, new CssColor(CssColor::KEYWORDS));
         $this->assertNoViolation();
     }
 
@@ -191,7 +191,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidRGB')]
     public function testValidRGB($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::RGB));
+        $this->validate($cssColor, new CssColor(CssColor::RGB));
         $this->assertNoViolation();
     }
 
@@ -207,7 +207,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidRGBA')]
     public function testValidRGBA($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::RGBA));
+        $this->validate($cssColor, new CssColor(CssColor::RGBA));
         $this->assertNoViolation();
     }
 
@@ -224,7 +224,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidHSL')]
     public function testValidHSL($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::HSL));
+        $this->validate($cssColor, new CssColor(CssColor::HSL));
         $this->assertNoViolation();
     }
 
@@ -240,7 +240,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidHSLA')]
     public function testValidHSLA($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor(CssColor::HSLA));
+        $this->validate($cssColor, new CssColor(CssColor::HSLA));
         $this->assertNoViolation();
     }
 
@@ -258,7 +258,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidHexColors($cssColor)
     {
         $constraint = new CssColor([CssColor::HEX_LONG, CssColor::HEX_LONG_WITH_ALPHA], 'myMessage');
-        $this->validator->validate($cssColor, $constraint);
+        $this->validate($cssColor, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$cssColor.'"')
@@ -274,7 +274,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getInvalidShortHexColors')]
     public function testInvalidShortHexColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor([CssColor::HEX_SHORT, CssColor::HEX_SHORT_WITH_ALPHA], 'myMessage'));
+        $this->validate($cssColor, new CssColor([CssColor::HEX_SHORT, CssColor::HEX_SHORT_WITH_ALPHA], 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$cssColor.'"')
@@ -290,7 +290,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getInvalidNamedColors')]
     public function testInvalidNamedColors($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor([
+        $this->validate($cssColor, new CssColor([
             CssColor::BASIC_NAMED_COLORS,
             CssColor::EXTENDED_NAMED_COLORS,
             CssColor::SYSTEM_COLORS,
@@ -311,7 +311,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getInvalidRGB')]
     public function testInvalidRGB($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor([
+        $this->validate($cssColor, new CssColor([
             CssColor::BASIC_NAMED_COLORS,
             CssColor::EXTENDED_NAMED_COLORS,
             CssColor::SYSTEM_COLORS,
@@ -332,7 +332,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getInvalidRGBA')]
     public function testInvalidRGBA($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor([
+        $this->validate($cssColor, new CssColor([
             CssColor::BASIC_NAMED_COLORS,
             CssColor::EXTENDED_NAMED_COLORS,
             CssColor::SYSTEM_COLORS,
@@ -358,7 +358,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getInvalidHSL')]
     public function testInvalidHSL($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor([
+        $this->validate($cssColor, new CssColor([
             CssColor::BASIC_NAMED_COLORS,
             CssColor::EXTENDED_NAMED_COLORS,
             CssColor::SYSTEM_COLORS,
@@ -379,7 +379,7 @@ final class CssColorValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getInvalidHSLA')]
     public function testInvalidHSLA($cssColor)
     {
-        $this->validator->validate($cssColor, new CssColor([
+        $this->validate($cssColor, new CssColor([
             CssColor::BASIC_NAMED_COLORS,
             CssColor::EXTENDED_NAMED_COLORS,
             CssColor::SYSTEM_COLORS,

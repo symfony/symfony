@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Төв Европын цаг (Бусинген)',
         'Europe/Chisinau' => 'Зүүн Европын цаг (Кишинёв)',
         'Europe/Copenhagen' => 'Төв Европын цаг (Копенхаген)',
-        'Europe/Dublin' => 'Ирланд-н цаг (Дублин)',
+        'Europe/Dublin' => 'Гринвичийн цаг (Дублин)',
         'Europe/Gibraltar' => 'Төв Европын цаг (Гибралтар)',
         'Europe/Guernsey' => 'Гринвичийн цаг (Гернси)',
         'Europe/Helsinki' => 'Зүүн Европын цаг (Хельсинк)',

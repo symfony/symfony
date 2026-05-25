@@ -27,14 +27,14 @@ class IpValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Ip());
+        $this->validate(null, new Ip());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Ip());
+        $this->validate('', new Ip());
 
         $this->assertNoViolation();
     }
@@ -42,7 +42,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Ip());
+        $this->validate(new \stdClass(), new Ip());
     }
 
     public function testInvalidValidatorVersion()
@@ -54,7 +54,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIpsV4')]
     public function testValidIpsV4($ip)
     {
-        $this->validator->validate($ip, new Ip(version: Ip::V4));
+        $this->validate($ip, new Ip(version: Ip::V4));
 
         $this->assertNoViolation();
     }
@@ -76,7 +76,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIpsV4WithWhitespaces')]
     public function testValidIpsV4WithWhitespaces($ip)
     {
-        $this->validator->validate($ip, new Ip(
+        $this->validate($ip, new Ip(
             version: Ip::V4,
             normalizer: 'trim',
         ));
@@ -86,7 +86,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidIpV6WithWhitespacesNamed()
     {
-        $this->validator->validate(
+        $this->validate(
             "\n\t2001:0db8:85a3:0000:0000:8a2e:0370:7334\r\n",
             new Ip(version: Ip::V6, normalizer: 'trim')
         );
@@ -109,7 +109,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIpsV6')]
     public function testValidIpsV6($ip)
     {
-        $this->validator->validate($ip, new Ip(version: Ip::V6));
+        $this->validate($ip, new Ip(version: Ip::V6));
 
         $this->assertNoViolation();
     }
@@ -142,7 +142,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIpsAll')]
     public function testValidIpsAll($ip)
     {
-        $this->validator->validate($ip, new Ip(version: Ip::ALL));
+        $this->validate($ip, new Ip(version: Ip::ALL));
 
         $this->assertNoViolation();
     }
@@ -160,7 +160,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -176,7 +176,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -211,7 +211,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidPrivateIpsV4')]
     public function testValidPrivateIpsV4($ip)
     {
-        $this->validator->validate($ip, new Ip(version: Ip::V4_ONLY_PRIVATE));
+        $this->validate($ip, new Ip(version: Ip::V4_ONLY_PRIVATE));
 
         $this->assertNoViolation();
     }
@@ -224,7 +224,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -240,7 +240,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -265,7 +265,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidReservedIpsV4')]
     public function testValidReservedIpsV4($ip)
     {
-        $this->validator->validate($ip, new Ip(version: Ip::V4_ONLY_RESERVED));
+        $this->validate($ip, new Ip(version: Ip::V4_ONLY_RESERVED));
 
         $this->assertNoViolation();
     }
@@ -278,7 +278,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -294,7 +294,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -324,7 +324,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -345,7 +345,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -380,7 +380,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -405,7 +405,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -429,7 +429,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -450,7 +450,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -471,7 +471,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -492,7 +492,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')
@@ -513,7 +513,7 @@ class IpValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($ip, $constraint);
+        $this->validate($ip, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$ip.'"')

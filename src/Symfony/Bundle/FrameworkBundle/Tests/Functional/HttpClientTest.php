@@ -24,13 +24,13 @@ class HttpClientTest extends AbstractWebTestCase
         $client->request('GET', '/http_client_call');
 
         $this->assertHttpClientRequest('https://symfony.com/');
-        $this->assertHttpClientRequest('https://symfony.com/', httpClientId: 'symfony.http_client');
-        $this->assertHttpClientRequest('https://symfony.com/', 'POST', 'foo', httpClientId: 'symfony.http_client');
-        $this->assertHttpClientRequest('https://symfony.com/', 'POST', ['foo' => 'bar'], httpClientId: 'symfony.http_client');
-        $this->assertHttpClientRequest('https://symfony.com/', 'POST', ['foo' => 'bar'], httpClientId: 'symfony.http_client');
+        $this->assertHttpClientRequest('https://symfony.com/', 'GET', null, [], 'symfony.http_client');
+        $this->assertHttpClientRequest('https://symfony.com/', 'POST', 'foo', [], 'symfony.http_client');
+        $this->assertHttpClientRequest('https://symfony.com/', 'POST', ['foo' => 'bar'], [], 'symfony.http_client');
+        $this->assertHttpClientRequest('https://symfony.com/', 'POST', ['foo' => 'bar'], [], 'symfony.http_client');
         $this->assertHttpClientRequest('https://symfony.com/', 'POST', ['foo' => 'bar'], ['X-Test-Header' => 'foo'], 'symfony.http_client');
-        $this->assertHttpClientRequest('https://symfony.com/doc/current/index.html', httpClientId: 'symfony.http_client');
-        $this->assertNotHttpClientRequest('https://laravel.com', httpClientId: 'symfony.http_client');
+        $this->assertHttpClientRequest('https://symfony.com/doc/current/index.html', 'GET', null, [], 'symfony.http_client');
+        $this->assertNotHttpClientRequest('https://laravel.com', 'GET', 'symfony.http_client');
 
         $this->assertHttpClientRequestCount(6, 'symfony.http_client');
     }

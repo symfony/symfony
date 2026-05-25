@@ -178,7 +178,22 @@ trait RedisTrait
         }
 
         $params += $query + $options + self::$defaultConnectionOptions;
-        $params['auth'] ??= $auth;
+
+        $booleanStreamOptions = [
+            'allow_self_signed',
+            'capture_peer_cert',
+            'capture_peer_cert_chain',
+            'disable_compression',
+            'SNI_enabled',
+            'verify_peer',
+            'verify_peer_name',
+        ];
+
+        foreach ($params['ssl'] ?? [] as $streamOption => $value) {
+            if (\in_array($streamOption, $booleanStreamOptions, true) && \is_string($value)) {
+                $params['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+            }
+        }
 
         $aliases = [
             'sentinel_master' => 'sentinel',
@@ -195,8 +210,14 @@ trait RedisTrait
             };
         }
 
-        if (isset($params['sentinel']) && !class_exists(\Predis\Client::class) && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
+        if (!isset($params['sentinel'])) {
+            $params['auth'] ??= $auth;
+            $sentinelAuth = null;
+        } elseif (!class_exists(\Predis\Client::class) && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
             throw new CacheException('Redis Sentinel support requires one of: "predis/predis", "ext-redis >= 6.1", "ext-relay".');
+        } else {
+            $sentinelAuth = $params['auth'] ?? null;
+            $params['auth'] = $auth ?? $params['auth'];
         }
 
         foreach (['lazy', 'persistent', 'cluster'] as $option) {
@@ -236,14 +257,14 @@ trait RedisTrait
         if ($isRedisExt || $isRelayExt) {
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
 
-            $initializer = static function () use ($class, $isRedisExt, $connect, $params, $hosts, $tls) {
+            $initializer = static function () use ($class, $isRedisExt, $connect, $params, $sentinelAuth, $hosts, $tls) {
                 $sentinelClass = $isRedisExt ? \RedisSentinel::class : Sentinel::class;
                 $redis = new $class();
                 $hostIndex = 0;
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
-                    $passAuth = null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
+                    $passAuth = null !== $sentinelAuth && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {
@@ -266,12 +287,16 @@ trait RedisTrait
                             ];
 
                             if ($passAuth) {
-                                $options['auth'] = $params['auth'];
+                                $options['auth'] = $sentinelAuth;
+                            }
+
+                            if (null !== $params['ssl'] && version_compare(phpversion('redis'), '6.2.0', '>=')) {
+                                $options['ssl'] = $params['ssl'];
                             }
 
                             $sentinel = new \RedisSentinel($options);
                         } else {
-                            $extra = $passAuth ? [$params['auth']] : [];
+                            $extra = $passAuth ? [$sentinelAuth] : [];
 
                             $sentinel = @new $sentinelClass($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
                         }
@@ -364,10 +389,8 @@ trait RedisTrait
 
                     foreach ($context as $name => $value) {
                         match ($name) {
-                            'use-cache', 'client-tracking', 'throw-on-error', 'client-invalidations', 'reply-literal', 'persistent',
-                                => $context[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN),
-                            'max-retries', 'serializer', 'compression', 'compression-level',
-                                => $context[$name] = filter_var($value, \FILTER_VALIDATE_INT),
+                            'use-cache', 'client-tracking', 'throw-on-error', 'client-invalidations', 'reply-literal', 'persistent', => $context[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN),
+                            'max-retries', 'serializer', 'compression', 'compression-level', => $context[$name] = filter_var($value, \FILTER_VALIDATE_INT),
                             default => null,
                         };
                     }
@@ -455,6 +478,24 @@ trait RedisTrait
                 $params['parameters']['password'] = $params['auth'];
             }
 
+            if (isset($params['sentinel']) && null !== $sentinelAuth) {
+                if (\is_array($sentinelAuth)) {
+                    $sentinelUsername = $sentinelAuth[0];
+                    $sentinelPassword = $sentinelAuth[1];
+                } else {
+                    $sentinelUsername = null;
+                    $sentinelPassword = $sentinelAuth;
+                }
+
+                foreach ($hosts as $i => $host) {
+                    $hosts[$i]['password'] ??= $sentinelPassword;
+
+                    if (null !== $sentinelUsername) {
+                        $hosts[$i]['username'] ??= $sentinelUsername;
+                    }
+                }
+            }
+
             if (isset($params['ssl'])) {
                 foreach ($hosts as $i => $host) {
                     $hosts[$i]['ssl'] ??= $params['ssl'];
@@ -531,7 +572,7 @@ trait RedisTrait
 
         if ($this->redis instanceof RelayCluster) {
             $prefix = Relay::SCAN_PREFIX & $this->redis->getOption(Relay::OPT_SCAN) ? '' : $this->redis->getOption(Relay::OPT_PREFIX);
-            $prefixLen = \strlen($prefix);
+            $prefixLen = \strlen($prefix ?? '');
             $pattern = $prefix.$namespace.'*';
             foreach ($this->redis->_masters() as $ipAndPort) {
                 $address = implode(':', $ipAndPort);
@@ -679,6 +720,9 @@ trait RedisTrait
         return $failed;
     }
 
+    /**
+     * @param-immediately-invoked-callable $generator
+     */
     private function pipeline(\Closure $generator, ?object $redis = null): \Generator
     {
         $ids = [];
@@ -772,8 +816,7 @@ trait RedisTrait
     {
         foreach ($options as $name => $value) {
             match ($name) {
-                'allow_self_signed', 'capture_peer_cert', 'capture_peer_cert_chain', 'disable_compression', 'SNI_enabled', 'verify_peer', 'verify_peer_name',
-                    => $options[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN),
+                'allow_self_signed', 'capture_peer_cert', 'capture_peer_cert_chain', 'disable_compression', 'SNI_enabled', 'verify_peer', 'verify_peer_name', => $options[$name] = filter_var($value, \FILTER_VALIDATE_BOOLEAN),
                 default => null,
             };
         }

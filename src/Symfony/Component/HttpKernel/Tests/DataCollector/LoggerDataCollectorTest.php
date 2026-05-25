@@ -217,4 +217,20 @@ class LoggerDataCollectorTest extends TestCase
             2,
         ];
     }
+
+    public function testWarningCount()
+    {
+        $logger = $this->createStub(DebugLoggerInterface::class);
+        $logger->method('getLogs')->willReturn([
+            ['message' => 'Monolog warning record', 'priority' => 300, 'priorityName' => 'WARNING'],
+            ['message' => 'HttpKernel logger warning record', 'priority' => 300, 'priorityName' => 'warning'],
+            ['message' => 'Monolog debug record', 'priority' => 100, 'priorityName' => 'DEBUG'],
+            ['message' => 'HttpKernel logger debug record', 'priority' => 100, 'priorityName' => 'debug'],
+        ]);
+
+        $c = new LoggerDataCollector($logger);
+        $c->lateCollect();
+
+        $this->assertSame(2, $c->countWarnings());
+    }
 }

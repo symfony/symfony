@@ -130,9 +130,6 @@ final class LokaliseProvider implements ProviderInterface
         }
     }
 
-    /**
-     * @see https://app.lokalise.com/api2docs/curl/#transition-download-files-post
-     */
     private function exportFiles(array $locales, array $domains): array
     {
         $response = $this->client->request('POST', 'files/export', [
@@ -146,18 +143,11 @@ final class LokaliseProvider implements ProviderInterface
             ],
         ]);
 
-        $responseContent = $response->toArray(false);
-
-        if (406 === $response->getStatusCode()
-            && 'No keys found with specified filenames.' === $responseContent['error']['message']
-        ) {
+        if (406 === $response->getStatusCode()) {
             return [];
         }
 
-        if (200 !== $response->getStatusCode()) {
-            if (self::PROJECT_TOO_BIG_STATUS_CODE !== ($responseContent['error']['code'] ?? null)) {
-                throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
-            }
+        if (self::PROJECT_TOO_BIG_STATUS_CODE === $response->getStatusCode()) {
             if (!\extension_loaded('zip')) {
                 throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s". Make sure that the "zip" extension is enabled.', $response->getContent(false)), $response);
             }
@@ -165,10 +155,16 @@ final class LokaliseProvider implements ProviderInterface
             return $this->exportFilesAsync($locales, $domains);
         }
 
-        // Lokalise returns languages with "-" separator, we need to reformat them to "_" separator.
-        $reformattedLanguages = array_map(static fn ($language) => str_replace('-', '_', $language), array_keys($responseContent['files']));
+        if (200 !== $response->getStatusCode()) {
+            throw new ProviderException(\sprintf('Unable to export translations from Lokalise: "%s".', $response->getContent(false)), $response);
+        }
 
-        return array_combine($reformattedLanguages, $responseContent['files']);
+        $files = $response->toArray(false)['files'];
+
+        // Lokalise returns languages with "-" separator, we need to reformat them to "_" separator.
+        $reformattedLanguages = array_map(static fn ($language) => str_replace('-', '_', $language), array_keys($files));
+
+        return array_combine($reformattedLanguages, $files);
     }
 
     /**

@@ -1219,6 +1219,36 @@ class IntegrationTest extends TestCase
         self::assertInstanceOf(ContainerInterface::class, $taggedLocator = $s->getLocator());
         self::assertSame($container, $taggedLocator);
     }
+
+    public function testAttributeAutoconfigurationOnAnonymousClass()
+    {
+        $anonymousClass = new class {
+            #[CustomMethodAttribute('static')]
+            public function aMethod()
+            {
+            }
+        };
+
+        $container = new ContainerBuilder();
+        $container->registerAttributeForAutoconfiguration(
+            CustomMethodAttribute::class,
+            static function (ChildDefinition $d, CustomMethodAttribute $a, \ReflectionMethod $_r) {
+                $d->addTag('app.custom_tag', ['attribute' => $a->someAttribute]);
+            }
+        );
+
+        $container->register('test', $anonymousClass::class)
+            ->setPublic(true)
+            ->setSynthetic(true)
+            ->setAutoconfigured(true);
+
+        $collector = new TagCollector();
+        $container->addCompilerPass($collector);
+
+        $container->compile();
+
+        self::assertSame(['test' => [['attribute' => 'static']]], $collector->collectedTags);
+    }
 }
 
 class ServiceSubscriberStub implements ServiceSubscriberInterface

@@ -61,6 +61,13 @@ class Definition
      */
     public ?int $decorationOnInvalid = null;
 
+    /**
+     * @internal
+     *
+     * Used to store the priority of the decoration
+     */
+    public ?int $decorationPriority = null;
+
     public function __construct(?string $class = null, array $arguments = [])
     {
         if (null !== $class) {
@@ -94,17 +101,17 @@ class Definition
     /**
      * Sets a factory.
      *
-     * @param string|array|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Definition|Reference|null $factory A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
-    public function setFactory(string|array|Reference|null $factory): static
+    public function setFactory(string|array|self|Reference|null $factory): static
     {
         $this->changes['factory'] = true;
 
         if (\is_string($factory) && str_contains($factory, '::')) {
             $factory = explode('::', $factory, 2);
-        } elseif ($factory instanceof Reference) {
+        } elseif ($factory instanceof Reference || $factory instanceof self) {
             $factory = [$factory, '__invoke'];
         }
 
@@ -698,17 +705,17 @@ class Definition
     /**
      * Sets a configurator to call after the service is fully initialized.
      *
-     * @param string|array|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
+     * @param string|array|Definition|Reference|null $configurator A PHP function, reference or an array containing a class/Reference and a method to call
      *
      * @return $this
      */
-    public function setConfigurator(string|array|Reference|null $configurator): static
+    public function setConfigurator(string|array|self|Reference|null $configurator): static
     {
         $this->changes['configurator'] = true;
 
         if (\is_string($configurator) && str_contains($configurator, '::')) {
             $configurator = explode('::', $configurator, 2);
-        } elseif ($configurator instanceof Reference) {
+        } elseif ($configurator instanceof Reference || $configurator instanceof self) {
             $configurator = [$configurator, '__invoke'];
         }
 

@@ -16,7 +16,7 @@
     }
   ],
   "require": {
-    "php": ">=8.4",
+    "php": ">=8.4.1",
     "symfony/http-client": "^7.4|^8.0",
     "symfony/notifier": "^7.4|^8.0",
     "symfony/uid": "^7.4|^8.0"

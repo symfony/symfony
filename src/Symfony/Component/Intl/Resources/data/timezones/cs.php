@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'středoevropský čas (Büsingen)',
         'Europe/Chisinau' => 'východoevropský čas (Kišiněv)',
         'Europe/Copenhagen' => 'středoevropský čas (Kodaň)',
-        'Europe/Dublin' => 'časové pásmo Irsko (Dublin)',
+        'Europe/Dublin' => 'greenwichský střední čas (Dublin)',
         'Europe/Gibraltar' => 'středoevropský čas (Gibraltar)',
         'Europe/Guernsey' => 'greenwichský střední čas (Guernsey)',
         'Europe/Helsinki' => 'východoevropský čas (Helsinky)',

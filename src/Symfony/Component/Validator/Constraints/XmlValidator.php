@@ -37,11 +37,22 @@ class XmlValidator extends ConstraintValidator
         }
 
         $value = (string) $value;
+
+        if (\strlen($value) > $constraint->maxSize) {
+            $this->context->buildViolation($constraint->tooLargeMessage)
+                ->setParameter('{{ size }}', (string) \strlen($value))
+                ->setParameter('{{ limit }}', (string) $constraint->maxSize)
+                ->setCode(Xml::TOO_LARGE_ERROR)
+                ->addViolation();
+
+            return;
+        }
+
         $previousUseErrors = libxml_use_internal_errors(true);
 
         try {
             // First, check if XML is well-formed
-            if (false === $doc = simplexml_load_string($value)) {
+            if (false === $doc = simplexml_load_string($value, \SimpleXMLElement::class, \LIBXML_NONET)) {
                 $this->context->buildViolation($constraint->formatMessage)
                     ->setParameter('{{ value }}', $this->formatValue($value))
                     ->setCode(Xml::INVALID_XML_ERROR)
@@ -58,7 +69,7 @@ class XmlValidator extends ConstraintValidator
                 libxml_clear_errors();
                 $schemaPath = realpath($schemaPath) ?: $schemaPath;
 
-                if (@$dom->schemaValidate($schemaPath, $constraint->schemaFlags)) {
+                if (@$dom->schemaValidate($schemaPath, $constraint->schemaFlags | \LIBXML_NONET)) {
                     return;
                 }
                 $errors = libxml_get_errors();
@@ -73,7 +84,7 @@ class XmlValidator extends ConstraintValidator
                     $this->context->buildViolation($constraint->schemaMessage)
                         ->setParameter('{{ error }}', $error->message)
                         ->setParameter('{{ line }}', $error->line)
-                        ->setCode(Xml::INVALID_XML_ERROR)
+                        ->setCode(Xml::INVALID_SCHEMA_ERROR)
                         ->addViolation();
                 }
             }

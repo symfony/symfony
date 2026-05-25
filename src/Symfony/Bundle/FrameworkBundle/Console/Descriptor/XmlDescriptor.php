@@ -76,14 +76,9 @@ class XmlDescriptor extends Descriptor
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, $options['id'] ?? null)->childNodes->item(0), true));
-
-        if (!$container) {
-            $this->writeDocument($dom);
-
-            return;
+        if ($container) {
+            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $alias), (string) $alias, false, $container)->childNodes->item(0), true));
         }
-
-        $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $alias), (string) $alias, false, $container)->childNodes->item(0), true));
 
         $this->writeDocument($dom);
     }
@@ -409,6 +404,17 @@ class XmlDescriptor extends Descriptor
                 foreach ($edges as $edge) {
                     $usagesXML->appendChild($usageXML = $dom->createElement('usage'));
                     $usageXML->appendChild(new \DOMText($edge));
+                }
+            }
+
+            $stack = $this->getDecorationStack($container, $id);
+            if (\count($stack) > 1) {
+                $serviceXML->appendChild($stackXML = $dom->createElement('decoration-stack'));
+                foreach ($stack as $item) {
+                    $stackXML->appendChild($itemXML = $dom->createElement('service'));
+                    $itemXML->setAttribute('id', $item['id']);
+                    $itemXML->setAttribute('class', $item['class']);
+                    $itemXML->setAttribute('priority', $item['priority']);
                 }
             }
         }

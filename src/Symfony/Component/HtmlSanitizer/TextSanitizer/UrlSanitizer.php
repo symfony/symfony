@@ -35,6 +35,10 @@ final class UrlSanitizer
             return null;
         }
 
+        if (false !== strpbrk($input, '\\') || preg_match('~^(?:https?|ftp|wss?):(/[^/]|///)~i', $input)) {
+            return null;
+        }
+
         $url = self::parse($input);
 
         // Malformed URL
@@ -94,11 +98,42 @@ final class UrlSanitizer
         }
 
         try {
-            $parsedUrl = UriString::parse($url);
+            // Reject explicit-direction BiDi formatting characters: they have no
+            // legitimate place in a URL and enable visual spoofing of the rendered
+            // href when the URL is later embedded in HTML.
+            if (preg_match('/[\x{202A}-\x{202E}\x{2066}-\x{2069}]/u', $url)) {
+                return null;
+            }
+
+            // Browsers tolerate spaces inside path/query/fragment by transparently
+            // percent-encoding them. Mirror that behavior, but never inside the
+            // scheme or authority (where spaces are illegal); the whitespace check
+            // below rejects any space that didn't fit in the encoded slice.
+            if (str_contains($url, ' ')) {
+                if (str_starts_with($url, ' ')) {
+                    return null;
+                }
+
+                if (false !== $i = strpos($url, '://')) {
+                    $i += 3 + strcspn($url, '/?#', $i + 3);
+                } elseif (str_starts_with($url, '//')) {
+                    $i = 2 + strcspn($url, '/?#', 2);
+                } elseif (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $url)) {
+                    // Hostless scheme (data:, mailto:, …): leave the URL untouched
+                    // and let the whitespace check reject it.
+                    $i = \strlen($url);
+                } else {
+                    $i = 0;
+                }
+
+                $url = substr($url, 0, $i).str_replace(' ', '%20', substr($url, $i));
+            }
 
             if (preg_match('/\s/', $url)) {
                 return null;
             }
+
+            $parsedUrl = UriString::parse($url);
 
             if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {
                 return null;
@@ -112,7 +147,7 @@ final class UrlSanitizer
 
     private static function isHostlessScheme(?string $scheme): bool
     {
-        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'view-source'], true);
+        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'sms', 'view-source'], true);
     }
 
     private static function isAllowedHost(?string $host, array $allowedHosts): bool

@@ -42,6 +42,10 @@ class ImportMapConfigReader
         $configPath = $this->importMapConfigPath;
         $importMapConfig = is_file($configPath) ? \Closure::bind(static fn () => include func_get_arg(0), null, null)($configPath) : [];
 
+        if (!\is_array($importMapConfig)) {
+            throw new RuntimeException(\sprintf('The "%s" file must return an array, got "%s".', $configPath, get_debug_type($importMapConfig)));
+        }
+
         $entries = new ImportMapEntries();
         foreach ($importMapConfig as $importName => $data) {
             $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
@@ -49,7 +53,7 @@ class ImportMapConfigReader
                 throw new \InvalidArgumentException(\sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
 
-            $type = ImportMapType::tryFrom($data['type'] ?? 'js') ?? ImportMapType::JS;
+            $type = ImportMapType::tryFrom($data['type'] ?? 'js') ?? throw new RuntimeException(\sprintf('The importmap entry "%s" has an invalid "type" value "%s". Valid values are: "%s".', $importName, $data['type'], implode('", "', array_column(ImportMapType::cases(), 'value'))));
             $isEntrypoint = $data['entrypoint'] ?? false;
 
             if (isset($data['path'])) {

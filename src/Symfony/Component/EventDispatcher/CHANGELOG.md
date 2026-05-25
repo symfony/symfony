@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add hot-path and no-preload event support to `AddEventAliasesPass`
+ * Deprecate `RegisterListenersPass::setHotPathEvents()` and `setNoPreloadEvents()`, use `AddEventAliasesPass` instead
+
 6.0
 ---
 

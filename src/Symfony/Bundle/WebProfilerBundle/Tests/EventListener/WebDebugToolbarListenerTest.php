@@ -30,7 +30,7 @@ use Twig\Environment;
 class WebDebugToolbarListenerTest extends TestCase
 {
     #[DataProvider('getInjectToolbarTests')]
-    public function testInjectToolbar($content, $expected)
+    public function testInjectToolbar(string $content, string $expected)
     {
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $m = new \ReflectionMethod($listener, 'injectToolbar');
@@ -60,7 +60,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[DataProvider('provideRedirects')]
-    public function testHtmlRedirectionIsIntercepted($statusCode)
+    public function testHtmlRedirectionIsIntercepted(int $statusCode)
     {
         $response = new Response('Some content', $statusCode);
         $response->headers->set('Location', 'https://example.com/');
@@ -76,7 +76,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     public function testNonHtmlRedirectionIsNotIntercepted()
     {
-        $response = new Response('Some content', '301');
+        $response = new Response('Some content', 301);
         $response->headers->set('Location', 'https://example.com/');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
         $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request([], [], ['_format' => 'json']), HttpKernelInterface::MAIN_REQUEST, $response);
@@ -131,7 +131,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     #[DataProvider('provideRedirects')]
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnRedirection($statusCode)
+    public function testToolbarIsNotInjectedOnRedirection(int $statusCode)
     {
         $response = new Response('<html><head></head><body></body></html>', $statusCode);
         $response->headers->set('Location', 'https://example.com/');
@@ -287,7 +287,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('Exception: This multiline tabbed text should come out on a single plain line', $response->headers->get('X-Debug-Error'));
     }
 
-    public function testCspIsDisabledIfDumperWasUsed()
+    public function testCspNonceIsForwardedToDumpDataCollectorWhenDumperWasUsed()
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -295,12 +295,19 @@ class WebDebugToolbarListenerTest extends TestCase
         $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cspHandler = $this->createMock(ContentSecurityPolicyHandler::class);
-        $cspHandler->expects($this->once())
+        $cspHandler->expects($this->never())
             ->method('disableCsp');
+        $cspHandler->expects($this->once())
+            ->method('updateResponseHeaders')
+            ->willReturn(['csp_script_nonce' => 'script-abc', 'csp_style_nonce' => 'style-xyz']);
+
         $dumpDataCollector = $this->createMock(DumpDataCollector::class);
         $dumpDataCollector->expects($this->once())
             ->method('getDumpsCount')
             ->willReturn(1);
+        $dumpDataCollector->expects($this->once())
+            ->method('setNonce')
+            ->with('script-abc', 'style-xyz');
 
         $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', $cspHandler, $dumpDataCollector);
         $listener->onKernelResponse($event);
@@ -308,7 +315,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
     }
 
-    public function testCspIsKeptEnabledIfDumperWasNotUsed()
+    public function testCspNonceIsNotForwardedIfDumperWasNotUsed()
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -322,6 +329,8 @@ class WebDebugToolbarListenerTest extends TestCase
         $dumpDataCollector->expects($this->once())
             ->method('getDumpsCount')
             ->willReturn(0);
+        $dumpDataCollector->expects($this->never())
+            ->method('setNonce');
 
         $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', $cspHandler, $dumpDataCollector);
         $listener->onKernelResponse($event);
@@ -412,7 +421,8 @@ class WebDebugToolbarListenerTest extends TestCase
         $request = new Request();
         $response = new EventStreamResponse(
             static fn () => yield new ServerEvent('some data'),
-            headers: [
+            200,
+            [
                 'X-Debug-Token' => 'aabbcc',
                 'X-Debug-Token-Link' => 'test://foobar',
             ],
@@ -452,7 +462,8 @@ class WebDebugToolbarListenerTest extends TestCase
                 yield new ServerEvent('some data');
                 throw new \RuntimeException('Something went wrong');
             },
-            headers: [
+            200,
+            [
                 'X-Debug-Token' => 'aabbcc',
                 'X-Debug-Token-Link' => 'test://foobar',
             ],
@@ -485,7 +496,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $response->send(false);
     }
 
-    protected function getTwigMock($render = 'WDT')
+    protected function getTwigMock(string $render = 'WDT')
     {
         $templating = $this->createStub(Environment::class);
         $templating

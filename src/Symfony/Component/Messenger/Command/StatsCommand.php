@@ -54,6 +54,7 @@ class StatsCommand extends Command
                 The <info>--format</info> option specifies the format of the command output:
 
                   <info>php %command.full_name% --format=json</info>
+
                 EOF
             )
         ;

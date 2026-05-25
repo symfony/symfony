@@ -15,12 +15,16 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
 #[RequiresPhpExtension('pdo_sqlite')]
+#[IgnoreDeprecations]
+#[Group('doctrine-dbal-workaround')]
 class DoctrineIntegrationTest extends TestCase
 {
     private \Doctrine\DBAL\Connection $driverConnection;
@@ -46,8 +50,8 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
     }
 
     public function testSendWithDelay()
@@ -117,7 +121,7 @@ class DoctrineIntegrationTest extends TestCase
         ]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi available"}', $encoded['body']);
+        $this->assertEquals('{"message": "Hi available"}', $encoded[0]['body']);
     }
 
     public function testItCountMessages()
@@ -182,8 +186,8 @@ class DoctrineIntegrationTest extends TestCase
         ]);
 
         $next = $this->connection->get();
-        $this->assertEquals('{"message": "Hi requeued"}', $next['body']);
-        $this->connection->reject($next['id']);
+        $this->assertEquals('{"message": "Hi requeued"}', $next[0]['body']);
+        $this->connection->reject($next[0]['id']);
     }
 
     public function testTheTransportIsSetupOnGet()
@@ -194,7 +198,7 @@ class DoctrineIntegrationTest extends TestCase
 
         $this->connection->send('the body', ['my' => 'header']);
         $envelope = $this->connection->get();
-        $this->assertEquals('the body', $envelope['body']);
+        $this->assertEquals('the body', $envelope[0]['body']);
     }
 
     private function formatDateTime(\DateTimeImmutable $dateTime): string

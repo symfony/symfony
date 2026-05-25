@@ -129,8 +129,9 @@ class SwitchUserListenerTest extends TestCase
     {
         $originalUser = new InMemoryUser('username', null);
         $refreshedUser = new InMemoryUser('username', null);
-        $userProvider = $this->createStub(InMemoryUserProvider::class);
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
         $userProvider
+            ->expects($this->once())
             ->method('refreshUser')
             ->with($this->identicalTo($originalUser))
             ->willReturn($refreshedUser);
@@ -388,8 +389,9 @@ class SwitchUserListenerTest extends TestCase
     {
         $originalUser = new InMemoryUser('username', null);
         $refreshedOriginalUser = new InMemoryUser('username', null);
-        $userProvider = $this->createStub(InMemoryUserProvider::class);
+        $userProvider = $this->createMock(InMemoryUserProvider::class);
         $userProvider
+            ->expects($this->once())
             ->method('refreshUser')
             ->with($this->identicalTo($originalUser))
             ->willReturn($refreshedOriginalUser);

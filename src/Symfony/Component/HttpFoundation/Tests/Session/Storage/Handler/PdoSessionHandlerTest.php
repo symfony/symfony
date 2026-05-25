@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
@@ -332,6 +333,8 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertFalse($schema->hasTable('sessions'));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('doctrine-dbal-workaround')]
     public function testConfigureSchemaSameDatabase()
     {
         $schema = new Schema();
@@ -341,6 +344,8 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertTrue($schema->hasTable('sessions'));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('doctrine-dbal-workaround')]
     public function testConfigureSchemaTableExistsPdo()
     {
         $schema = new Schema();

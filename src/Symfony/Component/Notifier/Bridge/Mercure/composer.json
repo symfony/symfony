@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/mercure": "^0.5.2|^0.6|^0.7",
         "symfony/notifier": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3"

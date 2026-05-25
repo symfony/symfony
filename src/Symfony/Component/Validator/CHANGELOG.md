@@ -4,7 +4,15 @@ CHANGELOG
 8.1
 ---
 
+ * Add `ValidatorBuilder::enablePropertyMetadataExistenceCheck()` to make `validateProperty()` and `validatePropertyValue()` throw when the given property has no metadata
+ * Add `findByCodes()` to `ConstraintViolationListInterface`
+ * Add clock-awareness to comparison and range validators for testable date comparisons
  * Add the `Xml` constraint for validating XML content
+ * Add `ConstraintValidatorTestCase::validate()` to encapsulate the way to call the constraint validator
+ * Deprecate `ConstraintValidatorInterface::initialize()` and `ConstraintValidatorInterface::validate()` in
+   favor of `ConstraintValidatorInterface::validateInContext()`. The `ConstraintValidator` abstract class
+   handles the context management when extending it. When writing tests with `ConstraintValidatorTestCase`,
+   use the new `validate()` method to abstract the way to use the constraint validator.
 
 8.0
 ---

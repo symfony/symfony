@@ -68,7 +68,7 @@ final class SlidingWindow implements LimiterStateInterface
 
     public function add(int $hits = 1): void
     {
-        $this->hitCount += $hits;
+        $this->hitCount = max(0, $this->hitCount + $hits);
     }
 
     /**
@@ -116,6 +116,9 @@ final class SlidingWindow implements LimiterStateInterface
         // BC layer for old objects serialized via __sleep
         if (5 === \count($data)) {
             $data = array_values($data);
+            if ($data[0] instanceof \Stringable) {
+                throw new \BadMethodCallException('Cannot unserialize '.self::class);
+            }
             $this->id = $data[0];
             $this->hitCount = $data[1];
             $this->intervalInSeconds = $data[2];

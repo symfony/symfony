@@ -38,8 +38,8 @@ class MessengerDataCollectorTest extends TestCase
         $message = new DummyMessage('dummy message');
         $envelope = new Envelope($message);
 
-        $bus = $this->createStub(MessageBusInterface::class);
-        $bus->method('dispatch')->with($message)->willReturn($envelope);
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn($envelope);
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -79,8 +79,8 @@ class MessengerDataCollectorTest extends TestCase
     {
         $message = new DummyMessage('dummy message');
 
-        $bus = $this->createStub(MessageBusInterface::class);
-        $bus->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();

@@ -153,7 +153,7 @@ return [
         'Europe/Busingen' => 'मरकज़ी यूरपी वख (بوسِنگین)',
         'Europe/Chisinau' => 'मशरिकी यूरपी वख (چِسیٖنو)',
         'Europe/Copenhagen' => 'मरकज़ी यूरपी वख (کوپن ہیگن)',
-        'Europe/Dublin' => 'اَیَرلینڑ वख (ڈَبلِن)',
+        'Europe/Dublin' => 'ग्रीनविच ओसत वख (ڈَبلِن)',
         'Europe/Gibraltar' => 'मरकज़ी यूरपी वख (گِبرالٹَر)',
         'Europe/Guernsey' => 'ग्रीनविच ओसत वख (گویرنسے)',
         'Europe/Helsinki' => 'मशरिकी यूरपी वख (حؠلسِنکی)',

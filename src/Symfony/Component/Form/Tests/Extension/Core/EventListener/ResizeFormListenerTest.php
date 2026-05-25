@@ -266,7 +266,7 @@ class ResizeFormListenerTest extends TestCase
 
         $data = new \ArrayIterator([0 => 'first', 1 => 'second', 2 => 'third']);
         $event = new FormEvent($this->builder->getForm(), $data);
-        $listener = new ResizeFormListener(TextType::class, keepAsList: true);
+        $listener = new ResizeFormListener(TextType::class, [], false, false, false, null, true);
         $listener->onSubmit($event);
 
         $this->assertCount(1, $event->getData());

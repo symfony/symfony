@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Loader;
 
+use Symfony\Component\Routing\Loader\Configurator\Traits\HostTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\LocalizedRouteTrait;
 use Symfony\Component\Routing\Loader\Configurator\Traits\PrefixTrait;
 use Symfony\Component\Routing\RouteCollection;
@@ -20,13 +21,21 @@ use Symfony\Component\Routing\RouteCollection;
  */
 trait ContentLoaderTrait
 {
+    use HostTrait;
     use LocalizedRouteTrait;
     use PrefixTrait;
 
+    /**
+     * Config keys accepted at the route or import level by {@see validate()}.
+     */
     private const AVAILABLE_KEYS = [
         'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
     ];
 
+    /**
+     * Processes a parsed configuration array, handling `when@<env>` filtering
+     * before dispatching each entry to {@see parseRoute()} or {@see parseImport()}.
+     */
     private function loadContent(RouteCollection $collection, array $config, string $path, string $file): void
     {
         foreach ($config as $name => $config) {
@@ -214,6 +223,8 @@ trait ContentLoaderTrait
     }
 
     /**
+     * Validates that an alias definition only carries the `alias` and `deprecated` keys.
+     *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
      *                                   something is missing or the combination is nonsense
      */

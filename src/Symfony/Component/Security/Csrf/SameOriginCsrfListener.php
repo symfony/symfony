@@ -19,8 +19,15 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 final class SameOriginCsrfListener
 {
     public function __construct(
-        private readonly string $cookieName = 'csrf-token')
-    {
+        private readonly string $cookieName = 'csrf-token',
+    ) {
+        if (!$cookieName) {
+            throw new \InvalidArgumentException('The cookie name cannot be empty.');
+        }
+
+        if (!preg_match('/^[-a-zA-Z0-9_]+$/D', $cookieName)) {
+            throw new \InvalidArgumentException('The cookie name contains invalid characters.');
+        }
     }
 
     public function onKernelResponse(ResponseEvent $event): void

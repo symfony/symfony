@@ -25,6 +25,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class AbstractTokenProcessor
 {
+    private bool $processing = false;
+
     public function __construct(
         protected TokenStorageInterface $tokenStorage,
     ) {
@@ -36,15 +38,24 @@ abstract class AbstractTokenProcessor
 
     public function __invoke(LogRecord $record): LogRecord
     {
-        $record->extra[$this->getKey()] = null;
+        if ($this->processing) {
+            return $record;
+        }
 
-        if (null !== $token = $this->getToken()) {
-            $record->extra[$this->getKey()] = [
-                'authenticated' => (bool) $token->getUser(),
-                'roles' => $token->getRoleNames(),
-            ];
+        $this->processing = true;
+        try {
+            $record->extra[$this->getKey()] = null;
 
-            $record->extra[$this->getKey()]['user_identifier'] = $token->getUserIdentifier();
+            if (null !== $token = $this->getToken()) {
+                $record->extra[$this->getKey()] = [
+                    'authenticated' => (bool) $token->getUser(),
+                    'roles' => $token->getRoleNames(),
+                ];
+
+                $record->extra[$this->getKey()]['user_identifier'] = $token->getUserIdentifier();
+            }
+        } finally {
+            $this->processing = false;
         }
 
         return $record;

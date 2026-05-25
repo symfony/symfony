@@ -15,6 +15,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -143,5 +145,51 @@ class ControllerEventTest extends TestCase
         yield [new AttributeController()];
         yield [(new AttributeController())->__invoke(...)];
         yield [#[Bar('class'), Bar('method'), Baz] static function () {}];
+    }
+
+    public function testEvaluateWithClosureUsesArgsRequestAndController()
+    {
+        $request = new Request();
+        $controller = [new AttributeController(), 'action'];
+        $event = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $closure = function (array $args, Request $requestArg, ?object $controllerArg): string {
+            $this->assertSame(['baz' => 'value'], $args);
+            $this->assertInstanceOf(Request::class, $requestArg);
+            $this->assertInstanceOf(AttributeController::class, $controllerArg);
+
+            return 'ok';
+        };
+
+        $this->assertSame('ok', $event->evaluate($closure, null, ['baz' => 'value']));
+    }
+
+    public function testEvaluateWithExpressionUsesExpressionLanguage()
+    {
+        $request = new Request();
+        $controller = [new AttributeController(), 'action'];
+        $event = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
+        $expressionLanguage->expects($this->once())
+            ->method('evaluate')
+            ->with(new Expression('args["baz"]'), [
+                'request' => $request,
+                'args' => ['baz' => 'value'],
+                'this' => $controller[0],
+            ])
+            ->willReturn('value');
+
+        $this->assertSame('value', $event->evaluate(new Expression('args["baz"]'), $expressionLanguage, ['baz' => 'value']));
+    }
+
+    public function testEvaluateWithExpressionRequiresExpressionLanguage()
+    {
+        $event = new ControllerEvent(new TestHttpKernel(), static function () {}, new Request(), HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot evaluate Expression for controllers since no ExpressionLanguage service was configured.');
+
+        $event->evaluate(new Expression('args["foo"]'), null, ['foo' => 'bar']);
     }
 }

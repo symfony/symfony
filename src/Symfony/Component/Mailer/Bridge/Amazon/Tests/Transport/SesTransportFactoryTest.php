@@ -170,6 +170,21 @@ class SesTransportFactoryTest extends AbstractTransportFactoryTestCase
             new Dsn('ses+smtps', 'custom.vpc.endpoint', self::USER, self::PASSWORD, null, ['region' => 'eu-west-1']),
             new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'custom.vpc.endpoint'),
         ];
+
+        yield [
+            new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD, 587, ['region' => 'eu-west-1', 'require_tls' => '0']),
+            (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'default', 587))->setRequireTls(false),
+        ];
+
+        yield [
+            new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD, 587, ['region' => 'eu-west-1']),
+            new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'default', 587),
+        ];
+
+        yield [
+            new Dsn('ses+smtp', 'default', self::USER, self::PASSWORD, 465, ['region' => 'eu-west-1', 'require_tls' => '1']),
+            (new SesSmtpTransport(self::USER, self::PASSWORD, 'eu-west-1', null, $logger, 'default', 465))->setRequireTls(true),
+        ];
     }
 
     public static function unsupportedSchemeProvider(): iterable

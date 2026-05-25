@@ -12,11 +12,11 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Traits\Relay\RelayCluster20Trait;
+use Symfony\Component\Cache\Traits\Relay\RelayCluster21Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 // Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
@@ -29,6 +29,7 @@ class RelayClusterProxy extends \Relay\Cluster implements ResetInterface, LazyOb
         resetLazyObject as reset;
     }
     use RelayCluster20Trait;
+    use RelayCluster21Trait;
 
     public function __construct($name, $seeds = null, $connect_timeout = 0, $command_timeout = 0, $persistent = false, #[\SensitiveParameter] $auth = null, $context = null)
     {

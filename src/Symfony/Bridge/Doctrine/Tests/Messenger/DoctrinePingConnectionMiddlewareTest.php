@@ -100,8 +100,9 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->never())->method('getDatabasePlatform');
-        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry
+            ->expects($this->once())
             ->method('getManager')
             ->willThrowException(new \InvalidArgumentException());
 
@@ -144,6 +145,55 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         ]);
 
         $middleware = new DoctrinePingConnectionMiddleware($registry);
+
+        $envelope = new Envelope(new \stdClass(), [
+            new ConsumedByWorkerStamp(),
+        ]);
+        $middleware->handle($envelope, $this->getStackMock());
+    }
+
+    public function testMiddlewarePingsHealthyManagersWhenOneFailsInMultiEntityManagerMode()
+    {
+        $healthy = $this->connectionExpectingOnePing();
+
+        $failing = $this->createMock(Connection::class);
+        $failing->method('isConnected')->willReturn(true);
+        $failing->method('getDatabasePlatform')->willReturn($this->mockPlatform());
+        $failing->expects($this->exactly(2))
+            ->method('executeQuery')
+            ->willThrowException($this->createStub(DBALException::class));
+        $failing->expects($this->once())->method('close');
+
+        $registry = $this->createRegistryForManagers([
+            'broken' => $this->createManagerWithConnection($failing),
+            'healthy' => $this->createManagerWithConnection($healthy),
+        ]);
+
+        $middleware = new DoctrinePingConnectionMiddleware($registry);
+
+        $envelope = new Envelope(new \stdClass(), [
+            new ConsumedByWorkerStamp(),
+        ]);
+
+        $this->expectException(DBALException::class);
+
+        $middleware->handle($envelope, $this->getStackMock(false));
+    }
+
+    public function testMiddlewareSkipsPingWhenConnectionIsNotConnected()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('isConnected')->willReturn(false);
+        $connection->expects($this->never())->method('executeQuery');
+        $connection->expects($this->never())->method('close');
+
+        $manager = $this->createStub(EntityManagerInterface::class);
+        $manager->method('getConnection')->willReturn($connection);
+
+        $registry = $this->createStub(ManagerRegistry::class);
+        $registry->method('getManager')->willReturn($manager);
+
+        $middleware = new DoctrinePingConnectionMiddleware($registry, $this->entityManagerName);
 
         $envelope = new Envelope(new \stdClass(), [
             new ConsumedByWorkerStamp(),
@@ -209,13 +259,8 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
         $registry = $withExpectations ? $this->createMock(ManagerRegistry::class) : $this->createStub(ManagerRegistry::class);
 
-        if ($withExpectations) {
-            $registry->expects($this->any())->method('getManagerNames')->willReturn(array_combine(array_keys($managers), array_keys($managers)));
-            $registry->expects($this->any())->method('getManager')->willReturnCallback(static fn (?string $name): ?EntityManagerInterface => $managers[$name ?? $defaultName] ?? null);
-        } else {
-            $registry->method('getManagerNames')->willReturn(array_combine(array_keys($managers), array_keys($managers)));
-            $registry->method('getManager')->willReturnCallback(static fn (?string $name): ?EntityManagerInterface => $managers[$name ?? $defaultName] ?? null);
-        }
+        $registry->method('getManagerNames')->willReturn(array_combine(array_keys($managers), array_keys($managers)));
+        $registry->method('getManager')->willReturnCallback(static fn (?string $name): ?EntityManagerInterface => $managers[$name ?? $defaultName] ?? null);
 
         return $registry;
     }

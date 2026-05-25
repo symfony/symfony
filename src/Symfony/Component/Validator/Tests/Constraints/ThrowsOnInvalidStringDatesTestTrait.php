@@ -23,7 +23,7 @@ trait ThrowsOnInvalidStringDatesTestTrait
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
     }
 
     public static function throwsOnInvalidStringDatesProvider(): array

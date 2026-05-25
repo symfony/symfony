@@ -12,9 +12,11 @@
 namespace Symfony\Bundle\FrameworkBundle\Test;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -32,6 +34,8 @@ abstract class KernelTestCase extends TestCase
     protected static ?string $class = null;
     protected static ?KernelInterface $kernel = null;
     protected static bool $booted = false;
+
+    private static bool $kernelHasBeenRebooted = false;
 
     protected function tearDown(): void
     {
@@ -81,8 +85,9 @@ abstract class KernelTestCase extends TestCase
         // If the cache warmer is registered, it means that the cache has been
         // warmed up, so the current container is not fresh anymore. Let's
         // reboot a fresh one.
-        if (self::getContainer()->initialized('cache_warmer')) {
+        if ($kernel->getContainer()->initialized('cache_warmer')) {
             static::ensureKernelShutdown();
+            self::$kernelHasBeenRebooted = true;
 
             $kernel = static::createKernel($options);
             $kernel->boot();
@@ -143,7 +148,7 @@ abstract class KernelTestCase extends TestCase
 
             $httpCacheDir = null;
             if ($container->has('http_cache')) {
-                $httpCacheDir = static::$kernel->getCacheDir().'/http_cache';
+                $httpCacheDir = static::$kernel->getShareDir().'/http_cache';
             }
 
             if ($container->has('services_resetter')) {
@@ -153,6 +158,20 @@ abstract class KernelTestCase extends TestCase
 
             static::$kernel->shutdown();
             static::$booted = false;
+
+            if (self::$kernelHasBeenRebooted) {
+                self::$kernelHasBeenRebooted = false;
+                try {
+                    (new \ReflectionProperty(Kernel::class, 'freshCache'))->setValue(null, []);
+                } catch (\ReflectionException) {
+                    // ignore if the property doesn't exist
+                }
+                try {
+                    (new \ReflectionProperty(SelfCheckingResourceChecker::class, 'cache'))->setValue(null, []);
+                } catch (\ReflectionException) {
+                    // ignore if the property doesn't exist
+                }
+            }
 
             if ($container instanceof ResetInterface) {
                 $container->reset();

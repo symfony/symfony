@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -69,16 +68,18 @@ class PhpFileLoader extends FileLoader
             if (\is_object($result) && \is_callable($result)) {
                 $this->callConfigurator($result, new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $path);
             } elseif (\is_array($result)) {
-                $yamlLoader = new YamlFileLoader($this->container, $this->locator, $this->env, $this->prepend);
-                $yamlLoader->setResolver($this->resolver ?? new LoaderResolver([$this]));
-                $result = ContainerConfigurator::processValue($result);
-
                 ++$this->importing;
                 try {
-                    $content = array_intersect_key($result, ['imports' => true, 'parameters' => true, 'services' => true]);
-                    $this->loadContent($content, $path);
+                    $this->loadContent([
+                        'imports' => ContainerConfigurator::processValue($result['imports'] ?? []),
+                        'parameters' => ContainerConfigurator::processValue($result['parameters'] ?? []),
+                        'services' => ContainerConfigurator::processValue($result['services'] ?? [], true),
+                    ], $path);
 
                     foreach ($result as $namespace => $config) {
+                        if (!\is_array($config)) {
+                            throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $namespace, $path));
+                        }
                         if (\in_array($namespace, ['imports', 'parameters', 'services'], true)) {
                             continue;
                         }
@@ -87,7 +88,7 @@ class PhpFileLoader extends FileLoader
                             $this->container->setParameter('.container.known_envs', array_keys($knownEnvs + [substr($namespace, 5) => true]));
                             continue;
                         }
-                        $this->loadExtensionConfig($namespace, $config);
+                        $this->loadExtensionConfig($namespace, ContainerConfigurator::processValue($config));
                     }
 
                     // per-env configuration
@@ -96,12 +97,18 @@ class PhpFileLoader extends FileLoader
                             throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $when, $path));
                         }
 
-                        $content = array_intersect_key($result[$when], ['imports' => true, 'parameters' => true, 'services' => true]);
-                        $this->loadContent($content, $path);
+                        $this->loadContent([
+                            'imports' => ContainerConfigurator::processValue($result[$when]['imports'] ?? []),
+                            'parameters' => ContainerConfigurator::processValue($result[$when]['parameters'] ?? []),
+                            'services' => ContainerConfigurator::processValue($result[$when]['services'] ?? [], true),
+                        ], $path);
 
                         foreach ($result[$when] as $namespace => $config) {
+                            if (!\is_array($config)) {
+                                throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $namespace, $path));
+                            }
                             if (!\in_array($namespace, ['imports', 'parameters', 'services'], true) && !str_starts_with($namespace, 'when@')) {
-                                $this->loadExtensionConfig($namespace, $config);
+                                $this->loadExtensionConfig($namespace, ContainerConfigurator::processValue($config));
                             }
                         }
                     }
@@ -134,6 +141,8 @@ class PhpFileLoader extends FileLoader
 
     /**
      * Resolve the parameters to the $callback and execute it.
+     *
+     * @param-immediately-invoked-callable $callback
      */
     private function callConfigurator(callable $callback, ContainerConfigurator $containerConfigurator, string $path): void
     {

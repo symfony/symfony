@@ -342,6 +342,11 @@ class HtmlSanitizerConfig
      * A list of allowed elements for this attribute can be passed as a second argument.
      * Passing "*" will allow all currently allowed elements to use this attribute.
      *
+     * Note: this method is subtractive within the currently allowed elements.
+     * It restricts the attribute to the listed elements and removes it from any
+     * other allowed element that previously had it. To add an attribute to one
+     * element without affecting others, use allowElement($element, [$attribute]).
+     *
      * @param list<string>|string $allowedElements
      */
     public function allowAttribute(string $attribute, array|string $allowedElements): static
@@ -394,7 +399,10 @@ class HtmlSanitizerConfig
     /**
      * Forcefully set the value of a given attribute on a given element.
      *
-     * The attribute will be created on the nodes if it didn't exist.
+     * The attribute will be created on the nodes if it didn't exist. The
+     * provided value is written verbatim and is NOT passed through any
+     * attribute sanitizer (in particular, URL attribute sanitization is
+     * skipped), so callers are responsible for ensuring the value is safe.
      */
     public function forceAttribute(string $element, string $attribute, string $value): static
     {

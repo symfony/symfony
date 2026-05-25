@@ -17,9 +17,13 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 
+trigger_deprecation('symfony/messenger', '8.1', '"%s" is deprecated, use the "time_limit" worker option instead.', StopWorkerOnTimeLimitListener::class);
+
 /**
  * @author Simon Delicata <simon.delicata@free.fr>
  * @author Tobias Schultze <http://tobion.de>
+ *
+ * @deprecated since Symfony 8.1, use the "time_limit" worker option instead
  */
 class StopWorkerOnTimeLimitListener implements EventSubscriberInterface
 {

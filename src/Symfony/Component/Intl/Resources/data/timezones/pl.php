@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'czas środkowoeuropejski (Büsingen am Hochrhein)',
         'Europe/Chisinau' => 'czas wschodnioeuropejski (Kiszyniów)',
         'Europe/Copenhagen' => 'czas środkowoeuropejski (Kopenhaga)',
-        'Europe/Dublin' => 'czas: Irlandia (Dublin)',
+        'Europe/Dublin' => 'czas uniwersalny (Dublin)',
         'Europe/Gibraltar' => 'czas środkowoeuropejski (Gibraltar)',
         'Europe/Guernsey' => 'czas uniwersalny (Guernsey)',
         'Europe/Helsinki' => 'czas wschodnioeuropejski (Helsinki)',

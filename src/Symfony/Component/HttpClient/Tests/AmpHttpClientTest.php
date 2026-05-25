@@ -24,6 +24,14 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testNonBlockingStream();
     }
 
+    /**
+     * @group transient-on-windows
+     */
+    public function testResolve()
+    {
+        parent::testResolve();
+    }
+
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
         return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 30]);

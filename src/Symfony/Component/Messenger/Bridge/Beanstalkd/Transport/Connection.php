@@ -255,6 +255,9 @@ class Connection
         $this->watchingTube = true;
     }
 
+    /**
+     * @param-immediately-invoked-callable $command
+     */
     private function withReconnect(callable $command): mixed
     {
         try {

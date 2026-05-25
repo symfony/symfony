@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Waktu Eropa Tengah (Büsingen)',
         'Europe/Chisinau' => 'Waktu Eropa Timur (Kishinev)',
         'Europe/Copenhagen' => 'Waktu Eropa Tengah (Kopenhagen)',
-        'Europe/Dublin' => 'Waktu Irlandia (Dublin)',
+        'Europe/Dublin' => 'Greenwich Mean Time (Dublin)',
         'Europe/Gibraltar' => 'Waktu Eropa Tengah (Gibraltar)',
         'Europe/Guernsey' => 'Greenwich Mean Time (Guernsey)',
         'Europe/Helsinki' => 'Waktu Eropa Timur (Helsinki)',

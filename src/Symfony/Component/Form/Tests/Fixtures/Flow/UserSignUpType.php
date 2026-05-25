@@ -29,7 +29,7 @@ class UserSignUpType extends AbstractFlowType
             : static fn (array $data) => !$data['worker'];
 
         $builder->addStep('personal', UserSignUpPersonalType::class);
-        $builder->addStep('professional', UserSignUpProfessionalType::class, skip: $skip);
+        $builder->addStep('professional', UserSignUpProfessionalType::class, [], $skip);
         $builder->addStep('account', UserSignUpAccountType::class);
 
         $builder->add('navigator', UserSignUpNavigatorType::class);

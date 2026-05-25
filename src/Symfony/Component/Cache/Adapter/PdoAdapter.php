@@ -224,7 +224,8 @@ class PdoAdapter extends AbstractAdapter implements PruneableInterface
                 $sql = "TRUNCATE TABLE $this->table";
             }
         } else {
-            $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%'";
+            $namespace = str_replace('_', '!_', $namespace);
+            $sql = "DELETE FROM $this->table WHERE $this->idCol LIKE '$namespace%' ESCAPE '!'";
         }
 
         try {

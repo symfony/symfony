@@ -47,7 +47,7 @@ $worker = new Worker(['the_receiver' => $receiver], new class implements Message
     }
 }, $eventDispatcher);
 
-pcntl_signal(15, fn () => $worker->stop());
+pcntl_signal(15, static fn () => $worker->stop());
 
 echo "Receiving messages...\n";
 $worker->run();

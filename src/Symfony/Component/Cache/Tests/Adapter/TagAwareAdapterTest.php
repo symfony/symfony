@@ -217,4 +217,29 @@ class TagAwareAdapterTest extends AdapterTestCase
             // run generator
         }
     }
+
+    public function testResetClearsInternalStateEvenOnCommitFailure()
+    {
+        $pool = new class extends ArrayAdapter {
+            public function commit(): bool
+            {
+                return false;
+            }
+        };
+
+        $adapter = new TagAwareAdapter($pool);
+        $item = $adapter->getItem('foo');
+        $item->set('bar');
+        $adapter->saveDeferred($item);
+
+        // Simulate some known tag versions
+        $propertyTags = new \ReflectionProperty($adapter, 'knownTagVersions');
+        $propertyTags->setValue($adapter, ['tag1' => 1]);
+
+        $adapter->reset();
+
+        $propertyDeferred = new \ReflectionProperty($adapter, 'deferred');
+        $this->assertEmpty($propertyDeferred->getValue($adapter), 'The deferred items must be cleared even if commit fails.');
+        $this->assertEmpty($propertyTags->getValue($adapter), 'The known tag versions must be cleared even if commit fails.');
+    }
 }

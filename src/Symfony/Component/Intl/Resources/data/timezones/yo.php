@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Àkókò Àárin Europe (Büsingen)',
         'Europe/Chisinau' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Chișinău)',
         'Europe/Copenhagen' => 'Àkókò Àárin Europe (Copenhagen)',
-        'Europe/Dublin' => 'Ìgbà Ailandi (Dublin)',
+        'Europe/Dublin' => 'Greenwich Mean Time (Dublin)',
         'Europe/Gibraltar' => 'Àkókò Àárin Europe (Gibraltar)',
         'Europe/Guernsey' => 'Greenwich Mean Time (Guernsey)',
         'Europe/Helsinki' => 'Àkókò Ìhà Ìlà Oòrùn Europe (Helsinki)',

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\SafeClassPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
@@ -29,6 +30,7 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Twig\Environment;
+use Twig\Runtime\EscaperRuntime;
 
 class TwigExtensionTest extends TestCase
 {
@@ -303,15 +305,27 @@ class TwigExtensionTest extends TestCase
         $container->register('http_kernel', 'FooClass');
         $container->register('foo', '%foo%')->addTag('twig.runtime');
         $container->register('error_renderer.html', HtmlErrorRenderer::class);
+        $container->register('foo_safe')->setClass(\stdClass::class)->addResourceTag('twig.safe_class', ['strategy' => 'html']);
+        $container->register('bar_safe')->setClass(\stdClass::class)->addResourceTag('twig.safe_class', ['strategy' => ['html', 'js']]);
+        $container->addCompilerPass(new SafeClassPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->getCompilerPassConfig()->setRemovingPasses([]);
         $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         $container->compile();
 
+        $this->assertTrue($container->hasDefinition('twig.runtime.escaper'));
+        $this->assertSame('UTF-8', $container->getDefinition('twig.runtime.escaper')->getArgument(0));
+
+        $calls = $container->getDefinition('twig.runtime.escaper')->getMethodCalls();
+        $this->assertContains(['addSafeClass', [\stdClass::class, ['html']]], $calls);
+        $this->assertContains(['addSafeClass', [\stdClass::class, ['html', 'js']]], $calls);
+
         $loader = $container->getDefinition('twig.runtime_loader');
         $args = $container->getDefinition((string) $loader->getArgument(0))->getArgument(0);
+        $this->assertArrayHasKey(EscaperRuntime::class, $args);
         $this->assertArrayHasKey(FormRenderer::class, $args);
         $this->assertArrayHasKey('FooClass', $args);
+        $this->assertEquals('twig.runtime.escaper', $args[EscaperRuntime::class]->getValues()[0]);
         $this->assertEquals('twig.form.renderer', $args[FormRenderer::class]->getValues()[0]);
         $this->assertEquals('foo', $args['FooClass']->getValues()[0]);
     }

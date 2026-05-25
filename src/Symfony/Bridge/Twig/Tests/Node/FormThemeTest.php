@@ -60,10 +60,17 @@ class FormThemeTest extends TestCase
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);
 
+        // cope with various versions of Twig
+        $source = '[1 => "tpl1", 0 => "tpl2"]';
+        if ('["tpl1", "tpl2"]' === (new Compiler($environment))->subcompile($node->getNode('resources'))->getSource()) {
+            $source = '["tpl1", "tpl2"]';
+        }
+
         $this->assertEquals(
             \sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], true);',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, %s, true);',
+                $this->getVariableGetter('form'),
+                $source
             ),
             trim($compiler->compile($node)->getSource())
         );
@@ -72,8 +79,9 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             \sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], false);',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, %s, false);',
+                $this->getVariableGetter('form'),
+                $source
             ),
             trim($compiler->compile($node)->getSource())
         );

@@ -1,0 +1,43 @@
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+       version="2.2" srcLang="en" trgLang="fr">
+    <file id="f1">
+        <unit id="tu1" name="party_host" pgs:switch="gender:host_gender plural:guest_count">
+            <segment id="seg1" pgs:case="feminine 0">
+                <source><ph id="ph1" disp="host_name"/> did not invite anyone to her party.</source>
+                <target><ph id="ph1" disp="host_name"/> n'a invité personne à sa fête.</target>
+            </segment>
+            <segment id="seg2" pgs:case="feminine 1">
+                <source><ph id="ph2" disp="host_name"/> invited one guest to her party.</source>
+                <target><ph id="ph2" disp="host_name"/> a invité un convive à sa fête.</target>
+            </segment>
+            <segment id="seg3" pgs:case="feminine other">
+                <source><ph id="ph3" disp="host_name"/> invited <ph id="ph4" disp="guest_count"/> guests to her party.</source>
+                <target><ph id="ph3" disp="host_name"/> a invité <ph id="ph4" disp="guest_count"/> convives à sa fête.</target>
+            </segment>
+            <segment id="seg4" pgs:case="masculine 0">
+                <source><ph id="ph5" disp="host_name"/> did not invite anyone to his party.</source>
+                <target><ph id="ph5" disp="host_name"/> n'a invité personne à sa fête.</target>
+            </segment>
+            <segment id="seg5" pgs:case="masculine 1">
+                <source><ph id="ph6" disp="host_name"/> invited one guest to his party.</source>
+                <target><ph id="ph6" disp="host_name"/> a invité un convive à sa fête.</target>
+            </segment>
+            <segment id="seg6" pgs:case="masculine other">
+                <source><ph id="ph7" disp="host_name"/> invited <ph id="ph8" disp="guest_count"/> guests to his party.</source>
+                <target><ph id="ph7" disp="host_name"/> a invité <ph id="ph8" disp="guest_count"/> convives à sa fête.</target>
+            </segment>
+            <segment id="seg7" pgs:case="other 0">
+                <source><ph id="ph9" disp="host_name"/> did not invite anyone to their party.</source>
+                <target><ph id="ph9" disp="host_name"/> n'a invité personne à leur fête.</target>
+            </segment>
+            <segment id="seg8" pgs:case="other 1">
+                <source><ph id="ph10" disp="host_name"/> invited one guest to their party.</source>
+                <target><ph id="ph10" disp="host_name"/> a invité un convive à leur fête.</target>
+            </segment>
+            <segment id="seg9" pgs:case="other other">
+                <source><ph id="ph11" disp="host_name"/> invited <ph id="ph12" disp="guest_count"/> guests to their party.</source>
+                <target><ph id="ph11" disp="host_name"/> a invité <ph id="ph12" disp="guest_count"/> convives à leur fête.</target>
+            </segment>
+        </unit>
+    </file>
+</xliff>

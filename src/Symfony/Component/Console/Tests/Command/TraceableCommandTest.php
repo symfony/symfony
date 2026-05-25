@@ -16,6 +16,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\TraceableCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithAskCommand;
 use Symfony\Component\Console\Tests\Fixtures\LoopExampleCommand;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -67,6 +68,37 @@ class TraceableCommandTest extends TestCase
         $commandTester = new CommandTester($traceableCommand);
         $commandTester->execute([]);
         $commandTester->assertCommandIsSuccessful();
+    }
+
+    public function testRunOnInvokableCommandWithAskAttribute()
+    {
+        $this->application->addCommand(new InvokableWithAskCommand());
+        $command = $this->application->find('invokable:ask');
+        $traceableCommand = new TraceableCommand($command, new Stopwatch());
+
+        $commandTester = new CommandTester($traceableCommand);
+        $commandTester->setInputs(['World']);
+        $commandTester->execute([], ['interactive' => true]);
+        $commandTester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('What is your name?', $commandTester->getDisplay());
+        self::assertStringContainsString('Hello World', $commandTester->getDisplay());
+    }
+
+    public function testArgumentsCaptureValueSetDuringInteract()
+    {
+        $this->application->addCommand(new InvokableWithAskCommand());
+        $command = $this->application->find('invokable:ask');
+        $traceableCommand = new TraceableCommand($command, new Stopwatch());
+
+        $commandTester = new CommandTester($traceableCommand);
+        $commandTester->setInputs(['Robin']);
+        $commandTester->execute([], ['interactive' => true]);
+        $commandTester->assertCommandIsSuccessful();
+
+        self::assertSame('Robin', $traceableCommand->arguments['name']);
+        self::assertTrue($traceableCommand->isInteractive);
+        self::assertSame(['name' => 'Robin'], $traceableCommand->interactiveInputs);
     }
 
     public function assertLoopOutputCorrectness(string $output)

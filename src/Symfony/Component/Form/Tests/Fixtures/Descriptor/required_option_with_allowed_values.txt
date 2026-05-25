@@ -21,7 +21,6 @@ Symfony\Component\Form\Tests\Console\Descriptor\FooType (foo)
   Normalizers      [         %s
                      Closure(%s
                        class:%s
-                       this: %s
                        file: %s
                        line: %s
                      }       %s

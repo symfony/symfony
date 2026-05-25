@@ -127,6 +127,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
+     * Whether deep merging should occur.
+     */
+    public function shouldPerformDeepMerging(): bool
+    {
+        return $this->performDeepMerging;
+    }
+
+    /**
      * Whether extra keys should just be ignored without an exception.
      *
      * @param bool $boolean To allow extra keys

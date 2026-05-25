@@ -14,7 +14,9 @@ namespace Symfony\Component\Cache\Tests;
 use Cache\IntegrationTests\SimpleCacheTest;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Psr16Cache;
 
@@ -168,6 +170,32 @@ class Psr16CacheTest extends SimpleCacheTest
         $getFileMethod = (new \ReflectionObject($pool))->getMethod('getFile');
 
         return !file_exists($getFileMethod->invoke($pool, $name));
+    }
+
+    public function testGetMultipleWithTagAwareAdapter()
+    {
+        $cache = new Psr16Cache(new TagAwareAdapter(new ArrayAdapter()));
+
+        $cache->set('foo', 'foo-val');
+        $cache->set('bar', 'bar-val');
+
+        $this->assertSame('foo-val', $cache->get('foo'));
+        $this->assertSame('bar-val', $cache->get('bar'));
+
+        $this->assertSame(['foo' => 'foo-val', 'bar' => 'bar-val'], $cache->getMultiple(['foo', 'bar']));
+    }
+
+    public function testGetMultipleWithTtl()
+    {
+        $cache = new Psr16Cache(new ArrayAdapter());
+
+        $cache->set('foo', 'foo-val', 60);
+        $cache->set('bar', 'bar-val', 60);
+
+        $this->assertSame('foo-val', $cache->get('foo'));
+        $this->assertSame('bar-val', $cache->get('bar'));
+
+        $this->assertSame(['foo' => 'foo-val', 'bar' => 'bar-val'], $cache->getMultiple(['foo', 'bar']));
     }
 }
 

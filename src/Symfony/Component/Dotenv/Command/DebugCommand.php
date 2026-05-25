@@ -32,7 +32,7 @@ final class DebugCommand extends Command
 {
     public function __construct(
         private string $kernelEnvironment,
-        private string $projectDirectory,
+        private string $projectDir,
     ) {
         parent::__construct();
     }
@@ -67,29 +67,17 @@ final class DebugCommand extends Command
             return 1;
         }
 
-        if (!$filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? null) {
-            $dotenvPath = $this->projectDirectory;
+        $dotenvPath = $this->getDotenvPath();
 
-            if (is_file($composerFile = $this->projectDirectory.'/composer.json')) {
-                $runtimeConfig = json_decode(file_get_contents($composerFile), true)['extra']['runtime'] ?? [];
-
-                if (isset($runtimeConfig['dotenv_path'])) {
-                    $dotenvPath = $this->projectDirectory.'/'.$runtimeConfig['dotenv_path'];
-                }
-            }
-
-            $filePath = $dotenvPath.'/.env';
-        }
-
-        $envFiles = $this->getEnvFiles($filePath);
+        $envFiles = $this->getEnvFiles($dotenvPath);
         $availableFiles = array_filter($envFiles, 'is_file');
 
-        if (\in_array(\sprintf('%s.local.php', $filePath), $availableFiles, true)) {
-            $io->warning(\sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($filePath)));
+        if (\in_array(\sprintf('%s.local.php', $dotenvPath), $availableFiles, true)) {
+            $io->warning(\sprintf('Due to existing dump file (%s.local.php) all other dotenv files are skipped.', $this->getRelativeName($dotenvPath)));
         }
 
-        if (is_file($filePath) && is_file(\sprintf('%s.dist', $filePath))) {
-            $io->warning(\sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($filePath)));
+        if (is_file($dotenvPath) && is_file(\sprintf('%s.dist', $dotenvPath))) {
+            $io->warning(\sprintf('The file %s.dist gets skipped due to the existence of %1$s.', $this->getRelativeName($dotenvPath)));
         }
 
         $io->section('Scanned Files (in descending priority)');
@@ -165,10 +153,25 @@ final class DebugCommand extends Command
 
     private function getAvailableVars(): array
     {
-        $filePath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? $this->projectDirectory.\DIRECTORY_SEPARATOR.'.env';
-        $envFiles = $this->getEnvFiles($filePath);
+        $envFiles = $this->getEnvFiles($this->getDotenvPath());
 
         return array_keys($this->getVariables(array_filter($envFiles, 'is_file'), null));
+    }
+
+    private function getDotenvPath(): string
+    {
+        $config = [];
+        $projectDir = $this->projectDir;
+
+        if (is_file($projectDir)) {
+            $config = ['dotenv_path' => basename($projectDir)];
+            $projectDir = \dirname($projectDir);
+        }
+
+        $composerFile = $projectDir.'/composer.json';
+        $config += $_SERVER['APP_RUNTIME_OPTIONS'] ?? (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime'] ?? [];
+
+        return $projectDir.'/'.($config['dotenv_path'] ?? '.env');
     }
 
     private function getEnvFiles(string $filePath): array
@@ -194,8 +197,10 @@ final class DebugCommand extends Command
 
     private function getRelativeName(string $filePath): string
     {
-        if (str_starts_with($filePath, $this->projectDirectory)) {
-            return substr($filePath, \strlen($this->projectDirectory) + 1);
+        $projectDir = is_file($this->projectDir) ? \dirname($this->projectDir) : $this->projectDir;
+
+        if (str_starts_with($filePath, $projectDir.'/') || str_starts_with($filePath, $projectDir.\DIRECTORY_SEPARATOR)) {
+            return substr($filePath, \strlen($projectDir) + 1);
         }
 
         return basename($filePath);

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\PdoStore;
@@ -115,6 +116,78 @@ class PdoStoreTest extends AbstractStoreTestCase
             $this->assertTrue($store->exists($key));
         } finally {
             $pdo = new \PDO($dsn);
+            $pdo->exec('DROP TABLE IF EXISTS lock_keys');
+        }
+    }
+
+    #[RequiresPhpExtension('pdo_pgsql')]
+    #[Group('integration')]
+    public function testSaveDoesNotAbortSurroundingPostgresTransactionOnLockContention()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
+        $pdo = new \PDO($dsn);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        $resource = uniqid(__METHOD__, true);
+
+        try {
+            $store = new PdoStore($pdo);
+            $store->createTable();
+
+            $owner = new Key($resource);
+            $store->save($owner);
+
+            $pdo->beginTransaction();
+
+            $contender = new Key($resource);
+            try {
+                $store->save($contender);
+                $this->fail('LockConflictedException was expected.');
+            } catch (LockConflictedException) {
+                // expected
+            }
+
+            $this->assertSame('alive', $pdo->query("SELECT 'alive'")->fetchColumn(), 'The surrounding transaction must remain usable after a lock conflict.');
+            $pdo->rollBack();
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $pdo->exec('DROP TABLE IF EXISTS lock_keys');
+        }
+    }
+
+    #[RequiresPhpExtension('pdo_pgsql')]
+    #[Group('integration')]
+    public function testSavePostgresRefreshesSameKeyInsideTransaction()
+    {
+        if (!$host = getenv('POSTGRES_HOST')) {
+            $this->markTestSkipped('Missing POSTGRES_HOST env variable');
+        }
+
+        $dsn = 'pgsql:host='.$host.';user=postgres;password=password';
+        $pdo = new \PDO($dsn);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        try {
+            $store = new PdoStore($pdo);
+            $store->createTable();
+
+            $key = new Key(uniqid(__METHOD__, true));
+            $store->save($key);
+
+            $pdo->beginTransaction();
+            $store->save($key);
+            $this->assertTrue($store->exists($key));
+            $pdo->rollBack();
+        } finally {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             $pdo->exec('DROP TABLE IF EXISTS lock_keys');
         }
     }

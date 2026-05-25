@@ -103,7 +103,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
         $this->setObject($object);
 
-        $this->validator->validate($comparedValue, $constraint);
+        $this->validate($comparedValue, $constraint);
 
         $this->assertNoViolation();
     }
@@ -114,7 +114,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
         $this->setObject(null);
 
-        $this->validator->validate('some data', $constraint);
+        $this->validate('some data', $constraint);
 
         $this->assertNoViolation();
     }
@@ -130,7 +130,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
 
         $this->setObject($object);
 
-        $this->validator->validate(5, $constraint);
+        $this->validate(5, $constraint);
     }
 
     abstract public static function provideValidComparisons(): array;

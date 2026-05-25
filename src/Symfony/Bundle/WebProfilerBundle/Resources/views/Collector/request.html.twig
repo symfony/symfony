@@ -20,6 +20,10 @@
         .empty-query-post-files .empty {
             margin-bottom: 0;
         }
+        .sf-profiler-request-scrollable {
+            max-height: 500px;
+            overflow-y: auto;
+        }
     </style>
 {% endblock %}
 
@@ -83,7 +87,7 @@
             </div>
 
             <div class="sf-toolbar-info-piece">
-                <b>Stateless Check</b>
+                <b>Stateless check</b>
                 <span>{% if collector.statelesscheck %}yes{% else %}no{% endif %}</span>
             </div>
         </div>
@@ -121,7 +125,7 @@
 
 {% block menu %}
     <span class="label">
-        <span class="icon">{{ source('@WebProfiler/Icon/request.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/request.svg') }}</span>
         <strong>Request / Response</strong>
     </span>
 {% endblock %}
@@ -139,7 +143,7 @@
             <div class="tab-content">
                 {% set has_no_query_post_or_files = collector.requestquery.all is empty and collector.requestrequest.all is empty and collector.requestfiles is empty %}
                 {% if has_no_query_post_or_files %}
-                    <div class="empty-query-post-files" style="display: flex; align-items: stretch">
+                    <div class="empty-query-post-files">
                         <div>
                             <h3>GET Parameters</h3>
                             <div class="empty"><p>None</p></div>
@@ -174,11 +178,11 @@
                         {{ include('@WebProfiler/Profiler/bag.html.twig', {bag: collector.requestrequest, maxDepth: 1}, with_context: false) }}
                     {% endif %}
 
-                    <h4>Uploaded Files</h4>
+                    <h3>Uploaded Files</h3>
 
                     {% if collector.requestfiles is empty %}
                         <div class="empty">
-                            <p>No files were uploaded</p>
+                            <p>No uploaded files</p>
                         </div>
                     {% else %}
                         {{ include('@WebProfiler/Profiler/bag.html.twig', {bag: collector.requestfiles, maxDepth: 1}, with_context: false) }}
@@ -189,7 +193,7 @@
 
                 {% if collector.requestattributes.all is empty %}
                     <div class="empty">
-                        <p>No attributes</p>
+                        <p>No request attributes</p>
                     </div>
                 {% else %}
                     {{ include('@WebProfiler/Profiler/bag.html.twig', {bag: collector.requestattributes}, with_context: false) }}
@@ -211,7 +215,7 @@
                         <div class="tab">
                             <h3 class="tab-title">Pretty</h3>
                             <div class="tab-content">
-                                <div class="card" style="max-height: 500px; overflow-y: auto;">
+                                <div class="card sf-profiler-request-scrollable">
                                     <pre class="break-long-words">{{ prettyJson }}</pre>
                                 </div>
                             </div>
@@ -229,7 +233,15 @@
                     </div>
                 {% else %}
                     <div class="empty">
-                        <p>No content</p>
+                        <p>No request content</p>
+                    </div>
+                {% endif %}
+
+                {% if collector.curlCommand is defined and collector.curlCommand != '' %}
+                    <h3>Retry Command</h3>
+                    <div class="card">
+                        <button class="btn btn-sm hidden" title="Copy as cURL" data-clipboard-text="{{ collector.curlCommand }}">Copy as cURL</button>
+                        <pre class="break-long-words">{{ collector.curlCommand }}</pre>
                     </div>
                 {% endif %}
             </div>
@@ -394,7 +406,7 @@
 
         {% if profile.children|length %}
         <div class="tab">
-            <h3 class="tab-title">Sub Requests <span class="badge">{{ profile.children|length }}</span></h3>
+            <h3 class="tab-title">Sub-Requests <span class="badge">{{ profile.children|length }}</span></h3>
 
             <div class="tab-content">
                 {% for child in profile.children %}

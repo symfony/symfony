@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Bīzingene (Centrāleiropas laiks)',
         'Europe/Chisinau' => 'Kišiņeva (Austrumeiropas laiks)',
         'Europe/Copenhagen' => 'Kopenhāgena (Centrāleiropas laiks)',
-        'Europe/Dublin' => 'Dublina (Laika josla: Īrija)',
+        'Europe/Dublin' => 'Dublina (Griničas laiks)',
         'Europe/Gibraltar' => 'Gibraltārs (Centrāleiropas laiks)',
         'Europe/Guernsey' => 'Gērnsija (Griničas laiks)',
         'Europe/Helsinki' => 'Helsinki (Austrumeiropas laiks)',

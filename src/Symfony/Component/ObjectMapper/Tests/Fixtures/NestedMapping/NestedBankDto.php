@@ -22,4 +22,3 @@ class NestedBankDto
     #[Map(target: 'bankName')]
     public string $name;
 }
-

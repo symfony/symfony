@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Monolog\Tests\Handler;
 
+use Monolog\Handler\TestHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -173,7 +174,6 @@ class ConsoleHandlerTest extends TestCase
     {
         $output = $this->createMock(OutputInterface::class);
         $output
-            ->expects($this->any())
             ->method('getVerbosity')
             ->willReturn(OutputInterface::VERBOSITY_DEBUG)
         ;
@@ -253,5 +253,77 @@ class ConsoleHandlerTest extends TestCase
         $handler->setOutput($output);
         self::assertFalse($handler->isHandling($message), '->isHandling returns false when input is not interactive');
         self::assertTrue($handler->getBubble(), '->getBubble returns true when input is not interactive and interactiveOnly is true');
+    }
+
+    public function testInteractiveOnlyPreventsPropagationWhenInteractive()
+    {
+        $interactiveInput = $this->createStub(InputInterface::class);
+        $interactiveInput->method('isInteractive')->willReturn(true);
+
+        $consoleHandler = new ConsoleHandler(null, true, [], [], true);
+        $consoleHandler->setInput($interactiveInput);
+        $consoleHandler->setOutput(new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE));
+
+        $sibling = new TestHandler();
+        $logger = new Logger('test', [$consoleHandler, $sibling]);
+
+        $logger->warning('hello');
+
+        self::assertFalse(
+            $sibling->hasWarningRecords(),
+            'sibling handler must not receive records when interactive_only is true and input is interactive',
+        );
+    }
+
+    public function testInteractiveOnlyAllowsPropagationWhenNotInteractive()
+    {
+        $nonInteractiveInput = $this->createStub(InputInterface::class);
+        $nonInteractiveInput->method('isInteractive')->willReturn(false);
+
+        $consoleHandler = new ConsoleHandler(null, true, [], [], true);
+        $consoleHandler->setInput($nonInteractiveInput);
+        $consoleHandler->setOutput(new BufferedOutput(OutputInterface::VERBOSITY_VERBOSE));
+
+        $sibling = new TestHandler();
+        $logger = new Logger('test', [$consoleHandler, $sibling]);
+
+        $logger->warning('hello');
+
+        self::assertTrue(
+            $sibling->hasWarningRecords(),
+            'sibling handler must still receive records when interactive_only is true but input is not interactive',
+        );
+    }
+
+    public function testNestedCommandsDoNotCloseHandler()
+    {
+        $output = new BufferedOutput();
+        $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
+
+        $handler = new ConsoleHandler(null, false);
+
+        $logger = new Logger('app');
+        $logger->pushHandler($handler);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber($handler);
+
+        $parentInput = new ArrayInput([]);
+        $subInput = new ArrayInput([]);
+
+        $dispatcher->dispatch(new ConsoleCommandEvent(new Command('messenger:consume'), $parentInput, $output), ConsoleEvents::COMMAND);
+        $logger->info('log from parent');
+        $this->assertStringContainsString('log from parent', $output->fetch());
+
+        $subOutput = new BufferedOutput();
+        $dispatcher->dispatch(new ConsoleCommandEvent(new Command('nested:task'), $subInput, $subOutput), ConsoleEvents::COMMAND);
+        $dispatcher->dispatch(new ConsoleTerminateEvent(new Command('nested:task'), $subInput, $subOutput, Command::SUCCESS), ConsoleEvents::TERMINATE);
+
+        $logger->info('log after sub-command');
+        $this->assertStringContainsString('log after sub-command', $output->fetch(), 'Handler must still be active after nested command terminates');
+
+        // Parent command terminates: handler must be closed now
+        $dispatcher->dispatch(new ConsoleTerminateEvent(new Command('messenger:consume'), $parentInput, $output, Command::SUCCESS), ConsoleEvents::TERMINATE);
+        $this->assertFalse($handler->isHandling(RecordFactory::create(Logger::DEBUG)), 'Handler must be closed after main command terminates');
     }
 }

@@ -13,8 +13,10 @@ namespace Symfony\Bundle\SecurityBundle;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
@@ -118,9 +120,9 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
             throw new LogicException('Unable to login without a request context.');
         }
 
-        $firewallName ??= $this->getFirewallConfig($request)?->getName();
+        $currentFirewallConfig = $this->getFirewallConfig($request);
 
-        if (!$firewallName) {
+        if (!$firewallName ??= $currentFirewallConfig?->getName()) {
             throw new LogicException('Unable to login as the current route is not covered by any firewall.');
         }
 
@@ -129,7 +131,59 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
         $userCheckerLocator = $this->container->get('security.user_checker_locator');
         $userCheckerLocator->get($firewallName)->checkPreAuth($user);
 
-        return $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges, $attributes);
+        $response = $this->container->get('security.authenticator.managers_locator')->get($firewallName)->authenticateUser($user, $authenticator, $request, $badges, $attributes);
+
+        if ($currentFirewallConfig && $firewallName !== $currentFirewallConfig->getName()) {
+            $this->persistTokenInTargetFirewall($request, $firewallName);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Persists the freshly minted token under the target firewall's session key
+     * and prevents the current firewall's ContextListener from overwriting its
+     * own session bucket with a token that belongs to another firewall.
+     */
+    private function persistTokenInTargetFirewall(Request $request, string $firewallName): void
+    {
+        $token = $this->container->get('security.token_storage')->getToken();
+        if (null === $token) {
+            return;
+        }
+
+        $targetConfig = $this->getNamedFirewallConfig($firewallName);
+        if (null === $targetConfig || $targetConfig->isStateless()) {
+            return;
+        }
+
+        if (null === $session = $this->getSessionForWrite($request)) {
+            return;
+        }
+
+        $session->set('_security_'.$targetConfig->getContext(), serialize($token));
+
+        $request->attributes->remove('_security_firewall_run');
+    }
+
+    private function getNamedFirewallConfig(string $firewallName): ?FirewallConfig
+    {
+        if (!$this->container->has('security.firewall_config_locator')) {
+            return null;
+        }
+
+        $locator = $this->container->get('security.firewall_config_locator');
+
+        return $locator->has($firewallName) ? $locator->get($firewallName) : null;
+    }
+
+    private function getSessionForWrite(Request $request): ?SessionInterface
+    {
+        try {
+            return $request->getSession();
+        } catch (SessionNotFoundException) {
+            return null;
+        }
     }
 
     /**

@@ -16,11 +16,11 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "composer-runtime-api": ">=2.1",
         "symfony/config": "^7.4|^8.0",
         "symfony/framework-bundle": "^7.4|^8.0",
-        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/http-kernel": "^8.1",
         "symfony/routing": "^7.4|^8.0",
         "symfony/twig-bundle": "^7.4|^8.0"
     },

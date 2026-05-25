@@ -14,10 +14,14 @@ namespace Symfony\Bundle\DebugBundle\Tests\DependencyInjection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\DebugBundle\DebugBundle;
+use Symfony\Bundle\DebugBundle\DependencyInjection\Compiler\DumpDataCollectorPass;
 use Symfony\Bundle\DebugBundle\DependencyInjection\DebugExtension;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
@@ -104,6 +108,33 @@ class DebugExtensionTest extends TestCase
         $cliDumper = $container->get('cli_dumper_public');
         $this->assertInstanceOf(CliDumper::class, $cliDumper);
         $this->assertSame($expectedOutput, $container->findDefinition('cli_dumper_public')->getArgument(0));
+    }
+
+    public function testRuntimeModeIsNotSetIfParameterDoesNotExist()
+    {
+        $kernel = new class('dev', true) extends Kernel {
+            public function registerBundles(): iterable
+            {
+                return [];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            public function getKernelParameters(): array
+            {
+                return parent::getKernelParameters();
+            }
+        };
+        $container = new ContainerBuilder();
+        $container->getParameterBag()->add($kernel->getKernelParameters());
+        $container->registerExtension(new DebugExtension());
+        $container->loadFromExtension('debug', []);
+        $container->addCompilerPass(new DumpDataCollectorPass());
+        $this->compileContainer($container);
+
+        $this->assertInstanceOf(DumpDataCollector::class, $container->get('data_collector.dump'));
     }
 
     private function createContainer()

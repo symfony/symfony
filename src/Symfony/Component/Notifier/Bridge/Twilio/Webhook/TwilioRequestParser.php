@@ -38,6 +38,10 @@ final class TwilioRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
+        if ('' !== $secret) {
+            $this->verifySignature($request, $payload, $secret);
+        }
+
         $name = match ($payload['MessageStatus']) {
             'delivered' => SmsEvent::DELIVERED,
             'failed' => SmsEvent::FAILED,
@@ -50,7 +54,7 @@ final class TwilioRequestParser extends AbstractRequestParser
             'receiving' => null,
             'received' => null,
             'scheduled' => null,
-            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['event'])),
+            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['MessageStatus'])),
         };
         if (!$name) {
             return null;
@@ -59,5 +63,31 @@ final class TwilioRequestParser extends AbstractRequestParser
         $event->setRecipientPhone($payload['To']);
 
         return $event;
+    }
+
+    /**
+     * Validates the X-Twilio-Signature header against the documented scheme:
+     * HMAC-SHA1 over the full request URL concatenated with the POST parameters
+     * sorted alphabetically by key (key1.value1.key2.value2...), then base64-encoded.
+     *
+     * @see https://www.twilio.com/docs/usage/webhooks/webhooks-security
+     */
+    private function verifySignature(Request $request, array $payload, #[\SensitiveParameter] string $secret): void
+    {
+        if (!$signature = $request->headers->get('X-Twilio-Signature')) {
+            throw new RejectWebhookException(406, 'Missing signature header.');
+        }
+
+        ksort($payload);
+        $data = $request->getUri();
+        foreach ($payload as $key => $value) {
+            $data .= $key.$value;
+        }
+
+        $expected = base64_encode(hash_hmac('sha1', $data, $secret, true));
+
+        if (!hash_equals($expected, $signature)) {
+            throw new RejectWebhookException(406, 'Signature is invalid.');
+        }
     }
 }

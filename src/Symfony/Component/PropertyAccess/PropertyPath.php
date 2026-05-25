@@ -202,4 +202,39 @@ class PropertyPath implements \IteratorAggregate, PropertyPathInterface
 
         return $this->isNullSafe[$index];
     }
+
+    /**
+     * Utility method for dealing with property paths.
+     * For more extensive functionality, use instances of this class.
+     *
+     * Appends a path to a given property path. The dispatch order matches the
+     * code below:
+     *
+     *  1. If the sub path is empty, the base path is returned unchanged.
+     *  2. If the sub path starts with an opening bracket ("["), the two paths
+     *     are concatenated as-is, regardless of whether the base path is empty.
+     *  3. If the base path is empty, the sub path is returned unchanged.
+     *  4. Otherwise, the two paths are joined with a dot (".").
+     *
+     * Both arguments are assumed to be syntactically valid property paths; the
+     * method performs only structural joining and does not validate them.
+     *
+     * @see \Symfony\Component\Validator\Util\PropertyPath::append()
+     */
+    public static function append(string $basePath, string $subPath): string
+    {
+        if ('' === $subPath) {
+            return $basePath;
+        }
+
+        if ('[' === $subPath[0]) {
+            return $basePath.$subPath;
+        }
+
+        if ('' === $basePath) {
+            return $subPath;
+        }
+
+        return $basePath.'.'.$subPath;
+    }
 }

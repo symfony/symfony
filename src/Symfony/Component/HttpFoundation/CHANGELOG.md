@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `BinaryFileResponse::shouldDeleteFileAfterSend()`
+ * Deprecate setting public properties of `Request` and `Response` objects directly; use setters or constructor arguments instead
+ * Add `SessionHasFlashMessage` test constraint
+ * `Response::__construct()` now accepts a `ResponseHeaderBag` as its third argument
+ * `ParameterBag::getInt()` and `ParameterBag::getBoolean()` now throw `UnexpectedValueException` instead of silently returning `0`/`false` when the value cannot be converted
+
 8.0
 ---
 

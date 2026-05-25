@@ -18,7 +18,7 @@ require $vendor.'/vendor/autoload.php';
 (new class extends Command {
     protected function configure(): void
     {
-        $this->addArgument('mode', InputArgument::OPTIONAL, default: 'single');
+        $this->addArgument('mode', InputArgument::OPTIONAL, '', 'single');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

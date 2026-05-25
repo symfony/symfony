@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Mərkəzi Avropa Vaxtı (Büsingen)',
         'Europe/Chisinau' => 'Şərqi Avropa Vaxtı (Kişinyov)',
         'Europe/Copenhagen' => 'Mərkəzi Avropa Vaxtı (Kopenhagen)',
-        'Europe/Dublin' => 'İrlandiya Vaxtı (Dublin)',
+        'Europe/Dublin' => 'Qrinviç Orta Vaxtı (Dublin)',
         'Europe/Gibraltar' => 'Mərkəzi Avropa Vaxtı (Cəbəli-Tariq)',
         'Europe/Guernsey' => 'Qrinviç Orta Vaxtı (Gernzey)',
         'Europe/Helsinki' => 'Şərqi Avropa Vaxtı (Helsinki)',

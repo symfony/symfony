@@ -34,7 +34,7 @@ class DoctrineTransportTest extends TestCase
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->createStub(SerializerInterface::class),
+            $serializer = $this->createMock(SerializerInterface::class),
             $connection = $this->createStub(Connection::class)
         );
 
@@ -46,8 +46,8 @@ class DoctrineTransportTest extends TestCase
             'headers' => ['my' => 'header'],
         ];
 
-        $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
-        $connection->method('get')->willReturn($doctrineEnvelope);
+        $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $connection->method('get')->willReturn([$doctrineEnvelope]);
 
         $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());

@@ -40,18 +40,8 @@ use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
-use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\BackedEnumValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\BuiltinTypeValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\DateTimeValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\DefaultValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\MapInputValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\ServiceValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\UidValueResolver;
-use Symfony\Component\Console\ArgumentResolver\ValueResolver\VariadicValueResolver;
-use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
-use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
@@ -74,14 +64,13 @@ use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('console.error_listener', ErrorListener::class)
-            ->args([
-                service('logger')->nullOnInvalid(),
-            ])
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'console'])
-
         ->set('console.suggest_missing_package_subscriber', SuggestMissingPackageSubscriber::class)
+            ->tag('kernel.event_subscriber')
+
+        ->set('.console.validate_question_input_listener', ValidateQuestionInputListener::class)
+            ->args([
+                service('validator'),
+            ])
             ->tag('kernel.event_subscriber')
 
         ->set('console.command.about', AboutCommand::class)
@@ -138,6 +127,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('console.command.config_debug', ConfigDebugCommand::class)
+            ->args([
+                service('container.env_var_processors_locator'),
+            ])
             ->tag('console.command')
 
         ->set('console.command.config_dump_reference', ConfigDumpReferenceCommand::class)
@@ -153,13 +145,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 null,
                 service('debug.file_link_formatter')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.dotenv_debug', DotenvDebugCommand::class)
-            ->args([
-                param('kernel.environment'),
-                param('kernel.project_dir'),
             ])
             ->tag('console.command')
 
@@ -321,6 +306,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
             ->args([
                 tagged_locator('workflow', 'name'),
+                service('event_dispatcher')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -417,47 +403,5 @@ return static function (ContainerConfigurator $container) {
                 service('console.messenger.application'),
             ])
             ->tag('messenger.message_handler', ['sign' => true])
-
-        ->set('console.argument_resolver', ArgumentResolver::class)
-            ->public()
-            ->args([
-                abstract_arg('argument value resolvers'),
-                abstract_arg('named argument value resolvers'),
-            ])
-
-        ->set('console.argument_resolver.backed_enum', BackedEnumValueResolver::class)
-            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => BackedEnumValueResolver::class])
-
-        ->set('console.argument_resolver.uid', UidValueResolver::class)
-            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => UidValueResolver::class])
-
-        ->set('console.argument_resolver.builtin_type', BuiltinTypeValueResolver::class)
-            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => BuiltinTypeValueResolver::class])
-
-        ->set('console.argument_resolver.datetime', DateTimeValueResolver::class)
-            ->args([
-                service('clock')->nullOnInvalid(),
-            ])
-            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => DateTimeValueResolver::class])
-
-        ->set('console.argument_resolver.map_input', MapInputValueResolver::class)
-            ->args([
-                service('console.argument_resolver.builtin_type'),
-                service('console.argument_resolver.backed_enum'),
-                service('console.argument_resolver.datetime'),
-            ])
-            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => MapInputValueResolver::class])
-
-        ->set('console.argument_resolver.service', ServiceValueResolver::class)
-            ->args([
-                abstract_arg('service locator, set in RegisterCommandArgumentLocatorsPass'),
-            ])
-            ->tag('console.argument_value_resolver', ['priority' => -50, 'name' => ServiceValueResolver::class])
-
-        ->set('console.argument_resolver.default', DefaultValueResolver::class)
-            ->tag('console.argument_value_resolver', ['priority' => -100, 'name' => DefaultValueResolver::class])
-
-        ->set('console.argument_resolver.variadic', VariadicValueResolver::class)
-            ->tag('console.argument_value_resolver', ['priority' => -150, 'name' => VariadicValueResolver::class])
     ;
 };

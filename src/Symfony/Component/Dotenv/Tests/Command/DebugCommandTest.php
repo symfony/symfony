@@ -290,6 +290,14 @@ class DebugCommandTest extends TestCase
 
     private function executeCommand(string $projectDirectory, string $env, array $input = [], ?string $dotenvPath = null): string
     {
+        if (null === $dotenvPath) {
+            unset($_SERVER['APP_RUNTIME_OPTIONS']);
+        } elseif (str_starts_with($dotenvPath, $projectDirectory.'/')) {
+            $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => substr($dotenvPath, \strlen($projectDirectory) + 1)];
+        } else {
+            $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => $dotenvPath];
+        }
+
         $_SERVER['TEST_ENV_KEY'] = $env;
         (new Dotenv('TEST_ENV_KEY'))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');
 

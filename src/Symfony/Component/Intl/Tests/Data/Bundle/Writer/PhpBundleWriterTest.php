@@ -54,7 +54,7 @@ class PhpBundleWriterTest extends TestCase
             ]),
         ]);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/en.php', $this->directory.'/en.php');
+        $this->assertSame(require __DIR__.'/Fixtures/en.php', require $this->directory.'/en.php');
     }
 
     #[RequiresPhpExtension('intl')]
@@ -64,6 +64,6 @@ class PhpBundleWriterTest extends TestCase
 
         $this->writer->write($this->directory, 'en', $bundle);
 
-        $this->assertFileEquals(__DIR__.'/Fixtures/rb.php', $this->directory.'/en.php');
+        $this->assertSame(require __DIR__.'/Fixtures/rb.php', require $this->directory.'/en.php');
     }
 }

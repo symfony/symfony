@@ -613,7 +613,9 @@ class Finder implements \IteratorAggregate, \Countable
     }
 
     /**
-     * Force the use of UNIX paths when recursing directories.
+     * Forces forward slashes as the directory separator in returned paths.
+     *
+     * This is intended for Windows, where the native separator is "\".
      *
      * @return $this
      */

@@ -311,8 +311,44 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame($payload, $event->getPayload());
     }
 
-    private function getRequest(array $data): Request
+    public function testSecretIsRequiredWhenConfigured()
     {
-        return Request::create('/test', 'POST', $data);
+        $this->expectException(RejectWebhookException::class);
+
+        $request = $this->getRequest([
+            'id' => 'webhook-id',
+            'name' => 'sms.delivery',
+            'data' => ['id' => '123', 'status_code' => 100],
+        ]);
+        $this->parser->parse($request, 'shared-secret');
+    }
+
+    public function testSecretMismatchIsRejected()
+    {
+        $this->expectException(RejectWebhookException::class);
+
+        $request = $this->getRequest([
+            'id' => 'webhook-id',
+            'name' => 'sms.delivery',
+            'data' => ['id' => '123', 'status_code' => 100],
+        ], ['HTTP_X-LOX24-Token' => 'wrong']);
+        $this->parser->parse($request, 'shared-secret');
+    }
+
+    public function testSecretMatchIsAccepted()
+    {
+        $request = $this->getRequest([
+            'id' => 'webhook-id',
+            'name' => 'sms.delivery',
+            'data' => ['id' => '123', 'status_code' => 100],
+        ], ['HTTP_X-LOX24-Token' => 'shared-secret']);
+
+        $event = $this->parser->parse($request, 'shared-secret');
+        $this->assertInstanceOf(SmsEvent::class, $event);
+    }
+
+    private function getRequest(array $data, array $server = []): Request
+    {
+        return Request::create('/test', 'POST', $data, [], [], $server);
     }
 }

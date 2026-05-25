@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Http\Tests\Authentication;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,7 +36,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
     {
         $this->session = new Session(new MockArraySessionStorage());
         $this->request = Request::create('https://localhost/');
-        $this->request->attributes = new ParameterBag(['_stateless' => false]);
+        $this->request->attributes->replace(['_stateless' => false]);
         $this->request->setSession($this->session);
         $this->exception = new AuthenticationException();
     }
@@ -81,7 +80,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
 
     public function testExceptionIsNotPersistedInSessionOnStatelessRequest()
     {
-        $this->request->attributes = new ParameterBag(['_stateless' => true]);
+        $this->request->attributes->replace(['_stateless' => true]);
 
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
         $handler->onAuthenticationFailure($this->request, $this->exception);

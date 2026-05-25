@@ -99,7 +99,7 @@ final class Key implements \Stringable
     public function __serialize(): array
     {
         if (!$this->serializable) {
-            throw new UnserializableKeyException('The key cannot be serialized.');
+            throw new UnserializableKeyException('The current lock store doesn\'t support serialization of Key objects.');
         }
 
         return [

@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'CTE (waxtu ëroop sàntaraal) (Büsingen)',
         'Europe/Chisinau' => 'EET (waxtu ëroop u penku) (Chișinău)',
         'Europe/Copenhagen' => 'CTE (waxtu ëroop sàntaraal) (Copenhagen)',
-        'Europe/Dublin' => 'Irlànd (Dublin)',
+        'Europe/Dublin' => 'GMT (waxtu Greenwich) (Dublin)',
         'Europe/Gibraltar' => 'CTE (waxtu ëroop sàntaraal) (Gibraltar)',
         'Europe/Guernsey' => 'GMT (waxtu Greenwich) (Guernsey)',
         'Europe/Helsinki' => 'EET (waxtu ëroop u penku) (Helsinki)',

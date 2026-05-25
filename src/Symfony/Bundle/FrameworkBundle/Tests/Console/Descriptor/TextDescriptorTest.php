@@ -50,7 +50,16 @@ class TextDescriptorTest extends AbstractDescriptorTestCase
     public function testDescribeRouteWithControllerLink(Route $route, $expectedDescription, $file)
     {
         static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
-        parent::testDescribeRoute($route, str_replace('[:file:]', __FILE__, $expectedDescription), $file);
+        $expectedDescription = str_replace('[:file:]', __FILE__, $expectedDescription);
+        $expectedDescription = str_replace('[:line:]', (new \ReflectionMethod(MyController::class, '__invoke'))->getStartLine(), $expectedDescription);
+        parent::testDescribeRoute($route, $expectedDescription, $file);
+    }
+
+    protected function normalizeOutput(string $output): string
+    {
+        $output = str_replace(\PHP_EOL, "\n", $output);
+
+        return preg_replace_callback("/\e\[([0-9]+)X\e\[([0-9]+)C/", static fn ($m) => str_repeat(' ', $m[1]), $output);
     }
 }
 

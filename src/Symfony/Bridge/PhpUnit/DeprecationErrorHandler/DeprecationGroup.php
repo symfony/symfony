@@ -35,7 +35,7 @@ final class DeprecationGroup
         $this->addNotice();
     }
 
-    public function addNotice()
+    public function addNotice(): void
     {
         ++$this->count;
     }

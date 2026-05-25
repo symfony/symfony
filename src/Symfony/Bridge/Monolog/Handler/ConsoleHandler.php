@@ -54,6 +54,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     ];
 
     private ?InputInterface $input = null;
+    private int $nestedCommandDepth = 0;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -96,9 +97,13 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
 
     public function handle(LogRecord $record): bool
     {
-        // we have to update the logging level each time because the verbosity of the
-        // console output might have changed in the meantime (it is not immutable)
-        return $this->updateLevel() && parent::handle($record);
+        if (!$this->isHandling($record)) {
+            return false;
+        }
+
+        parent::handle($record);
+
+        return !$this->getBubble();
     }
 
     public function setInput(InputInterface $input): void
@@ -120,6 +125,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     public function close(): void
     {
         $this->input = null;
+        $this->nestedCommandDepth = 0;
         $this->output = null;
 
         parent::close();
@@ -132,6 +138,10 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     public function onCommand(ConsoleCommandEvent $event): void
     {
         $this->setInput($event->getInput());
+
+        if (1 !== ++$this->nestedCommandDepth) {
+            return;
+        }
 
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
@@ -146,7 +156,9 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
      */
     public function onTerminate(ConsoleTerminateEvent $event): void
     {
-        $this->close();
+        if ($this->nestedCommandDepth && !--$this->nestedCommandDepth) {
+            $this->close();
+        }
     }
 
     public static function getSubscribedEvents(): array

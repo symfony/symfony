@@ -2,6 +2,7 @@ name: Twig CS Fixer
 
 on:
   push:
+    branches: [ '*.*' ]
     paths:
       - '**.twig'
   pull_request:

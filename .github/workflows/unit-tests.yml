@@ -1,7 +1,7 @@
 name: Unit Tests
 
 on:
-  push:
+  push: { branches: [ '*.*' ] }
   pull_request:
 
 defaults:
@@ -47,7 +47,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           coverage: "none"
-          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
+          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1,intl.default_locale=en,intl.error_level=0
           php-version: "${{ matrix.php }}"
           extensions: "${{ matrix.extensions || env.extensions }}"
           tools: flex
@@ -237,8 +237,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.4.0-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.4.1-pcntl-sigchild.tar.bz2
           cd ..
 
           mkdir -p /opt/php/lib

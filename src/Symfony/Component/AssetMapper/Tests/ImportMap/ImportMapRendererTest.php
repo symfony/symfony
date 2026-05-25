@@ -133,13 +133,30 @@ class ImportMapRendererTest extends TestCase
         $html = $renderer->render([]);
         $this->assertStringContainsString('<script type="importmap" something data-turbo-track="reload">', $html);
         $this->assertStringContainsString('<script something data-turbo-track="reload">', $html);
-        $this->assertStringContainsString(<<<EOTXT
-                script.src = 'https://polyfillUrl.example';
-                script.setAttribute('something', 'something');
-                script.setAttribute('data-turbo-track', 'reload');
-            EOTXT,
-            $html
-        );
+        $this->assertStringContainsString("script.src = 'https://polyfillUrl.example';", $html);
+        $this->assertStringContainsString("script.setAttribute('something', 'something');", $html);
+        $this->assertStringContainsString("script.setAttribute('data-turbo-track', 'reload');", $html);
+    }
+
+    public function testPolyfillBodyIsStableAcrossRequestsWithDifferentNonces()
+    {
+        // Two renders with distinct CSP nonces must produce byte-identical HTML except for the
+        // literal `nonce="..."` attribute on the wrapper <script> tags. Anything else differing
+        // means the per-request value leaked into the rendered body and would break Turbo's
+        // <head> element signature check plus any body-keyed HTTP cache.
+        $renderer1 = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', 'es-module-shims');
+        $renderer2 = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', 'es-module-shims');
+
+        $html1 = $renderer1->render([], ['nonce' => 'aaaaaaaa']);
+        $html2 = $renderer2->render([], ['nonce' => 'bbbbbbbb']);
+
+        $stripWrapperNonce = static fn (string $html): string => preg_replace('/ nonce="[^"]*"/', '', $html);
+        $this->assertSame($stripWrapperNonce($html1), $stripWrapperNonce($html2));
+
+        // Sanity-check that the runtime propagation hook is in the rendered body, otherwise CSP
+        // would block the dynamically-created polyfill <script> on strict policies without
+        // 'strict-dynamic'.
+        $this->assertStringContainsString('document.currentScript?.nonce', $html1);
     }
 
     public function testWithEntrypoint()

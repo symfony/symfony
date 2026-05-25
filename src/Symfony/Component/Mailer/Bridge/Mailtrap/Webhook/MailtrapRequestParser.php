@@ -42,6 +42,16 @@ final class MailtrapRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null
     {
+        if ($secret) {
+            if (!$signature = $request->headers->get('Mailtrap-Signature')) {
+                throw new RejectWebhookException(406, 'Signature is required.');
+            }
+
+            if (!hash_equals(hash_hmac('sha256', $request->getContent(), $secret), $signature)) {
+                throw new RejectWebhookException(406, 'Signature is wrong.');
+            }
+        }
+
         $payload = $request->toArray();
 
         if (

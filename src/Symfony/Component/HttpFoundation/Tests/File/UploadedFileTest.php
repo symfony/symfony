@@ -120,6 +120,32 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(\UPLOAD_ERR_OK, $file->getError());
     }
 
+    public function testInvalidFile()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+        );
+
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('The file "original.gif" was not uploaded due to an unknown error.');
+
+        $file->move(__DIR__.'/Fixtures/directory');
+    }
+
+    public function testNoErrorMessageIfErrorIsUploadErrOk()
+    {
+        $file = new UploadedFile(
+            __DIR__.'/Fixtures/test.gif',
+            'original.gif',
+            'image/gif',
+            null
+        );
+
+        $this->assertSame('', $file->getErrorMessage());
+    }
+
     public function testGetClientOriginalName()
     {
         $file = new UploadedFile(

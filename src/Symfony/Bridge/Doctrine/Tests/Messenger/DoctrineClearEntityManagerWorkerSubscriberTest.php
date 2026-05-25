@@ -31,7 +31,6 @@ class DoctrineClearEntityManagerWorkerSubscriberTest extends MiddlewareTestCase
         $managerRegistry = $this->createStub(ManagerRegistry::class);
         $managerRegistry
             ->method('getManagers')
-            ->with()
             ->willReturn([$entityManager1, $entityManager2]);
 
         $subscriber = new DoctrineClearEntityManagerWorkerSubscriber($managerRegistry);

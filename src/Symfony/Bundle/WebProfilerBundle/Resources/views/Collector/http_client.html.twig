@@ -60,7 +60,7 @@
 
 {% block menu %}
 <span class="label {{ collector.requestCount == 0 ? 'disabled' }}">
-    <span class="icon">{{ source('@WebProfiler/Icon/http-client.svg') }}</span>
+    <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/http-client.svg') }}</span>
     <strong>HTTP Client</strong>
     {% if collector.requestCount %}
         <span class="count">

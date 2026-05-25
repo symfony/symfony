@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
@@ -24,6 +25,8 @@ use Symfony\Component\Form\Test\FormPerformanceTestCase;
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
+#[IgnoreDeprecations]
+#[Group('doctrine-dbal-workaround')]
 class EntityTypePerformanceTest extends FormPerformanceTestCase
 {
     private const ENTITY_CLASS = SingleIntIdEntity::class;

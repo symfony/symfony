@@ -131,11 +131,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testClosureCasterExcludingVerbosity()
     {
-        $var = function &($a = 123) {
-            \assert(null !== $this);
-        };
+        $var = static function &($a = 5) {};
 
-        $this->assertDumpEquals('Closure&($a = 123) { …5}', $var, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals('Closure&($a = 5) { …4}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()
@@ -372,16 +370,13 @@ class ReflectionCasterTest extends TestCase
 
     public function testReturnType()
     {
-        $f = function (): int {
-            \assert(null !== $this);
-        };
+        $f = static function (): int {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
                 Closure(): int {
                   returnType: "int"
                   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
-                  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
                   file: "%s"
                   line: "%s"
                 }
@@ -392,16 +387,13 @@ class ReflectionCasterTest extends TestCase
 
     public function testMixedReturnType()
     {
-        $f = function (): mixed {
-            \assert(null !== $this);
-        };
+        $f = static function (): mixed {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
                 Closure(): mixed {
                   returnType: "mixed"
                   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
-                  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
                   file: "%s"
                   line: "%s"
                 }
@@ -429,16 +421,13 @@ class ReflectionCasterTest extends TestCase
 
     public function testUnionReturnType()
     {
-        $f = function (): int|float {
-            \assert(null !== $this);
-        };
+        $f = static function (): int|float {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
                 Closure(): int|float {
                   returnType: "int|float"
                   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
-                  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
                   file: "%s"
                   line: "%s"
                 }
@@ -449,16 +438,13 @@ class ReflectionCasterTest extends TestCase
 
     public function testNullableUnionReturnType()
     {
-        $f = function (): int|float|null {
-            \assert(null !== $this);
-        };
+        $f = static function (): int|float|null {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
                 Closure(): int|float|null {
                   returnType: "int|float|null"
                   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
-                  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
                   file: "%s"
                   line: "%s"
                 }
@@ -547,15 +533,12 @@ class ReflectionCasterTest extends TestCase
 
     public function testNewInInitializer()
     {
-        $f = function ($a = new \stdClass()) {
-            \assert(null !== $this);
-        };
+        $f = static function ($a = new \stdClass()) {};
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
                 Closure(\$a = new stdClass) {
                   class: "Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest"
-                  this: Symfony\Component\VarDumper\Tests\Caster\ReflectionCasterTest { …}
                   file: "%s"
                   line: "%s"
                 }

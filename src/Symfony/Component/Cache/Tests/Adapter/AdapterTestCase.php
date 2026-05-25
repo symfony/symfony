@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Cache\IntegrationTests\CachePoolTest;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\CacheItem;
@@ -304,6 +305,49 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache->clear('foo');
         $this->assertFalse($cache->hasItem('foobar'));
         $this->assertTrue($cache->hasItem('barfoo'));
+    }
+
+    public function testClearPrefixWithUnderscore()
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->clear();
+
+        $cache->save($cache->getItem('DC2_REGION_product_region_key')->set(1));
+        $cache->save($cache->getItem('other_key')->set(2));
+
+        $this->assertTrue($cache->clear('DC2_REGION_'));
+        $this->assertFalse($cache->hasItem('DC2_REGION_product_region_key'));
+        $this->assertTrue($cache->hasItem('other_key'));
+    }
+
+    #[DataProvider('provideInvalidPrefixes')]
+    public function testClearWithInvalidPrefix(string $prefix)
+    {
+        if (isset($this->skippedTests[__FUNCTION__])) {
+            $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
+        }
+
+        $cache = $this->createCachePool(0, __FUNCTION__);
+        $cache->clear();
+
+        $cache->save($cache->getItem('foobar')->set(1));
+
+        $this->assertFalse($cache->clear($prefix));
+        $this->assertTrue($cache->hasItem('foobar'));
+    }
+
+    public static function provideInvalidPrefixes(): iterable
+    {
+        yield 'single quote' => ["foo' OR 1=1; --"];
+        yield 'percent wildcard' => ['foo%'];
+        yield 'space' => ['foo bar'];
+        yield 'null byte' => ["foo\0bar"];
+        yield 'backslash' => ['foo\\bar'];
+        yield 'slash' => ['foo/bar'];
     }
 
     public function testWeirdDataMatchingMetadataWrappedValues()

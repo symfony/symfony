@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/property-info": "^7.4.4|^8.0.4"
     },
     "require-dev": {

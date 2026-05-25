@@ -55,8 +55,9 @@ class HttpCacheTest extends HttpCacheTestCase
     {
         $terminateEvents = [];
 
-        $eventDispatcher = $this->createStub(EventDispatcher::class);
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher
+            ->expects($this->atLeastOnce())
             ->method('dispatch')
             ->with($this->callback(static function ($event) use (&$terminateEvents) {
                 if ($event instanceof TerminateEvent) {
@@ -94,6 +95,47 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->cache->terminate($this->request, $this->response);
 
         $this->assertCount(1, $terminateEvents);
+    }
+
+    #[DataProvider('provideTerminateBackendRequestCases')]
+    public function testTerminateUsesBackendRequestOnCacheMiss(string $method, string $expectedMethod)
+    {
+        $terminateEvents = [];
+
+        $eventDispatcher = $this->createStub(EventDispatcher::class);
+        $eventDispatcher
+            ->method('dispatch')
+            ->willReturnCallback(static function ($event) use (&$terminateEvents) {
+                if ($event instanceof TerminateEvent) {
+                    $terminateEvents[] = $event;
+                }
+
+                return $event;
+            });
+
+        $this->setNextResponse(
+            200,
+            ['Cache-Control' => 'public, s-maxage=60'],
+            'Hello World',
+            static function (Request $request): void {
+                $request->attributes->set('terminate_attribute', 'present');
+            },
+            $eventDispatcher
+        );
+
+        $this->request($method, '/');
+        $this->cache->terminate($this->request, $this->response);
+
+        $this->assertCount(1, $terminateEvents);
+        $this->assertSame($expectedMethod, $terminateEvents[0]->getRequest()->getMethod());
+        $this->assertSame('present', $terminateEvents[0]->getRequest()->attributes->get('terminate_attribute'));
+    }
+
+    public static function provideTerminateBackendRequestCases(): iterable
+    {
+        yield 'GET is forwarded as-is' => ['GET', 'GET'];
+        // HEAD requests are forwarded to the backend as GET sub-requests
+        yield 'HEAD is forwarded as GET' => ['HEAD', 'GET'];
     }
 
     public function testPassesOnNonGetHeadRequests()

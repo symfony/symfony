@@ -16,6 +16,13 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
 /**
  * Represents an already serialized parsed expression.
  *
+ * The serialized form passed to the constructor MUST come from a trusted source:
+ * by contract, callers are expected to serialize their own ParsedExpression
+ * instances and to keep the resulting bytes under their control. This class
+ * does NOT validate the unserialize() allow-list and will instantiate any
+ * class referenced by the payload. Pass attacker-controlled bytes here at
+ * your peril.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class SerializedParsedExpression extends ParsedExpression

@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'توقيت وسط أوروبا (بوسنغن)',
         'Europe/Chisinau' => 'توقيت شرق أوروبا (تشيسيناو)',
         'Europe/Copenhagen' => 'توقيت وسط أوروبا (كوبنهاغن)',
-        'Europe/Dublin' => 'توقيت أيرلندا (دبلن)',
+        'Europe/Dublin' => 'توقيت غرينتش (دبلن)',
         'Europe/Gibraltar' => 'توقيت وسط أوروبا (جبل طارق)',
         'Europe/Guernsey' => 'توقيت غرينتش (غيرنزي)',
         'Europe/Helsinki' => 'توقيت شرق أوروبا (هلسنكي)',

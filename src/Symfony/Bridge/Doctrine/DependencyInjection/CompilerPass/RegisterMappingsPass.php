@@ -66,7 +66,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
         private readonly array $aliasMap = [],
     ) {
         if ($aliasMap) {
-            trigger_deprecation('symfony/doctrine-bridge', '8.1', 'The property RegisterMappingsPass::$aliasMap is deprecated and will be removed in 9.0. Namespace alias are no longer supported.');
+            trigger_deprecation('symfony/doctrine-bridge', '8.1', 'The property RegisterMappingsPass::$aliasMap is deprecated and will be removed in 9.0. Namespace aliases are no longer supported.');
 
             if (!$configurationPattern || !$registerAliasMethodName) {
                 throw new \InvalidArgumentException('configurationPattern and registerAliasMethodName are required to register namespace alias.');

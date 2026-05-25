@@ -17,7 +17,7 @@ define('LINE_WIDTH', 75);
 
 define('LINE', str_repeat('-', LINE_WIDTH)."\n");
 
-function bailout(string $message)
+function bailout(string $message): void
 {
     echo wordwrap($message, LINE_WIDTH)." Aborting.\n";
 

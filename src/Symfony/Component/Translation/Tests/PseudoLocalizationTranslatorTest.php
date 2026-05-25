@@ -77,6 +77,28 @@ final class PseudoLocalizationTranslatorTest extends TestCase
             'brackets' => false,
         ], $options);
     }
+
+    public function testTransDoesNotResolveExternalEntities()
+    {
+        $networkLoads = [];
+        libxml_set_external_entity_loader(static function (?string $public, string $system, array $context) use (&$networkLoads) {
+            if (preg_match('#^(?:https?|ftp)://#i', $system)) {
+                $networkLoads[] = $system;
+            }
+
+            return null;
+        });
+
+        try {
+            $translator = new PseudoLocalizationTranslator(new IdentityTranslator(), ['parse_html' => true]);
+            $output = $translator->trans('<!DOCTYPE html SYSTEM "http://127.0.0.1:1/payload.dtd"><p>hi</p>');
+        } finally {
+            libxml_set_external_entity_loader(null);
+        }
+
+        $this->assertSame([], $networkLoads, 'PseudoLocalizationTranslator must not resolve external entities over the network.');
+        $this->assertIsString($output);
+    }
 }
 
 // @php-cs-fixer-ignore random_api_migration As logic is coupled with mt_rand() in src

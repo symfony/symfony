@@ -105,6 +105,7 @@ return [
         'Europe/Berlin' => 'ꄓꇩꄮꈉ（Berlin）',
         'Europe/Brussels' => 'ꀘꆹꏃꄮꈉ（Brussels）',
         'Europe/Busingen' => 'ꄓꇩꄮꈉ（Büsingen）',
+        'Europe/Dublin' => 'ꋧꃅꎕꏦꄮꈉ（Dublin）',
         'Europe/Guernsey' => 'ꋧꃅꎕꏦꄮꈉ（Guernsey）',
         'Europe/Isle_of_Man' => 'ꋧꃅꎕꏦꄮꈉ（Isle of Man）',
         'Europe/Jersey' => 'ꋧꃅꎕꏦꄮꈉ（Jersey）',

@@ -256,6 +256,12 @@ class TextPart extends AbstractPart
 
     public function __unserialize(array $data): void
     {
+        foreach (['charset', 'subtype', 'disposition', 'name', 'encoding'] as $prop) {
+            if (($data[$prop] ?? $data["\0".self::class."\0".$prop] ?? $data["\0*\0".$prop] ?? null) instanceof \Stringable) {
+                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+            }
+        }
+
         if ($headers = $data['_headers'] ?? $data["\0*\0_headers"] ?? null) {
             parent::__unserialize(['headers' => $headers]);
         }

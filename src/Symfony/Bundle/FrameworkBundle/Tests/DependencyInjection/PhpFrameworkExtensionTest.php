@@ -12,12 +12,16 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
+use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -296,12 +300,14 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             'policy' => 'fixed_window',
             'limit' => 10,
             'interval' => '1 hour',
+            'anchor_at' => null,
             'id' => 'first',
         ], $container->getDefinition('limiter.first')->getArgument(0));
         $this->assertSame([
             'policy' => 'sliding_window',
             'limit' => 10,
             'interval' => '1 hour',
+            'anchor_at' => null,
             'id' => 'second',
         ], $container->getDefinition('limiter.second')->getArgument(0));
 
@@ -349,6 +355,25 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
+    public function testRateLimiterAnchorAtRequiresMonthlyOrYearlyInterval()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "anchor_at" option requires an "interval" of at least one month.');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'sub_month' => [
+                        'policy' => 'fixed_window',
+                        'limit' => 10,
+                        'interval' => '1 hour',
+                        'anchor_at' => '2024-01-01 00:00:00 UTC',
+                    ],
+                ],
+            ]);
+        });
+    }
+
     #[DataProvider('emailValidationModeProvider')]
     public function testValidatorEmailValidationMode(string $mode)
     {
@@ -370,8 +395,12 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
     }
 
-    public function testMessengerSigningSerializerWiring()
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyMessengerSigningSerializerWiring()
     {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
+
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->register('signed_handler', 'stdClass')
                 ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
@@ -398,6 +427,112 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $this->assertTrue($container->hasDefinition('message_bus'));
         $this->assertSame('message_bus', (string) $container->getAlias('messenger.default_bus'));
+    }
+
+    public function testMessengerSigningSerializerWiring()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('signed_handler', 'stdClass')
+                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
+
+            $container->loadFromExtension('framework', [
+                'messenger' => [
+                    'transports' => [
+                        'async' => ['dsn' => 'in-memory://'],
+                    ],
+                    'routing' => [
+                        DummyMessage::class => ['async'],
+                    ],
+                    'buses' => [
+                        'message_bus' => ['default_middleware' => ['enabled' => true]],
+                    ],
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
+        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
+        $this->assertArrayHasKey(DummyMessage::class, $mapping);
+        $this->assertNotEmpty($mapping[DummyMessage::class]);
+
+        $this->assertTrue($container->hasDefinition('message_bus'));
+        $this->assertSame('message_bus', (string) $container->getAlias('messenger.default_bus'));
+    }
+
+    public function testMessengerSigningSerializerWiringForUnroutedMessages()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('signed_handler', 'stdClass')
+                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
+
+            $container->loadFromExtension('framework', [
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'messenger' => [
+                    'transports' => [
+                        'async' => ['dsn' => 'in-memory://'],
+                    ],
+                    'routing' => [],
+                    'buses' => [
+                        'message_bus' => ['default_middleware' => ['enabled' => true]],
+                    ],
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
+        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
+        $this->assertArrayHasKey('*', $mapping);
+        $this->assertContains('messenger.default_serializer', $mapping['*']);
+    }
+
+    public function testMailerWebhookProdExcludesLocalhost()
+    {
+        if (!\defined(BrevoRequestParser::class.'::PROVIDER_IPS') || !\defined(PostmarkRequestParser::class.'::PROVIDER_IPS')) {
+            $this->markTestSkipped('PROVIDER_IPS not available on the installed bridges.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'mailer' => ['dsn' => 'smtp://null'],
+                'webhook' => ['enabled' => true],
+                'http_client' => ['enabled' => true],
+                'serializer' => ['enabled' => true],
+            ]);
+        });
+
+        foreach (['mailer.webhook.request_parser.brevo', 'mailer.webhook.request_parser.postmark'] as $service) {
+            $this->assertArrayNotHasKey('$allowedIPs', $container->getDefinition($service)->getArguments());
+        }
+    }
+
+    public function testMailerWebhookDebugAddsLocalhost()
+    {
+        if (!\defined(BrevoRequestParser::class.'::PROVIDER_IPS') || !\defined(PostmarkRequestParser::class.'::PROVIDER_IPS')) {
+            $this->markTestSkipped('PROVIDER_IPS not available on the installed bridges.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'mailer' => ['dsn' => 'smtp://null'],
+                'webhook' => ['enabled' => true],
+                'http_client' => ['enabled' => true],
+                'serializer' => ['enabled' => true],
+            ]);
+        }, ['kernel.debug' => true]);
+
+        $this->assertSame(
+            [...BrevoRequestParser::PROVIDER_IPS, '127.0.0.1'],
+            $container->getDefinition('mailer.webhook.request_parser.brevo')->getArgument('$allowedIPs')
+        );
+        $this->assertSame(
+            [...PostmarkRequestParser::PROVIDER_IPS, '127.0.0.1'],
+            $container->getDefinition('mailer.webhook.request_parser.postmark')->getArgument('$allowedIPs')
+        );
     }
 }
 

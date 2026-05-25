@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Oge Mpaghara Etiti Europe (Büsingen)',
         'Europe/Chisinau' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Chișinău)',
         'Europe/Copenhagen' => 'Oge Mpaghara Etiti Europe (Copenhagen)',
-        'Europe/Dublin' => 'Oge Ireland (Dublin)',
+        'Europe/Dublin' => 'Oge Mpaghara Greemwich Mean (Dublin)',
         'Europe/Gibraltar' => 'Oge Mpaghara Etiti Europe (Gibraltar)',
         'Europe/Guernsey' => 'Oge Mpaghara Greemwich Mean (Guernsey)',
         'Europe/Helsinki' => 'Oge Mpaghara Ọwụwa Anyanwụ Europe (Helsinki)',

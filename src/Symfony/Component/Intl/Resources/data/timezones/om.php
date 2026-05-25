@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Sa’aatii Awurooppaa Gidduugaleessaa (Büsingen)',
         'Europe/Chisinau' => 'Saaatii Awurooppaa Bahaa (Chișinău)',
         'Europe/Copenhagen' => 'Sa’aatii Awurooppaa Gidduugaleessaa (Copenhagen)',
-        'Europe/Dublin' => 'Sa’aatii Ayeerlaand (Dublin)',
+        'Europe/Dublin' => 'Sa’aatii Giriinwiich Gidduugaleessaa (Dublin)',
         'Europe/Gibraltar' => 'Sa’aatii Awurooppaa Gidduugaleessaa (Gibraltar)',
         'Europe/Guernsey' => 'Sa’aatii Giriinwiich Gidduugaleessaa (Guernsey)',
         'Europe/Helsinki' => 'Saaatii Awurooppaa Bahaa (Helsinki)',

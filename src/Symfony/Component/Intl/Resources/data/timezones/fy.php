@@ -342,7 +342,7 @@ return [
         'Europe/Busingen' => 'Midden-Europeeske tiid (Büsingen)',
         'Europe/Chisinau' => 'East-Europeeske tiid (Chișinău)',
         'Europe/Copenhagen' => 'Midden-Europeeske tiid (Kopenhagen)',
-        'Europe/Dublin' => 'Ierlân-tiid (Dublin)',
+        'Europe/Dublin' => 'Greenwich Mean Time (Dublin)',
         'Europe/Gibraltar' => 'Midden-Europeeske tiid (Gibraltar)',
         'Europe/Guernsey' => 'Greenwich Mean Time (Guernsey)',
         'Europe/Helsinki' => 'East-Europeeske tiid (Helsinki)',

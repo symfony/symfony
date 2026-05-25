@@ -123,10 +123,6 @@ abstract class HttpCacheTestCase extends TestCase
             $this->cacheConfig['debug'] = true;
         }
 
-        if (!isset($this->cacheConfig['terminate_on_cache_hit'])) {
-            $this->cacheConfig['terminate_on_cache_hit'] = false;
-        }
-
         $this->esi = $esi ? new Esi() : null;
         $this->cache = new HttpCache($this->kernel, $this->store, $this->esi, $this->cacheConfig);
         $this->request = Request::create($uri, $method, [], $cookies, [], $server);

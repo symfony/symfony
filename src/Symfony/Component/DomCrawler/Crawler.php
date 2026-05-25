@@ -193,7 +193,9 @@ class Crawler implements \Countable, \IteratorAggregate
      * and then, get the errors via libxml_get_errors(). Be
      * sure to clear errors with libxml_clear_errors() afterward.
      *
-     * @param int $options Bitwise OR of the libxml option constants
+     * @param int $options Bitwise OR of the libxml option constants;
+     *                     `LIBXML_NONET` is always added to the options to prevent
+     *                     network requests for external entities.
      *                     LIBXML_PARSEHUGE is dangerous, see
      *                     http://symfony.com/blog/security-release-symfony-2-0-17-released
      */
@@ -207,10 +209,9 @@ class Crawler implements \Countable, \IteratorAggregate
         $internalErrors = libxml_use_internal_errors(true);
 
         $dom = new \DOMDocument('1.0', $charset);
-        $dom->validateOnParse = true;
 
         if ('' !== trim($content)) {
-            @$dom->loadXML($content, $options);
+            @$dom->loadXML($content, $options | \LIBXML_NONET);
         }
 
         libxml_use_internal_errors($internalErrors);
@@ -303,6 +304,8 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @template R of mixed
      *
+     * @param-immediately-invoked-callable $closure
+     *
      * @param \Closure(static, int):R $closure
      *
      * @return list<R> An array of values returned by the anonymous function
@@ -329,6 +332,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Reduces the list of nodes by calling an anonymous function.
      *
      * To remove a node from the list, the anonymous function must return false.
+     *
+     * @param-immediately-invoked-callable $closure
      *
      * @param \Closure(static, int):bool $closure
      */

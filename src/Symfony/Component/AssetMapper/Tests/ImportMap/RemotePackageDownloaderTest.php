@@ -43,10 +43,10 @@ class RemotePackageDownloaderTest extends TestCase
         $packageResolver = $this->createMock(PackageResolverInterface::class);
         $remotePackageStorage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
 
-        $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'foo', isEntrypoint: false);
-        $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'bar.js/file', isEntrypoint: false);
-        $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'baz', isEntrypoint: false);
-        $entry4 = ImportMapEntry::createRemote('different_specifier', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'custom_specifier', isEntrypoint: false);
+        $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/any', '1.0.0', 'foo', false);
+        $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, '/any', '1.0.0', 'bar.js/file', false);
+        $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, '/any', '1.0.0', 'baz', false);
+        $entry4 = ImportMapEntry::createRemote('different_specifier', ImportMapType::JS, '/any', '1.0.0', 'custom_specifier', false);
         $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3, $entry4]);
 
         $configReader->expects($this->once())
@@ -113,15 +113,15 @@ class RemotePackageDownloaderTest extends TestCase
         $packageResolver = $this->createMock(PackageResolverInterface::class);
 
         // matches installed version and file exists
-        $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'foo', isEntrypoint: false);
+        $entry1 = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/any', '1.0.0', 'foo', false);
         $this->filesystem->dumpFile(self::$writableRoot.'/assets/vendor/foo/foo.index.js', 'original foo content');
         // matches installed version but file does not exist
-        $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'bar.js/file', isEntrypoint: false);
+        $entry2 = ImportMapEntry::createRemote('bar.js/file', ImportMapType::JS, '/any', '1.0.0', 'bar.js/file', false);
         // does not match installed version
-        $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, path: '/any', version: '1.1.0', packageModuleSpecifier: 'baz', isEntrypoint: false);
+        $entry3 = ImportMapEntry::createRemote('baz', ImportMapType::CSS, '/any', '1.1.0', 'baz', false);
         $this->filesystem->dumpFile(self::$writableRoot.'/assets/vendor/baz/baz.index.css', 'original baz content');
         // matches installed & file exists, but has missing extra file
-        $entry4 = ImportMapEntry::createRemote('has-missing-extra', ImportMapType::JS, path: '/any', version: '1.0.0', packageModuleSpecifier: 'has-missing-extra', isEntrypoint: false);
+        $entry4 = ImportMapEntry::createRemote('has-missing-extra', ImportMapType::JS, '/any', '1.0.0', 'has-missing-extra', false);
         $importMapEntries = new ImportMapEntries([$entry1, $entry2, $entry3, $entry4]);
 
         $configReader->expects($this->once())

@@ -22,6 +22,7 @@ return [
         'Atlantic/Reykjavik' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Reykjavik)',
         'Atlantic/St_Helena' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (St. Helena)',
         'Etc/GMT' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich',
+        'Europe/Dublin' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Dublin)',
         'Europe/Guernsey' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Guernsey)',
         'Europe/Isle_of_Man' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Isle of Man)',
         'Europe/Jersey' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Jersey)',

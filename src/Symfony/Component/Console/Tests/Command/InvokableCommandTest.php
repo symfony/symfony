@@ -35,6 +35,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithCustomValidatorTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFileAndConstraintsTestCommand;
 
 class InvokableCommandTest extends TestCase
 {
@@ -554,6 +556,42 @@ class InvokableCommandTest extends TestCase
     public function getSuggestedRoles(CompletionInput $input): array
     {
         return ['ROLE_ADMIN', 'ROLE_USER'];
+    }
+
+    public function testAskWithInputFileAndConstraints()
+    {
+        if (!\extension_loaded('fileinfo')) {
+            $this->markTestSkipped('The "fileinfo" extension is required for this test.');
+        }
+
+        $pngData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+        $tempFile = sys_get_temp_dir().'/test_image_'.uniqid().'.png';
+        file_put_contents($tempFile, $pngData);
+
+        try {
+            $tester = new CommandTester(new InvokableWithInputFileAndConstraintsTestCommand());
+            $tester->setInputs([$tempFile]);
+            $tester->execute([], ['interactive' => true]);
+            $tester->assertCommandIsSuccessful();
+
+            self::assertStringContainsString('Provide an image file:', $tester->getDisplay());
+            self::assertStringContainsString('Filename:', $tester->getDisplay());
+            self::assertStringContainsString('Valid: yes', $tester->getDisplay());
+        } finally {
+            @unlink($tempFile);
+        }
+    }
+
+    public function testAskWithCustomValidatorIsNotOverwritten()
+    {
+        $tester = new CommandTester(new InvokableWithCustomValidatorTestCommand());
+        $tester->setInputs(['invalid', 'valid']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Enter a value:', $tester->getDisplay());
+        self::assertStringContainsString('Value must be "valid"', $tester->getDisplay());
+        self::assertStringContainsString('Value: valid', $tester->getDisplay());
     }
 }
 

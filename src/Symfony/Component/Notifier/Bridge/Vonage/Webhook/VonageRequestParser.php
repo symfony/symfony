@@ -83,7 +83,8 @@ final class VonageRequestParser extends AbstractRequestParser
         }
 
         [$header, $payload, $signature] = $tokenParts;
-        if ($signature !== $this->base64EncodeUrl(hash_hmac('sha256', $header.'.'.$payload, $secret, true))) {
+        $expected = $this->base64EncodeUrl(hash_hmac('sha256', $header.'.'.$payload, $secret, true));
+        if (!hash_equals($expected, $signature)) {
             throw new RejectWebhookException(406, 'Signature is wrong.');
         }
     }

@@ -326,5 +326,6 @@ class SendgridApiTransportTest extends TestCase
 
         $this->assertArrayHasKey('send_at', $payload);
         $this->assertSame(1746626400, $payload['send_at']);
+        $this->assertTrue($email->getHeaders()->has('Send-At'));
     }
 }

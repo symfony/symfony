@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
 use Symfony\Component\Translation\Bridge\Lokalise\LokaliseProviderFactory;
@@ -18,6 +19,7 @@ use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Provider\NullProviderFactory;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 use Symfony\Component\Translation\Provider\TranslationProviderCollectionFactory;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -46,9 +48,19 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('translation.provider_factory')
 
+        ->set('translation.provider_factory.loco.http_client', HttpClientInterface::class)
+            ->factory([HttpClient::class, 'create'])
+            ->args([
+                [], // default options
+                10, // max host connections
+            ])
+            ->call('setLogger', [service('logger')])
+            ->tag('http_client.client')
+            ->tag('monolog.logger', ['channel' => 'http_client'])
+
         ->set('translation.provider_factory.loco', LocoProviderFactory::class)
             ->args([
-                service('http_client'),
+                service('translation.provider_factory.loco.http_client'),
                 service('logger'),
                 param('kernel.default_locale'),
                 service('translation.loader.xliff'),

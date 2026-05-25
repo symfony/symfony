@@ -35,7 +35,7 @@ class ValidatorExtensionTest extends TestCase
             ->setMetadataFactory($metadataFactory)
             ->getValidator();
 
-        $extension = new ValidatorExtension($validator, false);
+        $extension = new ValidatorExtension($validator);
 
         $this->assertInstanceOf(ValidatorTypeGuesser::class, $extension->loadTypeGuesser());
 
@@ -45,5 +45,42 @@ class ValidatorExtensionTest extends TestCase
         $this->assertSame(CascadingStrategy::NONE, $metadata->getCascadingStrategy());
         $this->assertSame(TraversalStrategy::NONE, $metadata->getTraversalStrategy());
         $this->assertCount(0, $metadata->getPropertyMetadata('children'));
+    }
+
+    public function testNoDoubleConstraintWhenInstantiatedTwice()
+    {
+        $metadata = new ClassMetadata(Form::class);
+
+        $metadataFactory = new FakeMetadataFactory();
+        $metadataFactory->addMetadata($metadata);
+
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory($metadataFactory)
+            ->getValidator();
+
+        new ValidatorExtension($validator);
+        new ValidatorExtension($validator);
+
+        $this->assertCount(1, $metadata->getConstraints());
+        $this->assertInstanceOf(FormConstraint::class, $metadata->getConstraints()[0]);
+    }
+
+    public function testPropertiesInitializedWithEarlyReturn()
+    {
+        $metadata = new ClassMetadata(Form::class);
+        $metadata->addConstraint(new FormConstraint());
+
+        $metadataFactory = new FakeMetadataFactory();
+        $metadataFactory->addMetadata($metadata);
+
+        $validator = Validation::createValidatorBuilder()
+            ->setMetadataFactory($metadataFactory)
+            ->getValidator();
+
+        // create with an early return condition
+        $extension = new ValidatorExtension($validator);
+
+        // verify the extension is functional after an early return
+        $this->assertInstanceOf(ValidatorTypeGuesser::class, $extension->loadTypeGuesser());
     }
 }

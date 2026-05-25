@@ -26,7 +26,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
-        $this->validator->validate($value, new NotBlank());
+        $this->validate($value, new NotBlank());
 
         $this->assertNoViolation();
     }
@@ -46,7 +46,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new NotBlank(message: 'myMessage');
 
-        $this->validator->validate(null, $constraint);
+        $this->validate(null, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
@@ -58,7 +58,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new NotBlank(message: 'myMessage');
 
-        $this->validator->validate('', $constraint);
+        $this->validate('', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
@@ -70,7 +70,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new NotBlank(message: 'myMessage');
 
-        $this->validator->validate(false, $constraint);
+        $this->validate(false, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'false')
@@ -82,7 +82,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new NotBlank(message: 'myMessage');
 
-        $this->validator->validate([], $constraint);
+        $this->validate([], $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
@@ -97,7 +97,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             allowNull: true,
         );
 
-        $this->validator->validate(null, $constraint);
+        $this->validate(null, $constraint);
         $this->assertNoViolation();
     }
 
@@ -108,7 +108,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             allowNull: false,
         );
 
-        $this->validator->validate(null, $constraint);
+        $this->validate(null, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
@@ -124,7 +124,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             normalizer: 'trim',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')

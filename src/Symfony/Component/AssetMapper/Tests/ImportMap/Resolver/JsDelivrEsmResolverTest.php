@@ -700,6 +700,6 @@ class JsDelivrEsmResolverTest extends TestCase
     {
         $packageSpecifier ??= $importName;
 
-        return ImportMapEntry::createRemote($importName, $type, path: 'does not matter', version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
+        return ImportMapEntry::createRemote($importName, $type, 'does not matter', $version, $packageSpecifier, false);
     }
 }

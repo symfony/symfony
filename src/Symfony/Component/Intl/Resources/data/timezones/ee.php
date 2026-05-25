@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Central Europe gaƒoƒo me (Büsingen)',
         'Europe/Chisinau' => 'Ɣedzeƒe Europe gaƒoƒome (Chișinău)',
         'Europe/Copenhagen' => 'Central Europe gaƒoƒo me (Copenhagen)',
-        'Europe/Dublin' => 'Ireland nutome game (Dublin)',
+        'Europe/Dublin' => 'Greenwich gaƒoƒo (Dublin)',
         'Europe/Gibraltar' => 'Central Europe gaƒoƒo me (Gibraltar)',
         'Europe/Guernsey' => 'Greenwich gaƒoƒo (Guernsey)',
         'Europe/Helsinki' => 'Ɣedzeƒe Europe gaƒoƒome (Helsinki)',

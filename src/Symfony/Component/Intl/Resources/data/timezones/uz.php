@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Markaziy Yevropa vaqti (Byuzingen)',
         'Europe/Chisinau' => 'Sharqiy Yevropa vaqti (Kishinyov)',
         'Europe/Copenhagen' => 'Markaziy Yevropa vaqti (Kopengagen)',
-        'Europe/Dublin' => 'Irlandiya (Dublin)',
+        'Europe/Dublin' => 'Grinvich o‘rtacha vaqti (Dublin)',
         'Europe/Gibraltar' => 'Markaziy Yevropa vaqti (Gibraltar)',
         'Europe/Guernsey' => 'Grinvich o‘rtacha vaqti (Gernsi)',
         'Europe/Helsinki' => 'Sharqiy Yevropa vaqti (Xelsinki)',

@@ -25,7 +25,7 @@ class LazyLoadingFragmentHandlerTest extends TestCase
     {
         $renderer = $this->createMock(FragmentRendererInterface::class);
         $renderer->expects($this->once())->method('getName')->willReturn('foo');
-        $renderer->expects($this->any())->method('render')->willReturn(new Response());
+        $renderer->method('render')->willReturn(new Response());
 
         $requestStack = new RequestStack();
         $requestStack->push(Request::create('/'));

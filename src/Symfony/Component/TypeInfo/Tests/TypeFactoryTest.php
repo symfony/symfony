@@ -178,6 +178,24 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::union(Type::int(), Type::union(Type::int(), Type::string())));
     }
 
+    public function testUnionWithNestedNullTypeIsProperlyNullable()
+    {
+        $nestedUnion = Type::union(Type::int(), Type::string(), Type::null());
+        $result = Type::union($nestedUnion, Type::float());
+
+        $this->assertInstanceOf(NullableType::class, $result);
+
+        $wrappedType = $result->getWrappedType();
+        $this->assertInstanceOf(UnionType::class, $wrappedType);
+
+        $types = $wrappedType->getTypes();
+        $this->assertCount(3, $types);
+
+        $typeStrings = array_map(static fn ($t) => (string) $t, $types);
+        sort($typeStrings);
+        $this->assertSame(['float', 'int', 'string'], $typeStrings);
+    }
+
     public function testCreateIntersection()
     {
         $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::object(self::class)));
@@ -214,15 +232,15 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals(new ArrayShapeType(['foo' => ['type' => Type::bool(), 'optional' => true]]), Type::arrayShape(['foo' => ['type' => Type::bool(), 'optional' => true]]));
         $this->assertEquals(new ArrayShapeType(['foo' => ['type' => Type::bool(), 'optional' => false]]), Type::arrayShape(['foo' => Type::bool()]));
         $this->assertEquals(new ArrayShapeType(
-            shape: ['foo' => ['type' => Type::bool(), 'optional' => false]],
-            extraKeyType: Type::arrayKey(),
-            extraValueType: Type::mixed(),
-        ), Type::arrayShape(['foo' => Type::bool()], sealed: false));
+            ['foo' => ['type' => Type::bool(), 'optional' => false]],
+            Type::arrayKey(),
+            Type::mixed(),
+        ), Type::arrayShape(['foo' => Type::bool()], false));
         $this->assertEquals(new ArrayShapeType(
-            shape: ['foo' => ['type' => Type::bool(), 'optional' => false]],
-            extraKeyType: Type::string(),
-            extraValueType: Type::bool(),
-        ), Type::arrayShape(['foo' => Type::bool()], extraKeyType: Type::string(), extraValueType: Type::bool()));
+            ['foo' => ['type' => Type::bool(), 'optional' => false]],
+            Type::string(),
+            Type::bool(),
+        ), Type::arrayShape(['foo' => Type::bool()], true, Type::string(), Type::bool()));
     }
 
     public function testCreateArrayShapeWithCallableKey()

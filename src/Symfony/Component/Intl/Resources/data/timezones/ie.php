@@ -88,7 +88,7 @@ return [
         'Europe/Busingen' => 'témpor de Germania (Büsingen)',
         'Europe/Chisinau' => 'témpor de Moldova (Chișinău)',
         'Europe/Copenhagen' => 'témpor de Dania (Copenhagen)',
-        'Europe/Dublin' => 'témpor de Irland (Dublin)',
+        'Europe/Dublin' => 'témpore medial de Greenwich (Dublin)',
         'Europe/Gibraltar' => 'témpor de Gibraltar (Gibraltar)',
         'Europe/Guernsey' => 'témpore medial de Greenwich (Guernsey)',
         'Europe/Helsinki' => 'témpor de Finland (Helsinki)',

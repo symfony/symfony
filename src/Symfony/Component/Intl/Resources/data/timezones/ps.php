@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'مرکزي اروپايي وخت (بوسينجن)',
         'Europe/Chisinau' => 'ختيځ اروپايي وخت (چیسینو)',
         'Europe/Copenhagen' => 'مرکزي اروپايي وخت (کوپن هيګن)',
-        'Europe/Dublin' => 'آيرلېنډ وخت (ډبلن)',
+        'Europe/Dublin' => 'ګرينويچ معياري وخت (ډبلن)',
         'Europe/Gibraltar' => 'مرکزي اروپايي وخت (جبل الطارق)',
         'Europe/Guernsey' => 'ګرينويچ معياري وخت (ګرنسي)',
         'Europe/Helsinki' => 'ختيځ اروپايي وخت (هیلسنکی)',

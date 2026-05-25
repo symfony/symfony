@@ -75,6 +75,7 @@ final class Transport
         Bridge\OvhCloud\OvhCloudTransportFactory::class,
         Bridge\PagerDuty\PagerDutyTransportFactory::class,
         Bridge\Plivo\PlivoTransportFactory::class,
+        Bridge\Prelude\PreludeTransportFactory::class,
         Bridge\Primotexto\PrimotextoTransportFactory::class,
         Bridge\Pushover\PushoverTransportFactory::class,
         Bridge\Pushy\PushyTransportFactory::class,

@@ -46,6 +46,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -62,6 +63,7 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\MyFactory;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainerInterface;
@@ -180,6 +182,26 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsGeneratedFile('custom_container_class_with_optional_constructor_arguments.php', $dumper->dump(['base_class' => 'ConstructorWithOptionalArgumentsContainer', 'namespace' => 'Symfony\Component\DependencyInjection\Tests\Fixtures\Container']));
+    }
+
+    public function testDumpCustomContainerClassWithTypedParameterBagCanBeInstantiated()
+    {
+        $container = new ContainerBuilder();
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $code = $dumper->dump(['base_class' => 'ContainerWithTypedParameterBag', 'class' => 'CompiledContainerWithTypedParameterBag', 'namespace' => 'Symfony\Component\DependencyInjection\Tests\Fixtures\Container']);
+
+        // The compiled container must not assign null to a potentially typed $parameterBag property
+        $this->assertStringNotContainsString('$this->parameterBag = null', $code);
+        $this->assertStringContainsString('unset($this->parameterBag)', $code);
+
+        // Verify the compiled container can actually be instantiated without TypeError
+        eval('?>'.$code);
+        $compiledContainer = new \Symfony\Component\DependencyInjection\Tests\Fixtures\Container\CompiledContainerWithTypedParameterBag();
+        $this->assertTrue($compiledContainer->isCompiled());
+
+        $this->assertInstanceOf(FrozenParameterBag::class, $compiledContainer->getParameterBag());
     }
 
     public function testDumpCustomContainerClassWithMandatoryArgumentLessConstructor()
@@ -789,6 +811,21 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
     }
 
+    public function testEnvInAbstractDefinitionIsIgnoredWhenDefinitionIsRemoved()
+    {
+        $container = new ContainerBuilder();
+        $container->register('abstract_service', Bar::class)
+            ->setAbstract(true)
+            ->setArgument('$quz', '%env(FOO)%')
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertGreaterThan(0, $container->getEnvCounters()['FOO']);
+    }
+
     public function testCircularDynamicEnv()
     {
         $this->expectException(ParameterCircularReferenceException::class);
@@ -934,6 +971,51 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsGeneratedFile('services_non_shared_duplicates.php', $dumper->dump());
+    }
+
+    public function testNonSharedResettable()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setShared(false)
+            ->setPublic(true)
+            ->addTag('container.tracked_for_reset', ['method' => 'reset']);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsGeneratedFile('services_non_shared_resettable.php', $dumper->dump());
+    }
+
+    public function testNonSharedResettableMultipleMethods()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setShared(false)
+            ->setPublic(true)
+            ->addTag('container.tracked_for_reset', ['method' => 'reset'])
+            ->addTag('container.tracked_for_reset', ['method' => 'clear']);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsGeneratedFile('services_non_shared_resettable_multiple.php', $dumper->dump());
+    }
+
+    public function testNonSharedResettableAsArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setShared(false)
+            ->addTag('container.tracked_for_reset', ['method' => 'reset']);
+        $container->register('bar', 'stdClass')
+            ->setPublic(true)
+            ->addArgument(new Reference('foo'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsGeneratedFile('services_non_shared_resettable_as_arg.php', $dumper->dump());
     }
 
     public function testInitializePropertiesBeforeMethodCalls()
@@ -1498,6 +1580,39 @@ class PhpDumperTest extends TestCase
         $this->assertEquals((object) ['foo' => (object) [123]], $container->get('bar'));
     }
 
+    public function testSyntheticServiceWithNullOnInvalidReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('synthetic_service', 'stdClass')->setPublic(true)->setSynthetic(true);
+        // Reference the synthetic service twice so the dumper creates a variable for it
+        $container->register('bar', 'stdClass')->setPublic(true)->setShared(false)
+            ->setProperty('synth', new Reference('synthetic_service', ContainerBuilder::NULL_ON_INVALID_REFERENCE))
+            ->setProperty('synth2', new Reference('synthetic_service', ContainerBuilder::NULL_ON_INVALID_REFERENCE));
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump([
+            'class' => 'Symfony_DI_PhpDumper_Test_SyntheticNullOnInvalid',
+        ]);
+
+        // The dumped code should pass the behavior (2 = NULL_ON_INVALID_REFERENCE) when getting the synthetic service
+        $this->assertStringContainsString("->get('synthetic_service', 2)", $dump);
+
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Test_SyntheticNullOnInvalid();
+
+        // Without the synthetic service being set, bar should still be instantiable with synth=null
+        $bar = $container->get('bar');
+        $this->assertNull($bar->synth);
+
+        // After setting the synthetic service, it should be injected
+        $container->set('synthetic_service', (object) ['test' => 123]);
+        $bar2 = $container->get('bar');
+        $this->assertEquals((object) ['test' => 123], $bar2->synth);
+    }
+
     public function testAdawsonContainer()
     {
         $container = new ContainerBuilder();
@@ -1983,6 +2098,11 @@ class PhpDumperTest extends TestCase
     public function testAutowireClosure()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('env(FOO)', 'foo');
+        $container->setParameter('env(BAR)', 'foo');
+        $container->setParameter('env(HOST)', 'example.com');
+        $container->setParameter('env(PORT)', '6379');
+        $container->setParameter('dsn_template', 'redis://%env(HOST)%:%env(PORT)%');
         $container->register('foo', Foo::class)
             ->setPublic(true);
         $container->register('my_callable', MyCallable::class)
@@ -2008,10 +2128,18 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\Closure::class, $bar->foo);
         $this->assertInstanceOf(\Closure::class, $bar->baz);
         $this->assertInstanceOf(\Closure::class, $bar->buz);
+        $this->assertInstanceOf(\Closure::class, $bar->getFoo);
+        $this->assertInstanceOf(\Stringable::class, $bar->getBar);
+        $this->assertInstanceOf(\Stringable::class, $bar->getDsn);
+        $this->assertInstanceOf(\Stringable::class, $bar->getDsnFromParam);
         $this->assertSame($container->get('foo'), ($bar->foo)());
         $this->assertSame($container->get('baz'), $bar->baz);
         $this->assertInstanceOf(Foo::class, $fooClone = ($bar->buz)());
         $this->assertNotSame($container->get('foo'), $fooClone);
+        $this->assertSame('foo', ($bar->getFoo)());
+        $this->assertSame('foo', (string) $bar->getBar);
+        $this->assertSame('redis://example.com:6379', (string) $bar->getDsn);
+        $this->assertSame('redis://example.com:6379', (string) $bar->getDsnFromParam);
     }
 
     public function testLazyClosure()
@@ -2075,6 +2203,32 @@ class PhpDumperTest extends TestCase
         $r = new \ReflectionClass(Foo::class);
         $this->assertTrue($r->isUninitializedLazyObject($container->get('bar')->foo));
         $this->assertSame($container->get('foo'), $r->initializeLazyObject($container->get('bar')->foo));
+    }
+
+    public function testLazyAutowireAttributeOnAlreadyLazyService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic(true)
+            ->setLazy(true);
+        $container->setAlias(Foo::class, 'foo');
+        $container->register('bar', LazyServiceConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute_Already_Lazy']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute_Already_Lazy();
+
+        $bar = $container->get('bar');
+        $this->assertInstanceOf(Foo::class, $bar->foo);
+
+        $r = new \ReflectionClass(Foo::class);
+        $this->assertTrue($r->isUninitializedLazyObject($bar->foo));
+        $this->assertSame(0, $bar->foo->foo);
+        $this->assertFalse($r->isUninitializedLazyObject($bar->foo));
     }
 
     public function testLazyAutowireAttributeWithIntersection()
@@ -2409,6 +2563,14 @@ class LazyClosureConsumer
         public \Closure $buz,
         #[AutowireCallable(service: 'my_callable')]
         public \Closure $bar,
+        #[Autowire(env: 'FOO')]
+        public string|\Closure|null $getFoo = null,
+        #[Autowire(env: 'BAR')]
+        public string|\Stringable $getBar = 'bar',
+        #[Autowire('redis://%env(HOST)%:%env(PORT)%')]
+        public ?\Stringable $getDsn = null,
+        #[Autowire('%dsn_template%')]
+        public ?\Stringable $getDsnFromParam = null,
     ) {
     }
 }

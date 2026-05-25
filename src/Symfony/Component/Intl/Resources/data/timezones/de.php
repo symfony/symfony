@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Mitteleuropäische Zeit (Büsingen)',
         'Europe/Chisinau' => 'Osteuropäische Zeit (Chișinău)',
         'Europe/Copenhagen' => 'Mitteleuropäische Zeit (Kopenhagen)',
-        'Europe/Dublin' => 'Irland (Ortszeit) (Dublin)',
+        'Europe/Dublin' => 'Mittlere Greenwich-Zeit (Dublin)',
         'Europe/Gibraltar' => 'Mitteleuropäische Zeit (Gibraltar)',
         'Europe/Guernsey' => 'Mittlere Greenwich-Zeit (Guernsey)',
         'Europe/Helsinki' => 'Osteuropäische Zeit (Helsinki)',

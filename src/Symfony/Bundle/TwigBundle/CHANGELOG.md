@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `twig.safe_class` resource tag to register safe classes for Twig's escaper
+
 8.0
 ---
 

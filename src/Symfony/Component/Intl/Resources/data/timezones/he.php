@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'שעון מרכז אירופה (ביזינגן)',
         'Europe/Chisinau' => 'שעון מזרח אירופה (קישינב)',
         'Europe/Copenhagen' => 'שעון מרכז אירופה (קופנהגן)',
-        'Europe/Dublin' => 'שעון אירלנד (דבלין)',
+        'Europe/Dublin' => 'שעון גריניץ׳‏ (דבלין)',
         'Europe/Gibraltar' => 'שעון מרכז אירופה (גיברלטר)',
         'Europe/Guernsey' => 'שעון גריניץ׳‏ (גרנזי)',
         'Europe/Helsinki' => 'שעון מזרח אירופה (הלסינקי)',

@@ -14,7 +14,7 @@ namespace Symfony\Component\Scheduler\Trigger;
 interface TriggerInterface extends \Stringable
 {
     /**
-     * Returns the next run date; if null is returned, this method won't be called again.
+     * Returns the next run date strictly after $run; if null is returned, this method won't be called again.
      */
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable;
 }

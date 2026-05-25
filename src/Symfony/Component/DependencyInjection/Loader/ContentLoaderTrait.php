@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -24,8 +25,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\VarExporter\DeepCloner;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
@@ -55,6 +58,7 @@ trait ContentLoaderTrait
         'decoration_inner_name' => 'decoration_inner_name',
         'decoration_priority' => 'decoration_priority',
         'decoration_on_invalid' => 'decoration_on_invalid',
+        'decorates_tag' => 'decorates_tag',
         'autowire' => 'autowire',
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
@@ -335,8 +339,8 @@ trait ContentLoaderTrait
                 $stack[$k] = $definition;
             }
 
-            if ($diff = array_diff(array_keys($service), ['stack', 'public', 'deprecated'])) {
-                throw new InvalidArgumentException(\sprintf('Invalid attribute "%s"; supported ones are "public" and "deprecated" for service "%s" in "%s".', implode('", "', $diff), $id, $file));
+            if ($diff = array_diff(array_keys($service), ['stack', 'public', 'deprecated', 'decorates', 'decorates_tag', 'decoration_inner_name', 'decoration_priority', 'decoration_on_invalid'])) {
+                throw new InvalidArgumentException(\sprintf('Invalid attribute "%s"; supported ones are "public", "deprecated", "decorates", "decorates_tag" and "decoration_*" for service "%s" in "%s".', implode('", "', $diff), $id, $file));
             }
 
             $service = [
@@ -345,6 +349,11 @@ trait ContentLoaderTrait
                 'tags' => ['container.stack'],
                 'public' => $service['public'] ?? null,
                 'deprecated' => $service['deprecated'] ?? null,
+                'decorates' => $service['decorates'] ?? null,
+                'decorates_tag' => $service['decorates_tag'] ?? null,
+                'decoration_inner_name' => $service['decoration_inner_name'] ?? null,
+                'decoration_priority' => $service['decoration_priority'] ?? null,
+                'decoration_on_invalid' => $service['decoration_on_invalid'] ?? null,
             ];
         }
 
@@ -611,6 +620,34 @@ trait ContentLoaderTrait
             $definition->setDecoratedService($decorates, $renameId, $priority, $invalidBehavior);
         }
 
+        if (null !== $decoratesTag = $service['decorates_tag'] ?? null) {
+            if (isset($service['decorates'])) {
+                throw new InvalidArgumentException(\sprintf('A service cannot have both "decorates" and "decorates_tag" attributes on service "%s" in "%s".', $id, $file));
+            }
+
+            $priority = $service['decoration_priority'] ?? 0;
+
+            $decorationOnInvalid = \array_key_exists('decoration_on_invalid', $service) ? $service['decoration_on_invalid'] : 'exception';
+            $invalidBehavior = match ($decorationOnInvalid) {
+                'exception', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE => ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                'ignore', ContainerInterface::IGNORE_ON_INVALID_REFERENCE => ContainerInterface::IGNORE_ON_INVALID_REFERENCE,
+                null, ContainerInterface::NULL_ON_INVALID_REFERENCE => ContainerInterface::NULL_ON_INVALID_REFERENCE,
+                'null' => throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean null (without quotes) in "%s"?', $decorationOnInvalid, $id, $file)),
+                default => throw new InvalidArgumentException(\sprintf('Invalid value "%s" for attribute "decoration_on_invalid" on service "%s". Did you mean "exception", "ignore" or "null" in "%s"?', $decorationOnInvalid, $id, $file)),
+            };
+
+            $tagAttributes = [
+                'decorates_tag' => $decoratesTag,
+                'priority' => $priority,
+            ];
+
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+                $tagAttributes['on_invalid'] = $invalidBehavior;
+            }
+
+            $definition->addResourceTag('container.tag_decorator', $tagAttributes);
+        }
+
         if (isset($service['autowire'])) {
             $definition->setAutowired($service['autowire']);
         }
@@ -618,7 +655,7 @@ trait ContentLoaderTrait
         if (isset($defaults['bind']) || isset($service['bind'])) {
             // deep clone, to avoid multiple process of the same instance in the passes
             $bindings = $definition->getBindings();
-            $bindings += isset($defaults['bind']) ? unserialize(serialize($defaults['bind'])) : [];
+            $bindings += isset($defaults['bind']) ? DeepCloner::deepClone($defaults['bind']) : [];
 
             if (isset($service['bind'])) {
                 if (!\is_array($service['bind'])) {
@@ -672,6 +709,10 @@ trait ContentLoaderTrait
      */
     private function parseCallable(mixed $callable, string $parameter, string $id, string $file): string|array|Reference
     {
+        if ($callable instanceof Reference) {
+            return [$callable, '__invoke'];
+        }
+
         if (\is_string($callable)) {
             if (str_starts_with($callable, '@=')) {
                 if ('factory' !== $parameter) {
@@ -734,6 +775,27 @@ trait ContentLoaderTrait
                 $argument = $this->resolveServices($argument, $file, $isParameter);
 
                 return new ServiceClosureArgument($argument);
+            }
+            if ('env_closure' === $value->getTag()) {
+                if (\is_array($argument)) {
+                    $envExpr = $argument[0] ?? null;
+                    $default = $argument[1] ?? null;
+                    $stringable = $argument[2] ?? true;
+                    $validKeys = !array_diff(array_keys($argument), [0, 1, 2]);
+                } else {
+                    [$envExpr, $default, $stringable, $validKeys] = [$argument, null, false, true];
+                }
+
+                if (!\is_string($envExpr) || !\is_bool($stringable) || !$validKeys) {
+                    throw new InvalidArgumentException(\sprintf('"!env_closure" tag only accepts a string value or an array [value, default, stringable] in "%s".', $file));
+                }
+
+                try {
+                    $envExpr = $this->container->getParameterBag()->resolveValue($envExpr);
+                } catch (ParameterNotFoundException) {
+                }
+
+                return new EnvClosureArgument($envExpr, $default, $stringable);
             }
             if ('service_locator' === $value->getTag()) {
                 if (!\is_array($argument)) {

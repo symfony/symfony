@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Hora d’Europa central (Büsingen)',
         'Europe/Chisinau' => 'Hora d’Europa oriental (Chișinău)',
         'Europe/Copenhagen' => 'Hora d’Europa central (Copenhaguen)',
-        'Europe/Dublin' => 'Hora de: Irlanda (Dublín)',
+        'Europe/Dublin' => 'Hora del meridià de Greenwich (Dublín)',
         'Europe/Gibraltar' => 'Hora d’Europa central (Gibraltar)',
         'Europe/Guernsey' => 'Hora del meridià de Greenwich (Guernsey)',
         'Europe/Helsinki' => 'Hora d’Europa oriental (Hèlsinki)',

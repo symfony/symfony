@@ -31,6 +31,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithTemplateAndParent;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithStaticGetterInDifferentNs;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\DummyWithTemplateAndParentInDifferentNs;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWithDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IntRangeDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
@@ -460,7 +461,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('allowPrivateAccessProvider')]
     public function testAllowPrivateAccess(bool $allowPrivateAccess, Type $expectedType)
     {
-        $extractor = new PhpStanExtractor(allowPrivateAccess: $allowPrivateAccess);
+        $extractor = new PhpStanExtractor(null, null, null, $allowPrivateAccess);
 
         $this->assertEquals($expectedType, $extractor->getType(DummyPropertyAndGetterWithDifferentTypes::class, 'foo'));
     }
@@ -476,7 +477,7 @@ class PhpStanExtractorTest extends TestCase
     public function testGenericInterface()
     {
         $this->assertEquals(
-            Type::generic(Type::enum(\BackedEnum::class), Type::string()),
+            Type::generic(Type::object(\BackedEnum::class), Type::string()),
             $this->extractor->getType(Dummy::class, 'genericInterface'),
         );
     }
@@ -508,6 +509,14 @@ class PhpStanExtractorTest extends TestCase
             'nullableInterface',
             Type::nullable(Type::generic(Type::object(IFace::class), Type::object(Dummy::class))),
         ];
+        yield [
+            'twoGenerics',
+            Type::generic(Type::object(Clazz::class), Type::int(), Type::object(Dummy::class)),
+        ];
+        yield [
+            'threeGenerics',
+            Type::generic(Type::object(Clazz::class), Type::int(), Type::object(Dummy::class), Type::string()),
+        ];
     }
 
     #[DataProvider('descriptionsProvider')]
@@ -531,6 +540,23 @@ class PhpStanExtractorTest extends TestCase
         $this->assertNull($this->extractor->getType(VoidNeverReturnTypeDummy::class, 'voidProperty'));
         $this->assertNull($this->extractor->getType(VoidNeverReturnTypeDummy::class, 'neverProperty'));
         $this->assertEquals(Type::string(), $this->extractor->getType(VoidNeverReturnTypeDummy::class, 'normalProperty'));
+    }
+
+    #[DataProvider('providePromotedPropertyDocBlockTestCases')]
+    public function testPromotedPropertyDocBlock(string $class, string $property, ?string $shortDescription, ?string $longDescription, ?Type $type)
+    {
+        $this->assertSame($shortDescription, $this->extractor->getShortDescription($class, $property));
+        $this->assertSame($longDescription, $this->extractor->getLongDescription($class, $property));
+        $this->assertEquals($type, $this->extractor->getType($class, $property));
+    }
+
+    public static function providePromotedPropertyDocBlockTestCases(): iterable
+    {
+        yield 'description from constructor @param' => [PromotedPropertiesWithDocBlock::class, 'foo', 'Just a foo property', null, Type::string()];
+        yield 'promoted property with no docblock' => [PromotedPropertiesWithDocBlock::class, 'bar', null, null, null];
+        yield 'description and type from inline @var' => [PromotedPropertiesWithDocBlock::class, 'baz', 'A baz property', null, Type::string()];
+        yield 'inline @var wins over constructor @param' => [PromotedPropertiesWithDocBlock::class, 'qux', 'An overridden qux property', null, Type::int()];
+        yield 'long description from inline docblock' => [PromotedPropertiesWithDocBlock::class, 'corge', 'A corge property.', 'A detailed explanation of corge.', null];
     }
 }
 

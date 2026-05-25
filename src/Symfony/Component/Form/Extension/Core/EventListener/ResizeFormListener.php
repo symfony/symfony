@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Event\PostSetDataEvent;
+use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -28,6 +29,7 @@ class ResizeFormListener implements EventSubscriberInterface
     protected array $prototypeOptions;
 
     private \Closure|bool $deleteEmpty;
+    private array $preSetDataChildrenStack = [];
 
     public function __construct(
         private string $type,
@@ -45,6 +47,7 @@ class ResizeFormListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
+            FormEvents::PRE_SET_DATA => 'preSetData',
             FormEvents::POST_SET_DATA => ['postSetData', 255], // as early as possible
             FormEvents::PRE_SUBMIT => 'preSubmit',
             // (MergeCollectionListener, MergeDoctrineCollectionListener)
@@ -52,22 +55,41 @@ class ResizeFormListener implements EventSubscriberInterface
         ];
     }
 
+    final public function preSetData(PreSetDataEvent $event): void
+    {
+        $this->preSetDataChildrenStack[] = iterator_to_array($event->getForm());
+    }
+
     final public function postSetData(PostSetDataEvent $event): void
     {
         $form = $event->getForm();
         $data = $event->getData() ?? [];
+        $childrenToRemove = array_pop($this->preSetDataChildrenStack);
 
         if (!\is_array($data) && !($data instanceof \Traversable && $data instanceof \ArrayAccess)) {
             throw new UnexpectedTypeException($data, 'array or (\Traversable and \ArrayAccess)');
         }
 
-        // First remove all rows
-        foreach ($form as $name => $child) {
-            $form->remove($name);
+        if (null === $childrenToRemove) {
+            // First remove all rows
+            foreach ($form as $name => $child) {
+                $form->remove($name);
+            }
+        } else {
+            // First remove all rows that existed before PRE_SET_DATA listeners were called
+            foreach ($childrenToRemove as $name => $child) {
+                if ($form->has($name) && $form->get($name) === $child) {
+                    $form->remove($name);
+                }
+            }
         }
 
         // Then add all rows again in the correct order
         foreach ($data as $name => $value) {
+            if ($form->has($name)) {
+                continue;
+            }
+
             $form->add($name, $this->type, array_replace([
                 'property_path' => '['.$name.']',
             ], $this->options));

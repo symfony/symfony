@@ -355,12 +355,14 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.sf-toolbar-block:hover .sf-toolbar-icon {
+.sf-toolbar-block:hover .sf-toolbar-icon,
+.sf-toolbar-block:focus-within .sf-toolbar-icon {
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     box-shadow: 1px 0 0 var(--sf-toolbar-black), inset 0 -1px 0 var(--sf-toolbar-black);
 }
-.sf-toolbar-block.sf-toolbar-block-right:hover .sf-toolbar-icon {
+.sf-toolbar-block.sf-toolbar-block-right:hover .sf-toolbar-icon,
+.sf-toolbar-block.sf-toolbar-block-right:focus-within .sf-toolbar-icon {
     box-shadow: -1px 0 0 var(--sf-toolbar-black), inset 0 -1px 0 var(--sf-toolbar-black);
 }
 
@@ -383,10 +385,12 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
 }
 
 .sf-toolbar-block:hover,
+.sf-toolbar-block:focus-within,
 .sf-toolbar-block.hover {
     position: relative;
 }
 .sf-toolbar-block:hover .sf-toolbar-icon,
+.sf-toolbar-block:focus-within .sf-toolbar-icon,
 .sf-toolbar-block.hover .sf-toolbar-icon {
     background-color: var(--sf-toolbar-gray-700);
     position: relative;
@@ -396,6 +400,7 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
     z-index: 10001;
 }
 .sf-toolbar-block:hover .sf-toolbar-info,
+.sf-toolbar-block:focus-within .sf-toolbar-info,
 .sf-toolbar-block.hover .sf-toolbar-info {
     display: block;
     padding: 10px;
@@ -554,7 +559,8 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
         margin-left: 0;
     }
 
-    .sf-toolbar-block-request:hover .sf-toolbar-info {
+    .sf-toolbar-block-request:hover .sf-toolbar-info,
+    .sf-toolbar-block-request:focus-within .sf-toolbar-info {
         max-width: none;
     }
 
@@ -621,6 +627,18 @@ div.sf-toolbar  .sf-toolbar-block .sf-toolbar-info-piece.sf-toolbar-info-php-ext
 .sf-full-stack {
     left: 0px;
     font-size: 12px;
+}
+
+.sf-toolbarreset .visually-hidden {
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    position: absolute !important;
+    width: 1px !important;
+    white-space: nowrap !important;
 }
 
 /***** Media query print: Do not print the Toolbar. *****/

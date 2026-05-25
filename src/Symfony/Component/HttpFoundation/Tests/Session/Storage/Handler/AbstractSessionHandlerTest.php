@@ -47,6 +47,10 @@ class AbstractSessionHandlerTest extends TestCase
         $result = file_get_contents(\sprintf('http://localhost:8053/%s.php', $fixture), false, $context);
         $result = preg_replace_callback('/expires=[^;]++/', static fn ($m) => str_replace('-', ' ', $m[0]), $result);
 
+        if (\PHP_VERSION_ID < 80600) {
+            $result = str_replace("write\ndestroy\nclose\n", "updateTimestamp\ndestroy\nclose\n", $result);
+        }
+
         $this->assertStringEqualsFile(__DIR__.\sprintf('/Fixtures/%s.expected', $fixture), $result);
     }
 

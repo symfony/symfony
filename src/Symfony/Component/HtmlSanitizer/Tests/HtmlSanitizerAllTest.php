@@ -147,7 +147,7 @@ class HtmlSanitizerAllTest extends TestCase
             ],
             [
                 '<a href= onmouseover="alert(\\\'XSS\\\');">Lorem ipsum</a>',
-                '<a href="onmouseover&#61;&#34;alert(\&#039;XSS\&#039;);&#34;">Lorem ipsum</a>',
+                '<a>Lorem ipsum</a>',
             ],
             [
                 '<a href="http://trusted.com" onclick="alert(\'ok\')">Test</a>',

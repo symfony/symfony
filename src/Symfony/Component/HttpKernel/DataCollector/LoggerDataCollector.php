@@ -305,7 +305,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
                     'name' => $log['priorityName'],
                 ];
             }
-            if ('WARNING' === $log['priorityName']) {
+            if ('WARNING' === $log['priorityName'] || 'warning' === $log['priorityName']) {
                 ++$count['warning_count'];
             }
 

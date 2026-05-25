@@ -127,7 +127,14 @@ class EventSourceHttpClientTest extends TestCase
 
         $httpClient = $this->createStub(HttpClientInterface::class);
 
-        $httpClient->method('request')->with('POST', 'http://localhost:8080/events', $this->callback($hasCorrectHeaders))->willReturn($response);
+        $httpClient->method('request')
+            ->willReturnCallback(function (string $method, string $url, array $options = []) use ($hasCorrectHeaders, $response) {
+                $this->assertSame('POST', $method);
+                $this->assertSame('http://localhost:8080/events', $url);
+                $this->assertTrue($hasCorrectHeaders($options));
+
+                return $response;
+            });
 
         $httpClient->method('stream')->willReturn($responseStream);
 
@@ -153,7 +160,14 @@ class EventSourceHttpClientTest extends TestCase
         };
 
         $httpClient = $this->createStub(HttpClientInterface::class);
-        $httpClient->method('request')->with('GET', 'http://localhost:8080/events', $this->callback($hasCorrectHeaders))->willReturn($response);
+        $httpClient->method('request')
+            ->willReturnCallback(function (string $method, string $url, array $options = []) use ($hasCorrectHeaders, $response) {
+                $this->assertSame('GET', $method);
+                $this->assertSame('http://localhost:8080/events', $url);
+                $this->assertTrue($hasCorrectHeaders($options));
+
+                return $response;
+            });
 
         $httpClient->method('stream')->willReturn($responseStream);
 
@@ -173,6 +187,34 @@ class EventSourceHttpClientTest extends TestCase
                 return;
             }
         }
+    }
+
+    public function testFirstChunkIsYieldedAfterTimeout()
+    {
+        $es = new EventSourceHttpClient(new MockHttpClient([
+            // Throws TransportException before any chunks are sent, emulating a stream timeout
+            new MockResponse('', [
+                'response_headers' => ['content-type: text/event-stream'],
+                'error' => 'timeout',
+            ]),
+            new MockResponse("data: hello\n\n", [
+                'response_headers' => ['content-type: text/event-stream'],
+            ]),
+        ]), reconnectionTime: 0.0);
+
+        $res = $es->connect('http://localhost:8080/events');
+
+        $expected = [
+            new FirstChunk(),
+            new ServerSentEvent("data: hello\n\n"),
+            new LastChunk(13),
+        ];
+
+        foreach ($es->stream($res) as $chunk) {
+            $this->assertEquals(array_shift($expected), $chunk);
+        }
+
+        $this->assertSame([], $expected);
     }
 
     public static function contentTypeProvider()

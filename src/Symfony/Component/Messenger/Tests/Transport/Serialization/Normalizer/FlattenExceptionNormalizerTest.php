@@ -54,7 +54,12 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->assertSame($exception->getFile(), $normalized['file']);
         $this->assertSame($exception->getLine(), $normalized['line']);
         $this->assertSame($previous, $normalized['previous']);
-        $this->assertSame($exception->getTrace(), $normalized['trace']);
+        $expectedTrace = array_map(static function (array $frame): array {
+            unset($frame['args']);
+
+            return $frame;
+        }, $exception->getTrace());
+        $this->assertSame($expectedTrace, $normalized['trace']);
         $this->assertSame($exception->getTraceAsString(), $normalized['trace_as_string']);
         $this->assertSame($exception->getStatusText(), $normalized['status_text']);
     }
@@ -66,6 +71,31 @@ class FlattenExceptionNormalizerTest extends TestCase
             'instance with previous exception' => [FlattenException::createFromThrowable(new \RuntimeException('foo', 42, new \Exception()))],
             'instance with headers' => [FlattenException::createFromThrowable(new \RuntimeException('foo', 42), 404, ['Foo' => 'Bar'])],
         ];
+    }
+
+    public function testNormalizeStripsTraceArgs()
+    {
+        $exception = FlattenException::createFromThrowable(new \RuntimeException('boom'));
+
+        $trace = $exception->getTrace();
+        $trace[] = [
+            'namespace' => '', 'short_class' => '', 'class' => '', 'type' => '',
+            'function' => 'fromPdf', 'file' => 'foo.php', 'line' => 1,
+            'args' => [
+                ['string', 'valid utf8'],
+                ['string', "\x80\x81\xfe"],
+            ],
+        ];
+        $traceProperty = new \ReflectionProperty(FlattenException::class, 'trace');
+        $traceProperty->setValue($exception, $trace);
+
+        $normalized = $this->normalizer->normalize($exception, null, $this->getMessengerContext());
+
+        foreach ($normalized['trace'] as $frame) {
+            $this->assertArrayNotHasKey('args', $frame);
+        }
+
+        $this->assertNotFalse(json_encode($normalized, \JSON_THROW_ON_ERROR));
     }
 
     public function testSupportsDenormalization()

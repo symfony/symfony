@@ -18,6 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Doctrine\Persistence\Proxy;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
@@ -29,6 +31,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+#[IgnoreDeprecations]
+#[Group('doctrine-dbal-workaround')]
 class EntityUserProviderTest extends TestCase
 {
     public function testRefreshUserGetsUserByPrimaryKey()
@@ -247,7 +251,6 @@ class EntityUserProviderTest extends TestCase
         $manager = $this->createStub(ManagerRegistry::class);
         $manager
             ->method('getManager')
-            ->with($this->equalTo($name))
             ->willReturn($em);
 
         return $manager;

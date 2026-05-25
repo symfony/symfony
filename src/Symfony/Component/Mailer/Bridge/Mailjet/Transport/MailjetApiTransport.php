@@ -39,7 +39,7 @@ class MailjetApiTransport extends AbstractApiTransport
     private const HEADER_TO_MESSAGE = [
         'x-mj-templatelanguage' => ['TemplateLanguage', 'bool'],
         'x-mj-templateid' => ['TemplateID', 'int'],
-        'x-mj-templateerrorreporting' => ['TemplateErrorReporting', 'json'],
+        'x-mj-templateerrorreporting' => ['TemplateErrorReporting', 'templateerrorreporting'],
         'x-mj-templateerrordeliver' => ['TemplateErrorDeliver', 'bool'],
         'x-mj-vars' => ['Variables', 'json'],
         'x-mj-customid' => ['CustomID', 'string'],
@@ -183,7 +183,7 @@ class MailjetApiTransport extends AbstractApiTransport
                 'Base64Content' => $attachment->bodyToString(),
             ];
             if ('inline' === $headers->getHeaderBody('Content-Disposition')) {
-                $formattedAttachment['ContentID'] = $headers->getHeaderParameter('Content-Disposition', 'name');
+                $formattedAttachment['ContentID'] = $attachment->hasContentId() ? $attachment->getContentId() : $filename;
                 $inlines[] = $formattedAttachment;
             } else {
                 $attachments[] = $formattedAttachment;
@@ -205,6 +205,9 @@ class MailjetApiTransport extends AbstractApiTransport
             'int' => (int) $value,
             'json' => json_decode($value, true, 512, \JSON_THROW_ON_ERROR),
             'string' => $value,
+
+            // The API transport supports a richer address format than the SMTP relay. Use a special case to support both with BC.
+            'templateerrorreporting' => false !== filter_var($value, \FILTER_VALIDATE_EMAIL) ? ['Email' => $value, 'Name' => ''] : $this->castCustomHeader($value, 'json'),
         };
     }
 }

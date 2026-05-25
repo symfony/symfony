@@ -31,7 +31,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('provideNonSuspiciousStrings')]
     public function testNonSuspiciousStrings(string $string, array $options = [])
     {
-        $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
+        $this->validate($string, new NoSuspiciousCharacters(...$options));
 
         $this->assertNoViolation();
     }
@@ -55,7 +55,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('provideSuspiciousStrings')]
     public function testSuspiciousStrings(string $string, array $options, array $errors)
     {
-        $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
+        $this->validate($string, new NoSuspiciousCharacters(...$options));
 
         $violations = null;
 
@@ -169,10 +169,9 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidatorFiltersEmptyDefaultLocales()
     {
-        $validator = new NoSuspiciousCharactersValidator(['en', '', 'fr', null, 'de']);
-        $validator->initialize($this->context);
+        $this->validator = new NoSuspiciousCharactersValidator(['en', '', 'fr', null, 'de']);
 
-        $validator->validate('abc', new NoSuspiciousCharacters());
+        $this->validate('abc', new NoSuspiciousCharacters());
 
         $this->assertNoViolation();
     }

@@ -25,14 +25,28 @@ use Symfony\Component\Mime\Email;
  */
 final class MailerHandler extends AbstractProcessingHandler
 {
+    public const TRUNCATION_MARKER = '[...]';
+
     private \Closure|Email $messageTemplate;
 
+    /**
+     * @param int<0, max> $subjectMaxLength The maximum number of characters of the formatted subject;
+     *                                      pass 0 to disable truncation, otherwise the value must be at
+     *                                      least the length of self::TRUNCATION_MARKER. When triggered,
+     *                                      the trailing characters are replaced with the marker, so the
+     *                                      resulting subject never exceeds $subjectMaxLength characters.
+     */
     public function __construct(
         private MailerInterface $mailer,
         callable|Email $messageTemplate,
         string|int|Level $level = Level::Debug,
         bool $bubble = true,
+        private int $subjectMaxLength = 200,
     ) {
+        if ($subjectMaxLength < 0 || (0 < $subjectMaxLength && $subjectMaxLength < \strlen(self::TRUNCATION_MARKER))) {
+            throw new \InvalidArgumentException(\sprintf('The "$subjectMaxLength" argument must be 0 (to disable truncation) or at least %d (the length of the "%s" marker).', \strlen(self::TRUNCATION_MARKER), self::TRUNCATION_MARKER));
+        }
+
         parent::__construct($level, $bubble);
 
         $this->messageTemplate = $messageTemplate instanceof Email ? $messageTemplate : $messageTemplate(...);
@@ -101,7 +115,13 @@ final class MailerHandler extends AbstractProcessingHandler
 
         if ($records) {
             $subjectFormatter = $this->getSubjectFormatter($message->getSubject());
-            $message->subject($subjectFormatter->format($this->getHighestRecord($records)));
+            $subject = $subjectFormatter->format($this->getHighestRecord($records));
+
+            if ($this->subjectMaxLength && mb_strlen($subject) > $this->subjectMaxLength) {
+                $subject = mb_substr($subject, 0, $this->subjectMaxLength - \strlen(self::TRUNCATION_MARKER)).self::TRUNCATION_MARKER;
+            }
+
+            $message->subject($subject);
         }
 
         if ($this->getFormatter() instanceof HtmlFormatter) {

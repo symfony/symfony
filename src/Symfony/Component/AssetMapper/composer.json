@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "composer/semver": "^3.0",
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0"

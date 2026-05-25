@@ -17,6 +17,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
@@ -24,6 +25,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
 #[RequiresPhpExtension('pdo_pgsql')]
 #[Group('integration')]
+#[IgnoreDeprecations]
+#[Group('doctrine-dbal-workaround')]
 class DoctrinePostgreSqlIntegrationTest extends TestCase
 {
     private Connection $driverConnection;
@@ -59,8 +62,8 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($this->connection->get());
     }
@@ -72,8 +75,8 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($connection->get());
     }

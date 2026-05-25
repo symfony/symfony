@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Keski-Euroopan aika (Büsingen)',
         'Europe/Chisinau' => 'Itä-Euroopan aika (Chişinău)',
         'Europe/Copenhagen' => 'Keski-Euroopan aika (Kööpenhamina)',
-        'Europe/Dublin' => 'aikavyöhyke: Irlanti (Dublin)',
+        'Europe/Dublin' => 'Greenwichin normaaliaika (Dublin)',
         'Europe/Gibraltar' => 'Keski-Euroopan aika (Gibraltar)',
         'Europe/Guernsey' => 'Greenwichin normaaliaika (Guernsey)',
         'Europe/Helsinki' => 'Itä-Euroopan aika (Helsinki)',

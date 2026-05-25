@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Amser Canolbarth Ewrop (Büsingen)',
         'Europe/Chisinau' => 'Amser Dwyrain Ewrop (Chișinău)',
         'Europe/Copenhagen' => 'Amser Canolbarth Ewrop (Copenhagen)',
-        'Europe/Dublin' => 'Amser Iwerddon (Dulyn)',
+        'Europe/Dublin' => 'Amser Safonol Greenwich (Dulyn)',
         'Europe/Gibraltar' => 'Amser Canolbarth Ewrop (Gibraltar)',
         'Europe/Guernsey' => 'Amser Safonol Greenwich (Ynys y Garn)',
         'Europe/Helsinki' => 'Amser Dwyrain Ewrop (Helsinki)',

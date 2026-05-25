@@ -70,6 +70,9 @@ class DefinitionFileLoader extends FileLoader
         return 'php' === $type;
     }
 
+    /**
+     * @param-immediately-invoked-callable $callback
+     */
     private function callConfigurator(callable $callback, DefinitionConfigurator $configurator, string $path): void
     {
         $callback = $callback(...);

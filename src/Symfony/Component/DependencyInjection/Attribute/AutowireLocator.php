@@ -40,11 +40,13 @@ class AutowireLocator extends Autowire
         bool|string|null $excludeSelf = true,
         ...$_,
     ) {
-        if (\func_num_args() > 4 || !\is_bool($excludeSelf) || null === $exclude || (\is_string($exclude) && str_starts_with($exclude, 'get') && !\array_key_exists('defaultIndexMethod', $_))) {
+        if (\func_num_args() > 4 || !\is_bool($excludeSelf) || \array_key_exists('defaultIndexMethod', $_) || \array_key_exists('defaultPriorityMethod', $_) || (\is_string($exclude) && str_starts_with($exclude, 'get') && ctype_upper($exclude[3] ?? ''))) {
             [, , $defaultIndexMethod, $defaultPriorityMethod, $exclude, $excludeSelf] = \func_get_args() + [2 => null, null, [], true];
+            $defaultIndexMethod = $_['defaultIndexMethod'] ?? $defaultIndexMethod;
+            $defaultPriorityMethod = $_['defaultPriorityMethod'] ?? $defaultPriorityMethod;
         } else {
-            $defaultIndexMethod = \array_key_exists('defaultIndexMethod', $_) ? $_['defaultIndexMethod'] : false;
-            $defaultPriorityMethod = \array_key_exists('defaultPriorityMethod', $_) ? $_['defaultPriorityMethod'] : false;
+            $defaultIndexMethod = false;
+            $defaultPriorityMethod = false;
         }
 
         if (\is_string($services)) {

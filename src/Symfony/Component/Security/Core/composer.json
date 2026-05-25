@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/event-dispatcher-contracts": "^2.5|^3",
         "symfony/password-hasher": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3"

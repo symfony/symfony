@@ -204,22 +204,30 @@ class UploadedFile extends File
 
         switch ($this->error) {
             case \UPLOAD_ERR_INI_SIZE:
-                throw new IniSizeFileException($this->getErrorMessage());
+                throw new IniSizeFileException($this->getExceptionMessage());
             case \UPLOAD_ERR_FORM_SIZE:
-                throw new FormSizeFileException($this->getErrorMessage());
+                throw new FormSizeFileException($this->getExceptionMessage());
             case \UPLOAD_ERR_PARTIAL:
-                throw new PartialFileException($this->getErrorMessage());
+                throw new PartialFileException($this->getExceptionMessage());
             case \UPLOAD_ERR_NO_FILE:
-                throw new NoFileException($this->getErrorMessage());
+                throw new NoFileException($this->getExceptionMessage());
             case \UPLOAD_ERR_CANT_WRITE:
-                throw new CannotWriteFileException($this->getErrorMessage());
+                throw new CannotWriteFileException($this->getExceptionMessage());
             case \UPLOAD_ERR_NO_TMP_DIR:
-                throw new NoTmpDirFileException($this->getErrorMessage());
+                throw new NoTmpDirFileException($this->getExceptionMessage());
             case \UPLOAD_ERR_EXTENSION:
-                throw new ExtensionFileException($this->getErrorMessage());
+                throw new ExtensionFileException($this->getExceptionMessage());
         }
 
-        throw new FileException($this->getErrorMessage());
+        throw new FileException($this->getExceptionMessage());
+    }
+
+    /**
+     * Retrieves a user-friendly error message for file upload issues, if any.
+     */
+    public function getErrorMessage(): string
+    {
+        return \UPLOAD_ERR_OK !== $this->error ? $this->getExceptionMessage() : '';
     }
 
     /**
@@ -268,7 +276,7 @@ class UploadedFile extends File
     /**
      * Returns an informative upload error message.
      */
-    public function getErrorMessage(): string
+    private function getExceptionMessage(): string
     {
         static $errors = [
             \UPLOAD_ERR_INI_SIZE => 'The file "%s" exceeds your upload_max_filesize ini directive (limit is %d KiB).',

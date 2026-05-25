@@ -14,7 +14,6 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -64,8 +63,6 @@ class RedirectControllerTest extends TestCase
     #[DataProvider('provider')]
     public function testRoute($permanent, $keepRequestMethod, $keepQueryParams, $ignoreAttributes, $expectedCode, $expectedAttributes)
     {
-        $request = new Request();
-
         $route = 'new-route';
         $url = '/redirect-url';
         $attributes = [
@@ -82,7 +79,7 @@ class RedirectControllerTest extends TestCase
             ],
         ];
 
-        $request->attributes = new ParameterBag($attributes);
+        $request = new Request([], [], $attributes);
 
         $router = $this->createMock(UrlGeneratorInterface::class);
         $router
@@ -205,20 +202,18 @@ class RedirectControllerTest extends TestCase
         $httpsPort = 1443;
 
         $expectedUrl = "https://$host:$httpsPort$baseUrl$path";
-        $request = $this->createRequestObject('http', $host, $httpPort, $baseUrl);
+        $request = $this->createRequestObject('http', $host, $httpPort, $baseUrl, '', ['_route_params' => ['path' => $path, 'scheme' => 'https']]);
         $controller = $this->createRedirectController(null, $httpsPort);
         $returnValue = $controller->urlRedirectAction($request, $path, false, 'https');
         $this->assertRedirectUrl($returnValue, $expectedUrl);
-        $request->attributes = new ParameterBag(['_route_params' => ['path' => $path, 'scheme' => 'https']]);
         $returnValue = $controller($request);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
 
         $expectedUrl = "http://$host:$httpPort$baseUrl$path";
-        $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl);
+        $request = $this->createRequestObject('https', $host, $httpPort, $baseUrl, '', ['_route_params' => ['path' => $path, 'scheme' => 'http']]);
         $controller = $this->createRedirectController($httpPort);
         $returnValue = $controller->urlRedirectAction($request, $path, false, 'http');
         $this->assertRedirectUrl($returnValue, $expectedUrl);
-        $request->attributes = new ParameterBag(['_route_params' => ['path' => $path, 'scheme' => 'http']]);
         $returnValue = $controller($request);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
@@ -262,13 +257,12 @@ class RedirectControllerTest extends TestCase
         $path = '/redirect-path';
         $expectedUrl = "$scheme://$host$expectedPort$baseUrl$path";
 
-        $request = $this->createRequestObject($requestScheme, $host, $requestPort, $baseUrl);
+        $request = $this->createRequestObject($requestScheme, $host, $requestPort, $baseUrl, '', ['_route_params' => ['path' => $path, 'scheme' => $scheme, 'httpPort' => $httpPort, 'httpsPort' => $httpsPort]]);
         $controller = $this->createRedirectController();
 
         $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $httpPort, $httpsPort);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
 
-        $request->attributes = new ParameterBag(['_route_params' => ['path' => $path, 'scheme' => $scheme, 'httpPort' => $httpPort, 'httpsPort' => $httpsPort]]);
         $returnValue = $controller($request);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
@@ -292,14 +286,13 @@ class RedirectControllerTest extends TestCase
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, $queryString);
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, $queryString, ['_route_params' => ['path' => $path, 'scheme' => $scheme, 'httpPort' => $port]]);
 
         $controller = $this->createRedirectController();
 
         $returnValue = $controller->urlRedirectAction($request, $path, false, $scheme, $port, null);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
 
-        $request->attributes = new ParameterBag(['_route_params' => ['path' => $path, 'scheme' => $scheme, 'httpPort' => $port]]);
         $returnValue = $controller($request);
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
@@ -311,8 +304,7 @@ class RedirectControllerTest extends TestCase
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza&f[%2525][%26][%3D][p.c]=d');
-        $request->attributes = new ParameterBag(['_route_params' => ['base2' => 'zaza']]);
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza&f[%2525][%26][%3D][p.c]=d', ['_route_params' => ['base2' => 'zaza']]);
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->exactly(2))
              ->method('generate')
@@ -333,8 +325,7 @@ class RedirectControllerTest extends TestCase
         $baseUrl = '/base';
         $port = 80;
 
-        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza');
-        $request->attributes = new ParameterBag(['_route_params' => ['b.se' => 'zouzou']]);
+        $request = $this->createRequestObject($scheme, $host, $port, $baseUrl, 'b.se=zaza', ['_route_params' => ['b.se' => 'zouzou']]);
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $urlGenerator->expects($this->exactly(2))->method('generate')->willReturn('/test?b.se=zouzou')->with('/test', ['b.se' => 'zouzou'], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -361,7 +352,7 @@ class RedirectControllerTest extends TestCase
         (new RedirectController())(new Request([], [], ['_route' => '_redirect', '_route_params' => ['path' => '/foo', 'route' => 'bar']]));
     }
 
-    private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '')
+    private function createRequestObject($scheme, $host, $port, $baseUrl, $queryString = '', array $attributes = [])
     {
         if ('' !== $queryString) {
             parse_str($queryString, $query);
@@ -369,7 +360,7 @@ class RedirectControllerTest extends TestCase
             $query = [];
         }
 
-        return new Request($query, [], [], [], [], [
+        return new Request($query, [], $attributes, [], [], [
             'HTTPS' => 'https' === $scheme,
             'HTTP_HOST' => $host.($port ? ':'.$port : ''),
             'SERVER_PORT' => $port,

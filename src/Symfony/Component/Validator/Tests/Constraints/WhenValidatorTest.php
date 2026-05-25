@@ -34,7 +34,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, 'Foo', $constraints);
 
-        $this->validator->validate('Foo', new When(
+        $this->validate('Foo', new When(
             expression: 'true',
             constraints: $constraints,
         ));
@@ -49,7 +49,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, 'Foo', $constraints);
 
-        $this->validator->validate('Foo', new When(
+        $this->validate('Foo', new When(
             expression: static fn () => true,
             constraints: $constraints,
         ));
@@ -60,7 +60,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $subject = new \stdClass();
         $this->setObject($subject);
 
-        $this->validator->validate($subject, new When(
+        $this->validate($subject, new When(
             expression: static function ($closureSubject) use ($subject) {
                 self::assertSame($subject, $closureSubject);
             },
@@ -73,7 +73,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $constraint = new NotNull();
         $this->expectValidateValue(0, 'Foo', [$constraint]);
 
-        $this->validator->validate('Foo', new When(
+        $this->validate('Foo', new When(
             expression: 'true',
             constraints: $constraint,
         ));
@@ -86,7 +86,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, 'Foo', [$otherwise]);
 
-        $this->validator->validate('Foo', new When(
+        $this->validate('Foo', new When(
             expression: 'false',
             constraints: $constraint,
             otherwise: $otherwise,
@@ -100,7 +100,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, 'Foo', [$otherwise]);
 
-        $this->validator->validate('Foo', new When(
+        $this->validate('Foo', new When(
             expression: static fn () => false,
             constraints: $constraint,
             otherwise: $otherwise,
@@ -115,7 +115,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, null, $constraints);
 
-        $this->validator->validate(null, new When(
+        $this->validate(null, new When(
             expression: 'true',
             constraints: $constraints,
         ));
@@ -136,7 +136,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, $number->value, $constraints);
 
-        $this->validator->validate($number->value, new When(
+        $this->validate($number->value, new When(
             expression: 'this.type === "positive"',
             constraints: $constraints,
         ));
@@ -161,7 +161,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, $number->value, $constraints);
 
-        $this->validator->validate($number->value, new When(
+        $this->validate($number->value, new When(
             expression: 'context.getRoot().ok === true',
             constraints: $constraints,
         ));
@@ -175,7 +175,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, 'foo', $constraints);
 
-        $this->validator->validate('foo', new When(
+        $this->validate('foo', new When(
             expression: 'value === "foo"',
             constraints: $constraints,
         ));
@@ -189,7 +189,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, 'foo', $constraints);
 
-        $this->validator->validate('foo', new When(
+        $this->validate('foo', new When(
             expression: 'activated && value === compared_value',
             constraints: $constraints,
             values: [
@@ -208,7 +208,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectNoValidate();
 
-        $this->validator->validate('', new When(
+        $this->validate('', new When(
             expression: 'false',
             constraints: $constraints,
         ));
@@ -222,7 +222,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, '', $constraints);
 
-        $this->validator->validate('', new When(
+        $this->validate('', new When(
             expression: 'true',
             constraints: $constraints,
             otherwise: new Length(exactly: 10),
@@ -246,7 +246,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectNoValidate();
 
-        $this->validator->validate($number->value, new When(
+        $this->validate($number->value, new When(
             expression: 'this.type !== "positive"',
             constraints: $constraints,
         ));
@@ -262,7 +262,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectNoValidate();
 
-        $this->validator->validate('foo', new When(
+        $this->validate('foo', new When(
             expression: 'value === null',
             constraints: $constraints,
         ));
@@ -278,7 +278,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectNoValidate();
 
-        $this->validator->validate('foo', new When(
+        $this->validate('foo', new When(
             expression: 'activated && value === compared_value',
             constraints: $constraints,
             values: [
@@ -314,7 +314,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
             ),
         );
 
-        $this->validator->validate('foo', new When('true', $constraints));
+        $this->validate('foo', new When('true', $constraints));
     }
 
     protected function createValidator(): WhenValidator

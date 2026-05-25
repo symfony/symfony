@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Mið-Evróputími (Büsingen)',
         'Europe/Chisinau' => 'Austur-Evróputími (Chișinău)',
         'Europe/Copenhagen' => 'Mið-Evróputími (Kaupmannahöfn)',
-        'Europe/Dublin' => 'Írland (Dublin)',
+        'Europe/Dublin' => 'Greenwich-staðaltími (Dublin)',
         'Europe/Gibraltar' => 'Mið-Evróputími (Gíbraltar)',
         'Europe/Guernsey' => 'Greenwich-staðaltími (Guernsey)',
         'Europe/Helsinki' => 'Austur-Evróputími (Helsinki)',

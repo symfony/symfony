@@ -26,6 +26,8 @@ class GetAttrNode extends Node
 
     /**
      * @param self::* $type
+     * @param bool    $isNullSafe Whether the access uses the `?.[]` null-safe operator; only honored for self::ARRAY_CALL.
+     *                            For self::PROPERTY_CALL and self::METHOD_CALL, null-safety is driven by ConstantNode::$isNullSafe.
      */
     public function __construct(Node $node, Node $attribute, ArrayNode $arguments, int $type, bool $isNullSafe = false)
     {

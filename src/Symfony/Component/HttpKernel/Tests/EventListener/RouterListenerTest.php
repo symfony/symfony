@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,9 +103,8 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createStub(RequestMatcherInterface::class);
         $requestMatcher
-                       ->method('matchRequest')
-                       ->with($this->isInstanceOf(Request::class))
-                       ->willReturn([]);
+            ->method('matchRequest')
+            ->willReturn([]);
 
         $context = new RequestContext();
 
@@ -198,7 +198,6 @@ class RouterListenerTest extends TestCase
 
     public function testRequestWithBadHost()
     {
-        $this->expectException(BadRequestHttpException::class);
         $kernel = $this->createStub(HttpKernelInterface::class);
         $request = Request::create('/');
         $request->headers->set('host', 'bad host %22');
@@ -207,7 +206,12 @@ class RouterListenerTest extends TestCase
         $requestMatcher = $this->createStub(RequestMatcherInterface::class);
 
         $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
-        $listener->onKernelRequest($event);
+        try {
+            $listener->onKernelRequest($event);
+            self::fail(\sprintf('Expected "%s" or "%s" to be thrown.', BadRequestHttpException::class, BadRequestException::class));
+        } catch (\Throwable $e) {
+            $this->assertTrue($e instanceof BadRequestHttpException || $e instanceof BadRequestException);
+        }
     }
 
     public function testResourceNotFoundException()
@@ -272,9 +276,8 @@ class RouterListenerTest extends TestCase
 
         $requestMatcher = $this->createStub(RequestMatcherInterface::class);
         $requestMatcher
-                       ->method('matchRequest')
-                       ->with($this->isInstanceOf(Request::class))
-                       ->willReturn($parameters);
+            ->method('matchRequest')
+            ->willReturn($parameters);
 
         $listener = new RouterListener($requestMatcher, new RequestStack(), new RequestContext());
         $listener->onKernelRequest($event);

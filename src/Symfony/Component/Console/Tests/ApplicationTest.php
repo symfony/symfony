@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -60,6 +61,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Process\Exception\ProcessTimedOutException;
+use Symfony\Component\Process\Exception\RuntimeException;
 use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
@@ -114,6 +117,7 @@ class ApplicationTest extends TestCase
         require_once self::$fixturesPath.'/TestAmbiguousCommandRegistering2.php';
         require_once self::$fixturesPath.'/FooHiddenCommand.php';
         require_once self::$fixturesPath.'/BarHiddenCommand.php';
+        require_once self::$fixturesPath.'/ManyAliasesCommand.php';
     }
 
     protected function normalizeLineBreaks($text)
@@ -159,6 +163,90 @@ class ApplicationTest extends TestCase
     {
         $application = new Application('foo', 'bar');
         $this->assertEquals('foo <info>bar</info>', $application->getLongVersion(), '->getLongVersion() returns the long version of the application');
+    }
+
+    public function testGetLongVersionWithContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('kernel.debug', false);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertStringContainsString('env:', $application->getLongVersion());
+        $this->assertStringContainsString('prod', $application->getLongVersion());
+    }
+
+    public function testContainerWiresEventDispatcher()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $application->all(); // triggers init
+
+        $this->assertInstanceOf(EventDispatcherInterface::class, $application->getDispatcher());
+    }
+
+    public function testContainerWiresCommandLoader()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.command_loader', FactoryCommandLoader::class)
+            ->setPublic(true)
+            ->setArguments([['test:cmd' => static fn () => new Command('test:cmd')]]);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertTrue($application->has('test:cmd'));
+    }
+
+    public function testContainerWiresEagerCommands()
+    {
+        $container = new ContainerBuilder();
+        $container->register('my.command', \FooCommand::class)->setPublic(true);
+        $container->setParameter('console.command.ids', ['my.command']);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertTrue($application->has('foo:bar'));
+    }
+
+    public function testPsrContainerWiresEagerCommands()
+    {
+        $fooCommand = new \FooCommand();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnCallback(static fn (string $id) => \in_array($id, ['console.command.ids', 'my.command']));
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
+            'console.command.ids' => ['my.command'],
+            'my.command' => $fooCommand,
+        });
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertTrue($application->has('foo:bar'));
+    }
+
+    public function testPsrContainerSkipsLazyCommands()
+    {
+        $fooCommand = new \FooCommand();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnCallback(static fn (string $id) => \in_array($id, ['console.command.ids', 'console.lazy_command.ids', 'my.command']));
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
+            'console.command.ids' => ['my.command'],
+            'console.lazy_command.ids' => ['my.command' => true],
+            'my.command' => $fooCommand,
+        });
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertFalse($application->has('foo:bar'));
+    }
+
+    public function testApplicationWithoutContainer()
+    {
+        $application = new Application('foo', 'bar');
+        $this->assertStringNotContainsString('env:', $application->getLongVersion());
     }
 
     public function testHelp()
@@ -406,6 +494,19 @@ class ApplicationTest extends TestCase
         $application->findNamespace('f');
     }
 
+    public function testFindAmbiguousNamespaceSortedAlphabetically()
+    {
+        $application = new Application();
+        $application->addCommand(new Command('test-zzz:cmd'));
+        $application->addCommand(new Command('test-aaa:cmd'));
+        $application->addCommand(new Command('test-bbb:cmd'));
+
+        $this->expectException(NamespaceNotFoundException::class);
+        $this->expectExceptionMessage("The namespace \"test\" is ambiguous.\nDid you mean one of these?\n    test-aaa\n    test-bbb\n    test-zzz");
+
+        $application->findNamespace('test');
+    }
+
     public function testFindNonAmbiguous()
     {
         $application = new Application();
@@ -481,6 +582,18 @@ class ApplicationTest extends TestCase
         $application->find('FoO:BaR');
     }
 
+    public function testFindSingleWithAmbiguousAliases()
+    {
+        $application = new Application();
+        $application->addCommand(new \ManyAliasesCommand());
+        $application->addCommand(new \AlternativeCommand());
+
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('a'), '->find() will find the correct command using a short alias');
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('alias'), '->find() will find the correct command using a long alias');
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('aliased'), '->find() will find the correct command using the right name');
+        $this->assertInstanceOf(\ManyAliasesCommand::class, $application->find('ali'), '->find() will find the correct command using an ambiguous shortened version');
+    }
+
     public function testFindWithCommandLoader()
     {
         $application = new Application();
@@ -524,11 +637,34 @@ class ApplicationTest extends TestCase
             [
                 'foo:b',
                 "Command \"foo:b\" is ambiguous.\nDid you mean one of these?\n".
+                "    foo1:bar The foo1:bar command\n".
                 "    foo:bar  The foo:bar command\n".
-                "    foo:bar1 The foo:bar1 command\n".
-                '    foo1:bar The foo1:bar command',
+                '    foo:bar1 The foo:bar1 command',
             ],
         ];
+    }
+
+    public function testFindAmbiguousCommandsSortedAlphabetically()
+    {
+        putenv('COLUMNS=120');
+
+        $application = new Application();
+        // Register commands in non-alphabetical order
+        $application->addCommand(new Command('test:zzz'));
+        $application->addCommand(new Command('test:aaa'));
+        $application->addCommand(new Command('test:bbb'));
+
+        try {
+            $application->find('test:');
+            $this->fail('Expected CommandNotFoundException');
+        } catch (CommandNotFoundException $e) {
+            $this->assertMatchesRegularExpression(
+                '/test:aaa.*test:bbb.*test:zzz/s',
+                $e->getMessage()
+            );
+        } finally {
+            putenv('COLUMNS');
+        }
     }
 
     public function testFindWithAmbiguousAbbreviationsFindsCommandIfAlternativesAreHidden()
@@ -2311,8 +2447,16 @@ class ApplicationTest extends TestCase
 
         array_unshift($params, 'php');
         $p = new Process($params);
-        $p->setTty(true);
-        $p->start();
+        try {
+            $p->setTty(true);
+            $p->start();
+        } catch (RuntimeException $e) {
+            if (str_contains($e->getMessage(), '/dev/tty')) {
+                $this->markTestSkipped('/dev/tty is not read/writable in this environment.');
+            }
+
+            throw $e;
+        }
 
         for ($i = 0; $i < 10 && shell_exec('stty -g') === $previousSttyMode; ++$i) {
             usleep(200000);
@@ -2320,7 +2464,12 @@ class ApplicationTest extends TestCase
 
         $this->assertNotSame($previousSttyMode, shell_exec('stty -g'));
         $p->signal(\SIGINT);
-        $exitCode = $p->wait();
+        try {
+            $exitCode = $p->wait();
+        } catch (ProcessTimedOutException) {
+            $p->stop(0);
+            $this->markTestSkipped('TTY signal handling is not supported in this environment.');
+        }
 
         $sttyMode = shell_exec('stty -g');
         shell_exec('stty '.$previousSttyMode);
@@ -2457,7 +2606,7 @@ class ApplicationTest extends TestCase
     #[RequiresPhpExtension('pcntl')]
     public function testAlarmSubscriber()
     {
-        $command = new BaseSignableCommand(signal: \SIGALRM);
+        $command = new BaseSignableCommand(true, \SIGALRM);
 
         $subscriber1 = new AlarmEventSubscriber();
         $subscriber2 = new AlarmEventSubscriber();
@@ -2675,7 +2824,7 @@ class ApplicationTest extends TestCase
     #[TestWith([4])]
     public function testAlarmSubscriberCalledAfterSignalSubscriberAndInheritsExitCode(int|false $exitCode)
     {
-        $command = new BaseSignableCommand(signal: \SIGALRM);
+        $command = new BaseSignableCommand(true, \SIGALRM);
 
         $subscriber1 = new class($exitCode) extends SignalEventSubscriber {
             public function __construct(private int|false $exitCode)

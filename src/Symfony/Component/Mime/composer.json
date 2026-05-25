@@ -16,14 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3.1|^4",
         "league/html-to-markdown": "^5.0",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
@@ -32,7 +32,7 @@
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",
-        "phpdocumentor/reflection-docblock": "<5.2|>=6",
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1"
     },
     "autoload": {

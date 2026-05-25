@@ -10,16 +10,16 @@
  */
 
 eval(<<<'EOPHP'
-namespace PHPUnit\Util;
+    namespace PHPUnit\Util;
 
-class Test
-{
-    public static function getGroups()
+    class Test
     {
-        return array();
+        public static function getGroups()
+        {
+            return array();
+        }
     }
-}
-EOPHP
+    EOPHP
 );
 
 @trigger_error('root deprecation', \E_USER_DEPRECATED);
@@ -44,3 +44,6 @@ class FooTestCase
 $foo = new FooTestCase();
 $foo->testLegacyFoo();
 $foo->testNonLegacyBar();
+
+// @php-cs-fixer-ignore error_suppression Explicit trigger_error tests
+// @php-cs-fixer-ignore psr_autoloading

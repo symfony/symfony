@@ -19,6 +19,6 @@ trait SomeSharedImplementation
     #[Route('/a/route/from/a/trait', name: 'with_a_trait')]
     public function someAction(): Response
     {
-        return new Response(status: Response::HTTP_NO_CONTENT);
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }

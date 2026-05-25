@@ -1,0 +1,28 @@
+services:
+    foo:
+        class: stdClass
+        public: true
+        tags:
+            - { name: my_tag }
+        properties:
+            label: foo
+
+    bar:
+        class: stdClass
+        public: true
+        tags:
+            - { name: my_tag }
+        properties:
+            label: bar
+
+    my_stack:
+        decorates_tag: my_tag
+        stack:
+            - class: stdClass
+              properties:
+                  label: A
+                  inner: '@.inner'
+            - class: stdClass
+              properties:
+                  label: B
+                  inner: '@.inner'

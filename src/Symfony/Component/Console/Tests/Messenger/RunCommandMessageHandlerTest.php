@@ -60,7 +60,7 @@ final class RunCommandMessageHandlerTest extends TestCase
     public function testExecutesCommandThatCatchesThrownException()
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
-        $context = $handler(new RunCommandMessage('test:command --throw -v', throwOnFailure: false, catchExceptions: true));
+        $context = $handler(new RunCommandMessage('test:command --throw -v', false, true));
 
         $this->assertSame(1, $context->exitCode);
         $this->assertStringContainsString('[RuntimeException]', $context->output);

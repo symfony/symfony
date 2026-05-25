@@ -27,3 +27,5 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Dto\Dummy: ~
     Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\StringToRangeValueTransformer: ~
     Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\RangeToStringValueTransformer: ~
+    json_streamer.value_object_transformer.height:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\HeightValueObjectTransformer

@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
-use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -42,7 +41,9 @@ use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
+use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\TypeInfo\TypeResolver\ReflectionTypeResolver;
 
 /**
  * Base class for a normalizer dealing with objects.
@@ -67,6 +68,15 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      * You can disable this by setting this flag to true.
      */
     public const DISABLE_TYPE_ENFORCEMENT = 'disable_type_enforcement';
+
+    /**
+     * While denormalizing, convert scalar types to the expected type.
+     *
+     * If not defined, it will be enabled for XML and CSV format, because all basic datatypes are represented as strings.
+     * The default is computed once from the outermost $format and then propagated to child contexts. Set the key
+     * explicitly to opt in or out independently of $format.
+     */
+    public const ENABLE_TYPE_CONVERSION = 'enable_type_conversion';
 
     /**
      * Flag to control whether fields with the value `null` should be output
@@ -196,8 +206,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $attributeValue = $attribute === $this->classDiscriminatorResolver?->getMappingForMappedObject($data)?->getTypeProperty()
                     ? $this->classDiscriminatorResolver?->getTypeForMappedObject($data)
                     : $this->getAttributeValue($data, $attribute, $format, $attributeContext);
-            } catch (UninitializedPropertyException|\Error $e) {
-                if (($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) && $this->isUninitializedValueError($e)) {
+            } catch (UninitializedPropertyException $e) {
+                if ($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) {
                     continue;
                 }
                 throw $e;
@@ -289,6 +299,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
     /**
      * Gets the attribute value.
+     *
+     * @throws UninitializedPropertyException When the attribute exists but is not initialized on the object
      */
     abstract protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed;
 
@@ -314,6 +326,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         if (XmlEncoder::FORMAT === $format && !\is_array($data)) {
             $data = ['#' => $data];
         }
+
+        $context[self::ENABLE_TYPE_CONVERSION] ??= XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format;
 
         $allowedAttributes = $this->getAllowedAttributes($type, $context, true);
         $normalizedData = $this->prepareForDenormalization($data);
@@ -377,8 +391,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         ? $discriminatorMapping
                         : $this->getAttributeValue($object, $attribute, $format, $attributeContext);
                 } catch (NoSuchPropertyException) {
-                } catch (UninitializedPropertyException|\Error $e) {
-                    if (!(($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true) && $this->isUninitializedValueError($e))) {
+                } catch (UninitializedPropertyException $e) {
+                    if (!($context[self::SKIP_UNINITIALIZED_VALUES] ?? $this->defaultContext[self::SKIP_UNINITIALIZED_VALUES] ?? true)) {
                         throw $e;
                     }
                 }
@@ -400,16 +414,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $attributeContext);
-            } catch (PropertyAccessInvalidArgumentException $e) {
-                $exception = NotNormalizableValueException::createForUnexpectedDataType(
-                    \sprintf('Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(), $attribute, $resolvedClass),
-                    $data,
-                    $e instanceof InvalidTypeException ? [$e->expectedType] : ['unknown'],
-                    $attributeContext['deserialization_path'] ?? null,
-                    false,
-                    $e->getCode(),
-                    $e
-                );
+            } catch (NotNormalizableValueException $exception) {
                 if (isset($context['not_normalizable_value_exceptions'])) {
                     $context['not_normalizable_value_exceptions'][] = $exception;
                     continue;
@@ -419,12 +424,19 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if ($extraAttributes) {
-            throw new ExtraAttributesException($extraAttributes);
+            $extraAttributeException = new ExtraAttributesException(array_map(static fn (string $extraAttribute) => PropertyPath::append($context['deserialization_path'] ?? '', $extraAttribute), $extraAttributes));
+            if (!isset($context['extra_attributes_exceptions'])) {
+                throw $extraAttributeException;
+            }
+            $context['extra_attributes_exceptions'][] = $extraAttributeException;
         }
 
         return $object;
     }
 
+    /**
+     * @throws NotNormalizableValueException When the value cannot be assigned to the attribute (e.g. type mismatch)
+     */
     abstract protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void;
 
     /**
@@ -480,7 +492,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 // if a value is meant to be a string, float, int or a boolean value from the serialized representation.
                 // That's why we have to transform the values, if one of these non-string basic datatypes is expected.
                 $typeIdentifier = $t->getTypeIdentifier();
-                if (\is_string($data) && (XmlEncoder::FORMAT === $format || CsvEncoder::FORMAT === $format)) {
+                if (\is_string($data) && ($context[self::ENABLE_TYPE_CONVERSION] ?? $this->defaultContext[self::ENABLE_TYPE_CONVERSION] ?? false)) {
                     if ('' === $data) {
                         if (TypeIdentifier::ARRAY === $typeIdentifier) {
                             return [];
@@ -574,6 +586,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             // the builtinType is the inner one and the class is the class followed by []...[]
                             $typeIdentifier = TypeIdentifier::OBJECT;
                             $class = $innerType->getClassName().$dimensions;
+                            $context['key_type'] = $collectionKeyType;
+                            $context['value_type'] = $collectionValueType;
                         } else {
                             // default fallback (keep it as array)
                             if ($t instanceof ObjectType) {
@@ -699,6 +713,34 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         if ($parameter->isVariadic() || null === $this->propertyTypeExtractor || null === $type = $this->getType($class->getName(), $parameterName)) {
             return parent::denormalizeParameter($class, $parameter, $parameterName, $parameterData, $context, $format);
+        }
+
+        $parameterType = $parameter->getType();
+        static $parameterTypeResolver;
+        static $parameterTypeContextFactory;
+
+        if (null !== $parameterType && $parameterTypeResolver ??= class_exists(ReflectionTypeResolver::class) ? new ReflectionTypeResolver() : false) {
+            $resolvedParameterType = $parameterTypeResolver->resolve($parameterType, ($parameterTypeContextFactory ??= new TypeContextFactory())->createFromClassName($class->name, $parameter->getDeclaringClass()?->name));
+            if ($resolvedParameterType->isSatisfiedBy(static fn (Type $t) => match (true) {
+                $t instanceof BuiltinType && !\in_array($t->getTypeIdentifier(), [TypeIdentifier::NULL, TypeIdentifier::MIXED], true) => !$type->isIdentifiedBy($t->getTypeIdentifier()),
+                $t instanceof ObjectType => !$type->isIdentifiedBy($t->getClassName()),
+                default => false,
+            })) {
+                $type = $resolvedParameterType;
+            }
+        } elseif ($parameterType instanceof \ReflectionNamedType) {
+            if ($parameterType->isBuiltin()) {
+                $typeIdentifier = TypeIdentifier::tryFrom($parameterType->getName());
+
+                if (null !== $typeIdentifier && TypeIdentifier::MIXED !== $typeIdentifier && !$type->isIdentifiedBy($typeIdentifier)) {
+                    $type = Type::builtin($typeIdentifier);
+                }
+            } elseif (!$type->isIdentifiedBy($parameterType->getName())) {
+                $type = Type::object($parameterType->getName());
+            }
+            if ($parameter->allowsNull()) {
+                $type = Type::nullable($type);
+            }
         }
 
         $parameterData = $this->validateAndDenormalize($type, $class->getName(), $parameterName, $parameterData, $format, $context);
@@ -862,17 +904,6 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             // The context cannot be serialized, skip the cache
             return false;
         }
-    }
-
-    /**
-     * This error may occur when specific object normalizer implementation gets attribute value
-     * by accessing a public uninitialized property or by calling a method accessing such property.
-     */
-    private function isUninitializedValueError(\Error|UninitializedPropertyException $e): bool
-    {
-        return $e instanceof UninitializedPropertyException
-            || str_starts_with($e->getMessage(), 'Typed property')
-            && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
     }
 
     /**

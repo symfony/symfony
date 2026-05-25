@@ -31,6 +31,7 @@ class RedirectableCompiledUrlMatcher extends CompiledUrlMatcher implements Redir
             'httpPort' => $this->context->getHttpPort(),
             'httpsPort' => $this->context->getHttpsPort(),
             '_route' => $route,
+            '_route_mapping' => [],
         ];
     }
 }

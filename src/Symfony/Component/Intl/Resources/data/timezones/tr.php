@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Orta Avrupa Saati (Büsingen)',
         'Europe/Chisinau' => 'Doğu Avrupa Saati (Kişinev)',
         'Europe/Copenhagen' => 'Orta Avrupa Saati (Kopenhag)',
-        'Europe/Dublin' => 'İrlanda Saati (Dublin)',
+        'Europe/Dublin' => 'Greenwich Ortalama Saati (Dublin)',
         'Europe/Gibraltar' => 'Orta Avrupa Saati (Cebelitarık)',
         'Europe/Guernsey' => 'Greenwich Ortalama Saati (Guernsey)',
         'Europe/Helsinki' => 'Doğu Avrupa Saati (Helsinki)',

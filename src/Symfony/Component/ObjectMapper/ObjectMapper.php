@@ -12,6 +12,7 @@
 namespace Symfony\Component\ObjectMapper;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\ObjectMapper\Condition\ClassRuleConditionCallableInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
@@ -148,8 +149,18 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
+                $fn = null;
+                $isClassRule = false;
+                if ($if) {
+                    $fn = $this->getCallable($if, $this->conditionCallableLocator, ConditionCallableInterface::class);
+                    $isClassRule = $fn instanceof ClassRuleConditionCallableInterface;
+                    if ($isClassRule && !$this->call($fn, null, $source, $mappedTarget)) {
+                        continue;
+                    }
+                }
+
                 $value = $this->getRawValue($source, $sourcePropertyName);
-                if ($if && ($fn = $this->getCallable($if, $this->conditionCallableLocator, ConditionCallableInterface::class)) && !$this->call($fn, $value, $source, $mappedTarget)) {
+                if ($fn && !$isClassRule && !$this->call($fn, $value, $source, $mappedTarget)) {
                     unset($ctorArguments[$targetPropertyName]);
 
                     continue;
@@ -181,6 +192,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             $rawValue = $this->getRawValue($source, $propertyName);
             if (
                 \is_object($rawValue)
+                && !$objectMap->offsetExists($rawValue)
                 && ($innerMetadata = $this->metadataFactory->create($rawValue))
                 && ($mapTo = $this->getMapTarget($innerMetadata, $rawValue, $source, $mappedTarget))
                 && \is_string($mapTo->target)
@@ -316,6 +328,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     }
 
     /**
+     * @param-immediately-invoked-callable $fn
+     *
      * @param callable(): mixed $fn
      */
     private function call(callable $fn, mixed $value, object $source, ?object $target = null): mixed

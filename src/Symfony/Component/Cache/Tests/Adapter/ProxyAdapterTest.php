@@ -26,6 +26,7 @@ class ProxyAdapterTest extends AdapterTestCase
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testPrune' => 'ProxyAdapter just proxies',
+        'testClearWithInvalidPrefix' => 'Inner ArrayAdapter does not validate the prefix.',
     ];
 
     public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface

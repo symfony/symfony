@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'مرڪزي يورپي وقت (بزيجين)',
         'Europe/Chisinau' => 'مشرقي يورپي وقت (چسينائو)',
         'Europe/Copenhagen' => 'مرڪزي يورپي وقت (ڪوپن هيگن)',
-        'Europe/Dublin' => 'آئرلينڊ وقت (ڊبلن)',
+        'Europe/Dublin' => 'گرين وچ مين ٽائيم (ڊبلن)',
         'Europe/Gibraltar' => 'مرڪزي يورپي وقت (جبرالٽر)',
         'Europe/Guernsey' => 'گرين وچ مين ٽائيم (گرنزي)',
         'Europe/Helsinki' => 'مشرقي يورپي وقت (هيلسنڪي)',

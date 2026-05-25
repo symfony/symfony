@@ -52,7 +52,7 @@ class Connection
         'retry_interval' => 0, //  Int, value in milliseconds (optional, default is 0)
         'persistent_id' => null, // String, persistent connection id (optional, default is NULL meaning not persistent)
         'ssl' => null, // see https://php.net/context.ssl
-        'redis_cluster' => false, // force use of cluster
+        'cluster' => false, // force use of cluster
     ];
 
     private \Redis|Relay|\RedisCluster|null $redis = null;
@@ -68,7 +68,9 @@ class Connection
     private float $claimInterval;
     private bool $deleteAfterAck;
     private bool $deleteAfterReject;
-    private bool $couldHavePendingMessages = true;
+    private ?string $lastPendingMessageId = '0';
+    /** @var array<string, true> */
+    private array $inflightIds = [];
 
     public function __construct(array $options, \Redis|Relay|\RedisCluster|null $redis = null)
     {
@@ -77,6 +79,7 @@ class Connection
         $port = $options['port'];
         $auth = $options['auth'];
 
+        $sentinelAuth = $options['sentinel_auth'] ?? null;
         $sentinelMaster = $options['sentinel'] ?? $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
 
         if (null !== $sentinelMaster && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
@@ -93,11 +96,11 @@ class Connection
             }
         }
 
-        if ((\is_array($host) && null === $sentinelMaster) || $redis instanceof \RedisCluster || filter_var($options['redis_cluster'], \FILTER_VALIDATE_BOOLEAN)) {
+        if ((\is_array($host) && null === $sentinelMaster) || $redis instanceof \RedisCluster || filter_var($options['cluster'], \FILTER_VALIDATE_BOOLEAN)) {
             $hosts = \is_string($host) ? [$host.':'.$port] : $host; // Always ensure we have an array
             $this->redisInitializer = static fn () => self::initializeRedisCluster($redis, $hosts, $auth, $options);
         } else {
-            $this->redisInitializer = static function () use ($redis, $sentinelMaster, $host, $port, $options, $auth) {
+            $this->redisInitializer = static function () use ($redis, $sentinelMaster, $host, $port, $options, $auth, $sentinelAuth) {
                 if (null !== $sentinelMaster) {
                     $sentinelClass = \extension_loaded('redis') ? \RedisSentinel::class : Sentinel::class;
                     $hostIndex = 0;
@@ -106,6 +109,7 @@ class Connection
                         $host = $hosts[$hostIndex]['host'];
                         $port = $hosts[$hostIndex]['port'] ?? 0;
                         $tls = 'tls' === $hosts[$hostIndex]['scheme'];
+                        $passAuth = null !== $sentinelAuth && (!\extension_loaded('redis') || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                         $address = false;
 
                         if (isset($hosts[$hostIndex]['host']) && $tls) {
@@ -123,9 +127,18 @@ class Connection
                                     'readTimeout' => $options['read_timeout'],
                                 ];
 
+                                if ($passAuth) {
+                                    $params['auth'] = $sentinelAuth;
+                                }
+
+                                if (null !== $options['ssl'] && version_compare(phpversion('redis'), '6.2.0', '>=')) {
+                                    $params['ssl'] = $options['ssl'];
+                                }
+
                                 $sentinel = @new \RedisSentinel($params);
                             } else {
-                                $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout']);
+                                $extra = $passAuth ? [$sentinelAuth] : [];
+                                $sentinel = @new $sentinelClass($host, $port, $options['timeout'], $options['persistent_id'], $options['retry_interval'], $options['read_timeout'], ...$extra);
                             }
 
                             if ($address = @$sentinel->getMasterAddrByName($sentinelMaster)) {
@@ -260,7 +273,7 @@ class Connection
         }
 
         $options['sentinel'] ??= $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
-        unset($options['redis_sentinel'], $options['sentinel_master']);
+        unset($options['redis_sentinel'], $options['sentinel_master'], $options['cluster']);
 
         if ($invalidOptions = array_diff(array_keys($options), array_keys(self::DEFAULT_OPTIONS), ['host', 'port'])) {
             throw new LogicException(\sprintf('Invalid option(s) "%s" passed to the Redis Messenger transport.', implode('", "', $invalidOptions)));
@@ -276,7 +289,14 @@ class Connection
 
         $pass = '' !== ($params['pass'] ?? '') ? rawurldecode($params['pass']) : null;
         $user = '' !== ($params['user'] ?? '') ? rawurldecode($params['user']) : null;
-        $options['auth'] ??= null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
+        $auth = null !== $pass && null !== $user ? [$user, $pass] : ($pass ?? $user);
+        if (null === $options['sentinel']) {
+            $options['auth'] ??= $auth;
+            $options['sentinel_auth'] = null;
+        } else {
+            $options['sentinel_auth'] = $options['auth'] ?? null;
+            $options['auth'] = $auth ?? $options['auth'];
+        }
 
         if (isset($params['query'])) {
             parse_str($params['query'], $query);
@@ -367,52 +387,86 @@ class Connection
 
     private function claimOldPendingMessages(): void
     {
+        $redis = $this->getRedis();
+
         try {
-            // This could soon be optimized with https://github.com/antirez/redis/issues/5212 or
-            // https://github.com/antirez/redis/issues/6256
-            $pendingMessages = $this->getRedis()->xpending($this->stream, $this->group, '-', '+', 1) ?: [];
+            $pendingMessages = $redis->xpending($this->stream, $this->group, '-', '+', 1) ?: [];
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        $claimableIds = [];
-        foreach ($pendingMessages as $pendingMessage) {
-            if ($pendingMessage[1] === $this->consumer) {
-                $this->couldHavePendingMessages = true;
+        if (!$pendingMessages) {
+            $this->nextClaim = microtime(true) + $this->claimInterval;
 
-                return;
-            }
-
-            if ($pendingMessage[2] >= $this->redeliverTimeout) {
-                $claimableIds[] = $pendingMessage[0];
-            }
+            return;
         }
 
-        if (\count($claimableIds) > 0) {
-            try {
-                $this->getRedis()->xclaim(
-                    $this->stream,
-                    $this->group,
-                    $this->consumer,
-                    $this->redeliverTimeout,
-                    $claimableIds,
-                    ['JUSTID']
-                );
+        $pendingMessage = $pendingMessages[0];
 
-                $this->couldHavePendingMessages = true;
-            } catch (\RedisException|\Relay\Exception $e) {
-                throw new TransportException($e->getMessage(), 0, $e);
-            }
+        if ($pendingMessage[1] === $this->consumer) {
+            $this->nextClaim = microtime(true) + $this->claimInterval;
+
+            return;
         }
 
-        $this->nextClaim = microtime(true) + $this->claimInterval;
+        if ($pendingMessage[2] < $this->redeliverTimeout) {
+            $this->nextClaim = microtime(true) + $this->claimInterval;
+
+            return;
+        }
+
+        try {
+            $redis->xclaim(
+                $this->stream,
+                $this->group,
+                $this->consumer,
+                $this->redeliverTimeout,
+                [$pendingMessage[0]],
+                ['JUSTID']
+            );
+
+            $this->lastPendingMessageId = '0';
+        } catch (\RedisException|\Relay\Exception $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
     }
 
-    public function get(): ?array
+    /**
+     * @return list<array{id: string, data: mixed}>|null
+     */
+    public function get(int $fetchSize = 1): ?array
     {
+        $fetchSize = max(1, $fetchSize);
+
         if ($this->autoSetup) {
             $this->setup();
         }
+
+        $this->handleDelayedMessages();
+
+        $messages = [];
+
+        while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
+            $messages[] = $message;
+        }
+
+        if (\count($messages) < $fetchSize && null === $this->lastPendingMessageId && $this->nextClaim <= microtime(true)) {
+            $this->claimOldPendingMessages();
+
+            while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
+                $messages[] = $message;
+            }
+        }
+
+        if (\count($messages) < $fetchSize) {
+            $messages = [...$messages, ...$this->getNewMessages($fetchSize - \count($messages))];
+        }
+
+        return $messages ?: null;
+    }
+
+    private function handleDelayedMessages(): void
+    {
         $now = microtime();
         $now = substr($now, 11).substr($now, 2, 3);
 
@@ -439,16 +493,61 @@ class Connection
             $decodedQueuedMessage = json_decode($queuedMessage, true);
             $this->add(\array_key_exists('body', $decodedQueuedMessage) ? $decodedQueuedMessage['body'] : $queuedMessage, $decodedQueuedMessage['headers'] ?? [], 0);
         }
+    }
 
-        if (!$this->couldHavePendingMessages && $this->nextClaim <= microtime(true)) {
-            $this->claimOldPendingMessages();
+    private function getPendingMessage(): ?array
+    {
+        if (null === $this->lastPendingMessageId) {
+            return null;
         }
 
-        $messageId = '>'; // will receive new messages
+        while (true) {
+            $messages = $this->xReadGroup($this->lastPendingMessageId);
 
-        if ($this->couldHavePendingMessages) {
-            $messageId = '0'; // will receive consumers pending messages
+            if (empty($messages[$this->stream])) {
+                $this->lastPendingMessageId = null;
+
+                return null;
+            }
+
+            /** @var string $key */
+            $key = array_key_first($messages[$this->stream]);
+            $this->lastPendingMessageId = $key;
+
+            if (isset($this->inflightIds[$key])) {
+                continue;
+            }
+
+            $this->inflightIds[$key] = true;
+
+            return [
+                'id' => $key,
+                'data' => $messages[$this->stream][$key],
+            ];
         }
+    }
+
+    /**
+     * @return list<array{id: string, data: mixed}>
+     */
+    private function getNewMessages(int $count): array
+    {
+        $messages = $this->xReadGroup('>', $count);
+        $result = [];
+
+        foreach ($messages[$this->stream] ?? [] as $key => $message) {
+            $this->inflightIds[$key] = true;
+            $result[] = [
+                'id' => $key,
+                'data' => $message,
+            ];
+        }
+
+        return $result;
+    }
+
+    private function xReadGroup(string $messageId, int $count = 1): array
+    {
         $redis = $this->getRedis();
 
         try {
@@ -456,14 +555,14 @@ class Connection
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
-                1,
+                $count,
                 1
             );
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        if (false === $messages) {
+        if (!\is_array($messages)) {
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
             }
@@ -471,21 +570,7 @@ class Connection
             throw new TransportException($error ?? 'Could not read messages from the redis stream.');
         }
 
-        if ($this->couldHavePendingMessages && empty($messages[$this->stream])) {
-            $this->couldHavePendingMessages = false;
-
-            // No pending messages so get a new one
-            return $this->get();
-        }
-
-        foreach ($messages[$this->stream] ?? [] as $key => $message) {
-            return [
-                'id' => $key,
-                'data' => $message,
-            ];
-        }
-
-        return null;
+        return $messages;
     }
 
     public function ack(string $id): void
@@ -507,6 +592,8 @@ class Connection
             }
             throw new TransportException($error ?? \sprintf('Could not acknowledge redis message "%s".', $id));
         }
+
+        unset($this->inflightIds[$id]);
     }
 
     public function reject(string $id): void
@@ -528,6 +615,8 @@ class Connection
             }
             throw new TransportException($error ?? \sprintf('Could not delete message "%s" from the redis stream.', $id));
         }
+
+        unset($this->inflightIds[$id]);
     }
 
     public function add(string $body, array $headers, int $delayInMs = 0): string
@@ -746,6 +835,70 @@ class Connection
         }
 
         return $this->redis;
+    }
+
+    public function findAll(?int $limit = null): array
+    {
+        $redis = $this->getRedis();
+
+        try {
+            if (null === $limit) {
+                $range = $redis->xRange($this->stream, '-', '+');
+            } else {
+                $range = $redis->xRange($this->stream, '-', '+', $limit);
+            }
+        } catch (\RedisException|\Relay\Exception $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (!$range) {
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
+            }
+
+            return [];
+        }
+
+        $messages = [];
+        foreach ($range as $id => $data) {
+            $messages[] = [
+                'id' => $id,
+                'data' => $data,
+            ];
+        }
+
+        return $messages;
+    }
+
+    public function find(mixed $id): ?array
+    {
+        if (!\is_string($id)) {
+            return null;
+        }
+
+        $redis = $this->getRedis();
+
+        try {
+            $range = $redis->xRange($this->stream, $id, $id, 1);
+        } catch (\RedisException|\Relay\Exception $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (!$range) {
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
+            }
+
+            return null;
+        }
+
+        $data = current($range);
+        $messageId = key($range);
+
+        return [
+            'id' => $messageId,
+            'data' => $data,
+        ];
     }
 
     public function close(): void

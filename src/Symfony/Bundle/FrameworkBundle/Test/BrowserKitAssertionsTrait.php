@@ -17,6 +17,8 @@ use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\BrowserKit\History;
+use Symfony\Component\BrowserKit\Request as BrowserKitRequest;
+use Symfony\Component\BrowserKit\Response as BrowserKitResponse;
 use Symfony\Component\BrowserKit\Test\Constraint as BrowserKitConstraint;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -178,6 +180,11 @@ trait BrowserKitAssertionsTrait
         self::assertThat(self::getRequest(), $constraint, $message);
     }
 
+    public static function assertSessionHasFlashMessage(string $messageType, string|array $messages = ''): void
+    {
+        static::assertThat(self::getRequest(), new ResponseConstraint\SessionHasFlashMessage($messageType, $messages));
+    }
+
     public static function assertThatForResponse(Constraint $constraint, string $message = ''): void
     {
         try {
@@ -219,6 +226,14 @@ trait BrowserKitAssertionsTrait
             static::fail('A client must have an HTTP Response to make assertions. Did you forget to make an HTTP request?');
         }
 
+        if ($response instanceof BrowserKitResponse) {
+            return new Response(
+                $response->getContent(),
+                $response->getStatusCode(),
+                $response->getHeaders()
+            );
+        }
+
         return $response;
     }
 
@@ -226,6 +241,18 @@ trait BrowserKitAssertionsTrait
     {
         if (!$request = self::getClient()->getRequest()) {
             static::fail('A client must have an HTTP Request to make assertions. Did you forget to make an HTTP request?');
+        }
+
+        if ($request instanceof BrowserKitRequest) {
+            return Request::create(
+                $request->getUri(),
+                $request->getMethod(),
+                $request->getParameters(),
+                $request->getCookies(),
+                $request->getFiles(),
+                $request->getServer(),
+                $request->getContent()
+            );
         }
 
         return $request;

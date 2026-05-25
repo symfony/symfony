@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExceptionNormalizer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -29,6 +30,7 @@ class ErrorDetailsStampTest extends TestCase
     {
         $exception = new \Exception('exception message');
         $flattenException = FlattenException::createFromThrowable($exception);
+        $flattenException->setTrace([], $exception->getFile(), $exception->getLine());
 
         $stamp = ErrorDetailsStamp::create($exception);
 
@@ -43,6 +45,7 @@ class ErrorDetailsStampTest extends TestCase
         $envelope = new Envelope(new \stdClass());
         $exception = new HandlerFailedException($envelope, [$wrappedException]);
         $flattenException = FlattenException::createFromThrowable($wrappedException);
+        $flattenException->setTrace([], $wrappedException->getFile(), $wrappedException->getLine());
 
         $stamp = ErrorDetailsStamp::create($exception);
 
@@ -56,6 +59,16 @@ class ErrorDetailsStampTest extends TestCase
     {
         $exception = new \Exception('exception message');
         $stamp = ErrorDetailsStamp::create($exception);
+
+        // FlattenExceptionNormalizer drops trace args, mirror that on the expected stamp
+        $flattenException = $stamp->getFlattenException();
+        $trace = array_map(static function (array $frame): array {
+            unset($frame['args']);
+
+            return $frame;
+        }, $flattenException->getTrace());
+        (new \ReflectionProperty(FlattenException::class, 'trace'))->setValue($flattenException, $trace);
+
         $serializer = new Serializer(
             new SymfonySerializer([
                 new ArrayDenormalizer(),
@@ -69,5 +82,47 @@ class ErrorDetailsStampTest extends TestCase
         $deserializedStamp = $deserializedEnvelope->last(ErrorDetailsStamp::class);
         $this->assertInstanceOf(ErrorDetailsStamp::class, $deserializedStamp);
         $this->assertEquals($stamp, $deserializedStamp);
+    }
+
+    public function testRecoverableExceptionSkipsFlattenException()
+    {
+        $exception = new RecoverableTestException('recoverable message', 10);
+
+        $stamp = ErrorDetailsStamp::create($exception);
+
+        $this->assertSame($exception::class, $stamp->getExceptionClass());
+        $this->assertSame('recoverable message', $stamp->getExceptionMessage());
+        $this->assertSame(10, $stamp->getExceptionCode());
+        $this->assertNull($stamp->getFlattenException());
+    }
+
+    public function testEqualsUsesFlattenExceptionLocation()
+    {
+        $exceptionA = new \RuntimeException('same');
+        $exceptionB = new \RuntimeException('same');
+
+        $stampA = ErrorDetailsStamp::create($exceptionA);
+        $stampB = ErrorDetailsStamp::create($exceptionB);
+
+        $this->assertFalse($stampA->equals($stampB));
+    }
+
+    public function testEqualsFallsBackToExceptionDetailsWithoutFlattenException()
+    {
+        $exceptionA = new RecoverableTestException('recoverable', 123);
+        $exceptionB = new RecoverableTestException('recoverable', 123);
+
+        $stampA = ErrorDetailsStamp::create($exceptionA);
+        $stampB = ErrorDetailsStamp::create($exceptionB);
+
+        $this->assertTrue($stampA->equals($stampB));
+    }
+}
+
+class RecoverableTestException extends \RuntimeException implements RecoverableExceptionInterface
+{
+    public function getRetryDelay(): ?int
+    {
+        return null;
     }
 }

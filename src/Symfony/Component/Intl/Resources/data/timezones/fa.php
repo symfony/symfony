@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'وقت مرکز اروپا (بازنگن)',
         'Europe/Chisinau' => 'وقت شرق اروپا (کیشیناو)',
         'Europe/Copenhagen' => 'وقت مرکز اروپا (کپنهاگ)',
-        'Europe/Dublin' => 'وقت ایرلند (دوبلین)',
+        'Europe/Dublin' => 'وقت گرینویچ (دوبلین)',
         'Europe/Gibraltar' => 'وقت مرکز اروپا (جبل‌الطارق)',
         'Europe/Guernsey' => 'وقت گرینویچ (گرنزی)',
         'Europe/Helsinki' => 'وقت شرق اروپا (هلسینکی)',

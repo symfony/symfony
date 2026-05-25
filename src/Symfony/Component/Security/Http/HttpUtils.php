@@ -69,9 +69,17 @@ class HttpUtils
             Request::setTrustedProxies([], Request::getTrustedHeaderSet());
         }
 
+        // Trusted proxies are disabled above, so getBaseUrl() now returns only the
+        // webserver-derived portion of the base URL (e.g. an Apache "Alias /myapp …"
+        // sub-directory install). That portion must remain in the generated sub-request
+        // URI so it can re-detect its own base URL from SCRIPT_NAME/REQUEST_URI; only
+        // the trusted-proxy prefix is dropped from the URL generator's context here,
+        // otherwise it would be doubled once the sub-request is processed.
         $context = $this->urlGenerator?->getContext();
-        if ($baseUrl = $context?->getBaseUrl()) {
-            $context->setBaseUrl('');
+        $contextBaseUrl = $context?->getBaseUrl();
+        $realBaseUrl = null !== $context ? $request->getBaseUrl() : null;
+        if ($resetBaseUrl = $contextBaseUrl !== $realBaseUrl) {
+            $context->setBaseUrl($realBaseUrl);
         }
 
         try {
@@ -80,8 +88,8 @@ class HttpUtils
             if ($trustedProxies) {
                 Request::setTrustedProxies($trustedProxies, Request::getTrustedHeaderSet());
             }
-            if ($baseUrl) {
-                $context->setBaseUrl($baseUrl);
+            if ($resetBaseUrl) {
+                $context->setBaseUrl($contextBaseUrl);
             }
         }
 

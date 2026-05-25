@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Isikhathi sase-Central Europe (i-Busingen)',
         'Europe/Chisinau' => 'Isikhathi sase-Eastern Europe (i-Chisinau)',
         'Europe/Copenhagen' => 'Isikhathi sase-Central Europe (i-Copenhagen)',
-        'Europe/Dublin' => 'Isikhathi sase-i-Ireland (i-Dublin)',
+        'Europe/Dublin' => 'Isikhathi sase-Greenwich Mean (i-Dublin)',
         'Europe/Gibraltar' => 'Isikhathi sase-Central Europe (i-Gibraltar)',
         'Europe/Guernsey' => 'Isikhathi sase-Greenwich Mean (i-Guernsey)',
         'Europe/Helsinki' => 'Isikhathi sase-Eastern Europe (i-Helsinki)',

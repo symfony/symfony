@@ -1,7 +1,7 @@
 name: Windows
 
 on:
-  push:
+  push: { branches: [ '*.*' ] }
   pull_request:
 
 concurrency:
@@ -42,7 +42,7 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-Win32-vs17-x86.zip
+          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           Copy php.ini-development php.ini
           "memory_limit=-1" >> php.ini
@@ -56,6 +56,8 @@ jobs:
           "extension=php_mbstring.dll" >> php.ini
           "extension=php_openssl.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
+          "intl.default_locale=en" >> php.ini
+          "intl.error_level=0" >> php.ini
           cd ${{ github.workspace }}
           iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
 
@@ -83,9 +85,33 @@ jobs:
       - name: Run tests
         run: |
           $env:Path = 'c:\php;' + $env:Path
+          $x = 0
+          $workingDir = $PWD.Path
 
           Remove-Item -Path src\Symfony\Bridge\PhpUnit -Recurse
-          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group transient-on-windows
+          mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
+          # HttpClient tests need to run separately, they timeout otherwise
+          $hcJob = Start-Job -ScriptBlock {
+            Set-Location $using:workingDir
+            & php phpunit src\Symfony\Component\HttpClient 2>&1 | Out-File -FilePath "hc.log" -Encoding utf8
+            return $LASTEXITCODE
+          }
+          sleep 10
+
+          & php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows
+          if ($LASTEXITCODE -ne 0) { $x = 1 }
+
+          Wait-Job $hcJob | Out-Null
+          $hcExit = Receive-Job $hcJob
+          Get-Content "hc.log"
+          if ($hcExit -ne 0) {
+            $x = 1
+            Write-Host "`e[41mKO`e[0m src\Symfony/Component/HttpClient`n"
+          } else {
+            Write-Host "`e[32mOK`e[0m src\Symfony/Component/HttpClient`n"
+          }
+
+          exit $x
 
   windows-all-extensions:
     name: x86 / all extensions / lowest-php
@@ -117,7 +143,7 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-Win32-vs17-x86.zip
+          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           cd ext
           iwr -outf php_apcu.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.24-8.4-ts-vs17-x86.zip
@@ -149,6 +175,8 @@ jobs:
           "extension=php_pdo_sqlite.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
           "extension=php_sodium.dll" >> php.ini
+          "intl.default_locale=en" >> php.ini
+          "intl.error_level=0" >> php.ini
           cd ${{ github.workspace }}
           iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
 

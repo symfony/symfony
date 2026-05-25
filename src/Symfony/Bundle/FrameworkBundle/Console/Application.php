@@ -11,9 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\ListCommand;
 use Symfony\Component\Console\Command\TraceableCommand;
 use Symfony\Component\Console\Debug\CliRequest;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,14 +24,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Service\ContainerAwareInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Application extends BaseApplication
+class Application extends BaseApplication implements ContainerAwareInterface
 {
     private bool $commandsRegistered = false;
-    private array $registrationErrors = [];
 
     public function __construct(
         private KernelInterface $kernel,
@@ -52,6 +52,13 @@ class Application extends BaseApplication
         return $this->kernel;
     }
 
+    public function getContainer(): ContainerInterface
+    {
+        $this->kernel->boot();
+
+        return $this->kernel->getContainer();
+    }
+
     public function reset(): void
     {
         if ($this->kernel->getContainer()->has('services_resetter')) {
@@ -68,10 +75,6 @@ class Application extends BaseApplication
     {
         $this->registerCommands();
 
-        if ($this->registrationErrors) {
-            $this->renderRegistrationErrors($input, $output);
-        }
-
         $container = $this->kernel->getContainer();
         $this->setDispatcher($container->get('event_dispatcher'));
 
@@ -85,15 +88,6 @@ class Application extends BaseApplication
     protected function doRunCommand(Command $command, InputInterface $input, OutputInterface $output): int
     {
         $requestStack = null;
-        $renderRegistrationErrors = true;
-
-        if (!$command instanceof ListCommand) {
-            if ($this->registrationErrors) {
-                $this->renderRegistrationErrors($input, $output);
-                $this->registrationErrors = [];
-                $renderRegistrationErrors = false;
-            }
-        }
 
         if ($input->hasParameterOption('--profile')) {
             $container = $this->kernel->getContainer();
@@ -128,11 +122,6 @@ class Application extends BaseApplication
             $returnCode = parent::doRunCommand($command, $input, $output);
         } finally {
             $requestStack?->pop();
-        }
-
-        if ($renderRegistrationErrors && $this->registrationErrors) {
-            $this->renderRegistrationErrors($input, $output);
-            $this->registrationErrors = [];
         }
 
         return $returnCode;
@@ -184,11 +173,16 @@ class Application extends BaseApplication
         $container = $this->kernel->getContainer();
 
         foreach ($this->kernel->getBundles() as $bundle) {
-            if ($bundle instanceof Bundle) {
+            if ($bundle instanceof Bundle
+                && method_exists($bundle, 'registerCommands')
+                && Bundle::class !== new \ReflectionMethod($bundle, 'registerCommands')->getDeclaringClass()->getName()
+            ) {
+                trigger_deprecation('symfony/framework-bundle', '8.1', 'Overriding the "%s::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', Bundle::class, get_debug_type($bundle));
+
                 try {
                     $bundle->registerCommands($this);
                 } catch (\Throwable $e) {
-                    $this->registrationErrors[] = $e;
+                    throw new \RuntimeException(\sprintf('"%s::registerCommands()" failed: register your commands as services tagged "console.command" (or with the #[AsCommand] attribute) instead of overriding this method.', $bundle::class), 0, $e);
                 }
             }
         }
@@ -204,23 +198,10 @@ class Application extends BaseApplication
                     try {
                         $this->addCommand($container->get($id));
                     } catch (\Throwable $e) {
-                        $this->registrationErrors[] = $e;
+                        throw new \RuntimeException(\sprintf('Eagerly loading command "%s" failed: declare its name at compile time with the #[AsCommand] attribute (or the "command" attribute of the "console.command" tag) so it can be loaded lazily.', $id), 0, $e);
                     }
                 }
             }
-        }
-    }
-
-    private function renderRegistrationErrors(InputInterface $input, OutputInterface $output): void
-    {
-        if ($output instanceof ConsoleOutputInterface) {
-            $output = $output->getErrorOutput();
-        }
-
-        (new SymfonyStyle($input, $output))->warning('Some commands could not be registered:');
-
-        foreach ($this->registrationErrors as $error) {
-            $this->doRenderThrowable($error, $output);
         }
     }
 }

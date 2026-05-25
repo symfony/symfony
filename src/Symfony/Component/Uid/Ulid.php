@@ -47,7 +47,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             if (self::MAX === $this->uid) {
                 $this->uid = self::MAX;
             } elseif (!self::isValid($ulid)) {
-                throw new InvalidArgumentException('Invalid ULID.');
+                throw new InvalidArgumentException('Invalid ULID.', $ulid);
             }
         }
     }
@@ -55,9 +55,9 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
     /**
      * @param int-mask-of<Ulid::FORMAT_*> $format
      */
-    public static function isValid(string $ulid/*, int $format = self::FORMAT_BASE_32*/): bool
+    public static function isValid(string $ulid/* , int $format = self::FORMAT_BASE_32 */): bool
     {
-        $format = \func_num_args() > 1 ? func_get_arg(1) : self::FORMAT_BASE_32;
+        $format = \func_num_args() > 1 ? (int) func_get_arg(1) : self::FORMAT_BASE_32;
 
         if (26 === \strlen($ulid) && !($format & self::FORMAT_BASE_32)) {
             return false;

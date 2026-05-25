@@ -25,6 +25,10 @@ final class RequestValueResolver implements ValueResolverInterface
 {
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
+        if ($request->attributes->has($argument->getName())) {
+            return [];
+        }
+
         if (Request::class === $argument->getType() || is_subclass_of($argument->getType(), Request::class)) {
             return [$request];
         }

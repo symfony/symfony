@@ -18,7 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  *
  * Primarily, the metadata stores serialization groups.
  *
- * @internal
+ * @psalm-inheritors AttributeMetadata
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

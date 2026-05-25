@@ -167,4 +167,291 @@ class ArrayInputTest extends TestCase
         $input = new ArrayInput(['array_arg' => ['val_1', 'val_2']]);
         $this->assertSame('val_1 val_2', (string) $input);
     }
+
+    #[DataProvider('unparseProvider')]
+    public function testUnparse(?InputDefinition $inputDefinition, ArrayInput $input, ?array $parsedOptions, array $expected)
+    {
+        if (null !== $inputDefinition) {
+            $input->bind($inputDefinition);
+        }
+
+        $actual = $input->unparse($parsedOptions);
+
+        self::assertSame($expected, $actual);
+    }
+
+    public static function unparseProvider(): iterable
+    {
+        yield 'empty input and empty definition' => [
+            new InputDefinition(),
+            new ArrayInput([]),
+            null,
+            [],
+        ];
+
+        yield 'empty input and definition with default values: ignore default values' => [
+            new InputDefinition([
+                new InputArgument(
+                    'argWithDefaultValue',
+                    InputArgument::OPTIONAL,
+                    'Argument with a default value',
+                    'arg1DefaultValue',
+                ),
+                new InputOption(
+                    'optWithDefaultValue',
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                    'Option with a default value',
+                    'opt1DefaultValue',
+                ),
+            ]),
+            new ArrayInput([]),
+            null,
+            [],
+        ];
+
+        $completeInputDefinition = new InputDefinition([
+            new InputArgument(
+                'requiredArgWithoutDefaultValue',
+                InputArgument::REQUIRED,
+                'Argument without a default value',
+            ),
+            new InputArgument(
+                'optionalArgWithDefaultValue',
+                InputArgument::OPTIONAL,
+                'Argument with a default value',
+                'argDefaultValue',
+            ),
+            new InputOption(
+                'optWithoutDefaultValue',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Option without a default value',
+            ),
+            new InputOption(
+                'optWithDefaultValue',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Option with a default value',
+                'optDefaultValue',
+            ),
+        ]);
+
+        yield 'arguments & options: returns all passed options but ignore default values' => [
+            $completeInputDefinition,
+            new ArrayInput([
+                'requiredArgWithoutDefaultValue' => 'argValue',
+                '--optWithoutDefaultValue' => 'optValue',
+            ]),
+            null,
+            ['--optWithoutDefaultValue=optValue'],
+        ];
+
+        yield 'arguments & options; explicitly pass the default values: the default values are returned' => [
+            $completeInputDefinition,
+            new ArrayInput([
+                'requiredArgWithoutDefaultValue' => 'argValue',
+                'optionalArgWithDefaultValue' => 'argDefaultValue',
+                '--optWithoutDefaultValue' => 'optValue',
+                '--optWithDefaultValue' => 'optDefaultValue',
+            ]),
+            null,
+            [
+                '--optWithoutDefaultValue=optValue',
+                '--optWithDefaultValue=optDefaultValue',
+            ],
+        ];
+
+        yield 'arguments & options; no input definition: nothing returned' => [
+            null,
+            new ArrayInput([
+                'requiredArgWithoutDefaultValue' => 'argValue',
+                'optionalArgWithDefaultValue' => 'argDefaultValue',
+                '--optWithoutDefaultValue' => 'optValue',
+                '--optWithDefaultValue' => 'optDefaultValue',
+            ]),
+            null,
+            [],
+        ];
+
+        yield 'arguments & options; parsing an argument name instead of an option name: that option is ignored' => [
+            $completeInputDefinition,
+            new ArrayInput(['requiredArgWithoutDefaultValue' => 'argValue']),
+            ['requiredArgWithoutDefaultValue'],
+            [],
+        ];
+
+        yield 'arguments & options; non passed option: it is ignored' => [
+            $completeInputDefinition,
+            new ArrayInput(['requiredArgWithoutDefaultValue' => 'argValue']),
+            ['optWithDefaultValue'],
+            [],
+        ];
+
+        yield 'arguments & options; requesting a specific option' => [
+            $completeInputDefinition,
+            new ArrayInput([
+                '--optWithoutDefaultValue' => 'optValue1',
+                '--optWithDefaultValue' => 'optValue2',
+            ]),
+            ['optWithDefaultValue'],
+            ['--optWithDefaultValue=optValue2'],
+        ];
+
+        yield 'arguments & options; requesting no options' => [
+            $completeInputDefinition,
+            new ArrayInput([
+                '--optWithoutDefaultValue' => 'optValue1',
+                '--optWithDefaultValue' => 'optValue2',
+            ]),
+            [],
+            [],
+        ];
+
+        $createSingleOptionScenario = static fn (
+            InputOption $option,
+            array $input,
+            array $expected,
+        ) => [
+            new InputDefinition([$option]),
+            new ArrayInput($input),
+            null,
+            $expected,
+        ];
+
+        yield 'option without value' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_NONE,
+            ),
+            ['--opt' => null],
+            ['--opt'],
+        );
+
+        yield 'option without value by shortcut' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                'o',
+                InputOption::VALUE_NONE,
+            ),
+            ['-o' => null],
+            ['--opt'],
+        );
+
+        yield 'option with value required' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_REQUIRED,
+            ),
+            ['--opt' => 'foo'],
+            ['--opt=foo'],
+        );
+
+        yield 'option with non string value (bool)' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_REQUIRED,
+            ),
+            ['--opt' => true],
+            ['--opt=1'],
+        );
+
+        yield 'option with non string value (int)' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_REQUIRED,
+            ),
+            ['--opt' => 20],
+            ['--opt=20'],
+        );
+
+        yield 'option with non string value (float)' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_REQUIRED,
+            ),
+            ['--opt' => 5.3],
+            ['--opt=5.3'],
+        );
+
+        yield 'option with non string value (array of strings)' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            ),
+            ['--opt' => ['v1', 'v2', 'v3']],
+            ['--opt=v1', '--opt=v2', '--opt=v3'],
+        );
+
+        yield 'negatable option (positive)' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_NEGATABLE,
+            ),
+            ['--opt' => null],
+            ['--opt'],
+        );
+
+        yield 'negatable option (negative)' => $createSingleOptionScenario(
+            new InputOption(
+                'opt',
+                null,
+                InputOption::VALUE_NEGATABLE,
+            ),
+            ['--no-opt' => null],
+            ['--no-opt'],
+        );
+
+        $createEscapeOptionTokenScenario = static fn (
+            string $optionValue,
+            ?string $expected,
+        ) => [
+            new InputDefinition([
+                new InputOption(
+                    'opt',
+                    null,
+                    InputOption::VALUE_REQUIRED,
+                ),
+            ]),
+            new ArrayInput([
+                '--opt' => $optionValue,
+            ]),
+            null,
+            [
+                '--opt='.$expected,
+            ],
+        ];
+
+        yield 'escape token; string token' => $createEscapeOptionTokenScenario(
+            'foo',
+            'foo',
+        );
+
+        yield 'escape token; escaped string token' => $createEscapeOptionTokenScenario(
+            '"foo"',
+            '"foo"',
+        );
+
+        yield 'escape token; escaped string token with both types of quotes' => $createEscapeOptionTokenScenario(
+            '"o_id in(\'20\')"',
+            '"o_id in(\'20\')"',
+        );
+
+        yield 'escape token; string token with spaces' => $createEscapeOptionTokenScenario(
+            'a b c d',
+            'a b c d',
+        );
+
+        yield 'escape token; string token with line return' => $createEscapeOptionTokenScenario(
+            "A\nB'C",
+            "A\nB'C",
+        );
+    }
 }

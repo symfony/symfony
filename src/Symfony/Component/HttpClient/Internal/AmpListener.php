@@ -223,6 +223,11 @@ class AmpListener implements EventListener
 
     public function requestRejected(Request $request): void
     {
+        if (null !== $this->connectTimerId) {
+            EventLoop::cancel($this->connectTimerId);
+            $this->connectTimerId = null;
+        }
+
         $this->handle = null;
         ($this->onProgress)();
     }

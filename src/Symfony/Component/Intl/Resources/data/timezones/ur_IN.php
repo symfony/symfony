@@ -89,6 +89,7 @@ return [
         'Europe/Budapest' => 'وسطی یورپ کا وقت (بوڈاپیسٹ)',
         'Europe/Busingen' => 'وسطی یورپ کا وقت (بزنجن)',
         'Europe/Copenhagen' => 'وسطی یورپ کا وقت (کوپن ہیگن)',
+        'Europe/Dublin' => 'گرین وچ مین ٹائم (ڈبلن)',
         'Europe/Gibraltar' => 'وسطی یورپ کا وقت (جبل الطارق)',
         'Europe/Guernsey' => 'گرین وچ مین ٹائم (گرنزی)',
         'Europe/Isle_of_Man' => 'گرین وچ مین ٹائم (آئل آف مین)',

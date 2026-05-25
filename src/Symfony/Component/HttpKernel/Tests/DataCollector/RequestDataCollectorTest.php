@@ -462,4 +462,111 @@ class RequestDataCollectorTest extends TestCase
             ['', null],
         ];
     }
+
+    public function testCurlCommandGet()
+    {
+        $request = Request::create('http://test.com/foo?bar=baz');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringStartsWith("curl \\\n  --compressed", $curlCommand);
+        $this->assertStringContainsString('--url '.('\\' === \DIRECTORY_SEPARATOR ? '"http://test.com/foo?bar=baz"' : "'http://test.com/foo?bar=baz'"), $curlCommand);
+        $this->assertStringNotContainsString('--request', $curlCommand);
+    }
+
+    public function testCurlCommandPost()
+    {
+        $request = Request::create('http://test.com/foo', 'POST', [], [], [], [], '{"key":"value"}');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--request POST', $curlCommand);
+        $this->assertStringContainsString('--data-raw', $curlCommand);
+        $this->assertStringContainsString('\\' === \DIRECTORY_SEPARATOR ? '"{""key"":""value""}"' : '\'{"key":"value"}\'', $curlCommand);
+    }
+
+    public function testCurlCommandHead()
+    {
+        $request = Request::create('http://test.com/foo', 'HEAD');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--head', $curlCommand);
+        $this->assertStringNotContainsString('--request', $curlCommand);
+    }
+
+    public function testCurlCommandWithHeaders()
+    {
+        $request = Request::create('http://test.com/foo');
+        $request->headers->set('Accept', 'application/json');
+        $request->headers->set('X-Custom-Header', 'custom-value');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--header '.('\\' === \DIRECTORY_SEPARATOR ? '"Accept: application/json"' : "'Accept: application/json'"), $curlCommand);
+        $this->assertStringContainsString('--header '.('\\' === \DIRECTORY_SEPARATOR ? '"X-Custom-Header: custom-value"' : "'X-Custom-Header: custom-value'"), $curlCommand);
+        $this->assertStringNotContainsString('Host:', $curlCommand);
+    }
+
+    public function testCurlCommandWithCookies()
+    {
+        $request = Request::create('http://test.com/foo', 'GET', [], ['session' => 'abc123', 'lang' => 'en']);
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--cookie', $curlCommand);
+        $this->assertStringContainsString('session=abc123', $curlCommand);
+        $this->assertStringContainsString('lang=en', $curlCommand);
+    }
+
+    public function testCurlCommandPutWithBody()
+    {
+        $request = Request::create('http://test.com/resource/1', 'PUT', [], [], [], [], 'updated data');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--request PUT', $curlCommand);
+        $this->assertStringContainsString('--data-raw', $curlCommand);
+    }
+
+    public function testCurlCommandDoesNotDuplicateQueryString()
+    {
+        $request = Request::create('http://test.com/path?foo=bar&baz=qux');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertSame(1, substr_count($curlCommand, 'foo=bar'));
+        $this->assertSame(1, substr_count($curlCommand, 'baz=qux'));
+    }
+
+    public function testCurlCommandGetWithNoBody()
+    {
+        $request = Request::create('http://test.com/foo', 'GET');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringNotContainsString('--data-raw', $curlCommand);
+    }
+
+    public function testCurlCommandIsEmptyStringWhenNotCollected()
+    {
+        $c = new RequestDataCollector();
+        $this->assertSame('', $c->getCurlCommand());
+    }
 }

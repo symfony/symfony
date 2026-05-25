@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Vidurio Europos laikas (Biusingenas)',
         'Europe/Chisinau' => 'Rytų Europos laikas (Kišiniovas)',
         'Europe/Copenhagen' => 'Vidurio Europos laikas (Kopenhaga)',
-        'Europe/Dublin' => 'Laikas: Airija (Dublinas)',
+        'Europe/Dublin' => 'Grinvičo laikas (Dublinas)',
         'Europe/Gibraltar' => 'Vidurio Europos laikas (Gibraltaras)',
         'Europe/Guernsey' => 'Grinvičo laikas (Gernsis)',
         'Europe/Helsinki' => 'Rytų Europos laikas (Helsinkis)',

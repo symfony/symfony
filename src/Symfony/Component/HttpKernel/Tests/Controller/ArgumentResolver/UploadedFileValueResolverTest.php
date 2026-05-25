@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\ValidatorBuilder;
 
 class UploadedFileValueResolverTest extends TestCase
@@ -62,6 +63,44 @@ class UploadedFileValueResolverTest extends TestCase
     #[DataProvider('provideContext')]
     public function testEmpty(RequestPayloadValueResolver $resolver, Request $request)
     {
+        $attribute = new MapUploadedFile();
+        $argument = new ArgumentMetadata(
+            'qux',
+            UploadedFile::class,
+            false,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->expectException(HttpException::class);
+
+        $resolver->onKernelControllerArguments($event);
+    }
+
+    public function testEmptyArrayUploadedFileArgument()
+    {
+        $resolver = new RequestPayloadValueResolver(
+            new Serializer(),
+            (new ValidatorBuilder())->getValidator()
+        );
+        $request = Request::create(
+            '/',
+            'POST',
+            files: [
+                'qux' => [],
+            ],
+            server: ['HTTP_CONTENT_TYPE' => 'multipart/form-data']
+        );
+
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
             'qux',
@@ -200,6 +239,37 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
+    public function testConstraintsViolationHasArgumentNameAsPropertyPath(RequestPayloadValueResolver $resolver, Request $request)
+    {
+        $attribute = new MapUploadedFile(constraints: new Assert\File(maxSize: 50));
+        $argument = new ArgumentMetadata(
+            'bar',
+            UploadedFile::class,
+            false,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('bar', $validationFailedException->getViolations()[0]->getPropertyPath());
+        }
+    }
+
+    #[DataProvider('provideContext')]
     public function testMultipleFilesArray(RequestPayloadValueResolver $resolver, Request $request)
     {
         $attribute = new MapUploadedFile();
@@ -259,6 +329,36 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
+    public function testSingleFileVariadic(RequestPayloadValueResolver $resolver, Request $request)
+    {
+        $attribute = new MapUploadedFile();
+        $argument = new ArgumentMetadata(
+            'foo',
+            UploadedFile::class,
+            true,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+        $resolver->onKernelControllerArguments($event);
+
+        /** @var UploadedFile[] $data */
+        $data = $event->getArguments();
+
+        $this->assertCount(1, $data);
+        $this->assertSame('file-small.txt', $data[0]->getFilename());
+        $this->assertSame(36, $data[0]->getSize());
+    }
+
+    #[DataProvider('provideContext')]
     public function testMultipleFilesVariadic(RequestPayloadValueResolver $resolver, Request $request)
     {
         $attribute = new MapUploadedFile();
@@ -281,7 +381,7 @@ class UploadedFileValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         /** @var UploadedFile[] $data */
-        $data = $event->getArguments()[0];
+        $data = $event->getArguments();
 
         $this->assertCount(2, $data);
         $this->assertSame('file-small.txt', $data[0]->getFilename());

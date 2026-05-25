@@ -22,18 +22,19 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class SmsboxRequestParser extends AbstractRequestParser
 {
+    // https://www.smsbox.net/en/tools-development#doc-sms-accusees
+    public const PROVIDER_IPS = ['37.59.198.135', '178.33.185.51', '54.36.93.79', '54.36.93.80', '62.4.31.47', '62.4.31.48'];
+
+    public function __construct(
+        private readonly array $allowedIPs = self::PROVIDER_IPS,
+    ) {
+    }
+
     protected function getRequestMatcher(): RequestMatcherInterface
     {
         return new ChainRequestMatcher([
             new MethodRequestMatcher(['GET']),
-            new IpsRequestMatcher([
-                '37.59.198.135',
-                '178.33.185.51',
-                '54.36.93.79',
-                '54.36.93.80',
-                '62.4.31.47',
-                '62.4.31.48',
-            ]),
+            new IpsRequestMatcher($this->allowedIPs),
         ]);
     }
 

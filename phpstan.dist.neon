@@ -1,0 +1,20 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - .github/sa-tools/phpstan.baseline.neon
+
+parameters:
+    level: 5
+    reportUnmatchedIgnoredErrors: false
+    tmpDir: .github/sa-tools/phpstan-cache
+    paths:
+        - src
+    excludePaths:
+        - src/Symfony/*/Tests/*
+        - src/Symfony/*/*/Tests/*
+        - src/Symfony/*/*/*/Tests/*
+        - src/Symfony/*/*/*/*/Tests/*
+        - src/Symfony/Component/Intl/Resources/data/*
+        - src/Symfony/Component/Emoji/Resources/data/*
+    ignoreErrors:
+        # Added in PHP 8.4
+        - '#^Class BcMath\\Number not found\.$#'

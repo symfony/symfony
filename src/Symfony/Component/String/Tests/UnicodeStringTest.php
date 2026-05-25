@@ -15,8 +15,38 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\String\AbstractString;
 use Symfony\Component\String\UnicodeString;
 
+class UnicodeStringTestToStringGadget
+{
+    public static bool $fired = false;
+
+    public function __toString(): string
+    {
+        self::$fired = true;
+
+        return '';
+    }
+}
+
 class UnicodeStringTest extends AbstractUnicodeTestCase
 {
+    public function testUnserializeRejectsObjectInTypedStringProperty()
+    {
+        $payload = \sprintf(
+            'O:%d:"%s":1:{s:6:"string";O:%d:"%s":0:{}}',
+            \strlen(UnicodeString::class), UnicodeString::class,
+            \strlen(UnicodeStringTestToStringGadget::class), UnicodeStringTestToStringGadget::class,
+        );
+        UnicodeStringTestToStringGadget::$fired = false;
+
+        try {
+            unserialize($payload);
+            $this->fail('Expected BadMethodCallException.');
+        } catch (\BadMethodCallException $e) {
+        }
+
+        $this->assertFalse(UnicodeStringTestToStringGadget::$fired, '__toString gadget must not fire during unserialize');
+    }
+
     #[DataProvider('provideTrimNormalization')]
     public function testTrimPrefixNormalization(string $expected, string $string, $prefix)
     {

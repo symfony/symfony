@@ -331,7 +331,7 @@ return [
         'Europe/Busingen' => 'Марказий Европа вақти (Byuzingen)',
         'Europe/Chisinau' => 'Шарқий Европа вақти (Kishinyov)',
         'Europe/Copenhagen' => 'Марказий Европа вақти (Kopengagen)',
-        'Europe/Dublin' => 'Ирландия вақти (Dublin)',
+        'Europe/Dublin' => 'Гринвич вақти (Dublin)',
         'Europe/Gibraltar' => 'Марказий Европа вақти (Gibraltar)',
         'Europe/Guernsey' => 'Гринвич вақти (Gernsi)',
         'Europe/Helsinki' => 'Шарқий Европа вақти (Xelsinki)',

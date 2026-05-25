@@ -37,8 +37,9 @@ class CsrfProtectionListenerTest extends TestCase
 
     public function testValidCsrfToken()
     {
-        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager
+            ->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(true);
@@ -53,8 +54,9 @@ class CsrfProtectionListenerTest extends TestCase
 
     public function testInvalidCsrfToken()
     {
-        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager
+            ->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(false);

@@ -32,7 +32,7 @@ final class BeanstalkdTransportTest extends TestCase
     public function testReceivesMessages()
     {
         $transport = $this->getTransport(
-            $serializer = $this->createStub(SerializerInterface::class),
+            $serializer = $this->createMock(SerializerInterface::class),
             $connection = $this->createStub(Connection::class)
         );
 
@@ -44,10 +44,10 @@ final class BeanstalkdTransportTest extends TestCase
             'headers' => ['my' => 'header'],
         ];
 
-        $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
         $connection->method('get')->willReturn($beanstalkdEnvelope);
 
-        $envelopes = $transport->get();
+        $envelopes = iterator_to_array($transport->get());
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 

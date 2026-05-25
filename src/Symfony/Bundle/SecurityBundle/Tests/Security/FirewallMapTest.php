@@ -87,7 +87,7 @@ class FirewallMapTest extends TestCase
     public static function providesStatefulStatelessRequests(): \Generator
     {
         yield [new Request(), false];
-        yield [new Request(attributes: ['_stateless' => false]), false];
-        yield [new Request(attributes: ['_stateless' => true]), true];
+        yield [new Request([], [], ['_stateless' => false]), false];
+        yield [new Request([], [], ['_stateless' => true]), true];
     }
 }

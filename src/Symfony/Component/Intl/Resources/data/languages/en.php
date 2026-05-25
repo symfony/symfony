@@ -484,7 +484,7 @@ return [
         'saq' => 'Samburu',
         'sas' => 'Sasak',
         'sat' => 'Santali',
-        'saz' => 'Saurashtra',
+        'saz' => 'Sourashtra',
         'sba' => 'Ngambay',
         'sbp' => 'Sangu',
         'sc' => 'Sardinian',

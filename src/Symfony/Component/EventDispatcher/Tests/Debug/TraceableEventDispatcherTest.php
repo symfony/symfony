@@ -331,6 +331,146 @@ class TraceableEventDispatcherTest extends TestCase
         $events = $tdispatcher->getOrphanedEvents();
         $this->assertCount(0, $events);
     }
+
+    public function testCallStackIsNotLeakingOnRepeatedDispatch()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () {}, 5);
+
+        for ($i = 0; $i < 5; ++$i) {
+            $tdispatcher->dispatch(new Event(), 'foo');
+        }
+
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+    }
+
+    public function testCallStackIsNotLeakingWithMultipleListeners()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () {}, 10);
+        $tdispatcher->addListener('foo', static function () {}, 5);
+
+        for ($i = 0; $i < 5; ++$i) {
+            $tdispatcher->dispatch(new Event(), 'foo');
+        }
+
+        $this->assertCount(2, $tdispatcher->getCalledListeners());
+    }
+
+    public function testCallStackCleanupDoesNotAffectOtherEvents()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () {});
+        $tdispatcher->addListener('bar', static function () {});
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+        $tdispatcher->dispatch(new Event(), 'bar');
+        $tdispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertCount(2, $tdispatcher->getCalledListeners());
+    }
+
+    public function testCallStackIsNotLeakingWithStoppedPropagation()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function (Event $event) { $event->stopPropagation(); }, 10);
+        $tdispatcher->addListener('foo', static function () {}, 5);
+
+        for ($i = 0; $i < 5; ++$i) {
+            $tdispatcher->dispatch(new Event(), 'foo');
+        }
+
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+        $this->assertCount(1, $tdispatcher->getNotCalledListeners());
+    }
+
+    public function testPreviouslyCalledListenerStaysCalledAfterLaterStopPropagation()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () {}, 5);
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+
+        $tdispatcher->addListener('foo', static function (Event $event) { $event->stopPropagation(); }, 10);
+        $tdispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertCount(2, $tdispatcher->getCalledListeners());
+        $this->assertCount(0, $tdispatcher->getNotCalledListeners());
+    }
+
+    public function testCallStackCleanupWhenEventBecomesOrphaned()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $listener = static function () {};
+        $tdispatcher->addListener('foo', $listener);
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+
+        $tdispatcher->removeListener('foo', $listener);
+        $tdispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+        $this->assertCount(1, $tdispatcher->getOrphanedEvents());
+    }
+
+    public function testCallStackIsNotLeakingWithNestedSameEventDispatch()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $iteration = 0;
+        $tdispatcher->addListener('foo', static function () use ($tdispatcher, &$iteration) {
+            if ($iteration++ < 1) {
+                $tdispatcher->dispatch(new Event(), 'foo');
+            }
+        });
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+    }
+
+    public function testCallStackIsNotLeakingWhenListenerIsAddedBetweenDispatches()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () {}, 10);
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+        $this->assertCount(1, $tdispatcher->getCalledListeners());
+
+        $tdispatcher->addListener('foo', static function () {}, 5);
+        $tdispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertCount(2, $tdispatcher->getCalledListeners());
+    }
+
+    public function testResetDuringDispatch()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () use ($tdispatcher) {
+            $tdispatcher->reset();
+        });
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertSame([], $tdispatcher->getCalledListeners());
+    }
+
+    public function testCallStackIsNotLeakingWhenListenerIsRemovedBetweenDispatches()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $listenerA = static function () {};
+        $listenerB = static function () {};
+        $tdispatcher->addListener('foo', $listenerA, 10);
+        $tdispatcher->addListener('foo', $listenerB, 5);
+
+        $tdispatcher->dispatch(new Event(), 'foo');
+        $this->assertCount(2, $tdispatcher->getCalledListeners());
+
+        $tdispatcher->removeListener('foo', $listenerB);
+        $tdispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertCount(2, $tdispatcher->getCalledListeners());
+    }
 }
 
 class EventSubscriber implements EventSubscriberInterface

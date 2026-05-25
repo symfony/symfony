@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => '中央ヨーロッパ時間（ビュージンゲン）',
         'Europe/Chisinau' => '東ヨーロッパ時間（キシナウ）',
         'Europe/Copenhagen' => '中央ヨーロッパ時間（コペンハーゲン）',
-        'Europe/Dublin' => 'アイルランド時間（ダブリン）',
+        'Europe/Dublin' => 'グリニッジ標準時（ダブリン）',
         'Europe/Gibraltar' => '中央ヨーロッパ時間（ジブラルタル）',
         'Europe/Guernsey' => 'グリニッジ標準時（ガーンジー）',
         'Europe/Helsinki' => '東ヨーロッパ時間（ヘルシンキ）',

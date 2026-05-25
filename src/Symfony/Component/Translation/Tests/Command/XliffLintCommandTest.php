@@ -139,6 +139,7 @@ class XliffLintCommandTest extends TestCase
             The <info>--format</info> option specifies the format of the command output:
 
               <info>php %command.full_name% dirname --format=json</info>
+
             EOF;
 
         $this->assertStringContainsString($expected, $command->getHelp());
@@ -263,5 +264,45 @@ class XliffLintCommandTest extends TestCase
     public static function provideCompletionSuggestions()
     {
         yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+    }
+
+    public function testValidateDoesNotResolveExternalEntitiesByDefault()
+    {
+        $networkLoads = [];
+        libxml_set_external_entity_loader(static function (?string $public, string $system, array $context) use (&$networkLoads) {
+            if (preg_match('#^(?:https?|ftp)://#i', $system)) {
+                $networkLoads[] = $system;
+            }
+
+            return null;
+        });
+
+        try {
+            $xliffContent = <<<XLIFF
+                <?xml version="1.0"?>
+                <!DOCTYPE xliff [<!ENTITY xxe SYSTEM "http://127.0.0.1:1/payload.dtd">]>
+                <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+                    <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                        <body>
+                            <trans-unit id="note">
+                                <source>note</source>
+                                <target>NOTE</target>
+                            </trans-unit>
+                        </body>
+                    </file>
+                </xliff>
+                XLIFF;
+
+            $filename = \sprintf('%s/translation-xliff-lint-test/messages.en.xlf', sys_get_temp_dir());
+            file_put_contents($filename, $xliffContent);
+            $this->files[] = $filename;
+
+            $tester = $this->createCommandTester();
+            $tester->execute(['filename' => $filename], ['decorated' => false]);
+        } finally {
+            libxml_set_external_entity_loader(null);
+        }
+
+        $this->assertSame([], $networkLoads, 'XliffLintCommand::validate() must not resolve external entities over the network.');
     }
 }

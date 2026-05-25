@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Am Lár na hEorpa (Büsingen)',
         'Europe/Chisinau' => 'Am Oirthear na hEorpa (Císineá)',
         'Europe/Copenhagen' => 'Am Lár na hEorpa (Cóbanhávan)',
-        'Europe/Dublin' => 'Éire (Baile Átha Cliath)',
+        'Europe/Dublin' => 'Meán-Am Greenwich (Baile Átha Cliath)',
         'Europe/Gibraltar' => 'Am Lár na hEorpa (Giobráltar)',
         'Europe/Guernsey' => 'Meán-Am Greenwich (Geansaí)',
         'Europe/Helsinki' => 'Am Oirthear na hEorpa (Heilsincí)',

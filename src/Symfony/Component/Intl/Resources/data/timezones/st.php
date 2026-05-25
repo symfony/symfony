@@ -22,6 +22,7 @@ return [
         'Atlantic/Reykjavik' => 'Greenwich Mean Time (Reykjavik)',
         'Atlantic/St_Helena' => 'Greenwich Mean Time (St. Helena)',
         'Etc/GMT' => 'Greenwich Mean Time',
+        'Europe/Dublin' => 'Greenwich Mean Time (Dublin)',
         'Europe/Guernsey' => 'Greenwich Mean Time (Guernsey)',
         'Europe/Isle_of_Man' => 'Greenwich Mean Time (Isle of Man)',
         'Europe/Jersey' => 'Greenwich Mean Time (Jersey)',

@@ -503,7 +503,7 @@ class CacheAttributeListenerTest extends TestCase
         );
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), [new TestController(true), '__invoke'], [$entity], $request, null);
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
         $controllerResponse = $controllerArgumentsEvent->getController()($entity);
@@ -531,9 +531,27 @@ class CacheAttributeListenerTest extends TestCase
             true,
         ];
 
+        yield 'expression accessing controller' => [
+            'this.cache',
+            'not this.cache',
+            true,
+            true,
+            false,
+            false,
+        ];
+
         yield 'closure' => [
-            static fn (array $arguments, Request $request) => $arguments['test']->getDate() <= new \DateTimeImmutable(),
-            static fn (array $arguments, Request $request) => $arguments['test']->getDate() > new \DateTimeImmutable(),
+            static fn (array $arguments, Request $request, ?object $controller) => $arguments['test']->getDate() <= new \DateTimeImmutable(),
+            static fn (array $arguments, Request $request, ?object $controller) => $arguments['test']->getDate() > new \DateTimeImmutable(),
+            true,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'closure accessing controller' => [
+            static fn (array $arguments, Request $request, ?object $controller) => $controller->cache,
+            static fn (array $arguments, Request $request, ?object $controller) => !$controller->cache,
             true,
             true,
             false,
@@ -584,5 +602,17 @@ class TestEntity
     public function getId()
     {
         return '12345';
+    }
+}
+
+class TestController
+{
+    public function __construct(public bool $cache)
+    {
+    }
+
+    public function __invoke(TestEntity $test)
+    {
+        return new Response();
     }
 }

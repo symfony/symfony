@@ -249,7 +249,7 @@ class AppVariableTest extends TestCase
 
     public function testGetCurrentRoute()
     {
-        $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
+        $this->setRequestStack(new Request([], [], ['_route' => 'some_route']));
 
         $this->assertSame('some_route', $this->appVariable->getCurrent_route());
     }
@@ -263,7 +263,7 @@ class AppVariableTest extends TestCase
     public function testGetCurrentRouteParameters()
     {
         $routeParams = ['some_param' => true];
-        $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
+        $this->setRequestStack(new Request([], [], ['_route_params' => $routeParams]));
 
         $this->assertSame($routeParams, $this->appVariable->getCurrent_route_parameters());
     }
@@ -307,7 +307,14 @@ class AppVariableTest extends TestCase
 
         $enabledLocales = $this->appVariable->getEnabled_locales();
 
-        $this->assertEquals(['en', 'fr', 'de'], array_values($enabledLocales));
+        $this->assertSame(['en', 'fr', 'de'], $enabledLocales);
+    }
+
+    public function testSetEnabledLocalesPreservesNonEmptyStringValues()
+    {
+        $this->appVariable->setEnabledLocales(['en', '0', 'fr']);
+
+        $this->assertSame(['en', '0', 'fr'], $this->appVariable->getEnabled_locales());
     }
 
     private function setFlashMessages($sessionHasStarted = true)

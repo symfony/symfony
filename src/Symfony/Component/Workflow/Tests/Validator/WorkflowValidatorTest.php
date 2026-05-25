@@ -94,7 +94,7 @@ class WorkflowValidatorTest extends TestCase
         $definition = new Definition($places, $transitions);
 
         $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "t1" cannot store many places. But the transition "foo" has an arc from the transition to "a" with a weight equals to 2.');
+        $this->expectExceptionMessage('The marking store of workflow "foo" cannot store many places. But the transition "t1" has an arc from place "a" with a weight of 2.');
 
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }
@@ -108,7 +108,7 @@ class WorkflowValidatorTest extends TestCase
         $definition = new Definition($places, $transitions);
 
         $this->expectException(InvalidDefinitionException::class);
-        $this->expectExceptionMessage('The marking store of workflow "t1" cannot store many places. But the transition "foo" has an arc from "b" to the transition with a weight equals to 2.');
+        $this->expectExceptionMessage('The marking store of workflow "foo" cannot store many places. But the transition "t1" has an arc to place "b" with a weight of 2.');
 
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }

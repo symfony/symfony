@@ -175,6 +175,7 @@ final class DomVisitor
                     $this->attributeSanitizers[$domNodeName][$name] ?? [],
                     $this->attributeSanitizers['*'][$name] ?? [],
                     $this->attributeSanitizers[$domNodeName]['*'] ?? [],
+                    $this->attributeSanitizers['*']['*'] ?? [],
                 );
 
                 foreach ($attributeSanitizers as $sanitizer) {

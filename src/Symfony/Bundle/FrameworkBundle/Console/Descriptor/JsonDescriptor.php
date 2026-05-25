@@ -79,7 +79,8 @@ class JsonDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $options, $container);
         } elseif ($service instanceof Definition) {
-            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], $container, $options['id']), $options);
+            $data = $this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], $container, $options['id']);
+            $this->writeData($data, $options);
         } else {
             $this->writeData($service::class, $options);
         }
@@ -305,6 +306,13 @@ class JsonDescriptor extends Descriptor
         }
 
         $data['usages'] = null !== $container && null !== $id ? $this->getServiceEdges($container, $id) : [];
+
+        if ($container && $id) {
+            $decorationStack = $this->getDecorationStack($container, $id);
+            if (\count($decorationStack) > 1) {
+                $data['decoration_stack'] = $decorationStack;
+            }
+        }
 
         return $data;
     }

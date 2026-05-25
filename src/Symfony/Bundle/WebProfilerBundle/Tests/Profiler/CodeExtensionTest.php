@@ -217,6 +217,17 @@ class CodeExtensionTest extends TestCase
         ];
     }
 
+    public function testFileExcerptEscapesNonPhpContents()
+    {
+        $file = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'xss.html';
+
+        $html = $this->getExtension()->fileExcerpt($file, 1);
+
+        $this->assertStringNotContainsString('<script>', $html);
+        $this->assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $html);
+        $this->assertStringContainsString('&amp; &quot;quoted&quot; &lt;tags&gt;', $html);
+    }
+
     public function testFormatFileFromTextIntegration()
     {
         $template = <<<'TWIG'

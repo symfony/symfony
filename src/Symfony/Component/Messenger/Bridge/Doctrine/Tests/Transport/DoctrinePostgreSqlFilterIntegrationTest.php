@@ -22,6 +22,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Tools\DsnParser;
 use Doctrine\DBAL\Types\Type;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
@@ -31,6 +32,8 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
  */
 #[RequiresPhpExtension('pdo_pgsql')]
 #[Group('integration')]
+#[IgnoreDeprecations()]
+#[Group('doctrine-dbal-workaround')]
 class DoctrinePostgreSqlFilterIntegrationTest extends TestCase
 {
     private Connection $driverConnection;

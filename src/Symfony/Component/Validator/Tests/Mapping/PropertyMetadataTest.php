@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy;
+use Symfony\Component\Validator\Tests\Fixtures\EntityWithHook;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
 
@@ -78,5 +79,31 @@ class PropertyMetadataTest extends TestCase
 
         $this->assertNull($notUnsetMetadata->getPropertyValue($entity));
         $this->assertEquals(42, $metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromUninitializedPropertyShouldUseHookIfPresent()
+    {
+        $entity = new EntityWithHook();
+        $entity->name = 'FOOBAR';
+        $metadata = new PropertyMetadata(EntityWithHook::class, 'withHook');
+
+        $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromUninitializedPropertyShouldReturnNullIfHookFails()
+    {
+        $entity = new EntityWithHook();
+        // $withHook uses $entity->name but it's not initialized
+        $metadata = new PropertyMetadata(EntityWithHook::class, 'withHook');
+
+        $this->assertNull($metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromUninitializedPropertyWithHookReferencingItself()
+    {
+        $entity = new EntityWithHook();
+        $metadata = new PropertyMetadata(EntityWithHook::class, 'withHookOnSelf');
+
+        $this->assertNull($metadata->getPropertyValue($entity));
     }
 }

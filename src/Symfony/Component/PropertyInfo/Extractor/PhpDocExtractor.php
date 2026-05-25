@@ -45,6 +45,11 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     private array $docBlocks = [];
 
     /**
+     * @var array<string, array{DocBlock, string}|false>
+     */
+    private array $promotedPropertyDocBlocks = [];
+
+    /**
      * @var Context[]
      */
     private array $contexts = [];
@@ -79,32 +84,26 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     public function getShortDescription(string $class, string $property, array $context = []): ?string
     {
+        $docBlockData = $this->getPromotedPropertyDocBlockData($class, $property);
+        if ($docBlockData && $shortDescription = $this->getShortDescriptionFromDocBlock($docBlockData[0])) {
+            return $shortDescription;
+        }
+
         [$docBlock] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
 
-        $shortDescription = $docBlock->getSummary();
-
-        if ($shortDescription) {
-            return $shortDescription;
-        }
-
-        foreach ($docBlock->getTagsByName('var') as $var) {
-            if ($var && !$var instanceof InvalidTag) {
-                $varDescription = $var->getDescription()->render();
-
-                if ($varDescription) {
-                    return $varDescription;
-                }
-            }
-        }
-
-        return null;
+        return $this->getShortDescriptionFromDocBlock($docBlock);
     }
 
     public function getLongDescription(string $class, string $property, array $context = []): ?string
     {
+        $docBlockData = $this->getPromotedPropertyDocBlockData($class, $property);
+        if ($docBlockData && '' !== $contents = $docBlockData[0]->getDescription()->render()) {
+            return $contents;
+        }
+
         [$docBlock] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
             return null;
@@ -117,61 +116,18 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     public function getType(string $class, string $property, array $context = []): ?Type
     {
-        /** @var DocBlock $docBlock */
+        if ([$propertyDocBlock, $propertyDeclaringClass] = $this->getPromotedPropertyDocBlockData($class, $property)) {
+            if ($type = $this->getTypeFromDocBlock($propertyDocBlock, self::PROPERTY, $class, $propertyDeclaringClass, null)) {
+                return $type;
+            }
+        }
+
         [$docBlock, $source, $prefix, $declaringClass] = $this->findDocBlock($class, $property);
         if (!$docBlock) {
             return null;
         }
 
-        $tag = match ($source) {
-            self::PROPERTY => 'var',
-            self::ACCESSOR => 'return',
-            self::MUTATOR => 'param',
-        };
-
-        $types = [];
-        $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass ?? $class);
-
-        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
-        foreach ($docBlock->getTagsByName($tag) as $tag) {
-            if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
-                continue;
-            }
-
-            $type = $this->phpDocTypeHelper->getType($tagType);
-
-            if (!$type instanceof ObjectType) {
-                $types[] = $type;
-
-                continue;
-            }
-
-            $normalizedClassName = match ($type->getClassName()) {
-                'self' => $typeContext->getDeclaringClass(),
-                'static' => $typeContext->getCalledClass(),
-                default => $type->getClassName(),
-            };
-
-            if ('parent' === $normalizedClassName) {
-                try {
-                    $normalizedClassName = $typeContext->getParentClass();
-                } catch (LogicException) {
-                    // if there is no parent for the current class, we keep the "parent" raw string
-                }
-            }
-
-            $types[] = $type->isNullable() ? Type::nullable(Type::object($normalizedClassName)) : Type::object($normalizedClassName);
-        }
-
-        if (null === $type = $types[0] ?? null) {
-            return null;
-        }
-
-        if (!\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
-            return $type;
-        }
-
-        return Type::list($type);
+        return $this->getTypeFromDocBlock($docBlock, $source, $class, $declaringClass, $prefix);
     }
 
     public function getTypeFromConstructor(string $class, string $property): ?Type
@@ -195,9 +151,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
     public function getDocBlock(string $class, string $property): ?DocBlock
     {
-        $output = $this->findDocBlock($class, $property);
-
-        return $output[0];
+        return $this->findDocBlock($class, $property)[0];
     }
 
     private function getDocBlockFromConstructor(string $class, string $property): ?DocBlock
@@ -207,8 +161,7 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
         } catch (\ReflectionException) {
             return null;
         }
-        $reflectionConstructor = $reflectionClass->getConstructor();
-        if (!$reflectionConstructor) {
+        if (!$reflectionConstructor = $reflectionClass->getConstructor()) {
             return null;
         }
 
@@ -248,25 +201,14 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
 
         $ucFirstProperty = ucfirst($property);
 
-        switch (true) {
-            case $reflectionProperty?->isPromoted() && $docBlock = $this->getDocBlockFromConstructor($reflectionProperty->class, $property):
-                $data = [$docBlock, self::MUTATOR, null, $reflectionProperty->class];
-                break;
-
-            case [$docBlock, $declaringClass] = $this->getDocBlockFromProperty($class, $property):
-                $data = [$docBlock, self::PROPERTY, null, $declaringClass];
-                break;
-
-            case [$docBlock, , $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR):
-                $data = [$docBlock, self::ACCESSOR, null, $declaringClass];
-                break;
-
-            case [$docBlock, $prefix, $declaringClass] = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR):
-                $data = [$docBlock, self::MUTATOR, $prefix, $declaringClass];
-                break;
-
-            default:
-                $data = [null, null, null, null];
+        if ($reflectionProperty?->isPromoted() && $docBlock = $this->getDocBlockFromConstructor($reflectionProperty->class, $property)) {
+            $data = [$docBlock, self::MUTATOR, null, $reflectionProperty->class];
+        } elseif ([$docBlock, $declaringClass] = $this->getDocBlockFromProperty($class, $property)) {
+            $data = [$docBlock, self::PROPERTY, null, $declaringClass];
+        } else {
+            $data = $this->getDocBlockFromMethod($class, $ucFirstProperty, self::ACCESSOR)
+                ?? $this->getDocBlockFromMethod($class, $ucFirstProperty, self::MUTATOR)
+                ?? [null, null, null, null];
         }
 
         return $this->docBlocks[$propertyHash] = $data;
@@ -294,17 +236,26 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
         }
 
+        $context = $this->createFromReflector($reflector);
+
         try {
             $declaringClass = $reflector->isTrait() ? $originalClass : $reflector->getName();
 
-            return [$this->docBlockFactory->create($reflectionProperty, $this->createFromReflector($reflector)), $declaringClass];
-        } catch (\InvalidArgumentException|\RuntimeException) {
+            return [$this->docBlockFactory->create($reflectionProperty, $context), $declaringClass];
+        } catch (\InvalidArgumentException) {
+            return null;
+        } catch (\RuntimeException) {
+            // Workaround for phpdocumentor/reflection-docblock < 6 not supporting ?Type<...> syntax
+            if (($rawDoc = $reflectionProperty->getDocComment()) && $docBlock = $this->getNullableGenericDocBlock($rawDoc, $context)) {
+                return [$docBlock, $declaringClass ?? ($reflector->isTrait() ? $originalClass : $reflector->getName())];
+            }
+
             return null;
         }
     }
 
     /**
-     * @return array{DocBlock, string, string}|null
+     * @return array{DocBlock, int, ?string, string}|null
      */
     private function getDocBlockFromMethod(string $class, string $ucFirstProperty, int $type, ?string $originalClass = null): ?array
     {
@@ -349,10 +300,34 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
             }
         }
 
+        $context = $this->createFromReflector($reflector);
+        $prefix = self::ACCESSOR === $type ? null : $prefix;
+
         try {
             $declaringClass = $reflector->isTrait() ? $originalClass : $reflector->getName();
 
-            return [$this->docBlockFactory->create($method, $this->createFromReflector($reflector)), $prefix, $declaringClass];
+            return [$this->docBlockFactory->create($method, $context), $type, $prefix, $declaringClass];
+        } catch (\InvalidArgumentException) {
+            return null;
+        } catch (\RuntimeException) {
+            // Workaround for phpdocumentor/reflection-docblock < 6 not supporting ?Type<...> syntax
+            if (($rawDoc = $method->getDocComment()) && $docBlock = $this->getNullableGenericDocBlock($rawDoc, $context)) {
+                return [$docBlock, $type, $prefix, $declaringClass ?? ($reflector->isTrait() ? $originalClass : $reflector->getName())];
+            }
+
+            return null;
+        }
+    }
+
+    private function getNullableGenericDocBlock(string $rawDoc, Context $context): ?DocBlock
+    {
+        // Converts "?Type<...>" to "Type<...>|null"
+        if ($rawDoc === $processedDoc = preg_replace('/@(var|param|return)\s+\?(\S+)/', '@$1 $2|null', $rawDoc)) {
+            return null;
+        }
+
+        try {
+            return $this->docBlockFactory->create($processedDoc, $context);
         } catch (\InvalidArgumentException|\RuntimeException) {
             return null;
         }
@@ -365,12 +340,112 @@ class PhpDocExtractor implements PropertyDescriptionExtractorInterface, Property
     {
         $cacheKey = $reflector->getNamespaceName().':'.$reflector->getFileName();
 
-        if (isset($this->contexts[$cacheKey])) {
-            return $this->contexts[$cacheKey];
+        return $this->contexts[$cacheKey] ??= $this->contextFactory->createFromReflector($reflector);
+    }
+
+    /**
+     * @return array{DocBlock, string}|null
+     */
+    private function getPromotedPropertyDocBlockData(string $class, string $property): ?array
+    {
+        $propertyHash = $class.'::'.$property;
+
+        if (isset($this->promotedPropertyDocBlocks[$propertyHash])) {
+            return false === $this->promotedPropertyDocBlocks[$propertyHash] ? null : $this->promotedPropertyDocBlocks[$propertyHash];
         }
 
-        $this->contexts[$cacheKey] = $this->contextFactory->createFromReflector($reflector);
+        try {
+            $reflectionProperty = new \ReflectionProperty($class, $property);
+        } catch (\ReflectionException) {
+            $this->promotedPropertyDocBlocks[$propertyHash] = false;
 
-        return $this->contexts[$cacheKey];
+            return null;
+        }
+
+        if (!$reflectionProperty->isPromoted() || !$data = $this->getDocBlockFromProperty($class, $property)) {
+            $this->promotedPropertyDocBlocks[$propertyHash] = false;
+
+            return null;
+        }
+
+        return $this->promotedPropertyDocBlocks[$propertyHash] = $data;
+    }
+
+    private function getTypeFromDocBlock(DocBlock $docBlock, int $source, string $class, ?string $declaringClass, ?string $prefix): ?Type
+    {
+        $tag = match ($source) {
+            self::PROPERTY => 'var',
+            self::ACCESSOR => 'return',
+            self::MUTATOR => 'param',
+        };
+
+        $types = [];
+        $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass ?? $class);
+
+        /** @var DocBlock\Tags\Var_|DocBlock\Tags\Return_|DocBlock\Tags\Param $tag */
+        foreach ($docBlock->getTagsByName($tag) as $tag) {
+            if ($tag instanceof InvalidTag || !$tagType = $tag->getType()) {
+                continue;
+            }
+
+            $type = $this->phpDocTypeHelper->getType($tagType);
+
+            if (!$type instanceof ObjectType) {
+                $types[] = $type;
+
+                continue;
+            }
+
+            $normalizedClassName = match ($type->getClassName()) {
+                'self' => $typeContext->getDeclaringClass(),
+                'static' => $typeContext->getCalledClass(),
+                default => $type->getClassName(),
+            };
+
+            if ('parent' === $normalizedClassName) {
+                try {
+                    $normalizedClassName = $typeContext->getParentClass();
+                } catch (LogicException) {
+                    // if there is no parent for the current class, we keep the "parent" raw string
+                }
+            }
+
+            $types[] = $type->isNullable() ? Type::nullable(Type::object($normalizedClassName)) : Type::object($normalizedClassName);
+        }
+
+        if (!$type = $types[0] ?? null) {
+            return null;
+        }
+
+        if (self::MUTATOR !== $source || !\in_array($prefix, $this->arrayMutatorPrefixes, true)) {
+            return $type;
+        }
+
+        return Type::list($type);
+    }
+
+    private function getShortDescriptionFromDocBlock(DocBlock $docBlock): ?string
+    {
+        if ($shortDescription = $docBlock->getSummary()) {
+            return $shortDescription;
+        }
+
+        foreach ($docBlock->getTagsByName('var') as $var) {
+            if ($var && !$var instanceof InvalidTag && $varDescription = $var->getDescription()->render()) {
+                return $varDescription;
+            }
+        }
+
+        foreach ($docBlock->getTagsByName('param') as $param) {
+            if (!$param instanceof DocBlock\Tags\Param) {
+                continue;
+            }
+
+            if ($paramDescription = $param->getDescription()?->render()) {
+                return $paramDescription;
+            }
+        }
+
+        return null;
     }
 }

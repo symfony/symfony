@@ -3,6 +3,7 @@ imports:
 
 framework:
   serializer: ~
+  trusted_hosts: ['^localhost$']
 
 security:
   password_hashers:

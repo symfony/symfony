@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Allow setting `queues` to `false` to skip binding the default `messages` queue
+ * Add option `delay[daily_delay_queues]` in the transport definition
+
 7.3
 ---
 
@@ -11,6 +17,11 @@ CHANGELOG
 
  * Implement the `CloseableTransportInterface` to allow closing the AMQP connection
  * Add option `delay[arguments]` in the transport definition
+
+6.4
+---
+
+ * Add option `delay[daily_delay_queues]` in the transport definition
 
 6.0
 ---

@@ -1,0 +1,6 @@
+*
+!.gitignore
+!psalm.baseline.xml
+!phpstan.baseline.neon
+!stubs
+!stubs/*

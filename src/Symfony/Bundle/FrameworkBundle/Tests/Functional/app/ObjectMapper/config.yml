@@ -7,3 +7,5 @@ services:
         public: true
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\TransformCallable:
         autoconfigure: true
+    Symfony\Component\ObjectMapper\Transform\MapCollection:
+        autoconfigure: true

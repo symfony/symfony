@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Saeta Ewropaya Navîn (Bûsîngen)',
         'Europe/Chisinau' => 'Saeta Ewropaya Rojhilat (Kişînew)',
         'Europe/Copenhagen' => 'Saeta Ewropaya Navîn (Kopenhag)',
-        'Europe/Dublin' => 'Saeta Îrlanda(y)ê (Dûblîn)',
+        'Europe/Dublin' => 'Saeta Navînî ya Greenwichê (Dûblîn)',
         'Europe/Gibraltar' => 'Saeta Ewropaya Navîn (Cebelîtariq)',
         'Europe/Guernsey' => 'Saeta Navînî ya Greenwichê (Guernsey)',
         'Europe/Helsinki' => 'Saeta Ewropaya Rojhilat (Helsînkî)',

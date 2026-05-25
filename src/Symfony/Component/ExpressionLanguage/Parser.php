@@ -402,7 +402,7 @@ class Parser
                         $type = Node\GetAttrNode::PROPERTY_CALL;
                     }
 
-                    $node = new Node\GetAttrNode($node, $arg, $arguments, $type, $isNullSafe);
+                    $node = new Node\GetAttrNode($node, $arg, $arguments, $type);
                 }
             } elseif ('[' === $token->value) {
                 $this->stream->next();

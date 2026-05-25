@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\RangeValidator;
@@ -31,7 +32,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Range(min: 10, max: 20));
+        $this->validate(null, new Range(min: 10, max: 20));
 
         $this->assertNoViolation();
     }
@@ -74,7 +75,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidValuesMinNamed($value)
     {
         $constraint = new Range(min: 10);
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -83,7 +84,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidValuesMaxNamed($value)
     {
         $constraint = new Range(max: 20);
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -92,7 +93,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidValuesMinMaxNamed($value)
     {
         $constraint = new Range(min: 10, max: 20);
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -102,7 +103,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Range(min: 10, minMessage: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -116,7 +117,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Range(max: 20, maxMessage: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -130,7 +131,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Range(min: 10, max: 20, notInRangeMessage: 'myNotInRangeMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -145,7 +146,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Range(min: 10, max: 20, notInRangeMessage: 'myNotInRangeMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -218,7 +219,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidDatesMin($value)
     {
         $constraint = new Range(min: 'March 10, 2014');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -227,7 +228,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidDatesMax($value)
     {
         $constraint = new Range(max: 'March 20, 2014');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -236,7 +237,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testValidDatesMinMax($value)
     {
         $constraint = new Range(min: 'March 10, 2014', max: 'March 20, 2014');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -253,7 +254,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             minMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -274,7 +275,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             maxMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -296,7 +297,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             notInRangeMessage: 'myNotInRangeMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -319,7 +320,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             notInRangeMessage: 'myNotInRangeMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -347,7 +348,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             max: 20,
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -361,7 +362,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             min: 'March 10, 2014',
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidDateTimeMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -375,7 +376,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             max: 'March 20, 2014',
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidDateTimeMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -390,7 +391,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             max: 'March 20, 2014',
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidDateTimeMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -405,7 +406,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             max: 'March 20, 2014',
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -420,7 +421,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             max: 'March 50, 2014',
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -435,7 +436,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             max: 'March 50, 2014',
         );
 
-        $this->validator->validate('abcd', $constraint);
+        $this->validate('abcd', $constraint);
 
         $this->buildViolation($constraint->invalidMessage)
             ->setParameter('{{ value }}', '"abcd"')
@@ -449,7 +450,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage($expectedMessage);
 
-        $this->validator->validate($value, new Range(
+        $this->validate($value, new Range(
             min: $min,
             max: $max,
         ));
@@ -470,7 +471,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(null);
 
-        $this->validator->validate(1, new Range(
+        $this->validate(1, new Range(
             minPropertyPath: 'minPropertyPath',
             maxPropertyPath: 'maxPropertyPath',
         ));
@@ -483,7 +484,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new Limit(10));
 
-        $this->validator->validate($value, new Range(minPropertyPath: 'value'));
+        $this->validate($value, new Range(minPropertyPath: 'value'));
 
         $this->assertNoViolation();
     }
@@ -493,7 +494,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new Limit(20));
 
-        $this->validator->validate($value, new Range(
+        $this->validate($value, new Range(
             maxPropertyPath: 'value',
         ));
 
@@ -505,7 +506,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new Limit(20));
 
-        $this->validator->validate($value, new Range(maxPropertyPath: 'value'));
+        $this->validate($value, new Range(maxPropertyPath: 'value'));
 
         $this->assertNoViolation();
     }
@@ -515,7 +516,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new MinMax(10, 20));
 
-        $this->validator->validate($value, new Range(
+        $this->validate($value, new Range(
             minPropertyPath: 'min',
             maxPropertyPath: 'max',
         ));
@@ -533,7 +534,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             minMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -553,7 +554,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             maxMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -574,7 +575,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             notInRangeMessage: 'myNotInRangeMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -597,7 +598,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             notInRangeMessage: 'myNotInRangeMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $formattedValue)
@@ -614,7 +615,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(null);
 
-        $this->validator->validate($value, new Range(
+        $this->validate($value, new Range(
             min: 10,
             maxPropertyPath: 'max',
             minMessage: 'myMessage',
@@ -633,7 +634,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(null);
 
-        $this->validator->validate($value, new Range(
+        $this->validate($value, new Range(
             minPropertyPath: 'min',
             max: 20,
             maxMessage: 'myMessage',
@@ -652,7 +653,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new Limit('March 10, 2014'));
 
-        $this->validator->validate($value, new Range(minPropertyPath: 'value'));
+        $this->validate($value, new Range(minPropertyPath: 'value'));
 
         $this->assertNoViolation();
     }
@@ -663,7 +664,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->setObject(new Limit('March 20, 2014'));
 
         $constraint = new Range(maxPropertyPath: 'value');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -674,7 +675,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
 
         $constraint = new Range(minPropertyPath: 'min', maxPropertyPath: 'max');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -693,7 +694,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             minMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -717,7 +718,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             maxMessage: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -742,7 +743,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             notInRangeMessage: 'myNotInRangeMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -769,7 +770,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             notInRangeMessage: 'myNotInRangeMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myNotInRangeMessage')
             ->setParameter('{{ value }}', $dateTimeAsString)
@@ -787,7 +788,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $object->max = 5;
         $this->setObject($object);
 
-        $this->validator->validate(5, new Range(minPropertyPath: 'min', maxPropertyPath: 'max'));
+        $this->validate(5, new Range(minPropertyPath: 'min', maxPropertyPath: 'max'));
 
         $this->assertNoViolation();
     }
@@ -798,7 +799,7 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         $object->min = 5;
         $this->setObject($object);
 
-        $this->validator->validate(5, new Range(minPropertyPath: 'min', maxPropertyPath: 'max'));
+        $this->validate(5, new Range(minPropertyPath: 'min', maxPropertyPath: 'max'));
 
         $this->assertNoViolation();
     }
@@ -827,13 +828,86 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
     public function testMessageIfMinAndMaxSet(array $constraintExtraOptions, int $value, string $expectedMessage, string $expectedCode)
     {
         $constraint = new Range(...array_merge(['min' => 1, 'max' => 10], $constraintExtraOptions));
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this
             ->buildViolation($expectedMessage)
             ->setParameters(['{{ min }}' => '1', '{{ max }}' => '10', '{{ value }}' => (string) $value])
             ->setCode($expectedCode)
             ->assertRaised();
+    }
+
+    public function testValidRelativeRangeWithMockClock()
+    {
+        $clock = new MockClock('2025-01-15 00:00:00 UTC');
+        $this->validator = new RangeValidator(null, $clock);
+
+        // Value is Jan 10, within range [-10 days (Jan 5) .. +10 days (Jan 25)]
+        $value = new \DateTimeImmutable('2025-01-10 00:00:00 UTC');
+        $constraint = new Range(min: '-10 days', max: '+10 days');
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidRelativeRangeWithMockClock()
+    {
+        $clock = new MockClock('2025-01-15 00:00:00 UTC');
+        $this->validator = new RangeValidator(null, $clock);
+
+        // Value is Feb 1, outside range [-10 days (Jan 5) .. +10 days (Jan 25)]
+        $value = new \DateTimeImmutable('2025-02-01 00:00:00 UTC');
+        $constraint = new Range(min: '-10 days', max: '+10 days', notInRangeMessage: 'myMessage');
+
+        $this->validate($value, $constraint);
+
+        $now = $clock->now();
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', self::formatDateTime($value))
+            ->setParameter('{{ min }}', self::formatDateTime($now->modify('-10 days')))
+            ->setParameter('{{ max }}', self::formatDateTime($now->modify('+10 days')))
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testAbsoluteRangeWithMockClock()
+    {
+        $clock = new MockClock('2025-01-15 00:00:00 UTC');
+        $this->validator = new RangeValidator(null, $clock);
+
+        // Absolute dates should still work with a mock clock
+        $value = new \DateTimeImmutable('2025-03-15 00:00:00 UTC');
+        $constraint = new Range(min: '2025-01-01', max: '2025-12-31');
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testBackwardCompatWithoutClock()
+    {
+        // Without setClock(), the validator should still work (falls back to system clock)
+        $value = new \DateTimeImmutable('2025-03-15 00:00:00 UTC');
+        $constraint = new Range(min: '2025-01-01', max: '2025-12-31');
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    private static function formatDateTime(\DateTimeInterface $value): string
+    {
+        if (class_exists(\IntlDateFormatter::class)) {
+            $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+
+            return $formatter->format(new \DateTimeImmutable(
+                $value->format('Y-m-d H:i:s.u'),
+                new \DateTimeZone('UTC')
+            ));
+        }
+
+        return $value->format('Y-m-d H:i:s');
     }
 }
 

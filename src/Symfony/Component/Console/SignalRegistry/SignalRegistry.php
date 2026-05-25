@@ -81,6 +81,14 @@ final class SignalRegistry
      */
     public function pushCurrentHandlers(): void
     {
+        // Restore the original OS-level disposition while the active map is empty,
+        // so signals are not routed through handle() without a registered handler.
+        foreach ($this->signalHandlers as $signal => $handlers) {
+            if (isset($this->originalHandlers[$signal])) {
+                pcntl_signal($signal, $this->originalHandlers[$signal]);
+            }
+        }
+
         $this->stack[] = $this->signalHandlers;
         $this->signalHandlers = [];
     }
@@ -96,14 +104,25 @@ final class SignalRegistry
     public function popPreviousHandlers(): void
     {
         $popped = $this->signalHandlers;
-        $this->signalHandlers = array_pop($this->stack) ?? [];
+        $previous = array_pop($this->stack) ?? [];
 
-        // Restore OS handler if no more Symfony handlers for this signal
+        // Expose a transitional superset so handle() never reads a missing key
+        // if a signal lands while the OS-level handlers below are being swapped.
+        $this->signalHandlers = $previous + $popped;
+
+        // Reinstall the registry handler for signals owned by the restored scope.
+        foreach ($previous as $signal => $handlers) {
+            pcntl_signal($signal, [$this, 'handle']);
+        }
+
+        // Restore the original OS-level handler for signals no scope owns anymore.
         foreach ($popped as $signal => $handlers) {
-            if (!($this->signalHandlers[$signal] ?? false) && isset($this->originalHandlers[$signal])) {
+            if (!isset($previous[$signal]) && isset($this->originalHandlers[$signal])) {
                 pcntl_signal($signal, $this->originalHandlers[$signal]);
             }
         }
+
+        $this->signalHandlers = $previous;
     }
 
     /**

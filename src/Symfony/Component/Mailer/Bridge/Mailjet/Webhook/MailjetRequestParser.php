@@ -39,6 +39,10 @@ final class MailjetRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
+        if ($secret && !hash_equals('Basic '.base64_encode($secret), $request->headers->get('Authorization', ''))) {
+            throw new RejectWebhookException(403, 'Invalid credentials.');
+        }
+
         try {
             return $this->converter->convert($request->toArray());
         } catch (ParseException $e) {

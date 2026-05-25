@@ -86,6 +86,22 @@ class LexerTest extends TestCase
         $this->lexer->tokenize($expression);
     }
 
+    public function testTokenizeUnterminatedStringIsLinear()
+    {
+        $expression = '"'.str_repeat('\\a', 30).'\\';
+
+        $start = microtime(true);
+        try {
+            $this->lexer->tokenize($expression);
+            $this->fail('Expected a SyntaxError for the unterminated string.');
+        } catch (SyntaxError) {
+            // expected
+        }
+        $elapsed = microtime(true) - $start;
+
+        $this->assertLessThan(0.5, $elapsed, \sprintf('Tokenizing an unterminated string took %.3fs, suggesting a ReDoS regression.', $elapsed));
+    }
+
     public static function getTokenizeData()
     {
         return [

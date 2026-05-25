@@ -23,6 +23,6 @@ final class IrrelevantClass
 {
     public function irrelevantAction(): Response
     {
-        return new Response(status: Response::HTTP_NO_CONTENT);
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }

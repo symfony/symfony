@@ -36,14 +36,24 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    public function get(): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
     {
-        return $this->getReceiver()->get();
+        $fetchSize = \func_num_args() > 0 ? func_get_arg(0) : 1;
+
+        return $this->getReceiver()->get($fetchSize);
     }
 
-    public function getFromQueues(array $queueNames): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function getFromQueues(array $queueNames/* , int $fetchSize = 1 */): iterable
     {
-        return $this->getReceiver()->getFromQueues($queueNames);
+        $fetchSize = \func_num_args() > 1 ? func_get_arg(1) : 1;
+
+        return $this->getReceiver()->getFromQueues($queueNames, $fetchSize);
     }
 
     public function ack(Envelope $envelope): void

@@ -25,7 +25,7 @@ class UserSignUpTypeExtension extends AbstractTypeExtension
             throw new \InvalidArgumentException(\sprintf('The "%s" can only be used with FormFlowType.', self::class));
         }
 
-        $builder->addStep('first', FormType::class, ['mapped' => false], priority: 1);
+        $builder->addStep('first', FormType::class, ['mapped' => false], null, 1);
         $builder->addStep('last', FormType::class, ['mapped' => false]);
     }
 

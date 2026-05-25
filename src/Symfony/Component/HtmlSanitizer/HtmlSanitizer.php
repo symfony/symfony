@@ -47,6 +47,11 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
         $context = W3CReference::CONTEXTS_MAP[$element] ?? W3CReference::CONTEXT_BODY;
         $element = isset(W3CReference::BODY_ELEMENTS[$element]) ? $element : $context;
 
+        // Prevent DOS attack induced by extremely long HTML strings
+        if (-1 !== $this->config->getMaxInputLength() && \strlen($input) > $this->config->getMaxInputLength()) {
+            $input = substr($input, 0, $this->config->getMaxInputLength());
+        }
+
         // Text context: early return with HTML encoding
         if (W3CReference::CONTEXT_TEXT === $context) {
             return StringSanitizer::encodeHtmlEntities($input);
@@ -54,11 +59,6 @@ final class HtmlSanitizer implements HtmlSanitizerInterface
 
         // Other context: build a DOM visitor
         $this->domVisitors[$context] ??= $this->createDomVisitorForContext($context);
-
-        // Prevent DOS attack induced by extremely long HTML strings
-        if (-1 !== $this->config->getMaxInputLength() && \strlen($input) > $this->config->getMaxInputLength()) {
-            $input = substr($input, 0, $this->config->getMaxInputLength());
-        }
 
         // Only operate on valid UTF-8 strings. This is necessary to prevent cross
         // site scripting issues on Internet Explorer 6. Idea from Drupal (filter_xss).

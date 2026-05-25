@@ -34,6 +34,7 @@ final class MailomatRequestParser extends AbstractRequestParser
 
     public function __construct(
         private readonly MailomatPayloadConverter $converter,
+        private readonly int $timestampTolerance = 43200,
     ) {
     }
 
@@ -81,9 +82,24 @@ final class MailomatRequestParser extends AbstractRequestParser
     private function validateSignature(HeaderBag $headers, #[\SensitiveParameter] string $secret): void
     {
         // see https://api.mailomat.swiss/docs/#tag/webhook-security
-        $data = implode('.', [$headers->get(self::HEADER_ID), $headers->get(self::HEADER_EVENT), $headers->get(self::HEADER_TIMESTAMP)]);
+        $signatureHeader = $headers->get(self::HEADER_SIGNATURE);
+        if (!$signatureHeader || !str_contains($signatureHeader, '=')) {
+            throw new RejectWebhookException(406, 'Signature is wrong.');
+        }
 
-        [$algo, $signature] = explode('=', $headers->get(self::HEADER_SIGNATURE));
+        [$algo, $signature] = explode('=', $signatureHeader, 2);
+
+        $timestamp = $headers->get(self::HEADER_TIMESTAMP);
+        if ($this->timestampTolerance > 0 && (!ctype_digit((string) $timestamp) || abs(time() - (int) $timestamp) > $this->timestampTolerance)) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the tolerance window.');
+        }
+
+        $data = implode('.', [
+            $headers->get(self::HEADER_ID),
+            $headers->get(self::HEADER_EVENT),
+            $timestamp,
+        ]);
+
         if (!hash_equals(hash_hmac($algo, $data, $secret), $signature)) {
             throw new RejectWebhookException(406, 'Signature is wrong.');
         }

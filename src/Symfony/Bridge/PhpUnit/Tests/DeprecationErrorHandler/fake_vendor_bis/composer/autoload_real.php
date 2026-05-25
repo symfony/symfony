@@ -23,6 +23,16 @@ class ComposerLoaderFakeBis
         ];
     }
 
+    public function getFallbackDirs()
+    {
+        return [];
+    }
+
+    public function getFallbackDirsPsr4()
+    {
+        return [];
+    }
+
     public function loadClass($className)
     {
         foreach ($this->getPrefixesPsr4() as $prefix => $baseDirs) {

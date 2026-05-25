@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'ਮੱਧ ਯੂਰਪੀ ਵੇਲਾ (ਬੁਸਿੰਜੇਨ)',
         'Europe/Chisinau' => 'ਪੂਰਬੀ ਯੂਰਪੀ ਵੇਲਾ (ਚਿਸਿਨੌ)',
         'Europe/Copenhagen' => 'ਮੱਧ ਯੂਰਪੀ ਵੇਲਾ (ਕੋਪਨਹੇਗਨ)',
-        'Europe/Dublin' => 'ਆਇਰਲੈਂਡ ਵੇਲਾ (ਡਬਲਿਨ)',
+        'Europe/Dublin' => 'ਗ੍ਰੀਨਵਿਚ ਮੀਨ ਵੇਲਾ (ਡਬਲਿਨ)',
         'Europe/Gibraltar' => 'ਮੱਧ ਯੂਰਪੀ ਵੇਲਾ (ਜਿਬਰਾਲਟਰ)',
         'Europe/Guernsey' => 'ਗ੍ਰੀਨਵਿਚ ਮੀਨ ਵੇਲਾ (ਗਰਨਜੀ)',
         'Europe/Helsinki' => 'ਪੂਰਬੀ ਯੂਰਪੀ ਵੇਲਾ (ਹੇਲਸਿੰਕੀ)',

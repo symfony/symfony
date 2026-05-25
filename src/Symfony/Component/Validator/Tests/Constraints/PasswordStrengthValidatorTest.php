@@ -27,7 +27,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidValues')]
     public function testValidValues(string|\Stringable $value, int $expectedStrength)
     {
-        $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength));
+        $this->validate($value, new PasswordStrength(minScore: $expectedStrength));
 
         $this->assertNoViolation();
 
@@ -35,7 +35,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
             return;
         }
 
-        $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength + 1));
+        $this->validate($value, new PasswordStrength(minScore: $expectedStrength + 1));
 
         $this->buildViolation('The password strength is too low. Please use a stronger password.')
             ->setCode(PasswordStrength::PASSWORD_STRENGTH_ERROR)
@@ -55,7 +55,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('provideInvalidConstraints')]
     public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, string $strength)
     {
-        $this->validator->validate($password, $constraint);
+        $this->validate($password, $constraint);
 
         $this->buildViolation($expectedMessage)
             ->setCode($expectedCode)

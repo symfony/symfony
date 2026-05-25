@@ -393,7 +393,7 @@ class LdapUserProviderTest extends TestCase
     public function testLoadUserWithCorrectRoles()
     {
         // Given
-        $result = $this->createStub(CollectionInterface::class);
+        $result = $this->createMock(CollectionInterface::class);
         $query = $this->createStub(QueryInterface::class);
         $query
             ->method('execute')
@@ -401,6 +401,7 @@ class LdapUserProviderTest extends TestCase
         ;
         $ldap = $this->createStub(LdapInterface::class);
         $result
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->willReturn(new Entry('foo', ['sAMAccountName' => ['foo']]))

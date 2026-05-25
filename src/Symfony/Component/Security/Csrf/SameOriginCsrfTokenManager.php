@@ -197,17 +197,7 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
     {
         trigger_deprecation('symfony/security-csrf', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, SameOriginCsrfListener::class);
 
-        if (!$request->attributes->has($this->cookieName)) {
-            return;
-        }
-
-        $cookieName = ($request->isSecure() ? '__Host-' : '').$this->cookieName;
-
-        foreach ($request->cookies->all() as $name => $value) {
-            if ($this->cookieName === $value && str_starts_with($name, $cookieName.'_')) {
-                $response->headers->clearCookie($name, '/', null, $request->isSecure(), false, 'strict');
-            }
-        }
+        $this->doClearCookies($request, $response);
     }
 
     /**
@@ -217,17 +207,7 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
     {
         trigger_deprecation('symfony/security-csrf', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, SameOriginCsrfListener::class);
 
-        if (!$request->attributes->has($this->cookieName)
-            || !$request->hasSession(true)
-            || !($session = $request->getSession())->isStarted()
-        ) {
-            return;
-        }
-
-        $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
-        $usageIndexReference = \PHP_INT_MIN;
-        $session->set($this->cookieName, $request->attributes->get($this->cookieName));
-        $usageIndexReference = $usageIndexValue;
+        $this->doPersistStrategy($request);
     }
 
     /**
@@ -241,8 +221,38 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
             return;
         }
 
-        $this->clearCookies($event->getRequest(), $event->getResponse());
-        $this->persistStrategy($event->getRequest());
+        $this->doClearCookies($event->getRequest(), $event->getResponse());
+        $this->doPersistStrategy($event->getRequest());
+    }
+
+    private function doClearCookies(Request $request, Response $response): void
+    {
+        if (!$request->attributes->has($this->cookieName)) {
+            return;
+        }
+
+        $cookieName = ($request->isSecure() ? '__Host-' : '').$this->cookieName;
+
+        foreach ($request->cookies->all() as $name => $value) {
+            if ($this->cookieName === $value && str_starts_with($name, $cookieName.'_')) {
+                $response->headers->clearCookie($name, '/', null, $request->isSecure(), false, 'strict');
+            }
+        }
+    }
+
+    private function doPersistStrategy(Request $request): void
+    {
+        if (!$request->attributes->has($this->cookieName)
+            || !$request->hasSession(true)
+            || !($session = $request->getSession())->isStarted()
+        ) {
+            return;
+        }
+
+        $usageIndexValue = $session instanceof Session ? $usageIndexReference = &$session->getUsageIndex() : 0;
+        $usageIndexReference = \PHP_INT_MIN;
+        $session->set($this->cookieName, $request->attributes->get($this->cookieName));
+        $usageIndexReference = $usageIndexValue;
     }
 
     /**

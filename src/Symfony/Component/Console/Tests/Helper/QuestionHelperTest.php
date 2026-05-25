@@ -29,8 +29,11 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
 
 #[Group('tty')]
 class QuestionHelperTest extends AbstractQuestionHelperTestCase
@@ -821,6 +824,26 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
+    public function testValidatorExceptionPropagatesOnEmptyInput()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('What\'s your name?');
+        $question->setValidator(static function ($value) {
+            if ('' === $value || null === $value) {
+                throw new \InvalidArgumentException('A value is required.');
+            }
+
+            return $value;
+        });
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A value is required.');
+
+        // Simulate setInputs(['']), which writes "\n" to the stream then EOF
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $this->createOutputInterface(), $question);
+    }
+
     public function testQuestionValidatorRepeatsThePrompt()
     {
         $tries = 0;
@@ -1021,6 +1044,73 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
             ->willReturn($interactive);
 
         return $mock;
+    }
+
+    public function testAskWithConstraintsWithoutDispatcherValidValue()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+
+        $inputStream = $this->getInputStream("https://symfony.com\n");
+
+        $this->assertEquals('https://symfony.com', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskWithConstraintsWithoutDispatcherInvalidThenValid()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+
+        $inputStream = $this->getInputStream("not-a-url\nhttps://symfony.com\n");
+
+        $output = $this->createOutputInterface();
+        $this->assertEquals('https://symfony.com', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output, $question));
+
+        rewind($output->getStream());
+        $outputContent = stream_get_contents($output->getStream());
+        $this->assertStringContainsString('This value is not a valid URL.', $outputContent);
+    }
+
+    public function testAskWithConstraintsWithoutDispatcherExceedsMaxAttempts()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+        $question->setMaxAttempts(1);
+
+        $inputStream = $this->getInputStream("not-a-url\n");
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('This value is not a valid URL.');
+
+        $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+    }
+
+    public function testAskWithConstraintsWithDispatcher()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new \Symfony\Component\Console\EventListener\ValidateQuestionInputListener(
+            Validation::createValidator()
+        ));
+
+        $dialog = new QuestionHelper($dispatcher);
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+
+        $inputStream = $this->getInputStream("not-a-url\nhttps://symfony.com\n");
+
+        $output = $this->createOutputInterface();
+        $this->assertEquals('https://symfony.com', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output, $question));
+
+        rewind($output->getStream());
+        $outputContent = stream_get_contents($output->getStream());
+        $this->assertStringContainsString('This value is not a valid URL.', $outputContent);
     }
 }
 

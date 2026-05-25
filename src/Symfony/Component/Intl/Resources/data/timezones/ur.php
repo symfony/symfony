@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'وسط یورپ کا وقت (بزنجن)',
         'Europe/Chisinau' => 'مشرقی یورپ کا وقت (چیسیناؤ)',
         'Europe/Copenhagen' => 'وسط یورپ کا وقت (کوپن ہیگن)',
-        'Europe/Dublin' => 'آئرلینڈ وقت (ڈبلن)',
+        'Europe/Dublin' => 'گرین وچ کا اصل وقت (ڈبلن)',
         'Europe/Gibraltar' => 'وسط یورپ کا وقت (جبل الطارق)',
         'Europe/Guernsey' => 'گرین وچ کا اصل وقت (گرنزی)',
         'Europe/Helsinki' => 'مشرقی یورپ کا وقت (ہیلسنکی)',

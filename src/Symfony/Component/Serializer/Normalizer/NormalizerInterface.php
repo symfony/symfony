@@ -28,7 +28,7 @@ interface NormalizerInterface
      * @param string|null          $format  Format the normalization result will be encoded as
      * @param array<string, mixed> $context Context options for the normalizer
      *
-     * @return array|string|int|float|bool|\ArrayObject|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
+     * @return mixed[]|string|int|float|bool|\ArrayObject<array-key, mixed>|null \ArrayObject is used to make sure an empty object is encoded as an object not an array
      *
      * @throws InvalidArgumentException   Occurs when the object given is not a supported type for the normalizer
      * @throws CircularReferenceException Occurs when the normalizer detects a circular reference when no circular

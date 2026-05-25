@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
  */
 final class LazyServiceInstantiator implements InstantiatorInterface
 {
+    /**
+     * @param-immediately-invoked-callable $realInstantiator
+     */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object
     {
         $dumper = new LazyServiceDumper();

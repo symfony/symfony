@@ -18,7 +18,7 @@ namespace Symfony\Component\Serializer\Mapping;
  *
  * There may only exist one metadata for each attribute according to its name.
  *
- * @internal
+ * @psalm-inheritors ClassMetadata
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

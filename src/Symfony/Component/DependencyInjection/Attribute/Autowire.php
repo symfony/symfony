@@ -21,7 +21,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Autowire
 {
     public readonly string|array|Expression|Reference|ArgumentInterface|null $value;

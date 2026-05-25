@@ -122,8 +122,7 @@ class MigratingSessionHandlerTest extends TestCase
 
         $writeOnlyHandler = $this->createMock(\SessionHandlerInterface::class);
         $writeOnlyHandler->expects($this->never())
-            ->method('read')
-            ->with($this->any());
+            ->method('read');
 
         $dualHandler = new MigratingSessionHandler($currentHandler, $writeOnlyHandler);
         $result = $dualHandler->read($sessionId);
@@ -167,8 +166,7 @@ class MigratingSessionHandlerTest extends TestCase
 
         $writeOnlyHandler = $this->createMock(\SessionHandlerInterface::class);
         $writeOnlyHandler->expects($this->never())
-            ->method('read')
-            ->with($this->any());
+            ->method('read');
 
         $dualHandler = new MigratingSessionHandler($currentHandler, $writeOnlyHandler);
         $result = $dualHandler->validateId($sessionId);

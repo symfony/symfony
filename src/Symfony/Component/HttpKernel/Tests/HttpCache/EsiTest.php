@@ -243,12 +243,12 @@ class EsiTest extends TestCase
               ->willReturn($request)
         ;
         if (\is_array($response)) {
-            $cache->expects($this->any())
+            $cache
                   ->method('handle')
                   ->willReturn(...$response)
             ;
         } else {
-            $cache->expects($this->any())
+            $cache
                   ->method('handle')
                   ->willReturn($response)
             ;

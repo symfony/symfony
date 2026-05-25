@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'közép-európai idő (Büsingen)',
         'Europe/Chisinau' => 'kelet-európai időzóna (Chișinău)',
         'Europe/Copenhagen' => 'közép-európai idő (Koppenhága)',
-        'Europe/Dublin' => 'Írország idő (Dublin)',
+        'Europe/Dublin' => 'greenwichi középidő, téli idő (Dublin)',
         'Europe/Gibraltar' => 'közép-európai idő (Gibraltár)',
         'Europe/Guernsey' => 'greenwichi középidő, téli idő (Guernsey)',
         'Europe/Helsinki' => 'kelet-európai időzóna (Helsinki)',

@@ -100,7 +100,7 @@ final class NtfyTransportTest extends TransportTestCase
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
-            $expectedAuthorization = 'Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ';
+            $expectedAuthorization = 'Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ=';
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
             $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
 

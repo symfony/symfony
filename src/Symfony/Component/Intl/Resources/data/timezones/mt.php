@@ -342,7 +342,7 @@ return [
         'Europe/Busingen' => 'Ħin Ċentrali Ewropew (Büsingen)',
         'Europe/Chisinau' => 'Ħin ta’ il-Moldova (Chișinău)',
         'Europe/Copenhagen' => 'Ħin Ċentrali Ewropew (Copenhagen)',
-        'Europe/Dublin' => 'Ħin ta’ l-Irlanda (Dublin)',
+        'Europe/Dublin' => 'Greenwich Mean Time (Dublin)',
         'Europe/Gibraltar' => 'Ħin Ċentrali Ewropew (Ġibiltà)',
         'Europe/Guernsey' => 'Greenwich Mean Time (Guernsey)',
         'Europe/Helsinki' => 'Ħin ta’ il-Finlandja (Helsinki)',

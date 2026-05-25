@@ -126,7 +126,7 @@ final class CodeExtension extends AbstractExtension
         $contents = file_get_contents($file);
 
         if (!str_contains($contents, '<?php') && !str_contains($contents, '<?=')) {
-            $lines = explode("\n", $contents);
+            $lines = explode("\n", htmlspecialchars($contents, \ENT_QUOTES | \ENT_SUBSTITUTE, $this->charset));
 
             if (0 > $srcContext) {
                 $srcContext = \count($lines);

@@ -74,7 +74,9 @@ class PhraseProviderTest extends TestCase
                 return true;
             }));
 
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
         $this->getCache()
+            ->expects($this->once())
             ->method('getItem')
             ->with(self::callback(function ($v) use ($locale, $domain) {
                 $this->assertStringStartsWith($locale.'.'.$domain.'.', $v);

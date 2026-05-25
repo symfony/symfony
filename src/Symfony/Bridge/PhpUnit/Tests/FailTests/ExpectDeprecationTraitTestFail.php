@@ -23,7 +23,7 @@ use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
  * This class is deliberately suffixed with *TestFail.php so that it is ignored
  * by PHPUnit. This test is designed to fail. See ../expectdeprecationfail.phpt.
  */
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 final class ExpectDeprecationTraitTestFail extends TestCase
 {
     use ExpectDeprecationTrait;

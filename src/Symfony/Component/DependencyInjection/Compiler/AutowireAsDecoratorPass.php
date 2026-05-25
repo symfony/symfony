@@ -12,11 +12,13 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\AsTagDecorator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * Reads #[AsDecorator] attributes on definitions that are autowired
+ * Reads #[AsDecorator] and #[AsTagDecorator] attributes on definitions that are autowired
  * and don't have the "container.ignore_attributes" tag.
  */
 final class AutowireAsDecoratorPass implements CompilerPassInterface
@@ -37,23 +39,43 @@ final class AutowireAsDecoratorPass implements CompilerPassInterface
 
     private function processClass(string $id, ContainerBuilder $container, Definition $definition, \ReflectionClass $reflectionClass): void
     {
-        if (!$attributes = $reflectionClass->getAttributes(AsDecorator::class, \ReflectionAttribute::IS_INSTANCEOF)) {
+        $decoratorAttributes = $reflectionClass->getAttributes(AsDecorator::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $tagDecoratorAttributes = $reflectionClass->getAttributes(AsTagDecorator::class, \ReflectionAttribute::IS_INSTANCEOF);
+
+        if (!$decoratorAttributes && !$tagDecoratorAttributes) {
             return;
         }
 
-        if (1 === \count($attributes)) {
-            $attribute = $attributes[0]->newInstance();
+        if (1 === \count($decoratorAttributes) && !$tagDecoratorAttributes) {
+            $attribute = $decoratorAttributes[0]->newInstance();
             $definition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
 
             return;
         }
 
-        foreach ($attributes as $attribute) {
+        foreach ($decoratorAttributes as $attribute) {
             $attribute = $attribute->newInstance();
 
-            $definition = clone $definition;
-            $definition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
-            $container->setDefinition(\sprintf('.decorator.%s.%s', $attribute->decorates, $id), $definition);
+            $clonedDefinition = clone $definition;
+            $clonedDefinition->setDecoratedService($attribute->decorates, null, $attribute->priority, $attribute->onInvalid);
+            $container->setDefinition(\sprintf('.decorator.%s.%s', $attribute->decorates, $id), $clonedDefinition);
+        }
+
+        foreach ($tagDecoratorAttributes as $attribute) {
+            $attribute = $attribute->newInstance();
+
+            $clonedDefinition = clone $definition;
+            $tagAttributes = [
+                'decorates_tag' => $attribute->tag,
+                'priority' => $attribute->priority,
+            ];
+
+            if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $attribute->onInvalid) {
+                $tagAttributes['on_invalid'] = $attribute->onInvalid;
+            }
+
+            $clonedDefinition->addResourceTag('container.tag_decorator', $tagAttributes);
+            $container->setDefinition(\sprintf('.tag_decorator.%s.%s', $attribute->tag, $id), $clonedDefinition);
         }
 
         $container->removeDefinition($id);

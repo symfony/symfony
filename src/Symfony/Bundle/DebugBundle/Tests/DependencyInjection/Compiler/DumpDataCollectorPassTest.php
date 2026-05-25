@@ -27,7 +27,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition(DumpDataCollector::class, [null, null, new Reference('.virtual_request_stack'), null]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
         $container->setDefinition('data_collector.dump', $definition);
 
         $container->compile();
@@ -42,7 +42,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container->register('.virtual_request_stack', RequestStack::class);
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition(DumpDataCollector::class, [null, null, null, new Reference('.virtual_request_stack')]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
         $container->setDefinition('data_collector.dump', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::ENABLED);
 
@@ -57,7 +57,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container->register('request_stack', RequestStack::class);
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition(DumpDataCollector::class, [null, null, null, new Reference('.virtual_request_stack')]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
         $container->setDefinition('data_collector.dump', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::ENABLED);
 
@@ -71,7 +71,7 @@ class DumpDataCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition(DumpDataCollector::class, [null, null, new Reference('.virtual_request_stack'), new RequestStack()]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
         $container->setDefinition('data_collector.dump', $definition);
         $container->setParameter('web_profiler.debug_toolbar.mode', WebDebugToolbarListener::DISABLED);
 
@@ -85,11 +85,42 @@ class DumpDataCollectorPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
 
-        $definition = new Definition(DumpDataCollector::class, [null, null, new Reference('.virtual_request_stack'), new RequestStack()]);
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
         $container->setDefinition('data_collector.dump', $definition);
 
         $container->compile();
 
         $this->assertNull($definition->getArgument(3));
+    }
+
+    public function testProcessWithRuntimeModeSet()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.charset', 'UTF-8');
+        $container->setParameter('kernel.runtime_mode.web', false);
+        $container->addCompilerPass(new DumpDataCollectorPass());
+
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
+        $container->setDefinition('data_collector.dump', $definition);
+
+        $container->compile();
+
+        $this->assertFalse($definition->getArgument(5));
+        $this->assertCount(0, $definition->getErrors());
+    }
+
+    public function testProcessWithRuntimeModeNotSet()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.charset', 'UTF-8');
+        $container->addCompilerPass(new DumpDataCollectorPass());
+
+        $definition = new Definition(DumpDataCollector::class, [null, null, '%kernel.charset%', new Reference('.virtual_request_stack'), null, '%kernel.runtime_mode.web%']);
+        $container->setDefinition('data_collector.dump', $definition);
+
+        $container->compile();
+
+        $this->assertNull($definition->getArgument(5));
+        $this->assertCount(0, $definition->getErrors());
     }
 }

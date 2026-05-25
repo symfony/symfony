@@ -255,7 +255,7 @@ class DateTimeNormalizerTest extends TestCase
     #[IgnoreDeprecations]
     public function testDenormalizeAndShowDeprecationForDateTime()
     {
-        $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: A "Symfony\\Component\\Serializer\\Exception\\NotNormalizableValueException" will be thrown when a date could not be parsed using the default format "Y-m-d\\TH:i:sP".');
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: Parsing date "  2016-01-01T00:00:00+00:00  " for type "DateTime" using the loose constructor is deprecated and will throw a "Symfony\\Component\\Serializer\\Exception\\NotNormalizableValueException" in 9.0 when it does not match the default format "Y-m-d\\TH:i:sP". Either fix the input to match the format, or pass "datetime_format" => null in the denormalization context to opt in to the loose parser explicitly.');
         $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', \DateTime::class));
     }
 
@@ -263,8 +263,13 @@ class DateTimeNormalizerTest extends TestCase
     #[IgnoreDeprecations]
     public function testDenormalizeAndShowDeprecationForDateTimeChild()
     {
-        $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: A "Symfony\\Component\\Serializer\\Exception\\NotNormalizableValueException" will be thrown when a date could not be parsed using the default format "Y-m-d\\TH:i:sP".');
-        $this->assertEquals(new DateTimeChild('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', DateTimeChild::class, null, [DateTimeNormalizer::FORMAT_KEY => null]));
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: Parsing date "  2016-01-01T00:00:00+00:00  " for type "Symfony\\Component\\Serializer\\Tests\\Normalizer\\DateTimeChild" using the loose constructor is deprecated and will throw a "Symfony\\Component\\Serializer\\Exception\\NotNormalizableValueException" in 9.0 when it does not match the default format "Y-m-d\\TH:i:sP". Either fix the input to match the format, or pass "datetime_format" => null in the denormalization context to opt in to the loose parser explicitly.');
+        $this->assertEquals(new DateTimeChild('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', DateTimeChild::class));
+    }
+
+    public function testDenormalizeWithExplicitNullFormatSuppressesDeprecation()
+    {
+        $this->assertEquals(new \DateTime('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('  2016-01-01T00:00:00+00:00  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => null]));
     }
 
     public function testDenormalizeUsingTimezonePassedInConstructor()
@@ -451,7 +456,7 @@ class DateTimeNormalizerTest extends TestCase
     {
         $format = 'd/m/Y'; // the default format
         $string = '2020-01-01'; // the value which is in the wrong format, but is accepted because of `new \DateTimeImmutable` in DateTimeNormalizer::denormalize
-        $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: A "Symfony\\Component\\Serializer\\Exception\\NotNormalizableValueException" will be thrown when a date could not be parsed using the default format "d/m/Y".');
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.1: Parsing date "2020-01-01" for type "DateTimeImmutable" using the loose constructor is deprecated and will throw a "Symfony\\Component\\Serializer\\Exception\\NotNormalizableValueException" in 9.0 when it does not match the default format "d/m/Y". Either fix the input to match the format, or pass "datetime_format" => null in the denormalization context to opt in to the loose parser explicitly.');
 
         $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => $format]);
         $denormalizedDate = $normalizer->denormalize($string, \DateTimeInterface::class);

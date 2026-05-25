@@ -5,6 +5,10 @@ CHANGELOG
 ---
 
  * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
+ * Add `this` to `#[IsGranted]` subject expression variables when available
+ * Add support for closures and `this` in `#[IsCsrfTokenValid]` when evaluating its `id`
+ * Add `$enforceKeyUsageVerification` argument to `OidcTokenHandler::enableDiscovery()` to allow accepting JWKs lacking `use`/`key_ops` (lax mode)
+ * Deprecate the `$eraseCredentials` argument of `AuthenticatorManager::__construct()`, as the `eraseCredentials()` method was removed in Symfony 8.0
 
 8.0
 ---

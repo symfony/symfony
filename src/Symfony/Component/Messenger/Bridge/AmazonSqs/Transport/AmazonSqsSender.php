@@ -36,7 +36,7 @@ class AmazonSqsSender implements SenderInterface
 
         /** @var DelayStamp|null $delayStamp */
         $delayStamp = $envelope->last(DelayStamp::class);
-        $delay = null !== $delayStamp ? (int) ceil($delayStamp->getDelay() / 1000) : 0;
+        $delay = null !== $delayStamp ? (int) ceil($delayStamp->getDelay() / 1000) : null;
 
         $messageGroupId = null;
         $messageDeduplicationId = null;

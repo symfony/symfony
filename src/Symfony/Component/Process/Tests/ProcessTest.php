@@ -1591,6 +1591,21 @@ class ProcessTest extends TestCase
         $this->assertSame($env, $p->getEnv());
     }
 
+    public function testEnvNonScalarValuesAreIgnored()
+    {
+        $_ENV['BAD_ARRAY_ENV'] = ['foo', 'bar'];
+        $_ENV['BAD_OBJECT_ENV'] = new \stdClass();
+
+        try {
+            $process = $this->getProcessForCode('echo "OK";');
+            $process->mustRun();
+
+            $this->assertSame('OK', $process->getOutput());
+        } finally {
+            unset($_ENV['BAD_ARRAY_ENV'], $_ENV['BAD_OBJECT_ENV']);
+        }
+    }
+
     public function testEnvVarNamesCastToString()
     {
         $process = $this->getProcess('echo hello');
@@ -1719,7 +1734,7 @@ class ProcessTest extends TestCase
         $process->setIgnoredSignals([\SIGTERM]);
 
         $process->start();
-        $process->stop(timeout: 0.2);
+        $process->stop(0.2);
 
         $this->assertNotSame(\SIGTERM, $process->getTermSignal());
     }
@@ -1734,7 +1749,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess(['sleep', '10']);
 
         $process->start();
-        $process->stop(timeout: 0.2);
+        $process->stop(0.2);
 
         $this->assertSame(\SIGTERM, $process->getTermSignal());
     }

@@ -19,6 +19,7 @@ use Symfony\Bridge\Monolog\Formatter\VarDumperFormatter;
 use Symfony\Bridge\Monolog\Handler\ServerLogHandler;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\VarDumper\Cloner\Data;
+use Symfony\Component\VarDumper\Cloner\Stub;
 
 /**
  * Tests the ServerLogHandler.
@@ -80,11 +81,19 @@ class ServerLogHandlerTest extends TestCase
                     $message = fgets($stream);
                     fclose($stream);
 
-                    $record = unserialize(base64_decode($message));
+                    $record = unserialize(base64_decode($message), [
+                        'allowed_classes' => [Data::class, Stub::class],
+                    ]);
                     $this->assertIsArray($record);
 
                     $this->assertArrayHasKey('message', $record);
                     $this->assertEquals('My info message', $record['message']);
+
+                    $this->assertArrayHasKey('datetime', $record);
+                    $this->assertIsString($record['datetime']);
+                    $datetime = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s.uP', $record['datetime']);
+                    $this->assertInstanceOf(\DateTimeImmutable::class, $datetime);
+                    $this->assertSame('2013-05-29 16:21:54', $datetime->format('Y-m-d H:i:s'));
 
                     $this->assertArrayHasKey('extra', $record);
                     $this->assertInstanceOf(Data::class, $record['extra']);

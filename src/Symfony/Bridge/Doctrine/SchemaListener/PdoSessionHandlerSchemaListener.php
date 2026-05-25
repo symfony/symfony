@@ -32,7 +32,12 @@ final class PdoSessionHandlerSchemaListener extends AbstractSchemaListener
         }
 
         $connection = $event->getEntityManager()->getConnection();
+        $schema = $event->getSchema();
+        $isSameDatabaseChecker = $this->getIsSameDatabaseChecker($connection);
+        $sessionHandler = $this->sessionHandler;
 
-        $this->sessionHandler->configureSchema($event->getSchema(), $this->getIsSameDatabaseChecker($connection));
+        $this->filterSchemaChanges($schema, $connection, static function () use ($sessionHandler, $schema, $isSameDatabaseChecker) {
+            $sessionHandler->configureSchema($schema, $isSameDatabaseChecker);
+        });
     }
 }

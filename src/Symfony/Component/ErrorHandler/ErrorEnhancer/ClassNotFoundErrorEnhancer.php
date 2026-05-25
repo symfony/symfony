@@ -114,10 +114,14 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
 
         $classes = [];
         $filename = $class.'.php';
-        foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
-            if ($filename == $file->getFileName() && $class = $this->convertFileToClass($path, $file->getPathName(), $prefix)) {
-                $classes[] = $class;
+        try {
+            foreach (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY) as $file) {
+                if ($filename == $file->getFileName() && $class = $this->convertFileToClass($path, $file->getPathName(), $prefix)) {
+                    $classes[] = $class;
+                }
             }
+        } catch (\UnexpectedValueException) {
+            // a subdirectory may vanish between listing and recursion (e.g. test fixtures)
         }
 
         return $classes;

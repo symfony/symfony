@@ -17,7 +17,8 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\Authentic
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
-use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvider\DummyProvider;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\CustomProviderFactory;
+use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\DummyProviderFactory;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -68,16 +69,50 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
+    public function testFirewallWithCustomUserProvider()
+    {
+        $container = $this->getRawContainer();
+
+        $extension = $container->getExtension('security');
+        $extension->addUserProviderFactory(new CustomProviderFactory());
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'my_app_provider' => [
+                    'custom' => [
+                        'foo' => 'baz',
+                    ],
+                ],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('security.user.provider.concrete.my_app_provider'));
+        $this->assertEquals('baz', $container->getDefinition('security.user.provider.concrete.my_app_provider')->getArgument('$foo'));
+    }
+
     public function testFirewallWithInvalidUserProvider()
     {
         $container = $this->getRawContainer();
 
         $extension = $container->getExtension('security');
-        $extension->addUserProviderFactory(new DummyProvider());
+        $extension->addUserProviderFactory(new CustomProviderFactory());
 
         $container->loadFromExtension('security', [
             'providers' => [
-                'my_foo' => ['foo' => []],
+                'my_app_provider' => [
+                    'some_other' => [
+                        'bar' => 'baz',
+                    ],
+                ],
             ],
 
             'firewalls' => [
@@ -89,9 +124,72 @@ class SecurityExtensionTest extends TestCase
         ]);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Unable to create definition for "security.user.provider.concrete.my_foo" user provider');
+        $this->expectExceptionMessage('Unrecognized option "some_other" under "security.providers.my_app_provider". Available options are "chain", "custom", "id", "ldap", "memory".');
 
         $container->compile();
+    }
+
+    public function testFirewallWithInvalidUserProviderConfig()
+    {
+        $container = $this->getRawContainer();
+
+        $extension = $container->getExtension('security');
+        $extension->addUserProviderFactory(new CustomProviderFactory());
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'my_app_provider' => [
+                    'custom' => [
+                        'bar' => 'baz',
+                    ],
+                ],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Unrecognized option "bar" under "security.providers.my_app_provider.custom". Available option is "foo".');
+
+        $container->compile();
+    }
+
+    public function testFirewallWithUserProviderWithoutConfig()
+    {
+        $container = $this->getRawContainer();
+
+        $extension = $container->getExtension('security');
+        $extension->addUserProviderFactory(new DummyProviderFactory());
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'my_app_provider' => [
+                    'foo' => null,
+                ],
+                'my_other_app_provider' => [
+                    'foo' => [],
+                ],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'pattern' => '/.*',
+                    'http_basic' => [
+                        'provider' => 'my_app_provider',
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('security.user.provider.concrete.my_app_provider'));
+        $this->assertTrue($container->hasDefinition('security.user.provider.concrete.my_other_app_provider'));
     }
 
     public function testDisableRoleHierarchyVoter()

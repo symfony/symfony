@@ -189,6 +189,7 @@ return [
         'Europe/Busingen' => 'मध्य यूरोपीय समयः (Büsingen)',
         'Europe/Chisinau' => 'पौर्व यूरोपीय समयः (Chișinău)',
         'Europe/Copenhagen' => 'मध्य यूरोपीय समयः (Copenhagen)',
+        'Europe/Dublin' => 'ग्रीनविच मीन समयः (Dublin)',
         'Europe/Gibraltar' => 'मध्य यूरोपीय समयः (Gibraltar)',
         'Europe/Guernsey' => 'ग्रीनविच मीन समयः (Guernsey)',
         'Europe/Helsinki' => 'पौर्व यूरोपीय समयः (Helsinki)',

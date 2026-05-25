@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Output;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Process\Process;
 
 class StreamOutputTest extends TestCase
 {
@@ -64,5 +65,13 @@ class StreamOutputTest extends TestCase
         $output = new StreamOutput($resource);
         rewind($output->getStream());
         $this->assertEquals('', stream_get_contents($output->getStream()));
+    }
+
+    public function testRawOutputPreservesNewlinesInContent()
+    {
+        $process = new Process(['php', __DIR__.'/../Fixtures/binary_output.php']);
+        $process->run();
+
+        $this->assertSame("HELLO\nWORLD", $process->getOutput(), 'Raw output must not convert LF in binary content');
     }
 }

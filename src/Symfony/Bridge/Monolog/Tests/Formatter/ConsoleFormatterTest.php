@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Monolog\Tests\Formatter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class ConsoleFormatterTest extends TestCase
 {
@@ -23,5 +24,15 @@ class ConsoleFormatterTest extends TestCase
         $formatter = new ConsoleFormatter();
 
         self::assertSame("12:34:56 <fg=cyan>WARNING  </> <comment>[test]</> test\n", $formatter->format($record));
+    }
+
+    public function testPlaceholderInMessageWithDataContext()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        // LogRecord::$context must be an array, so the Data object is nested inside it
+        $record = RecordFactory::create(message: 'Hello {user}', context: ['user' => (new VarCloner())->cloneVar('alice')]);
+
+        self::assertStringContainsString('Hello <comment>alice</>', $formatter->format($record));
     }
 }

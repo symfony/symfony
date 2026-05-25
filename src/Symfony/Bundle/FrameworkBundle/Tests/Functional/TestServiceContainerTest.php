@@ -25,9 +25,10 @@ class TestServiceContainerTest extends AbstractWebTestCase
 {
     public function testLogicExceptionIfTestConfigIsDisabled()
     {
-        $this->expectException(\LogicException::class);
-
         static::bootKernel(['test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled']);
+
+        $this->expectException(\LogicException::class);
+        static::getContainer();
     }
 
     public function testThatPrivateServicesAreAvailableIfTestConfigIsEnabled()

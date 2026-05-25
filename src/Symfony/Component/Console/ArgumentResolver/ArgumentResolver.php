@@ -23,6 +23,7 @@ use Symfony\Component\Console\Attribute\ValueResolver;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Service\ServiceProviderInterface;
@@ -116,6 +117,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
 
             if ($typeName && \in_array($typeName, [
                 InputInterface::class,
+                RawInputInterface::class,
                 OutputInterface::class,
                 SymfonyStyle::class,
                 Cursor::class,
@@ -145,10 +147,12 @@ final class ArgumentResolver implements ArgumentResolverInterface
         $builtinTypeResolver = new Resolver\BuiltinTypeValueResolver();
         $backedEnumResolver = new Resolver\BackedEnumValueResolver();
         $dateTimeResolver = new Resolver\DateTimeValueResolver();
+        $inputFileResolver = new Resolver\InputFileValueResolver();
 
         return [
             $backedEnumResolver,
             new Resolver\UidValueResolver(),
+            $inputFileResolver,
             $builtinTypeResolver,
             new Resolver\MapInputValueResolver($builtinTypeResolver, $backedEnumResolver, $dateTimeResolver),
             $dateTimeResolver,

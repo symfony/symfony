@@ -695,13 +695,30 @@ class LokaliseProviderTest extends ProviderTestCase
         }
     }
 
+    public function testReadReturnsEmptyBagWhenLokaliseHasNoKeys()
+    {
+        $response = static fn (): ResponseInterface => new JsonMockResponse(
+            ['error' => ['code' => 406, 'message' => 'No keys for export with current export settings']],
+            ['http_code' => 406],
+        );
+
+        $provider = self::createProvider((new MockHttpClient($response))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+
+        $translatorBag = $provider->read(['messages'], ['en']);
+
+        $this->assertSame([], $translatorBag->getCatalogues());
+    }
+
     #[RequiresPhpExtension('zip')]
     public function testReadWithExportAsync()
     {
         $zipLocation = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Symfony-locale.zip';
         $firstResponse = static fn (): ResponseInterface => new JsonMockResponse(
             ['error' => ['code' => 413, 'message' => 'test']],
-            ['http_code' => 406],
+            ['http_code' => 413],
         );
         $secondResponse = static fn (): ResponseInterface => new JsonMockResponse(
             ['process_id' => 123],
@@ -755,7 +772,7 @@ class LokaliseProviderTest extends ProviderTestCase
     {
         $firstResponse = static fn (): ResponseInterface => new JsonMockResponse(
             ['error' => ['code' => 413, 'message' => 'test']],
-            ['http_code' => 406],
+            ['http_code' => 413],
         );
         $secondResponse = static fn (): ResponseInterface => new JsonMockResponse(
             ['process_id' => 123],

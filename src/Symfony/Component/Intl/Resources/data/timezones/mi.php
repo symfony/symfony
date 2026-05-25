@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Wā Uropi Waenga (Büsingen)',
         'Europe/Chisinau' => 'Wā Uropi Rāwhiti (Chișinău)',
         'Europe/Copenhagen' => 'Wā Uropi Waenga (Kopeheikana)',
-        'Europe/Dublin' => 'Airani Wā (Tapurini)',
+        'Europe/Dublin' => 'Wā Toharite Kiriwīti (Tapurini)',
         'Europe/Gibraltar' => 'Wā Uropi Waenga (Gibraltar)',
         'Europe/Guernsey' => 'Wā Toharite Kiriwīti (Guernsey)',
         'Europe/Helsinki' => 'Wā Uropi Rāwhiti (Hēriki)',

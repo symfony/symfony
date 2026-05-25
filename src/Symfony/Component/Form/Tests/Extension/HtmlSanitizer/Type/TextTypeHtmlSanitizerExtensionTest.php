@@ -16,6 +16,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\HtmlSanitizer\HtmlSanitizerExtension;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
@@ -28,7 +29,7 @@ class TextTypeHtmlSanitizerExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
         $fooSanitizer = $this->createMock(HtmlSanitizerInterface::class);
         $fooSanitizer->expects($this->once())
@@ -42,7 +43,7 @@ class TextTypeHtmlSanitizerExtensionTest extends TypeTestCase
             ->with('foobar')
             ->willReturn('bar');
 
-        return array_merge(parent::getExtensions(), [
+        return array_merge(parent::getExtensions($violationMapper), [
             new HtmlSanitizerExtension(new ServiceLocator([
                 'foo' => static fn () => $fooSanitizer,
                 'bar' => static fn () => $barSanitizer,

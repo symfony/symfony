@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Miðevropa tíð (Büsingen)',
         'Europe/Chisinau' => 'Eysturevropa tíð (Chișinău)',
         'Europe/Copenhagen' => 'Miðevropa tíð (Keypmannahavn)',
-        'Europe/Dublin' => 'Írland tíð (Dublin)',
+        'Europe/Dublin' => 'Greenwich Mean tíð (Dublin)',
         'Europe/Gibraltar' => 'Miðevropa tíð (Gibraltar)',
         'Europe/Guernsey' => 'Greenwich Mean tíð (Guernsey)',
         'Europe/Helsinki' => 'Eysturevropa tíð (Helsinki)',

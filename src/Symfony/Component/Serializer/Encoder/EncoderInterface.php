@@ -21,9 +21,9 @@ interface EncoderInterface
     /**
      * Encodes data into the given format.
      *
-     * @param mixed  $data    Data to encode
-     * @param string $format  Format name
-     * @param array  $context Options that normalizers/encoders have access to
+     * @param mixed                $data    Data to encode
+     * @param string               $format  Format name
+     * @param array<string, mixed> $context Options that normalizers/encoders have access to
      *
      * @throws UnexpectedValueException
      */

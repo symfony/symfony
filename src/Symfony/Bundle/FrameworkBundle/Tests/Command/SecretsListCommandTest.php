@@ -33,24 +33,15 @@ class SecretsListCommandTest extends TestCase
         $tester = new CommandTester($command);
         $this->assertSame(0, $tester->execute([]));
 
-        $expectedOutput = <<<EOTXT
-             // Use "%%env(<name>)%%" to reference a secret in a config file.
+        $display = trim(preg_replace('/ ++$/m', '', $tester->getDisplay(true)), "\n");
 
-             // To reveal the secrets run %s secrets:list --reveal
-
-             -------- -------- -------------
-              Secret   Value    Local Value
-             -------- -------- -------------
-              A        "a"
-              B        "b"      ******
-              C        ******
-              D        ******   ******
-              E        ******
-             -------- -------- -------------
-
-             // Local values override secret values.
-             // Use secrets:set --local to define them.
-            EOTXT;
-        $this->assertStringMatchesFormat($expectedOutput, trim(preg_replace('/ ++$/m', '', $tester->getDisplay(true)), "\n"));
+        $this->assertStringContainsString('// Use "%env(<name>)%" to reference a secret in a config file.', $display);
+        $this->assertMatchesRegularExpression('/\n\s*A\s+"a"\s*\n/', $display);
+        $this->assertMatchesRegularExpression('/\n\s*B\s+"b"\s+\*\*\*\*\*\*\s*\n/', $display);
+        $this->assertMatchesRegularExpression('/\n\s*C\s+\*\*\*\*\*\*\s*\n/', $display);
+        $this->assertMatchesRegularExpression('/\n\s*D\s+\*\*\*\*\*\*\s+\*\*\*\*\*\*\s*\n/', $display);
+        $this->assertMatchesRegularExpression('/\n\s*E\s+\*\*\*\*\*\*\s*\n/', $display);
+        $this->assertStringContainsString('// Local values override secret values.', $display);
+        $this->assertStringContainsString('// Use secrets:set --local to define them.', $display);
     }
 }

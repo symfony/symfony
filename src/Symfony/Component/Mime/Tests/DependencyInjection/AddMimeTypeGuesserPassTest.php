@@ -39,4 +39,28 @@ class AddMimeTypeGuesserPassTest extends TestCase
         $this->assertEquals('registerGuesser', $calls[0][0]);
         $this->assertEquals(new Reference('some_mime_type_guesser'), $calls[0][1][0]);
     }
+
+    public function testMimeTypesIsMadePublicWhenGuessersAreTagged()
+    {
+        $container = new ContainerBuilder();
+
+        $guesser = new Definition(FileinfoMimeTypeGuesser::class);
+        $guesser->addTag('mime.mime_type_guesser');
+        $container->setDefinition('some_mime_type_guesser', $guesser);
+        $container->register('mime_types', MimeTypes::class);
+
+        (new AddMimeTypeGuesserPass())->process($container);
+
+        $this->assertTrue($container->getDefinition('mime_types')->isPublic());
+    }
+
+    public function testMimeTypesStaysPrivateWhenNoGuesserIsTagged()
+    {
+        $container = new ContainerBuilder();
+        $container->register('mime_types', MimeTypes::class);
+
+        (new AddMimeTypeGuesserPass())->process($container);
+
+        $this->assertFalse($container->getDefinition('mime_types')->isPublic());
+    }
 }

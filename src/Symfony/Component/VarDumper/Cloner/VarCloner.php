@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarDumper\Cloner;
 
+use Symfony\Component\VarDumper\Caster\ClassDumpStub;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -84,6 +86,12 @@ class VarCloner extends AbstractCloner
                     case \is_string($v):
                         if ('' === $v) {
                             continue 2;
+                        }
+                        if (0 === $i && class_exists($v, false) && new \ReflectionClass($v)->isUserDefined()) {
+                            $stub = new ClassDumpStub($v);
+                            $a = $stub->value;
+                            $stub->value = null;
+                            break;
                         }
                         if (!preg_match('//u', $v)) {
                             $stub = new Stub();

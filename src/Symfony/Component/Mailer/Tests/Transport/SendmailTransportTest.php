@@ -67,7 +67,7 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport = new SendmailTransport(self::FAKE_SENDMAIL);
         $sendmailTransport->send($mail, $envelope);
 
-        $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com to@mail.com');
+        $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com -- to@mail.com');
     }
 
     public function testRecipientsAreUsedWhenSet()
@@ -79,7 +79,7 @@ class SendmailTransportTest extends TestCase
         $sendmailTransport = new SendmailTransport(self::FAKE_SENDMAIL);
         $sendmailTransport->send($mail, $envelope);
 
-        $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com recipient@mail.com');
+        $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com -- recipient@mail.com');
     }
 
     public function testThrowsTransportExceptionOnFailure()

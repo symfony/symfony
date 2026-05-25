@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Csrf\Tests;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -212,15 +213,16 @@ class CsrfTokenManagerTest extends TestCase
 
     private function assertRandomizeTheToken($namespace, $manager, $storage): void
     {
-        $storage
-            ->method('hasToken')
-            ->with($namespace.'token_id')
-            ->willReturn(true);
-
-        $storage
-            ->method('getToken')
-            ->with($namespace.'token_id')
-            ->willReturn('TOKEN');
+        if ($storage instanceof MockObject) {
+            $storage
+                ->method('hasToken')
+                ->with($namespace.'token_id')
+                ->willReturn(true);
+            $storage
+                ->method('getToken')
+                ->with($namespace.'token_id')
+                ->willReturn('TOKEN');
+        }
 
         $values = [];
         $lengths = [];

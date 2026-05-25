@@ -93,7 +93,8 @@ class DebugAutowiringCommand extends ContainerDebugCommand
         uasort($serviceIds, 'strnatcmp');
 
         $io->title('Autowirable Types');
-        $io->text('The following classes & interfaces can be used as type-hints when autowiring:');
+        $io->text('Use the following classes & interfaces as type-hints in constructor arguments to autowire services.');
+        $io->text('Add <fg=magenta>#[Target(\'</><fg=cyan>name</><fg=magenta>\')]</> to the argument to select a specific variant.');
         if ($search) {
             $io->text(\sprintf('(only showing classes/interfaces matching <comment>%s</comment>)', $search));
         }
@@ -107,21 +108,16 @@ class DebugAutowiringCommand extends ContainerDebugCommand
             }
             $text = [];
             $resolvedServiceId = $serviceId;
-            if (!str_starts_with($serviceId, $previousId.' $')) {
+            $description = '';
+
+            if ($isNewGroup = !str_starts_with($serviceId, $previousId.' $')) {
                 $text[] = '';
                 $previousId = preg_replace('/ \$.*/', '', $serviceId);
-                if ('' !== $description = Descriptor::getClassDescription($previousId, $resolvedServiceId)) {
-                    if (isset($hasAlias[$previousId])) {
-                        continue;
-                    }
-                    $text[] = $description;
+                $skipReflection = $container->hasAlias($previousId) && $container->getAlias($previousId)->isDeprecated();
+                $description = $skipReflection ? '' : Descriptor::getClassDescription($previousId, $resolvedServiceId);
+                if ('' !== $description && isset($hasAlias[$previousId])) {
+                    continue;
                 }
-            }
-
-            $serviceLine = \sprintf('<fg=yellow>%s</>', $serviceId);
-            if ('' !== $fileLink = $this->getFileLink($previousId)) {
-                $serviceLine = substr($serviceId, \strlen($previousId));
-                $serviceLine = \sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId).('' !== $serviceLine ? \sprintf('<fg=yellow>%s</>', $serviceLine) : '');
             }
 
             if ($container->hasAlias($serviceId)) {
@@ -130,14 +126,13 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                 $alias = (string) $serviceAlias;
 
                 $target = null;
-                foreach ($reverseAliases[(string) $serviceAlias] ?? [] as $id) {
-                    if (!str_starts_with($id, '.'.$previousId.' $')) {
+                foreach ($reverseAliases[$alias] ?? [] as $id) {
+                    if (!str_starts_with($id, '.'.$previousId.' $') || !str_contains($serviceId, ' $')) {
                         continue;
                     }
                     $target = substr($id, \strlen($previousId) + 3);
 
                     if ($container->findDefinition($id) === $container->findDefinition($serviceId)) {
-                        $serviceLine .= ' - <fg=magenta>target:</><fg=cyan>'.$target.'</>';
                         break;
                     }
                 }
@@ -146,20 +141,72 @@ class DebugAutowiringCommand extends ContainerDebugCommand
                     $alias = $decorated[0]['id'];
                 }
 
-                if ($alias !== $target) {
-                    $serviceLine .= ' - <fg=magenta>alias:</><fg=cyan>'.$alias.'</>';
-                }
+                if ($isNewGroup) {
+                    // Build the main type line with optional file link
+                    $typeLine = \sprintf('<fg=yellow>%s</>', $previousId);
+                    if (!$skipReflection && '' !== $fileLink = $this->getFileLink($previousId)) {
+                        $typeLine = \sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId);
+                    }
 
-                if ($serviceAlias->isDeprecated()) {
-                    $serviceLine .= ' - <fg=magenta>deprecated</>';
+                    if (null !== $target) {
+                        // Type whose first entry is already targeted (no un-targeted base)
+                        $text[] = $typeLine;
+                        if ('' !== $description) {
+                            $text[] = \sprintf('  %s', $description);
+                        }
+                        $targetLine = \sprintf('  <fg=magenta>#[Target(\'</><fg=cyan>%s</><fg=magenta>\')]</>', $target);
+                        if ($alias !== $target) {
+                            $targetLine .= \sprintf(' → <fg=cyan>%s</>', $alias);
+                        }
+                        if ($serviceAlias->isDeprecated()) {
+                            $targetLine .= ' <fg=magenta>[deprecated]</>';
+                        }
+                        $text[] = $targetLine;
+                    } else {
+                        // Regular main entry: Type → alias
+                        if ($alias !== $target) {
+                            $typeLine .= \sprintf(' → <fg=cyan>%s</>', $alias);
+                        }
+                        if ($serviceAlias->isDeprecated()) {
+                            $typeLine .= ' <fg=magenta>[deprecated]</>';
+                        }
+                        $text[] = $typeLine;
+                        if ('' !== $description) {
+                            $text[] = \sprintf('  %s', $description);
+                        }
+                    }
+                } else {
+                    // Variant entry: indented #[Target] line
+                    if (null !== $target) {
+                        $variantLine = \sprintf('  <fg=magenta>#[Target(\'</><fg=cyan>%s</><fg=magenta>\')]</>', $target);
+                    } else {
+                        $variantLine = \sprintf('  <fg=yellow>%s</>', $serviceId);
+                    }
+                    if ($alias !== $target) {
+                        $variantLine .= \sprintf(' → <fg=cyan>%s</>', $alias);
+                    }
+                    if ($serviceAlias->isDeprecated()) {
+                        $variantLine .= ' <fg=magenta>[deprecated]</>';
+                    }
+                    $text[] = $variantLine;
                 }
             } elseif (!$all) {
                 ++$serviceIdsNb;
                 continue;
-            } elseif ($container->getDefinition($serviceId)->isDeprecated()) {
-                $serviceLine .= ' - <fg=magenta>deprecated</>';
+            } else {
+                // Service without alias (shown with --all)
+                $serviceLine = \sprintf('<fg=yellow>%s</>', $previousId);
+                if ('' !== $fileLink = $this->getFileLink($previousId)) {
+                    $serviceLine = \sprintf('<fg=yellow;href=%s>%s</>', $fileLink, $previousId);
+                }
+                if ($container->getDefinition($serviceId)->isDeprecated()) {
+                    $serviceLine .= ' <fg=magenta>[deprecated]</>';
+                }
+                $text[] = $serviceLine;
+                if ($isNewGroup && '' !== $description) {
+                    $text[] = \sprintf('  %s', $description);
+                }
             }
-            $text[] = $serviceLine;
             $io->text($text);
         }
 

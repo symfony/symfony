@@ -90,7 +90,7 @@ final class ArrayShapeType extends CollectionType
 
     public function getExtraValueType(): ?Type
     {
-        return $this->extraKeyType;
+        return $this->extraValueType;
     }
 
     public function accepts(mixed $value): bool

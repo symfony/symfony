@@ -147,6 +147,10 @@ class DateType extends AbstractType
                 $yearOptions[$passOpt] = $monthOptions[$passOpt] = $dayOptions[$passOpt] = $options[$passOpt];
             }
 
+            $yearOptions['label'] = $options['labels']['year'];
+            $monthOptions['label'] = $options['labels']['month'];
+            $dayOptions['label'] = $options['labels']['day'];
+
             $builder
                 ->add('year', self::WIDGETS[$options['widget']], $yearOptions)
                 ->add('month', self::WIDGETS[$options['widget']], $monthOptions)
@@ -269,6 +273,11 @@ class DateType extends AbstractType
             ];
         };
 
+        $labelsNormalizer = static fn (Options $options, array $labels) => array_replace(
+            ['year' => null, 'month' => null, 'day' => null],
+            array_filter($labels, static fn ($label) => null !== $label)
+        );
+
         $format = static fn (Options $options) => 'single_text' === $options['widget'] ? self::HTML5_FORMAT : self::DEFAULT_FORMAT;
 
         $resolver->setDefaults([
@@ -282,6 +291,7 @@ class DateType extends AbstractType
             'view_timezone' => null,
             'calendar' => null,
             'placeholder' => $placeholderDefault,
+            'labels' => [],
             'html5' => true,
             // Don't modify \DateTime classes by reference, we treat
             // them like immutable value objects
@@ -301,6 +311,8 @@ class DateType extends AbstractType
 
         $resolver->setNormalizer('placeholder', $placeholderNormalizer);
         $resolver->setNormalizer('choice_translation_domain', $choiceTranslationDomainNormalizer);
+        $resolver->setNormalizer('labels', $labelsNormalizer);
+        $resolver->setAllowedTypes('labels', 'array');
 
         $resolver->setAllowedValues('input', [
             'datetime',

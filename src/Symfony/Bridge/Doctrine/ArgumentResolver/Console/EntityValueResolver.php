@@ -47,8 +47,12 @@ final class EntityValueResolver implements ValueResolverInterface
 
     public function resolve(string $argumentName, InputInterface $input, ReflectionMember $member): iterable
     {
-        if (!Argument::tryFrom($member->getMember()) && !Option::tryFrom($member->getMember())) {
-            return [];
+        $isOption = false;
+        if (!Argument::tryFrom($member->getMember())) {
+            if (!Option::tryFrom($member->getMember())) {
+                return [];
+            }
+            $isOption = true;
         }
 
         $type = $member->getType();
@@ -58,7 +62,11 @@ final class EntityValueResolver implements ValueResolverInterface
 
         $inputName = $member->getInputName();
 
-        if ($input->hasArgument($inputName) && \is_object($input->getArgument($inputName))) {
+        if ($isOption) {
+            if ($input->hasOption($inputName) && \is_object($input->getOption($inputName))) {
+                return [];
+            }
+        } elseif ($input->hasArgument($inputName) && \is_object($input->getArgument($inputName))) {
             return [];
         }
 
@@ -79,12 +87,12 @@ final class EntityValueResolver implements ValueResolverInterface
 
         $message = '';
         if (null !== $options->expr) {
-            $variables = array_merge($input->getArguments(), ['input' => $input]);
+            $variables = array_merge($input->getArguments(), $input->getOptions(), ['input' => $input]);
             if (null === $object = $this->findViaExpression($this->expressionLanguage, $manager, $options, $variables)) {
                 $message = \sprintf(' The expression "%s" returned null.', $options->expr);
             }
-        } elseif (false === $object = $this->findById($manager, $options, $this->getIdentifier($inputName, $input, $options, $member))) {
-            if (!$criteria = $this->getCriteria($inputName, $input, $options, $manager, $member)) {
+        } elseif (false === $object = $this->findById($manager, $options, $this->getIdentifier($inputName, $input, $options, $isOption))) {
+            if (!$criteria = $this->getCriteria($inputName, $input, $options, $manager, $isOption)) {
                 throw new NearMissValueResolverException(\sprintf('Cannot find mapping for "%s": use the #[MapEntity] attribute to configure entity resolution.', $options->class));
             }
             $object = $this->findOneByCriteria($manager, $options, $criteria);
@@ -97,22 +105,25 @@ final class EntityValueResolver implements ValueResolverInterface
         return [$object];
     }
 
-    private function getIdentifier(string $argumentName, InputInterface $input, MapEntity $options, ReflectionMember $member): mixed
+    private function getIdentifier(string $inputName, InputInterface $input, MapEntity $options, bool $isOption): mixed
     {
+        $has = $isOption ? $input->hasOption(...) : $input->hasArgument(...);
+        $get = $isOption ? $input->getOption(...) : $input->getArgument(...);
+
         if (\is_array($options->id)) {
             $id = [];
             foreach ($options->id as $field) {
                 if (str_contains($field, '%s')) {
-                    $field = \sprintf($field, $argumentName);
+                    $field = \sprintf($field, $inputName);
                 }
 
                 $fieldName = (new UnicodeString($field))->kebab()->toString();
 
-                if (!$input->hasArgument($fieldName)) {
+                if (!$has($fieldName)) {
                     return $options->stripNull ? false : null;
                 }
 
-                $id[$field] = $input->getArgument($fieldName);
+                $id[$field] = $get($fieldName);
             }
 
             return $id;
@@ -121,13 +132,11 @@ final class EntityValueResolver implements ValueResolverInterface
         if ($options->id) {
             $idName = (new UnicodeString($options->id))->kebab()->toString();
 
-            return $input->hasArgument($idName)
-                ? $input->getArgument($idName)
-                : ($options->stripNull ? false : null);
+            return $has($idName) ? $get($idName) : ($options->stripNull ? false : null);
         }
 
-        if ($input->hasArgument($argumentName)) {
-            $value = $input->getArgument($argumentName);
+        if ($has($inputName)) {
+            $value = $get($inputName);
             if (\is_array($value)) {
                 return false;
             }
@@ -135,18 +144,20 @@ final class EntityValueResolver implements ValueResolverInterface
             return $value ?? ($options->stripNull ? false : null);
         }
 
-        if ($input->hasArgument('id')) {
+        if (!$isOption && $input->hasArgument('id')) {
             return $input->getArgument('id') ?? ($options->stripNull ? false : null);
         }
 
         return false;
     }
 
-    private function getCriteria(string $argumentName, InputInterface $input, MapEntity $options, ObjectManager $manager, ReflectionMember $member): array
+    private function getCriteria(string $inputName, InputInterface $input, MapEntity $options, ObjectManager $manager, bool $isOption): array
     {
+        $has = $isOption ? $input->hasOption(...) : $input->hasArgument(...);
+        $get = $isOption ? $input->getOption(...) : $input->getArgument(...);
         $mapping = $options->mapping;
 
-        if (!$mapping && $input->hasArgument($argumentName) && \is_array($criteria = $input->getArgument($argumentName))) {
+        if (!$mapping && $has($inputName) && \is_array($criteria = $get($inputName))) {
             foreach ($options->exclude ?? [] as $exclude) {
                 unset($criteria[$exclude]);
             }
@@ -171,8 +182,8 @@ final class EntityValueResolver implements ValueResolverInterface
         $values = [];
         foreach (array_keys($mapping) as $attribute) {
             $attributeName = (new UnicodeString($attribute))->kebab()->toString();
-            if ($input->hasArgument($attributeName)) {
-                $values[$attribute] = $input->getArgument($attributeName);
+            if ($has($attributeName)) {
+                $values[$attribute] = $get($attributeName);
             }
         }
 

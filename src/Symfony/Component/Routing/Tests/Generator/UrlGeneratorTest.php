@@ -290,6 +290,23 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/amusant', $urlGenerator->generate('fun.fr', ['_locale' => 'en']));
     }
 
+    public function testLocalizedAliasRouteGeneratesCorrectUrlPerLocale()
+    {
+        $routeCollection = new RouteCollection();
+
+        $routeCollection->add('foo.en', (new Route('/en/fork'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en'));
+        $routeCollection->add('foo.fr', (new Route('/fr/fourchette'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'fr'));
+        $routeCollection->addAlias('bar.en', 'foo.en');
+        $routeCollection->addAlias('bar.fr', 'foo.fr');
+
+        $urlGenerator = $this->getGenerator($routeCollection);
+        $urlGenerator->getContext()->setParameter('_locale', 'fr');
+
+        $this->assertSame('/app.php/fr/fourchette', $urlGenerator->generate('bar'));
+        $this->assertSame('/app.php/en/fork', $urlGenerator->generate('bar', ['_locale' => 'en']));
+        $this->assertSame('/app.php/fr/fourchette', $urlGenerator->generate('bar', ['_locale' => 'fr']));
+    }
+
     public function testGenerateWithoutRoutes()
     {
         $routes = $this->getRoutes('foo', new Route('/testing/{foo}'));
@@ -347,6 +364,14 @@ class UrlGeneratorTest extends TestCase
         $this->expectException(InvalidParameterException::class);
 
         $this->getGenerator($routes)->generate('test', ['foo' => '0'], UrlGeneratorInterface::ABSOLUTE_URL);
+    }
+
+    public function testGenerateForRouteWithAlternationRequirementRejectsSubstringMatch()
+    {
+        $routes = $this->getRoutes('test', new Route('/{_locale}/blog', [], ['_locale' => 'en|fr|vi|de']));
+
+        $this->expectException(InvalidParameterException::class);
+        $this->getGenerator($routes)->generate('test', ['_locale' => '/evil.com']);
     }
 
     public function testGenerateForRouteWithInvalidOptionalParameterNonStrict()

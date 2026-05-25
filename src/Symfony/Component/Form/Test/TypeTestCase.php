@@ -12,6 +12,7 @@
 namespace Symfony\Component\Form\Test;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
@@ -32,14 +33,17 @@ abstract class TypeTestCase extends FormIntegrationTestCase
     }
 
     /**
+     * @param ViolationMapperInterface|null $violationMapper
+     *
      * @return FormExtensionInterface[]
      */
-    protected function getExtensions(): array
+    protected function getExtensions(/* ?ViolationMapperInterface $violationMapper = null */): array
     {
+        $violationMapper = \func_num_args() ? func_get_arg(0) : null;
         $extensions = [];
 
         if (\in_array(ValidatorExtensionTrait::class, class_uses($this), true)) {
-            $extensions[] = $this->getValidatorExtension();
+            $extensions[] = $this->getValidatorExtension($violationMapper);
         }
 
         return $extensions;

@@ -341,7 +341,7 @@ return [
         'Europe/Busingen' => 'Büsingen (gaska-Eurohpá áigi)',
         'Europe/Chisinau' => 'Chișinău (nuorti-Eurohpá áigi)',
         'Europe/Copenhagen' => 'Copenhagen (gaska-Eurohpá áigi)',
-        'Europe/Dublin' => 'Dublin (Irlánda áigi)',
+        'Europe/Dublin' => 'Dublin (Greenwich gaskka áigi)',
         'Europe/Gibraltar' => 'Gibraltar (gaska-Eurohpá áigi)',
         'Europe/Guernsey' => 'Guernsey (Greenwich gaskka áigi)',
         'Europe/Helsinki' => 'Helsinki (nuorti-Eurohpá áigi)',

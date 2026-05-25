@@ -196,6 +196,39 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertEquals(new Reference('voter_with_tag'), $refs[1]);
         $this->assertEquals(new Reference('voter_with_low_attribute'), $refs[2]);
     }
+
+    public function testExplicitTagPriorityTakesPrecedenceOverAsTaggedItem()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $container
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
+            ->addArgument([])
+        ;
+
+        // VoterWithAsTaggedItem declares priority 200 via the attribute, but
+        // the explicit tag priority 10 must win.
+        $container
+            ->register('voter_explicit_low', VoterWithAsTaggedItem::class)
+            ->setAutoconfigured(true)
+            ->addTag('security.voter', ['priority' => 10])
+        ;
+
+        $container
+            ->register('voter_plain_high', Voter::class)
+            ->addTag('security.voter', ['priority' => 100])
+        ;
+
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
+
+        $argument = $container->getDefinition('security.access.decision_manager')->getArgument(0);
+        $refs = $argument->getValues();
+        $this->assertCount(2, $refs);
+        $this->assertEquals(new Reference('voter_plain_high'), $refs[0]);
+        $this->assertEquals(new Reference('voter_explicit_low'), $refs[1]);
+    }
 }
 
 #[AsTaggedItem(priority: 200)]

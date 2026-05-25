@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -655,6 +656,55 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ]);
 
         $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
+    }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierWithGetStatusCode()
+    {
+        $client = new RetryableHttpClient($this->getHttpClient(__FUNCTION__));
+        $client = $client->withOptions([
+            'max_duration' => 0.1,
+            'timeout' => 0.1,
+        ]);
+
+        $response = $client->request('GET', 'https://127.0.0.1:8000/api/cheeses');
+
+        try {
+            $response->getStatusCode();
+            $this->fail('TransportException expected');
+        } catch (TransportException) {
+        }
+
+        try {
+            unset($response);
+        } catch (TransportException $e) {
+            $this->fail('Caught '.$e::class.'('.$e->getMessage().') but destruct should not throw');
+        }
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierEvenWithoutGetStatusCode()
+    {
+        $client = new RetryableHttpClient($this->getHttpClient(__FUNCTION__));
+        $client = $client->withOptions([
+            'max_duration' => 0.1,
+            'timeout' => 0.1,
+        ]);
+
+        $response = $client->request('GET', 'https://127.0.0.1:8000/api/cheeses');
+
+        try {
+            foreach ($client->stream($response) as $chunk) {
+            }
+            $this->fail('TransportException expected');
+        } catch (TransportException) {
+        }
+
+        try {
+            unset($response);
+        } catch (TransportException $e) {
+            $this->fail('Caught '.$e::class.'('.$e->getMessage().') but destruct should not throw');
+        }
+        $this->expectNotToPerformAssertions();
     }
 
     public function testHeadRequestWithClosureBody()

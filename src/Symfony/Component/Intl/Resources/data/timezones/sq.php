@@ -343,7 +343,7 @@ return [
         'Europe/Busingen' => 'Ora e Evropës Qendrore (Büsingen)',
         'Europe/Chisinau' => 'Ora e Evropës Lindore (Kishineu)',
         'Europe/Copenhagen' => 'Ora e Evropës Qendrore (Kopenhagen)',
-        'Europe/Dublin' => 'Ora: Irlandë (Dublin)',
+        'Europe/Dublin' => 'Ora e Grinuiçit (Dublin)',
         'Europe/Gibraltar' => 'Ora e Evropës Qendrore (Gjibraltar)',
         'Europe/Guernsey' => 'Ora e Grinuiçit (Gernsej)',
         'Europe/Helsinki' => 'Ora e Evropës Lindore (Helsinki)',

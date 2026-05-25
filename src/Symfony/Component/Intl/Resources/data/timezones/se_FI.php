@@ -301,6 +301,7 @@ return [
         'Europe/Busingen' => 'Büsingen (Gaska-Eurohpá áigi)',
         'Europe/Chisinau' => 'Chișinău (Nuorta-Eurohpa áigi)',
         'Europe/Copenhagen' => 'København (Gaska-Eurohpá áigi)',
+        'Europe/Dublin' => 'Dublin (Greenwicha áigi)',
         'Europe/Gibraltar' => 'Gibraltar (Gaska-Eurohpá áigi)',
         'Europe/Guernsey' => 'Guernsey (Greenwicha áigi)',
         'Europe/Helsinki' => 'Helsset (Nuorta-Eurohpa áigi)',

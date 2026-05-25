@@ -42,7 +42,7 @@ class PasswordMigratingListenerTest extends TestCase
         $this->user = new InMemoryUser('John', 'old-hash');
         $encoder = $this->createStub(PasswordHasherInterface::class);
         $encoder->method('needsRehash')->willReturn(true);
-        $encoder->method('hash')->with('pa$$word', null)->willReturn('new-hash');
+        $encoder->method('hash')->willReturn('new-hash');
         $this->hasherFactory = new PasswordHasherFactory([
             InMemoryUser::class => $encoder,
         ]);
@@ -82,7 +82,7 @@ class PasswordMigratingListenerTest extends TestCase
     public function testUpgradeWithoutUpgrader()
     {
         $userLoader = $this->createMock(TestMigratingUserProvider::class);
-        $userLoader->expects($this->any())->method('loadUserByIdentifier')->willReturn($this->user);
+        $userLoader->method('loadUserByIdentifier')->willReturn($this->user);
 
         $userLoader->expects($this->exactly(2))
             ->method('upgradePassword')

@@ -20,6 +20,9 @@ namespace Symfony\Component\VarExporter\Internal;
  */
 class LazyObjectRegistry
 {
+    public const PROPERTY_HAS_HOOKS = 1;
+    public const PROPERTY_NOT_BY_REF = 2;
+
     /**
      * @var array<class-string, \ReflectionClass>
      */
@@ -45,6 +48,67 @@ class LazyObjectRegistry
      */
     public static array $parentGet = [];
 
+    public static array $propertyScopes = [];
+
+    public static function getPropertyScopes($class): array
+    {
+        $propertyScopes = [];
+        $r = new \ReflectionClass($class);
+
+        foreach ($r->getProperties() as $property) {
+            $flags = $property->getModifiers();
+
+            if (\ReflectionProperty::IS_STATIC & $flags) {
+                continue;
+            }
+            $name = $property->name;
+            $access = ($flags << 2) | ($flags & \ReflectionProperty::IS_READONLY ? self::PROPERTY_NOT_BY_REF : 0);
+
+            if (!$property->isAbstract() && $h = $property->getHooks()) {
+                $access |= self::PROPERTY_HAS_HOOKS | (isset($h['get']) && !$h['get']->returnsReference() ? self::PROPERTY_NOT_BY_REF : 0);
+            }
+
+            if (\ReflectionProperty::IS_PRIVATE & $flags) {
+                $propertyScopes["\0$class\0$name"] = $propertyScopes[$name] = [$class, $name, null, $access, $property];
+
+                continue;
+            }
+
+            $propertyScopes[$name] = [$class, $name, null, $access, $property];
+
+            if ($flags & \ReflectionProperty::IS_PRIVATE_SET) {
+                $propertyScopes[$name][2] = $property->class;
+            }
+
+            if (\ReflectionProperty::IS_PROTECTED & $flags) {
+                $propertyScopes["\0*\0$name"] = $propertyScopes[$name];
+            }
+        }
+
+        while ($r = $r->getParentClass()) {
+            $class = $r->name;
+
+            foreach ($r->getProperties(\ReflectionProperty::IS_PRIVATE) as $property) {
+                $flags = $property->getModifiers();
+
+                if (\ReflectionProperty::IS_STATIC & $flags) {
+                    continue;
+                }
+                $name = $property->name;
+                $access = ($flags << 2) | ($flags & \ReflectionProperty::IS_READONLY ? self::PROPERTY_NOT_BY_REF : 0);
+
+                if ($h = $property->getHooks()) {
+                    $access |= self::PROPERTY_HAS_HOOKS | (isset($h['get']) && !$h['get']->returnsReference() ? self::PROPERTY_NOT_BY_REF : 0);
+                }
+
+                $propertyScopes["\0$class\0$name"] = [$class, $name, null, $access, $property];
+                $propertyScopes[$name] ??= $propertyScopes["\0$class\0$name"];
+            }
+        }
+
+        return $propertyScopes;
+    }
+
     public static function getClassResetters($class)
     {
         $classProperties = [];
@@ -53,7 +117,7 @@ class LazyObjectRegistry
         if ((self::$classReflectors[$class] ??= new \ReflectionClass($class))->isInternal()) {
             $propertyScopes = [];
         } else {
-            $propertyScopes = Hydrator::$propertyScopes[$class] ??= Hydrator::getPropertyScopes($class);
+            $propertyScopes = self::$propertyScopes[$class] ??= self::getPropertyScopes($class);
         }
 
         foreach ($propertyScopes as $key => [$scope, $name, $writeScope, $access]) {
@@ -63,7 +127,7 @@ class LazyObjectRegistry
                 continue;
             }
 
-            if ($access & Hydrator::PROPERTY_HAS_HOOKS) {
+            if ($access & self::PROPERTY_HAS_HOOKS) {
                 $hookedProperties[$k] = true;
             } else {
                 $classProperties[$writeScope ?? $scope][$name] = $key;

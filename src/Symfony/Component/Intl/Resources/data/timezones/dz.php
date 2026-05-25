@@ -342,7 +342,7 @@ return [
         'Europe/Busingen' => 'དབུས་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Büsingen་)',
         'Europe/Chisinau' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Chișinău་)',
         'Europe/Copenhagen' => 'དབུས་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (ཀོ་པེན་ཧེ་གེན་)',
-        'Europe/Dublin' => 'ཨཱ་ཡ་ལེནཌ་ཆུ་ཚོད།། (Dublin་)',
+        'Europe/Dublin' => 'གིརིན་ཝིཆ་ལུ་ཡོད་པའི་ཆུ་ཚོད། (Dublin་)',
         'Europe/Gibraltar' => 'དབུས་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (Gibraltar་)',
         'Europe/Guernsey' => 'གིརིན་ཝིཆ་ལུ་ཡོད་པའི་ཆུ་ཚོད། (Guernsey་)',
         'Europe/Helsinki' => 'ཤར་ཕྱོགས་ཡུ་རོ་པེན་ཆུ་ཚོད། (ཧེལ་སིང་ཀི་)',

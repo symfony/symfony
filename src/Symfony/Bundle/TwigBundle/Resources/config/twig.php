@@ -50,6 +50,7 @@ use Twig\ExtensionSet;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
 use Twig\Profiler\Profile;
+use Twig\Runtime\EscaperRuntime;
 use Twig\RuntimeLoader\ContainerRuntimeLoader;
 use Twig\Template;
 use Twig\TemplateWrapper;
@@ -174,6 +175,10 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.runtime_loader', ContainerRuntimeLoader::class)
             ->args([abstract_arg('runtime locator')])
+
+        ->set('twig.runtime.escaper', EscaperRuntime::class)
+            ->args([abstract_arg('charset, set in TwigExtension')])
+            ->tag('twig.runtime')
 
         ->set('twig.error_renderer.html', TwigErrorRenderer::class)
             ->decorate('error_renderer.html')

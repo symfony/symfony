@@ -432,6 +432,15 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Usages', $inEdges ? implode(\PHP_EOL, $inEdges) : 'none'];
 
         $options['output']->table($tableHeaders, $tableRows);
+
+        if (isset($options['id']) && $container) {
+            $stack = $this->getDecorationStack($container, $options['id']);
+
+            if (\count($stack) > 1) {
+                $options['output']->section('Decoration Stack');
+                $options['output']->table(['ID', 'Class', 'Priority'], array_map(static fn ($item) => array_values($item), $stack));
+            }
+        }
     }
 
     protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
@@ -635,6 +644,8 @@ class TextDescriptor extends Descriptor
     }
 
     /**
+     * @param-immediately-invoked-callable $getContainer
+     *
      * @param (callable():ContainerBuilder)|null $getContainer
      */
     private function formatControllerLink(mixed $controller, string $anchorText, ?callable $getContainer = null): string

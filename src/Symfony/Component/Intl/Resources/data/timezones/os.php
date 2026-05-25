@@ -122,6 +122,7 @@ return [
         'Europe/Busingen' => 'Астӕуккаг Европӕйаг рӕстӕг (Büsingen)',
         'Europe/Chisinau' => 'Скӕсӕн Европӕйаг рӕстӕг (Chișinău)',
         'Europe/Copenhagen' => 'Астӕуккаг Европӕйаг рӕстӕг (Copenhagen)',
+        'Europe/Dublin' => 'Гринвичы рӕстӕмбис рӕстӕг (Dublin)',
         'Europe/Gibraltar' => 'Астӕуккаг Европӕйаг рӕстӕг (Gibraltar)',
         'Europe/Guernsey' => 'Гринвичы рӕстӕмбис рӕстӕг (Guernsey)',
         'Europe/Helsinki' => 'Скӕсӕн Европӕйаг рӕстӕг (Helsinki)',

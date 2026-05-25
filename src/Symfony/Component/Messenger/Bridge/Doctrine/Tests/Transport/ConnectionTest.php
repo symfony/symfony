@@ -30,6 +30,8 @@ use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
@@ -37,13 +39,15 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 
+#[IgnoreDeprecations]
+#[Group('doctrine-dbal-workaround')]
 class ConnectionTest extends TestCase
 {
     public function testGetAMessageWillChangeItsStatus()
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection();
-        $stmt = $this->getResultMock([
+        $stmt = $this->getGetResultMock([
             'id' => 1,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -70,16 +74,16 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection([], $driverConnection);
         $doctrineEnvelope = $connection->get();
-        $this->assertEquals(1, $doctrineEnvelope['id']);
-        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
+        $this->assertEquals(1, $doctrineEnvelope[0]['id']);
+        $this->assertEquals('{"message":"Hi"}', $doctrineEnvelope[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope[0]['headers']);
     }
 
     public function testGetWithNoPendingMessageWillReturnNull()
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection(true);
-        $stmt = $this->getResultMock(false);
+        $stmt = $this->getGetResultMock(false);
 
         $queryBuilder
             ->method('getParameters')
@@ -106,9 +110,9 @@ class ConnectionTest extends TestCase
 
     public function testGetWithSkipLockedWithForUpdateMethod()
     {
-        $queryBuilder = $this->getQueryBuilderStub();
+        $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnection(true);
-        $stmt = $this->getResultMock(false);
+        $stmt = $this->getGetResultMock(false);
 
         $queryBuilder
             ->method('getParameters')
@@ -117,6 +121,7 @@ class ConnectionTest extends TestCase
             ->method('getParameterTypes')
             ->willReturn([]);
         $queryBuilder
+            ->expects($this->once())
             ->method('forUpdate')
             ->with(ConflictResolutionMode::SKIP_LOCKED)
             ->willReturn($queryBuilder);
@@ -130,8 +135,12 @@ class ConnectionTest extends TestCase
             ->method('update');
         $driverConnection
             ->method('executeQuery')
-            ->with($this->callback(static fn ($sql) => str_contains($sql, 'SKIP LOCKED')))
-            ->willReturn($stmt);
+            ->willReturnCallback(function (string $sql) use ($stmt) {
+                $this->assertStringContainsString('SKIP LOCKED', $sql);
+
+                return $stmt;
+            })
+        ;
 
         $connection = new Connection(['skip_locked' => true], $driverConnection);
         $doctrineEnvelope = $connection->get();
@@ -415,7 +424,18 @@ class ConnectionTest extends TestCase
         return $queryBuilder;
     }
 
-    private function getResultMock($expectedResult): Result&MockObject
+    private function getGetResultMock($expectedResult): Result&MockObject
+    {
+        $stmt = $this->createMock(Result::class);
+
+        $stmt->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn(false === $expectedResult ? [] : [$expectedResult]);
+
+        return $stmt;
+    }
+
+    private function getFindResultMock($expectedResult): Result&MockObject
     {
         $stmt = $this->createMock(Result::class);
 
@@ -526,10 +546,10 @@ class ConnectionTest extends TestCase
 
     public function testFind()
     {
-        $queryBuilder = $this->getQueryBuilderStub();
+        $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnection();
         $id = 1;
-        $stmt = $this->getResultMock([
+        $stmt = $this->getFindResultMock([
             'id' => $id,
             'body' => '{"message":"Hi"}',
             'headers' => json_encode(['type' => DummyMessage::class]),
@@ -539,6 +559,7 @@ class ConnectionTest extends TestCase
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
         $queryBuilder
+            ->expects($this->once())
             ->method('where')
             ->with('m.id = ? and m.queue_name = ?')
             ->willReturn($queryBuilder);
@@ -618,7 +639,7 @@ class ConnectionTest extends TestCase
         $driverConnection->method('createQueryBuilder')->willReturnCallback(static fn () => new QueryBuilder($driverConnection));
 
         $result = $this->createStub(Result::class);
-        $result->method('fetchAssociative')->willReturn(false);
+        $result->method('fetchAllAssociative')->willReturn([]);
 
         $driverConnection->expects($this->once())->method('beginTransaction');
         $driverConnection

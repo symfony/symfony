@@ -67,6 +67,8 @@ class FormTypeGuesserChain implements FormTypeGuesserInterface
      * Executes a closure for each guesser and returns the best guess from the
      * return values.
      *
+     * @param-immediately-invoked-callable $closure
+     *
      * @param \Closure $closure The closure to execute. Accepts a guesser
      *                          as argument and should return a Guess instance
      */

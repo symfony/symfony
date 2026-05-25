@@ -12,15 +12,18 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use phpDocumentor\Reflection\DocBlock;
+use phpDocumentor\Reflection\PseudoTypes\Generic;
 use phpDocumentor\Reflection\PseudoTypes\IntMask;
 use phpDocumentor\Reflection\PseudoTypes\IntMaskOf;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentWithPromotedSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildWithConstructorOverride;
@@ -32,6 +35,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentUsingTraitWith
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithPromotedPropertyDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithPromotedSelfDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ParentWithSelfDocBlock;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\PromotedPropertiesWithDocBlock;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\InvalidDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php80Dummy;
@@ -72,6 +77,58 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
     }
 
+    #[DataProvider('genericsProvider')]
+    public function testGenerics(string $class, string $property, Type $expectedType)
+    {
+        $this->assertEquals($expectedType, $this->extractor->getType($class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: class-string, 1: string, 2: Type}>
+     */
+    public static function genericsProvider(): iterable
+    {
+        yield [
+            Dummy::class,
+            'genericInterface',
+            Type::generic(Type::object(\BackedEnum::class), Type::string()),
+        ];
+        yield [
+            DummyGeneric::class,
+            'basicClass',
+            Type::generic(Type::object(Clazz::class), Type::object(Dummy::class)),
+        ];
+        yield [
+            DummyGeneric::class,
+            'basicInterface',
+            Type::generic(Type::object(IFace::class), Type::object(Dummy::class)),
+        ];
+        yield [
+            DummyGeneric::class,
+            'twoGenerics',
+            Type::generic(Type::object(Clazz::class), Type::int(), Type::object(Dummy::class)),
+        ];
+        yield [
+            DummyGeneric::class,
+            'nullableClass',
+            Type::nullable(Type::generic(Type::object(Clazz::class), Type::object(Dummy::class))),
+        ];
+        yield [
+            DummyGeneric::class,
+            'nullableInterface',
+            Type::nullable(Type::generic(Type::object(IFace::class), Type::object(Dummy::class))),
+        ];
+
+        // phpdocumentor/reflection-docblock >= 6
+        if (class_exists(Generic::class)) {
+            yield [
+                DummyGeneric::class,
+                'threeGenerics',
+                Type::generic(Type::object(Clazz::class), Type::int(), Type::object(Dummy::class), Type::string()),
+            ];
+        }
+    }
+
     public function testParamTagTypeIsOmitted()
     {
         $this->assertNull($this->extractor->getType(OmittedParamTagTypeDocBlock::class, 'omittedType'));
@@ -104,6 +161,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['nestedCollection', Type::list(Type::list(Type::string())), null, null];
         yield ['mixedCollection', Type::array(), null, null];
         yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class))), null, null];
+        yield ['unionWithMixed', Type::mixed(), null, null];
         yield ['a', Type::int(), 'A.', null];
         yield ['b', Type::nullable(Type::object(ParentDummy::class)), 'B.', null];
         yield ['c', Type::nullable(Type::bool()), null, null];
@@ -171,6 +229,8 @@ class PhpDocExtractorTest extends TestCase
         yield ['collection', Type::list(Type::object(\DateTimeImmutable::class))];
         yield ['nestedCollection', Type::list(Type::list(Type::string()))];
         yield ['mixedCollection', Type::array()];
+        yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class)))];
+        yield ['unionWithMixed', Type::mixed()];
         yield ['a', null];
         yield ['b', null];
         yield ['c', null];
@@ -231,6 +291,8 @@ class PhpDocExtractorTest extends TestCase
         yield ['collection', Type::list(Type::object(\DateTimeImmutable::class))];
         yield ['nestedCollection', Type::list(Type::list(Type::string()))];
         yield ['mixedCollection', Type::array()];
+        yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class)))];
+        yield ['unionWithMixed', Type::mixed()];
         yield ['a', null];
         yield ['b', null];
         yield ['c', Type::nullable(Type::bool())];
@@ -477,6 +539,23 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($this->extractor->getType(VoidNeverReturnTypeDummy::class, 'neverProperty'));
         // Normal getter should still work
         $this->assertEquals(Type::string(), $this->extractor->getType(VoidNeverReturnTypeDummy::class, 'normalProperty'));
+    }
+
+    #[DataProvider('providePromotedPropertyDocBlockTestCases')]
+    public function testPromotedPropertyDocBlock(string $class, string $property, ?string $shortDescription, ?string $longDescription, ?Type $type)
+    {
+        $this->assertSame($shortDescription, $this->extractor->getShortDescription($class, $property));
+        $this->assertSame($longDescription, $this->extractor->getLongDescription($class, $property));
+        $this->assertEquals($type, $this->extractor->getType($class, $property));
+    }
+
+    public static function providePromotedPropertyDocBlockTestCases(): iterable
+    {
+        yield 'description from constructor @param' => [PromotedPropertiesWithDocBlock::class, 'foo', 'Just a foo property', null, Type::string()];
+        yield 'promoted property with no docblock' => [PromotedPropertiesWithDocBlock::class, 'bar', null, null, null];
+        yield 'description and type from inline @var' => [PromotedPropertiesWithDocBlock::class, 'baz', 'A baz property', null, Type::string()];
+        yield 'inline @var wins over constructor @param' => [PromotedPropertiesWithDocBlock::class, 'qux', 'An overridden qux property', null, Type::int()];
+        yield 'long description from inline docblock' => [PromotedPropertiesWithDocBlock::class, 'corge', 'A corge property.', 'A detailed explanation of corge.', null];
     }
 }
 

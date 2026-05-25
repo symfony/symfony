@@ -41,19 +41,22 @@ final class Window implements LimiterStateInterface
 
     public function getExpirationTime(): ?int
     {
-        return $this->intervalInSeconds;
+        // Keep the entry alive long enough for any reservation debt to be
+        // carried forward, otherwise resets that span an idle interval would
+        // re-issue the borrowed tokens and silently double the rate.
+        return $this->intervalInSeconds * max(1, (int) ceil($this->hitCount / $this->maxSize));
     }
 
     public function add(int $hits = 1, ?float $now = null): void
     {
         $now ??= microtime(true);
         if (($now - $this->timer) > $this->intervalInSeconds) {
-            // reset window
+            // carry any reservation debt forward instead of zeroing it
+            $this->hitCount = $this->getCarriedHitCount($now);
             $this->timer = $now;
-            $this->hitCount = 0;
         }
 
-        $this->hitCount += $hits;
+        $this->hitCount = max(0, $this->hitCount + $hits);
     }
 
     public function getHitCount(): int
@@ -63,12 +66,25 @@ final class Window implements LimiterStateInterface
 
     public function getAvailableTokens(float $now): int
     {
-        // if now is more than the window interval in the past, all tokens are available
-        if (($now - $this->timer) > $this->intervalInSeconds) {
-            return $this->maxSize;
+        return $this->maxSize - $this->getCarriedHitCount($now);
+    }
+
+    /**
+     * Returns the hit count after virtually applying any window resets that
+     * have occurred between $this->timer and $now, carrying over reservations
+     * that exceed the previous window's capacity (debt borrowed from future
+     * windows via reserve()).
+     */
+    private function getCarriedHitCount(float $now): int
+    {
+        $elapsed = $now - $this->timer;
+        if ($elapsed <= $this->intervalInSeconds) {
+            return $this->hitCount;
         }
 
-        return $this->maxSize - $this->hitCount;
+        $windowsElapsed = (int) ($elapsed / $this->intervalInSeconds);
+
+        return max(0, $this->hitCount - $windowsElapsed * $this->maxSize);
     }
 
     public function calculateTimeForTokens(int $tokens, float $now): int
@@ -77,7 +93,9 @@ final class Window implements LimiterStateInterface
             return 0;
         }
 
-        return (int) ceil($this->timer + $this->intervalInSeconds - $now);
+        $inWindow = (int) ceil(($this->hitCount + $tokens) / $this->maxSize) - 1;
+
+        return (int) ceil($this->timer + ($this->intervalInSeconds * $inWindow) - $now);
     }
 
     public function __serialize(): array
@@ -93,6 +111,9 @@ final class Window implements LimiterStateInterface
         // BC layer for old objects serialized via __sleep
         if (5 === \count($data)) {
             $data = array_values($data);
+            if ($data[0] instanceof \Stringable) {
+                throw new \BadMethodCallException('Cannot unserialize '.self::class);
+            }
             $this->id = $data[0];
             $this->hitCount = $data[1];
             $this->intervalInSeconds = $data[2];

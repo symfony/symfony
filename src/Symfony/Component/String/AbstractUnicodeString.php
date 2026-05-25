@@ -310,6 +310,9 @@ abstract class AbstractUnicodeString extends AbstractString
         return $this->pad($length, $pad, \STR_PAD_LEFT);
     }
 
+    /**
+     * @param-immediately-invoked-callable $to
+     */
     public function replaceMatches(string $fromRegexp, string|callable $to): static
     {
         if ($this->ignoreCase) {
@@ -575,6 +578,8 @@ abstract class AbstractUnicodeString extends AbstractString
     private function wcswidth(string $string): int
     {
         $width = 0;
+        $lastChar = null;
+        $lastWidth = null;
 
         foreach (preg_split('//u', $string, -1, \PREG_SPLIT_NO_EMPTY) as $c) {
             $codePoint = mb_ord($c, 'UTF-8');
@@ -595,6 +600,20 @@ abstract class AbstractUnicodeString extends AbstractString
                 || (0x07F <= $codePoint && 0x0A0 > $codePoint) // C1 control characters and DEL
             ) {
                 return -1;
+            }
+
+            if (0xFE0F === $codePoint) {
+                if (\PCRE_VERSION_MAJOR < 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR < 40) {
+                    $regex = '/\p{So}/u';
+                } else {
+                    $regex = '/\p{Emoji}/u';
+                }
+                if (null !== $lastChar && 1 === $lastWidth && preg_match($regex, $lastChar)) {
+                    ++$width;
+                    $lastWidth = 2;
+                }
+
+                continue;
             }
 
             self::$tableZero ??= require __DIR__.'/Resources/data/wcswidth_table_zero.php';
@@ -627,6 +646,8 @@ abstract class AbstractUnicodeString extends AbstractString
                         $ubound = $mid - 1;
                     } else {
                         $width += 2;
+                        $lastChar = $c;
+                        $lastWidth = 2;
 
                         continue 2;
                     }
@@ -634,6 +655,8 @@ abstract class AbstractUnicodeString extends AbstractString
             }
 
             ++$width;
+            $lastChar = $c;
+            $lastWidth = 1;
         }
 
         return $width;

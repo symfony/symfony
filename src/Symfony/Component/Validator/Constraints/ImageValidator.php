@@ -266,17 +266,22 @@ class ImageValidator extends FileValidator
             $content = (new File($value))->getContent();
         }
 
-        if (1 === preg_match('/<svg[^<>]+width="(?<width>[0-9]+)"[^<>]*>/', $content, $widthMatches)) {
-            $width = (int) $widthMatches['width'];
+        $number = '[0-9]+(?:\.[0-9]+)?';
+        $unit = '(?:px|pt|pc|in|cm|mm|em|rem)?';
+
+        if (1 === preg_match('/<svg[^<>]+width="(?<width>'.$number.')(?<unit>'.$unit.')"[^<>]*>/', $content, $widthMatches)) {
+            $width = self::svgLengthToPixels($widthMatches['width'], $widthMatches['unit']);
         }
 
-        if (1 === preg_match('/<svg[^<>]+height="(?<height>[0-9]+)"[^<>]*>/', $content, $heightMatches)) {
-            $height = (int) $heightMatches['height'];
+        if (1 === preg_match('/<svg[^<>]+height="(?<height>'.$number.')(?<unit>'.$unit.')"[^<>]*>/', $content, $heightMatches)) {
+            $height = self::svgLengthToPixels($heightMatches['height'], $heightMatches['unit']);
         }
 
-        if (1 === preg_match('/<svg[^<>]+viewBox="-?[0-9]+ -?[0-9]+ (?<width>-?[0-9]+) (?<height>-?[0-9]+)"[^<>]*>/', $content, $viewBoxMatches)) {
-            $width ??= (int) $viewBoxMatches['width'];
-            $height ??= (int) $viewBoxMatches['height'];
+        $vbNumber = '-?[0-9]+(?:\.[0-9]+)?';
+
+        if (1 === preg_match('/<svg[^<>]+viewBox="'.$vbNumber.'[ ,]+'.$vbNumber.'[ ,]+(?<width>'.$vbNumber.')[ ,]+(?<height>'.$vbNumber.')"[^<>]*>/', $content, $viewBoxMatches)) {
+            $width ??= (int) round((float) $viewBoxMatches['width']);
+            $height ??= (int) round((float) $viewBoxMatches['height']);
         }
 
         if (isset($width) && isset($height)) {
@@ -284,5 +289,26 @@ class ImageValidator extends FileValidator
         }
 
         return null;
+    }
+
+    /**
+     * Converts an SVG length value with an optional CSS unit to pixels using the
+     * CSS standard 96 DPI.
+     */
+    private static function svgLengthToPixels(string $value, string $unit): int
+    {
+        $value = (float) $value;
+
+        $pixels = match ($unit) {
+            'in' => $value * 96,
+            'cm' => $value * 96 / 2.54,
+            'mm' => $value * 96 / 25.4,
+            'pt' => $value * 96 / 72,
+            'pc' => $value * 16,
+            'em', 'rem' => $value * 16,
+            default => $value,
+        };
+
+        return (int) round($pixels);
     }
 }

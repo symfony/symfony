@@ -218,6 +218,21 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
     private function mapQueryString(Request $request, ArgumentMetadata $argument, MapQueryString $attribute): ?object
     {
+        // a named parameter holding a JSON document, e.g. ?filter={"page":1}
+        if (null !== $attribute->key && \is_string($data = $request->query->all()[$attribute->key] ?? null)) {
+            if ('' === $data && !$attribute->mapWhenEmpty) {
+                return null;
+            }
+
+            try {
+                return $this->serializer->deserialize($data, $argument->getType(), 'json', self::CONTEXT_DESERIALIZE + $attribute->serializationContext);
+            } catch (NotEncodableValueException $e) {
+                throw new BadRequestHttpException(\sprintf('Query parameter "%s" contains invalid "json" data.', $attribute->key), $e);
+            } catch (UnexpectedPropertyException $e) {
+                throw new BadRequestHttpException(\sprintf('Query parameter "%s" contains invalid "%s" property.', $attribute->key, $e->property), $e);
+            }
+        }
+
         if (!($data = $request->query->all($attribute->key)) && ($argument->isNullable() || $argument->hasDefaultValue()) && !$attribute->mapWhenEmpty) {
             return null;
         }

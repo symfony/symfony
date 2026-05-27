@@ -39,6 +39,9 @@ final class MicrosoftTeamsTransportFactory extends AbstractTransportFactory
 
         $host = $dsn->getHost();
         $port = $dsn->getPort();
+        if ($query = $dsn->getOptions()) {
+            $path .= '?'.http_build_query($query, '', '&');
+        }
 
         return (new MicrosoftTeamsTransport($path, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }

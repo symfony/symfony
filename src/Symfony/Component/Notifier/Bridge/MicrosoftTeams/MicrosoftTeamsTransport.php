@@ -78,14 +78,15 @@ final class MicrosoftTeamsTransport extends AbstractTransport
             throw new TransportException('Could not reach the remote MicrosoftTeams server.', $response, 0, $e);
         }
 
-        $requestId = $response->getHeaders(false)['request-id'][0] ?? null;
+        $headers = $response->getHeaders(false);
+        $requestId = $headers['x-ms-service-request-id'][0] ?? $headers['request-id'][0] ?? null;
         if (null === $requestId) {
             $originalContent = $message->getSubject();
 
             throw new TransportException(sprintf('Unable to post the Microsoft Teams message: "%s" (request-id not found).', $originalContent), $response);
         }
 
-        if (200 !== $statusCode) {
+       if (!\in_array($statusCode, [200, 202], true)) {
             $errorMessage = $response->getContent(false);
             $originalContent = $message->getSubject();
 

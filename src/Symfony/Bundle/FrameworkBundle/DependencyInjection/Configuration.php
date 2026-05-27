@@ -1141,6 +1141,7 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('dsn')->end()
                                     ->arrayNode('domains', 'domain')
+                                        ->useAttributeAsKey('key')
                                         ->prototype('scalar')->end()
                                         ->defaultValue([])
                                     ->end()

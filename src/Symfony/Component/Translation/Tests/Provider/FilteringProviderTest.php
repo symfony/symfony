@@ -37,4 +37,21 @@ class FilteringProviderTest extends TestCase
 
         $this->assertSame($expectedBag, $result);
     }
+
+    public function testReadKeepDomainKeys()
+    {
+        $innerProvider = $this->createMock(ProviderInterface::class);
+        $innerProvider->expects($this->once())
+            ->method('read')
+            ->with(['foo' => 'bar'], ['en'])
+            ->willReturn(new TranslatorBag());
+
+        $filteringProvider = new FilteringProvider(
+            $innerProvider,
+            ['en'],
+            ['foo' => 'bar', 'baz' => 'qux']
+        );
+
+        $filteringProvider->read(['bar'], ['en']);
+    }
 }

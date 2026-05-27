@@ -121,18 +121,29 @@ final class LocoProvider implements ProviderInterface
 
     public function read(array $domains, array $locales): TranslatorBag
     {
-        $domains = $domains ?: ['*'];
+        if (!$domains || ['*'] === $domains) {
+            trigger_deprecation('symfony/loco-translation-provider', '8.2', 'Passing no domains or "*" to "%s" is deprecated, configure your loco provider domains as an associative array with an empty string key and "*" as value.', __METHOD__);
+
+            $domains = ['' => '*'];
+        } else {
+            $filters = [];
+            foreach ($domains as $filter => $domain) {
+                $filters[\is_int($filter) ? $domain : $filter] = $domain;
+            }
+            $domains = $filters;
+        }
         $locales = $locales ?: $this->getLocales();
+
         $translatorBag = new TranslatorBag();
         $responses = [];
 
         foreach ($locales as $locale) {
-            foreach ($domains as $domain) {
-                $previousCatalogue = $this->translatorBag?->getCatalogue($locale);
+            $previousCatalogue = $this->translatorBag?->getCatalogue($locale);
 
+            foreach ($domains as $filter => $domain) {
                 $responses[] = $this->client->request('GET', \sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
                     'query' => [
-                        'filter' => '*' !== $domain ? $domain : '',
+                        'filter' => $filter,
                         'status' => $this->restrictToStatus ?? 'translated,blank-translation',
                     ],
                     'headers' => [
@@ -140,6 +151,7 @@ final class LocoProvider implements ProviderInterface
                     ],
                     'user_data' => [
                         'locale' => $locale,
+                        'filter' => $filter,
                         'domain' => $domain,
                         'previousCatalogue' => $previousCatalogue,
                     ],
@@ -148,19 +160,27 @@ final class LocoProvider implements ProviderInterface
         }
 
         foreach ($this->client->stream($responses) as $response => $chunk) {
-            ['locale' => $locale, 'domain' => $domain, 'previousCatalogue' => $previousCatalogue] = $response->getInfo('user_data');
+            if ($response->getInfo('canceled')) {
+                continue;
+            }
+
+            ['locale' => $locale, 'filter' => $filter, 'domain' => $domain, 'previousCatalogue' => $previousCatalogue] = $response->getInfo('user_data');
 
             if ($chunk->isFirst()) {
                 if (404 === $response->getStatusCode()) {
-                    $this->logger->warning(\sprintf('Locale "%s" for domain "%s" does not exist in Loco.', $locale, $domain));
+                    $this->logger->warning(\sprintf('Locale "%s" does not exist in your Loco project.', $locale));
 
-                    $response->cancel();
+                    foreach ($responses as $localeResponse) {
+                        if ($locale === $localeResponse->getInfo('user_data')['locale']) {
+                            $localeResponse->cancel();
+                        }
+                    }
 
                     continue;
                 }
 
                 if (304 === $response->getStatusCode()) {
-                    $this->logger->info(\sprintf('No modifications found for locale "%s" and domain "%s" in Loco.', $locale, $domain));
+                    $this->logger->info(\sprintf('No modifications found in Loco for locale "%s" and domain "%s".', $locale, $domain));
 
                     $catalogue = new MessageCatalogue($locale);
                     $previousMessages = $previousCatalogue->all($domain);
@@ -191,7 +211,7 @@ final class LocoProvider implements ProviderInterface
                 $catalogue = new MessageCatalogue($locale);
 
                 foreach ($locoCatalogue->all($domain) as $key => $message) {
-                    $catalogue->set($this->retrieveKeyFromId($key, $domain), $message, $domain);
+                    $catalogue->set($this->retrieveKeyFromId($key, $filter), $message, $domain);
                 }
 
                 if ($previousCatalogue instanceof CatalogueMetadataAwareInterface) {

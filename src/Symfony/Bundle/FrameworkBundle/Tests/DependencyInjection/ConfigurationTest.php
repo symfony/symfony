@@ -52,6 +52,27 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
+    public function testTranslatorProviderDomainsCanBeKeyed()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'translator' => [
+                'providers' => [
+                    'loco' => [
+                        'dsn' => 'loco://API_KEY@default',
+                        // as an XML configuration is converted
+                        'domains' => [
+                            ['key' => 'foo', 'value' => 'bar'],
+                            ['key' => '', 'value' => '*'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $this->assertSame(['foo' => 'bar', '' => '*'], $config['translator']['providers']['loco']['domains']);
+    }
+
     public function getTestValidSessionName()
     {
         return [

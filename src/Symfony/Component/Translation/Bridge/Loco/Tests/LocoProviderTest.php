@@ -12,8 +12,12 @@
 namespace Symfony\Component\Translation\Bridge\Loco\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -33,6 +37,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class LocoProviderTest extends ProviderTestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null, ?string $restrictToStatus = null, XliffFileDumper $dumper = new XliffFileDumper()): ProviderInterface
     {
         return new LocoProvider($client, $loader, $logger, $endpoint, $translatorBag ?? new TranslatorBag(), $restrictToStatus, $dumper);
@@ -713,7 +719,11 @@ class LocoProviderTest extends ProviderTestCase
         }
     }
 
-    public function testReadForAllDomains()
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[TestWith([[]])]
+    #[TestWith([['*']])]
+    public function testReadForAllDomains(array $domains)
     {
         $this->loader = $this->createMock(LoaderInterface::class);
         $this->loader->expects($this->once())
@@ -736,7 +746,9 @@ class LocoProviderTest extends ProviderTestCase
             'localise.biz/api/',
         );
 
-        $this->translatorBag = $provider->read(['*'], ['fr']);
+        $this->expectUserDeprecationMessage('Since symfony/loco-translation-provider 8.2: Passing no domains or "*" to "Symfony\Component\Translation\Bridge\Loco\LocoProvider::read" is deprecated, configure your loco provider domains as an associative array with an empty string key and "*" as value.');
+
+        $this->translatorBag = $provider->read($domains, ['fr']);
     }
 
     public function testReadWithRestrictToStatus()
@@ -766,5 +778,94 @@ class LocoProviderTest extends ProviderTestCase
         );
 
         $this->translatorBag = $provider->read(['messages'], ['de']);
+    }
+
+    public function testReadWithDomainMapping()
+    {
+        $this->loader = new XliffFileLoader();
+
+        $provider = self::createProvider(
+            new MockHttpClient([
+                function (string $method, string $url, array $options): ResponseInterface {
+                    $this->assertSame('foo', $options['query']['filter']);
+
+                    return new MockResponse(<<<'XLIFF'
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                          <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
+                            <header>
+                              <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
+                            </header>
+                            <body>
+                              <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="foo__index.hello" datatype="plaintext">
+                                <source>foo__index.hello</source>
+                                <target state="translated">Hello</target>
+                              </trans-unit>
+                            </body>
+                          </file>
+                        </xliff>
+                        XLIFF);
+                },
+            ], 'https://localise.biz/api/'),
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'localise.biz/api/',
+        );
+
+        $this->translatorBag = $provider->read(['foo' => 'bar'], ['en']);
+        $this->assertSame(['bar'], $this->translatorBag->getCatalogue('en')->getDomains());
+        $this->assertSame(['index.hello' => 'Hello'], $this->translatorBag->getCatalogue('en')->all('bar'));
+    }
+
+    public function testReadWithDomainsAndFiltersMixed()
+    {
+        $this->loader = new XliffFileLoader();
+        $filters = [];
+        $provider = self::createProvider(
+            new MockHttpClient(static function (string $method, string $url, array $options) use (&$filters): ResponseInterface {
+                $filters[] = $options['query']['filter'];
+
+                return new MockResponse(<<<'XLIFF'
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                      <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
+                        <header>
+                          <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
+                        </header>
+                        <body/>
+                      </file>
+                    </xliff>
+                    XLIFF);
+            }, 'https://localise.biz/api/'),
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'localise.biz/api/',
+        );
+
+        $this->translatorBag = $provider->read(['messages', 'foo' => 'bar'], ['en']);
+
+        $this->assertSame(['messages', 'foo'], $filters);
+    }
+
+    public function testReadForLocaleThatDoesNotExistWarnsOnceAndReturnsAnEmptyBag()
+    {
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->logger->expects($this->once())
+            ->method('warning')
+            ->with('Locale "de" does not exist in your Loco project.');
+
+        $provider = self::createProvider(
+            new MockHttpClient(static fn (): ResponseInterface => new MockResponse('', ['http_code' => 404]), 'https://localise.biz/api/'),
+            $this->getLoader(),
+            $this->getLogger(),
+            $this->getDefaultLocale(),
+            'localise.biz/api/',
+        );
+
+        $this->translatorBag = $provider->read(['messages', 'validators'], ['de']);
+
+        $this->assertSame([], iterator_to_array($this->translatorBag->getCatalogues()));
     }
 }

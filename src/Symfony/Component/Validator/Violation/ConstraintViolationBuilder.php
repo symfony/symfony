@@ -52,7 +52,7 @@ class ConstraintViolationBuilder implements ConstraintViolationBuilderInterface
         return $this;
     }
 
-    public function setParameter(string $key, string $value): static
+    public function setParameter(string $key, string|int|float|\Stringable|\DateTimeInterface $value): static
     {
         $this->parameters[$key] = $value;
 

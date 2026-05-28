@@ -28,7 +28,8 @@
         "symfony/http-kernel": "^6.4|^7.0|^8.0"
     },
     "conflict": {
-        "symfony/dotenv": "<6.4"
+        "symfony/dotenv": "<6.4",
+        "symfony/http-foundation": "<6.4"
     },
     "autoload": {
         "psr-4": {

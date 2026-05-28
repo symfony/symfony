@@ -52,16 +52,13 @@ class WebProfilerBundleKernel extends Kernel
     {
         $config = [
             'http_method_override' => false,
+            'handle_all_throwables' => true,
             'php_errors' => ['log' => true],
             'secret' => 'foo-secret',
             'profiler' => ['only_exceptions' => false, 'collect_serializer_data' => true],
             'session' => ['handler_id' => null, 'storage_factory_id' => 'session.storage.factory.mock_file', 'cookie-secure' => 'auto', 'cookie-samesite' => 'lax'],
             'router' => ['utf8' => true],
         ];
-
-        if (Kernel::VERSION_ID >= 60400) {
-            $config['handle_all_throwables'] = true;
-        }
 
         $container->loadFromExtension('framework', $config);
 

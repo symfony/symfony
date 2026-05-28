@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2026-05-04T03:57:38Z
+
+Symfony UX won't be impacted. What about AI cc @OskarStark @chr-hertel?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-05-04T04:50:58Z
+
+AFAICS we don't rely on this const either
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-05-04T05:57:46Z
+
+Should we do this change on 8.1 instead? We cannot safely remove the constant on the LTS branch anyway.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-05-04T06:42:32Z
+
+> Should we do this change on 8.1 instead? We cannot safely remove the constant on the LTS branch anyway.
+
+This PR does not remove the constant. It removes usages of this constant, so that we can safely deprecate the constant in 8.1.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-05-04T10:19:39Z
+
+> This PR does not remove the constant.
+
+I am aware.
+
+> It removes usages of this constant, so that we can safely deprecate the constant in 8.1.
+
+Yes, but the PR changes components that cannot be installed together with http-kernel 8.1, e.g. framework-bundle 6.4. Touching the old LTS feels pointless.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-05-06T12:32:38Z
+
+Not urgent anymore as I've tweaked the release process to always tag `symfony/http-kernel` thanks to using `data #xxxx`. And maybe for 8.1.
+
+<img width="1232" height="952" alt="image" src="https://github.com/user-attachments/assets/af22ca82-3fc4-4261-92d6-cbb912a6a7b4" />

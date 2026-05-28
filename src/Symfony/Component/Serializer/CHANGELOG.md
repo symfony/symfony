@@ -11,6 +11,7 @@ CHANGELOG
  * Trigger a deprecation when denormalizing an array that is not a list into a `list`-typed property
  * Add the `XmlEncoder::BOOLEAN_REPR` context option to choose the strings representing booleans when encoding, e.g. `['true', 'false']`
  * Add support for denormalizing arrays of union types, e.g. `array<Foo|Bar>`
+ * Add argument `$writeInfoExtractor` to `ObjectNormalizer::__construct()`
 
 8.1
 ---

@@ -25,6 +25,8 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -240,6 +242,27 @@ class ObjectNormalizerTest extends TestCase
             ['bar' => 'bar'],
             $this->normalizer->normalize($obj, 'any')
         );
+    }
+
+    public function testWriteInfoExtractorCanBeInjected()
+    {
+        $writeInfoExtractor = new class implements PropertyWriteInfoExtractorInterface {
+            public array $properties = [];
+
+            public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
+            {
+                $this->properties[] = $property;
+
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, 'assign');
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], null, $writeInfoExtractor);
+        new Serializer([$normalizer]);
+
+        $normalizer->denormalize(['foo' => 'bar'], ObjectWithUnconventionalSetter::class);
+
+        $this->assertSame(['foo'], $writeInfoExtractor->properties);
     }
 
     public function testDenormalize()
@@ -2469,4 +2492,19 @@ class ObjectNormalizerDiscriminatorSub extends ObjectNormalizerDiscriminatorBase
     public const BAR = 'bar';
 
     public string $bar = self::BAR;
+}
+
+class ObjectWithUnconventionalSetter
+{
+    private string $foo = 'init';
+
+    public function getFoo(): string
+    {
+        return $this->foo;
+    }
+
+    public function assign(string $foo): void
+    {
+        $this->foo = $foo;
+    }
 }

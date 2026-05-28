@@ -21,6 +21,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
+use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -48,7 +49,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
     private readonly \Closure $objectClassResolver;
 
-    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, array $defaultContext = [], ?PropertyInfoExtractorInterface $propertyInfoExtractor = null)
+    public function __construct(?ClassMetadataFactoryInterface $classMetadataFactory = null, ?NameConverterInterface $nameConverter = null, ?PropertyAccessorInterface $propertyAccessor = null, ?PropertyTypeExtractorInterface $propertyTypeExtractor = null, ?ClassDiscriminatorResolverInterface $classDiscriminatorResolver = null, ?callable $objectClassResolver = null, array $defaultContext = [], ?PropertyInfoExtractorInterface $propertyInfoExtractor = null, ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null)
     {
         if (!class_exists(PropertyAccess::class)) {
             throw new LogicException('The ObjectNormalizer class requires the "PropertyAccess" component. Try running "composer require symfony/property-access".');
@@ -60,7 +61,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         $this->objectClassResolver = ($objectClassResolver ?? static fn ($class) => \is_object($class) ? $class::class : $class)(...);
         $this->propertyInfoExtractor = $propertyInfoExtractor ?: new ReflectionExtractor();
-        $this->writeInfoExtractor = new ReflectionExtractor();
+        $this->writeInfoExtractor = $writeInfoExtractor ?: new ReflectionExtractor();
     }
 
     public function getSupportedTypes(?string $format): array

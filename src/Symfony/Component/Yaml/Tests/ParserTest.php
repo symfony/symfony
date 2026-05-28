@@ -3356,6 +3356,22 @@ YAML;
         $this->assertSame(['foo' => 'bar'], $this->parser->parse($yaml));
     }
 
+    public function testParseInlineMappingWithAnchoredQuotedValueContainingBraces()
+    {
+        $this->assertSame(
+            ['foo' => '${FOO}', 'bar' => '${FOO}'],
+            $this->parser->parse('{ foo: &a "${FOO}", bar: *a }'),
+        );
+    }
+
+    public function testParseInlineMappingWithAnchoredQuotedValue()
+    {
+        $this->assertSame(
+            ['foo' => 'FOO', 'bar' => 'FOO'],
+            $this->parser->parse('{ foo: &a "FOO", bar: *a }'),
+        );
+    }
+
     private function assertSameData($expected, $actual)
     {
         $this->assertEquals($expected, $actual);

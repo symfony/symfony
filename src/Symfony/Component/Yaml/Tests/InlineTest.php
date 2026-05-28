@@ -1137,4 +1137,62 @@ class InlineTest extends TestCase
         $this->assertSame(['&string1', '&string2', '&string3', null], $parsed['block']);
         $this->assertSame($parsed['block'], $parsed['flow']);
     }
+
+    #[DataProvider('getAnchoredInlineValues')]
+    public function testParseAnchoredInlineValues(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, Inline::parse($yaml));
+    }
+
+    public static function getAnchoredInlineValues(): iterable
+    {
+        yield 'double-quoted value in mapping' => [
+            '{ foo: &a "FOO", bar: *a }',
+            ['foo' => 'FOO', 'bar' => 'FOO'],
+        ];
+        yield 'single-quoted value in mapping' => [
+            "{ foo: &a 'FOO', bar: *a }",
+            ['foo' => 'FOO', 'bar' => 'FOO'],
+        ];
+        yield 'double-quoted value with braces in mapping' => [
+            '{ foo: &a "${FOO}", bar: *a }',
+            ['foo' => '${FOO}', 'bar' => '${FOO}'],
+        ];
+        yield 'double-quoted value with comma in mapping' => [
+            '{ foo: &a "a,b", bar: *a }',
+            ['foo' => 'a,b', 'bar' => 'a,b'],
+        ];
+        yield 'sequence value in mapping' => [
+            '{ foo: &a [a, b], bar: *a }',
+            ['foo' => ['a', 'b'], 'bar' => ['a', 'b']],
+        ];
+        yield 'mapping value in mapping' => [
+            '{ foo: &a { k: v }, bar: *a }',
+            ['foo' => ['k' => 'v'], 'bar' => ['k' => 'v']],
+        ];
+        yield 'double-quoted value in sequence' => [
+            '[&a "FOO", *a]',
+            ['FOO', 'FOO'],
+        ];
+        yield 'double-quoted value with braces in sequence' => [
+            '[&a "${FOO}", *a]',
+            ['${FOO}', '${FOO}'],
+        ];
+        yield 'sequence value in sequence' => [
+            '[&a [a, b], *a]',
+            [['a', 'b'], ['a', 'b']],
+        ];
+        yield 'plain scalar value in mapping' => [
+            '{ foo: &a bar, baz: *a }',
+            ['foo' => 'bar', 'baz' => 'bar'],
+        ];
+    }
+
+    public function testParseAnchoredMergeKey()
+    {
+        $this->assertSame(
+            ['k' => 'v', 'bar' => 2],
+            Inline::parse('{ <<: &a { k: v }, bar: 2 }'),
+        );
+    }
 }

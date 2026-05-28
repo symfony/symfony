@@ -24,6 +24,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsag
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveSecurityDataCollectorListenerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\UnshareAuthenticationResultHandlersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OAuth2TokenHandlerFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\OidcTokenHandlerFactory;
@@ -109,5 +110,7 @@ class SecurityBundle extends Bundle
 
         // must be registered before DecoratorServicePass
         $container->addCompilerPass(new MakeFirewallsEventDispatcherTraceablePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+
+        $container->addCompilerPass(new UnshareAuthenticationResultHandlersPass());
     }
 }

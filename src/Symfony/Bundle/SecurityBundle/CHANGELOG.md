@@ -13,6 +13,7 @@ CHANGELOG
  * Add `path`, `enable_csrf`, `csrf_token_id`, `csrf_parameter` and `csrf_token_manager` options to the `switch_user` firewall configuration to restrict user switching to a dedicated (POST-only) route protected by a CSRF token
  * Deprecate configuring an access control rule with many `roles`, use `allow_if` or role hierarchy instead
  * Deprecate configuring both an access control rule `allow_if` and `roles`, update `allow_if` instead
+ * Add support for decorating custom authentication failure and success handlers
 
 8.1
 ---

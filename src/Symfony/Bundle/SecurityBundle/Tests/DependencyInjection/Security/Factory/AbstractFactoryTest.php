@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class AbstractFactoryTest extends TestCase
 {
@@ -53,8 +54,8 @@ class AbstractFactoryTest extends TestCase
             $this->assertInstanceOf(ChildDefinition::class, $failureHandler);
             $this->assertEquals('security.authentication.custom_failure_handler', $failureHandler->getParent());
             $failureHandlerArguments = $failureHandler->getArguments();
-            $this->assertInstanceOf(ChildDefinition::class, $failureHandlerArguments['index_0']);
-            $this->assertEquals($serviceId, $failureHandlerArguments['index_0']->getParent());
+            $this->assertInstanceOf(Reference::class, $failureHandlerArguments['index_0']);
+            $this->assertEquals($serviceId, (string) $failureHandlerArguments['index_0']);
             $this->assertEquals($expectedFailureHandlerOptions, $failureHandlerArguments['index_1']);
         }
     }
@@ -97,8 +98,8 @@ class AbstractFactoryTest extends TestCase
             $this->assertInstanceOf(ChildDefinition::class, $successHandler);
             $this->assertEquals('security.authentication.custom_success_handler', $successHandler->getParent());
             $successHandlerArguments = $successHandler->getArguments();
-            $this->assertInstanceOf(ChildDefinition::class, $successHandlerArguments['index_0']);
-            $this->assertEquals($serviceId, $successHandlerArguments['index_0']->getParent());
+            $this->assertInstanceOf(Reference::class, $successHandlerArguments['index_0']);
+            $this->assertEquals($serviceId, (string) $successHandlerArguments['index_0']);
             $this->assertEquals($expectedSuccessHandlerOptions, $successHandlerArguments['index_1']);
             $this->assertEquals($expectedFirewallName, $successHandlerArguments['index_2']);
         }

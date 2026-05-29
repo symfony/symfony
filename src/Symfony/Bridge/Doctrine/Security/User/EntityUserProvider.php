@@ -58,7 +58,9 @@ class EntityUserProvider implements AttributesBasedUserProviderInterface, Passwo
                 throw new \InvalidArgumentException(\sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
             }
 
-            if (null === $attributes) {
+            if ($repository instanceof AttributesBasedUserProviderInterface) {
+                $user = $repository->loadUserByIdentifier($identifier, $attributes ?? []);
+            } elseif (null === $attributes) {
                 $user = $repository->loadUserByIdentifier($identifier);
             } else {
                 $user = $repository->loadUserByIdentifier($identifier, $attributes);

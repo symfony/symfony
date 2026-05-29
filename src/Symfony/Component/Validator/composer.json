@@ -24,6 +24,7 @@
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3|^4",
+        "giggsey/libphonenumber-for-php": "^8.13|^9",
         "symfony/cache": "^7.4|^8.0",
         "symfony/clock": "^7.4|^8.0",
         "symfony/config": "^7.4|^8.0",
@@ -48,6 +49,9 @@
         "doctrine/lexer": "<1.1",
         "symfony/doctrine-bridge": "<7.4",
         "symfony/expression-language": "<7.4"
+    },
+    "suggest": {
+        "giggsey/libphonenumber-for-php": "To use the PhoneNumber constraint in strict mode"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Validator\\": "" },

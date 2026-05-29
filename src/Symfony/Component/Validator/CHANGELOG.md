@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `PhoneNumber` constraint to validate phone numbers in the E.164 format, with an optional strict mode backed by the "giggsey/libphonenumber-for-php" library
+
 8.1
 ---
 

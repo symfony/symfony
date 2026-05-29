@@ -140,7 +140,7 @@
         "doctrine/orm": "^3.4",
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^2.1.10|^3.1|^4",
-        "giggsey/libphonenumber-for-php": "^8.13|^9",
+        "giggsey/libphonenumber-for-php-lite": "^8.13|^9",
         "guzzlehttp/guzzle": "^7.10",
         "jolicode/jolinotif": "^2.7.2|^3.0",
         "jsonpath-standard/jsonpath-compliance-test-suite": "*",

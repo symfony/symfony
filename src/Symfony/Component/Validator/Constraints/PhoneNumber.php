@@ -30,7 +30,7 @@ final class PhoneNumber extends Constraint
     public const MODE_E164 = 'e164';
 
     /**
-     * Additionally checks, via the "giggsey/libphonenumber-for-php" library, that the value
+     * Additionally checks, via the "giggsey/libphonenumber-for-php-lite" library, that the value
      * is valid for a supported numbering plan.
      */
     public const MODE_STRICT = 'strict';
@@ -68,7 +68,7 @@ final class PhoneNumber extends Constraint
         }
 
         if (self::MODE_STRICT === $mode && !class_exists(PhoneNumberUtil::class)) {
-            throw new LogicException(\sprintf('The "giggsey/libphonenumber-for-php" library is required to use the "%s" constraint in strict mode. Try running "composer require giggsey/libphonenumber-for-php".', __CLASS__));
+            throw new LogicException(\sprintf('The "giggsey/libphonenumber-for-php-lite" library is required to use the "%s" constraint in strict mode. Try running "composer require giggsey/libphonenumber-for-php-lite".', __CLASS__));
         }
 
         parent::__construct(null, $groups, $payload);

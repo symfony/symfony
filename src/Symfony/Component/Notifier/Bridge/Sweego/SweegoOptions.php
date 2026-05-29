@@ -64,4 +64,11 @@ class SweegoOptions implements MessageOptionsInterface
 
         return $this;
     }
+
+    public function region(string $region): self
+    {
+        $this->options[self::REGION] = $region;
+
+        return $this;
+    }
 }

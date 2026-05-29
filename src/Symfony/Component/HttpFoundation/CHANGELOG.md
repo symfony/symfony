@@ -6,6 +6,7 @@ CHANGELOG
 
  * Deprecate not passing an expiry to `UriSigner::sign()`
  * Add the `$defaultExpiration` argument to `UriSigner::__construct()`
+ * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()` to bind a signed URI to a state token, folded into the signature
 
 8.1
 ---

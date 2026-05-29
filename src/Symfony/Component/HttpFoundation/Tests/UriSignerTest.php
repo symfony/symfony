@@ -256,6 +256,27 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_hash=bar', new \DateTimeImmutable('2099-01-01 00:00:00'));
     }
 
+    public function testSignWithReservedVersionParameter()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->expectException(LogicException::class);
+
+        $signer->sign('http://example.com/foo?_version=valid', new \DateTimeImmutable('2099-01-01 00:00:00'));
+    }
+
+    public function testSignDoesNotExposeVersion()
+    {
+        $signer = new UriSigner('foobar');
+        $expiration = new \DateTimeImmutable('2099-01-01 00:00:00');
+        $uri = $signer->sign('http://example.com/foo', $expiration, 'v1');
+
+        parse_str(parse_url($uri, \PHP_URL_QUERY), $params);
+
+        $this->assertArrayNotHasKey('_version', $params);
+        $this->assertNotSame($signer->sign('http://example.com/foo', $expiration), $uri);
+    }
+
     public function testSignWithExpirationAndWithReservedParameter()
     {
         $signer = new UriSigner('foobar');
@@ -310,6 +331,36 @@ class UriSignerTest extends TestCase
         $this->assertFalse($signer->check($relativeUriFromNow3));
     }
 
+    public function testCheckWithUriVersion()
+    {
+        $signer = new UriSigner('foobar');
+        $expiration = new \DateTimeImmutable('2099-01-01 00:00:00');
+
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo', $expiration, 'valid'), 'valid'));
+        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', $expiration, 'valid'), 'invalid'));
+        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', $expiration, 'missing-on-check')));
+    }
+
+    public function testCheckRequestWithUriVersion()
+    {
+        $signer = new UriSigner('foobar');
+        $expiration = new \DateTimeImmutable('2099-01-01 00:00:00');
+
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo', $expiration, 'valid')), 'valid'));
+        $this->assertFalse($signer->checkRequest(Request::create($signer->sign('http://example.com/foo', $expiration, 'valid')), 'invalid'));
+        $this->assertFalse($signer->checkRequest(Request::create($signer->sign('http://example.com/foo', $expiration, 'missing-on-check'))));
+    }
+
+    public function testUnversionedUriFailsWhenVersionExpected()
+    {
+        $signer = new UriSigner('foobar');
+        $expiration = new \DateTimeImmutable('2099-01-01 00:00:00');
+
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo', $expiration)));
+        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', $expiration), 'any'));
+        $this->assertFalse($signer->checkRequest(Request::create($signer->sign('http://example.com/foo', $expiration)), 'any'));
+    }
+
     public function testNonUrlSafeBase64()
     {
         $signer = new UriSigner('foobar');
@@ -344,5 +395,25 @@ class UriSignerTest extends TestCase
         $this->expectException(ExpiredSignedUriException::class);
 
         $signer->verify($uri);
+    }
+
+    public function testVerifyWithMatchingVersion()
+    {
+        $signer = new UriSigner('foobar');
+        $uri = $signer->sign('http://example.com/foo', new \DateTimeImmutable('2099-01-01 00:00:00'), 'valid');
+
+        $this->expectNotToPerformAssertions();
+
+        $signer->verify($uri, 'valid');
+    }
+
+    public function testVerifyWithVersionMismatch()
+    {
+        $signer = new UriSigner('foobar');
+        $uri = $signer->sign('http://example.com/foo', new \DateTimeImmutable('2099-01-01 00:00:00'), 'valid');
+
+        $this->expectException(UnverifiedSignedUriException::class);
+
+        $signer->verify($uri, 'invalid');
     }
 }

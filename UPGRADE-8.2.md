@@ -12,3 +12,8 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+
+HttpFoundation
+--------------
+
+ * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`

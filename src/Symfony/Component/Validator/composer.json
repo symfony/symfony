@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3|^4",
-        "giggsey/libphonenumber-for-php-lite": "^8.13|^9",
+        "giggsey/libphonenumber-for-php-lite": "^8.13.1|^9",
         "symfony/cache": "^7.4|^8.0",
         "symfony/clock": "^7.4|^8.0",
         "symfony/config": "^7.4|^8.0",
@@ -47,6 +47,7 @@
     },
     "conflict": {
         "doctrine/lexer": "<1.1",
+        "giggsey/libphonenumber-for-php-lite": "<8.13.1",
         "symfony/doctrine-bridge": "<7.4",
         "symfony/expression-language": "<7.4"
     },

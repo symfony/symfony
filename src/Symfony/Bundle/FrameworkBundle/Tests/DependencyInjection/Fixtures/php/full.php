@@ -54,6 +54,7 @@ $container->loadFromExtension('framework', [
     'validation' => [
         'enabled' => true,
         'email_validation_mode' => 'html5',
+        'phone_number_validation_mode' => 'e164',
     ],
     'serializer' => [
         'enabled' => true,

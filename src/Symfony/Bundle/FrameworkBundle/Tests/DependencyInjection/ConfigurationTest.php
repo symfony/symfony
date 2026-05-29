@@ -782,6 +782,7 @@ class ConfigurationTest extends TestCase
                     'endpoint' => null,
                 ],
                 'email_validation_mode' => 'html5',
+                'phone_number_validation_mode' => 'e164',
             ],
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `framework.validation.phone_number_validation_mode` config option
+
 8.1
 ---
 

@@ -36,11 +36,11 @@ class PhoneNumberTest extends TestCase
         $this->assertSame('trim', $constraint->normalizer);
     }
 
-    public function testModeDefaultsToE164()
+    public function testModeDefaultsToNull()
     {
         $constraint = new PhoneNumber();
 
-        $this->assertSame(PhoneNumber::MODE_E164, $constraint->mode);
+        $this->assertNull($constraint->mode);
     }
 
     public function testModeCanBeSet()
@@ -67,7 +67,7 @@ class PhoneNumberTest extends TestCase
         [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame('This value is not a valid phone number.', $aConstraint->message);
         self::assertNull($aConstraint->normalizer);
-        self::assertSame(PhoneNumber::MODE_E164, $aConstraint->mode);
+        self::assertNull($aConstraint->mode);
         self::assertSame(['Default', 'PhoneNumberDummy'], $aConstraint->groups);
 
         [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();

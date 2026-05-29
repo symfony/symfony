@@ -1759,6 +1759,11 @@ class FrameworkExtension extends Extension
         $definition = $container->findDefinition('validator.email');
         $definition->replaceArgument(0, $config['email_validation_mode']);
 
+        if ($container->hasDefinition('validator.phone_number')) {
+            $definition = $container->findDefinition('validator.phone_number');
+            $definition->replaceArgument(0, $config['phone_number_validation_mode']);
+        }
+
         // When attributes are disabled, it means from runtime-discovery only; autoconfiguration should still happen.
         // And when runtime-discovery of attributes is enabled, we can skip compile-time autoconfiguration in debug mode.
         if (!($config['enable_attributes'] ?? false) || !$container->getParameter('kernel.debug')) {

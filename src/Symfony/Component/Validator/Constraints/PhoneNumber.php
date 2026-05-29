@@ -52,18 +52,18 @@ final class PhoneNumber extends Constraint
     public $normalizer;
 
     /**
-     * @param self::MODE_*  $mode       One of {@see self::MODE_E164} or {@see self::MODE_STRICT}
-     * @param callable|null $normalizer A callable to normalize the value before it is validated
-     * @param string[]|null $groups
+     * @param self::MODE_*|null $mode       One of {@see self::MODE_E164} or {@see self::MODE_STRICT}; pass null to use the default mode configured for the PhoneNumberValidator
+     * @param callable|null     $normalizer A callable to normalize the value before it is validated
+     * @param string[]|null     $groups
      */
     public function __construct(
         public string $message = 'This value is not a valid phone number.',
-        public string $mode = self::MODE_E164,
+        public ?string $mode = null,
         ?callable $normalizer = null,
         ?array $groups = null,
         mixed $payload = null,
     ) {
-        if (!\in_array($mode, self::VALIDATION_MODES, true)) {
+        if (null !== $mode && !\in_array($mode, self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 

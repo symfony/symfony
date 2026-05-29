@@ -27,6 +27,14 @@ class PhoneNumberValidatorTest extends ConstraintValidatorTestCase
         return new PhoneNumberValidator();
     }
 
+    public function testUnknownDefaultModeTriggerException()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "defaultMode" parameter value is not valid.');
+
+        new PhoneNumberValidator('Unknown Mode');
+    }
+
     public function testNullIsValid()
     {
         $this->validate(null, new PhoneNumber());
@@ -102,6 +110,29 @@ class PhoneNumberValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ value }}', '"14155552671"')
             ->setCode(PhoneNumber::INVALID_FORMAT_ERROR)
             ->assertRaised();
+    }
+
+    public function testDefaultStrictMode()
+    {
+        $this->validator = new PhoneNumberValidator(PhoneNumber::MODE_STRICT);
+
+        $this->validate('+11111111111', new PhoneNumber());
+
+        $this->buildViolation('This value is not a valid phone number.')
+            ->setParameter('{{ value }}', '"+11111111111"')
+            ->setCode(PhoneNumber::INVALID_PHONE_NUMBER_ERROR)
+            ->assertRaised();
+    }
+
+    public function testUnknownModesOnValidateTriggerException()
+    {
+        $constraint = new PhoneNumber();
+        $constraint->mode = 'Unknown Mode';
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\PhoneNumber::$mode" parameter value is not valid.');
+
+        $this->validate('+14155552671', $constraint);
     }
 
     public static function getValidPhoneNumbers(): array

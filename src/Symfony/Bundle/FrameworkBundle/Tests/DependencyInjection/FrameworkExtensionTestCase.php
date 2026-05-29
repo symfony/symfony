@@ -1695,11 +1695,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         // no cache, no attributes, no static methods
     }
 
-    public function testEmailValidationModeIsPassedToEmailValidator()
+    public function testValidationModesArePassedToValidators()
     {
         $container = $this->createContainerFromFile('validation_email_validation_mode');
 
         $this->assertSame('html5-allow-no-tld', $container->getDefinition('validator.email')->getArgument(0));
+        $this->assertSame('strict', $container->getDefinition('validator.phone_number')->getArgument(0));
     }
 
     public function testValidationTranslationDomain()

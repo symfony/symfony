@@ -26,6 +26,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\PhoneNumber;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
@@ -391,6 +392,27 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     public static function emailValidationModeProvider()
     {
         foreach (Email::VALIDATION_MODES as $mode) {
+            yield [$mode];
+        }
+    }
+
+    #[DataProvider('phoneNumberValidationModeProvider')]
+    public function testValidatorPhoneNumberValidationMode(string $mode)
+    {
+        $this->expectNotToPerformAssertions();
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($mode) {
+            $container->loadFromExtension('framework', [
+                'validation' => [
+                    'phone_number_validation_mode' => $mode,
+                ],
+            ]);
+        });
+    }
+
+    public static function phoneNumberValidationModeProvider()
+    {
+        foreach (PhoneNumber::VALIDATION_MODES as $mode) {
             yield [$mode];
         }
     }

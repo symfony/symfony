@@ -1150,6 +1150,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
                         ->enumNode('email_validation_mode')->values(['html5', 'html5-allow-no-tld', 'strict'])->defaultValue('html5')->end()
+                        ->enumNode('phone_number_validation_mode')->values(['e164', 'strict'])->defaultValue('e164')->end()
                         ->arrayNode('mapping')
                             ->addDefaultsIfNotSet()
                             ->children()

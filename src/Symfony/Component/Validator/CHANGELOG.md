@@ -4,7 +4,7 @@ CHANGELOG
 8.2
 ---
 
- * Add the `PhoneNumber` constraint to validate E.164-formatted phone numbers, with an optional strict mode backed by the "giggsey/libphonenumber-for-php-lite" library
+ * Add the `PhoneNumber` constraint to validate E.164-formatted phone numbers, with an optional strict mode backed by the "giggsey/libphonenumber-for-php-lite" library and a configurable default validation mode
 
 8.1
 ---

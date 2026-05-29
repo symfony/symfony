@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraints\ExpressionValidator;
 use Symfony\Component\Validator\Constraints\NoSuspiciousCharactersValidator;
 use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\Constraints\PhoneNumberValidator;
 use Symfony\Component\Validator\Constraints\WhenValidator;
 use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
@@ -104,7 +105,19 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Default mode'),
             ])
             ->tag('validator.constraint_validator')
+    ;
 
+    if (class_exists(PhoneNumberValidator::class)) {
+        $container->services()
+            ->set('validator.phone_number', PhoneNumberValidator::class)
+                ->args([
+                    abstract_arg('Default mode'),
+                ])
+                ->tag('validator.constraint_validator')
+        ;
+    }
+
+    $container->services()
         ->set('validator.not_compromised_password', NotCompromisedPasswordValidator::class)
             ->args([
                 service('http_client')->nullOnInvalid(),

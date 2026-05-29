@@ -26,7 +26,14 @@ class PhoneNumberTest extends TestCase
     {
         $constraint = new PhoneNumber(normalizer: 'trim');
 
-        $this->assertEquals(trim(...), $constraint->normalizer);
+        $this->assertEquals('trim', $constraint->normalizer);
+    }
+
+    public function testCanBeSerializedWithStringNormalizer()
+    {
+        $constraint = unserialize(serialize(new PhoneNumber(normalizer: 'trim')));
+
+        $this->assertSame('trim', $constraint->normalizer);
     }
 
     public function testModeDefaultsToE164()
@@ -65,7 +72,7 @@ class PhoneNumberTest extends TestCase
 
         [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
-        self::assertEquals(trim(...), $bConstraint->normalizer);
+        self::assertSame('trim', $bConstraint->normalizer);
         self::assertSame(['Default', 'PhoneNumberDummy'], $bConstraint->groups);
 
         [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();

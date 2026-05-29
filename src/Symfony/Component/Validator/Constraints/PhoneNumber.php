@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
- * Validates that a value is a valid phone number in the E.164 format.
+ * Validates that a value is an E.164-formatted phone number.
  *
  * @author Joppe De Cuyper <hello@joppe.dev>
  */
@@ -25,13 +25,13 @@ use Symfony\Component\Validator\Exception\LogicException;
 final class PhoneNumber extends Constraint
 {
     /**
-     * Checks that the value is syntactically a valid E.164 number.
+     * Checks that the value matches the E.164 syntax.
      */
     public const MODE_E164 = 'e164';
 
     /**
-     * Additionally checks, via the "giggsey/libphonenumber-for-php" library, that the value is
-     * an actually assignable number (valid country prefix and length).
+     * Additionally checks, via the "giggsey/libphonenumber-for-php" library, that the value
+     * is valid for a supported numbering plan.
      */
     public const MODE_STRICT = 'strict';
 
@@ -48,7 +48,8 @@ final class PhoneNumber extends Constraint
         self::INVALID_PHONE_NUMBER_ERROR => 'INVALID_PHONE_NUMBER_ERROR',
     ];
 
-    public ?\Closure $normalizer;
+    /** @var callable|null */
+    public $normalizer;
 
     /**
      * @param self::MODE_*  $mode       One of {@see self::MODE_E164} or {@see self::MODE_STRICT}
@@ -72,6 +73,6 @@ final class PhoneNumber extends Constraint
 
         parent::__construct(null, $groups, $payload);
 
-        $this->normalizer = null !== $normalizer ? $normalizer(...) : null;
+        $this->normalizer = $normalizer;
     }
 }

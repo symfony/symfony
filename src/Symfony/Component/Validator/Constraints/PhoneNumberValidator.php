@@ -59,7 +59,7 @@ final class PhoneNumberValidator extends ConstraintValidator
         $phoneNumberUtil = PhoneNumberUtil::getInstance();
 
         try {
-            // E.164 numbers carry their region in the "+" prefix, so no default region is needed
+            // E.164 numbers carry their country calling code in the "+" prefix, so no default region is needed.
             $isValid = $phoneNumberUtil->isValidNumber($phoneNumberUtil->parse($value, null));
         } catch (NumberParseException) {
             $isValid = false;

@@ -554,6 +554,10 @@
                 <source>This filename does not match the expected charset.</source>
                 <target>Dette filnavn matcher ikke det forventede tegnsæt.</target>
             </trans-unit>
+            <trans-unit id="143">
+                <source>This value is not a valid phone number.</source>
+                <target state="needs-translation">This value is not a valid phone number.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

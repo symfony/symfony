@@ -55,6 +55,6 @@ class LocoProviderFactoryTest extends AbstractProviderFactoryTestCase
 
     public function createFactory(): ProviderFactoryInterface
     {
-        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), 'en', new ArrayLoader(), new TranslatorBag());
+        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), new ArrayLoader(), new TranslatorBag());
     }
 }

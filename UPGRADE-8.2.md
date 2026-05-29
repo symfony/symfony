@@ -30,6 +30,11 @@ HttpFoundation
 
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
 
+Loco Translation Provider
+-------------------------
+
+ * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument. It has no effect and can be removed.
+
 Security
 --------
 

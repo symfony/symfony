@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
@@ -29,13 +30,29 @@ final class LocoProviderFactory extends AbstractProviderFactory
 {
     private const HOST = 'localise.biz';
 
+    private LoaderInterface $loader;
+    private ?TranslatorBagInterface $translatorBag;
+    private XliffFileDumper $dumper;
+
     public function __construct(
         private HttpClientInterface $client,
         private LoggerInterface $logger,
-        private string $defaultLocale,
-        private LoaderInterface $loader,
-        private ?TranslatorBagInterface $translatorBag = null,
+        LoaderInterface|string $loader,
+        TranslatorBagInterface|LoaderInterface|null $translatorBag = null,
+        XliffFileDumper|TranslatorBagInterface|null $dumper = null,
     ) {
+        if (\is_string($loader)) {
+            trigger_deprecation('symfony/loco-translation-provider', '8.2', '"%s" constructor "$defaultLocale" parameter has no effect and will be removed in version 9.0.', __CLASS__);
+
+            $this->loader = $translatorBag;
+            $this->translatorBag = $dumper;
+            $dumper = \func_get_args()[5] ?? null;
+        } else {
+            $this->loader = $loader;
+            $this->translatorBag = $translatorBag;
+        }
+
+        $this->dumper = $dumper ?? new XliffFileDumper();
     }
 
     public function create(Dsn $dsn): LocoProvider
@@ -55,7 +72,7 @@ final class LocoProviderFactory extends AbstractProviderFactory
             ],
         ]);
 
-        return new LocoProvider($client, $this->loader, $this->logger, $this->defaultLocale, $endpoint, $this->translatorBag, $restrictToStatus);
+        return new LocoProvider($client, $this->loader, $this->logger, $endpoint, $this->translatorBag, $restrictToStatus, $this->dumper);
     }
 
     protected function getSupportedSchemes(): array

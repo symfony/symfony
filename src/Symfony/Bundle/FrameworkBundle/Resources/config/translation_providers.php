@@ -72,9 +72,9 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('translation.provider_factory.loco.http_client'),
                 service('logger'),
-                param('kernel.default_locale'),
                 service('translation.loader.xliff'),
                 service('translator'),
+                service('translation.dumper.xliff'),
             ])
             ->tag('translation.provider_factory')
 

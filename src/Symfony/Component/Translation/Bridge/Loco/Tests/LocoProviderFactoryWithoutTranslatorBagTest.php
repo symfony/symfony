@@ -21,6 +21,6 @@ class LocoProviderFactoryWithoutTranslatorBagTest extends LocoProviderFactoryTes
 {
     public function createFactory(): ProviderFactoryInterface
     {
-        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), 'en', new ArrayLoader(), null);
+        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), new ArrayLoader(), null);
     }
 }

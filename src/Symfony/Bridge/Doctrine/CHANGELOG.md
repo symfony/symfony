@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+* Add `AttributesBasedUserLoaderInterface`
+
+
 8.1
 ---
 

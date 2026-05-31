@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add dump indicator to profiler list view for profiles with dumped content
+
 8.1
 ---
 

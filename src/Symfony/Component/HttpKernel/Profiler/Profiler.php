@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Contracts\Service\ResetInterface;
@@ -102,6 +103,14 @@ class Profiler implements ResetInterface
             && $logger->countErrors() > 0
         ) {
             $profile->setHasErrors(true);
+        }
+
+        if (!$profile->hasDump()
+            && $profile->hasCollector('dump')
+            && ($logger = $profile->getCollector('dump')) instanceof DumpDataCollector
+            && $logger->getDumpsCount() > 0
+        ) {
+            $profile->setHasDump(true);
         }
 
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {

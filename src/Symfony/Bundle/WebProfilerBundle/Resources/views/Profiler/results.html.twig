@@ -27,14 +27,18 @@
         }
         #search-results .status-with-indicator {
             position: relative;
-            display: inline-block;
-            padding-right: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        #search-results .status-with-indicator .indicators {
+            display: flex;
+            gap: 2px;
+        }
+        #search-results .status-with-indicator .indicators:empty {
+            display: none;
         }
         #search-results .error-indicator {
-            position: absolute;
-            right: -10px;
-            top: 50%;
-            transform: translateY(-50%);
             display: flex;
             padding: 3px 4px;
         }
@@ -122,12 +126,21 @@
                     {% endif %}
 
                     <tr>
-                        <td class="text-center">
+                        <td class="text-left">
                             <span class="status-with-indicator">
                                 <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
-                                {%- if has_errors -%}
-                                    <span class="label status-error error-indicator">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
-                                {%- endif -%}
+                                <span class="indicators">
+                                    {%- if has_errors -%}
+                                        <a href="{{ path('_profiler', {token: result.token, panel: 'exception'}) }}">
+                                            <span class="label status-error error-indicator">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
+                                        </a>
+                                    {%- endif -%}
+                                    {%- if has_dump -%}
+                                        <a href="{{ path('_profiler', {token: result.token, panel: 'dump'}) }}">
+                                            <span class="label error-indicator">{{ source('@WebProfiler/Icon/dump.svg') }}</span>
+                                        </a>
+                                    {%- endif -%}
+                                </span>
                             </span>
                         </td>
                         <td>

@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-05-31T06:10:54Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by damient at 2026-05-31T06:20:49Z
+
+The two red checks look unrelated to this PR:
+
+- **Static Analysis / PHPStan** reports 34 errors, all in files untouched by this PR (`Bridge/PhpUnit`, `Cache` Redis/Relay proxies, `ExpressionLanguage`, `HttpClient`, `Runtime/ComposerPlugin`). The same job is currently failing on every recent `8.1` PR, so it appears to be a pre-existing environment issue rather than something introduced here.
+- **Unit Tests (8.4, high-deps)** has a single failure in `Bridge/Doctrine`: `MiddlewareTest::testTransaction@rollback` — `Failed asserting that 0.0 is greater than 0.`. That is the timing-based assertion flaking under the bleeding-edge Doctrine dev deps; unrelated to FrameworkBundle/Messenger.
+
+FrameworkBundle passes in all matrices (Unit Tests 8.4, 8.5, 8.6 and low-deps are green).

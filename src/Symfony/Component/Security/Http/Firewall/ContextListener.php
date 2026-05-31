@@ -53,6 +53,13 @@ class ContextListener extends AbstractListener
 
     /**
      * @param iterable<mixed, UserProviderInterface> $userProviders
+     * @param array|true $allowedTokenClasses Passed as the `allowed_classes` option to `unserialize()`
+     *                                         when reading the security token from the session.
+     *                                         Defaults to `true` (allow all classes) for backwards
+     *                                         compatibility. Set to an explicit array of token class
+     *                                         names (including any custom token classes used by your
+     *                                         application) to harden against PHP Object Injection.
+     *                                         Example: [PostAuthenticationToken::class, SwitchUserToken::class]
      */
     public function __construct(
         private TokenStorageInterface $tokenStorage,
@@ -62,6 +69,7 @@ class ContextListener extends AbstractListener
         private ?EventDispatcherInterface $dispatcher = null,
         ?AuthenticationTrustResolverInterface $trustResolver = null,
         ?callable $sessionTrackerEnabler = null,
+        private array|bool $allowedTokenClasses = true,
     ) {
         if (!$contextKey) {
             throw new \InvalidArgumentException('$contextKey must not be empty.');
@@ -282,7 +290,9 @@ class ContextListener extends AbstractListener
         });
 
         try {
-            $token = unserialize($serializedToken);
+            $token = $this->allowedTokenClasses !== true
+                ? unserialize($serializedToken, ['allowed_classes' => $this->allowedTokenClasses])
+                : unserialize($serializedToken);
         } catch (\ErrorException $e) {
             if (0x37313BC !== $e->getCode()) {
                 throw $e;

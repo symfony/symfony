@@ -63,6 +63,18 @@ class EntityUserProvider implements AttributesBasedUserProviderInterface, Passwo
             } elseif (null === $attributes) {
                 $user = $repository->loadUserByIdentifier($identifier);
             } else {
+                $method = new \ReflectionMethod($repository, 'loadUserByIdentifier');
+                if ($method->getNumberOfParameters() > 1) {
+                    trigger_deprecation(
+                        'symfony/security-core',
+                        '8.2',
+                        'Implementing "%s::loadUserByIdentifier()" with a second argument without implementing "%s" is deprecated. Implement "%s" instead.',
+                        $repository::class,
+                        AttributesBasedUserProviderInterface::class,
+                        AttributesBasedUserProviderInterface::class,
+                    );
+                }
+
                 $user = $repository->loadUserByIdentifier($identifier, $attributes);
             }
         }

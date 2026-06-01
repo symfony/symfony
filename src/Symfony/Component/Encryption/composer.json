@@ -1,0 +1,33 @@
+{
+    "name": "symfony/encryption",
+    "type": "library",
+    "description": "Provides safe-by-default symmetric/asymmetric encryption, signing, certificate management and hashing over Sodium, OpenSSL and phpseclib",
+    "keywords": ["encryption", "cryptography", "sodium", "openssl", "phpseclib", "signing", "x509", "hashing"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Gebler",
+            "email": "me@davegebler.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "phpseclib/phpseclib": "^3.0"
+    },
+    "suggest": {
+        "ext-sodium": "For the primary (recommended) crypto engine and Argon2id password hashing",
+        "ext-openssl": "For RSA/EC asymmetric crypto and X.509 certificate support"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Encryption\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

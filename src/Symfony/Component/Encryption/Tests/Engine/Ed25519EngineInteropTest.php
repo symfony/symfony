@@ -17,7 +17,7 @@ use Symfony\Component\Encryption\Engine\Sodium\SodiumEd25519Engine;
 
 final class Ed25519EngineInteropTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new SodiumEd25519Engine())->isAvailable() || !(new PhpseclibEd25519Engine())->isAvailable()) {
             self::markTestSkipped('Both sodium and phpseclib Ed25519 engines are required.');

@@ -18,7 +18,7 @@ use Symfony\Component\Encryption\Engine\SymmetricEngineInterface;
 
 final class SymmetricEngineInteropTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new SodiumSymmetricEngine())->isAvailable() || !(new OpenSslSymmetricEngine())->isAvailable()) {
             self::markTestSkipped('Both sodium and openssl engines are required for interop tests.');

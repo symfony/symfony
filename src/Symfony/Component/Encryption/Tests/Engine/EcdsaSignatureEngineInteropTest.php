@@ -17,7 +17,7 @@ use Symfony\Component\Encryption\Engine\Phpseclib\PhpseclibEcdsaSignatureEngine;
 
 final class EcdsaSignatureEngineInteropTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new OpenSslEcdsaSignatureEngine())->isAvailable() || !(new PhpseclibEcdsaSignatureEngine())->isAvailable()) {
             self::markTestSkipped('Both OpenSSL and phpseclib ECDSA engines are required.');

@@ -16,7 +16,7 @@ use Symfony\Component\Encryption\PasswordHasher;
 
 final class PasswordHasherTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\extension_loaded('sodium')) {
             self::markTestSkipped('ext-sodium is required for PasswordHasher.');

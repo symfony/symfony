@@ -17,7 +17,7 @@ use Symfony\Component\Encryption\Engine\Phpseclib\PhpseclibRsaSignatureEngine;
 
 final class RsaSignatureEngineInteropTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new OpenSslRsaSignatureEngine())->isAvailable() || !(new PhpseclibRsaSignatureEngine())->isAvailable()) {
             self::markTestSkipped('Both OpenSSL and phpseclib RSA engines are required.');

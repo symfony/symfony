@@ -18,7 +18,7 @@ use Symfony\Component\Encryption\Exception\CertificateException;
 
 final class CertificateManagerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required.');

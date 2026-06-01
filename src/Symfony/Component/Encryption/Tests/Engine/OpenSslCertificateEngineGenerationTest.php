@@ -20,7 +20,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
 {
     private OpenSslCertificateEngine $engine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->engine = new OpenSslCertificateEngine();
         if (!$this->engine->isAvailable()) {

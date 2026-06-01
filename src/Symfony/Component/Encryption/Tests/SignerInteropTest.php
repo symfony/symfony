@@ -23,7 +23,7 @@ final class SignerInteropTest extends TestCase
     private Signer $sodiumSigner;
     private Signer $phpseclibSigner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new SodiumEd25519Engine())->isAvailable() || !(new PhpseclibEd25519Engine())->isAvailable()) {
             self::markTestSkipped('Both Ed25519 engines are required.');

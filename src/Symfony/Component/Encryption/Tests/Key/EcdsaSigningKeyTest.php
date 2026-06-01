@@ -17,7 +17,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class EcdsaSigningKeyTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required to mint an EC key for this test.');

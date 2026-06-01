@@ -22,7 +22,7 @@ final class SignerRsaInteropTest extends TestCase
     private Signer $opensslSigner;
     private Signer $phpseclibSigner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new OpenSslRsaSignatureEngine())->isAvailable() || !(new PhpseclibRsaSignatureEngine())->isAvailable()) {
             self::markTestSkipped('Both RSA signature engines are required.');

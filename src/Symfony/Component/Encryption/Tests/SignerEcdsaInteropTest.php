@@ -22,7 +22,7 @@ final class SignerEcdsaInteropTest extends TestCase
     private Signer $opensslSigner;
     private Signer $phpseclibSigner;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!(new OpenSslEcdsaSignatureEngine())->isAvailable() || !(new PhpseclibEcdsaSignatureEngine())->isAvailable()) {
             self::markTestSkipped('Both ECDSA signature engines are required.');

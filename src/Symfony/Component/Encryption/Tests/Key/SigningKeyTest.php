@@ -18,7 +18,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class SigningKeyTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\function_exists('sodium_crypto_sign_keypair')) {
             self::markTestSkipped('ext-sodium is required.');

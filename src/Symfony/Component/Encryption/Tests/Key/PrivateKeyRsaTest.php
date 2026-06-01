@@ -18,7 +18,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class PrivateKeyRsaTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('openssl required to mint an RSA key for this test.');

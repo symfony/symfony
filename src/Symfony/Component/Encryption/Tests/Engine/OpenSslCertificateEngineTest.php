@@ -21,7 +21,7 @@ final class OpenSslCertificateEngineTest extends TestCase
     private string $certPem = '';
     private string $privateKeyPem = '';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->engine = new OpenSslCertificateEngine();
         if (!$this->engine->isAvailable()) {

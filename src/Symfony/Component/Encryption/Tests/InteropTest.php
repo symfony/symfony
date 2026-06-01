@@ -23,7 +23,7 @@ final class InteropTest extends TestCase
     private SymmetricCipher $sodiumCipher;
     private SymmetricCipher $opensslCipher;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $sodium = new SodiumSymmetricEngine();
         $openssl = new OpenSslSymmetricEngine();

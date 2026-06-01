@@ -21,7 +21,7 @@ final class PhpseclibRsaEngineTest extends TestCase
 {
     private PhpseclibRsaEngine $engine;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->engine = new PhpseclibRsaEngine();
         if (!$this->engine->isAvailable()) {

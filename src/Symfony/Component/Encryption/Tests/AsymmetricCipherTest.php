@@ -18,7 +18,7 @@ use Symfony\Component\Encryption\Key\KeyPair;
 
 final class AsymmetricCipherTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\function_exists('sodium_crypto_box_seal')) {
             self::markTestSkipped('ext-sodium is required.');

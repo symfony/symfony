@@ -18,7 +18,7 @@ use Symfony\Component\Encryption\Signer;
 
 final class SignerEcdsaTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required for ECDSA signing.');

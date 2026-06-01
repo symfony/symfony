@@ -20,7 +20,7 @@ use Symfony\Component\Encryption\Signer;
 
 final class SignerTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         if (!\function_exists('sodium_crypto_sign_detached')) {
             self::markTestSkipped('ext-sodium is required.');

@@ -12,15 +12,15 @@
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Encryption\Engine\AsymmetricEncryptionEngineInterface;
+use Symfony\Component\Encryption\Engine\CertificateEngineInterface;
 use Symfony\Component\Encryption\Engine\EngineSelector;
 use Symfony\Component\Encryption\Engine\OpenSsl\OpenSslSymmetricEngine;
-use Symfony\Component\Encryption\Engine\Sodium\SodiumSymmetricEngine;
-use Symfony\Component\Encryption\Engine\AsymmetricEncryptionEngineInterface;
-use Symfony\Component\Encryption\Engine\Sodium\SodiumX25519Engine;
-use Symfony\Component\Encryption\Engine\CertificateEngineInterface;
 use Symfony\Component\Encryption\Engine\RsaEngineInterface;
 use Symfony\Component\Encryption\Engine\SignatureEngineInterface;
 use Symfony\Component\Encryption\Engine\Sodium\SodiumEd25519Engine;
+use Symfony\Component\Encryption\Engine\Sodium\SodiumSymmetricEngine;
+use Symfony\Component\Encryption\Engine\Sodium\SodiumX25519Engine;
 use Symfony\Component\Encryption\Engine\SymmetricEngineInterface;
 use Symfony\Component\Encryption\Exception\NoEngineAvailableException;
 

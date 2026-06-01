@@ -99,7 +99,7 @@ final class SignerTest extends TestCase
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
         $signed = $signer->signAttached('original', $pair->private());
-        $signed[\strlen($signed) - 2] = $signed[\strlen($signed) - 2] === 'A' ? 'B' : 'A';
+        $signed[\strlen($signed) - 2] = 'A' === $signed[\strlen($signed) - 2] ? 'B' : 'A';
 
         $this->expectException(SignatureVerificationException::class);
 
@@ -135,7 +135,7 @@ final class SignerTest extends TestCase
         $pair = $signer->generateKeyPair();
         $forged = \Symfony\Component\Encryption\Encoding::toBase64(pack('n', 60000).'short');
 
-        $this->expectException(\Symfony\Component\Encryption\Exception\SignatureVerificationException::class);
+        $this->expectException(SignatureVerificationException::class);
 
         $signer->openAttached($forged, $pair->public());
     }

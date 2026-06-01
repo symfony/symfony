@@ -304,7 +304,6 @@ final class OpenSslCertificateEngine implements CertificateEngineInterface
             if (\is_string($item)) {
                 $result[$key] = $item;
             } elseif (\is_array($item)) {
-                /** @var mixed $first */
                 $first = $item[0] ?? null;
                 if (\is_string($first)) {
                     $result[$key] = $first;
@@ -324,7 +323,7 @@ final class OpenSslCertificateEngine implements CertificateEngineInterface
             return [];
         }
 
-        /** @var list<string> */
+        /* @var list<string> */
         return array_map('trim', explode(',', $subjectAltName));
     }
 

@@ -70,7 +70,7 @@ final class Hasher implements HasherInterface
     private function assertSupported(string $algorithm): void
     {
         if (!\in_array($algorithm, self::ALLOWED, true) || !\in_array($algorithm, hash_algos(), true)) {
-            throw new UnsupportedAlgorithmException(sprintf('Unsupported hash algorithm "%s". Supported: "%s".', $algorithm, implode(', ', self::ALLOWED)));
+            throw new UnsupportedAlgorithmException(\sprintf('Unsupported hash algorithm "%s". Supported: "%s".', $algorithm, implode(', ', self::ALLOWED)));
         }
     }
 }

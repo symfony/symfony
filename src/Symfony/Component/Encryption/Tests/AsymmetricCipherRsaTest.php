@@ -62,7 +62,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair('rsa', 2048);
         $ciphertext = $cipher->encryptAnonymous('secret', $recipient->public());
-        $ciphertext[\strlen($ciphertext) - 2] = $ciphertext[\strlen($ciphertext) - 2] === 'A' ? 'B' : 'A';
+        $ciphertext[\strlen($ciphertext) - 2] = 'A' === $ciphertext[\strlen($ciphertext) - 2] ? 'B' : 'A';
 
         $this->expectException(DecryptionException::class);
 

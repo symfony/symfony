@@ -102,7 +102,7 @@ final class SodiumX25519EngineTest extends TestCase
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
         $sealed = $engine->sealAnonymous('secret message', $public);
-        $sealed[0] = $sealed[0] === 'A' ? 'B' : 'A';
+        $sealed[0] = 'A' === $sealed[0] ? 'B' : 'A';
 
         $this->expectException(DecryptionException::class);
 
@@ -131,7 +131,7 @@ final class SodiumX25519EngineTest extends TestCase
         [$senderPublic, $senderPrivate] = $engine->generateKeyPair();
         $nonce = random_bytes($engine->authenticatedNonceBytes());
         $ciphertext = $engine->encryptAuthenticated('secret message', $nonce, $senderPrivate, $recipientPublic);
-        $ciphertext[0] = $ciphertext[0] === 'A' ? 'B' : 'A';
+        $ciphertext[0] = 'A' === $ciphertext[0] ? 'B' : 'A';
 
         $this->expectException(DecryptionException::class);
 

@@ -70,7 +70,7 @@ final class SymmetricCipherTest extends TestCase
         $cipher = new SymmetricCipher();
         $key = $cipher->generateKey();
         $ciphertext = $cipher->encrypt('secret', $key);
-        $ciphertext[\strlen($ciphertext) - 2] = $ciphertext[\strlen($ciphertext) - 2] === 'A' ? 'B' : 'A';
+        $ciphertext[\strlen($ciphertext) - 2] = 'A' === $ciphertext[\strlen($ciphertext) - 2] ? 'B' : 'A';
 
         $this->expectException(DecryptionException::class);
 

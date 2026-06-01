@@ -69,7 +69,7 @@ final class SignerEcdsaTest extends TestCase
         $signer = new Signer();
         $pair = $signer->generateKeyPair('ecdsa-p256');
         $signed = $signer->signAttached('original', $pair->private());
-        $signed[\strlen($signed) - 4] = $signed[\strlen($signed) - 4] === 'A' ? 'B' : 'A';
+        $signed[\strlen($signed) - 4] = 'A' === $signed[\strlen($signed) - 4] ? 'B' : 'A';
 
         $this->expectException(SignatureVerificationException::class);
 

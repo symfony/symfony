@@ -60,7 +60,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
         $nonce = random_bytes(SymmetricEngineInterface::NONCE_BYTES);
         $ciphertext = $engine->encrypt('secret', $key, $nonce);
-        $ciphertext[0] = $ciphertext[0] === 'A' ? 'B' : 'A';
+        $ciphertext[0] = 'A' === $ciphertext[0] ? 'B' : 'A';
 
         $this->expectException(DecryptionException::class);
 

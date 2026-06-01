@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Engine\OpenSsl;
 
 use Symfony\Component\Encryption\Engine\AbstractSymmetricEngine;
@@ -42,7 +40,7 @@ final class OpenSslSymmetricEngine extends AbstractSymmetricEngine
             throw new EncryptionException('OpenSSL ChaCha20-Poly1305 encryption failed.');
         }
 
-        return $ciphertext . $tag;
+        return $ciphertext.$tag;
     }
 
     #[\Override]

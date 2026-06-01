@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\Encryption\Key\KeyDerivation;
 
 final class KeyDerivationTest extends TestCase
 {
-    public function testPbkdf2IsDeterministicAnd32Bytes(): void
+    public function testPbkdf2IsDeterministicAnd32Bytes()
     {
         $salt = str_repeat("\x01", Envelope::SALT_BYTES);
 
@@ -31,7 +29,7 @@ final class KeyDerivationTest extends TestCase
         self::assertSame($a, $b);
     }
 
-    public function testPbkdf2MatchesPhpReference(): void
+    public function testPbkdf2MatchesPhpReference()
     {
         $salt = random_bytes(Envelope::SALT_BYTES);
 
@@ -41,7 +39,7 @@ final class KeyDerivationTest extends TestCase
         );
     }
 
-    public function testPbkdf2DiffersByPassword(): void
+    public function testPbkdf2DiffersByPassword()
     {
         $salt = random_bytes(Envelope::SALT_BYTES);
 
@@ -51,7 +49,7 @@ final class KeyDerivationTest extends TestCase
         );
     }
 
-    public function testArgon2idIsDeterministicAnd32Bytes(): void
+    public function testArgon2idIsDeterministicAnd32Bytes()
     {
         if (!\function_exists('sodium_crypto_pwhash')) {
             self::markTestSkipped('ext-sodium is required for Argon2id.');
@@ -68,7 +66,7 @@ final class KeyDerivationTest extends TestCase
         self::assertSame($a, $b);
     }
 
-    public function testPreferredKdfIsArgon2idWhenSodiumPresent(): void
+    public function testPreferredKdfIsArgon2idWhenSodiumPresent()
     {
         $expected = \function_exists('sodium_crypto_pwhash')
             ? Envelope::KDF_ARGON2ID

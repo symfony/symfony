@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -22,7 +20,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
 {
     private OpenSslCertificateEngine $engine;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->engine = new OpenSslCertificateEngine();
         if (!$this->engine->isAvailable()) {
@@ -30,7 +28,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         }
     }
 
-    public function testGenerateRsaKeyPair(): void
+    public function testGenerateRsaKeyPair()
     {
         [$public, $private] = $this->engine->generateKeyPair('rsa', 2048);
 
@@ -38,7 +36,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertStringContainsString('PRIVATE KEY', $private);
     }
 
-    public function testGenerateEcKeyPair(): void
+    public function testGenerateEcKeyPair()
     {
         [$public, $private] = $this->engine->generateKeyPair('ecdsa-p256', 0);
 
@@ -46,14 +44,14 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertStringContainsString('PRIVATE KEY', $private);
     }
 
-    public function testGenerateKeyPairRejectsUnknownAlgorithm(): void
+    public function testGenerateKeyPairRejectsUnknownAlgorithm()
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->engine->generateKeyPair('dsa', 2048);
     }
 
-    public function testCreateAndParseCsr(): void
+    public function testCreateAndParseCsr()
     {
         [, $private] = $this->engine->generateKeyPair('rsa', 2048);
 
@@ -66,7 +64,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertStringContainsString('PUBLIC KEY', $parsed['publicKeyPem']);
     }
 
-    public function testCreateSelfSignedRoundTripsThroughParse(): void
+    public function testCreateSelfSignedRoundTripsThroughParse()
     {
         [, $private] = $this->engine->generateKeyPair('rsa', 2048);
 
@@ -79,7 +77,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertGreaterThan($parsed['validFrom'], $parsed['validTo']);
     }
 
-    public function testCreateSelfSignedWithSans(): void
+    public function testCreateSelfSignedWithSans()
     {
         [, $private] = $this->engine->generateKeyPair('rsa', 2048);
 
@@ -90,7 +88,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertContains('DNS:www.example.com', $sans);
     }
 
-    public function testEcSelfSignedCertVerifies(): void
+    public function testEcSelfSignedCertVerifies()
     {
         [, $private] = $this->engine->generateKeyPair('ecdsa-p256', 0);
 
@@ -99,7 +97,7 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertTrue($this->engine->verify($certPem, $this->engine->publicKeyPem($certPem)));
     }
 
-    public function testCreateCsrWithSans(): void
+    public function testCreateCsrWithSans()
     {
         [, $private] = $this->engine->generateKeyPair('rsa', 2048);
 
@@ -108,14 +106,14 @@ final class OpenSslCertificateEngineGenerationTest extends TestCase
         self::assertStringContainsString('CERTIFICATE REQUEST', $csrPem);
     }
 
-    public function testCreateCsrRejectsInvalidKey(): void
+    public function testCreateCsrRejectsInvalidKey()
     {
         $this->expectException(InvalidKeyException::class);
 
         $this->engine->createCsr(['CN' => 'x'], 'not a key', []);
     }
 
-    public function testCreateSelfSignedRejectsInvalidKey(): void
+    public function testCreateSelfSignedRejectsInvalidKey()
     {
         $this->expectException(InvalidKeyException::class);
 

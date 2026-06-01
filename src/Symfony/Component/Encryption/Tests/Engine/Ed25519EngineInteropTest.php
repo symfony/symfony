@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -19,14 +17,14 @@ use Symfony\Component\Encryption\Engine\Sodium\SodiumEd25519Engine;
 
 final class Ed25519EngineInteropTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!(new SodiumEd25519Engine())->isAvailable() || !(new PhpseclibEd25519Engine())->isAvailable()) {
             self::markTestSkipped('Both sodium and phpseclib Ed25519 engines are required.');
         }
     }
 
-    public function testPhpseclibEngineRoundTrip(): void
+    public function testPhpseclibEngineRoundTrip()
     {
         $engine = new PhpseclibEd25519Engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -37,7 +35,7 @@ final class Ed25519EngineInteropTest extends TestCase
         self::assertTrue($engine->verify($signature, 'terms', $public));
     }
 
-    public function testSodiumSignsPhpseclibVerifies(): void
+    public function testSodiumSignsPhpseclibVerifies()
     {
         $sodium = new SodiumEd25519Engine();
         $phpseclib = new PhpseclibEd25519Engine();
@@ -48,7 +46,7 @@ final class Ed25519EngineInteropTest extends TestCase
         self::assertTrue($phpseclib->verify($signature, 'cross-engine', $public));
     }
 
-    public function testPhpseclibSignsSodiumVerifies(): void
+    public function testPhpseclibSignsSodiumVerifies()
     {
         $sodium = new SodiumEd25519Engine();
         $phpseclib = new PhpseclibEd25519Engine();
@@ -59,7 +57,7 @@ final class Ed25519EngineInteropTest extends TestCase
         self::assertTrue($sodium->verify($signature, 'cross-engine', $public));
     }
 
-    public function testBothEnginesProduceIdenticalSignatures(): void
+    public function testBothEnginesProduceIdenticalSignatures()
     {
         $sodium = new SodiumEd25519Engine();
         $phpseclib = new PhpseclibEd25519Engine();

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -22,7 +20,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class PublicKeyTest extends TestCase
 {
-    public function testHoldsAlgorithmPurposeAndBytes(): void
+    public function testHoldsAlgorithmPurposeAndBytes()
     {
         $key = PublicKey::fromBytes('x25519', 'encryption', str_repeat("\x01", 32));
 
@@ -32,7 +30,7 @@ final class PublicKeyTest extends TestCase
         self::assertSame(str_repeat("\x01", 32), $key->bytes());
     }
 
-    public function testExportImportRoundTrip(): void
+    public function testExportImportRoundTrip()
     {
         $key = PublicKey::fromBytes('x25519', 'encryption', random_bytes(32));
 
@@ -43,14 +41,14 @@ final class PublicKeyTest extends TestCase
         self::assertSame($key->purpose(), $imported->purpose());
     }
 
-    public function testImportRejectsGarbage(): void
+    public function testImportRejectsGarbage()
     {
         $this->expectException(InvalidKeyException::class);
 
         PublicKey::import('not a key');
     }
 
-    public function testImportRejectsPrivateKeyMagic(): void
+    public function testImportRejectsPrivateKeyMagic()
     {
         $private = PrivateKey::fromBytes('x25519', 'encryption', random_bytes(32));
 
@@ -59,20 +57,20 @@ final class PublicKeyTest extends TestCase
         PublicKey::import($private->export());
     }
 
-    public function testImportRejectsUnsupportedVersion(): void
+    public function testImportRejectsUnsupportedVersion()
     {
         // SYU = public-key magic; \x02 = unknown version; \x01\x01 = valid algorithm/purpose ids
-        $raw = 'SYU' . "\x02\x01\x01" . random_bytes(32);
+        $raw = 'SYU'."\x02\x01\x01".random_bytes(32);
 
         $this->expectException(InvalidKeyException::class);
 
         PublicKey::import(Encoding::toBase64($raw));
     }
 
-    public function testImportRejectsUnknownAlgorithmId(): void
+    public function testImportRejectsUnknownAlgorithmId()
     {
         // \x7f = algorithm id not in ALGORITHM_IDS map
-        $raw = 'SYU' . "\x01\x7f\x01" . random_bytes(32);
+        $raw = 'SYU'."\x01\x7f\x01".random_bytes(32);
 
         $this->expectException(InvalidKeyException::class);
 

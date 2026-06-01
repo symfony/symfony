@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Exception;
 
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -45,7 +43,7 @@ final class ExceptionHierarchyTest extends TestCase
      * @param class-string $parent
      */
     #[DataProvider('provideExceptions')]
-    public function testImplementsMarkerAndExtendsExpectedParent(string $class, string $parent): void
+    public function testImplementsMarkerAndExtendsExpectedParent(string $class, string $parent)
     {
         $exception = new $class('boom');
 

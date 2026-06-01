@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class PrivateKeyRsaTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('openssl required to mint an RSA key for this test.');
@@ -36,7 +34,7 @@ final class PrivateKeyRsaTest extends TestCase
         return $pem;
     }
 
-    public function testHoldsRsaPemMaterial(): void
+    public function testHoldsRsaPemMaterial()
     {
         $pem = $this->rsaPrivatePem();
 
@@ -46,7 +44,7 @@ final class PrivateKeyRsaTest extends TestCase
         self::assertSame($pem, $key->bytes());
     }
 
-    public function testRsaExportImportRoundTrip(): void
+    public function testRsaExportImportRoundTrip()
     {
         $key = PrivateKey::fromBytes('rsa', 'encryption', $this->rsaPrivatePem());
 
@@ -56,7 +54,7 @@ final class PrivateKeyRsaTest extends TestCase
         self::assertSame('rsa', $imported->algorithm());
     }
 
-    public function testDerivePublicReturnsSpkiPublicKey(): void
+    public function testDerivePublicReturnsSpkiPublicKey()
     {
         $key = PrivateKey::fromBytes('rsa', 'encryption', $this->rsaPrivatePem());
 
@@ -67,7 +65,7 @@ final class PrivateKeyRsaTest extends TestCase
         self::assertStringContainsString('PUBLIC KEY', $public->bytes());
     }
 
-    public function testDerivePublicRejectsGarbagePem(): void
+    public function testDerivePublicRejectsGarbagePem()
     {
         $key = PrivateKey::fromBytes('rsa', 'encryption', "-----BEGIN RSA PRIVATE KEY-----\nnotvalidbase64!!!\n-----END RSA PRIVATE KEY-----\n");
 
@@ -76,7 +74,7 @@ final class PrivateKeyRsaTest extends TestCase
         $key->derivePublic();
     }
 
-    public function testDerivePublicRejectsPublicKeyPem(): void
+    public function testDerivePublicRejectsPublicKeyPem()
     {
         $resource = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => \OPENSSL_KEYTYPE_RSA]);
         self::assertNotFalse($resource);

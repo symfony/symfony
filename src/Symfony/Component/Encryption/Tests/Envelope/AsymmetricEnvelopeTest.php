@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Envelope;
 
 use PHPUnit\Framework\TestCase;
@@ -19,7 +17,7 @@ use Symfony\Component\Encryption\Exception\InvalidArgumentException;
 
 final class AsymmetricEnvelopeTest extends TestCase
 {
-    public function testAnonymousRoundTrip(): void
+    public function testAnonymousRoundTrip()
     {
         $body = random_bytes(58);
 
@@ -31,7 +29,7 @@ final class AsymmetricEnvelopeTest extends TestCase
         self::assertSame('', $envelope->nonce());
     }
 
-    public function testAuthenticatedRoundTrip(): void
+    public function testAuthenticatedRoundTrip()
     {
         $nonce = random_bytes(24);
         $body = random_bytes(40);
@@ -43,7 +41,7 @@ final class AsymmetricEnvelopeTest extends TestCase
         self::assertSame($body, $envelope->body());
     }
 
-    public function testFormatBeginsWithMagic(): void
+    public function testFormatBeginsWithMagic()
     {
         $raw = AsymmetricEnvelope::anonymous('x25519', random_bytes(58))->serialize();
 
@@ -51,14 +49,14 @@ final class AsymmetricEnvelopeTest extends TestCase
         self::assertSame(1, \ord($raw[3]));
     }
 
-    public function testRejectsBadMagic(): void
+    public function testRejectsBadMagic()
     {
         $this->expectException(InvalidArgumentException::class);
 
-        AsymmetricEnvelope::deserialize('ZZZ' . str_repeat("\x00", 40));
+        AsymmetricEnvelope::deserialize('ZZZ'.str_repeat("\x00", 40));
     }
 
-    public function testRejectsUnsupportedVersion(): void
+    public function testRejectsUnsupportedVersion()
     {
         $raw = AsymmetricEnvelope::anonymous('x25519', random_bytes(58))->serialize();
         $raw[3] = "\x02";
@@ -68,7 +66,7 @@ final class AsymmetricEnvelopeTest extends TestCase
         AsymmetricEnvelope::deserialize($raw);
     }
 
-    public function testRejectsUnsupportedAlgorithm(): void
+    public function testRejectsUnsupportedAlgorithm()
     {
         $raw = AsymmetricEnvelope::anonymous('x25519', random_bytes(58))->serialize();
         $raw[4] = "\x7f";
@@ -78,7 +76,7 @@ final class AsymmetricEnvelopeTest extends TestCase
         AsymmetricEnvelope::deserialize($raw);
     }
 
-    public function testRejectsUnsupportedMode(): void
+    public function testRejectsUnsupportedMode()
     {
         $raw = AsymmetricEnvelope::anonymous('x25519', random_bytes(58))->serialize();
         $raw[5] = "\x09";
@@ -88,7 +86,7 @@ final class AsymmetricEnvelopeTest extends TestCase
         AsymmetricEnvelope::deserialize($raw);
     }
 
-    public function testRejectsTruncatedAuthenticatedEnvelope(): void
+    public function testRejectsTruncatedAuthenticatedEnvelope()
     {
         $raw = AsymmetricEnvelope::authenticated('x25519', random_bytes(24), random_bytes(40))->serialize();
 
@@ -97,7 +95,7 @@ final class AsymmetricEnvelopeTest extends TestCase
         AsymmetricEnvelope::deserialize(substr($raw, 0, 10));
     }
 
-    public function testRsaAnonymousRoundTrip(): void
+    public function testRsaAnonymousRoundTrip()
     {
         $body = random_bytes(400);
 

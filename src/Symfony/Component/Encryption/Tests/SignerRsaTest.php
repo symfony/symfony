@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,14 +18,14 @@ use Symfony\Component\Encryption\Signer;
 
 final class SignerRsaTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required for RSA signing.');
         }
     }
 
-    public function testGenerateRsaKeyPairIsSigning(): void
+    public function testGenerateRsaKeyPairIsSigning()
     {
         $pair = (new Signer())->generateKeyPair('rsa');
 
@@ -37,7 +35,7 @@ final class SignerRsaTest extends TestCase
         self::assertStringContainsString('PUBLIC KEY', $pair->public()->bytes());
     }
 
-    public function testRsaDetachedRoundTrip(): void
+    public function testRsaDetachedRoundTrip()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('rsa');
@@ -47,7 +45,7 @@ final class SignerRsaTest extends TestCase
         self::assertTrue($signer->verifyDetached($signature, 'audit log', $pair->public()));
     }
 
-    public function testRsaDetachedRejectsTamperedMessage(): void
+    public function testRsaDetachedRejectsTamperedMessage()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('rsa');
@@ -56,7 +54,7 @@ final class SignerRsaTest extends TestCase
         self::assertFalse($signer->verifyDetached($signature, 'tampered', $pair->public()));
     }
 
-    public function testRsaAttachedRoundTrip(): void
+    public function testRsaAttachedRoundTrip()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('rsa');
@@ -66,7 +64,7 @@ final class SignerRsaTest extends TestCase
         self::assertSame('shipment', $signer->openAttached($signed, $pair->public()));
     }
 
-    public function testRsaOpenAttachedRejectsTampered(): void
+    public function testRsaOpenAttachedRejectsTampered()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('rsa');
@@ -78,7 +76,7 @@ final class SignerRsaTest extends TestCase
         $signer->openAttached($signed, $pair->public());
     }
 
-    public function testExportedRsaSigningKeyVerifiesLater(): void
+    public function testExportedRsaSigningKeyVerifiesLater()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('rsa');

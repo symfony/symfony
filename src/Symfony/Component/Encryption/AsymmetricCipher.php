@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption;
 
 use Symfony\Component\Encryption\Engine\EngineSelector;
@@ -151,7 +149,7 @@ final class AsymmetricCipher implements AsymmetricCipherInterface
             $this->wipe($symKey);
         }
 
-        $body = pack('n', \strlen($wrapped)) . $wrapped . $inner;
+        $body = pack('n', \strlen($wrapped)).$wrapped.$inner;
 
         return Encoding::toBase64(AsymmetricEnvelope::anonymous(self::ALGORITHM_RSA, $body)->serialize());
     }
@@ -189,7 +187,7 @@ final class AsymmetricCipher implements AsymmetricCipherInterface
     }
 
     /**
-     * @param-out null|string $key
+     * @param-out string|null $key
      */
     private function wipe(string &$key): void
     {

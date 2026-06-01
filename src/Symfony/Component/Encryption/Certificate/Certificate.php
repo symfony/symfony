@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Certificate;
 
 use Symfony\Component\Encryption\Exception\UnsupportedAlgorithmException;
@@ -99,11 +97,7 @@ final class Certificate
     public function fingerprint(string $algorithm = 'sha256'): string
     {
         if (!\in_array($algorithm, self::FINGERPRINT_ALGORITHMS, true)) {
-            throw new UnsupportedAlgorithmException(\sprintf(
-                'Unsupported fingerprint algorithm "%s". Supported: %s.',
-                $algorithm,
-                implode(', ', self::FINGERPRINT_ALGORITHMS),
-            ));
+            throw new UnsupportedAlgorithmException(\sprintf('Unsupported fingerprint algorithm "%s". Supported: %s.', $algorithm, implode(', ', self::FINGERPRINT_ALGORITHMS)));
         }
 
         return hash($algorithm, $this->der);

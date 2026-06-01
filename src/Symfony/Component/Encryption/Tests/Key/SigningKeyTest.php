@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -20,14 +18,14 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class SigningKeyTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\function_exists('sodium_crypto_sign_keypair')) {
             self::markTestSkipped('ext-sodium is required.');
         }
     }
 
-    public function testHoldsSigningPurposeAndAlgorithm(): void
+    public function testHoldsSigningPurposeAndAlgorithm()
     {
         $keypair = sodium_crypto_sign_keypair();
         $sk = sodium_crypto_sign_secretkey($keypair);
@@ -38,7 +36,7 @@ final class SigningKeyTest extends TestCase
         self::assertSame('signing', $key->purpose());
     }
 
-    public function testExportImportRoundTrip(): void
+    public function testExportImportRoundTrip()
     {
         $sk = sodium_crypto_sign_secretkey(sodium_crypto_sign_keypair());
         $key = PrivateKey::fromBytes('ed25519', 'signing', $sk);
@@ -50,7 +48,7 @@ final class SigningKeyTest extends TestCase
         self::assertSame('signing', $imported->purpose());
     }
 
-    public function testDerivePublicIsTrailing32BytesOfSecret(): void
+    public function testDerivePublicIsTrailing32BytesOfSecret()
     {
         $keypair = sodium_crypto_sign_keypair();
         $sk = sodium_crypto_sign_secretkey($keypair);
@@ -63,7 +61,7 @@ final class SigningKeyTest extends TestCase
         self::assertSame('signing', $public->purpose());
     }
 
-    public function testDerivePublicRejectsWrongLengthEd25519Secret(): void
+    public function testDerivePublicRejectsWrongLengthEd25519Secret()
     {
         $key = PrivateKey::fromBytes('ed25519', 'signing', str_repeat("\x01", 32));
 

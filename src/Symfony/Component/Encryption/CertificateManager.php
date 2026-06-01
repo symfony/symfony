@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption;
 
 use Symfony\Component\Encryption\Certificate\Certificate;
@@ -119,10 +117,7 @@ final class CertificateManager implements CertificateManagerInterface
     private function assertCertificateKey(PrivateKey $key): void
     {
         if (!\in_array($key->algorithm(), ['rsa', 'ecdsa-p256'], true)) {
-            throw new InvalidKeyException(\sprintf(
-                'Certificate operations require an RSA or ECDSA P-256 key; got "%s".',
-                $key->algorithm(),
-            ));
+            throw new InvalidKeyException(\sprintf('Certificate operations require an RSA or ECDSA P-256 key; got "%s".', $key->algorithm()));
         }
     }
 }

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -19,7 +17,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class EcdsaSigningKeyTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required to mint an EC key for this test.');
@@ -35,7 +33,7 @@ final class EcdsaSigningKeyTest extends TestCase
         return $pem;
     }
 
-    public function testHoldsEcdsaPemMaterial(): void
+    public function testHoldsEcdsaPemMaterial()
     {
         $pem = $this->ecPrivatePem();
 
@@ -46,7 +44,7 @@ final class EcdsaSigningKeyTest extends TestCase
         self::assertSame($pem, $key->bytes());
     }
 
-    public function testExportImportRoundTrip(): void
+    public function testExportImportRoundTrip()
     {
         $key = PrivateKey::fromBytes('ecdsa-p256', 'signing', $this->ecPrivatePem());
 
@@ -56,7 +54,7 @@ final class EcdsaSigningKeyTest extends TestCase
         self::assertSame('ecdsa-p256', $imported->algorithm());
     }
 
-    public function testDerivePublicReturnsSpkiPublicKey(): void
+    public function testDerivePublicReturnsSpkiPublicKey()
     {
         $public = PrivateKey::fromBytes('ecdsa-p256', 'signing', $this->ecPrivatePem())->derivePublic();
 
@@ -65,7 +63,7 @@ final class EcdsaSigningKeyTest extends TestCase
         self::assertStringContainsString('PUBLIC KEY', $public->bytes());
     }
 
-    public function testDerivePublicRejectsGarbagePem(): void
+    public function testDerivePublicRejectsGarbagePem()
     {
         $key = PrivateKey::fromBytes('ecdsa-p256', 'signing', 'not a pem');
 

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Envelope;
 
 use Symfony\Component\Encryption\Engine\SymmetricEngineInterface;
@@ -67,18 +65,18 @@ final class Envelope
     public function serialize(): string
     {
         $header = self::MAGIC
-            . pack('C', self::VERSION)
-            . pack('C', $this->aeadId)
-            . pack('C', $this->kdfId);
+            .pack('C', self::VERSION)
+            .pack('C', $this->aeadId)
+            .pack('C', $this->kdfId);
 
         $kdf = match ($this->kdfId) {
             self::KDF_NONE => '',
-            self::KDF_ARGON2ID => $this->salt . pack('J', $this->argon2OpsLimit) . pack('J', $this->argon2MemLimit),
-            self::KDF_PBKDF2_SHA256 => $this->salt . pack('N', $this->pbkdf2Iterations),
+            self::KDF_ARGON2ID => $this->salt.pack('J', $this->argon2OpsLimit).pack('J', $this->argon2MemLimit),
+            self::KDF_PBKDF2_SHA256 => $this->salt.pack('N', $this->pbkdf2Iterations),
             default => throw new \LogicException('Unknown KDF id.'),
         };
 
-        return $header . $kdf . $this->nonce . $this->ciphertext;
+        return $header.$kdf.$this->nonce.$this->ciphertext;
     }
 
     public static function deserialize(string $raw): self

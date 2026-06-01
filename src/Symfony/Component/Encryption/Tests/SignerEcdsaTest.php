@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,14 +18,14 @@ use Symfony\Component\Encryption\Signer;
 
 final class SignerEcdsaTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required for ECDSA signing.');
         }
     }
 
-    public function testGenerateEcdsaKeyPairIsSigning(): void
+    public function testGenerateEcdsaKeyPairIsSigning()
     {
         $pair = (new Signer())->generateKeyPair('ecdsa-p256');
 
@@ -37,7 +35,7 @@ final class SignerEcdsaTest extends TestCase
         self::assertStringContainsString('PUBLIC KEY', $pair->public()->bytes());
     }
 
-    public function testEcdsaDetachedRoundTrip(): void
+    public function testEcdsaDetachedRoundTrip()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('ecdsa-p256');
@@ -47,7 +45,7 @@ final class SignerEcdsaTest extends TestCase
         self::assertTrue($signer->verifyDetached($signature, 'audit log', $pair->public()));
     }
 
-    public function testEcdsaDetachedRejectsTamperedMessage(): void
+    public function testEcdsaDetachedRejectsTamperedMessage()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('ecdsa-p256');
@@ -56,7 +54,7 @@ final class SignerEcdsaTest extends TestCase
         self::assertFalse($signer->verifyDetached($signature, 'tampered', $pair->public()));
     }
 
-    public function testEcdsaAttachedRoundTrip(): void
+    public function testEcdsaAttachedRoundTrip()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('ecdsa-p256');
@@ -66,7 +64,7 @@ final class SignerEcdsaTest extends TestCase
         self::assertSame('shipment', $signer->openAttached($signed, $pair->public()));
     }
 
-    public function testEcdsaOpenAttachedRejectsTampered(): void
+    public function testEcdsaOpenAttachedRejectsTampered()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('ecdsa-p256');
@@ -78,7 +76,7 @@ final class SignerEcdsaTest extends TestCase
         $signer->openAttached($signed, $pair->public());
     }
 
-    public function testExportedEcdsaSigningKeyVerifiesLater(): void
+    public function testExportedEcdsaSigningKeyVerifiesLater()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair('ecdsa-p256');

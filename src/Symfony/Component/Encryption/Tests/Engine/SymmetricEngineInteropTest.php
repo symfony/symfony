@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -20,14 +18,14 @@ use Symfony\Component\Encryption\Engine\SymmetricEngineInterface;
 
 final class SymmetricEngineInteropTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!(new SodiumSymmetricEngine())->isAvailable() || !(new OpenSslSymmetricEngine())->isAvailable()) {
             self::markTestSkipped('Both sodium and openssl engines are required for interop tests.');
         }
     }
 
-    public function testSodiumEncryptOpenSslDecrypt(): void
+    public function testSodiumEncryptOpenSslDecrypt()
     {
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
         $nonce = random_bytes(SymmetricEngineInterface::NONCE_BYTES);
@@ -37,7 +35,7 @@ final class SymmetricEngineInteropTest extends TestCase
         self::assertSame('interop me', (new OpenSslSymmetricEngine())->decrypt($ciphertext, $key, $nonce));
     }
 
-    public function testOpenSslEncryptSodiumDecrypt(): void
+    public function testOpenSslEncryptSodiumDecrypt()
     {
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
         $nonce = random_bytes(SymmetricEngineInterface::NONCE_BYTES);
@@ -47,7 +45,7 @@ final class SymmetricEngineInteropTest extends TestCase
         self::assertSame('interop me', (new SodiumSymmetricEngine())->decrypt($ciphertext, $key, $nonce));
     }
 
-    public function testEnginesProduceIdenticalCiphertext(): void
+    public function testEnginesProduceIdenticalCiphertext()
     {
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
         $nonce = random_bytes(SymmetricEngineInterface::NONCE_BYTES);

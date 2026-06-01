@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -30,7 +28,7 @@ final class SodiumX25519EngineTest extends TestCase
         return $engine;
     }
 
-    public function testGenerateKeyPairProduces32ByteKeys(): void
+    public function testGenerateKeyPairProduces32ByteKeys()
     {
         [$public, $private] = $this->engine()->generateKeyPair();
 
@@ -38,7 +36,7 @@ final class SodiumX25519EngineTest extends TestCase
         self::assertSame(32, \strlen($private));
     }
 
-    public function testAnonymousRoundTrip(): void
+    public function testAnonymousRoundTrip()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -48,7 +46,7 @@ final class SodiumX25519EngineTest extends TestCase
         self::assertSame('to whom it may concern', $engine->openAnonymous($sealed, $public, $private));
     }
 
-    public function testAnonymousRejectsWrongRecipient(): void
+    public function testAnonymousRejectsWrongRecipient()
     {
         $engine = $this->engine();
         [$public] = $engine->generateKeyPair();
@@ -60,7 +58,7 @@ final class SodiumX25519EngineTest extends TestCase
         $engine->openAnonymous($sealed, $otherPublic, $otherPrivate);
     }
 
-    public function testAuthenticatedRoundTrip(): void
+    public function testAuthenticatedRoundTrip()
     {
         $engine = $this->engine();
         [$recipientPublic, $recipientPrivate] = $engine->generateKeyPair();
@@ -75,7 +73,7 @@ final class SodiumX25519EngineTest extends TestCase
         );
     }
 
-    public function testAuthenticatedRejectsWrongSender(): void
+    public function testAuthenticatedRejectsWrongSender()
     {
         $engine = $this->engine();
         [$recipientPublic, $recipientPrivate] = $engine->generateKeyPair();
@@ -89,7 +87,7 @@ final class SodiumX25519EngineTest extends TestCase
         $engine->decryptAuthenticated($ciphertext, $nonce, $recipientPrivate, $impostorPublic);
     }
 
-    public function testAnonymousEmptyPlaintextRoundTrips(): void
+    public function testAnonymousEmptyPlaintextRoundTrips()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -99,7 +97,7 @@ final class SodiumX25519EngineTest extends TestCase
         self::assertSame('', $engine->openAnonymous($sealed, $public, $private));
     }
 
-    public function testTamperedAnonymousCiphertextIsRejected(): void
+    public function testTamperedAnonymousCiphertextIsRejected()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -111,7 +109,7 @@ final class SodiumX25519EngineTest extends TestCase
         $engine->openAnonymous($sealed, $public, $private);
     }
 
-    public function testAuthenticatedEmptyPlaintextRoundTrips(): void
+    public function testAuthenticatedEmptyPlaintextRoundTrips()
     {
         $engine = $this->engine();
         [$recipientPublic, $recipientPrivate] = $engine->generateKeyPair();
@@ -126,7 +124,7 @@ final class SodiumX25519EngineTest extends TestCase
         );
     }
 
-    public function testTamperedAuthenticatedCiphertextIsRejected(): void
+    public function testTamperedAuthenticatedCiphertextIsRejected()
     {
         $engine = $this->engine();
         [$recipientPublic, $recipientPrivate] = $engine->generateKeyPair();
@@ -140,14 +138,14 @@ final class SodiumX25519EngineTest extends TestCase
         $engine->decryptAuthenticated($ciphertext, $nonce, $recipientPrivate, $senderPublic);
     }
 
-    public function testRejectsWrongKeyLength(): void
+    public function testRejectsWrongKeyLength()
     {
         $this->expectException(InvalidKeyException::class);
 
         $this->engine()->sealAnonymous('x', random_bytes(16));
     }
 
-    public function testNameAndAlgorithm(): void
+    public function testNameAndAlgorithm()
     {
         self::assertSame('sodium', $this->engine()->name());
         self::assertSame('x25519', $this->engine()->algorithm());

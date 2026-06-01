@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -29,7 +27,7 @@ final class SodiumEd25519EngineTest extends TestCase
         return $engine;
     }
 
-    public function testGenerateKeyPairLengths(): void
+    public function testGenerateKeyPairLengths()
     {
         [$public, $private] = $this->engine()->generateKeyPair();
 
@@ -37,7 +35,7 @@ final class SodiumEd25519EngineTest extends TestCase
         self::assertSame(64, \strlen($private));
     }
 
-    public function testSignVerifyRoundTrip(): void
+    public function testSignVerifyRoundTrip()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -48,7 +46,7 @@ final class SodiumEd25519EngineTest extends TestCase
         self::assertTrue($engine->verify($signature, 'contract terms', $public));
     }
 
-    public function testVerifyRejectsTamperedMessage(): void
+    public function testVerifyRejectsTamperedMessage()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -57,7 +55,7 @@ final class SodiumEd25519EngineTest extends TestCase
         self::assertFalse($engine->verify($signature, 'tampered', $public));
     }
 
-    public function testVerifyRejectsWrongKey(): void
+    public function testVerifyRejectsWrongKey()
     {
         $engine = $this->engine();
         [, $private] = $engine->generateKeyPair();
@@ -67,7 +65,7 @@ final class SodiumEd25519EngineTest extends TestCase
         self::assertFalse($engine->verify($signature, 'message', $otherPublic));
     }
 
-    public function testVerifyReturnsFalseForMalformedSignatureWithoutThrowing(): void
+    public function testVerifyReturnsFalseForMalformedSignatureWithoutThrowing()
     {
         $engine = $this->engine();
         [$public] = $engine->generateKeyPair();
@@ -75,14 +73,14 @@ final class SodiumEd25519EngineTest extends TestCase
         self::assertFalse($engine->verify('too short', 'message', $public));
     }
 
-    public function testSignRejectsWrongSecretKeyLength(): void
+    public function testSignRejectsWrongSecretKeyLength()
     {
         $this->expectException(InvalidKeyException::class);
 
         $this->engine()->sign('m', str_repeat("\x01", 32));
     }
 
-    public function testNameAndAlgorithm(): void
+    public function testNameAndAlgorithm()
     {
         self::assertSame('sodium', $this->engine()->name());
         self::assertSame('ed25519', $this->engine()->algorithm());

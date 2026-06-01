@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Key;
 
 use Symfony\Component\Encryption\Encoding;
@@ -38,11 +36,7 @@ final class SecretKey implements KeyInterface
         private readonly string $bytes,
     ) {
         if (SymmetricEngineInterface::KEY_BYTES !== \strlen($bytes)) {
-            throw new InvalidKeyException(\sprintf(
-                'Secret key must be exactly %d bytes; got %d.',
-                SymmetricEngineInterface::KEY_BYTES,
-                \strlen($bytes),
-            ));
+            throw new InvalidKeyException(\sprintf('Secret key must be exactly %d bytes; got %d.', SymmetricEngineInterface::KEY_BYTES, \strlen($bytes)));
         }
     }
 
@@ -71,7 +65,7 @@ final class SecretKey implements KeyInterface
     public function export(): string
     {
         return Encoding::toBase64(
-            self::MAGIC . pack('C', self::VERSION) . pack('C', self::ALGORITHM_ID) . $this->bytes,
+            self::MAGIC.pack('C', self::VERSION).pack('C', self::ALGORITHM_ID).$this->bytes,
         );
     }
 

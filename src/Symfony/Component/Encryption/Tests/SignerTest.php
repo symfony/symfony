@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -22,14 +20,14 @@ use Symfony\Component\Encryption\Signer;
 
 final class SignerTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\function_exists('sodium_crypto_sign_detached')) {
             self::markTestSkipped('ext-sodium is required.');
         }
     }
 
-    public function testGenerateKeyPairIsEd25519Signing(): void
+    public function testGenerateKeyPairIsEd25519Signing()
     {
         $pair = (new Signer())->generateKeyPair();
 
@@ -38,7 +36,7 @@ final class SignerTest extends TestCase
         self::assertSame('signing', $pair->public()->purpose());
     }
 
-    public function testDetachedSignVerifyRoundTrip(): void
+    public function testDetachedSignVerifyRoundTrip()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -48,7 +46,7 @@ final class SignerTest extends TestCase
         self::assertTrue($signer->verifyDetached($signature, 'release notes', $pair->public()));
     }
 
-    public function testEmptyMessageSigns(): void
+    public function testEmptyMessageSigns()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -56,7 +54,7 @@ final class SignerTest extends TestCase
         self::assertTrue($signer->verifyDetached($signer->signDetached('', $pair->private()), '', $pair->public()));
     }
 
-    public function testVerifyDetachedRejectsTamperedMessage(): void
+    public function testVerifyDetachedRejectsTamperedMessage()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -65,7 +63,7 @@ final class SignerTest extends TestCase
         self::assertFalse($signer->verifyDetached($signature, 'tampered', $pair->public()));
     }
 
-    public function testVerifyDetachedReturnsFalseForGarbageSignature(): void
+    public function testVerifyDetachedReturnsFalseForGarbageSignature()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -73,7 +71,7 @@ final class SignerTest extends TestCase
         self::assertFalse($signer->verifyDetached('!!!not base64 sig!!!', 'm', $pair->public()));
     }
 
-    public function testVerifyDetachedReturnsFalseForWrongLengthSignature(): void
+    public function testVerifyDetachedReturnsFalseForWrongLengthSignature()
     {
         // Valid base64 whose decoded length (10 bytes) is shorter than the
         // required 64-byte Ed25519 signature — the "wrong-length but valid
@@ -85,7 +83,7 @@ final class SignerTest extends TestCase
         self::assertFalse($signer->verifyDetached($shortSig, 'm', $pair->public()));
     }
 
-    public function testAttachedSignOpenRoundTrip(): void
+    public function testAttachedSignOpenRoundTrip()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -96,7 +94,7 @@ final class SignerTest extends TestCase
         self::assertSame('shipment manifest', $signer->openAttached($signed, $pair->public()));
     }
 
-    public function testOpenAttachedRejectsTamperedMessage(): void
+    public function testOpenAttachedRejectsTamperedMessage()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -108,7 +106,7 @@ final class SignerTest extends TestCase
         $signer->openAttached($signed, $pair->public());
     }
 
-    public function testSignRejectsEncryptionPurposeKey(): void
+    public function testSignRejectsEncryptionPurposeKey()
     {
         $signer = new Signer();
         $signingPair = $signer->generateKeyPair();
@@ -119,7 +117,7 @@ final class SignerTest extends TestCase
         $signer->signDetached('m', $wrongPurpose);
     }
 
-    public function testAttachedLayoutIsLengthPrefixed(): void
+    public function testAttachedLayoutIsLengthPrefixed()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
@@ -131,11 +129,11 @@ final class SignerTest extends TestCase
         self::assertSame(2 + 64 + 2, \strlen($raw));
     }
 
-    public function testOpenAttachedRejectsLengthHeaderOverrun(): void
+    public function testOpenAttachedRejectsLengthHeaderOverrun()
     {
         $signer = new Signer();
         $pair = $signer->generateKeyPair();
-        $forged = \Symfony\Component\Encryption\Encoding::toBase64(pack('n', 60000) . 'short');
+        $forged = \Symfony\Component\Encryption\Encoding::toBase64(pack('n', 60000).'short');
 
         $this->expectException(\Symfony\Component\Encryption\Exception\SignatureVerificationException::class);
 

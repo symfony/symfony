@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,24 +18,24 @@ use Symfony\Component\Encryption\Mac;
 
 final class MacTest extends TestCase
 {
-    public function testGenerateKeyReturns32Bytes(): void
+    public function testGenerateKeyReturns32Bytes()
     {
         self::assertSame(32, \strlen((new Mac())->generateKey()));
     }
 
-    public function testGenerateKeyRespectsRequestedLength(): void
+    public function testGenerateKeyRespectsRequestedLength()
     {
         self::assertSame(64, \strlen((new Mac())->generateKey(64)));
     }
 
-    public function testGenerateKeyRejectsTooShortLength(): void
+    public function testGenerateKeyRejectsTooShortLength()
     {
         $this->expectException(InvalidArgumentException::class);
 
         (new Mac())->generateKey(8);
     }
 
-    public function testSignMatchesKnownHmacVector(): void
+    public function testSignMatchesKnownHmacVector()
     {
         $mac = new Mac();
         $key = str_repeat("\x0b", 20);
@@ -45,7 +43,7 @@ final class MacTest extends TestCase
         self::assertSame(hash_hmac('sha256', 'Hi There', $key), $mac->sign('Hi There', $key));
     }
 
-    public function testVerifyAcceptsValidTag(): void
+    public function testVerifyAcceptsValidTag()
     {
         $mac = new Mac();
         $key = $mac->generateKey();
@@ -54,7 +52,7 @@ final class MacTest extends TestCase
         self::assertTrue($mac->verify($tag, 'message', $key));
     }
 
-    public function testVerifyRejectsTamperedMessage(): void
+    public function testVerifyRejectsTamperedMessage()
     {
         $mac = new Mac();
         $key = $mac->generateKey();
@@ -63,7 +61,7 @@ final class MacTest extends TestCase
         self::assertFalse($mac->verify($tag, 'tampered', $key));
     }
 
-    public function testVerifyRejectsWrongKey(): void
+    public function testVerifyRejectsWrongKey()
     {
         $mac = new Mac();
         $tag = $mac->sign('message', $mac->generateKey());
@@ -71,7 +69,7 @@ final class MacTest extends TestCase
         self::assertFalse($mac->verify($tag, 'message', $mac->generateKey()));
     }
 
-    public function testVerifyRejectsMalformedTagWithoutThrowing(): void
+    public function testVerifyRejectsMalformedTagWithoutThrowing()
     {
         $mac = new Mac();
         $key = $mac->generateKey();
@@ -79,28 +77,28 @@ final class MacTest extends TestCase
         self::assertFalse($mac->verify('not-hex', 'message', $key));
     }
 
-    public function testVerifyRejectsEmptyKeyWithoutThrowing(): void
+    public function testVerifyRejectsEmptyKeyWithoutThrowing()
     {
         $mac = new Mac();
 
         self::assertFalse($mac->verify(str_repeat('a', 64), 'message', ''));
     }
 
-    public function testUnsupportedAlgorithmThrows(): void
+    public function testUnsupportedAlgorithmThrows()
     {
         $this->expectException(UnsupportedAlgorithmException::class);
 
         (new Mac())->sign('message', str_repeat('k', 32), 'md5');
     }
 
-    public function testConstructorRejectsUnsupportedDefaultAlgorithm(): void
+    public function testConstructorRejectsUnsupportedDefaultAlgorithm()
     {
         $this->expectException(UnsupportedAlgorithmException::class);
 
         new Mac('md5');
     }
 
-    public function testVerifyReturnsFalseForUnsupportedAlgorithmWithoutThrowing(): void
+    public function testVerifyReturnsFalseForUnsupportedAlgorithmWithoutThrowing()
     {
         $mac = new Mac();
         $key = $mac->generateKey();

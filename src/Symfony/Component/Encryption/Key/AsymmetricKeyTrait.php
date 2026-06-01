@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Key;
 
 use Symfony\Component\Encryption\Encoding;
@@ -73,10 +71,10 @@ trait AsymmetricKeyTrait
     {
         return Encoding::toBase64(
             self::MAGIC
-            . pack('C', self::VERSION)
-            . pack('C', self::ALGORITHM_IDS[$this->algorithm])
-            . pack('C', self::PURPOSE_IDS[$this->purpose])
-            . $this->bytes,
+            .pack('C', self::VERSION)
+            .pack('C', self::ALGORITHM_IDS[$this->algorithm])
+            .pack('C', self::PURPOSE_IDS[$this->purpose])
+            .$this->bytes,
         );
     }
 

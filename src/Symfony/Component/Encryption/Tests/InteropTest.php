@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -25,7 +23,7 @@ final class InteropTest extends TestCase
     private SymmetricCipher $sodiumCipher;
     private SymmetricCipher $opensslCipher;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $sodium = new SodiumSymmetricEngine();
         $openssl = new OpenSslSymmetricEngine();
@@ -37,7 +35,7 @@ final class InteropTest extends TestCase
         $this->opensslCipher = new SymmetricCipher(new EngineSelector([$openssl]));
     }
 
-    public function testRawKeyEncryptedWithSodiumDecryptsWithOpenSsl(): void
+    public function testRawKeyEncryptedWithSodiumDecryptsWithOpenSsl()
     {
         $key = $this->sodiumCipher->generateKey();
 
@@ -46,7 +44,7 @@ final class InteropTest extends TestCase
         self::assertSame('cross-engine payload', $this->opensslCipher->decrypt($ciphertext, $key));
     }
 
-    public function testRawKeyEncryptedWithOpenSslDecryptsWithSodium(): void
+    public function testRawKeyEncryptedWithOpenSslDecryptsWithSodium()
     {
         $key = $this->opensslCipher->generateKey();
 
@@ -55,21 +53,21 @@ final class InteropTest extends TestCase
         self::assertSame('cross-engine payload', $this->sodiumCipher->decrypt($ciphertext, $key));
     }
 
-    public function testPasswordEncryptedWithSodiumDecryptsWithOpenSsl(): void
+    public function testPasswordEncryptedWithSodiumDecryptsWithOpenSsl()
     {
         $ciphertext = $this->sodiumCipher->encryptWithPassword('cross-engine secret', 'shared pw');
 
         self::assertSame('cross-engine secret', $this->opensslCipher->decryptWithPassword($ciphertext, 'shared pw'));
     }
 
-    public function testPasswordEncryptedWithOpenSslDecryptsWithSodium(): void
+    public function testPasswordEncryptedWithOpenSslDecryptsWithSodium()
     {
         $ciphertext = $this->opensslCipher->encryptWithPassword('cross-engine secret', 'shared pw');
 
         self::assertSame('cross-engine secret', $this->sodiumCipher->decryptWithPassword($ciphertext, 'shared pw'));
     }
 
-    public function testExportedKeyIsPortableAcrossEngines(): void
+    public function testExportedKeyIsPortableAcrossEngines()
     {
         $key = $this->sodiumCipher->generateKey();
         $ciphertext = $this->sodiumCipher->encrypt('portable', $key);

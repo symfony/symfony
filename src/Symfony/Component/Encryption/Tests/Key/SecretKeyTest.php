@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -22,7 +20,7 @@ use Symfony\Component\Encryption\Key\SecretKey;
 
 final class SecretKeyTest extends TestCase
 {
-    public function testGenerateProduces32ByteKey(): void
+    public function testGenerateProduces32ByteKey()
     {
         $key = SecretKey::generate();
 
@@ -31,14 +29,14 @@ final class SecretKeyTest extends TestCase
         self::assertSame('chacha20-poly1305-ietf', $key->algorithm());
     }
 
-    public function testFromBytesRejectsWrongLength(): void
+    public function testFromBytesRejectsWrongLength()
     {
         $this->expectException(InvalidKeyException::class);
 
         SecretKey::fromBytes(random_bytes(16));
     }
 
-    public function testExportImportRoundTrip(): void
+    public function testExportImportRoundTrip()
     {
         $key = SecretKey::generate();
 
@@ -47,16 +45,16 @@ final class SecretKeyTest extends TestCase
         self::assertSame($key->bytes(), $imported->bytes());
     }
 
-    public function testImportRejectsGarbage(): void
+    public function testImportRejectsGarbage()
     {
         $this->expectException(InvalidKeyException::class);
 
         SecretKey::import('this is not a key');
     }
 
-    public function testImportRejectsWrongMagic(): void
+    public function testImportRejectsWrongMagic()
     {
-        $bytes = 'XYZ' . "\x01\x01" . random_bytes(SymmetricEngineInterface::KEY_BYTES);
+        $bytes = 'XYZ'."\x01\x01".random_bytes(SymmetricEngineInterface::KEY_BYTES);
         $exported = Encoding::toBase64($bytes);
 
         $this->expectException(InvalidKeyException::class);
@@ -64,9 +62,9 @@ final class SecretKeyTest extends TestCase
         SecretKey::import($exported);
     }
 
-    public function testImportRejectsUnsupportedVersion(): void
+    public function testImportRejectsUnsupportedVersion()
     {
-        $bytes = 'SYK' . "\x02\x01" . random_bytes(SymmetricEngineInterface::KEY_BYTES);
+        $bytes = 'SYK'."\x02\x01".random_bytes(SymmetricEngineInterface::KEY_BYTES);
         $exported = Encoding::toBase64($bytes);
 
         $this->expectException(InvalidKeyException::class);

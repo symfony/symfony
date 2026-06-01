@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -32,7 +30,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         return $engine;
     }
 
-    public function testRoundTrip(): void
+    public function testRoundTrip()
     {
         $engine = $this->engine();
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
@@ -44,7 +42,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         self::assertSame('attack at dawn', $engine->decrypt($ciphertext, $key, $nonce));
     }
 
-    public function testEmptyPlaintextRoundTrips(): void
+    public function testEmptyPlaintextRoundTrips()
     {
         $engine = $this->engine();
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
@@ -56,7 +54,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         self::assertSame('', $engine->decrypt($ciphertext, $key, $nonce));
     }
 
-    public function testTamperedCiphertextIsRejected(): void
+    public function testTamperedCiphertextIsRejected()
     {
         $engine = $this->engine();
         $key = random_bytes(SymmetricEngineInterface::KEY_BYTES);
@@ -69,7 +67,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         $engine->decrypt($ciphertext, $key, $nonce);
     }
 
-    public function testRejectsWrongKeyLength(): void
+    public function testRejectsWrongKeyLength()
     {
         $engine = $this->engine();
 
@@ -78,7 +76,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         $engine->encrypt('x', random_bytes(16), random_bytes(SymmetricEngineInterface::NONCE_BYTES));
     }
 
-    public function testRejectsWrongNonceLength(): void
+    public function testRejectsWrongNonceLength()
     {
         $engine = $this->engine();
 
@@ -87,7 +85,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         $engine->encrypt('x', random_bytes(SymmetricEngineInterface::KEY_BYTES), random_bytes(8));
     }
 
-    public function testWrongKeyIsRejected(): void
+    public function testWrongKeyIsRejected()
     {
         $engine = $this->engine();
         $nonce = random_bytes(SymmetricEngineInterface::NONCE_BYTES);
@@ -98,7 +96,7 @@ final class OpenSslSymmetricEngineTest extends TestCase
         $engine->decrypt($ciphertext, random_bytes(SymmetricEngineInterface::KEY_BYTES), $nonce);
     }
 
-    public function testName(): void
+    public function testName()
     {
         self::assertSame('openssl', $this->engine()->name());
     }

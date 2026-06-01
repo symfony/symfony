@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,14 +18,14 @@ use Symfony\Component\Encryption\Key\KeyPair;
 
 final class AsymmetricCipherTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\function_exists('sodium_crypto_box_seal')) {
             self::markTestSkipped('ext-sodium is required.');
         }
     }
 
-    public function testGenerateKeyPairIsX25519(): void
+    public function testGenerateKeyPairIsX25519()
     {
         $pair = (new AsymmetricCipher())->generateKeyPair();
 
@@ -36,7 +34,7 @@ final class AsymmetricCipherTest extends TestCase
         self::assertSame('encryption', $pair->public()->purpose());
     }
 
-    public function testAnonymousRoundTrip(): void
+    public function testAnonymousRoundTrip()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair();
@@ -47,7 +45,7 @@ final class AsymmetricCipherTest extends TestCase
         self::assertSame('meet at noon', $cipher->decryptAnonymous($ciphertext, $recipient));
     }
 
-    public function testAnonymousEmptyPlaintextRoundTrips(): void
+    public function testAnonymousEmptyPlaintextRoundTrips()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair();
@@ -55,7 +53,7 @@ final class AsymmetricCipherTest extends TestCase
         self::assertSame('', $cipher->decryptAnonymous($cipher->encryptAnonymous('', $recipient->public()), $recipient));
     }
 
-    public function testAnonymousWrongRecipientFails(): void
+    public function testAnonymousWrongRecipientFails()
     {
         $cipher = new AsymmetricCipher();
         $ciphertext = $cipher->encryptAnonymous('secret', $cipher->generateKeyPair()->public());
@@ -65,7 +63,7 @@ final class AsymmetricCipherTest extends TestCase
         $cipher->decryptAnonymous($ciphertext, $cipher->generateKeyPair());
     }
 
-    public function testAuthenticatedRoundTrip(): void
+    public function testAuthenticatedRoundTrip()
     {
         $cipher = new AsymmetricCipher();
         $sender = $cipher->generateKeyPair();
@@ -79,7 +77,7 @@ final class AsymmetricCipherTest extends TestCase
         );
     }
 
-    public function testAuthenticatedWrongSenderFails(): void
+    public function testAuthenticatedWrongSenderFails()
     {
         $cipher = new AsymmetricCipher();
         $sender = $cipher->generateKeyPair();
@@ -92,7 +90,7 @@ final class AsymmetricCipherTest extends TestCase
         $cipher->decryptAuthenticated($ciphertext, $recipient, $impostor->public());
     }
 
-    public function testGarbageFailsToDecrypt(): void
+    public function testGarbageFailsToDecrypt()
     {
         $cipher = new AsymmetricCipher();
 
@@ -101,7 +99,7 @@ final class AsymmetricCipherTest extends TestCase
         $cipher->decryptAnonymous('not a ciphertext', $cipher->generateKeyPair());
     }
 
-    public function testDecryptAnonymousRejectsAuthenticatedEnvelope(): void
+    public function testDecryptAnonymousRejectsAuthenticatedEnvelope()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair();
@@ -112,7 +110,7 @@ final class AsymmetricCipherTest extends TestCase
         $cipher->decryptAnonymous($authCiphertext, $recipient);
     }
 
-    public function testDecryptAuthenticatedRejectsAnonymousEnvelope(): void
+    public function testDecryptAuthenticatedRejectsAnonymousEnvelope()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair();

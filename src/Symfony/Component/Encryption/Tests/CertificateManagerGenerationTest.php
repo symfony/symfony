@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -23,14 +21,14 @@ use Symfony\Component\Encryption\Signer;
 
 final class CertificateManagerGenerationTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required.');
         }
     }
 
-    public function testGenerateRsaKeyPair(): void
+    public function testGenerateRsaKeyPair()
     {
         $pair = (new CertificateManager())->generateKeyPair('rsa', 2048);
 
@@ -39,14 +37,14 @@ final class CertificateManagerGenerationTest extends TestCase
         self::assertStringContainsString('PRIVATE KEY', $pair->private()->bytes());
     }
 
-    public function testGenerateEcKeyPair(): void
+    public function testGenerateEcKeyPair()
     {
         $pair = (new CertificateManager())->generateKeyPair('ecdsa-p256');
 
         self::assertSame('ecdsa-p256', $pair->algorithm());
     }
 
-    public function testCreateCsr(): void
+    public function testCreateCsr()
     {
         $manager = new CertificateManager();
         $key = $manager->generateKeyPair('rsa', 2048);
@@ -58,7 +56,7 @@ final class CertificateManagerGenerationTest extends TestCase
         self::assertStringContainsString('CERTIFICATE REQUEST', $csr->pem());
     }
 
-    public function testCreateSelfSignedIsLoadableAndSelfSigned(): void
+    public function testCreateSelfSignedIsLoadableAndSelfSigned()
     {
         $manager = new CertificateManager();
         $key = $manager->generateKeyPair('rsa', 2048);
@@ -76,7 +74,7 @@ final class CertificateManagerGenerationTest extends TestCase
         self::assertContains('DNS:self.example', $cert->subjectAlternativeNames());
     }
 
-    public function testEcSelfSignedRoundTrip(): void
+    public function testEcSelfSignedRoundTrip()
     {
         $manager = new CertificateManager();
         $key = $manager->generateKeyPair('ecdsa-p256');
@@ -86,7 +84,7 @@ final class CertificateManagerGenerationTest extends TestCase
         self::assertTrue($manager->isSelfSigned($cert));
     }
 
-    public function testCreateCsrRejectsNonCertificateKey(): void
+    public function testCreateCsrRejectsNonCertificateKey()
     {
         $manager = new CertificateManager();
         $ed25519 = (new Signer())->generateKeyPair(); // ed25519 signing key
@@ -96,7 +94,7 @@ final class CertificateManagerGenerationTest extends TestCase
         $manager->createCsr(new DistinguishedName(['CN' => 'x']), $ed25519->private());
     }
 
-    public function testCreateSelfSignedRejectsNonCertificateKey(): void
+    public function testCreateSelfSignedRejectsNonCertificateKey()
     {
         $manager = new CertificateManager();
         $ed25519 = (new Signer())->generateKeyPair();

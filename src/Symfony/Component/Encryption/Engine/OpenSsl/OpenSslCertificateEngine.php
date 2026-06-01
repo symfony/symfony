@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Engine\OpenSsl;
 
 use Symfony\Component\Encryption\Engine\CertificateEngineInterface;
@@ -36,8 +34,8 @@ final class OpenSslCertificateEngine implements CertificateEngineInterface
 
         // Treat as DER: wrap base64 in PEM armor.
         return "-----BEGIN CERTIFICATE-----\n"
-            . chunk_split(base64_encode($certificate), 64, "\n")
-            . "-----END CERTIFICATE-----\n";
+            .chunk_split(base64_encode($certificate), 64, "\n")
+            ."-----END CERTIFICATE-----\n";
     }
 
     #[\Override]
@@ -264,7 +262,7 @@ final class OpenSslCertificateEngine implements CertificateEngineInterface
             return null;
         }
 
-        $entries = implode(',', array_map(static fn (string $name): string => 'DNS:' . $name, $dnsNames));
+        $entries = implode(',', array_map(static fn (string $name): string => 'DNS:'.$name, $dnsNames));
         $path = tempnam(sys_get_temp_dir(), 'sym-enc-csr');
         if (false === $path) {
             throw new CertificateException('Unable to prepare the certificate SAN configuration.');
@@ -272,7 +270,7 @@ final class OpenSslCertificateEngine implements CertificateEngineInterface
 
         $written = file_put_contents(
             $path,
-            "[req]\ndistinguished_name = dn\nreq_extensions = v3\n[dn]\n[v3]\nsubjectAltName = " . $entries . "\n",
+            "[req]\ndistinguished_name = dn\nreq_extensions = v3\n[dn]\n[v3]\nsubjectAltName = ".$entries."\n",
         );
         if (false === $written) {
             $this->removeFile($path);

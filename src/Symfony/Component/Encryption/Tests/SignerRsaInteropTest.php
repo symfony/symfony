@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -24,7 +22,7 @@ final class SignerRsaInteropTest extends TestCase
     private Signer $opensslSigner;
     private Signer $phpseclibSigner;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!(new OpenSslRsaSignatureEngine())->isAvailable() || !(new PhpseclibRsaSignatureEngine())->isAvailable()) {
             self::markTestSkipped('Both RSA signature engines are required.');
@@ -34,7 +32,7 @@ final class SignerRsaInteropTest extends TestCase
         $this->phpseclibSigner = new Signer(new EngineSelector(null, null, null, [new PhpseclibRsaSignatureEngine()]));
     }
 
-    public function testOpenSslSignsPhpseclibVerifiesDetached(): void
+    public function testOpenSslSignsPhpseclibVerifiesDetached()
     {
         $pair = $this->opensslSigner->generateKeyPair('rsa');
 
@@ -43,7 +41,7 @@ final class SignerRsaInteropTest extends TestCase
         self::assertTrue($this->phpseclibSigner->verifyDetached($signature, 'cross-engine', $pair->public()));
     }
 
-    public function testPhpseclibSignsOpenSslOpensAttached(): void
+    public function testPhpseclibSignsOpenSslOpensAttached()
     {
         $pair = $this->phpseclibSigner->generateKeyPair('rsa');
 

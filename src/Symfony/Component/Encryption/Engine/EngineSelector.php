@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Engine;
 
 use Symfony\Component\Encryption\Engine\OpenSsl\OpenSslCertificateEngine;
@@ -97,9 +95,7 @@ final class EngineSelector
             }
         }
 
-        throw new NoEngineAvailableException(
-            'No symmetric encryption engine is available; install ext-sodium or ext-openssl with ChaCha20-Poly1305.',
-        );
+        throw new NoEngineAvailableException('No symmetric encryption engine is available; install ext-sodium or ext-openssl with ChaCha20-Poly1305.');
     }
 
     public function asymmetricEncryptionEngine(string $algorithm): AsymmetricEncryptionEngineInterface
@@ -110,9 +106,7 @@ final class EngineSelector
             }
         }
 
-        throw new NoEngineAvailableException(
-            \sprintf('No asymmetric encryption engine is available for algorithm "%s".', $algorithm),
-        );
+        throw new NoEngineAvailableException(\sprintf('No asymmetric encryption engine is available for algorithm "%s".', $algorithm));
     }
 
     public function rsaEngine(): RsaEngineInterface
@@ -132,9 +126,7 @@ final class EngineSelector
             }
         }
 
-        throw new NoEngineAvailableException(
-            \sprintf('No signature engine is available for algorithm "%s".', $algorithm),
-        );
+        throw new NoEngineAvailableException(\sprintf('No signature engine is available for algorithm "%s".', $algorithm));
     }
 
     public function certificateEngine(): CertificateEngineInterface

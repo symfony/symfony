@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -25,7 +23,7 @@ final class SignerInteropTest extends TestCase
     private Signer $sodiumSigner;
     private Signer $phpseclibSigner;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!(new SodiumEd25519Engine())->isAvailable() || !(new PhpseclibEd25519Engine())->isAvailable()) {
             self::markTestSkipped('Both Ed25519 engines are required.');
@@ -35,7 +33,7 @@ final class SignerInteropTest extends TestCase
         $this->phpseclibSigner = new Signer(new EngineSelector(null, null, null, [new PhpseclibEd25519Engine()]));
     }
 
-    public function testSodiumSignsPhpseclibVerifiesDetached(): void
+    public function testSodiumSignsPhpseclibVerifiesDetached()
     {
         $pair = $this->sodiumSigner->generateKeyPair();
 
@@ -44,7 +42,7 @@ final class SignerInteropTest extends TestCase
         self::assertTrue($this->phpseclibSigner->verifyDetached($signature, 'cross-engine', $pair->public()));
     }
 
-    public function testPhpseclibSignsSodiumOpensAttached(): void
+    public function testPhpseclibSignsSodiumOpensAttached()
     {
         $pair = $this->phpseclibSigner->generateKeyPair();
 
@@ -53,7 +51,7 @@ final class SignerInteropTest extends TestCase
         self::assertSame('cross-engine', $this->sodiumSigner->openAttached($signed, $pair->public()));
     }
 
-    public function testExportedSigningKeyIsPortableAcrossEngines(): void
+    public function testExportedSigningKeyIsPortableAcrossEngines()
     {
         $pair = $this->sodiumSigner->generateKeyPair();
         $signature = $this->sodiumSigner->signDetached('portable', $pair->private());

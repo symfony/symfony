@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -26,7 +24,7 @@ use Symfony\Component\Encryption\SymmetricCipherInterface;
 
 final class EncryptionTest extends TestCase
 {
-    public function testAccessorsReturnTheRightInterfaces(): void
+    public function testAccessorsReturnTheRightInterfaces()
     {
         $encryption = new Encryption();
 
@@ -39,7 +37,7 @@ final class EncryptionTest extends TestCase
         self::assertInstanceOf(PasswordHasherInterface::class, $encryption->passwords());
     }
 
-    public function testAccessorsAreCached(): void
+    public function testAccessorsAreCached()
     {
         $encryption = new Encryption();
 
@@ -52,7 +50,7 @@ final class EncryptionTest extends TestCase
         self::assertSame($encryption->passwords(), $encryption->passwords());
     }
 
-    public function testEngineBackedServicesShareTheInjectedEngineSelector(): void
+    public function testEngineBackedServicesShareTheInjectedEngineSelector()
     {
         $engines = new EngineSelector();
         $encryption = new Encryption($engines);
@@ -63,7 +61,7 @@ final class EncryptionTest extends TestCase
         }
     }
 
-    public function testEndToEndSymmetricThroughFacade(): void
+    public function testEndToEndSymmetricThroughFacade()
     {
         $encryption = new Encryption();
         $key = $encryption->symmetric()->generateKey();
@@ -73,7 +71,7 @@ final class EncryptionTest extends TestCase
         self::assertSame('via the facade', $encryption->symmetric()->decrypt($ciphertext, $key));
     }
 
-    public function testEndToEndAsymmetricThroughFacade(): void
+    public function testEndToEndAsymmetricThroughFacade()
     {
         if (!\function_exists('sodium_crypto_box_seal')) {
             self::markTestSkipped('ext-sodium is required for X25519 asymmetric encryption.');
@@ -87,7 +85,7 @@ final class EncryptionTest extends TestCase
         self::assertSame('secret via facade', $encryption->asymmetric()->decryptAnonymous($ciphertext, $recipient));
     }
 
-    public function testEndToEndSigningThroughFacade(): void
+    public function testEndToEndSigningThroughFacade()
     {
         $encryption = new Encryption();
         $pair = $encryption->signing()->generateKeyPair();
@@ -97,7 +95,7 @@ final class EncryptionTest extends TestCase
         self::assertTrue($encryption->signing()->verifyDetached($signature, 'message', $pair->public()));
     }
 
-    public function testDigestSmokeThroughFacade(): void
+    public function testDigestSmokeThroughFacade()
     {
         $encryption = new Encryption();
 
@@ -108,7 +106,7 @@ final class EncryptionTest extends TestCase
         );
     }
 
-    public function testMacRoundTripThroughFacade(): void
+    public function testMacRoundTripThroughFacade()
     {
         $encryption = new Encryption();
         $key = $encryption->mac()->generateKey();
@@ -118,7 +116,7 @@ final class EncryptionTest extends TestCase
         self::assertFalse($encryption->mac()->verify($tag, 'tampered', $key));
     }
 
-    public function testPasswordsSmokeThroughFacade(): void
+    public function testPasswordsSmokeThroughFacade()
     {
         if (!\extension_loaded('sodium')) {
             self::markTestSkipped('ext-sodium is required for PasswordHasher.');

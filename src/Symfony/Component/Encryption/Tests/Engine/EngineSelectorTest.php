@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -28,7 +26,7 @@ use Symfony\Component\Encryption\Exception\NoEngineAvailableException;
 
 final class EngineSelectorTest extends TestCase
 {
-    public function testReturnsFirstAvailableEngine(): void
+    public function testReturnsFirstAvailableEngine()
     {
         $unavailable = $this->unavailableEngine();
         $available = new SodiumSymmetricEngine();
@@ -44,7 +42,7 @@ final class EngineSelectorTest extends TestCase
         self::assertSame($available, $selector->symmetricEngine());
     }
 
-    public function testThrowsWhenNoEngineIsAvailable(): void
+    public function testThrowsWhenNoEngineIsAvailable()
     {
         $selector = new EngineSelector([$this->unavailableEngine()]);
 
@@ -53,7 +51,7 @@ final class EngineSelectorTest extends TestCase
         $selector->symmetricEngine();
     }
 
-    public function testDefaultSelectorPrefersSodium(): void
+    public function testDefaultSelectorPrefersSodium()
     {
         $selector = new EngineSelector();
 
@@ -63,7 +61,7 @@ final class EngineSelectorTest extends TestCase
         self::assertSame('sodium', $engine->name());
     }
 
-    public function testReturnsAsymmetricEncryptionEngineForX25519(): void
+    public function testReturnsAsymmetricEncryptionEngineForX25519()
     {
         $selector = new EngineSelector();
 
@@ -73,7 +71,7 @@ final class EngineSelectorTest extends TestCase
         self::assertSame('x25519', $engine->algorithm());
     }
 
-    public function testThrowsForUnknownAsymmetricAlgorithm(): void
+    public function testThrowsForUnknownAsymmetricAlgorithm()
     {
         $selector = new EngineSelector();
 
@@ -82,7 +80,7 @@ final class EngineSelectorTest extends TestCase
         $selector->asymmetricEncryptionEngine('rsa');
     }
 
-    public function testInjectedAsymmetricEnginesAreUsed(): void
+    public function testInjectedAsymmetricEnginesAreUsed()
     {
         $engine = new SodiumX25519Engine();
         if (!$engine->isAvailable()) {
@@ -93,7 +91,7 @@ final class EngineSelectorTest extends TestCase
         self::assertSame($engine, $selector->asymmetricEncryptionEngine('x25519'));
     }
 
-    public function testReturnsRsaEngine(): void
+    public function testReturnsRsaEngine()
     {
         $engine = (new EngineSelector())->rsaEngine();
 
@@ -101,7 +99,7 @@ final class EngineSelectorTest extends TestCase
         self::assertTrue($engine->isAvailable());
     }
 
-    public function testReturnsSignatureEngineForEd25519(): void
+    public function testReturnsSignatureEngineForEd25519()
     {
         $engine = (new EngineSelector())->signatureEngine('ed25519');
 
@@ -109,28 +107,28 @@ final class EngineSelectorTest extends TestCase
         self::assertSame('ed25519', $engine->algorithm());
     }
 
-    public function testThrowsForUnknownSignatureAlgorithm(): void
+    public function testThrowsForUnknownSignatureAlgorithm()
     {
         $this->expectException(NoEngineAvailableException::class);
 
         (new EngineSelector())->signatureEngine('dsa');
     }
 
-    public function testReturnsSignatureEngineForRsa(): void
+    public function testReturnsSignatureEngineForRsa()
     {
         $engine = (new EngineSelector())->signatureEngine('rsa');
 
         self::assertSame('rsa', $engine->algorithm());
     }
 
-    public function testReturnsSignatureEngineForEcdsa(): void
+    public function testReturnsSignatureEngineForEcdsa()
     {
         $engine = (new EngineSelector())->signatureEngine('ecdsa-p256');
 
         self::assertSame('ecdsa-p256', $engine->algorithm());
     }
 
-    public function testReturnsCertificateEngine(): void
+    public function testReturnsCertificateEngine()
     {
         $engine = (new EngineSelector())->certificateEngine();
 
@@ -138,7 +136,7 @@ final class EngineSelectorTest extends TestCase
         self::assertTrue($engine->isAvailable());
     }
 
-    public function testInjectedSignatureEnginesAreUsed(): void
+    public function testInjectedSignatureEnginesAreUsed()
     {
         $engine = new SodiumEd25519Engine();
         if (!$engine->isAvailable()) {

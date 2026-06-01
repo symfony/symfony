@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -23,7 +21,7 @@ final class OpenSslCertificateEngineTest extends TestCase
     private string $certPem = '';
     private string $privateKeyPem = '';
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->engine = new OpenSslCertificateEngine();
         if (!$this->engine->isAvailable()) {
@@ -40,7 +38,7 @@ final class OpenSslCertificateEngineTest extends TestCase
         openssl_x509_export($cert, $this->certPem);
     }
 
-    public function testParseExtractsFields(): void
+    public function testParseExtractsFields()
     {
         $parsed = $this->engine->parse($this->certPem);
 
@@ -52,9 +50,9 @@ final class OpenSslCertificateEngineTest extends TestCase
         self::assertSame([], $parsed['subjectAlternativeNames']);
     }
 
-    public function testParseExtractsSubjectAlternativeNames(): void
+    public function testParseExtractsSubjectAlternativeNames()
     {
-        $tmpConf = sys_get_temp_dir() . '/openssl_san_test.cnf';
+        $tmpConf = sys_get_temp_dir().'/openssl_san_test.cnf';
         file_put_contents($tmpConf, implode("\n", [
             '[req]',
             'distinguished_name=dn',
@@ -94,26 +92,26 @@ final class OpenSslCertificateEngineTest extends TestCase
         }
     }
 
-    public function testParseRejectsGarbage(): void
+    public function testParseRejectsGarbage()
     {
         $this->expectException(CertificateException::class);
 
         $this->engine->parse('not a certificate');
     }
 
-    public function testPublicKeyPem(): void
+    public function testPublicKeyPem()
     {
         self::assertStringContainsString('PUBLIC KEY', $this->engine->publicKeyPem($this->certPem));
     }
 
-    public function testVerifySelfSigned(): void
+    public function testVerifySelfSigned()
     {
         $publicKeyPem = $this->engine->publicKeyPem($this->certPem);
 
         self::assertTrue($this->engine->verify($this->certPem, $publicKeyPem));
     }
 
-    public function testVerifyRejectsWrongIssuerKey(): void
+    public function testVerifyRejectsWrongIssuerKey()
     {
         $other = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => \OPENSSL_KEYTYPE_RSA]);
         self::assertNotFalse($other);
@@ -122,12 +120,12 @@ final class OpenSslCertificateEngineTest extends TestCase
         self::assertFalse($this->engine->verify($this->certPem, $otherPublicPem));
     }
 
-    public function testVerifyReturnsFalseForGarbageIssuerKey(): void
+    public function testVerifyReturnsFalseForGarbageIssuerKey()
     {
         self::assertFalse($this->engine->verify($this->certPem, 'not a pem'));
     }
 
-    public function testNormalizePemAcceptsDer(): void
+    public function testNormalizePemAcceptsDer()
     {
         $body = preg_replace('/-----[^-]+-----|\s+/', '', $this->certPem);
         $der = base64_decode((string) $body, true);
@@ -139,14 +137,14 @@ final class OpenSslCertificateEngineTest extends TestCase
         self::assertSame('example.com', $this->engine->parse($normalized)['subject']['CN']);
     }
 
-    public function testDerBytes(): void
+    public function testDerBytes()
     {
         $der = $this->engine->derBytes($this->certPem);
 
         self::assertSame(openssl_x509_fingerprint($this->certPem, 'sha256'), hash('sha256', $der));
     }
 
-    public function testName(): void
+    public function testName()
     {
         self::assertSame('openssl', $this->engine->name());
     }

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Engine\Sodium;
 
 use Symfony\Component\Encryption\Engine\AsymmetricEncryptionEngineInterface;
@@ -117,12 +115,7 @@ final class SodiumX25519Engine implements AsymmetricEncryptionEngineInterface
     private function assertKey(string $key, string $label): void
     {
         if (self::KEY_BYTES !== \strlen($key)) {
-            throw new InvalidKeyException(\sprintf(
-                'X25519 %s key must be %d bytes; got %d.',
-                $label,
-                self::KEY_BYTES,
-                \strlen($key),
-            ));
+            throw new InvalidKeyException(\sprintf('X25519 %s key must be %d bytes; got %d.', $label, self::KEY_BYTES, \strlen($key)));
         }
     }
 }

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Envelope;
 
 use Symfony\Component\Encryption\Exception\InvalidArgumentException;
@@ -63,11 +61,11 @@ final class AsymmetricEnvelope
         }
 
         $header = self::MAGIC
-            . pack('C', self::VERSION)
-            . pack('C', self::ALGORITHM_IDS[$this->algorithm])
-            . pack('C', $this->mode);
+            .pack('C', self::VERSION)
+            .pack('C', self::ALGORITHM_IDS[$this->algorithm])
+            .pack('C', $this->mode);
 
-        return $header . (self::MODE_AUTHENTICATED === $this->mode ? $this->nonce : '') . $this->body;
+        return $header.(self::MODE_AUTHENTICATED === $this->mode ? $this->nonce : '').$this->body;
     }
 
     public static function deserialize(string $raw): self

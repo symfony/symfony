@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -29,7 +27,7 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         return $engine;
     }
 
-    public function testGenerateKeyPairProducesPemKeys(): void
+    public function testGenerateKeyPairProducesPemKeys()
     {
         [$public, $private] = $this->engine()->generateKeyPair();
 
@@ -37,7 +35,7 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         self::assertStringContainsString('PRIVATE KEY', $private);
     }
 
-    public function testSignVerifyRoundTrip(): void
+    public function testSignVerifyRoundTrip()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -47,7 +45,7 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         self::assertTrue($engine->verify($signature, 'contract', $public));
     }
 
-    public function testVerifyRejectsTamperedMessage(): void
+    public function testVerifyRejectsTamperedMessage()
     {
         $engine = $this->engine();
         [$public, $private] = $engine->generateKeyPair();
@@ -56,7 +54,7 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         self::assertFalse($engine->verify($signature, 'tampered', $public));
     }
 
-    public function testVerifyRejectsWrongKey(): void
+    public function testVerifyRejectsWrongKey()
     {
         $engine = $this->engine();
         [, $private] = $engine->generateKeyPair();
@@ -66,7 +64,7 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         self::assertFalse($engine->verify($signature, 'm', $otherPublic));
     }
 
-    public function testVerifyReturnsFalseForGarbageKeyWithoutThrowing(): void
+    public function testVerifyReturnsFalseForGarbageKeyWithoutThrowing()
     {
         $engine = $this->engine();
         [, $private] = $engine->generateKeyPair();
@@ -75,7 +73,7 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         self::assertFalse($engine->verify($signature, 'm', 'not a pem'));
     }
 
-    public function testVerifyReturnsFalseForGarbageSignature(): void
+    public function testVerifyReturnsFalseForGarbageSignature()
     {
         $engine = $this->engine();
         [$public] = $engine->generateKeyPair();
@@ -83,14 +81,14 @@ final class OpenSslEcdsaSignatureEngineTest extends TestCase
         self::assertFalse($engine->verify('garbage', 'm', $public));
     }
 
-    public function testSignRejectsInvalidKey(): void
+    public function testSignRejectsInvalidKey()
     {
         $this->expectException(InvalidKeyException::class);
 
         $this->engine()->sign('m', 'not a pem');
     }
 
-    public function testNameAndAlgorithm(): void
+    public function testNameAndAlgorithm()
     {
         self::assertSame('openssl', $this->engine()->name());
         self::assertSame('ecdsa-p256', $this->engine()->algorithm());

@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class PrivateKeyTest extends TestCase
 {
-    public function testHoldsAlgorithmPurposeAndBytes(): void
+    public function testHoldsAlgorithmPurposeAndBytes()
     {
         $key = PrivateKey::fromBytes('x25519', 'encryption', str_repeat("\x02", 32));
 
@@ -29,7 +27,7 @@ final class PrivateKeyTest extends TestCase
         self::assertSame(str_repeat("\x02", 32), $key->bytes());
     }
 
-    public function testExportImportRoundTrip(): void
+    public function testExportImportRoundTrip()
     {
         $key = PrivateKey::fromBytes('x25519', 'encryption', random_bytes(32));
 
@@ -40,7 +38,7 @@ final class PrivateKeyTest extends TestCase
         self::assertSame('encryption', $imported->purpose());
     }
 
-    public function testDerivePublicMatchesSodium(): void
+    public function testDerivePublicMatchesSodium()
     {
         $sk = random_bytes(32);
         $key = PrivateKey::fromBytes('x25519', 'encryption', $sk);
@@ -52,7 +50,7 @@ final class PrivateKeyTest extends TestCase
         self::assertSame('encryption', $public->purpose());
     }
 
-    public function testImportRejectsPublicKeyMagic(): void
+    public function testImportRejectsPublicKeyMagic()
     {
         $public = PublicKey::fromBytes('x25519', 'encryption', random_bytes(32));
 

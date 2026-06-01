@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Certificate;
 
 use PHPUnit\Framework\TestCase;
@@ -36,7 +34,7 @@ final class CertificateTest extends TestCase
         );
     }
 
-    public function testAccessors(): void
+    public function testAccessors()
     {
         $cert = $this->certificate();
 
@@ -49,7 +47,7 @@ final class CertificateTest extends TestCase
         self::assertStringContainsString('CERTIFICATE', $cert->pem());
     }
 
-    public function testFingerprintIsHashOfDer(): void
+    public function testFingerprintIsHashOfDer()
     {
         $cert = $this->certificate();
 
@@ -57,14 +55,14 @@ final class CertificateTest extends TestCase
         self::assertSame(hash('sha1', 'binary-der-bytes'), $cert->fingerprint('sha1'));
     }
 
-    public function testFingerprintRejectsUnsupportedAlgorithm(): void
+    public function testFingerprintRejectsUnsupportedAlgorithm()
     {
         $this->expectException(UnsupportedAlgorithmException::class);
 
         $this->certificate()->fingerprint('md5');
     }
 
-    public function testExpiryChecks(): void
+    public function testExpiryChecks()
     {
         $cert = $this->certificate();
 

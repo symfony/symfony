@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Envelope;
 
 use PHPUnit\Framework\TestCase;
@@ -19,7 +17,7 @@ use Symfony\Component\Encryption\Exception\InvalidArgumentException;
 
 final class EnvelopeTest extends TestCase
 {
-    public function testRawKeyRoundTrip(): void
+    public function testRawKeyRoundTrip()
     {
         $nonce = random_bytes(12);
         $ciphertext = random_bytes(40);
@@ -31,7 +29,7 @@ final class EnvelopeTest extends TestCase
         self::assertSame($ciphertext, $envelope->ciphertext());
     }
 
-    public function testArgon2idRoundTrip(): void
+    public function testArgon2idRoundTrip()
     {
         $salt = random_bytes(16);
         $nonce = random_bytes(12);
@@ -47,7 +45,7 @@ final class EnvelopeTest extends TestCase
         self::assertSame($ciphertext, $envelope->ciphertext());
     }
 
-    public function testPbkdf2RoundTrip(): void
+    public function testPbkdf2RoundTrip()
     {
         $salt = random_bytes(16);
         $nonce = random_bytes(12);
@@ -62,7 +60,7 @@ final class EnvelopeTest extends TestCase
         self::assertSame($ciphertext, $envelope->ciphertext());
     }
 
-    public function testSerializedFormatBeginsWithMagicAndVersion(): void
+    public function testSerializedFormatBeginsWithMagicAndVersion()
     {
         $raw = Envelope::forRawKey(random_bytes(12), random_bytes(40))->serialize();
 
@@ -72,14 +70,14 @@ final class EnvelopeTest extends TestCase
         self::assertSame(0, \ord($raw[5])); // kdfId none
     }
 
-    public function testRejectsBadMagic(): void
+    public function testRejectsBadMagic()
     {
         $this->expectException(InvalidArgumentException::class);
 
-        Envelope::deserialize('XXX' . str_repeat("\x00", 40));
+        Envelope::deserialize('XXX'.str_repeat("\x00", 40));
     }
 
-    public function testRejectsUnsupportedVersion(): void
+    public function testRejectsUnsupportedVersion()
     {
         $raw = Envelope::forRawKey(random_bytes(12), random_bytes(40))->serialize();
         $raw[3] = "\x02";
@@ -89,7 +87,7 @@ final class EnvelopeTest extends TestCase
         Envelope::deserialize($raw);
     }
 
-    public function testRejectsTruncatedEnvelope(): void
+    public function testRejectsTruncatedEnvelope()
     {
         $raw = Envelope::forArgon2id(random_bytes(16), 3, 67108864, random_bytes(12), random_bytes(40))->serialize();
 
@@ -98,7 +96,7 @@ final class EnvelopeTest extends TestCase
         Envelope::deserialize(substr($raw, 0, 10));
     }
 
-    public function testRejectsUnsupportedAeadId(): void
+    public function testRejectsUnsupportedAeadId()
     {
         $raw = Envelope::forRawKey(random_bytes(12), random_bytes(40))->serialize();
         $raw[4] = "\xFF"; // replace aeadId with an unknown value
@@ -109,7 +107,7 @@ final class EnvelopeTest extends TestCase
         Envelope::deserialize($raw);
     }
 
-    public function testRejectsUnsupportedKdfId(): void
+    public function testRejectsUnsupportedKdfId()
     {
         $raw = Envelope::forRawKey(random_bytes(12), random_bytes(40))->serialize();
         $raw[5] = "\xFF"; // replace kdfId with an unknown value

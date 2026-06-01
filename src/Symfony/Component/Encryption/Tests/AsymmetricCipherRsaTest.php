@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -21,7 +19,7 @@ use Symfony\Component\Encryption\Key\KeyPair;
 
 final class AsymmetricCipherRsaTest extends TestCase
 {
-    public function testGenerateRsaKeyPair(): void
+    public function testGenerateRsaKeyPair()
     {
         $pair = (new AsymmetricCipher())->generateKeyPair('rsa', 2048);
 
@@ -30,18 +28,18 @@ final class AsymmetricCipherRsaTest extends TestCase
         self::assertStringContainsString('PUBLIC KEY', $pair->public()->bytes());
     }
 
-    public function testRsaAnonymousRoundTrip(): void
+    public function testRsaAnonymousRoundTrip()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair('rsa', 2048);
-        $message = 'a longer message than RSA could ever encrypt directly ' . str_repeat('x', 500);
+        $message = 'a longer message than RSA could ever encrypt directly '.str_repeat('x', 500);
 
         $ciphertext = $cipher->encryptAnonymous($message, $recipient->public());
 
         self::assertSame($message, $cipher->decryptAnonymous($ciphertext, $recipient));
     }
 
-    public function testRsaEmptyPlaintextRoundTrips(): void
+    public function testRsaEmptyPlaintextRoundTrips()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair('rsa', 2048);
@@ -49,7 +47,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         self::assertSame('', $cipher->decryptAnonymous($cipher->encryptAnonymous('', $recipient->public()), $recipient));
     }
 
-    public function testRsaWrongRecipientFails(): void
+    public function testRsaWrongRecipientFails()
     {
         $cipher = new AsymmetricCipher();
         $ciphertext = $cipher->encryptAnonymous('secret', $cipher->generateKeyPair('rsa', 2048)->public());
@@ -59,7 +57,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         $cipher->decryptAnonymous($ciphertext, $cipher->generateKeyPair('rsa', 2048));
     }
 
-    public function testRsaTamperedCiphertextFails(): void
+    public function testRsaTamperedCiphertextFails()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair('rsa', 2048);
@@ -71,7 +69,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         $cipher->decryptAnonymous($ciphertext, $recipient);
     }
 
-    public function testRsaRejectsAuthenticatedEncryption(): void
+    public function testRsaRejectsAuthenticatedEncryption()
     {
         $cipher = new AsymmetricCipher();
         $sender = $cipher->generateKeyPair('rsa', 2048);
@@ -82,7 +80,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         $cipher->encryptAuthenticated('secret', $sender->private(), $recipient->public());
     }
 
-    public function testExportedRsaKeyDecryptsLater(): void
+    public function testExportedRsaKeyDecryptsLater()
     {
         $cipher = new AsymmetricCipher();
         $recipient = $cipher->generateKeyPair('rsa', 2048);
@@ -93,7 +91,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         self::assertSame('persisted', $cipher->decryptAnonymous($ciphertext, $reloaded));
     }
 
-    public function testRsaCiphertextDoesNotDecryptWithX25519Key(): void
+    public function testRsaCiphertextDoesNotDecryptWithX25519Key()
     {
         if (!\function_exists('sodium_crypto_box_seal')) {
             self::markTestSkipped('ext-sodium is required for X25519 keys.');
@@ -109,7 +107,7 @@ final class AsymmetricCipherRsaTest extends TestCase
         $cipher->decryptAnonymous($ciphertext, $x25519Recipient);
     }
 
-    public function testX25519CiphertextDoesNotDecryptWithRsaKey(): void
+    public function testX25519CiphertextDoesNotDecryptWithRsaKey()
     {
         if (!\function_exists('sodium_crypto_box_seal')) {
             self::markTestSkipped('ext-sodium is required for X25519 keys.');

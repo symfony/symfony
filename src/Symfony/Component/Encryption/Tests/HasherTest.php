@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\Encryption\Hasher;
 
 final class HasherTest extends TestCase
 {
-    public function testKnownSha256Vector(): void
+    public function testKnownSha256Vector()
     {
         $hasher = new Hasher();
 
@@ -31,21 +29,21 @@ final class HasherTest extends TestCase
         );
     }
 
-    public function testDefaultAlgorithmIsSha256(): void
+    public function testDefaultAlgorithmIsSha256()
     {
         $hasher = new Hasher();
 
         self::assertSame($hasher->hash('abc', 'sha256'), $hasher->hash('abc'));
     }
 
-    public function testSelectableAlgorithm(): void
+    public function testSelectableAlgorithm()
     {
         $hasher = new Hasher();
 
         self::assertSame(hash('sha512', 'abc'), $hasher->hash('abc', 'sha512'));
     }
 
-    public function testBase64Output(): void
+    public function testBase64Output()
     {
         $hasher = new Hasher();
 
@@ -55,14 +53,14 @@ final class HasherTest extends TestCase
         );
     }
 
-    public function testRawOutput(): void
+    public function testRawOutput()
     {
         $hasher = new Hasher();
 
         self::assertSame(hash('sha256', 'abc', true), $hasher->raw('abc'));
     }
 
-    public function testUnsupportedAlgorithmThrows(): void
+    public function testUnsupportedAlgorithmThrows()
     {
         $hasher = new Hasher();
 
@@ -71,7 +69,7 @@ final class HasherTest extends TestCase
         $hasher->hash('abc', 'md5');
     }
 
-    public function testConstructorRejectsUnsupportedDefaultAlgorithm(): void
+    public function testConstructorRejectsUnsupportedDefaultAlgorithm()
     {
         $this->expectException(UnsupportedAlgorithmException::class);
 

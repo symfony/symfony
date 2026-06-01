@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption;
 
 use Symfony\Component\Encryption\Engine\EngineSelector;
@@ -85,7 +83,7 @@ final class Signer implements SignerInterface
         $this->assertSigningKey($key);
         $signature = $this->engines->signatureEngine($key->algorithm())->sign($message, $key->bytes());
 
-        return Encoding::toBase64(pack('n', \strlen($signature)) . $signature . $message);
+        return Encoding::toBase64(pack('n', \strlen($signature)).$signature.$message);
     }
 
     #[\Override]

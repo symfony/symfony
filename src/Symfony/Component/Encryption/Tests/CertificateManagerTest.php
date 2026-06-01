@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\Encryption\Exception\CertificateException;
 
 final class CertificateManagerTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!\extension_loaded('openssl')) {
             self::markTestSkipped('ext-openssl is required.');
@@ -46,7 +44,7 @@ final class CertificateManagerTest extends TestCase
         return [$certPem, $privateKeyPem];
     }
 
-    public function testLoadParsesCertificate(): void
+    public function testLoadParsesCertificate()
     {
         [$pem] = $this->selfSigned();
 
@@ -59,14 +57,14 @@ final class CertificateManagerTest extends TestCase
         self::assertFalse($cert->isExpired());
     }
 
-    public function testLoadRejectsGarbage(): void
+    public function testLoadRejectsGarbage()
     {
         $this->expectException(CertificateException::class);
 
         (new CertificateManager())->load('not a certificate');
     }
 
-    public function testIsSelfSigned(): void
+    public function testIsSelfSigned()
     {
         $manager = new CertificateManager();
         [$pem] = $this->selfSigned();
@@ -74,7 +72,7 @@ final class CertificateManagerTest extends TestCase
         self::assertTrue($manager->isSelfSigned($manager->load($pem)));
     }
 
-    public function testVerifyAgainstIssuer(): void
+    public function testVerifyAgainstIssuer()
     {
         $manager = new CertificateManager();
         [$pem] = $this->selfSigned();
@@ -84,7 +82,7 @@ final class CertificateManagerTest extends TestCase
         self::assertTrue($manager->verify($cert, $cert));
     }
 
-    public function testVerifyRejectsUnrelatedIssuer(): void
+    public function testVerifyRejectsUnrelatedIssuer()
     {
         $manager = new CertificateManager();
         $a = $manager->load($this->selfSigned('a.example')[0]);

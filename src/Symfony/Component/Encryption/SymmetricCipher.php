@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption;
 
 use Symfony\Component\Encryption\Engine\EngineSelector;
@@ -166,7 +164,7 @@ final class SymmetricCipher implements SymmetricCipherInterface
     }
 
     /**
-     * @param-out null|string $key
+     * @param-out string|null $key
      */
     private function wipe(string &$key): void
     {

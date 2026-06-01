@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -19,14 +17,14 @@ use Symfony\Component\Encryption\Engine\Phpseclib\PhpseclibEcdsaSignatureEngine;
 
 final class EcdsaSignatureEngineInteropTest extends TestCase
 {
-    protected function setUp(): void
+    protected function setUp()
     {
         if (!(new OpenSslEcdsaSignatureEngine())->isAvailable() || !(new PhpseclibEcdsaSignatureEngine())->isAvailable()) {
             self::markTestSkipped('Both OpenSSL and phpseclib ECDSA engines are required.');
         }
     }
 
-    public function testOpenSslSignsPhpseclibVerifies(): void
+    public function testOpenSslSignsPhpseclibVerifies()
     {
         $openssl = new OpenSslEcdsaSignatureEngine();
         $phpseclib = new PhpseclibEcdsaSignatureEngine();
@@ -37,7 +35,7 @@ final class EcdsaSignatureEngineInteropTest extends TestCase
         self::assertTrue($phpseclib->verify($signature, 'cross-engine', $public));
     }
 
-    public function testPhpseclibSignsOpenSslVerifies(): void
+    public function testPhpseclibSignsOpenSslVerifies()
     {
         $openssl = new OpenSslEcdsaSignatureEngine();
         $phpseclib = new PhpseclibEcdsaSignatureEngine();

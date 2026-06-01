@@ -9,15 +9,13 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
 
 final class SmokeTest extends TestCase
 {
-    public function testAutoloadingAndPhpUnitWork(): void
+    public function testAutoloadingAndPhpUnitWork()
     {
         self::assertTrue(true);
     }

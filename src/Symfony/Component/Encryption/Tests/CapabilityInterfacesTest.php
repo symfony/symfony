@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -23,17 +21,17 @@ use Symfony\Component\Encryption\PasswordHasherInterface;
 
 final class CapabilityInterfacesTest extends TestCase
 {
-    public function testHasherImplementsInterface(): void
+    public function testHasherImplementsInterface()
     {
         self::assertInstanceOf(HasherInterface::class, new Hasher());
     }
 
-    public function testMacImplementsInterface(): void
+    public function testMacImplementsInterface()
     {
         self::assertInstanceOf(MacInterface::class, new Mac());
     }
 
-    public function testPasswordHasherImplementsInterface(): void
+    public function testPasswordHasherImplementsInterface()
     {
         if (!\extension_loaded('sodium')) {
             self::markTestSkipped('ext-sodium is required.');

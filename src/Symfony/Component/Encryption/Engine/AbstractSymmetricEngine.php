@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Engine;
 
 use Symfony\Component\Encryption\Exception\InvalidArgumentException;
@@ -29,20 +27,12 @@ abstract class AbstractSymmetricEngine implements SymmetricEngineInterface
     {
         $keyLen = \strlen($key);
         if (self::KEY_BYTES !== $keyLen) {
-            throw new InvalidKeyException(\sprintf(
-                'Key must be exactly %d bytes; got %d.',
-                self::KEY_BYTES,
-                $keyLen,
-            ));
+            throw new InvalidKeyException(\sprintf('Key must be exactly %d bytes; got %d.', self::KEY_BYTES, $keyLen));
         }
 
         $nonceLen = \strlen($nonce);
         if (self::NONCE_BYTES !== $nonceLen) {
-            throw new InvalidArgumentException(\sprintf(
-                'Nonce must be exactly %d bytes; got %d.',
-                self::NONCE_BYTES,
-                $nonceLen,
-            ));
+            throw new InvalidArgumentException(\sprintf('Nonce must be exactly %d bytes; got %d.', self::NONCE_BYTES, $nonceLen));
         }
     }
 }

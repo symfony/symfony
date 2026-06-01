@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Certificate;
 
 use PHPUnit\Framework\TestCase;
@@ -31,7 +29,7 @@ final class DistinguishedNameTest extends TestCase
         ]);
     }
 
-    public function testNamedAccessors(): void
+    public function testNamedAccessors()
     {
         $dn = $this->dn();
 
@@ -44,7 +42,7 @@ final class DistinguishedNameTest extends TestCase
         self::assertSame('admin@example.com', $dn->emailAddress());
     }
 
-    public function testMissingFieldsAreNull(): void
+    public function testMissingFieldsAreNull()
     {
         $dn = new DistinguishedName(['CN' => 'minimal.example']);
 
@@ -53,7 +51,7 @@ final class DistinguishedNameTest extends TestCase
         self::assertNull($dn->country());
     }
 
-    public function testGetAndToArray(): void
+    public function testGetAndToArray()
     {
         $dn = $this->dn();
 
@@ -62,7 +60,7 @@ final class DistinguishedNameTest extends TestCase
         self::assertSame('example.com', $dn->toArray()['CN']);
     }
 
-    public function testEquals(): void
+    public function testEquals()
     {
         $a = new DistinguishedName(['CN' => 'x', 'O' => 'y']);
         $b = new DistinguishedName(['CN' => 'x', 'O' => 'y']);

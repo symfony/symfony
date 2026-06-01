@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Engine;
 
 use PHPUnit\Framework\TestCase;
@@ -23,7 +21,7 @@ final class PhpseclibRsaEngineTest extends TestCase
 {
     private PhpseclibRsaEngine $engine;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->engine = new PhpseclibRsaEngine();
         if (!$this->engine->isAvailable()) {
@@ -31,7 +29,7 @@ final class PhpseclibRsaEngineTest extends TestCase
         }
     }
 
-    public function testGenerateKeyPairProducesPemKeys(): void
+    public function testGenerateKeyPairProducesPemKeys()
     {
         [$public, $private] = $this->engine->generateKeyPair(2048);
 
@@ -39,7 +37,7 @@ final class PhpseclibRsaEngineTest extends TestCase
         self::assertStringContainsString('PRIVATE KEY', $private);
     }
 
-    public function testWrapUnwrapRoundTrip(): void
+    public function testWrapUnwrapRoundTrip()
     {
         [$public, $private] = $this->engine->generateKeyPair(2048);
         $secret = random_bytes(32);
@@ -50,7 +48,7 @@ final class PhpseclibRsaEngineTest extends TestCase
         self::assertSame($secret, $this->engine->unwrap($wrapped, $private));
     }
 
-    public function testUnwrapWithWrongKeyFails(): void
+    public function testUnwrapWithWrongKeyFails()
     {
         [$public] = $this->engine->generateKeyPair(2048);
         [, $otherPrivate] = $this->engine->generateKeyPair(2048);
@@ -61,21 +59,21 @@ final class PhpseclibRsaEngineTest extends TestCase
         $this->engine->unwrap($wrapped, $otherPrivate);
     }
 
-    public function testRejectsTooSmallKeySize(): void
+    public function testRejectsTooSmallKeySize()
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->engine->generateKeyPair(1024);
     }
 
-    public function testWrapWithInvalidPublicKeyThrowsInvalidKeyException(): void
+    public function testWrapWithInvalidPublicKeyThrowsInvalidKeyException()
     {
         $this->expectException(InvalidKeyException::class);
 
         $this->engine->wrap('secret', 'not-a-pem');
     }
 
-    public function testName(): void
+    public function testName()
     {
         self::assertSame('phpseclib-rsa', $this->engine->name());
     }

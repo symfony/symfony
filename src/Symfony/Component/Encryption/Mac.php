@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption;
 
 use Symfony\Component\Encryption\Exception\InvalidArgumentException;
@@ -80,11 +78,7 @@ final class Mac implements MacInterface
     private function assertSupported(string $algorithm): void
     {
         if (!\in_array($algorithm, self::ALLOWED, true) || !\in_array($algorithm, hash_hmac_algos(), true)) {
-            throw new UnsupportedAlgorithmException(sprintf(
-                'Unsupported MAC algorithm "%s". Supported: %s.',
-                $algorithm,
-                implode(', ', self::ALLOWED),
-            ));
+            throw new UnsupportedAlgorithmException(sprintf('Unsupported MAC algorithm "%s". Supported: %s.', $algorithm, implode(', ', self::ALLOWED)));
         }
     }
 }

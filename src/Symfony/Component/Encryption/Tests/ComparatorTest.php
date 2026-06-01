@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests;
 
 use PHPUnit\Framework\TestCase;
@@ -18,22 +16,22 @@ use Symfony\Component\Encryption\Comparator;
 
 final class ComparatorTest extends TestCase
 {
-    public function testEqualStringsMatch(): void
+    public function testEqualStringsMatch()
     {
         self::assertTrue(Comparator::equals('correct-horse', 'correct-horse'));
     }
 
-    public function testDifferentStringsDoNotMatch(): void
+    public function testDifferentStringsDoNotMatch()
     {
         self::assertFalse(Comparator::equals('correct-horse', 'battery-staple'));
     }
 
-    public function testDifferentLengthsDoNotMatch(): void
+    public function testDifferentLengthsDoNotMatch()
     {
         self::assertFalse(Comparator::equals('short', 'considerably-longer'));
     }
 
-    public function testEmptyStringsMatch(): void
+    public function testEmptyStringsMatch()
     {
         self::assertTrue(Comparator::equals('', ''));
     }

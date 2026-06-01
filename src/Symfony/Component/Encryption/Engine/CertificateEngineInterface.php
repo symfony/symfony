@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Engine;
 
 /**
@@ -65,13 +63,13 @@ interface CertificateEngineInterface
     public function generateKeyPair(string $algorithm, int $rsaKeyBits): array;
 
     /**
-     * @param array<string, string> $subject Short-name DN fields (CN, O, ...)
+     * @param array<string, string> $subject  Short-name DN fields (CN, O, ...)
      * @param list<string>          $dnsNames
      */
     public function createCsr(array $subject, string $privateKeyPem, array $dnsNames): string;
 
     /**
-     * @param array<string, string> $subject Short-name DN fields (CN, O, ...)
+     * @param array<string, string> $subject  Short-name DN fields (CN, O, ...)
      * @param list<string>          $dnsNames
      */
     public function createSelfSigned(array $subject, string $privateKeyPem, int $days, array $dnsNames, int $serial): string;

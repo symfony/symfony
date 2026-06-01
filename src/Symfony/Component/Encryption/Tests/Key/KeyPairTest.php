@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Key;
 
 use PHPUnit\Framework\TestCase;
@@ -20,7 +18,7 @@ use Symfony\Component\Encryption\Key\PublicKey;
 
 final class KeyPairTest extends TestCase
 {
-    public function testExposesPublicAndPrivate(): void
+    public function testExposesPublicAndPrivate()
     {
         $sk = random_bytes(32);
         $private = PrivateKey::fromBytes('x25519', 'encryption', $sk);
@@ -31,7 +29,7 @@ final class KeyPairTest extends TestCase
         self::assertSame('x25519', $pair->algorithm());
     }
 
-    public function testExportImportReconstructsBothKeys(): void
+    public function testExportImportReconstructsBothKeys()
     {
         $private = PrivateKey::fromBytes('x25519', 'encryption', random_bytes(32));
         $pair = new KeyPair($private->derivePublic(), $private);

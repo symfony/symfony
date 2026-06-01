@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption;
 
 use Symfony\Component\Encryption\Exception\UnsupportedAlgorithmException;
@@ -72,11 +70,7 @@ final class Hasher implements HasherInterface
     private function assertSupported(string $algorithm): void
     {
         if (!\in_array($algorithm, self::ALLOWED, true) || !\in_array($algorithm, hash_algos(), true)) {
-            throw new UnsupportedAlgorithmException(sprintf(
-                'Unsupported hash algorithm "%s". Supported: %s.',
-                $algorithm,
-                implode(', ', self::ALLOWED),
-            ));
+            throw new UnsupportedAlgorithmException(sprintf('Unsupported hash algorithm "%s". Supported: %s.', $algorithm, implode(', ', self::ALLOWED)));
         }
     }
 }

@@ -40,7 +40,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-          composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
+          composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs phpseclib/phpseclib
 
       - name: Generate Psalm baseline
         run: ./vendor/bin/psalm.phar --set-baseline=.github/sa-tools/psalm.baseline.xml --no-progress
@@ -79,7 +79,7 @@ jobs:
           ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
           export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
           composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-          composer require --no-progress --ansi --no-plugins phpstan/phpstan:@stable phpstan/phpstan-deprecation-rules:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
+          composer require --no-progress --ansi --no-plugins phpstan/phpstan:@stable phpstan/phpstan-deprecation-rules:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb phpseclib/phpseclib
 
       - name: Generate PHPStan baseline
         run: ./vendor/bin/phpstan analyse --generate-baseline=.github/sa-tools/phpstan.baseline.neon --allow-empty-baseline --no-progress

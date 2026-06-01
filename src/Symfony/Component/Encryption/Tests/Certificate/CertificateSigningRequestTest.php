@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Component\Encryption\Tests\Certificate;
 
 use PHPUnit\Framework\TestCase;
@@ -19,7 +17,7 @@ use Symfony\Component\Encryption\Certificate\DistinguishedName;
 
 final class CertificateSigningRequestTest extends TestCase
 {
-    public function testAccessors(): void
+    public function testAccessors()
     {
         $subject = new DistinguishedName(['CN' => 'example.com']);
         $csr = new CertificateSigningRequest(

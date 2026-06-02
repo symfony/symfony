@@ -101,7 +101,7 @@ final class ControllerEvent extends KernelEvent
             };
             $attributes = [];
 
-            foreach (array_merge($class?->getAttributes() ?? [], $this->controllerReflector->getAttributes()) as $attribute) {
+            foreach (array_merge($this->controllerReflector->getAttributes(), $class->getAttributes() ?? []) as $attribute) {
                 if (class_exists($attribute->getName())) {
                     $attributes[] = $attribute->newInstance();
                 }

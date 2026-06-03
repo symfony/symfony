@@ -1,0 +1,39 @@
+<div id="sfToolbarClearer-{{ token }}" class="sf-toolbar-clearer"></div>
+<div id="sfToolbarMainContent-{{ token }}" class="sf-toolbarreset notranslate clear-fix" data-no-turbolink data-turbo="false">
+    {% for name, template in templates %}
+        {% if block('toolbar', template) is defined %}
+            {% with {
+                collector: profile ? profile.getcollector(name) : null,
+                profiler_url: profiler_url,
+                token: token ?? (profile ? profile.token : null),
+                name: name,
+                profiler_markup_version: profiler_markup_version,
+                csp_script_nonce: csp_script_nonce,
+                csp_style_nonce: csp_style_nonce,
+              } %}
+                {{ block('toolbar', template) }}
+            {% endwith %}
+        {% endif %}
+    {% endfor %}
+    {% if full_stack %}
+        <div class="sf-full-stack sf-toolbar-block sf-toolbar-block-full-stack sf-toolbar-status-red sf-toolbar-block-right">
+            <div class="sf-toolbar-icon">
+                <span class="sf-toolbar-value">Using symfony/symfony is NOT supported</span>
+            </div>
+            <div class="sf-toolbar-info sf-toolbar-status-red">
+                <p>This project is using Symfony via the "symfony/symfony" package.</p>
+                <p>This is NOT supported anymore since Symfony 4.0.</p>
+                <p>Even if it seems to work well, it has some important limitations with no workarounds.</p>
+                <p>Using this package also makes your project slower.</p>
+
+                <strong>Please, stop using this package and replace it with individual packages instead.</strong>
+            </div>
+            <div></div>
+        </div>
+    {% endif %}
+
+    <button class="sf-toolbar-toggle-button" type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}" aria-label="Toggle Symfony Toolbar">
+        <i class="sf-toolbar-icon-opened" title="Close Toolbar">{{ source('@WebProfiler/Icon/close.svg') }}</i>
+        <i class="sf-toolbar-icon-closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
+    </button>
+</div>

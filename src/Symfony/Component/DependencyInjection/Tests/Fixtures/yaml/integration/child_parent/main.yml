@@ -1,0 +1,12 @@
+services:
+    parent_service:
+        abstract: true
+        lazy: true
+        autowire: false
+        tags: [from_parent]
+
+    child_service:
+        class: stdClass
+        parent: parent_service
+        public: true
+        tags: [from_child]

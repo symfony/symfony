@@ -1,0 +1,32 @@
+.container {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+.container .container {
+    padding: 0;
+}
+
+.exception-summary {
+    background: var(--base-0);
+    border: var(--border);
+    box-shadow: 0 0 1px rgba(128, 128, 128, .2);
+    margin: 1em 0;
+    padding: 10px;
+}
+.exception-summary.exception-without-message {
+    display: none;
+}
+
+.exception-message {
+    color: var(--color-error);
+}
+
+.exception-metadata,
+.exception-illustration {
+    display: none;
+}
+
+.exception-message-wrapper .container {
+    min-height: unset;
+}

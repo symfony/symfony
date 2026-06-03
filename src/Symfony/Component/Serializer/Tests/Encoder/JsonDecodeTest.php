@@ -1,0 +1,72 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Serializer\Tests\Encoder;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
+
+class JsonDecodeTest extends TestCase
+{
+    private JsonDecode $decode;
+
+    protected function setUp(): void
+    {
+        $this->decode = new JsonDecode();
+    }
+
+    public function testSupportsDecoding()
+    {
+        $this->assertTrue($this->decode->supportsDecoding(JsonEncoder::FORMAT));
+        $this->assertFalse($this->decode->supportsDecoding('foobar'));
+    }
+
+    #[DataProvider('decodeProvider')]
+    public function testDecode($toDecode, $expected, $context)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->decode->decode($toDecode, JsonEncoder::FORMAT, $context)
+        );
+    }
+
+    public static function decodeProvider()
+    {
+        $stdClass = new \stdClass();
+        $stdClass->foo = 'bar';
+
+        return [
+            ['{"foo": "bar"}', $stdClass, []],
+            ['{"foo": "bar"}', ['foo' => 'bar'], ['json_decode_associative' => true]],
+        ];
+    }
+
+    #[DataProvider('decodeProviderException')]
+    public function testDecodeWithException(string $value, string $expectedExceptionMessage, array $context)
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+        $this->decode->decode($value, JsonEncoder::FORMAT, $context);
+    }
+
+    public static function decodeProviderException()
+    {
+        return [
+            ["{'foo': 'bar'}", 'Syntax error', []],
+            ["{'foo': 'bar'}", 'single quotes instead of double quotes', ['json_decode_detailed_errors' => true]],
+            ['kaboom!', 'Syntax error', ['json_decode_detailed_errors' => false]],
+            ['kaboom!', "Expected one of: 'STRING', 'NUMBER', 'NULL',", ['json_decode_detailed_errors' => true]],
+        ];
+    }
+}

@@ -1,0 +1,42 @@
+{
+    "signature": {
+        "token": "bbb203bc8d6602b6b22e4ce88a074f73fecb68d3a96e9c8318",
+        "timestamp": "1661621752",
+        "signature": "695c5558b2f9b7a05c73081c860688595fde006c60614e9d6841cc889c4c8c9f"
+    },
+    "event-data": {
+        "id": "Ase7i2zsRYeDXztHGENqRA",
+        "timestamp": 1521243339.873676,
+        "log-level": "info",
+        "event": "opened",
+        "message": {
+            "headers": {
+                "message-id": "20130503182626.18666.16540@app.symfony.com"
+            }
+        },
+        "recipient": "alice@example.com",
+        "recipient-domain": "example.com",
+        "ip": "50.56.129.169",
+        "geolocation": {
+            "country": "US",
+            "region": "CA",
+            "city": "San Francisco"
+        },
+        "client-info": {
+            "client-os": "Linux",
+            "device-type": "desktop",
+            "client-name": "Chrome",
+            "client-type": "browser",
+            "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31"
+        },
+        "campaigns": [],
+        "tags": [
+            "my_tag_1",
+            "my_tag_2"
+        ],
+        "user-variables": {
+            "my_var_1": "Mailgun Variable #1",
+            "my-var-2": "awesome"
+        }
+    }
+}

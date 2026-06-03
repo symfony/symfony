@@ -1,0 +1,26 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    translator: true
+    validation: true
+    serializer: true
+
+twig:
+    strict_variables: '%kernel.debug%'
+
+services:
+    twig.alias:
+        alias: twig
+
+    validator.alias:
+        alias: validator
+        public: true
+
+    serializer.alias:
+        alias: serializer
+        public: true
+
+    translator.alias:
+        alias: translator
+        public: true

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+  <parameter key="array">[12,"Hello world!",true]</parameter>
+  <parameter key="boolean">true</parameter>
+  <parameter key="integer">12</parameter>
+  <parameter key="string">Hello world!</parameter>
+</parameters>

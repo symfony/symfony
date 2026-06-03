@@ -1,0 +1,12 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: stdClass
+        public: true
+        tags:
+            - proxy: { interface: SomeInterface }
+        lazy: true

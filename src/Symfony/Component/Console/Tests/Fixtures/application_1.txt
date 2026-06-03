@@ -1,0 +1,18 @@
+Console Tool
+
+<comment>Usage:</comment>
+  command [options] [arguments]
+
+<comment>Options:</comment>
+  <info>-h, --help</info>            Display help for the given command. When no command is given display help for the <info>list</info> command
+  <info>    --silent</info>          Do not output any message
+  <info>-q, --quiet</info>           Only errors are displayed. All other output is suppressed
+  <info>-V, --version</info>         Display this application version
+  <info>    --ansi|--no-ansi</info>  Force (or disable --no-ansi) ANSI output
+  <info>-n, --no-interaction</info>  Do not ask any interactive question
+  <info>-v|vv|vvv, --verbose</info>  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+<comment>Available commands:</comment>
+  <info>completion</info>  Dump the shell completion script
+  <info>help</info>        Display help for a command
+  <info>list</info>        List commands

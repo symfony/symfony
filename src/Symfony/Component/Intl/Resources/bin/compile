@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+[[ ! -d /tmp/symfony/icu ]] && mkdir -p /tmp/symfony/icu
+
+docker run \
+    -it --rm --name symfony-intl \
+    -u $(id -u):$(id -g) \
+    -v /tmp/symfony/icu:/tmp \
+    -v $(pwd):/symfony \
+    -w /symfony \
+    jakzal/php-intl:8.4-77.1 \
+    php src/Symfony/Component/Intl/Resources/bin/update-data.php

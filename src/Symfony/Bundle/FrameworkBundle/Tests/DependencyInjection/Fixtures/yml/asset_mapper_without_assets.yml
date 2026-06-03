@@ -1,0 +1,3 @@
+framework:
+    asset_mapper: ~
+    assets: false

@@ -1,0 +1,44 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
+
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+/**
+ * @author Jérémy Derussé <jeremy@derusse.com>
+ *
+ * @implements TransportFactoryInterface<AmazonSqsTransport>
+ */
+class AmazonSqsTransportFactory implements TransportFactoryInterface
+{
+    public function __construct(
+        private ?LoggerInterface $logger = null,
+        private ?HttpClientInterface $httpClient = null,
+    ) {
+    }
+
+    public function createTransport(#[\SensitiveParameter] string $dsn, array $options, SerializerInterface $serializer): TransportInterface
+    {
+        unset($options['transport_name']);
+
+        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, $this->httpClient, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false));
+    }
+
+    public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
+    {
+        return str_starts_with($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.com/.+#', $dsn);
+    }
+}

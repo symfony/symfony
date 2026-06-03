@@ -1,0 +1,57 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Ldap\Adapter\ExtLdap;
+
+use Symfony\Component\Ldap\Exception\UpdateOperationException;
+
+class UpdateOperation
+{
+    private const VALID_OPERATION_TYPES = [
+        \LDAP_MODIFY_BATCH_ADD,
+        \LDAP_MODIFY_BATCH_REMOVE,
+        \LDAP_MODIFY_BATCH_REMOVE_ALL,
+        \LDAP_MODIFY_BATCH_REPLACE,
+    ];
+
+    /**
+     * @param int    $operationType An LDAP_MODIFY_BATCH_* constant
+     * @param string $attribute     The attribute to batch modify on
+     *
+     * @throws UpdateOperationException on consistency errors during construction
+     */
+    public function __construct(
+        private int $operationType,
+        private string $attribute,
+        private ?array $values,
+    ) {
+        if (!\in_array($operationType, self::VALID_OPERATION_TYPES, true)) {
+            throw new UpdateOperationException(\sprintf('"%s" is not a valid modification type.', $operationType));
+        }
+        if (\LDAP_MODIFY_BATCH_REMOVE_ALL === $operationType && null !== $values) {
+            throw new UpdateOperationException(\sprintf('$values must be null for LDAP_MODIFY_BATCH_REMOVE_ALL operation, "%s" given.', get_debug_type($values)));
+        }
+    }
+
+    public function toArray(): array
+    {
+        $op = [
+            'attrib' => $this->attribute,
+            'modtype' => $this->operationType,
+        ];
+
+        if (\LDAP_MODIFY_BATCH_REMOVE_ALL !== $this->operationType) {
+            $op['values'] = $this->values;
+        }
+
+        return $op;
+    }
+}

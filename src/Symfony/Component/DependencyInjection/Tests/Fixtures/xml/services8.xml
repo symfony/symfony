@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <parameters>
+    <parameter key="foo">%baz%</parameter>
+    <parameter key="baz">bar</parameter>
+    <parameter key="bar">foo is %%foo bar</parameter>
+    <parameter key="escape">@escapeme</parameter>
+    <parameter key="values" type="collection">
+      <parameter>true</parameter>
+      <parameter>false</parameter>
+      <parameter>null</parameter>
+      <parameter>0</parameter>
+      <parameter>1000.3</parameter>
+      <parameter type="string">true</parameter>
+      <parameter type="string">false</parameter>
+      <parameter type="string">null</parameter>
+    </parameter>
+    <parameter key="utf-8 valid string">&#x21B;&#x1B56;	test</parameter>
+    <parameter key="binary" type="binary">8PDw8A==</parameter>
+    <parameter key="binary-control-char" type="binary">VGhpcyBpcyBhIEJlbGwgY2hhciAH</parameter>
+    <parameter key="console banner" type="binary">G1szNzs0NG1IZWxsbxtbMzA7NDNtV29ybGQbWzBt</parameter>
+    <parameter key="null string" type="string">null</parameter>
+    <parameter key="string of digits" type="string">123</parameter>
+    <parameter key="string of digits prefixed with minus character" type="string">-123</parameter>
+    <parameter key="true string" type="string">true</parameter>
+    <parameter key="false string" type="string">false</parameter>
+    <parameter key="binary number string" type="string">0b0110</parameter>
+    <parameter key="numeric string" type="string">-1.2E2</parameter>
+    <parameter key="hexadecimal number string" type="string">0xFF</parameter>
+    <parameter key="float string" type="string">10100.1</parameter>
+    <parameter key="positive float string" type="string">+10100.1</parameter>
+    <parameter key="negative float string" type="string">-10100.1</parameter>
+  </parameters>
+  <services>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
+  </services>
+</container>

@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="sq" datatype="plaintext" original="file.ext">
+        <header>
+            <note>
+                Për fjalët e huaja, të cilat nuk kanë përkthim të drejtpërdrejtë, ju lutemi të ndiqni rregullat e mëposhtme:
+                  a) në rast se emri është akronim i përdorur gjerësisht si i përveçëm, atëherë, emri lakohet pa thonjëza dhe mbaresa shkruhet me vizë ndarëse. Gjinia gjykohet sipas rastit. Shembull: JSON (mashkullore)
+                  b) në rast se emri është akronim i papërdorur gjerësisht si i përveçëm, atëherë, emri lakohet pa thonjëza dhe mbaresa shkruhet me vizë ndarëse. Gjinia është femërore. Shembull: URL (femërore)
+                  c) në rast se emri duhet lakuar për shkak të rasës në fjali, atëherë, emri lakohet pa thonjëza dhe mbaresa shkruhet me vizë ndarëse. Shembull: host-i, prej host-it
+                  d) në rast se emri nuk duhet lakuar për shkak të trajtës në fjali, atëherë, emri rrethote me thonjëzat “”. Shembull: “locale”
+            </note>
+        </header>
+        <body>
+            <trans-unit id="1">
+                <source>This value should be false.</source>
+                <target>Kjo vlerë duhet të jetë e pavërtetë (false).</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>This value should be true.</source>
+                <target>Kjo vlerë duhet të jetë e vërtetë (true).</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>This value should be of type {{ type }}.</source>
+                <target>Kjo vlerë duhet të jetë e llojit {{ type }}.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>This value should be blank.</source>
+                <target>Kjo vlerë duhet të jetë e zbrazët.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>The value you selected is not a valid choice.</source>
+                <target>Vlera që keni zgjedhur nuk është alternativë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>Duhet të zgjidhni së paku {{ limit }} alternativë.|Duhet të zgjidhni së paku {{ limit }} alternativa.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>Duhet të zgjidhni së shumti {{ limit }} alternativë.|Duhet të zgjidhni së shumti {{ limit }} alternativa.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>One or more of the given values is invalid.</source>
+                <target>Një apo më shumë nga vlerat e dhëna janë të pavlefshme.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>This field was not expected.</source>
+                <target>Kjo fushë nuk pritej.</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>This field is missing.</source>
+                <target>Kjo fushë mungon.</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This value is not a valid date.</source>
+                <target>Kjo vlerë nuk është datë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>This value is not a valid datetime.</source>
+                <target>Kjo vlerë nuk është datë dhe orë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>This value is not a valid email address.</source>
+                <target>Kjo vlerë nuk është email adresë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>The file could not be found.</source>
+                <target>Fajli nuk u gjet.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>The file is not readable.</source>
+                <target>Fajli nuk është e lexueshme.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Fajli është shumë e madhe ({{ size }} {{ suffix }}). Madhësia maksimale e lejuar është {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>Lloji “mime” i fajlit është i pavlefshëm ({{ type }}). Llojet “mime” të lejuara janë {{ types }}.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>Kjo vlerë duhet të jetë {{ limit }} ose më pak.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>Kjo vlerë është shumë e gjatë. Duhet të përmbajë {{ limit }} karakter ose më pak.|Kjo vlerë është shumë e gjatë. Duhet të përmbajë {{ limit }} karaktere ose më pak.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>Kjo vlerë duhet të jetë {{ limit }} ose më shumë.</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>Kjo vlerë është shumë e shkurtër. Duhet të përmbajë {{ limit }} karakter ose më shumë.|Kjo vlerë është shumë e shkurtër. Duhet të përmbajë {{ limit }} karaktere ose më shumë.</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should not be blank.</source>
+                <target>Kjo vlerë nuk duhet të jetë e zbrazët.</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should not be null.</source>
+                <target>Kjo vlerë nuk duhet të jetë “null”.</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be null.</source>
+                <target>Kjo vlerë duhet të jetë “null”.</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>This value is not valid.</source>
+                <target>Kjo vlerë nuk është e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>This value is not a valid time.</source>
+                <target>Kjo vlerë nuk është një orë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>This value is not a valid URL.</source>
+                <target>Kjo vlerë nuk është URL e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal.</source>
+                <target>Këto dy vlera duhet të jenë të barabarta.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>Ky fajl është shumë i madhë. Madhësia maksimale e lejuar është {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large.</source>
+                <target>Ky fajl është shumë i madhë.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded.</source>
+                <target>Ky fajl nuk mund të ngarkohet.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>Kjo vlerë duhet të jetë një numër i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>Ky fajl nuk është një imazh i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Kjo vlerë nuk është një adresë IP e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>Kjo vlerë nuk është një gjuhë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Kjo vlerë nuk është nje “locale” e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Kjo vlerë nuk është një shtet i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>Kjo vlerë është tashmë në përdorim.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>Madhësia e imazhit nuk mund të zbulohet.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Gjerësia e imazhit është shumë e madhe ({{ width }}px). Gjerësia maksimale e lejuar është {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Gjerësia e imazhit është shumë e vogël ({{ width }}px). Gjerësia minimale e pritur është {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Gjatësia e imazhit është shumë e madhe ({{ height }}px). Gjatësia maksimale e lejuar është {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Gjatësia e imazhit është shumë e vogël ({{ height }}px). Gjatësia minimale e pritur është {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user's current password.</source>
+                <target>Kjo vlerë duhet të jetë fjalëkalimi i tanishëm i përdoruesit.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target>Kjo vlerë duhet të ketë saktësisht {{ limit }} karakter.|Kjo vlerë duhet të ketë saktësisht {{ limit }} karaktere.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>Ky fajl është ngarkuar pjesërisht.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Nuk është ngarkuar ndonjë fajl.</target>
+            </trans-unit>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>Nuk është konfiguruar asnjë dosje e përkohshëm në php.ini, ose dosja e konfiguruar nuk ekziston.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>Nuk mund të shkruhet fajli e përkohshme në disk.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Një shtojcë PHP shkaktoi dështimin e ngarkimit.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Ky koleksion duhet të përmbajë {{ limit }} element ose më shumë.|Ky koleksion duhet të përmbajë {{ limit }} elemente ose më shumë.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Ky koleksion duhet të përmbajë {{ limit }} element ose më pak.|Ky koleksion duhet të përmbajë {{ limit }} elemente ose më pak.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Ky koleksion duhet të përmbajë saktësisht {{ limit }} element.|Ky koleksion duhet të përmbajë saktësisht {{ limit }} elemente.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Numër karte i pavlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Lloji i kartës i papërkrahur ose numër kartës i pavlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Kjo vlerë nuk është një Numër Llogarie Bankare Ndërkombëtare (IBAN) i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Kjo vlerë nuk është një ISBN-10 e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Kjo vlerë nuk është një ISBN-13 e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Kjo vlerë nuk është as ISBN-10 e vlefshme as ISBN-13 e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Kjo vlerë nuk është një ISSN e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Kjo vlerë nuk është një valutë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më e madhe se {{ compared_value }}. </target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më e madhe ose e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë identike me {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më vogël se {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë më e vogël ose e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Kjo vlerë nuk duhet të jetë e barabartë me {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Kjo vlerë nuk duhet të jetë identike me {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Raporti i imazhit është shumë i madh ({{ ratio }}). Raporti maksimal i lejuar është {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Raporti i imazhit është shumë i vogël ({{ ratio }}). Raporti minimal pritet të jetë {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>Imazhi është katror ({{ width }}x{{ height }}px). Imazhet katrore nuk janë të lejuara.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>Imazhi është i orientuar horizontalisht ({{ width }}x{{ height }}px). Imazhet e orientuara horizontalisht nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>Imazhi është i orientuar vertikalisht ({{ width }}x{{ height }}px). Imazhet orientuara vertikalisht nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>Një fajl i zbrazët nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>Host-i nuk mund te zbulohej.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Kjo vlerë nuk përputhet me kodifikimin e karaktereve {{ charset }} që pritej.</target>
+            </trans-unit>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Kjo vlerë nuk është një Kod Identifikues Biznesi (BIC) i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Gabim</target>
+            </trans-unit>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Kjo vlerë nuk është një UUID e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Kjo vlerë duhet të jetë një shumëfish i {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Ky Kod Identifikues Biznesi (BIC) nuk është i lidhur me IBAN {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Kjo vlerë duhet të jetë JSON i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Ky koleksion duhet të përmbajë vetëm elementë unikë.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Kjo vlerë duhet të jetë pozitive.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Kjo vlerë duhet të jetë pozitive ose zero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Kjo vlerë duhet të jetë negative.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Kjo vlerë duhet të jetë negative ose zero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Kjo vlerë nuk është një zonë e vlefshme kohore.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Ky fjalëkalim është zbuluar në një shkelje të të dhënave, nuk duhet të përdoret. Ju lutemi përdorni një fjalëkalim tjetër.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Kjo vlerë duhet të jetë ndërmjet {{ min }} dhe {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Kjo vlerë nuk është një emër i vlefshëm host-i.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>Numri i elementeve në këtë koleksion duhet të jetë një shumëfish i {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Kjo vlerë duhet të plotësojë të paktën njërën nga kufizimet e mëposhtme:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Secili element i këtij koleksioni duhet të përmbushë kufizimet e veta.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Kjo vlerë nuk është një numër i vlefshëm identifikues ndërkombëtar i sigurisë (ISIN).</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Kjo vlerë duhet të jetë një shprehje e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Kjo vlerë nuk është një ngjyrë e vlefshme CSS.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Kjo vlerë nuk është një shënim i vlefshëm CIDR.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>Vlera e maskës së rrjetit duhet të jetë ndërmjet {{ min }} dhe {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>Emri i fajlit është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karakter ose më pak.|Emri i fajlit është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karaktere ose më pak.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>Fuqia e fjalëkalimit është shumë e ulët. Ju lutemi përdorni një fjalëkalim më të fortë.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Kjo vlerë përmban karaktere që nuk lejohen nga niveli aktual i kufizimit.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>Përdorimi i karaktereve të padukshme nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>Përzierja e numrave nga shkrimet e ndryshme nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>Përdorimi i karaktereve të mbivendosura të fshehura nuk lejohet.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>Shtesa e fajlit është e pavlefshme ({{ extension }}). Shtesat e lejuara janë {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>Kodimi i karakterit të identifikuar është i pavlefshëm ({{ detected }}). Kodimet e lejuara janë {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Kjo nuk është një adresë e vlefshme e Kontrollit të Qasjes në Media (MAC).</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Kësaj URL-je i mungon një domain i nivelit të sipërm.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>Kjo vlerë është shumë e shkurtër. Duhet të përmbajë të paktën një fjalë.|Kjo vlerë është shumë e shkurtër. Duhet të përmbajë të paktën {{ min }} fjalë.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>Kjo vlerë është shumë e gjatë. Duhet të përmbajë një fjalë.|Kjo vlerë është shumë e gjatë. Duhet të përmbajë {{ max }} fjalë ose më pak.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>Kjo vlerë nuk përfaqëson një javë të vlefshme në formatin ISO 8601.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>Kjo vlerë nuk është një javë e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>Kjo vlerë nuk duhet të jetë para javës "{{ min }}".</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>Kjo vlerë nuk duhet të jetë pas javës "{{ max }}".</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>Kjo vlerë nuk është një shabllon Twig i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>Ky fajl nuk është video e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>Madhësia e videos nuk mund të zbulohej.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Gjerësia e videos është shumë e madhe ({{ width }}px). Gjerësia maksimale e lejuar është {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Gjerësia e videos është shumë e vogël ({{ width }}px). Gjerësia minimale e pritur është {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Lartësia e videos është shumë e madhe ({{ height }}px). Lartësia maksimale e lejuar është {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Lartësia e videos është shumë e vogël ({{ height }}px). Lartësia minimale e pritur është {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>Video ka shumë pak pikselë ({{ pixels }}). Sasia minimale e pritur është {{ min_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>Videoja ka tepër piksele ({{ pixels }}). Sasia maksimale e pritur është {{ max_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Raporti i videos është shumë i madh ({{ ratio }}). Raporti maksimal i lejuar është {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Raporti i videos është shumë i vogël ({{ ratio }}). Raporti minimal i pritur është {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>Videoja është katrore ({{ width }}x{{ height }}px). Videot katrore nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>Videoja është me orientim horizontal ({{ width }}x{{ height }}px). Videot horizontale nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>Videoja është me orientim portret ({{ width }}x{{ height }}px). Videot me orientim portret nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>Fajli i videos është i korruptuar.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>Videoja përmban disa rrjedha. Lejohet vetëm një rrjedhë.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>Kodeku videos është i pambështetur „{{ codec }}“.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>Kontejneri videos është i pambështetur "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>Fajli i imazhit është korruptuar.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>Imazhi ka shumë pak pikselë ({{ pixels }}). Sasia minimale e pritur është {{ min_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>Imazhi ka shumë pikselë ({{ pixels }}). Shuma maksimale e pritur është {{ max_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>Ky emër fajlit nuk përputhet me grupin e pritur të karaktereve.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

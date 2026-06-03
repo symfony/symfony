@@ -1,0 +1,7 @@
+{
+    "required": false,
+    "default": null,
+    "is_lazy": true,
+    "has_normalizer": false,
+    "has_nested_options": false
+}

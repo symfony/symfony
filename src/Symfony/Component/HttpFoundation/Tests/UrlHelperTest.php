@@ -1,0 +1,164 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpFoundation\Tests;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\UrlHelper;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RequestContextAwareInterface;
+
+class UrlHelperTest extends TestCase
+{
+    #[DataProvider('getGenerateAbsoluteUrlData')]
+    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo)
+    {
+        $stack = new RequestStack();
+        $stack->push(Request::create($pathinfo));
+        $helper = new UrlHelper($stack);
+
+        $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
+    }
+
+    public static function getGenerateAbsoluteUrlData()
+    {
+        return [
+            ['http://localhost/foo.png', '/foo.png', '/foo/bar.html'],
+            ['http://localhost/foo/foo.png', 'foo.png', '/foo/bar.html'],
+            ['http://localhost/foo/foo.png', 'foo.png', '/foo/bar'],
+            ['http://localhost/foo/bar/foo.png', 'foo.png', '/foo/bar/'],
+
+            ['http://example.com/baz', 'http://example.com/baz', '/'],
+            ['https://example.com/baz', 'https://example.com/baz', '/'],
+            ['//example.com/baz', '//example.com/baz', '/'],
+
+            ['http://localhost/foo/bar?baz', '?baz', '/foo/bar'],
+            ['http://localhost/foo/bar?baz=1', '?baz=1', '/foo/bar?foo=1'],
+            ['http://localhost/foo/baz?baz=1', 'baz?baz=1', '/foo/bar?foo=1'],
+
+            ['http://localhost/foo/bar#baz', '#baz', '/foo/bar'],
+            ['http://localhost/foo/bar?0#baz', '#baz', '/foo/bar?0'],
+            ['http://localhost/foo/bar?baz=1#baz', '?baz=1#baz', '/foo/bar?foo=1'],
+            ['http://localhost/foo/baz?baz=1#baz', 'baz?baz=1#baz', '/foo/bar?foo=1'],
+        ];
+    }
+
+    #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
+    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    {
+        if (!class_exists(RequestContext::class)) {
+            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+        }
+
+        $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
+
+        $helper = new UrlHelper(new RequestStack(), $requestContext);
+
+        $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
+    }
+
+    #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
+    public function testGenerateAbsoluteUrlWithRequestContextAwareInterface($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    {
+        if (!class_exists(RequestContext::class)) {
+            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+        }
+
+        $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
+        $contextAware = new class($requestContext) implements RequestContextAwareInterface {
+            public function __construct(
+                private RequestContext $requestContext,
+            ) {
+            }
+
+            public function setContext(RequestContext $context): void
+            {
+                $this->requestContext = $context;
+            }
+
+            public function getContext(): RequestContext
+            {
+                return $this->requestContext;
+            }
+        };
+
+        $helper = new UrlHelper(new RequestStack(), $contextAware);
+
+        $this->assertEquals($expected, $helper->getAbsoluteUrl($path));
+    }
+
+    #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
+    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    {
+        if (!class_exists(RequestContext::class)) {
+            $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
+        }
+
+        $helper = new UrlHelper(new RequestStack());
+
+        $this->assertEquals($path, $helper->getAbsoluteUrl($path));
+    }
+
+    public static function getGenerateAbsoluteUrlRequestContextData()
+    {
+        return [
+            ['/foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo.png'],
+            ['foo.png', '/foo', 'localhost', 'http', 80, 443, 'http://localhost/foo/foo.png'],
+            ['foo.png', '/foo/bar/', 'localhost', 'http', 80, 443, 'http://localhost/foo/bar/foo.png'],
+            ['/foo.png', '/foo', 'localhost', 'https', 80, 443, 'https://localhost/foo.png'],
+            ['foo.png', '/foo', 'localhost', 'https', 80, 443, 'https://localhost/foo/foo.png'],
+            ['foo.png', '/foo/bar/', 'localhost', 'https', 80, 443, 'https://localhost/foo/bar/foo.png'],
+            ['/foo.png', '/foo', 'localhost', 'http', 443, 80, 'http://localhost:443/foo.png'],
+            ['/foo.png', '/foo', 'localhost', 'https', 443, 80, 'https://localhost:80/foo.png'],
+        ];
+    }
+
+    public function testGenerateAbsoluteUrlWithScriptFileName()
+    {
+        $request = Request::create('http://localhost/app/web/app_dev.php');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/app/web/app_dev.php');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+        $helper = new UrlHelper($stack);
+
+        $this->assertEquals(
+            'http://localhost/app/web/bundles/framework/css/structure.css',
+            $helper->getAbsoluteUrl('/app/web/bundles/framework/css/structure.css')
+        );
+    }
+
+    #[DataProvider('getGenerateRelativePathData')]
+    public function testGenerateRelativePath($expected, $path, $pathinfo)
+    {
+        $stack = new RequestStack();
+        $stack->push(Request::create($pathinfo));
+        $urlHelper = new UrlHelper($stack);
+
+        $this->assertEquals($expected, $urlHelper->getRelativePath($path));
+    }
+
+    public static function getGenerateRelativePathData()
+    {
+        return [
+            ['../foo.png', '/foo.png', '/foo/bar.html'],
+            ['../baz/foo.png', '/baz/foo.png', '/foo/bar.html'],
+            ['baz/foo.png', 'baz/foo.png', '/foo/bar.html'],
+
+            ['http://example.com/baz', 'http://example.com/baz', '/'],
+            ['https://example.com/baz', 'https://example.com/baz', '/'],
+            ['//example.com/baz', '//example.com/baz', '/'],
+        ];
+    }
+}

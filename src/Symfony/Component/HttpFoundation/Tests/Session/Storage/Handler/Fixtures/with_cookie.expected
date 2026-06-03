@@ -1,0 +1,15 @@
+open
+validateId
+read
+doRead: abc|i:123;
+read
+
+updateTimestamp
+close
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+    [1] => Cache-Control: max-age=10800, private, must-revalidate
+    [2] => Set-Cookie: abc=def
+)
+shutdown

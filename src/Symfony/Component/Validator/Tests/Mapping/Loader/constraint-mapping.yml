@@ -1,0 +1,80 @@
+namespaces:
+  custom: Symfony\Component\Validator\Tests\Fixtures\
+
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
+  group_sequence:
+    - Foo
+    - Entity
+
+  constraints:
+    # Custom constraint
+    - Symfony\Component\Validator\Tests\Fixtures\ConstraintA: ~
+    # Custom constraint with namespaces prefix
+    - "custom:ConstraintB": ~
+    # Callbacks
+    - Callback:
+        callback: validateMe
+    - Callback:
+        callback: validateMeStatic
+    - Callback:
+        callback: [Symfony\Component\Validator\Tests\Fixtures\CallbackClass, callback]
+    # Constraint with named arguments support without value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments: ~
+    # Constraint with named arguments support with scalar value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments:
+        choices: foo
+    # Constraint with named arguments support with array value
+    - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments:
+        choices: [foo, bar]
+
+  properties:
+    firstName:
+      # Constraint without value
+      - NotNull: ~
+      # Constraint with child constraints
+      - All:
+          constraints:
+            - NotNull: ~
+            - Range:
+                min: 3
+      # Option with child constraints
+      - All:
+          constraints:
+            - NotNull: ~
+            - Range:
+                min: 3
+      # Value with child constraints
+      - Collection:
+          fields:
+            foo:
+              - NotNull: ~
+              - Range:
+                  min: 3
+            bar:
+              - Range:
+                  min: 5
+            baz:
+              - Required:
+                  constraints:
+                    - Email: ~
+            qux:
+              - Optional:
+                  constraints:
+                    - NotBlank: ~
+      # Constraint with options
+      - Choice: { choices: [A, B], message: Must be one of %choices% }
+    dummy:
+
+  getters:
+    lastName:
+      - NotNull: ~
+    valid:
+      - "IsTrue": ~
+    permissions:
+      - "IsTrue": ~
+
+Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity:
+  group_sequence_provider: true
+
+Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto:
+  group_sequence_provider: Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider

@@ -1,0 +1,87 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\ChoiceToValueTransformer;
+
+class ChoiceToValueTransformerTest extends TestCase
+{
+    protected ChoiceToValueTransformer $transformer;
+    protected ChoiceToValueTransformer $transformerWithNull;
+
+    protected function setUp(): void
+    {
+        $list = new ArrayChoiceList(['', false, 'X', true]);
+        $listWithNull = new ArrayChoiceList(['', false, 'X', null]);
+
+        $this->transformer = new ChoiceToValueTransformer($list);
+        $this->transformerWithNull = new ChoiceToValueTransformer($listWithNull);
+    }
+
+    public static function transformProvider(): array
+    {
+        return [
+            // more extensive test set can be found in FormUtilTest
+            ['', '', '', '0'],
+            [false, '0', false, '1'],
+            ['X', 'X', 'X', '2'],
+            [true, '1', null, '3'],
+        ];
+    }
+
+    #[DataProvider('transformProvider')]
+    public function testTransform($in, $out, $inWithNull, $outWithNull)
+    {
+        $this->assertSame($out, $this->transformer->transform($in));
+        $this->assertSame($outWithNull, $this->transformerWithNull->transform($inWithNull));
+    }
+
+    public static function reverseTransformProvider()
+    {
+        return [
+            // values are expected to be valid choice keys already and stay
+            // the same
+            ['', '', '0', ''],
+            ['0', false, '1', false],
+            ['X', 'X', '2', 'X'],
+            ['1', true, '3', null],
+        ];
+    }
+
+    #[DataProvider('reverseTransformProvider')]
+    public function testReverseTransform($in, $out, $inWithNull, $outWithNull)
+    {
+        $this->assertSame($out, $this->transformer->reverseTransform($in));
+        $this->assertSame($outWithNull, $this->transformerWithNull->reverseTransform($inWithNull));
+    }
+
+    public static function reverseTransformExpectsStringOrNullProvider()
+    {
+        return [
+            [0],
+            [true],
+            [false],
+            [[]],
+        ];
+    }
+
+    #[DataProvider('reverseTransformExpectsStringOrNullProvider')]
+    public function testReverseTransformExpectsStringOrNull($value)
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->transformer->reverseTransform($value);
+    }
+}

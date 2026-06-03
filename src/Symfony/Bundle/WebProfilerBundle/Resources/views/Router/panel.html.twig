@@ -1,0 +1,71 @@
+<h2>Routing</h2>
+
+<div class="metrics">
+    <div class="metric">
+        <span class="value">{{ request.route ?: '(none)' }}</span>
+        <span class="label">Matched route</span>
+    </div>
+</div>
+
+{% if request.route %}
+    <h3>Route Parameters</h3>
+
+    {% if request.routeParams is empty %}
+        <div class="empty">
+            <p>No parameters.</p>
+        </div>
+    {% else %}
+        {{ include('@WebProfiler/Profiler/table.html.twig', {data: request.routeParams, labels: ['Name', 'Value']}, with_context: false) }}
+    {% endif %}
+{% endif %}
+
+{% if router.redirect %}
+    <h3>Route Redirection</h3>
+
+    <p>This page redirects to:</p>
+    <div class="card break-long-words">
+        {{ router.targetUrl }}
+        {% if router.targetRoute %}<span class="text-muted">(route: "{{ router.targetRoute }}")</span>{% endif %}
+    </div>
+{% endif %}
+
+<h3>Route Matching Logs</h3>
+
+<div class="card">
+    <strong>Path to match:</strong> <code>{{ request.pathinfo }}</code>
+</div>
+
+<table id="router-logs">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Route name</th>
+            <th>Path</th>
+            <th>Log</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for trace in traces %}
+        <tr class="{{ trace.level == 1 ? 'status-warning' : trace.level == 2 ? 'status-success' }}">
+            <td class="font-normal text-muted nowrap">{{ loop.index }}</td>
+            <td class="break-long-words">{{ trace.name }}</td>
+            <td class="break-long-words">{{ trace.path }}</td>
+            <td class="break-long-words font-normal">
+                {% if trace.level == 1 %}
+                    Path almost matches, but
+                    <span class="newline">{{ trace.log }}</span>
+                {% elseif trace.level == 2 %}
+                    {{ trace.log }}
+                {% else %}
+                    Path does not match
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p class="help">
+    Note: These matching logs are based on the current router configuration,
+    which might differ from the configuration used when profiling this request.
+</p>

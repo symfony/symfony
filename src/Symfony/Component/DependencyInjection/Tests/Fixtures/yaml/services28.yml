@@ -1,0 +1,33 @@
+services:
+    _defaults:
+        autowire: true
+        tags:
+            - name: foo
+
+    Acme\Foo: ~
+
+    with_defaults:
+        class: Foo
+
+    with_null:
+        class: Foo
+        public: true
+        autowire: ~
+
+    no_defaults:
+        class: Foo
+        public: true
+        autowire: false
+        tags: []
+
+    with_defaults_aliased:
+        alias: with_defaults
+
+    with_defaults_aliased_short: '@with_defaults'
+
+    Acme\WithShortCutArgs: [foo]
+
+    child_def:
+        parent: with_defaults
+        public: true
+        autowire: false

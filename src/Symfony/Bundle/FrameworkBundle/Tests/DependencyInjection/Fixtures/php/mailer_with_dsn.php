@@ -1,0 +1,21 @@
+<?php
+
+namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+
+return static function (ContainerConfigurator $container) {
+    $container->extension('framework', [
+        'mailer' => [
+            'dsn' => 'smtp://example.com',
+            'envelope' => [
+                'sender' => 'sender@example.org',
+                'recipients' => ['redirected@example.org'],
+                'allowed_recipients' => ['foobar@example\.org'],
+            ],
+            'headers' => [
+                'from' => 'from@example.org',
+                'bcc' => ['bcc1@example.org', 'bcc2@example.org'],
+                'foo' => 'bar',
+            ],
+        ],
+    ]);
+};

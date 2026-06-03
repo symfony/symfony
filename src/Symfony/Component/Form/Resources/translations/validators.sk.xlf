@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="sk" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>Polia by nemali obsahovať ďalšie prvky.</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>Odoslaný súbor je príliš veľký. Prosím odošlite súbor s menšou veľkosťou.</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>CSRF token je neplatný. Prosím skúste znovu odoslať formulár.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>Táto hodnota nie je platná HTML5 farba.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>Please enter a valid birthdate.</source>
+                <target>Prosím zadajte platný dátum narodenia.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>Vybraná možnosť je neplatná.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>Kolekcia je neplatná.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>Please select a valid color.</source>
+                <target>Prosím vyberte platnú farbu.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>Please select a valid country.</source>
+                <target>Prosím vyberte platnú krajinu.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>Please select a valid currency.</source>
+                <target>Prosím vyberte platnú menu.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>Please choose a valid date interval.</source>
+                <target>Prosím vyberte platný rozsah dát.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Please enter a valid date and time.</source>
+                <target>Prosím zadajte platný dátum a čas.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Please enter a valid date.</source>
+                <target>Prosím zadajte platný dátum.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Please select a valid file.</source>
+                <target>Prosím vyberte platný súbor.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>Skryté pole je neplatné.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>Please enter an integer.</source>
+                <target>Prosím zadajte celé číslo.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>Please select a valid language.</source>
+                <target>Prosím vyberte platný jazyk.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>Please select a valid locale.</source>
+                <target>Prosím vyberte platné miestne nastavenia.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>Please enter a valid money amount.</source>
+                <target>Prosím zadajte platnú čiastku.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>Please enter a number.</source>
+                <target>Prosím zadajte číslo.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>Heslo je neprávne.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>Please enter a percentage value.</source>
+                <target>Prosím zadajte percentuálnu hodnotu.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>Hodnoty nie sú zhodné.</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>Please enter a valid time.</source>
+                <target>Prosím zadajte platný čas.</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>Please select a valid timezone.</source>
+                <target>Prosím vyberte platné časové pásmo.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>Please enter a valid URL.</source>
+                <target>Prosím zadajte platnú URL.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>Please enter a valid search term.</source>
+                <target>Prosím zadajte platný vyhľadávací výraz.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>Please provide a valid phone number.</source>
+                <target>Prosím zadajte platné telefónne číslo.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Zaškrtávacie políčko má neplatnú hodnotu.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>Prosím zadajte platnú emailovú adresu.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>Prosím vyberte platnú možnosť.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>Prosím vyberte platný rozsah.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>Prosím zadajte platný týždeň.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

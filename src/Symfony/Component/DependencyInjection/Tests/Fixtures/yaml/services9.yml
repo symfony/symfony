@@ -1,0 +1,193 @@
+parameters:
+    baz_class: BazClass
+    foo_class: Bar\FooClass
+    foo: bar
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Bar\FooClass
+        tags:
+            - foo: { foo: foo }
+            - foo: { bar: bar, baz: baz }
+            - foo: { name: bar, baz: baz }
+            - nullable: { bar: bar, baz: ~ }
+        arguments: [foo, '@foo.baz', { '%foo%': 'foo is %foo%', foobar: '%foo%' }, true, '@service_container']
+        properties: { foo: bar, moo: '@foo.baz', qux: { '%foo%': 'foo is %foo%', foobar: '%foo%' } }
+        calls:
+            - [setBar, ['@bar']]
+            - [initialize, {}]
+
+        constructor: getInstance
+        configurator: sc_configure
+        public: true
+    foo.baz:
+        class: '%baz_class%'
+        constructor: getInstance
+        configurator: ['%baz_class%', configureStatic1]
+        public: true
+    bar:
+        class: Bar\FooClass
+        arguments: [foo, '@foo.baz', '%foo_bar%']
+        configurator: ['@foo.baz', configure]
+        public: true
+    foo_bar:
+        class: '%foo_class%'
+        shared: false
+        arguments: ['@deprecated_service']
+        public: true
+    method_call1:
+        class: Bar\FooClass
+        file: '%path%foo.php'
+        calls:
+            - [setBar, ['@foo']]
+            - [setBar, ['@?foo2']]
+            - [setBar, ['@?foo3']]
+            - [setBar, ['@?foobaz']]
+            - [setBar, ['@=service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")']]
+        public: true
+
+    foo_with_inline:
+        class: Foo
+        calls:
+            - [setBar, ['@inlined']]
+        public: true
+
+    inlined:
+        class: Bar
+        properties: { pub: pub }
+        calls:
+            - [setBaz, ['@baz']]
+
+    baz:
+        class: Baz
+        calls:
+            - [setFoo, ['@foo_with_inline']]
+        public: true
+
+    request:
+        class: Request
+        synthetic: true
+        public: true
+    configurator_service:
+        class: ConfClass
+        calls:
+            - [setFoo, ['@baz']]
+
+    configured_service:
+        class: stdClass
+        configurator: ['@configurator_service', configureStdClass]
+        public: true
+    configurator_service_simple:
+        class: ConfClass
+        arguments: ['bar']
+    configured_service_simple:
+        class: stdClass
+        configurator: ['@configurator_service_simple', configureStdClass]
+        public: true
+    decorated:
+        class: stdClass
+        public: true
+    decorator_service:
+        class: stdClass
+        decorates: decorated
+        public: true
+    decorator_service_with_name:
+        class: stdClass
+        decorates: decorated
+        decoration_inner_name: decorated.pif-pouf
+        public: true
+    deprecated_service:
+        class: stdClass
+        deprecated:
+            message: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
+            package: vendor/package
+            version: 1.1
+        public: true
+    new_factory:
+        class: FactoryClass
+        properties: { foo: bar }
+    factory_service:
+        class: Bar
+        factory: ['@foo.baz', getInstance]
+        public: true
+    new_factory_service:
+        class: FooBarBaz
+        properties: { foo: bar }
+        factory: ['@new_factory', getInstance]
+        public: true
+    service_from_static_method:
+        class: Bar\FooClass
+        constructor: getInstance
+        public: true
+    factory_simple:
+        class: SimpleFactoryClass
+        deprecated:
+            message: The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.
+            package: vendor/package
+            version: 1.1
+        arguments: ['foo']
+    factory_service_simple:
+        class: Bar
+        factory: ['@factory_simple', getInstance]
+        public: true
+    lazy_context:
+        class: LazyContext
+        arguments: [!iterator {'k1': '@foo.baz', 'k2': '@service_container'}, !iterator []]
+        public: true
+    lazy_context_ignore_invalid_ref:
+        class: LazyContext
+        arguments: [!iterator ['@foo.baz', '@?invalid'], !iterator []]
+        public: true
+    BAR:
+        class: stdClass
+        properties: { bar: '@bar' }
+        public: true
+    bar2:
+        class: stdClass
+        public: true
+    BAR2:
+        class: stdClass
+        public: true
+    tagged_iterator_foo:
+        class: Bar
+        tags:
+            - foo
+    tagged_iterator:
+        class: Bar
+        arguments:
+            - !tagged_iterator foo
+        public: true
+    alias_for_foo:
+        alias: 'foo'
+        public: true
+    alias_for_alias:
+        alias: 'foo'
+        public: true
+    runtime_error:
+        class: stdClass
+        arguments: ['@errored_definition']
+        public: true
+    errored_definition:
+        class: stdClass
+        tags:
+            - container.error: { message: 'Service "errored_definition" is broken.' }
+    preload_sidekick:
+        class: stdClass
+        tags:
+            - container.preload: { class: 'Some\Sidekick1' }
+            - container.preload: { class: 'Some\Sidekick2' }
+        public: true
+    a_factory:
+        class: Bar
+    a_service:
+        class: Bar
+        factory: ['@a_factory', 'getBar']
+        public: true
+    b_service:
+        class: Bar
+        factory: ['@a_factory', 'getBar']
+        public: true

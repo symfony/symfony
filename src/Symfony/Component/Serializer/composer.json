@@ -1,0 +1,62 @@
+{
+    "name": "symfony/serializer",
+    "type": "library",
+    "description": "Handles serializing and deserializing data structures, including object graphs, into array structures or other formats like XML and JSON.",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/polyfill-ctype": "^1.8"
+    },
+    "require-dev": {
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
+        "phpstan/phpdoc-parser": "^1.0|^2.0",
+        "seld/jsonlint": "^1.10",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/error-handler": "^7.4|^8.0",
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/form": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/mime": "^7.4|^8.0",
+        "symfony/property-access": "^8.1",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/translation-contracts": "^2.5|^3",
+        "symfony/type-info": "^7.4|^8.0",
+        "symfony/uid": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0",
+        "symfony/var-exporter": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0"
+    },
+    "conflict": {
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
+        "phpdocumentor/type-resolver": "<1.5.1",
+        "symfony/property-access": "<8.1",
+        "symfony/property-info": "<7.4",
+        "symfony/type-info": "<7.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Serializer\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

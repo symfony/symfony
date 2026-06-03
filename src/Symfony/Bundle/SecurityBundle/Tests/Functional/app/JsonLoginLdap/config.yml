@@ -1,0 +1,40 @@
+imports:
+    - { resource: ./../config/framework.yml }
+services:
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+        tags: [ 'ldap' ]
+    dummy_role_fetcher:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\JsonLdapLoginBundle\Security\Ldap\DummyRoleFetcher
+
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            -   host: 'localhost'
+                port: 389
+                options:
+                    protocol_version: 3
+                    referrals: false
+security:
+    providers:
+        ldap:
+            ldap:
+                service: Symfony\Component\Ldap\Ldap
+                base_dn: 'dc=onfroy,dc=net'
+                search_dn: ''
+                search_password: ''
+                role_fetcher: dummy_role_fetcher
+                uid_key: uid
+
+    firewalls:
+        main:
+            pattern:  ^/login
+            stateless: true
+            json_login_ldap:
+                check_path: /login
+                service: Symfony\Component\Ldap\Ldap
+                dn_string: ''
+                username_path: user.login
+                password_path: user.password
+
+    access_control:
+        - { path: ^/, roles: ROLE_USER }

@@ -1,0 +1,197 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Validator\Tests\Constraints;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Validator\Constraints\Hostname;
+use Symfony\Component\Validator\Constraints\HostnameValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+
+/**
+ * @author Dmitrii Poddubnyi <dpoddubny@gmail.com>
+ */
+class HostnameValidatorTest extends ConstraintValidatorTestCase
+{
+    public function testNullIsValid()
+    {
+        $this->validate(null, new Hostname());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validate('', new Hostname());
+
+        $this->assertNoViolation();
+    }
+
+    public function testExpectsStringCompatibleType()
+    {
+        $this->expectException(UnexpectedValueException::class);
+
+        $this->validate(new \stdClass(), new Hostname());
+    }
+
+    #[DataProvider('getValidMultilevelDomains')]
+    public function testValidTldDomainsPassValidationIfTldRequired($domain)
+    {
+        $this->validate($domain, new Hostname());
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getValidMultilevelDomains')]
+    public function testValidTldDomainsPassValidationIfTldNotRequired($domain)
+    {
+        $this->validate($domain, new Hostname(requireTld: false));
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidMultilevelDomains()
+    {
+        return [
+            ['symfony.com'],
+            ['example.co.uk'],
+            ['example.fr'],
+            ['example.com'],
+            ['xn--diseolatinoamericano-66b.com'],
+            ['xn--ggle-0nda.com'],
+            ['www.xn--simulateur-prt-2kb.fr'],
+            [\sprintf('%s.com', str_repeat('a', 20))],
+        ];
+    }
+
+    #[DataProvider('getInvalidDomains')]
+    public function testInvalidDomainsRaiseViolationIfTldRequired($domain)
+    {
+        $this->validate($domain, new Hostname(message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$domain.'"')
+            ->setCode(Hostname::INVALID_HOSTNAME_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getInvalidDomains')]
+    public function testInvalidDomainsRaiseViolationIfTldNotRequired($domain)
+    {
+        $this->validate($domain, new Hostname(
+            message: 'myMessage',
+            requireTld: false,
+        ));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$domain.'"')
+            ->setCode(Hostname::INVALID_HOSTNAME_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getInvalidDomains()
+    {
+        return [
+            ['acme..com'],
+            ['qq--.com'],
+            ['-example.com'],
+            ['example-.com'],
+            [\sprintf('%s.com', str_repeat('a', 300))],
+        ];
+    }
+
+    #[DataProvider('getReservedDomains')]
+    public function testReservedDomainsPassValidationIfTldNotRequired($domain)
+    {
+        $this->validate($domain, new Hostname(requireTld: false));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getReservedDomains')]
+    public function testReservedDomainsRaiseViolationIfTldRequired($domain)
+    {
+        $this->validate($domain, new Hostname(
+            message: 'myMessage',
+            requireTld: true,
+        ));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$domain.'"')
+            ->setCode(Hostname::INVALID_HOSTNAME_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getReservedDomains()
+    {
+        return [
+            ['example'],
+            ['foo.example'],
+            ['invalid'],
+            ['bar.invalid'],
+            ['localhost'],
+            ['lol.localhost'],
+            ['test'],
+            ['abc.test'],
+        ];
+    }
+
+    public function testReservedDomainsRaiseViolationIfTldRequiredNamed()
+    {
+        $this->validate(
+            'example',
+            new Hostname(message: 'myMessage', requireTld: true)
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"example"')
+            ->setCode(Hostname::INVALID_HOSTNAME_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getTopLevelDomains')]
+    public function testTopLevelDomainsPassValidationIfTldNotRequired($domain)
+    {
+        $this->validate($domain, new Hostname(requireTld: false));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTopLevelDomains')]
+    public function testTopLevelDomainsRaiseViolationIfTldRequired($domain)
+    {
+        $this->validate($domain, new Hostname(
+            message: 'myMessage',
+            requireTld: true,
+        ));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$domain.'"')
+            ->setCode(Hostname::INVALID_HOSTNAME_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getTopLevelDomains()
+    {
+        return [
+            ['com'],
+            ['net'],
+            ['org'],
+            ['etc'],
+        ];
+    }
+
+    protected function createValidator(): HostnameValidator
+    {
+        return new HostnameValidator();
+    }
+}

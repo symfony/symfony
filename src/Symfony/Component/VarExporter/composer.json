@@ -1,0 +1,35 @@
+{
+    "name": "symfony/var-exporter",
+    "type": "library",
+    "description": "Provides tools to export, instantiate, hydrate, clone and lazy-load PHP objects",
+    "keywords": ["export", "serialize", "instantiate", "hydrate", "construct", "clone", "deep-clone", "lazy-loading", "proxy"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/polyfill-deepclone": "^1.37"
+    },
+    "require-dev": {
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\VarExporter\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

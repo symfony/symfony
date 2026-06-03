@@ -1,0 +1,7 @@
+services:
+    foo:
+        class: stdClass
+    bar:
+        class: stdClass
+        decorates: "@foo"
+        arguments: ["@bar.inner"]

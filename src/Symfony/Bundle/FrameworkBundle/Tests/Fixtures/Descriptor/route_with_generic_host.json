@@ -1,0 +1,18 @@
+{
+    "some_route": {
+        "path": "\/some-route",
+        "pathRegex": "#PATH_REGEX#",
+        "host": "ANY",
+        "hostRegex": "",
+        "scheme": "https",
+        "method": "ANY",
+        "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\RouteStub",
+        "defaults": {
+            "_controller": "Controller"
+        },
+        "requirements": "NO CUSTOM",
+        "options": {
+            "compiler_class": "Symfony\\Component\\Routing\\RouteCompiler"
+        }
+    }
+}

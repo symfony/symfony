@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="ca" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>This value should be false.</source>
+                <target>Aquest valor hauria de ser fals.</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>This value should be true.</source>
+                <target>Aquest valor hauria de ser cert.</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>This value should be of type {{ type }}.</source>
+                <target>Aquest valor hauria de ser del tipus {{ type }}.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>This value should be blank.</source>
+                <target>Aquest valor hauria d'estar buit.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>The value you selected is not a valid choice.</source>
+                <target>El valor seleccionat no és una opció vàlida.</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>Ha de seleccionar almenys {{ limit }} opció.|Ha de seleccionar almenys {{ limit }} opcions.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>Ha de seleccionar com a màxim {{ limit }} opció.|Ha de seleccionar com a màxim {{ limit }} opcions.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>One or more of the given values is invalid.</source>
+                <target>Un o més dels valors facilitats són incorrectes.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>This field was not expected.</source>
+                <target>Aquest camp no s'esperava.</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>This field is missing.</source>
+                <target>Aquest camp està desaparegut.</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This value is not a valid date.</source>
+                <target>Aquest valor no és una data vàlida.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>This value is not a valid datetime.</source>
+                <target>Aquest valor no és una data i hora vàlida.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>This value is not a valid email address.</source>
+                <target>Aquest valor no és una adreça d'email vàlida.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>The file could not be found.</source>
+                <target>No s'ha pogut trobar l'arxiu.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>The file is not readable.</source>
+                <target>No es pot llegir l'arxiu.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>L'arxiu és massa gran ({{ size }} {{ suffix }}). La grandària màxima permesa és {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>El tipus mime de l'arxiu no és vàlid ({{ type }}). Els tipus mime vàlids són {{ types }}.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>Aquest valor hauria de ser {{ limit }} o menys.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>Aquest valor és massa llarg. Hauria de tenir {{ limit }} caràcter o menys.|Aquest valor és massa llarg. Hauria de tenir {{ limit }} caràcters o menys.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>Aquest valor hauria de ser {{ limit }} o més.</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>Aquest valor és massa curt. Hauria de tenir {{ limit }} caràcters o més.</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should not be blank.</source>
+                <target>Aquest valor no hauria d'estar buit.</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should not be null.</source>
+                <target>Aquest valor no hauria de ser null.</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be null.</source>
+                <target>Aquest valor hauria de ser null.</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>This value is not valid.</source>
+                <target>Aquest valor no és vàlid.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>This value is not a valid time.</source>
+                <target>Aquest valor no és una hora vàlida.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>This value is not a valid URL.</source>
+                <target>Aquest valor no és un URL vàlid.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal.</source>
+                <target>Els dos valors haurien de ser iguals.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>L'arxiu és massa gran. La mida màxima permesa és {{ limit }} {{ suffix }}.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large.</source>
+                <target>L'arxiu és massa gran.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded.</source>
+                <target>No es pot pujar l'arxiu.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>Aquest valor hauria de ser un nombre vàlid.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>L'arxiu no és una imatge vàlida.</target>
+            </trans-unit>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>Aquest valor no és una adreça IP vàlida.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>Aquest valor no és un idioma vàlid.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>Aquest valor no és una localització vàlida.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>Aquest valor no és un país vàlid.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>Aquest valor ja s'ha utilitzat.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>No s'ha pogut determinar la grandària de la imatge.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>L'amplària de la imatge és massa gran ({{ width }}px). L'amplària màxima permesa és {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>L'amplària de la imatge és massa petita ({{ width }}px). L'amplària mínima requerida és {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>L'altura de la imatge és massa gran ({{ height }}px). L'altura màxima permesa és {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>L'altura de la imatge és massa petita ({{ height }}px). L'altura mínima requerida és {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user's current password.</source>
+                <target>Aquest valor hauria de ser la contrasenya actual de l'usuari.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target>Aquest valor hauria de tenir exactament {{ limit }} caràcter.|Aquest valor hauria de tenir exactament {{ limit }} caràcters.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>L'arxiu va ser només pujat parcialment.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>Cap arxiu va ser pujat.</target>
+            </trans-unit>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>No s'ha configurat cap carpeta temporal en php.ini, o la carpeta configurada no existeix.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>No es va poder escriure l'arxiu temporal en el disc.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>Una extensió de PHP va fer que la pujada fallarà.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>Aquesta col·lecció ha de contenir {{ limit }} element o més.|Aquesta col·lecció ha de contenir {{ limit }} elements o més.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>Aquesta col·lecció ha de contenir {{ limit }} element o menys.|Aquesta col·lecció ha de contenir {{ limit }} elements o menys.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>Aquesta col·lecció ha de contenir exactament {{ limit }} element.|Aquesta col·lecció ha de contenir exactament {{ limit }} elements.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>Número de targeta invàlid.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>Tipus de targeta no suportada o número de targeta invàlid.</target>
+            </trans-unit>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>Aquest valor no és un Número de Compte Bancari Internacional (IBAN) vàlid.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>Aquest valor no és un ISBN-10 vàlid.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>Aquest valor no és un ISBN-13 vàlid.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>Aquest valor no és ni un ISBN-10 vàlid ni un ISBN-13 vàlid.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>Aquest valor no és un ISSN vàlid.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>Aquest valor no és una divisa vàlida.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>Aquest valor hauria de ser igual a {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>Aquest valor hauria de ser més gran a {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>Aquest valor hauria de ser major o igual a {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Aquest valor hauria de ser idèntic a {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>Aquest valor hauria de ser menor a {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>Aquest valor hauria de ser menor o igual a {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>Aquest valor no hauria de ser igual a {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>Aquest valor no hauria de ser idèntic a {{ compared_value_type }} {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>La proporció de la imatge és massa gran ({{ ratio }}). La màxima proporció permesa és {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>La proporció de la imatge és massa petita ({{ ratio }}). La mínima proporció permesa és {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>La imatge és quadrada({{ width }}x{{ height }}px). Les imatges quadrades no estan permeses.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>La imatge està orientada horitzontalment ({{ width }}x{{ height }}px). Les imatges orientades horitzontalment no estan permeses.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>La imatge està orientada verticalment ({{ width }}x{{ height }}px). Les imatges orientades verticalment no estan permeses.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>No està permès un fitxer buit.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>No s'ha pogut resoldre l'amfitrió.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>Aquest valor no coincideix amb l'esperat {{ charset }} joc de caràcters.</target>
+            </trans-unit>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>Aquest valor no és un Codi d'identificació bancari (BIC) vàlid.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>Error</target>
+            </trans-unit>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>Aquest valor no és un UUID vàlid.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>Aquest valor ha de ser múltiple de {{ compared_value }}.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>Aquest Codi d'identificació bancari (BIC) no està associat amb l'IBAN {{ iban }}.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>Aquest valor hauria de ser un JSON vàlid.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>Aquesta col·lecció només hauria de contenir elements únics.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>Aquest valor hauria de ser positiu.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>Aquest valor ha de ser positiu o zero.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>Aquest valor ha de ser negatiu.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>Aquest valor ha de ser negatiu o zero.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>Aquest valor no és una zona horària vàlida.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>Aquesta contrasenya s'ha filtrat en cas de violació de dades, no s'ha d'utilitzar. Utilitzeu una altra contrasenya.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>Aquest valor ha d'estar entre {{ min }} i {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>Aquest valor no és un nom d'amfitrió vàlid.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>El nombre d'elements d'aquesta col·lecció ha de ser múltiple de {{compared_value}}.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>Aquest valor ha de satisfer almenys una de les restriccions següents:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>Cada element d'aquesta col·lecció hauria de satisfer el seu propi conjunt de restriccions.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>Aquest valor no és un número d'identificació de valors internacionals (ISIN) vàlid.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>Aquest valor hauria de ser una expressió vàlida.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>Aquest valor no és un color CSS vàlid.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>Aquest valor no és una notació CIDR vàlida.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>El valor de la màscara de xarxa hauria d'estar entre {{ min }} i {{ max }}.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>El nom del fitxer és massa llarg. Ha de tenir {{ filename_max_length }} caràcter o menys.|El nom del fitxer és massa llarg. Ha de tenir {{ filename_max_length }} caràcters o menys.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>La contrasenya és massa feble. Si us plau, feu servir una contrasenya més segura.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>Aquest valor conté caràcters que no estan permisos segons el nivell de restricció actual.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>No es permet l'ús de caràcters invisibles.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>No es permet barrejar números de diferents scripts.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>No es permet l'ús de caràcters superposats ocults.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>L'extensió del fitxer no és vàlida ({{ extension }}). Les extensions permeses són {{ extensions }}.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>S'ha detectat que la codificació de caràcters no és vàlida ({{ detected }}). Les codificacions permeses són {{ encodings }}.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>Aquest valor no és una adreça MAC vàlida.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>Aquesta URL no conté un domini de primer nivell.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>Aquest valor és massa curt. Ha de contenir almenys una paraula.|Aquest valor és massa curt. Ha de contenir almenys {{ min }} paraules.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>Aquest valor és massa llarg. Ha de contenir una paraula.|Aquest valor és massa llarg. Ha de contenir {{ max }} paraules o menys.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>Aquest valor no representa una setmana vàlida en el format ISO 8601.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>Aquest valor no és una setmana vàlida.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>Aquest valor no ha de ser anterior a la setmana "{{ min }}".</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>Aquest valor no ha de ser posterior a la setmana "{{ max }}".</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>Aquest valor no és una plantilla Twig vàlida.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>Aquest fitxer no és un vídeo vàlid.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>No s'ha pogut detectar la mida del vídeo.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>L'amplada del vídeo és massa gran ({{ width }}px). L'amplada màxima permesa és {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>L'amplada del vídeo és massa petita ({{ width }}px). L'amplada mínima esperada és {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>L'altura del vídeo és massa gran ({{ height }}px). L'altura màxima permesa és {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>L'altura del vídeo és massa petita ({{ height }}px). L'altura mínima esperada és {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>El vídeo no té suficients píxels ({{ pixels }}). La quantitat mínima esperada és {{ min_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>El vídeo té massa píxels ({{ pixels }}). La quantitat màxima prevista és {{ max_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>La relació del vídeo és massa gran ({{ ratio }}). La relació màxima permesa és {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>La relació del vídeo és massa petita ({{ ratio }}). La relació mínima esperada és {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>El vídeo és quadrat ({{ width }}x{{ height }}px). No es permeten vídeos quadrats.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>El vídeo té orientació horitzontal ({{ width }}x{{ height }} px). No es permeten vídeos horitzontals.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>El vídeo és en orientació vertical ({{ width }}x{{ height }} px). No es permeten vídeos en orientació vertical.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>El fitxer de vídeo està espatllat.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>El vídeo conté diversos fluxos. Només es permet un sol flux.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>Còdec de vídeo incompatible «{{ codec }}».</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>Contenidor de vídeo incompatible "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>El fitxer d'imatge està espatllat.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>La imatge no té suficients píxels ({{ pixels }}). La quantitat mínima esperada és {{ min_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>La imatge té massa píxels ({{ pixels }}). El nombre màxim esperat és {{ max_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>Aquest nom de fitxer no coincideix amb el charset esperat.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

@@ -1,0 +1,36 @@
+{
+    "name": "symfony/mailchimp-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Mailchimp Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/mailer": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/webhook": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/webhook": "<7.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailchimp\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

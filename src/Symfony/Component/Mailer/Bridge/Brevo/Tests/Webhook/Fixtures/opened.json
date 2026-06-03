@@ -1,0 +1,18 @@
+{
+    "id": 814119,
+    "email": "example@gmail.com",
+    "message-id": "<202305311408.17112967225@smtp-relay.mailin.fr>",
+    "date": "2023-05-31 16:45:09",
+    "tags": [
+        "welcome",
+        "tag2"
+    ],
+    "tag": "[\"welcome\",\"tag2\"]",
+    "event": "opened",
+    "subject": "Subject Line",
+    "sending_ip": "127.0.0.1",
+    "ts": 1685544309,
+    "ts_epoch": 1685544309368,
+    "ts_event": 1685544309,
+    "link": ""
+}

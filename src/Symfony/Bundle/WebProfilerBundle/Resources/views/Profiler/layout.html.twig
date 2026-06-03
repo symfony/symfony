@@ -1,0 +1,78 @@
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        {{ include('@WebProfiler/Profiler/header.html.twig', {profile_type: profile_type}, with_context: false) }}
+
+        <div id="summary">
+        {% block summary %}
+            {% if profile is defined %}
+                {% set request_collector = profile.collectors.request|default(false) %}
+
+                {{ include('@WebProfiler/Profiler/_%s_summary.html.twig'|format(profile_type), {
+                    profile: profile,
+                    command_collector: profile.collectors.command|default(false),
+                    request_collector: request_collector,
+                    request: request,
+                    token: token,
+                }, with_context: false) }}
+            {% endif %}
+        {% endblock %}
+    </div>
+
+        <div id="content">
+            <main id="main">
+                <div id="sidebar">
+                    {% block sidebar %}
+                        <div id="sidebar-contents">
+                            <div id="sidebar-shortcuts">
+                                {% block sidebar_shortcuts_links %}
+                                    <div class="shortcuts">
+                                        <a class="btn btn-link" href="{{ path('_profiler_search', {limit: 10, type: profile_type}) }}">{{ source('@WebProfiler/Icon/search.svg') }} Search profiles</a>
+                                        <a class="btn btn-link" href="{{ path('_profiler', {token: 'latest', type: profile_type}|merge(request.query.all)) }}">Latest</a>
+                                    </div>
+                                {% endblock sidebar_shortcuts_links %}
+                            </div>
+
+                            {% if templates is defined %}
+                                <nav aria-label="Profiler menu">
+                                <ul id="menu-profiler">
+                                    {% if 'request' is same as(profile_type) %}
+                                        {% set excludes = ['command'] %}
+                                    {% elseif 'command' is same as(profile_type) %}
+                                        {% set excludes = ['request', 'router'] %}
+                                    {% endif %}
+
+                                    {% for name, template in templates|filter((t, n) => n not in excludes) %}
+                                        {% set menu -%}
+                                            {%- if block('menu', template) is defined -%}
+                                                {% with {collector: profile.getcollector(name), profiler_markup_version: profiler_markup_version} %}
+                                                    {{- block('menu', template) -}}
+                                                {% endwith %}
+                                            {%- endif -%}
+                                        {%- endset %}
+                                        {% if menu is not empty %}
+                                            <li class="{{ name }} {{ name == panel ? 'selected' }}">
+                                                <a href="{{ path('_profiler', {token: token, panel: name, type: profile_type}) }}"{{ name == panel ? ' aria-current="page"' }}>{{ menu|raw }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                </nav>
+                            {% endif %}
+                        </div>
+
+                        {{ include('@WebProfiler/Profiler/settings.html.twig') }}
+                    {% endblock sidebar %}
+                </div>
+
+                <div id="collector-wrapper">
+                    <div id="collector-content">
+                        {{ include('@WebProfiler/Profiler/base_js.html.twig') }}
+                        {% block panel '' %}
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,8 @@
+digraph sc {
+  ratio="compress"
+  node [fontsize="11" fontname="Arial" shape="record"];
+  edge [fontsize="9" fontname="Arial" color="grey" arrowhead="open" arrowsize="0.5"];
+
+  node_service_container [label="service_container\nSymfony\\Component\\DependencyInjection\\ContainerInterface\n", shape=record, fillcolor="#eeeeee", style="filled"];
+  node_foo [label="foo\n%foo.class%\n", shape=record, fillcolor="#eeeeee", style="filled"];
+}

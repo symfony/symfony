@@ -1,0 +1,55 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
+
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\DataTransformer\IntlTimeZoneToStringTransformer;
+
+#[RequiresPhpExtension('intl')]
+class IntlTimeZoneToStringTransformerTest extends TestCase
+{
+    public function testSingle()
+    {
+        $transformer = new IntlTimeZoneToStringTransformer();
+
+        $this->assertNull($transformer->transform(null));
+        $this->assertNull($transformer->reverseTransform(null));
+
+        $this->assertSame('Europe/Amsterdam', $transformer->transform(\IntlTimeZone::createTimeZone('Europe/Amsterdam')));
+        $this->assertEquals(\IntlTimeZone::createTimeZone('Europe/Amsterdam'), $transformer->reverseTransform('Europe/Amsterdam'));
+    }
+
+    public function testMultiple()
+    {
+        $transformer = new IntlTimeZoneToStringTransformer(true);
+
+        $this->assertNull($transformer->transform(null));
+        $this->assertNull($transformer->reverseTransform(null));
+
+        $this->assertSame(['Europe/Amsterdam'], $transformer->transform([\IntlTimeZone::createTimeZone('Europe/Amsterdam')]));
+        $this->assertEquals([\IntlTimeZone::createTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
+    }
+
+    public function testInvalidTimezone()
+    {
+        $this->expectException(TransformationFailedException::class);
+        (new IntlTimeZoneToStringTransformer())->transform(1);
+    }
+
+    public function testUnknownTimezone()
+    {
+        $this->expectException(TransformationFailedException::class);
+        (new IntlTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);
+    }
+}

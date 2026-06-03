@@ -1,0 +1,46 @@
+{
+    "name": "symfony/security-core",
+    "type": "library",
+    "description": "Symfony Security Component - Core Library",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/event-dispatcher-contracts": "^2.5|^3",
+        "symfony/password-hasher": "^7.4|^8.0",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "psr/container": "^1.1|^2.0",
+        "psr/cache": "^1.0|^2.0|^3.0",
+        "psr/log": "^1|^2|^3",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/ldap": "^7.4|^8.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/string": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Security\\Core\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,4 @@
+services:
+    # loaded here to avoid defaults in other file
+    child_service:
+        parent: parent_service

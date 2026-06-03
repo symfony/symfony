@@ -1,0 +1,10 @@
+imports:
+    - { resource: './third_a.yaml' }
+    - { resource: './third_b.yaml' }
+
+third:
+    foo: ping
+
+when@test:
+    third:
+        foo: zaa

@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'Names' => [
+        'ar_001' => 'Arabic (World)',
+        'bn' => 'Bengali',
+        'bn_BD' => 'Bengali (Bangladesh)',
+        'bn_IN' => 'Bengali (India)',
+        'bs_BA' => 'Bosnian (Bosnia and Herzegovina)',
+        'bs_Cyrl_BA' => 'Bosnian (Cyrillic, Bosnia and Herzegovina)',
+        'bs_Latn_BA' => 'Bosnian (Latin, Bosnia and Herzegovina)',
+        'en_001' => 'English (World)',
+        'en_AG' => 'English (Antigua and Barbuda)',
+        'en_GS' => 'English (South Georgia and South Sandwich Islands)',
+        'en_KN' => 'English (St Kitts and Nevis)',
+        'en_TC' => 'English (Turks and Caicos Islands)',
+        'en_TT' => 'English (Trinidad and Tobago)',
+        'en_VC' => 'English (St Vincent and the Grenadines)',
+        'eo_001' => 'Esperanto (World)',
+        'fr_PM' => 'French (St Pierre and Miquelon)',
+        'fr_WF' => 'French (Wallis and Futuna)',
+        'hr_BA' => 'Croatian (Bosnia and Herzegovina)',
+        'ia_001' => 'Interlingua (World)',
+        'nb_SJ' => 'Norwegian Bokmål (Svalbard and Jan Mayen)',
+        'pt_ST' => 'Portuguese (São Tomé and Príncipe)',
+        'sh_BA' => 'Serbo-Croatian (Bosnia and Herzegovina)',
+        'sr_BA' => 'Serbian (Bosnia and Herzegovina)',
+        'sr_Cyrl_BA' => 'Serbian (Cyrillic, Bosnia and Herzegovina)',
+        'sr_Latn_BA' => 'Serbian (Latin, Bosnia and Herzegovina)',
+    ],
+];

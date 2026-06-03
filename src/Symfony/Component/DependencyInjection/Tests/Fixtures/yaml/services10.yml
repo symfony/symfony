@@ -1,0 +1,10 @@
+parameters:
+    project.parameter.foo: BAR
+
+services:
+    project.service.foo:
+        class: BAR
+        public: true
+
+project:
+    test: '%project.parameter.foo%'

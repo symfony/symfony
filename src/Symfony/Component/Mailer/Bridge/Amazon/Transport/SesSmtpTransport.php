@@ -1,0 +1,78 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
+
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\RawMessage;
+
+/**
+ * @author Kevin Verschaeve
+ */
+class SesSmtpTransport extends EsmtpTransport
+{
+    /**
+     * @param string|null $region Amazon SES region (default `eu-west-1`)
+     * @param string      $host   SMTP host; `'default'` resolves to `email-smtp.<region>.amazonaws.com`
+     * @param int         $port   SMTP port; `465`/`2465` use implicit TLS, any other port starts plain and
+     *                            requires STARTTLS (via `setRequireTls(true)`) unless overridden by the caller
+     */
+    public function __construct(string $username, #[\SensitiveParameter] string $password, ?string $region = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null, string $host = 'default', int $port = 465)
+    {
+        if ('default' === $host) {
+            $host = \sprintf('email-smtp.%s.amazonaws.com', $region ?: 'eu-west-1');
+        }
+
+        $tls = \in_array($port, [465, 2465], true);
+
+        parent::__construct($host, $port, $tls, $dispatcher, $logger);
+
+        if (!$tls) {
+            $this->setRequireTls(true);
+        }
+
+        $this->setUsername($username);
+        $this->setPassword($password);
+    }
+
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
+    {
+        if ($message instanceof Message) {
+            $message = clone $message;
+            $this->addSesHeaders($message);
+        }
+
+        return parent::send($message, $envelope);
+    }
+
+    private function addSesHeaders(Message $message): void
+    {
+        $metadata = [];
+        $headers = $message->getHeaders();
+
+        foreach ($headers->all() as $name => $header) {
+            if ($header instanceof MetadataHeader) {
+                $metadata[] = "{$header->getKey()}={$header->getValue()}";
+                $headers->remove($name);
+            }
+        }
+
+        if ($metadata) {
+            $headers->addTextHeader('X-SES-MESSAGE-TAGS', implode(', ', $metadata));
+        }
+    }
+}

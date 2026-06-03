@@ -1,0 +1,11 @@
+- Class: `definition_with_enum`
+- Public: no
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
+- Deprecated: no
+- Arguments: yes
+- Usages: none

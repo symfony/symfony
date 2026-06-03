@@ -1,0 +1,26 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    providers:
+        in_memory:
+            memory:
+                users:
+                    weaverryan: { password: foo, roles: [ROLE_USER] }
+
+    firewalls:
+        main:
+            pattern: ^/
+            login_link:
+                check_route:    login_link_check
+                signature_properties: ['password']
+                max_uses: 2
+                success_handler: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\LoginLink\TestCustomLoginLinkSuccessHandler
+
+services:
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\LoginLink\TestCustomLoginLinkSuccessHandler: null
+    # needed so LoginLinkHandlerInterface has *some* reference, and so isn't
+    # entirely removed from the container (so we can fetch it in the test container)
+    login_link_handler:
+        alias: 'Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface'
+        public: true

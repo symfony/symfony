@@ -1,0 +1,713 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.data.nb_errors > 0 or collector.data.forms|length %}
+        {% set status_color = collector.data.nb_errors ? 'red' %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/form.svg') }}
+            <span class="sf-toolbar-value">
+                {{ collector.data.nb_errors ?: collector.data.forms|length }}
+            </span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Number of forms</b>
+                <span class="sf-toolbar-status">{{ collector.data.forms|length }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Number of errors</b>
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.data.nb_errors > 0 ? 'red' }}">{{ collector.data.nb_errors }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, status: status_color}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label label-status-{{ collector.data.nb_errors ? 'error' }} {{ collector.data.forms is empty ? 'disabled' }}">
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/form.svg') }}</span>
+        <strong>Forms</strong>
+        {% if collector.data.nb_errors > 0 %}
+            <span class="count">
+                <span>{{ collector.data.nb_errors }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+
+    <style>
+        .form-type-class {
+            font-size: var(--font-size-body);
+            display: flex;
+            margin: 0 0 15px;
+        }
+        .form-type-class-label {
+            margin-right: 4px;
+        }
+        .form-type-class pre.sf-dump {
+            font-family: var(--font-family-system) !important;
+            font-size: var(--font-size-body) !important;
+            margin-left: 5px;
+        }
+        .form-type-class .sf-dump .sf-dump-str {
+            color: var(--color-link) !important;
+            text-decoration: underline;
+        }
+        .form-type-class .sf-dump .sf-dump-str:hover {
+            text-decoration: none;
+        }
+
+        .sf-profiler-form-col-property { width: 180px; }
+
+        .tree-wrapper { display: flex; gap: 0; }
+
+        #tree-menu {
+            padding-right: 10px;
+            width: 220px;
+        }
+        #tree-menu ul {
+            list-style: none;
+            margin: 0;
+            padding-left: 0;
+        }
+        #tree-menu li {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+        }
+        #tree-menu .empty {
+            border: 0;
+            box-shadow: none !important;
+            padding: 0;
+        }
+        #tree-details-container {
+            border-left: 1px solid var(--table-border-color);
+            padding-left: 20px;
+            flex: 1;
+            min-width: 0;
+        }
+        .tree-details {
+            padding-bottom: 40px;
+        }
+        .tree-details h3 {
+            font-size: 18px;
+            position: relative;
+        }
+
+        .toggle-icon {
+            display: inline-block;
+        }
+        .closed .toggle-icon, .closed.toggle-icon {
+        }
+
+        .tree .tree-inner {
+            cursor: pointer;
+            padding: 5px 7px 5px 22px;
+            position: relative;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+        }
+        .tree .toggle-button {
+            width: 16px;
+            height: 16px;
+            margin-left: -18px;
+            display: inline-grid;
+            place-content: center;
+            background: none;
+            border: none;
+            transition: transform 200ms;
+        }
+        .tree .toggle-button.closed svg {
+            transform: rotate(-90deg);
+        }
+        .tree .toggle-button svg {
+            transform: rotate(0deg);
+            width: 16px;
+            height: 16px;
+        }
+        .tree .toggle-icon.empty {
+            width: 5px;
+            height: 5px;
+            position: absolute;
+            top: 50%;
+            margin-top: -2px;
+            margin-left: -13px;
+        }
+        .tree .tree-inner {
+            border-radius: 4px;
+        }
+        .tree ul ul .tree-inner {
+            padding-left: 32px;
+        }
+        .tree ul ul ul .tree-inner {
+            padding-left: 48px;
+        }
+        .tree ul ul ul ul .tree-inner {
+            padding-left: 64px;
+        }
+        .tree ul ul ul ul ul .tree-inner {
+            padding-left: 72px;
+        }
+        .tree .tree-inner:hover {
+            background: var(--gray-200);
+        }
+        .tree .tree-inner.active, .tree .tree-inner.active:hover {
+            background: var(--tree-active-background);
+            font-weight: bold;
+        }
+        .tree-details .toggle-icon {
+            width: 16px;
+            height: 16px;
+            /* vertically center the button */
+            position: absolute;
+            top: 50%;
+            margin-top: -9px;
+            margin-left: 6px;
+        }
+        .badge-error {
+            background: var(--background-error);
+            color: var(--base-0, #FFF);
+            padding: 1px 4px;
+            font-size: 10px;
+            font-weight: bold;
+            vertical-align: middle;
+        }
+        .has-error {
+            color: var(--color-error);
+        }
+        .errors h3 {
+            color: var(--color-error);
+        }
+        .errors th {
+            background: var(--background-error);
+            color: var(--base-0, #FFF);
+        }
+        .errors .toggle-icon {
+            background-color: var(--background-error);
+        }
+        h3 a, h3 a:hover, h3 a:focus {
+            color: inherit;
+            text-decoration: inherit;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            new SymfonyProfilerFormPanel();
+        });
+
+        class SymfonyProfilerFormPanel {
+            #activeTreeItem;
+            #activeTreePanel;
+            #storage;
+            #storageKey = 'sf_toggle_data';
+            #togglerStates = {};
+
+            constructor() {
+                this.#storage = sessionStorage;
+                this.#initTrees();
+                this.#initTogglerButtons();
+            }
+
+            #initTrees() {
+                const treeItems = document.querySelectorAll('.tree .tree-inner');
+                treeItems.forEach((treeItem) => {
+                    const targetId = treeItem.getAttribute('data-tab-target-id');
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw `Tab target ${targetId} does not exist`;
+                    }
+
+                    treeItem.addEventListener('click', (e) => {
+                        this.#selectTreeItem(treeItem);
+
+                        e.stopPropagation();
+                        return false;
+                    });
+
+                    target.classList.add('hidden');
+                });
+
+                if (treeItems.length > 0) {
+                    this.#selectTreeItem(treeItems[0]);
+                }
+            };
+
+            #selectTreeItem(treeItem) {
+                const treePanelId = treeItem.getAttribute('data-tab-target-id');
+                const treePanel = document.getElementById(treePanelId);
+
+                if (!treePanel) {
+                    throw `The tree panel ${treePanelId} does not exist`;
+                }
+
+                if (this.#activeTreeItem) {
+                    this.#activeTreeItem.classList.remove('active');
+                }
+
+                if (this.#activeTreePanel) {
+                    this.#activeTreePanel.classList.add('hidden');
+                }
+
+                treeItem.classList.add('active');
+                treePanel.classList.remove('hidden');
+
+                this.#activeTreeItem = treeItem;
+                this.#activeTreePanel = treePanel;
+            }
+
+            #initTogglerButtons() {
+                this.#togglerStates = this.#getTogglerStates();
+                if (!this.#isObject(this.#togglerStates)) {
+                    this.#togglerStates = {};
+                }
+
+                const buttons = document.querySelectorAll('.toggle-button');
+                buttons.forEach((button) => {
+                    const targetId = button.getAttribute('data-toggle-target-id');
+                    const target = document.getElementById(targetId);
+
+                    if (!target) {
+                        throw `Toggle target ${targetId} does not exist`;
+                    }
+
+                    // correct the initial state of the button
+                    if (target.classList.contains('hidden')) {
+                        button.classList.add('closed');
+                    }
+
+                    button.addEventListener('click', (e) => {
+                        this.#toggleToggler(button);
+
+                        e.stopPropagation();
+                        return false;
+                    });
+
+                    if (this.#togglerStates.hasOwnProperty(targetId)) {
+                        // open or collapse based on stored data
+                        if (0 === this.#togglerStates[targetId]) {
+                            this.#collapseToggler(button);
+                        } else {
+                            this.#expandToggler(button);
+                        }
+                    }
+                });
+            };
+
+            #isTogglerCollapsed(button) {
+                return button.classList.contains('closed');
+            }
+
+            #isTogglerExpanded(button) {
+                return !this.#isTogglerCollapsed(button);
+            }
+
+            #expandToggler(button) {
+                const targetId = button.getAttribute('data-toggle-target-id');
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw "Toggle target " + targetId + " does not exist";
+                }
+
+                if (this.#isTogglerCollapsed(button)) {
+                    button.classList.remove('closed');
+                    target.classList.remove('hidden');
+
+                    this.#togglerStates[targetId] = 1;
+                    this.#saveTogglerStates();
+                }
+            }
+
+            #collapseToggler(button) {
+                const targetId = button.getAttribute('data-toggle-target-id');
+                const target = document.getElementById(targetId);
+
+                if (!target) {
+                    throw `Toggle target ${targetId} does not exist`;
+                }
+
+                if (this.#isTogglerExpanded(button)) {
+                    button.classList.add('closed');
+                    target.classList.add('hidden');
+
+                    this.#togglerStates[targetId] = 0;
+                    this.#saveTogglerStates();
+                }
+            }
+
+            #toggleToggler(button) {
+                if (button.classList.contains('closed')) {
+                    this.#expandToggler(button);
+                } else {
+                    this.#collapseToggler(button);
+                }
+            }
+
+            #saveTogglerStates() {
+                this.#storage.setItem(this.#storageKey, JSON.stringify(this.#togglerStates));
+            }
+
+            #getTogglerStates() {
+                const data = this.#storage.getItem(this.#storageKey);
+
+                if (null !== data) {
+                    try {
+                        return JSON.parse(data);
+                    } catch(e) {
+                    }
+                }
+
+                return {};
+            }
+
+            #isObject(variable) {
+                return null !== variable && 'object' === typeof variable && !Array.isArray(variable);
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block panel %}
+    <h2>Forms</h2>
+
+    {% if collector.data.forms|length %}
+        <div class="tree-wrapper">
+            <div id="tree-menu" class="tree">
+                <ul>
+                {% for formName, formData in collector.data.forms %}
+                    {{ _self.form_tree_entry(formName, formData, true) }}
+                {% endfor %}
+                </ul>
+            </div>
+
+            <div id="tree-details-container">
+                {% for formName, formData in collector.data.forms %}
+                    {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="empty empty-panel">
+            <p>No forms were submitted.</p>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro form_tree_entry(name, data, is_root) %}
+    {% set has_error = data.errors is defined and data.errors|length > 0 %}
+    <li>
+        <div class="tree-inner" data-tab-target-id="{{ data.id }}-details" title="{{ name|default('(no name)') }}">
+            {% if has_error %}
+                <div class="badge-error">{{ data.errors|length }}</div>
+            {% endif %}
+
+            {% if data.children is not empty %}
+                <button class="toggle-button" data-toggle-target-id="{{ data.id }}-children">
+                    {{ source('@WebProfiler/Icon/chevron-down.svg') }}
+                </button>
+            {% else %}
+                <div class="toggle-icon empty"></div>
+            {% endif %}
+
+            <span {% if has_error or data.has_children_error|default(false) %}class="has-error"{% endif %}>
+                {{ name|default('(no name)') }}
+            </span>
+        </div>
+
+        {% if data.children is not empty %}
+            <ul id="{{ data.id }}-children" {% if not is_root and not data.has_children_error|default(false) %}class="hidden"{% endif %}>
+                {% for childName, childData in data.children %}
+                    {{ _self.form_tree_entry(childName, childData, false) }}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </li>
+{% endmacro %}
+
+{% macro form_tree_details(name, data, forms_by_hash, show) %}
+    <div class="tree-details{% if not show|default(false) %} hidden{% endif %}" {% if data.id is defined %}id="{{ data.id }}-details"{% endif %}>
+        <h2>{{ name|default('(no name)') }}</h2>
+        {% if data.type_class is defined %}
+            <div class="form-type-class">
+                <span class="form-type-class-label">Form type:</span>
+                {{ profiler_dump(data.type_class) }}
+            </div>
+        {% endif %}
+
+        {% set form_has_errors = data.errors ?? [] is not empty %}
+        <div class="sf-tabs">
+            <div class="tab {{ form_has_errors ? 'active' : 'disabled' }}">
+                <h3 class="tab-title">Errors</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_errors(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ not form_has_errors ? 'active' }}">
+                <h3 class="tab-title">Default Data</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_default_data(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.submitted_data ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title">Submitted Data</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_submitted_data(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.passed_options ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title">Passed Options</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_passed_options(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.resolved_options ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title">Resolved Options</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_resolved_options(data) }}
+                </div>
+            </div>
+
+            <div class="tab {{ (data.view_vars ?? []) is empty ? 'disabled' }}">
+                <h3 class="tab-title">View Vars</h3>
+
+                <div class="tab-content">
+                    {{ _self.render_form_view_variables(data) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% for childName, childData in data.children %}
+        {{ _self.form_tree_details(childName, childData, forms_by_hash) }}
+    {% endfor %}
+{% endmacro %}
+
+{% macro render_form_errors(data) %}
+    {% if data.errors is defined and data.errors|length > 0 %}
+        <div class="errors">
+            <table id="{{ data.id }}-errors">
+                <thead>
+                <tr>
+                    <th>Message</th>
+                    <th>Origin</th>
+                    <th>Cause</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for error in data.errors %}
+                    <tr>
+                        <td>{{ error.message }}</td>
+                        <td>
+                            {% if error.origin is empty %}
+                                <em>This form.</em>
+                            {% elseif forms_by_hash[error.origin] is not defined %}
+                                <em>Unknown.</em>
+                            {% else %}
+                                {{ forms_by_hash[error.origin].name }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if error.trace %}
+                                <span class="newline">Caused by:</span>
+                                {% for stacked in error.trace %}
+                                    {{ profiler_dump(stacked) }}
+                                {% endfor %}
+                            {% else %}
+                                <em>Unknown.</em>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty">
+            <p>This form has no errors.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_default_data(data) %}
+    {% if data.default_data is defined %}
+        <table>
+            <thead>
+            <tr>
+                <th class="sf-profiler-form-col-property">Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th class="font-normal" scope="row">Model Format</th>
+                <td>
+                    {% if data.default_data.model is defined %}
+                        {{ profiler_dump(data.default_data.seek('model')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">Normalized Format</th>
+                <td>{{ profiler_dump(data.default_data.seek('norm')) }}</td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">View Format</th>
+                <td>
+                    {% if data.default_data.view is defined %}
+                        {{ profiler_dump(data.default_data.seek('view')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No default data defined.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_submitted_data(data) %}
+    {% if data.submitted_data.norm is defined %}
+        <table>
+            <thead>
+            <tr>
+                <th class="sf-profiler-form-col-property">Property</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th class="font-normal" scope="row">View Format</th>
+                <td>
+                    {% if data.submitted_data.view is defined %}
+                        {{ profiler_dump(data.submitted_data.seek('view')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">Normalized Format</th>
+                <td>{{ profiler_dump(data.submitted_data.seek('norm')) }}</td>
+            </tr>
+            <tr>
+                <th class="font-normal" scope="row">Model Format</th>
+                <td>
+                    {% if data.submitted_data.model is defined %}
+                        {{ profiler_dump(data.submitted_data.seek('model')) }}
+                    {% else %}
+                        <em class="font-normal text-muted">same as normalized format</em>
+                    {% endif %}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>This form was not submitted.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_passed_options(data) %}
+    {% if data.passed_options ?? [] is not empty %}
+        <table>
+            <thead>
+            <tr>
+                <th class="sf-profiler-form-col-property">Option</th>
+                <th>Passed Value</th>
+                <th>Resolved Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for option, value in data.passed_options %}
+                <tr>
+                    <th>{{ option }}</th>
+                    <td>{{ profiler_dump(value) }}</td>
+                    <td>
+                        {# values can be stubs #}
+                        {% set option_value = (value.value is defined) ? value.value : value %}
+                        {% set resolved_option_value = (data.resolved_options[option].value is defined)
+                            ? data.resolved_options[option].value
+                            : data.resolved_options[option] %}
+                        {% if resolved_option_value == option_value %}
+                            <em class="font-normal text-muted">same as passed value</em>
+                        {% else %}
+                            {{ profiler_dump(data.resolved_options.seek(option)) }}
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No options were passed when constructing this form.</p>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_form_resolved_options(data) %}
+    <table>
+        <thead>
+        <tr>
+            <th class="sf-profiler-form-col-property">Option</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for option, value in data.resolved_options ?? [] %}
+            <tr>
+                <th scope="row">{{ option }}</th>
+                <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_form_view_variables(data) %}
+    <table>
+        <thead>
+        <tr>
+            <th class="sf-profiler-form-col-property">Variable</th>
+            <th>Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for variable, value in data.view_vars ?? [] %}
+            <tr>
+                <th scope="row">{{ variable }}</th>
+                <td>{{ profiler_dump(value) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

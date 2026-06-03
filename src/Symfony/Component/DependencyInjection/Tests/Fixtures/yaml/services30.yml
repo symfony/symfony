@@ -1,0 +1,14 @@
+parameters:
+    imported_parameter: 'default value'
+
+when@dev:
+    parameters:
+        imported_parameter: 'value when on dev'
+
+when@test:
+    parameters:
+        imported_parameter: 'value when on test'
+
+when@prod:
+    parameters:
+        imported_parameter: 'value when on prod'

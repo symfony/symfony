@@ -1,0 +1,30 @@
+form_login:
+    path:     /login
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::loginAction }
+
+form_login_check:
+    path:     /login_check
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::loginCheckAction }
+
+form_login_homepage:
+    path:     /
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::afterLoginAction }
+
+form_login_custom_target_path:
+    path:     /foo
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::afterLoginAction }
+
+form_login_default_target_path:
+    path:     /profile
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::afterLoginAction }
+
+form_login_redirect_to_protected_resource_after_login:
+    path:     /protected-resource
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::afterLoginAction }
+
+form_logout:
+    path:     /logout_path
+
+form_secure_action:
+    path:     /secure-but-not-covered-by-access-control
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\CsrfFormLoginBundle\Controller\LoginController::secureAction }

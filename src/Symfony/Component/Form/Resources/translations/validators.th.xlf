@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="th" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="28">
+                <source>This form should not contain extra fields.</source>
+                <target>ฟอร์มนี้ไม่ควรมี extra fields</target>
+            </trans-unit>
+            <trans-unit id="29">
+                <source>The uploaded file was too large. Please try to upload a smaller file.</source>
+                <target>ไฟล์ที่อัพโหลดมีขนาดใหญ่เกินไป กรุณาลองอัพโหลดใหม่อีกครั้งด้วยไฟล์ที่มีขนาดเล็กลง</target>
+            </trans-unit>
+            <trans-unit id="30">
+                <source>The CSRF token is invalid. Please try to resubmit the form.</source>
+                <target>CSRF token ไม่ถูกต้อง กรุณาลองส่งแบบฟอร์มใหม่</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid HTML5 color.</source>
+                <target>ค่านี้ไม่ใช่ค่าที่ถูกต้องของค่าสี HTML5</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>Please enter a valid birthdate.</source>
+                <target>กรุณากรอกวันเดือนปีเกิดที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>The selected choice is invalid.</source>
+                <target>ตัวเลือกที่เลิอกไม่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>The collection is invalid.</source>
+                <target>คอเล็กชั่นไม่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>Please select a valid color.</source>
+                <target>กรุณาเลือกค่าสีที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>Please select a valid country.</source>
+                <target>กรุณาเลือกประเทศที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>Please select a valid currency.</source>
+                <target>กรุุณาเลิอกค่าสกุลเงินที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>Please choose a valid date interval.</source>
+                <target>กรุณณากรอกช่วงวันที่ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Please enter a valid date and time.</source>
+                <target>กรุณณากรอกค่าเวลาและวันที่ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Please enter a valid date.</source>
+                <target>กรุณณากรอกค่าวันที่ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Please select a valid file.</source>
+                <target>กรุณาเลือกไฟล์ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The hidden field is invalid.</source>
+                <target>ค่า Hidden field ไม่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>Please enter an integer.</source>
+                <target>กรุณากรอกตัวเลขจำนวนเต็ม</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>Please select a valid language.</source>
+                <target>กรุณาเลือกภาษาที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>Please select a valid locale.</source>
+                <target>กรุณาเลือกท้องถิ่นที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>Please enter a valid money amount.</source>
+                <target>กรุณากรอกจำนวนเงินที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>Please enter a number.</source>
+                <target>กรุณากรอกตัวเลข</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>The password is invalid.</source>
+                <target>รหัสผ่านไม่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>Please enter a percentage value.</source>
+                <target>กรุณากรอกค่าเปอร์เซ็นต์</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>The values do not match.</source>
+                <target>ค่าทั้งสองไม่ตรงกัน</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>Please enter a valid time.</source>
+                <target>กรุณากรอกค่าเวลาที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="120">
+                <source>Please select a valid timezone.</source>
+                <target>กรุณาเลือกค่าเขตเวลาที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>Please enter a valid URL.</source>
+                <target>กรุณากรอก URL ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>Please enter a valid search term.</source>
+                <target>กรุณากรอกคำค้นหาที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>Please provide a valid phone number.</source>
+                <target>กรุณากรอกเบอร์โทรศัพท์ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The checkbox has an invalid value.</source>
+                <target>Checkbox มีค่าที่ไม่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>Please enter a valid email address.</source>
+                <target>กรุณากรอกที่อยู่อีเมล์ที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>Please select a valid option.</source>
+                <target>กรุณาเลือกตัวเลือกที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>Please select a valid range.</source>
+                <target>กรุณาเลือกค่าช่วงที่ถูกต้อง</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>Please enter a valid week.</source>
+                <target>กรุณากรอกค่าสัปดาห์ที่ถูกต้อง</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

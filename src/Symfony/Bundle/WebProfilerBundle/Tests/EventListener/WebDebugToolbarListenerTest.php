@@ -1,0 +1,508 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\WebProfilerBundle\Tests\EventListener;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
+use Symfony\Component\HttpFoundation\EventStreamResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ServerEvent;
+use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
+
+class WebDebugToolbarListenerTest extends TestCase
+{
+    #[DataProvider('getInjectToolbarTests')]
+    public function testInjectToolbar(string $content, string $expected)
+    {
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $m = new \ReflectionMethod($listener, 'injectToolbar');
+
+        $response = new Response($content);
+
+        $m->invoke($listener, $response, Request::create('/'), ['csp_script_nonce' => 'scripto', 'csp_style_nonce' => 'stylo']);
+        $this->assertEquals($expected, $response->getContent());
+    }
+
+    public static function getInjectToolbarTests()
+    {
+        return [
+            ['<html><head></head><body></body></html>', "<html><head></head><body>\nWDT\n</body></html>"],
+            ['<html>
+            <head></head>
+            <body>
+            <textarea><html><head></head><body></body></html></textarea>
+            </body>
+            </html>', "<html>
+            <head></head>
+            <body>
+            <textarea><html><head></head><body></body></html></textarea>
+            \nWDT\n</body>
+            </html>"],
+        ];
+    }
+
+    #[DataProvider('provideRedirects')]
+    public function testHtmlRedirectionIsIntercepted(int $statusCode)
+    {
+        $response = new Response('Some content', $statusCode);
+        $response->headers->set('Location', 'https://example.com/');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock('Redirection'), true);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('Redirection', $response->getContent());
+    }
+
+    public function testNonHtmlRedirectionIsNotIntercepted()
+    {
+        $response = new Response('Some content', 301);
+        $response->headers->set('Location', 'https://example.com/');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request([], [], ['_format' => 'json']), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock('Redirection'), true);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals(301, $response->getStatusCode());
+        $this->assertEquals('Some content', $response->getContent());
+    }
+
+    public function testToolbarIsInjected()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnNonHtmlContentType()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $response->headers->set('Content-Type', 'text/xml');
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnContentDispositionAttachment()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $response->headers->set('Content-Disposition', 'attachment; filename=test.html');
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    #[DataProvider('provideRedirects')]
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnRedirection(int $statusCode)
+    {
+        $response = new Response('<html><head></head><body></body></html>', $statusCode);
+        $response->headers->set('Location', 'https://example.com/');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    public static function provideRedirects(): array
+    {
+        return [
+            [301],
+            [302],
+        ];
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedWhenThereIsNoNoXDebugTokenResponseHeader()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedWhenOnSubRequest()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::SUB_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnIncompleteHtmlResponses()
+    {
+        $response = new Response('<div>Some content</div>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<div>Some content</div>', $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnXmlHttpRequests()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $request = new Request();
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnNonHtmlRequests()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request([], [], ['_format' => 'json']), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    public function testXDebugUrlHeader()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', ['token' => 'xxxxxxxx'], UrlGeneratorInterface::ABSOLUTE_URL)
+            ->willReturn('http://mydomain.com/_profiler/xxxxxxxx')
+        ;
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, $urlGenerator);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('http://mydomain.com/_profiler/xxxxxxxx', $response->headers->get('X-Debug-Token-Link'));
+    }
+
+    public function testThrowingUrlGenerator()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', ['token' => 'xxxxxxxx'])
+            ->willThrowException(new \Exception('foo'))
+        ;
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, $urlGenerator);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('Exception: foo', $response->headers->get('X-Debug-Error'));
+    }
+
+    public function testThrowingErrorCleanup()
+    {
+        $response = new Response();
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator
+            ->expects($this->once())
+            ->method('generate')
+            ->with('_profiler', ['token' => 'xxxxxxxx'])
+            ->willThrowException(new \Exception("This\nmultiline\r\ntabbed text should\tcome out\r on\n \ta single plain\r\nline"))
+        ;
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, $urlGenerator);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals('Exception: This multiline tabbed text should come out on a single plain line', $response->headers->get('X-Debug-Error'));
+    }
+
+    public function testCspNonceIsForwardedToDumpDataCollectorWhenDumperWasUsed()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $cspHandler = $this->createMock(ContentSecurityPolicyHandler::class);
+        $cspHandler->expects($this->never())
+            ->method('disableCsp');
+        $cspHandler->expects($this->once())
+            ->method('updateResponseHeaders')
+            ->willReturn(['csp_script_nonce' => 'script-abc', 'csp_style_nonce' => 'style-xyz']);
+
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector->expects($this->once())
+            ->method('getDumpsCount')
+            ->willReturn(1);
+        $dumpDataCollector->expects($this->once())
+            ->method('setNonce')
+            ->with('script-abc', 'style-xyz');
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', $cspHandler, $dumpDataCollector);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+    }
+
+    public function testCspNonceIsNotForwardedIfDumperWasNotUsed()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $cspHandler = $this->createMock(ContentSecurityPolicyHandler::class);
+        $cspHandler->expects($this->never())
+            ->method('disableCsp');
+        $dumpDataCollector = $this->createMock(DumpDataCollector::class);
+        $dumpDataCollector->expects($this->once())
+            ->method('getDumpsCount')
+            ->willReturn(0);
+        $dumpDataCollector->expects($this->never())
+            ->method('setNonce');
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', $cspHandler, $dumpDataCollector);
+        $listener->onKernelResponse($event);
+
+        $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
+    }
+
+    public function testNullContentTypeWithNoDebugEnv()
+    {
+        $response = new Response('<html><head></head><body></body></html>');
+        $response->headers->set('Content-Type', null);
+        $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null);
+        $listener->onKernelResponse($event);
+
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testAjaxReplaceHeaderOnDisabledToolbar()
+    {
+        $response = new Response();
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::DISABLED, null, '', null, null, true);
+        $listener->onKernelResponse($event);
+
+        $this->assertFalse($response->headers->has('Symfony-Debug-Toolbar-Replace'));
+    }
+
+    public function testAjaxReplaceHeaderOnDisabledReplace()
+    {
+        $response = new Response();
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', null, null);
+        $listener->onKernelResponse($event);
+
+        $this->assertFalse($response->headers->has('Symfony-Debug-Toolbar-Replace'));
+    }
+
+    public function testAjaxReplaceHeaderOnEnabledAndNonXHR()
+    {
+        $response = new Response();
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', null, null, true);
+        $listener->onKernelResponse($event);
+
+        $this->assertFalse($response->headers->has('Symfony-Debug-Toolbar-Replace'));
+    }
+
+    public function testAjaxReplaceHeaderOnEnabledAndXHR()
+    {
+        $request = new Request();
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+        $response = new Response();
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', null, null, true);
+        $listener->onKernelResponse($event);
+
+        $this->assertSame('1', $response->headers->get('Symfony-Debug-Toolbar-Replace'));
+    }
+
+    public function testAjaxReplaceHeaderOnEnabledAndXHRButPreviouslySet()
+    {
+        $request = new Request();
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+        $response = new Response();
+        $response->headers->set('Symfony-Debug-Toolbar-Replace', '0');
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock(), false, WebDebugToolbarListener::ENABLED, null, '', null, null, true);
+        $listener->onKernelResponse($event);
+
+        $this->assertSame('0', $response->headers->get('Symfony-Debug-Toolbar-Replace'));
+    }
+
+    public function testEventStreamResponseHasDebugEvents()
+    {
+        if (!class_exists(EventStreamResponse::class)) {
+            self::markTestSkipped('This test requires symfony/http-foundation >= 7.3');
+        }
+
+        $request = new Request();
+        $response = new EventStreamResponse(
+            static fn () => yield new ServerEvent('some data'),
+            200,
+            [
+                'X-Debug-Token' => 'aabbcc',
+                'X-Debug-Token-Link' => 'test://foobar',
+            ],
+        );
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+
+        $listener->onKernelResponse($event);
+
+        $this->expectOutputString(
+            <<<'EVENTSTREAM'
+                event: symfony:debug:started
+                data: aabbcc
+                data: test://foobar
+
+                data: some data
+
+                event: symfony:debug:finished
+                data: -
+
+
+                EVENTSTREAM
+        );
+        $response->send(false);
+    }
+
+    public function testEventStreamResponseHasDebugEventForException()
+    {
+        if (!class_exists(EventStreamResponse::class)) {
+            self::markTestSkipped('This test requires symfony/http-foundation >= 7.3');
+        }
+
+        $request = new Request();
+        $response = new EventStreamResponse(
+            static function () {
+                yield new ServerEvent('some data');
+                throw new \RuntimeException('Something went wrong');
+            },
+            200,
+            [
+                'X-Debug-Token' => 'aabbcc',
+                'X-Debug-Token-Link' => 'test://foobar',
+            ],
+        );
+        $event = new ResponseEvent($this->createStub(KernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+
+        $listener = new WebDebugToolbarListener($this->getTwigMock());
+
+        $listener->onKernelResponse($event);
+
+        $this->expectOutputString(
+            <<<'EVENTSTREAM'
+                event: symfony:debug:started
+                data: aabbcc
+                data: test://foobar
+
+                data: some data
+
+                event: symfony:debug:error
+                data: error
+
+                event: symfony:debug:finished
+                data: -
+
+
+                EVENTSTREAM
+        );
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Something went wrong');
+        $response->send(false);
+    }
+
+    protected function getTwigMock(string $render = 'WDT')
+    {
+        $templating = $this->createStub(Environment::class);
+        $templating
+            ->method('render')
+            ->willReturn($render);
+
+        return $templating;
+    }
+}

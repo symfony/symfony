@@ -1,0 +1,19 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Class2
+        public: true
+        tags:
+            - container.decorator: { id: bar, inner: b }
+        file: file.php
+        lazy: true
+        arguments: ['@b']
+    b:
+        class: Class1
+    bar:
+        alias: foo
+        public: true

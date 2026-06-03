@@ -1,0 +1,51 @@
+{
+    "name": "symfony/security-http",
+    "type": "library",
+    "description": "Symfony Security Component - HTTP Integration",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^8.1",
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/security-core": "^7.4|^8.0",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "psr/log": "^1|^2|^3",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/http-client-contracts": "^3.0",
+        "symfony/rate-limiter": "^7.4|^8.0",
+        "symfony/routing": "^7.4|^8.0",
+        "symfony/security-csrf": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "web-token/jwt-library": "^3.3.2|^4.0"
+    },
+    "conflict": {
+        "symfony/http-client-contracts": "<3.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Security\\Http\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

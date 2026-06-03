@@ -1,0 +1,30 @@
+{
+  "event_type": "email_clicked",
+  "timestamp": "2024-09-02T08:45:05+00:00",
+  "swg_uid": "02-6e5dbe48-e6f4-4af3-8fb4-bf125e75776b",
+  "event_id": "3e434a94-628c-4cbd-92b5-ed6be715aa2c",
+  "channel": "email",
+  "transaction_id": "568c5678-2d03-40f8-89e0-22ffb5cfe63d",
+  "headers": {
+    "x-mailer": "Sweego",
+    "x-swg-uid": "02-6e5dbe48-e6f4-4af3-8fb4-bf125e75776b",
+    "x-client-id": "f8367456332369298d050cf4bc83e058",
+    "x-client-ip": "XXX.XXX.XXX.XXX",
+    "x-campaign-id": "fake_campaign",
+    "x-campaign-type": "default",
+    "x-originating-ip": "XXX.XXX.XXX.XXX",
+    "x-transaction-id": "568c5678-2d03-40f8-89e0-22ffb5cfe63d"
+  },
+  "campaign_tags": null,
+  "campaign_type": "default",
+  "campaign_id": "fake_campaign",
+  "recipient": "recipient@example.com",
+  "domain_from": "example.org",
+  "subject": "Test webhook 2024-01-01",
+  "click": {
+    "ip_address": "XXX.XXX.XXX.XXX",
+    "url": "https://google.com",
+    "user_agent": "Mozilla/5.0 (Windows NT 5.1; rv:11.0) Gecko Firefox/11.0 (via ggpht.com GoogleImageProxy)",
+    "proxy": false
+  }
+}

@@ -1,0 +1,81 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Messenger\Tests\Fixtures;
+
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+
+class DummyReceiver implements ReceiverInterface
+{
+    private array $acknowledgedEnvelopes = [];
+    private array $rejectedEnvelopes = [];
+    private int $acknowledgeCount = 0;
+    private int $rejectCount = 0;
+    private array $fetchSizes = [];
+
+    /**
+     * @param Envelope[][] $deliveriesOfEnvelopes
+     */
+    public function __construct(
+        private array $deliveriesOfEnvelopes,
+    ) {
+    }
+
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
+    {
+        $this->fetchSizes[] = \func_num_args() > 0 ? func_get_arg(0) : 1;
+
+        $val = array_shift($this->deliveriesOfEnvelopes);
+
+        return $val ?? [];
+    }
+
+    public function ack(Envelope $envelope): void
+    {
+        ++$this->acknowledgeCount;
+        $this->acknowledgedEnvelopes[] = $envelope;
+    }
+
+    public function reject(Envelope $envelope): void
+    {
+        ++$this->rejectCount;
+        $this->rejectedEnvelopes[] = $envelope;
+    }
+
+    public function getAcknowledgeCount(): int
+    {
+        return $this->acknowledgeCount;
+    }
+
+    public function getRejectCount(): int
+    {
+        return $this->rejectCount;
+    }
+
+    public function getAcknowledgedEnvelopes(): array
+    {
+        return $this->acknowledgedEnvelopes;
+    }
+
+    public function getRejectedEnvelopes(): array
+    {
+        return $this->rejectedEnvelopes;
+    }
+
+    public function getFetchSizes(): array
+    {
+        return $this->fetchSizes;
+    }
+}

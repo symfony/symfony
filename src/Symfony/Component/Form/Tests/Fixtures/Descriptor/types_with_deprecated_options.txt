@@ -1,0 +1,4 @@
+Service form types
+------------------
+
+ * Symfony\Component\Form\Tests\Console\Descriptor\FooType

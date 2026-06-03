@@ -1,0 +1,58 @@
+{
+    "name": "symfony/cache",
+    "type": "library",
+    "description": "Provides extended PSR-6, PSR-16 (and tags) implementations",
+    "keywords": ["caching", "psr6"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "provide": {
+        "psr/cache-implementation": "2.0|3.0",
+        "psr/simple-cache-implementation": "1.0|2.0|3.0",
+        "symfony/cache-implementation": "1.1|2.0|3.0"
+    },
+    "require": {
+        "php": ">=8.4.1",
+        "psr/cache": "^2.0|^3.0",
+        "psr/log": "^1.1|^2|^3",
+        "symfony/cache-contracts": "^3.6",
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/var-exporter": "^8.1"
+    },
+    "require-dev": {
+        "cache/integration-tests": "dev-master",
+        "doctrine/dbal": "^4.3",
+        "predis/predis": "^1.1|^2.0",
+        "psr/simple-cache": "^1.0|^2.0|^3.0",
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
+    },
+    "conflict": {
+        "ext-redis": "<6.1",
+        "ext-relay": "<0.12.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Cache\\": "" },
+        "classmap": [
+            "Traits/ValueWrapper.php"
+        ],
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

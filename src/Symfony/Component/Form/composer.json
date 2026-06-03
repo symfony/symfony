@@ -1,0 +1,60 @@
+{
+    "name": "symfony/form",
+    "type": "library",
+    "description": "Allows to easily create, process and reuse HTML forms",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/options-resolver": "^7.4|^8.0",
+        "symfony/polyfill-ctype": "^1.8",
+        "symfony/polyfill-intl-icu": "^1.21",
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/var-exporter": "^8.1"
+    },
+    "require-dev": {
+        "doctrine/collections": "^1.0|^2.0",
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/html-sanitizer": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/intl": "^7.4|^8.0",
+        "symfony/security-core": "^7.4|^8.0",
+        "symfony/security-csrf": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "symfony/uid": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/translation-contracts": "<2.5",
+        "symfony/intl": "<7.4",
+        "symfony/validator": "<7.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Form\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

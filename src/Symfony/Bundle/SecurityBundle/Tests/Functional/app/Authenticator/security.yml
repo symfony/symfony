@@ -1,0 +1,13 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    'jane@example.org': { password: test, roles: [ROLE_USER] }
+        in_memory2:
+            memory:
+                users:
+                    'john@example.org': { password: test, roles: [ROLE_USER] }

@@ -1,0 +1,14 @@
+{
+    "event": "blocked",
+    "time": 1430812195,
+    "MessageID": 13792286917004336,
+    "Message_GUID": "1ab23cd4-e567-8901-2345-6789f0gh1i2j",
+    "email": "bounce@mailjet.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 1000,
+    "customcampaign": "",
+    "CustomID": "helloworld",
+    "Payload": "",
+    "error_related_to": "mailjet",
+    "error": "preblocked"
+}

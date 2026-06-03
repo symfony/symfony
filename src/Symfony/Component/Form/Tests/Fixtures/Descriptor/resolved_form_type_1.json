@@ -1,0 +1,91 @@
+{
+    "class": "Symfony\\Component\\Form\\Extension\\Core\\Type\\ChoiceType",
+    "block_prefix": "choice",
+    "options": {
+        "own": [
+            "choice_attr",
+            "choice_filter",
+            "choice_label",
+            "choice_lazy",
+            "choice_loader",
+            "choice_name",
+            "choice_translation_domain",
+            "choice_translation_parameters",
+            "choice_value",
+            "choices",
+            "duplicate_preferred_choices",
+            "expanded",
+            "group_by",
+            "multiple",
+            "placeholder",
+            "placeholder_attr",
+            "preferred_choices",
+            "separator",
+            "separator_html"
+        ],
+        "overridden": {
+            "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [
+                "compound",
+                "data_class",
+                "empty_data",
+                "error_bubbling",
+                "invalid_message",
+                "trim"
+            ]
+        },
+        "parent": {
+            "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [
+                "action",
+                "allow_file_upload",
+                "attr",
+                "attr_translation_parameters",
+                "auto_initialize",
+                "block_name",
+                "block_prefix",
+                "by_reference",
+                "data",
+                "disabled",
+                "form_attr",
+                "getter",
+                "help",
+                "help_attr",
+                "help_html",
+                "help_translation_parameters",
+                "inherit_data",
+                "invalid_message_parameters",
+                "is_empty_callback",
+                "label",
+                "label_attr",
+                "label_format",
+                "label_html",
+                "label_translation_parameters",
+                "mapped",
+                "method",
+                "post_max_size_message",
+                "priority",
+                "property_path",
+                "required",
+                "row_attr",
+                "setter",
+                "translation_domain",
+                "upload_max_size_message"
+            ]
+        },
+        "extension": {
+            "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension": [
+                "csrf_field_name",
+                "csrf_message",
+                "csrf_protection",
+                "csrf_token_id",
+                "csrf_token_manager"
+            ]
+        },
+        "required": []
+    },
+    "parent_types": [
+        "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType"
+    ],
+    "type_extensions": [
+        "Symfony\\Component\\Form\\Extension\\Csrf\\Type\\FormTypeCsrfExtension"
+    ]
+}

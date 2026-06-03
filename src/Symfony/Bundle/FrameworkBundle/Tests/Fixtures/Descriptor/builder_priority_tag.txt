@@ -1,0 +1,15 @@
+
+[33mSymfony Container Services Tagged with "tag1" Tag[39m
+[33m=================================================[39m
+
+ ------------------------------------------ ------- ------- ---------- ------- ----------------------- 
+ [32m Service ID                               [39m [32m attr1 [39m [32m attr2 [39m [32m priority [39m [32m attr3 [39m [32m Class name            [39m 
+ ------------------------------------------ ------- ------- ---------- ------- ----------------------- 
+  definition_3                                               40         val3    Full\Qualified\Class3  
+   (same service as previous, another tag)   val1    val2    0                                         
+  definition_1                               val1            30                 Full\Qualified\Class1  
+   (same service as previous, another tag)           val2                                              
+  definition_4                                               0                  Full\Qualified\Class4  
+  definition_2                               val1    val2    -20                Full\Qualified\Class2  
+ ------------------------------------------ ------- ------- ---------- ------- ----------------------- 
+

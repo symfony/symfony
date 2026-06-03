@@ -1,0 +1,17 @@
+{
+    "id": 814119,
+    "email": "example@gmail.com",
+    "message-id": "<202305311328.81899448177@smtp-relay.mailin.fr>",
+    "date": "2023-05-31 15:52:01",
+    "tags": [
+        "tag1",
+        "tag2"
+    ],
+    "tag": "[\"tag1\",\"tag2\"]",
+    "event": "unsubscribed",
+    "subject": "Subject Line",
+    "ts_event": 1685541121,
+    "ts": 1685541121,
+    "is_returnpath": true,
+    "ts_epoch": 1685541121606
+}

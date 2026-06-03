@@ -1,0 +1,9 @@
+imports:
+    - { resource: ./config.yml }
+    - { resource: ./config_session.yml }
+
+services:
+    Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security\UserChangingUserProvider:
+        public: true
+        decorates: security.user.provider.concrete.in_memory
+        arguments: ['@.inner']

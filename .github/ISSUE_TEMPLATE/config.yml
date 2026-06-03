@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+    - name: Support Question
+      url: https://symfony.com/support
+      about: We use GitHub issues only to discuss about Symfony bugs and new features. For this kind of questions about using Symfony or third-party bundles, please use any of the support alternatives shown in https://symfony.com/support
+    - name: Documentation Issue
+      url: https://github.com/symfony/symfony-docs/issues
+      about: Symfony Documentation has its own dedicated repository.

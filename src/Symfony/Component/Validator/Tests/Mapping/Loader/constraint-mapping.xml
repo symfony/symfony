@@ -1,0 +1,154 @@
+<?xml version="1.0" ?>
+
+<constraint-mapping xmlns="http://symfony.com/schema/dic/constraint-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/constraint-mapping https://symfony.com/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd">
+
+  <namespace prefix="custom">Symfony\Component\Validator\Tests\Fixtures\</namespace>
+
+  <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity">
+
+    <group-sequence>
+       <value>Foo</value>
+       <value>Entity</value>
+    </group-sequence>
+
+    <!-- CLASS CONSTRAINTS -->
+
+    <!-- Custom constraint -->
+    <constraint name="Symfony\Component\Validator\Tests\Fixtures\ConstraintA" />
+
+    <!-- Custom constraint with namespace abbreviation-->
+    <constraint name="custom:ConstraintB" />
+
+    <!-- Callbacks -->
+    <constraint name="Callback">validateMe</constraint>
+
+    <constraint name="Callback">validateMeStatic</constraint>
+
+    <constraint name="Callback">
+        <option name="callback">
+            <value>Symfony\Component\Validator\Tests\Fixtures\CallbackClass</value>
+            <value>callback</value>
+        </option>
+    </constraint>
+
+    <!-- Traverse with boolean default option -->
+    <constraint name="Traverse">
+        false
+    </constraint>
+
+    <!-- Constraint with named arguments support with scalar value -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
+      foo
+    </constraint>
+
+    <!-- Constraint with named arguments support with array value -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments">
+      <option name="choices">
+        <value>foo</value>
+        <value>bar</value>
+      </option>
+    </constraint>
+
+    <!-- Constraint with named arguments support with exactly one group -->
+    <constraint name="Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutValueWithNamedArguments">
+      <option name="groups">foo</option>
+    </constraint>
+
+    <!-- PROPERTY CONSTRAINTS -->
+
+    <property name="firstName">
+
+      <!-- Constraint without value -->
+      <constraint name="NotNull" />
+
+      <!-- Constraint with child constraints -->
+      <constraint name="All">
+        <option name="constraints">
+          <constraint name="NotNull" />
+          <constraint name="Range">
+            <option name="min">3</option>
+          </constraint>
+        </option>
+      </constraint>
+
+      <!-- Option with child constraints -->
+      <constraint name="All">
+        <option name="constraints">
+          <constraint name="NotNull" />
+          <constraint name="Range">
+             <option name="min">3</option>
+          </constraint>
+        </option>
+      </constraint>
+
+      <!-- Value with child constraints -->
+      <constraint name="Collection">
+        <option name="fields">
+          <value key="foo">
+            <constraint name="NotNull" />
+            <constraint name="Range">
+               <option name="min">3</option>
+            </constraint>
+          </value>
+          <value key="bar">
+            <constraint name="Range">
+               <option name="min">5</option>
+            </constraint>
+          </value>
+          <value key="baz">
+            <constraint name="Required">
+               <option name="constraints">
+                   <constraint name="Email" />
+               </option>
+            </constraint>
+          </value>
+          <value key="qux">
+            <constraint name="Optional">
+               <option name="constraints">
+                   <constraint name="NotBlank" />
+               </option>
+            </constraint>
+          </value>
+        </option>
+      </constraint>
+
+      <!-- Constraint with options -->
+      <constraint name="Choice">
+        <!-- Option with single value -->
+        <option name="message"> Must be one of %choices% </option>
+        <!-- Option with multiple values -->
+        <option name="choices">
+          <value>A</value>
+          <value>B</value>
+        </option>
+      </constraint>
+    </property>
+
+    <!-- GETTER CONSTRAINTS -->
+
+    <getter property="lastName">
+      <constraint name="NotNull" />
+    </getter>
+    <getter property="valid">
+      <constraint name="IsTrue" />
+    </getter>
+    <getter property="permissions">
+      <constraint name="IsTrue" />
+    </getter>
+  </class>
+
+  <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity">
+
+    <!-- GROUP SEQUENCE PROVIDER -->
+    <group-sequence-provider />
+
+  </class>
+
+  <class name="Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto">
+    <group-sequence-provider>
+      <value>Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider</value>
+    </group-sequence-provider>
+  </class>
+</constraint-mapping>

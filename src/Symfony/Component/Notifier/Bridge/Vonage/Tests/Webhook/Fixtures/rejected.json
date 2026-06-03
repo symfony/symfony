@@ -1,0 +1,25 @@
+{
+    "message_uuid": "aaaaaaaa-bbbb-cccc-dddd-0123456789ab",
+    "to": "447700900000",
+    "from": "447700900001",
+    "timestamp": {},
+    "status": "rejected",
+    "error": {
+        "type": "https://developer.nexmo.com/api-errors/messages-olympus#1000",
+        "title": 1000,
+        "detail": "Throttled - You have exceeded the submission capacity allowed on this account. Please wait and retry",
+        "instance": "bf0ca0bf927b3b52e3cb03217e1a1ddf"
+    },
+    "usage": {
+        "currency": "EUR",
+        "price": "0.0333"
+    },
+    "client_ref": "string",
+    "channel": "sms",
+    "destination": {
+        "network_code": "12345"
+    },
+    "sms": {
+        "count_total": "2"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "unicode-org/cldr",
+                "version": "2025.10.29",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/unicode-org/cldr",
+                    "reference": "release-48"
+                }
+            }
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/var-exporter": "^7.4|^8.0",
+        "unicode-org/cldr": "*"
+    }
+}

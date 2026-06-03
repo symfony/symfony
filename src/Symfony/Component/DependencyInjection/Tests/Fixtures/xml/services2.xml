@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <parameters>
+    <parameter key="a_string">a string</parameter>
+    <parameter key="foo">bar</parameter>
+    <parameter key="values" type="collection">
+      <parameter>0</parameter>
+      <parameter key="integer">4</parameter>
+      <parameter key="100">null</parameter>
+      <parameter type="string">true</parameter>
+      <parameter>true</parameter>
+      <parameter>false</parameter>
+      <parameter>on</parameter>
+      <parameter>off</parameter>
+      <parameter key="float">1.3</parameter>
+      <parameter>1000.3</parameter>
+      <parameter>a string</parameter>
+      <parameter trim="false"> a string not trimmed </parameter>
+      <parameter trim="true">
+        a trimmed string
+      </parameter>
+      <parameter type="string" trim="true">
+        an explicit trimmed string
+      </parameter>
+      <parameter type="collection">
+        <parameter>foo</parameter>
+        <parameter>bar</parameter>
+      </parameter>
+    </parameter>
+    <parameter key="mixedcase" type="collection"> <!-- Should be lower cased -->
+      <parameter key="MixedCaseKey">value</parameter> <!-- Should stay mixed case -->
+    </parameter>
+    <parameter key="constant" type="constant">PHP_EOL</parameter>
+  </parameters>
+</container>

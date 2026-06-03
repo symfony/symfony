@@ -1,0 +1,7 @@
+
+[39;49m // [39;49mÁrvíztűrőtükörfúrógép 🎼 Lorem ipsum dolor sit [33m💕 amet, consectetur adipisicing elit, sed do eiusmod tempor incididu[39m
+[39;49m // [39;49m[33mlabore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex[39m
+[39;49m // [39;49m[33mea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla  [39m
+[39;49m // [39;49m[33mpariatur.[39m Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est     
+[39;49m // [39;49mlaborum                                                                                                             
+

@@ -1,0 +1,29 @@
+{
+    "name": "symfony/stopwatch",
+    "type": "library",
+    "description": "Provides a way to profile code",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Stopwatch\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,178 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% if collector.totals.calls > 0 %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/cache.svg') }}
+            <span class="sf-toolbar-value">{{ collector.totals.calls }}</span>
+            <span class="sf-toolbar-info-piece-additional-detail">
+                <span class="sf-toolbar-label">in</span>
+                <span class="sf-toolbar-value">{{ '%0.2f'|format(collector.totals.time * 1000) }}</span>
+                <span class="sf-toolbar-label">ms</span>
+            </span>
+        {% endset %}
+        {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Cache Calls</b>
+            <span>{{ collector.totals.calls }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Total time</b>
+            <span>{{ '%0.2f'|format(collector.totals.time * 1000) }} ms</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Cache hits</b>
+            <span>{{ collector.totals.hits }} / {{ collector.totals.reads }}{% if collector.totals.hit_read_ratio is not null %} ({{ collector.totals.hit_read_ratio }}%){% endif %}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Cache writes</b>
+            <span>{{ collector.totals.writes }}</span>
+        </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.totals.calls == 0 ? 'disabled' }}">
+        <span class="icon" aria-hidden="true">
+            {{ source('@WebProfiler/Icon/cache.svg') }}
+        </span>
+        <strong>Cache</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Cache</h2>
+
+    {% if collector.totals.calls == 0 %}
+        <div class="empty empty-panel">
+            <p>No cache calls were made.</p>
+        </div>
+    {% else %}
+        {{ _self.render_metrics(collector.totals, true) }}
+
+        <h2>Pools</h2>
+        <div class="sf-tabs">
+            {# the empty merge is needed to turn the iterator into an array #}
+            {% set cache_pools_with_calls = collector.calls|filter(calls => calls|length > 0)|merge([]) %}
+            {% for name, calls in cache_pools_with_calls %}
+                <div class="tab {{ calls|length == 0 ? 'disabled' }}">
+                    <h3 class="tab-title">{{ name }} <span class="badge">{{ collector.statistics[name].calls }}</span></h3>
+
+                    <div class="tab-content">
+                        <h4>Adapter</h4>
+                        <div class="card">
+                            {% if collector.adapters[name] is defined %}
+                                <code>{{ collector.adapters[name] }}</code>
+                            {% else %}
+                                <span class="text-muted">Unable to get the adapter class.</span>
+                            {% endif %}
+                        </div>
+                        {% if calls|length == 0 %}
+                            <div class="empty">
+                                <p>No calls were made for {{ name }} pool.</p>
+                            </div>
+                        {% else %}
+                            <h4>Metrics</h4>
+                            {{ _self.render_metrics(collector.statistics[name]) }}
+
+                            <h4>Calls</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Time</th>
+                                        <th>Call</th>
+                                        <th>Hit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for call in calls %}
+                                    <tr>
+                                        <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                                        <td class="nowrap">{{ '%0.2f'|format((call.end - call.start) * 1000) }} ms</td>
+                                        <td class="nowrap">{{ call.name }}({{ call.namespace|default('') }})</td>
+                                        <td>{{ profiler_dump(call.value.result, maxDepth: 2) }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if loop.last %}
+                    <div class="tab">
+                        <h3 class="tab-title">Pools without calls <span class="badge">{{ collector.calls|filter(calls => 0 == calls|length)|length }}</span></h3>
+
+                        <div class="tab-content">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cache pools that received no calls</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cache_pool in collector.calls|filter(calls => 0 == calls|length)|keys|sort %}
+                                        <tr><td>{{ cache_pool }}</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% macro render_metrics(pool, is_total = false) %}
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ pool.calls }}</span>
+            <span class="label">{{ is_total ? 'Total calls' : 'Calls' }}</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ '%0.2f'|format(pool.time * 1000) }} <span class="unit">ms</span></span>
+            <span class="label">{{ is_total ? 'Total time' : 'Time' }}</span>
+        </div>
+
+        <div class="metric-divider"></div>
+
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value">{{ pool.reads }}</span>
+                <span class="label">{{ is_total ? 'Total reads' : 'Reads' }}</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ pool.writes }}</span>
+                <span class="label">{{ is_total ? 'Total writes' : 'Writes' }}</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ pool.deletes }}</span>
+                <span class="label">{{ is_total ? 'Total deletes' : 'Deletes' }}</span>
+            </div>
+        </div>
+
+        <div class="metric-divider"></div>
+
+        <div class="metric-group">
+            <div class="metric">
+                <span class="value">{{ pool.hits }}</span>
+                <span class="label">{{ is_total ? 'Total hits' : 'Hits' }}</span>
+            </div>
+            <div class="metric">
+                <span class="value">{{ pool.misses }}</span>
+                <span class="label">{{ is_total ? 'Total misses' : 'Misses' }}</span>
+            </div>
+            <div class="metric">
+                    <span class="value">
+                        {{ pool.hit_read_ratio ?? 0 }} <span class="unit">%</span>
+                    </span>
+                <span class="label">Hits/reads</span>
+            </div>
+        </div>
+    </div>
+{% endmacro %}

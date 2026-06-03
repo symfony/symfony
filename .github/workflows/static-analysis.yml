@@ -1,0 +1,94 @@
+name: Static Analysis
+
+on:
+  pull_request: ~
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  psalm:
+    name: Psalm
+    runs-on: ubuntu-24.04
+
+    env:
+      php-version: '8.4'
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.php-version }}
+          ini-values: memory_limit=-1,intl.default_locale=en,intl.error_level=0
+          coverage: none
+
+      - name: Checkout target branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Install dependencies
+        run: |
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
+          composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
+
+      - name: Generate Psalm baseline
+        run: ./vendor/bin/psalm.phar --set-baseline=.github/sa-tools/psalm.baseline.xml --no-progress
+
+      - name: Switch to PR
+        run: |
+          git checkout composer.json
+          git fetch --depth=1 origin '+${{ github.event.pull_request.head.sha }}'
+          git checkout -m FETCH_HEAD
+
+      - name: Psalm
+        run: ./vendor/bin/psalm.phar --no-progress || ./vendor/bin/psalm.phar --output-format=github --no-progress
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-24.04
+
+    env:
+      php-version: '8.4'
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.php-version }}
+          ini-values: memory_limit=-1,intl.default_locale=en,intl.error_level=0
+          coverage: none
+
+      - name: Checkout target branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.base_ref }}
+
+      - name: Install dependencies
+        run: |
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
+          composer require --no-progress --ansi --no-plugins phpstan/phpstan:@stable phpstan/phpstan-deprecation-rules:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
+
+      - name: Generate PHPStan baseline
+        run: ./vendor/bin/phpstan analyse --generate-baseline=.github/sa-tools/phpstan.baseline.neon --allow-empty-baseline --no-progress
+
+      - name: Switch to PR
+        run: |
+          git checkout composer.json
+          git fetch --depth=1 origin '+${{ github.event.pull_request.head.sha }}'
+          git checkout -m FETCH_HEAD
+
+      - name: PHPStan
+        run: ./vendor/bin/phpstan analyse --no-progress || ./vendor/bin/phpstan analyse --error-format=github --no-progress

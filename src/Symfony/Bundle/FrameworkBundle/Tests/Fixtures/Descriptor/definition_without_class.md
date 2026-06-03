@@ -1,0 +1,11 @@
+- Class: ``
+- Public: no
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
+- Deprecated: no
+- Arguments: no
+- Usages: none

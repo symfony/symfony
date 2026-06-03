@@ -1,0 +1,272 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Config\Tests\Resource;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
+use Symfony\Component\Config\Tests\Fixtures\FakeVendor\Base;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
+
+class ReflectionClassResourceTest extends TestCase
+{
+    public function testToString()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(\ErrorException::class));
+
+        $this->assertSame('reflection.ErrorException', (string) $res);
+    }
+
+    public function testSerializeUnserialize()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(DummyInterface::class));
+        $ser = unserialize(serialize($res));
+
+        $this->assertTrue($res->isFresh(0));
+        $this->assertTrue($ser->isFresh(0));
+
+        $this->assertSame((string) $res, (string) $ser);
+    }
+
+    public function testIsFresh()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(__CLASS__));
+        $mtime = filemtime(__FILE__);
+
+        $this->assertTrue($res->isFresh($mtime), '->isFresh() returns true if the resource has not changed in same second');
+        $this->assertTrue($res->isFresh($mtime + 10), '->isFresh() returns true if the resource has not changed');
+        $this->assertTrue($res->isFresh($mtime - 86400), '->isFresh() returns true if the resource has not changed');
+    }
+
+    public function testIsFreshForDeletedResources()
+    {
+        $now = time();
+        $tmp = sys_get_temp_dir().'/tmp.php';
+        file_put_contents($tmp, '<?php class ReflectionClassResourceTestClass {}');
+        require $tmp;
+
+        $res = new ReflectionClassResource(new \ReflectionClass(\ReflectionClassResourceTestClass::class));
+        $this->assertTrue($res->isFresh($now));
+
+        unlink($tmp);
+        $this->assertFalse($res->isFresh($now), '->isFresh() returns false if the resource does not exist');
+    }
+
+    #[DataProvider('provideHashedSignature')]
+    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null)
+    {
+        if ($setContext) {
+            $setContext();
+        }
+
+        $code = <<<'EOPHP'
+            /* 0*/
+            /* 1*/  class %s extends %s
+            /* 2*/  {
+            /* 3*/      const FOO = 123;
+            /* 4*/
+            /* 5*/      public $pub = [];
+            /* 6*/
+            /* 7*/      protected $prot;
+            /* 8*/
+            /* 9*/      private $priv;
+            /*10*/
+            /*11*/      public function pub($arg = null) {}
+            /*12*/
+            /*13*/      protected function prot($a = []) {}
+            /*14*/
+            /*15*/      private function priv() {}
+            /*16*/
+            /*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
+            /*18*/  }
+            EOPHP;
+
+        static $expectedSignature, $signatureGenerator;
+
+        if (null === $expectedSignature) {
+            eval(\sprintf($code, $class = 'Foo'.(string) $resourceClassNameSuffix, Base::class));
+
+            $r = new \ReflectionClass(ReflectionClassResource::class);
+            $generateSignature = $r->getMethod('generateSignature');
+
+            $res = new ReflectionClassResource(new \ReflectionClass($class), [\dirname(__DIR__).'/Fixtures/FakeVendor']);
+            $signatureGenerator = $generateSignature->getClosure($res);
+            $expectedSignature = implode("\n", iterator_to_array($signatureGenerator(new \ReflectionClass($class))));
+
+            $signatureGenerator = $generateSignature->getClosure(unserialize(serialize($res)));
+        }
+
+        $code = explode("\n", $code);
+        if (null !== $changedCode) {
+            $code[$changedLine] = $changedCode;
+        }
+        eval(\sprintf(implode("\n", $code), $class = 'Bar'.(string) $resourceClassNameSuffix, Base::class));
+        $signature = implode("\n", iterator_to_array($signatureGenerator(new \ReflectionClass($class))));
+
+        if ($changeExpected) {
+            $this->assertNotSame($expectedSignature, $signature);
+        } else {
+            $this->assertSame($expectedSignature, $signature);
+        }
+    }
+
+    public static function provideHashedSignature(): iterable
+    {
+        $i = 0;
+        yield [false, 0, "// line change\n\n", ++$i];
+        yield [true, 0, '/** class docblock */', ++$i];
+        yield [true, 0, '#[Foo]', ++$i];
+        yield [true, 0, '#[Foo(new MissingClass)]', ++$i];
+        yield [true, 1, 'abstract class %s', ++$i];
+        yield [true, 1, 'final class %s', ++$i];
+        yield [true, 1, 'class %s extends Exception', ++$i];
+        yield [true, 1, 'class %s implements '.DummyInterface::class, ++$i];
+        yield [true, 3, 'const FOO = 456;', ++$i];
+        yield [true, 3, 'const BAR = 123;', ++$i];
+        yield [true, 4, '/** pub docblock */', ++$i];
+        yield [true, 5, 'protected $pub = [];', ++$i];
+        yield [true, 5, 'public $pub = [123];', ++$i];
+        yield [true, 5, '#[Foo(new MissingClass)] public $pub = [];', ++$i];
+        yield [true, 6, '/** prot docblock */', ++$i];
+        yield [true, 7, 'private $prot;', ++$i];
+        yield [false, 8, '/** priv docblock */', ++$i];
+        yield [false, 9, 'private $priv = 123;', ++$i];
+        yield [true, 10, '/** pub docblock */', ++$i];
+        yield [true, 11, 'public function pub(...$arg) {}', ++$i];
+        yield [true, 11, 'public function pub($arg = null): Foo {}', ++$i];
+        yield [false, 11, "public function pub(\$arg = null) {\nreturn 123;\n}", ++$i];
+        yield [true, 12, '/** prot docblock */', ++$i];
+        yield [true, 13, 'protected function prot($a = [123]) {}', ++$i];
+        yield [true, 13, '#[Foo] protected function prot($a = []) {}', ++$i];
+        yield [true, 13, 'protected function prot(#[Foo] $a = []) {}', ++$i];
+        yield [true, 13, '#[Foo(new MissingClass)] protected function prot($a = []) {}', ++$i];
+        yield [true, 13, 'protected function prot(#[Foo(new MissingClass)] $a = []) {}', ++$i];
+        yield [false, 14, '/** priv docblock */', ++$i];
+        yield [false, 15, null, ++$i];
+
+        // PHP7.4 typed properties without default value are
+        // undefined, make sure this doesn't throw an error
+        yield [true, 5, 'public array $pub;', ++$i];
+        yield [false, 7, 'protected int $prot;', ++$i];
+        yield [false, 9, 'private string $priv;', ++$i];
+        yield [true, 17, 'public function __construct(private $bar = new \stdClass()) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = new \stdClass()) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = new MissingClass()) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = 187) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}', ++$i];
+        yield [true, 17, 'public function ccc($bar = parent::BOOM) {}', ++$i];
+        yield [false, 17, null, ++$i, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
+    }
+
+    public function testEventSubscriber()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+
+        TestEventSubscriber::$subscribedEvents = [123];
+        $this->assertFalse($res->isFresh(0));
+
+        $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+    }
+
+    public function testServiceSubscriber()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+
+        TestServiceSubscriber::$subscribedServices = [123];
+        $this->assertFalse($res->isFresh(0));
+
+        $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
+        $this->assertTrue($res->isFresh(0));
+    }
+
+    public function testIgnoresObjectsInSignature()
+    {
+        $res = new ReflectionClassResource(new \ReflectionClass(TestServiceWithStaticProperty::class));
+        $this->assertTrue($res->isFresh(0));
+
+        TestServiceWithStaticProperty::$initializedObject = new TestServiceWithStaticProperty();
+        $this->assertTrue($res->isFresh(0));
+    }
+
+    public function testEnum()
+    {
+        $res = new ReflectionClassResource($enum = new \ReflectionClass(SomeEnum::class));
+        $r = new \ReflectionClass(ReflectionClassResource::class);
+        $generateSignature = $r->getMethod('generateSignature')->getClosure($res);
+        $actual = implode("\n", iterator_to_array($generateSignature($enum)));
+        $this->assertStringContainsString('UnitEnum', $actual);
+        $this->assertStringContainsString('TestAttribute', $actual);
+        $this->assertStringContainsString('Beta', $actual);
+    }
+
+    public function testBackedEnum()
+    {
+        $res = new ReflectionClassResource($enum = new \ReflectionClass(SomeBackedEnum::class));
+        $r = new \ReflectionClass(ReflectionClassResource::class);
+        $generateSignature = $r->getMethod('generateSignature')->getClosure($res);
+        $actual = implode("\n", iterator_to_array($generateSignature($enum)));
+        $this->assertStringContainsString('UnitEnum', $actual);
+        $this->assertStringContainsString('BackedEnum', $actual);
+        $this->assertStringContainsString('TestAttribute', $actual);
+        $this->assertStringContainsString('Beta', $actual);
+        $this->assertStringContainsString('beta', $actual);
+    }
+}
+
+interface DummyInterface
+{
+}
+
+class TestEventSubscriber implements EventSubscriberInterface
+{
+    public static $subscribedEvents = [];
+
+    public static function getSubscribedEvents(): array
+    {
+        return self::$subscribedEvents;
+    }
+}
+
+class TestServiceSubscriber implements ServiceSubscriberInterface
+{
+    public static array $subscribedServices = [];
+
+    public static function getSubscribedServices(): array
+    {
+        return self::$subscribedServices;
+    }
+}
+
+class TestServiceWithStaticProperty
+{
+    public static object $initializedObject;
+}
+
+enum SomeEnum
+{
+    case Alpha;
+
+    #[TestAttribute]
+    case Beta;
+}
+
+enum SomeBackedEnum: string
+{
+    case Alpha = 'alpha';
+
+    #[TestAttribute]
+    case Beta = 'beta';
+}

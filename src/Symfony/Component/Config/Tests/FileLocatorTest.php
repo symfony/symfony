@@ -1,0 +1,117 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Config\Tests;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
+use Symfony\Component\Config\FileLocator;
+
+class FileLocatorTest extends TestCase
+{
+    #[DataProvider('getIsAbsolutePathTests')]
+    public function testIsAbsolutePath(string $path)
+    {
+        $loader = new FileLocator([]);
+        $r = new \ReflectionObject($loader);
+        $m = $r->getMethod('isAbsolutePath');
+
+        $this->assertTrue($m->invoke($loader, $path), '->isAbsolutePath() returns true for an absolute path');
+    }
+
+    public static function getIsAbsolutePathTests(): array
+    {
+        return [
+            ['/foo.xml'],
+            ['c:\\\\foo.xml'],
+            ['c:/foo.xml'],
+            ['\\server\\foo.xml'],
+            ['https://server/foo.xml'],
+            ['phar://server/foo.xml'],
+            ['phar:///server/foo.xml'],
+        ];
+    }
+
+    public function testLocate()
+    {
+        $loader = new FileLocator(__DIR__.'/Fixtures');
+
+        $this->assertEquals(
+            __DIR__.\DIRECTORY_SEPARATOR.'FileLocatorTest.php',
+            $loader->locate('FileLocatorTest.php', __DIR__),
+            '->locate() returns the absolute filename if the file exists in the given path'
+        );
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml',
+            $loader->locate('foo.xml', __DIR__),
+            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
+        );
+
+        $this->assertEquals(
+            __DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml',
+            $loader->locate(__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__),
+            '->locate() returns the absolute filename if the file exists in one of the paths given in the constructor'
+        );
+
+        $loader = new FileLocator([__DIR__.'/Fixtures', __DIR__.'/Fixtures/Again']);
+
+        $this->assertEquals(
+            [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
+            $loader->locate('foo.xml', __DIR__, false),
+            '->locate() returns an array of absolute filenames'
+        );
+
+        $this->assertEquals(
+            [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
+            $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
+            '->locate() returns an array of absolute filenames'
+        );
+
+        $loader = new FileLocator(__DIR__.'/Fixtures/Again');
+
+        $this->assertEquals(
+            [__DIR__.'/Fixtures'.\DIRECTORY_SEPARATOR.'foo.xml', __DIR__.'/Fixtures/Again'.\DIRECTORY_SEPARATOR.'foo.xml'],
+            $loader->locate('foo.xml', __DIR__.'/Fixtures', false),
+            '->locate() returns an array of absolute filenames'
+        );
+    }
+
+    public function testLocateThrowsAnExceptionIfTheFileDoesNotExists()
+    {
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
+
+        $this->expectException(FileLocatorFileNotFoundException::class);
+        $this->expectExceptionMessage('The file "foobar.xml" does not exist');
+
+        $loader->locate('foobar.xml', __DIR__);
+    }
+
+    public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath()
+    {
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
+
+        $this->expectException(FileLocatorFileNotFoundException::class);
+
+        $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
+    }
+
+    public function testLocateEmpty()
+    {
+        $loader = new FileLocator([__DIR__.'/Fixtures']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('An empty file name is not valid to be located.');
+
+        $loader->locate('', __DIR__);
+    }
+}

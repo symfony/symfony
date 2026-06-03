@@ -1,0 +1,48 @@
+{
+    "name": "symfony/property-info",
+    "type": "library",
+    "description": "Extracts information about PHP class' properties using metadata of popular sources",
+    "keywords": [
+        "property",
+        "type",
+        "phpdoc",
+        "symfony",
+        "validator",
+        "doctrine"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "dunglas@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/string": "^7.4|^8.0",
+        "symfony/type-info": "^7.4.7|^8.0.7"
+    },
+    "require-dev": {
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
+        "phpstan/phpdoc-parser": "^1.0|^2.0",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0"
+    },
+    "conflict": {
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
+        "phpdocumentor/type-resolver": "<1.5.1"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\PropertyInfo\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

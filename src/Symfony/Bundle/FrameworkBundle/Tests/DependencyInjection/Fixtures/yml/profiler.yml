@@ -1,0 +1,5 @@
+framework:
+    profiler:
+        enabled: true
+    serializer:
+        enabled: true

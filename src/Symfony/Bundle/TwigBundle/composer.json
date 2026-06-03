@@ -1,0 +1,52 @@
+{
+    "name": "symfony/twig-bundle",
+    "type": "symfony-bundle",
+    "description": "Provides a tight integration of Twig into the Symfony full-stack framework",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "composer-runtime-api": ">=2.1",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/twig-bridge": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/asset": "^7.4|^8.0",
+        "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/form": "^7.4|^8.0",
+        "symfony/routing": "^7.4|^8.0",
+        "symfony/runtime": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0",
+        "symfony/web-link": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bundle\\TwigBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": false
+        }
+    }
+}

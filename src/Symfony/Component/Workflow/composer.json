@@ -1,0 +1,45 @@
+{
+    "name": "symfony/workflow",
+    "type": "library",
+    "description": "Provides tools for managing a workflow or finite state machine",
+    "keywords": ["workflow", "petrinet", "place", "transition", "statemachine", "state"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Grégoire Pineau",
+            "email": "lyrixx@lyrixx.info"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1"
+    },
+    "require-dev": {
+        "psr/log": "^1|^2|^3",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/error-handler": "^7.4|^8.0",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/security-core": "^7.4|^8.0",
+        "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Workflow\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,20 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'http_client' => [
+        'default_options' => [
+            'headers' => ['X-powered' => 'PHP'],
+            'caching' => [
+                'cache_pool' => 'foo',
+                'shared' => false,
+                'max_ttl' => 2,
+            ],
+        ],
+        'scoped_clients' => [
+            'bar' => [
+                'base_uri' => 'http://example.com',
+                'caching' => ['cache_pool' => 'baz'],
+            ],
+        ],
+    ],
+]);

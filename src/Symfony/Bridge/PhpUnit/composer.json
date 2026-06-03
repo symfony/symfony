@@ -1,0 +1,47 @@
+{
+    "name": "symfony/phpunit-bridge",
+    "type": "symfony-bridge",
+    "description": "Provides utilities for PHPUnit, especially user deprecation notices management",
+    "keywords": [
+        "testing"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.1.0 EVEN ON LATEST SYMFONY VERSIONS TO ALLOW USING",
+        "php": "THIS BRIDGE WHEN TESTING LOWEST SYMFONY VERSIONS.",
+        "php": ">=8.1.0"
+    },
+    "require-dev": {
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/error-handler": "^6.4.3|^7.0.3|^8.0"
+    },
+    "autoload": {
+        "files": [ "bootstrap.php" ],
+        "psr-4": { "Symfony\\Bridge\\PhpUnit\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/",
+            "/bin/"
+        ]
+    },
+    "bin": [
+        "bin/simple-phpunit"
+    ],
+    "minimum-stability": "dev",
+    "extra": {
+        "thanks": {
+            "name": "phpunit/phpunit",
+            "url": "https://github.com/sebastianbergmann/phpunit"
+        }
+    }
+}

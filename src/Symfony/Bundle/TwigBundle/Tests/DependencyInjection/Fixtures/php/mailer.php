@@ -1,0 +1,7 @@
+<?php
+
+$container->loadFromExtension('twig', [
+    'mailer' => [
+        'html_to_text_converter' => 'my_converter',
+    ],
+]);

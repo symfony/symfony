@@ -1,0 +1,11 @@
+[
+    {
+        "type": "function",
+        "name": "var_dump",
+        "priority": 255
+    },
+    {
+        "type": "closure",
+        "priority": -1
+    }
+]

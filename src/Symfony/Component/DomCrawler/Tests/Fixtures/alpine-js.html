@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpine.js Test Page</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+    <div x-data="{ open: false, message: 'Hello Alpine!' }">
+        <!-- Alpine.js shorthand @ for x-on: -->
+        <button @click="open = !open" class="btn">
+            Toggle
+        </button>
+
+        <!-- Alpine.js shorthand : for x-bind: -->
+        <div x-show="open" :class="open ? 'visible' : 'hidden'">
+            <p x-text="message"></p>
+
+            <!-- More Alpine.js directives -->
+            <input
+                type="text"
+                x-model="message"
+                @input="console.log('Input changed')"
+                @keydown.enter="console.log('Enter pressed')"
+                @click.away="open = false"
+                :disabled="!open"
+                :placeholder="message"
+            >
+
+            <!-- Template with x-for -->
+            <template x-for="(item, index) in [1, 2, 3]" :key="index">
+                <div
+                    @click="console.log(item)"
+                    :aria-selected="index === 0"
+                    :style="`color: red`"
+                >
+                    Item: <span x-text="item"></span>
+                </div>
+            </template>
+        </div>
+    </div>
+</body>
+</html>

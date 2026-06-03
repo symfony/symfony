@@ -1,0 +1,4 @@
+---
+i_need:
+    resource: ./imported.yml
+    host: www.example.com

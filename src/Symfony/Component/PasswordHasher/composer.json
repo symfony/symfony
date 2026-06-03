@@ -1,0 +1,32 @@
+{
+    "name": "symfony/password-hasher",
+    "type": "library",
+    "description": "Provides password hashing utilities",
+    "keywords": ["password", "hashing"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Robin Chalas",
+            "email": "robin.chalas@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1"
+    },
+    "require-dev": {
+        "symfony/console": "^7.4|^8.0",
+        "symfony/security-core": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\PasswordHasher\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

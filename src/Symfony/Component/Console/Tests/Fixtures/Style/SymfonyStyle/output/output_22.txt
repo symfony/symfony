@@ -1,0 +1,7 @@
+
+[39;49m ║ [39;49m[★] Árvíztűrőtükörfúrógép Lorem ipsum dolor sit [33mamet, consectetur adipisicing elit, sed do eiusmod tempor incididunt [39m
+[39;49m ║ [39;49m[33m    ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut     [39m
+[39;49m ║ [39;49m[33m    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu [39m
+[39;49m ║ [39;49m[33m    fugiat nulla pariatur.[39m Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit 
+[39;49m ║ [39;49m    anim id est laborum                                                                                              
+

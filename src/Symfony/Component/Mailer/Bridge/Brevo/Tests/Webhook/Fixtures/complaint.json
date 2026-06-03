@@ -1,0 +1,11 @@
+{
+    "event": "complaint",
+    "email": "example@gmail.com",
+    "id": 814119,
+    "date": "2020-10-09 00:00:00",
+    "ts": 1604933619,
+    "message-id": "<201798300811.5787683@smtp-relay.mailin.fr>",
+    "ts_event": 1604933654,
+    "X-Mailin-custom": "some_custom_header",
+    "tags": ["transac_messages"]
+}

@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\TransController:
+        tags: ['controller.service_arguments']
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TransDebug\TransConstructArgService:
+        arguments: ['@translator']
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TransDebug\TransSubscriberService:
+        arguments: ['@Psr\Container\ContainerInterface']
+        tags: ['container.service_subscriber']
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TransDebug\TransPropertyService:
+        properties:
+            $translator: '@translator'
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TransDebug\TransMethodCallsService:
+        calls:
+            - [ setTranslator, ['@translator'] ]

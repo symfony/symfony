@@ -1,0 +1,5 @@
+---
+importing_with_missing_prefix:
+    resource: ./localized-route.yml
+    prefix:
+    nl: /prefix

@@ -1,0 +1,44 @@
+@startuml
+allow_mixing
+title ComplexDiagram
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam state {
+    BackgroundColor<<initial>> #87b741
+    BackgroundColor<<marked>> #3887C6
+    BorderColor #3887C6
+    BorderColor<<marked>> Black
+    FontColor<<marked>> White
+}
+skinparam agent {
+    BackgroundColor #ffffff
+    BorderColor #3887C6
+}
+state "a" <<initial>>
+state "b"
+state "c" <<marked>>
+state "d"
+state "e" <<marked>>
+state "f"
+state "g"
+agent "t1"
+agent "t2"
+agent "t3"
+agent "t4"
+agent "t5"
+agent "t6"
+"a" --> "t1"
+"t1" --> "b"
+"t1" --> "c"
+"b" --> "t2"
+"t2" --> "d"
+"c" --> "t2"
+"d" -[#Green]-> "t3": "<font color=Red>My custom transition label 1</font>"
+"t3" -[#Green]-> "e": "<font color=Red>My custom transition label 1</font>"
+"d" --> "t4"
+"t4" --> "f"
+"e" --> "t5"
+"t5" --> "g"
+"f" --> "t6"
+"t6" --> "g"
+@enduml

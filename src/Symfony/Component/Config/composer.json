@@ -1,0 +1,41 @@
+{
+    "name": "symfony/config",
+    "type": "library",
+    "description": "Helps you find, load, combine, autofill and validate configuration values of any kind",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/polyfill-ctype": "^1.8"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/yaml": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/service-contracts": "<2.5"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Config\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

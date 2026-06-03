@@ -1,0 +1,27 @@
+{
+  "event_type": "hard_bounce",
+  "timestamp": "2024-08-20T08:48:35+00:00",
+  "swg_uid": "01-68d20f85-253e-4986-b7f0-0e4229df4d61",
+  "event_id": "88eaff9a-5087-47d9-afdd-6eeaddfb11ae",
+  "channel": "email",
+  "transaction_id": "8dea05e7-9e8b-43d7-b000-3f7d15304162",
+  "headers": {
+    "x-swg-uid": "01-68d20f85-253e-4986-b7f0-0e4229df4d61",
+    "x-client-id": "myid",
+    "x-campaign-pool": "default",
+    "x-campaign-canal": "mycanal",
+    "x-campaign-type": "default",
+    "x-mailer": "Sweego",
+    "x-originating-ip": "XXX.XXX.XXX.XXX",
+    "x-campaign-ref": "895000#N",
+    "x-campaign-id": "b205d7b6-9eb5-4ba7-b3b9-5e2b8cade053",
+    "x-transaction-id": "8dea05e7-9e8b-43d7-b000-3f7d15304162"
+  },
+  "campaign_tags": null,
+  "campaign_type": "default",
+  "campaign_id": "default",
+  "recipient": "recipient@example.com",
+  "domain_from": "example.org",
+  "response_code": 550,
+  "status": null
+}

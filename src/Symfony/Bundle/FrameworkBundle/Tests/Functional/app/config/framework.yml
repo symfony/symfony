@@ -1,0 +1,18 @@
+framework:
+    secret:        test
+    router:        { resource: "%kernel.project_dir%/%kernel.test_case%/routing.yml" }
+    validation:    { enabled: true, enable_attributes: true }
+    csrf_protection: true
+    form:
+        enabled: true
+    test: true
+    default_locale: en
+    enabled_locales: ['en', 'fr']
+    session:
+        handler_id: null
+        storage_factory_id: session.storage.factory.mock_file
+        cookie_secure: auto
+        cookie_samesite: lax
+
+services:
+    logger: { class: Psr\Log\NullLogger }

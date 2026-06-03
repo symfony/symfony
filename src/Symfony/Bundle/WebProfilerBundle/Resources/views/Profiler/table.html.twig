@@ -1,0 +1,18 @@
+<div class="table-with-search-field">
+<table class="{{ class|default('') }}">
+    <thead>
+        <tr>
+            <th scope="col" class="key">{{ labels is defined ? labels[0] : 'Key' }}</th>
+            <th scope="col">{{ labels is defined ? labels[1] : 'Value' }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for key in data|keys|sort %}
+            <tr>
+                <th scope="row">{{ key }}</th>
+                <td>{{ profiler_dump(data[key]) }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>

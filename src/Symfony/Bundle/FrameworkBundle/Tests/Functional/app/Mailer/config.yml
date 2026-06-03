@@ -1,0 +1,12 @@
+imports:
+    - { resource: ../config/default.yml }
+    - { resource: services.yml }
+
+framework:
+    mailer:
+        dsn: 'null://null'
+        envelope:
+            sender: sender@example.org
+            recipients:
+                - redirected@example.org
+    profiler: ~

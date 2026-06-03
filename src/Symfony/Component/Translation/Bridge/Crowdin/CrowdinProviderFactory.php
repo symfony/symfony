@@ -1,0 +1,62 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Translation\Bridge\Crowdin;
+
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
+use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Provider\AbstractProviderFactory;
+use Symfony\Component\Translation\Provider\Dsn;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+/**
+ * @author Andrii Bodnar <andrii.bodnar@crowdin.com>
+ */
+final class CrowdinProviderFactory extends AbstractProviderFactory
+{
+    private const HOST = 'api.crowdin.com';
+
+    public function __construct(
+        private readonly HttpClientInterface $client,
+        private readonly LoggerInterface $logger,
+        private readonly string $defaultLocale,
+        private readonly LoaderInterface $loader,
+        private readonly XliffFileDumper $xliffFileDumper,
+    ) {
+    }
+
+    public function create(Dsn $dsn): CrowdinProvider
+    {
+        if ('crowdin' !== $dsn->getScheme()) {
+            throw new UnsupportedSchemeException($dsn, 'crowdin', $this->getSupportedSchemes());
+        }
+
+        $endpoint = preg_replace('/(^|\.)default$/', '\1'.self::HOST, $dsn->getHost());
+        $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
+
+        $client = new RetryableHttpClient($this->client, new GenericRetryStrategy([429]), 3, $this->logger);
+        $client = ScopingHttpClient::forBaseUri($client, \sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
+            'auth_bearer' => $this->getPassword($dsn),
+        ], preg_quote('https://'.$endpoint.'/api/v2/'));
+
+        return new CrowdinProvider($client, $this->loader, $this->logger, $this->xliffFileDumper, $this->defaultLocale, $endpoint);
+    }
+
+    protected function getSupportedSchemes(): array
+    {
+        return ['crowdin'];
+    }
+}

@@ -1,0 +1,7 @@
+services:
+    alias_for_foobar:
+        alias: foobar
+        deprecated:
+            package: vendor/package
+            version: 1.1
+            message: The "%alias_id%" service alias is deprecated.

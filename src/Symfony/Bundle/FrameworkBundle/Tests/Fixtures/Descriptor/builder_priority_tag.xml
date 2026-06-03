@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <definition id="definition_3" class="Full\Qualified\Class3" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+    <tags>
+      <tag name="tag1">
+        <parameter name="attr3">val3</parameter>
+        <parameter name="priority">40</parameter>
+      </tag>
+      <tag name="tag1">
+        <parameter name="attr1">val1</parameter>
+        <parameter name="attr2">val2</parameter>
+        <parameter name="priority">0</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="definition_1" class="Full\Qualified\Class1" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+    <factory service="factory.service" method="get"/>
+    <calls>
+      <call method="setMailer"/>
+    </calls>
+    <tags>
+      <tag name="tag1">
+        <parameter name="attr1">val1</parameter>
+        <parameter name="priority">30</parameter>
+      </tag>
+      <tag name="tag1">
+        <parameter name="attr2">val2</parameter>
+      </tag>
+      <tag name="tag2"/>
+    </tags>
+  </definition>
+  <definition id="definition_4" class="Full\Qualified\Class4" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+    <tags>
+      <tag name="tag1">
+        <parameter name="priority">0</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="definition_2" class="Full\Qualified\Class2" public="true" synthetic="true" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="/path/to/file">
+    <tags>
+      <tag name="tag1">
+        <parameter name="attr1">val1</parameter>
+        <parameter name="attr2">val2</parameter>
+        <parameter name="priority">-20</parameter>
+      </tag>
+    </tags>
+  </definition>
+</container>

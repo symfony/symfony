@@ -1,0 +1,33 @@
+imports:
+  - { resource: ./config.yml }
+  - { resource: ./security.yml }
+
+security:
+  firewalls:
+    firewall1:
+      pattern: /firewall1
+      provider: in_memory
+      entry_point: form_login
+      form_login:
+        check_path: /firewall1/login
+        success_handler: success_handler
+        failure_handler: failure_handler
+        default_target_path: /firewall1/test
+        login_path: /firewall1/login
+      dummy_form_login:
+        check_path: /firewall1/dummy_login
+        success_handler: success_handler
+        failure_handler: failure_handler
+        default_target_path: /firewall1/dummy
+        login_path: /firewall1/dummy_login
+
+services:
+  success_handler:
+    class: Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler
+    arguments:
+      - '@security.http_utils'
+  failure_handler:
+    class: Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler
+    arguments:
+      - '@http_kernel'
+      - '@security.http_utils'

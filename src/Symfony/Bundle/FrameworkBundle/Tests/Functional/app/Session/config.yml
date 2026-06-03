@@ -1,0 +1,15 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+services:
+    _defaults:
+        bind:
+            Symfony\Component\DependencyInjection\ContainerInterface $container: '@service_container'
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SessionController:
+        tags:
+            - { name: controller.service_arguments }
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\SubRequestController:
+        tags:
+            - { name: controller.service_arguments, action: indexAction, argument: handler, id: fragment.handler }

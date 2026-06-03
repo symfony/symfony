@@ -1,0 +1,30 @@
+
+Symfony\Component\Form\Tests\Console\Descriptor\FooType (foo)
+=============================================================
+
+ ---------------- -----------%s
+  Info             -         %s
+ ---------------- -----------%s
+  Required         true      %s
+ ---------------- -----------%s
+  Default          -         %s
+ ---------------- -----------%s
+  Allowed types    [         %s
+                     "string"%s
+                   ]         %s
+ ---------------- -----------%s
+  Allowed values   [         %s
+                     "bar",  %s
+                     "baz"   %s
+                   ]         %s
+ ---------------- -----------%s
+  Normalizers      [         %s
+                     Closure(%s
+                       class:%s
+                       file: %s
+                       line: %s
+                     }       %s
+                   ]         %s
+ ---------------- -----------%s
+  Nested Options   -         %s
+ ---------------- -----------%s

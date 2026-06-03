@@ -1,0 +1,7 @@
+{
+    "deprecated": true,
+    "deprecation_message": "The option \"bar\" is deprecated.",
+    "required": false,
+    "has_normalizer": false,
+    "has_nested_options": false
+}

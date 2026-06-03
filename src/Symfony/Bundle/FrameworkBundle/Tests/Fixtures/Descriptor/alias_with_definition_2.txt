@@ -1,0 +1,28 @@
+[39;49m // [39;49mThis service is a [33mprivate[39m alias for the service [32m.service_2[39m                                                          
+
+[33mInformation for Service "[39m[32m.service_2[39m[33m"[39m
+[33m====================================[39m
+
+ ----------------- ------------------------------------------------ 
+ [32m Option          [39m [32m Value                                          [39m 
+ ----------------- ------------------------------------------------ 
+  Service ID        .service_2                                      
+  Class             Full\Qualified\Class2                           
+  Tags              tag1 ([32mattr1[39m: val1, [32mattr2[39m: val2)                 
+                    tag1 ([32mattr3[39m: val3)                              
+                    tag2                                            
+                    tag3 ([32marray_attr[39m: ["foo","bar",[[[["ccc"]]]]])  
+  Calls             setMailer                                       
+  Public            no                                              
+  Synthetic         yes                                             
+  Lazy              no                                              
+  Shared            yes                                             
+  Abstract          no                                              
+  Autowired         no                                              
+  Autoconfigured    no                                              
+  Required File     /path/to/file                                   
+  Factory Service   factory.service                                 
+  Factory Method    get                                             
+  Usages            .alias_2                                        
+ ----------------- ------------------------------------------------ 
+

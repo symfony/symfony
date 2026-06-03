@@ -1,0 +1,50 @@
+services:
+    foo: { class: FooClass }
+    baz: { class: BazClass }
+    not_shared: { class: FooClass, shared: false }
+    file: { class: FooClass, file: '%path%/foo.php' }
+    arguments: { class: FooClass, arguments: [foo, '@foo', [true, false]] }
+    configurator1: { class: FooClass, configurator: sc_configure }
+    configurator2: { class: FooClass, configurator: ['@baz', configure] }
+    configurator3: { class: FooClass, configurator: [BazClass, configureStatic] }
+    method_call1:
+        class: FooClass
+        calls:
+            - [ setBar, [] ]
+            - [ setBar ]
+            - [ setBar, ['@=service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")'] ]
+    method_call2:
+        class: FooClass
+        calls:
+            - [ setBar, [ foo, '@foo', [true, false] ] ]
+    request:
+        class: Request
+        synthetic: true
+        lazy: true
+    decorator_service:
+        decorates: decorated
+    decorator_service_with_name:
+        decorates: decorated
+        decoration_inner_name: decorated.pif-pouf
+    decorator_service_with_name_and_priority:
+        decorates: decorated
+        decoration_inner_name: decorated.pif-pouf
+        decoration_priority: 5
+    decorator_service_with_name_and_priority_and_on_invalid:
+        decorates: decorated
+        decoration_inner_name: decorated.pif-pouf
+        decoration_priority: 5
+        decoration_on_invalid: ignore
+    new_factory1: { class: FooBarClass, factory: factory}
+    new_factory2: { class: FooBarClass, factory: ['@baz', getClass]}
+    new_factory3: { class: FooBarClass, factory: [BazClass, getInstance]}
+    new_factory4: { class: BazClass, factory: [~, getInstance]}
+    new_factory5: { class: FooBarClass, factory: '@baz' }
+    factory_expression:
+        class: FooClass
+        factory: "@=service('foo').getInstance()"
+    Acme\WithShortCutArgs: [foo, '@baz']
+    alias_for_foo: '@foo'
+    another_alias_for_foo:
+        alias: foo
+        public: true

@@ -1,0 +1,69 @@
+{
+    "name": "symfony/security-bundle",
+    "type": "symfony-bundle",
+    "description": "Provides a tight integration of the Security component into the Symfony full-stack framework",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "composer-runtime-api": ">=2.1",
+        "ext-xml": "*",
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/password-hasher": "^7.4|^8.0",
+        "symfony/security-core": "^7.4|^8.0",
+        "symfony/security-csrf": "^7.4|^8.0",
+        "symfony/security-http": "^8.1",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "symfony/asset": "^7.4|^8.0",
+        "symfony/browser-kit": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/css-selector": "^7.4|^8.0",
+        "symfony/dom-crawler": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/form": "^7.4|^8.0",
+        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/ldap": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/rate-limiter": "^7.4|^8.0",
+        "symfony/runtime": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "symfony/twig-bundle": "^7.4|^8.0",
+        "symfony/twig-bridge": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0",
+        "web-token/jwt-library": "^3.3.2|^4.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bundle\\SecurityBundle\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": false
+        }
+    }
+}

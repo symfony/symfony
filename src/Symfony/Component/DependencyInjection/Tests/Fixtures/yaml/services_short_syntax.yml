@@ -1,0 +1,6 @@
+services:
+    foo_bar: [1, 2]
+
+    bar_foo:
+        $a: 'a'
+        App\Foo: 'foo'

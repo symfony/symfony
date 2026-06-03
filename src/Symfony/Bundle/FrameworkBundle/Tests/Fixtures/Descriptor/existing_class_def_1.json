@@ -1,0 +1,16 @@
+{
+    "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\ClassWithDocComment",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "description": "This is a class with a doc comment.",
+    "arguments": [],
+    "file": null,
+    "tags": [],
+    "usages": []
+}

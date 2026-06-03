@@ -1,0 +1,30 @@
+{
+    "name": "symfony/expression-language",
+    "type": "library",
+    "description": "Provides an engine that can compile and evaluate expressions",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\ExpressionLanguage\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

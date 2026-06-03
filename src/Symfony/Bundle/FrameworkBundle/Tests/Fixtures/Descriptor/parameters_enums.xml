@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<parameters>
+  <parameter key="array_of_enums">["Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\Suit::H...</parameter>
+  <parameter key="backed_enum">Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit::Hearts</parameter>
+  <parameter key="map">{"mixed":["Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures...</parameter>
+  <parameter key="unit_enum">Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum::BAR</parameter>
+</parameters>

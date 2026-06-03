@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "allowed_types": [
+        "string"
+    ],
+    "allowed_values": [
+        "bar",
+        "baz"
+    ],
+    "has_normalizer": true,
+    "has_nested_options": false
+}

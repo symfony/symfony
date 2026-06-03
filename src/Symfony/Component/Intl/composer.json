@@ -1,0 +1,44 @@
+{
+    "name": "symfony/intl",
+    "type": "library",
+    "description": "Provides access to the localization data of the ICU library",
+    "keywords": ["intl", "icu", "internationalization", "localization", "i18n", "l10n"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bernhard Schussek",
+            "email": "bschussek@gmail.com"
+        },
+        {
+            "name": "Eriksen Costa",
+            "email": "eriksen.costa@infranology.com.br"
+        },
+        {
+            "name": "Igor Wiedler",
+            "email": "igor@wiedler.ch"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1"
+    },
+    "require-dev": {
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/var-exporter": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/string": "<7.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Intl\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/",
+            "/Resources/data/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

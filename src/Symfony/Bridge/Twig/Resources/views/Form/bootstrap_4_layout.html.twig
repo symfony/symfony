@@ -1,0 +1,324 @@
+{% use 'bootstrap_base_layout.html.twig' %}
+
+{# Widgets #}
+
+{% block money_widget -%}
+    {%- set prepend = not (money_pattern starts with '{{') -%}
+    {%- set append = not (money_pattern ends with '}}') -%}
+    {%- if prepend or append -%}
+        <div class="input-group {{ group_class|default('') }}">
+            {%- if prepend -%}
+                <div class="input-group-prepend">
+                    <span class="input-group-text">{{ money_pattern|form_encode_currency }}</span>
+                </div>
+            {%- endif -%}
+            {{- block('form_widget_simple') -}}
+            {%- if append -%}
+                <div class="input-group-append">
+                    <span class="input-group-text">{{ money_pattern|form_encode_currency }}</span>
+                </div>
+            {%- endif -%}
+        </div>
+    {%- else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif -%}
+{%- endblock money_widget %}
+
+{% block datetime_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock datetime_widget %}
+
+{% block date_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock date_widget %}
+
+{% block time_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {{- parent() -}}
+{%- endblock time_widget %}
+
+{% block dateinterval_widget -%}
+    {%- if widget != 'single_text' and not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-control is-invalid')|trim}) -%}
+        {% set valid = true %}
+    {%- endif -%}
+    {%- if widget == 'single_text' -%}
+        {{- block('form_widget_simple') -}}
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-inline')|trim}) -%}
+        <div {{ block('widget_container_attributes') }}>
+            {%- if with_years -%}
+            <div class="col-auto">
+                {{ form_label(form.years) }}
+                {{ form_widget(form.years) }}
+            </div>
+            {%- endif -%}
+            {%- if with_months -%}
+            <div class="col-auto">
+                {{ form_label(form.months) }}
+                {{ form_widget(form.months) }}
+            </div>
+            {%- endif -%}
+            {%- if with_weeks -%}
+            <div class="col-auto">
+                {{ form_label(form.weeks) }}
+                {{ form_widget(form.weeks) }}
+            </div>
+            {%- endif -%}
+            {%- if with_days -%}
+            <div class="col-auto">
+                {{ form_label(form.days) }}
+                {{ form_widget(form.days) }}
+            </div>
+            {%- endif -%}
+            {%- if with_hours -%}
+            <div class="col-auto">
+                {{ form_label(form.hours) }}
+                {{ form_widget(form.hours) }}
+            </div>
+            {%- endif -%}
+            {%- if with_minutes -%}
+            <div class="col-auto">
+                {{ form_label(form.minutes) }}
+                {{ form_widget(form.minutes) }}
+            </div>
+            {%- endif -%}
+            {%- if with_seconds -%}
+            <div class="col-auto">
+                {{ form_label(form.seconds) }}
+                {{ form_widget(form.seconds) }}
+            </div>
+            {%- endif -%}
+            {%- if with_invert %}{{ form_widget(form.invert) }}{% endif -%}
+        </div>
+    {%- endif -%}
+{%- endblock dateinterval_widget %}
+
+{% block percent_widget -%}
+    {%- if symbol -%}
+        <div class="input-group">
+            {{- block('form_widget_simple') -}}
+            <div class="input-group-append">
+                <span class="input-group-text">{{ symbol|default('%') }}</span>
+            </div>
+        </div>
+    {%- else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif -%}
+{%- endblock percent_widget %}
+
+{% block file_widget -%}
+    <{{ element|default('div') }} class="custom-file">
+        {%- set type = type|default('file') -%}
+        {%- set input_lang = 'en' -%}
+        {% if app is defined and app.request is defined %}{%- set input_lang = app.request.locale -%}{%- endif -%}
+        {%- set attr = {lang: input_lang}|merge(attr) -%}
+        {{- block('form_widget_simple') -}}
+        {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' custom-file-label')|trim})|filter((value, key) => key != 'id') -%}
+        <label for="{{ form.vars.id }}" {% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
+            {%- if attr.placeholder is defined and attr.placeholder is not none -%}
+                {{- translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans({}, translation_domain) -}}
+            {%- endif -%}
+        </label>
+    </{{ element|default('div') }}>
+{% endblock %}
+
+{% block form_widget_simple -%}
+    {%- if type is not defined or type != 'hidden' -%}
+        {%- set className = ' form-control' -%}
+        {%- if type|default('') == 'file' -%}
+            {%- set className = ' custom-file-input' -%}
+        {%- elseif type|default('') == 'range' -%}
+            {%- set className = ' form-control-range' -%}
+        {%- endif -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ className)|trim}) -%}
+    {%- endif -%}
+    {%- if type is defined and (type == 'range' or type == 'color') %}
+        {# Attribute "required" is not supported #}
+        {%- set required = false -%}
+    {% endif %}
+    {{- parent() -}}
+{%- endblock form_widget_simple %}
+
+{% block widget_attributes -%}
+    {%- if not valid -%}
+        {% set attr = attr|merge({class: (attr.class|default('') ~ ' is-invalid')|trim}) %}
+    {%- endif -%}
+    {{ parent() }}
+{%- endblock widget_attributes %}
+
+{% block button_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-secondary') ~ ' btn')|trim}) -%}
+    {{- parent() -}}
+{%- endblock button_widget %}
+
+{% block submit_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-primary'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock submit_widget %}
+
+{% block checkbox_widget -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {%- if 'checkbox-custom' in parent_label_class -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
+        <div class="custom-control custom-checkbox{{ 'checkbox-inline' in parent_label_class ? ' custom-control-inline' }}">
+            {{- form_label(form, null, {widget: parent()}) -}}
+        </div>
+    {%- elseif 'switch-custom' in parent_label_class -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
+        <div class="custom-control custom-switch{{ 'switch-inline' in parent_label_class ? ' custom-control-inline' }}">
+            {{- form_label(form, null, {widget: parent()}) -}}
+        </div>
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
+        <div class="form-check{{ 'checkbox-inline' in parent_label_class ? ' form-check-inline' }}">
+            {{- form_label(form, null, {widget: parent()}) -}}
+        </div>
+    {%- endif -%}
+{%- endblock checkbox_widget %}
+
+{% block radio_widget -%}
+    {%- set parent_label_class = parent_label_class|default(label_attr.class|default('')) -%}
+    {%- if 'radio-custom' in parent_label_class -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' custom-control-input')|trim}) -%}
+        <div class="custom-control custom-radio{{ 'radio-inline' in parent_label_class ? ' custom-control-inline' }}">
+            {{- form_label(form, null, {widget: parent()}) -}}
+        </div>
+    {%- else -%}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-check-input')|trim}) -%}
+        <div class="form-check{{ 'radio-inline' in parent_label_class ? ' form-check-inline' }}">
+            {{- form_label(form, null, {widget: parent()}) -}}
+        </div>
+    {%- endif -%}
+{%- endblock radio_widget %}
+
+{% block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' form-control')|trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed %}
+
+{% block choice_widget_expanded -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            {{- form_widget(child, {
+                parent_label_class: label_attr.class|default(''),
+                translation_domain: choice_translation_domain,
+                valid: valid,
+            }) -}}
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded %}
+
+{# Labels #}
+
+{% block form_label -%}
+    {% if label is not same as(false) -%}
+        {%- if compound is defined and compound -%}
+            {%- set element = 'legend' -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' col-form-label')|trim}) -%}
+        {%- else -%}
+            {%- set label_attr = label_attr|merge({for: id}) -%}
+        {%- endif -%}
+        {% if required -%}
+            {% set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) %}
+        {%- endif -%}
+        <{{ element|default('label') }}{% if label_attr %}{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}{% endif %}>
+        {{- block('form_label_content') -}}
+        </{{ element|default('label') }}>
+        {% block form_label_errors %}{{- form_errors(form) -}}{% endblock form_label_errors %}
+    {%- else -%}
+        {%- if errors|length > 0 -%}
+        <div id="{{ id }}_errors" class="mb-2">
+            {{- form_errors(form) -}}
+        </div>
+        {%- endif -%}
+    {%- endif -%}
+{%- endblock form_label %}
+
+{% block checkbox_radio_label -%}
+    {#- Do not display the label if widget is not defined in order to prevent double label rendering -#}
+    {%- if widget is defined -%}
+        {% set is_parent_custom = parent_label_class is defined and ('checkbox-custom' in parent_label_class or 'radio-custom' in parent_label_class or 'switch-custom' in parent_label_class) %}
+        {% set is_custom = label_attr.class is defined and ('checkbox-custom' in label_attr.class or 'radio-custom' in label_attr.class or 'switch-custom' in label_attr.class) %}
+        {%- if is_parent_custom or is_custom -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' custom-control-label')|trim}) -%}
+        {%- else %}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' form-check-label')|trim}) -%}
+        {%- endif %}
+        {%- if not compound -%}
+            {% set label_attr = label_attr|merge({for: id}) %}
+        {%- endif -%}
+        {%- if required -%}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' required')|trim}) -%}
+        {%- endif -%}
+        {%- if parent_label_class is defined -%}
+            {% set embed_label_classes = parent_label_class|split(' ')|filter(class => class in ['checkbox-inline', 'radio-inline']) %}
+            {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ embed_label_classes|join(' '))|trim}) -%}
+        {% endif %}
+
+        {{ widget|raw }}
+        <label{% with {attr: label_attr} %}{{ block('attributes') }}{% endwith %}>
+            {%- if label is not same as(false) -%}
+                {{- block('form_label_content') -}}
+            {%- endif -%}
+        </label>
+        {{- form_errors(form) -}}
+    {%- endif -%}
+{%- endblock checkbox_radio_label %}
+
+{# Rows #}
+
+{% block form_row -%}
+    {%- if compound is defined and compound -%}
+        {%- set element = 'fieldset' -%}
+    {%- endif -%}
+    {%- set attr = {} -%}
+    {%- if help -%}
+        {%- set attr = attr|merge({'aria-describedby': id ~ '_help'}) -%}
+    {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set attr = attr|merge({'aria-invalid': 'true'}) -%}
+    {%- endif -%}
+    {%- set widget_attr = {attr: attr} -%}
+    <{{ element|default('div') }}{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim})} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        {{- form_widget(form, widget_attr) -}}
+        {{- form_help(form) -}}
+    </{{ element|default('div') }}>
+{%- endblock form_row %}
+
+{# Errors #}
+
+{% block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <span class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block mb-1">
+            {%- for error in errors -%}
+                <span class="d-block">
+                    <span class="form-error-icon badge badge-danger text-uppercase">{{ 'Error'|trans({}, 'validators') }}</span> <span class="form-error-message">{{ error.message }}</span>
+                </span>
+            {%- endfor -%}
+        </span>
+    {%- endif %}
+{%- endblock form_errors %}
+
+{# Help #}
+
+{% block form_help -%}
+    {%- if help -%}
+        {%- set help_attr = help_attr|merge({class: (help_attr.class|default('') ~ ' form-text text-muted')|trim}) -%}
+        <small id="{{ id }}_help"{% with {attr: help_attr} %}{{ block('attributes') }}{% endwith %}>
+            {{- block('form_help_content') -}}
+        </small>
+    {%- endif -%}
+{%- endblock form_help %}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/13.1/phpunit.xsd"
+         backupGlobals="false"
+         colors="true"
+         bootstrap="vendor/autoload.php"
+         failOnDeprecation="true"
+         failOnRisky="true"
+         failOnWarning="true"
+>
+    <php>
+        <ini name="error_reporting" value="-1" />
+        <env name="REDIS_HOST" value="localhost" />
+        <env name="REDIS_SOCKET" value="/var/run/redis/redis-server.sock" />
+        <env name="MEMCACHED_HOST" value="localhost" />
+        <env name="COUCHBASE_HOST" value="localhost" />
+        <env name="COUCHBASE_USER" value="Administrator" />
+        <env name="COUCHBASE_PASS" value="111111@" />
+    </php>
+
+    <testsuites>
+        <testsuite name="Symfony Cache Component Test Suite">
+            <directory>./Tests/</directory>
+        </testsuite>
+    </testsuites>
+
+    <source ignoreSuppressionOfDeprecations="true">
+        <deprecationTrigger ignoreUndefinedTriggers="true">
+            <function>trigger_deprecation</function>
+            <method>Doctrine\Deprecations\Deprecation::trigger</method>
+            <method>Doctrine\Deprecations\Deprecation::triggerIfCalledFromOutside</method>
+        </deprecationTrigger>
+        <include>
+            <directory>./</directory>
+        </include>
+        <exclude>
+            <directory>./Tests</directory>
+            <directory>./vendor</directory>
+        </exclude>
+    </source>
+
+    <extensions>
+        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
+            <parameter name="clock-mock-namespaces" value="Cache\IntegrationTests,Symfony\Component\Cache,Symfony\Component\Cache\Tests\Fixtures,Symfony\Component\Cache\Tests\Traits,Symfony\Component\Cache\Traits" />
+        </bootstrap>
+    </extensions>
+</phpunit>

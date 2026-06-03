@@ -1,0 +1,63 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Form\Tests\Extension\Core\Type;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
+class TextTypeTest extends BaseTypeTestCase
+{
+    public const TESTED_TYPE = TextType::class;
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        parent::testSubmitNull($expected, $norm, '');
+    }
+
+    public function testSubmitNullReturnsNullWithEmptyDataAsString()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, 'name', array_merge($this->getTestOptions(), [
+            'empty_data' => '',
+        ]));
+
+        $form->submit(null);
+        $this->assertSame('', $form->getData());
+        $this->assertSame('', $form->getNormData());
+        $this->assertSame('', $form->getViewData());
+    }
+
+    public static function provideZeros(): array
+    {
+        return [
+            [0, '0'],
+            ['0', '0'],
+            ['00000', '00000'],
+        ];
+    }
+
+    /**
+     * @see https://github.com/symfony/symfony/issues/1986
+     */
+    #[DataProvider('provideZeros')]
+    public function testSetDataThroughParamsWithZero($data, $dataAsString)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, array_merge($this->getTestOptions(), [
+            'data' => $data,
+        ]));
+        $view = $form->createView();
+
+        $this->assertFalse($form->isEmpty());
+
+        $this->assertSame($dataAsString, $view->vars['value']);
+        $this->assertSame($dataAsString, $form->getData());
+    }
+}

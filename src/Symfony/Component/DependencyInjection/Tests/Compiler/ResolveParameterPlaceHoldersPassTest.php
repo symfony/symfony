@@ -1,0 +1,141 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\DependencyInjection\Tests\Compiler;
+
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+
+class ResolveParameterPlaceHoldersPassTest extends TestCase
+{
+    private ResolveParameterPlaceHoldersPass $compilerPass;
+    private ContainerBuilder $container;
+    private Definition $fooDefinition;
+
+    protected function setUp(): void
+    {
+        $this->compilerPass = new ResolveParameterPlaceHoldersPass();
+        $this->container = $this->createContainerBuilder();
+        $this->compilerPass->process($this->container);
+        $this->fooDefinition = $this->container->getDefinition('foo');
+    }
+
+    public function testClassParametersShouldBeResolved()
+    {
+        $this->assertSame('Foo', $this->fooDefinition->getClass());
+    }
+
+    public function testFactoryParametersShouldBeResolved()
+    {
+        $this->assertSame(['FooFactory', 'getFoo'], $this->fooDefinition->getFactory());
+    }
+
+    public function testArgumentParametersShouldBeResolved()
+    {
+        $this->assertSame(['bar', ['bar' => 'baz']], $this->fooDefinition->getArguments());
+    }
+
+    public function testMethodCallParametersShouldBeResolved()
+    {
+        $this->assertSame([['foobar', ['bar', ['bar' => 'baz']]]], $this->fooDefinition->getMethodCalls());
+    }
+
+    public function testPropertyParametersShouldBeResolved()
+    {
+        $this->assertSame(['bar' => 'baz'], $this->fooDefinition->getProperties());
+    }
+
+    public function testFileParametersShouldBeResolved()
+    {
+        $this->assertSame('foo.php', $this->fooDefinition->getFile());
+    }
+
+    public function testAliasParametersShouldBeResolved()
+    {
+        $this->assertSame('foo', $this->container->getAlias('bar')->__toString());
+    }
+
+    public function testBindingsShouldBeResolved()
+    {
+        [$boundValue] = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
+
+        $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
+    }
+
+    public function testParameterNotFoundExceptionsIsThrown()
+    {
+        $this->expectException(ParameterNotFoundException::class);
+        $this->expectExceptionMessage('The service "baz_service_id" has a dependency on a non-existent parameter "non_existent_param".');
+
+        $container = new ContainerBuilder();
+        $definition = $container->register('baz_service_id');
+        $definition->setArgument(0, '%non_existent_param%');
+
+        $pass = new ResolveParameterPlaceHoldersPass();
+        $pass->process($container);
+    }
+
+    public function testParameterNotFoundExceptionsIsNotThrown()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('baz_service_id');
+        $definition->setArgument(0, '%non_existent_param%');
+
+        $pass = new ResolveParameterPlaceHoldersPass(true, false);
+        $pass->process($container);
+
+        $this->assertCount(1, $definition->getErrors());
+    }
+
+    public function testOnlyProxyTagIsResolved()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('a_param', 'here_you_go');
+        $definition = $container->register('def');
+        $definition->addTag('foo', ['bar' => '%a_param%']);
+        $definition->addTag('proxy', ['interface' => '%a_param%']);
+
+        $pass = new ResolveParameterPlaceHoldersPass(true, false);
+        $pass->process($container);
+
+        $this->assertSame(['foo' => [['bar' => '%a_param%']], 'proxy' => [['interface' => 'here_you_go']]], $definition->getTags());
+    }
+
+    private function createContainerBuilder(): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+
+        $container->setParameter('foo.class', 'Foo');
+        $container->setParameter('foo.factory.class', 'FooFactory');
+        $container->setParameter('foo.arg1', 'bar');
+        $container->setParameter('foo.arg2', ['%foo.arg1%' => 'baz']);
+        $container->setParameter('foo.method', 'foobar');
+        $container->setParameter('foo.property.name', 'bar');
+        $container->setParameter('foo.property.value', 'baz');
+        $container->setParameter('foo.file', 'foo.php');
+        $container->setParameter('alias.id', 'bar');
+
+        $fooDefinition = $container->register('foo', '%foo.class%');
+        $fooDefinition->setFactory(['%foo.factory.class%', 'getFoo']);
+        $fooDefinition->setArguments(['%foo.arg1%', ['%foo.arg1%' => 'baz']]);
+        $fooDefinition->addMethodCall('%foo.method%', ['%foo.arg1%', '%foo.arg2%']);
+        $fooDefinition->setProperty('%foo.property.name%', '%foo.property.value%');
+        $fooDefinition->setFile('%foo.file%');
+        $fooDefinition->setBindings(['$baz' => '%env(BAZ)%']);
+
+        $container->setAlias('%alias.id%', 'foo');
+
+        return $container;
+    }
+}

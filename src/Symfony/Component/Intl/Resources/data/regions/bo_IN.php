@@ -1,0 +1,6 @@
+<?php
+
+return [
+    'UserAssignedNames' => [],
+    'Names' => [],
+];

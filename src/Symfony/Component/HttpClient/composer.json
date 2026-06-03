@@ -1,0 +1,57 @@
+{
+    "name": "symfony/http-client",
+    "type": "library",
+    "description": "Provides powerful methods to fetch HTTP resources synchronously or asynchronously",
+    "keywords": ["http"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Grekas",
+            "email": "p@tchwork.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "provide": {
+        "php-http/async-client-implementation": "*",
+        "php-http/client-implementation": "*",
+        "psr/http-client-implementation": "1.0",
+        "symfony/http-client-implementation": "3.0"
+    },
+    "require": {
+        "php": ">=8.4.1",
+        "psr/log": "^1|^2|^3",
+        "symfony/deprecation-contracts": "^2.5|^3.0",
+        "symfony/http-client-contracts": "^3.7",
+        "symfony/service-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "amphp/http-client": "^5.3.2",
+        "amphp/http-tunnel": "^2.0",
+        "guzzlehttp/guzzle": "^7.10",
+        "nyholm/psr7": "^1.0",
+        "php-http/httplug": "^1.0|^2.0",
+        "psr/http-client": "^1.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/rate-limiter": "^7.4|^8.0",
+        "symfony/stopwatch": "^7.4|^8.0"
+    },
+    "conflict": {
+        "amphp/amp": "<3",
+        "php-http/discovery": "<1.15"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\HttpClient\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

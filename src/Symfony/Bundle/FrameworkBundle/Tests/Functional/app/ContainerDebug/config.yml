@@ -1,0 +1,50 @@
+imports:
+    - { resource: ../config/default.yml }
+
+parameters:
+    env(JSON): '[1, "2.5", 3]'
+
+services:
+    _defaults: { public: true }
+    public:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
+    private_alias:
+        alias: public
+        public: false
+    deprecated:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeprecatedClass
+        deprecated:
+            package: 'foo/bar'
+            version: '1.9'
+            message: The "%service_id%" service is deprecated since foo/bar 1.9 and will be removed in 2.0
+    deprecated_alias:
+        alias: deprecated
+        deprecated:
+            package: 'foo/bar'
+            version: '1.9'
+            message: The "%alias_id%" alias is deprecated since foo/bar 1.9 and will be removed in 2.0
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ClassAliasExampleClass: '@public'
+    env:
+        class: stdClass
+        arguments:
+            - '%env(UNKNOWN)%'
+            - '%env(REAL)%'
+            - '%env(int:key:2:json:JSON)%'
+            - '%env(float:key:2:json:JSON)%'
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerExcluded:
+        tags: ['container.excluded']
+
+    original_service:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
+
+    decorator_1:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\WarmedClass
+        decorates: original_service
+        arguments: ['@.inner']
+
+    decorator_2:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
+        decorates: decorator_1
+        arguments: ['@.inner']

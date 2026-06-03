@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <parameters>
+    <parameter key="baz_class">BazClass</parameter>
+    <parameter key="foo_class">Bar\FooClass</parameter>
+    <parameter key="foo">bar</parameter>
+  </parameters>
+  <services>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
+    <service id="foo" class="Bar\FooClass" public="true" constructor="getInstance">
+      <tag name="foo" foo="foo"/>
+      <tag name="foo" bar="bar" baz="baz"/>
+      <tag name="bar" baz="baz">foo</tag>
+      <tag name="nullable" bar="bar" baz=""/>
+      <argument>foo</argument>
+      <argument type="service" id="foo.baz"/>
+      <argument type="collection">
+        <argument key="%foo%">foo is %foo%</argument>
+        <argument key="foobar">%foo%</argument>
+      </argument>
+      <argument>true</argument>
+      <argument type="service" id="service_container"/>
+      <property name="foo">bar</property>
+      <property name="moo" type="service" id="foo.baz"/>
+      <property name="qux" type="collection">
+        <property key="%foo%">foo is %foo%</property>
+        <property key="foobar">%foo%</property>
+      </property>
+      <call method="setBar">
+        <argument type="service" id="bar"/>
+      </call>
+      <call method="initialize"/>
+      <configurator function="sc_configure"/>
+    </service>
+    <service id="foo.baz" class="%baz_class%" public="true" constructor="getInstance">
+      <configurator class="%baz_class%" method="configureStatic1"/>
+    </service>
+    <service id="bar" class="Bar\FooClass" public="true">
+      <argument>foo</argument>
+      <argument type="service" id="foo.baz"/>
+      <argument>%foo_bar%</argument>
+      <configurator service="foo.baz" method="configure"/>
+    </service>
+    <service id="foo_bar" class="%foo_class%" shared="false" public="true">
+      <argument type="service" id="deprecated_service"/>
+    </service>
+    <service id="method_call1" class="Bar\FooClass" public="true">
+      <file>%path%foo.php</file>
+      <call method="setBar">
+        <argument type="service" id="foo"/>
+      </call>
+      <call method="setBar">
+        <argument type="service" id="foo2" on-invalid="null"/>
+      </call>
+      <call method="setBar">
+        <argument type="service" id="foo3" on-invalid="ignore"/>
+      </call>
+      <call method="setBar">
+        <argument type="service" id="foobaz" on-invalid="ignore"/>
+      </call>
+      <call method="setBar">
+        <argument type="expression">service("foo").foo() ~ (container.hasParameter("foo") ? parameter("foo") : "default")</argument>
+      </call>
+    </service>
+    <service id="foo_with_inline" class="Foo" public="true">
+      <call method="setBar">
+        <argument type="service" id="inlined"/>
+      </call>
+    </service>
+    <service id="inlined" class="Bar">
+      <property name="pub">pub</property>
+      <call method="setBaz">
+        <argument type="service" id="baz"/>
+      </call>
+    </service>
+    <service id="baz" class="Baz" public="true">
+      <call method="setFoo">
+        <argument type="service" id="foo_with_inline"/>
+      </call>
+    </service>
+    <service id="request" class="Request" public="true" synthetic="true"/>
+    <service id="configurator_service" class="ConfClass">
+      <call method="setFoo">
+        <argument type="service" id="baz"/>
+      </call>
+    </service>
+    <service id="configured_service" class="stdClass" public="true">
+      <configurator service="configurator_service" method="configureStdClass"/>
+    </service>
+    <service id="configurator_service_simple" class="ConfClass">
+      <argument>bar</argument>
+    </service>
+    <service id="configured_service_simple" class="stdClass" public="true">
+      <configurator service="configurator_service_simple" method="configureStdClass"/>
+    </service>
+    <service id="decorated" class="stdClass" public="true"/>
+    <service id="decorator_service" class="stdClass" public="true" decorates="decorated"/>
+    <service id="decorator_service_with_name" class="stdClass" public="true" decorates="decorated" decoration-inner-name="decorated.pif-pouf"/>
+    <service id="deprecated_service" class="stdClass" public="true">
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+    </service>
+    <service id="new_factory" class="FactoryClass">
+      <property name="foo">bar</property>
+    </service>
+    <service id="factory_service" class="Bar" public="true">
+      <factory service="foo.baz" method="getInstance"/>
+    </service>
+    <service id="new_factory_service" class="FooBarBaz" public="true">
+      <property name="foo">bar</property>
+      <factory service="new_factory" method="getInstance"/>
+    </service>
+    <service id="service_from_static_method" class="Bar\FooClass" public="true" constructor="getInstance"/>
+    <service id="factory_simple" class="SimpleFactoryClass">
+      <argument>foo</argument>
+      <deprecated package="vendor/package" version="1.1">The "%service_id%" service is deprecated. You should stop using it, as it will be removed in the future.</deprecated>
+    </service>
+    <service id="factory_service_simple" class="Bar" public="true">
+      <factory service="factory_simple" method="getInstance"/>
+    </service>
+    <service id="lazy_context" class="LazyContext" public="true">
+      <argument type="iterator">
+        <argument key="k1" type="service" id="foo.baz"/>
+        <argument key="k2" type="service" id="service_container"/>
+      </argument>
+      <argument type="iterator"/>
+    </service>
+    <service id="lazy_context_ignore_invalid_ref" class="LazyContext" public="true">
+      <argument type="iterator">
+        <argument type="service" id="foo.baz"/>
+        <argument type="service" id="invalid" on-invalid="ignore"/>
+      </argument>
+      <argument type="iterator"/>
+    </service>
+    <service id="BAR" class="stdClass" public="true">
+      <property name="bar" type="service" id="bar"/>
+    </service>
+    <service id="bar2" class="stdClass" public="true"/>
+    <service id="BAR2" class="stdClass" public="true"/>
+    <service id="tagged_iterator_foo" class="Bar">
+      <tag name="foo"/>
+    </service>
+    <service id="tagged_iterator" class="Bar" public="true">
+      <argument type="tagged_iterator" tag="foo"/>
+    </service>
+    <service id="runtime_error" class="stdClass" public="true">
+      <argument type="service" id="errored_definition"/>
+    </service>
+    <service id="errored_definition" class="stdClass">
+      <tag name="container.error" message="Service &quot;errored_definition&quot; is broken."/>
+    </service>
+    <service id="preload_sidekick" class="stdClass" public="true">
+      <tag name="container.preload" class="Some\Sidekick1"/>
+      <tag name="container.preload" class="Some\Sidekick2"/>
+    </service>
+    <service id="a_factory" class="Bar"/>
+    <service id="a_service" class="Bar" public="true">
+      <factory service="a_factory" method="getBar"/>
+    </service>
+    <service id="b_service" class="Bar" public="true">
+      <factory service="a_factory" method="getBar"/>
+    </service>
+    <service id="alias_for_foo" alias="foo" public="true"/>
+    <service id="alias_for_alias" alias="foo" public="true"/>
+  </services>
+</container>

@@ -1,0 +1,126 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\HttpClient\Tests;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
+
+class ScopingHttpClientTest extends TestCase
+{
+    public function testRelativeUrl()
+    {
+        $mockClient = new MockHttpClient();
+        $client = new ScopingHttpClient($mockClient, []);
+
+        $this->expectException(InvalidArgumentException::class);
+        $client->request('GET', '/foo');
+    }
+
+    public function testRelativeUrlWithDefaultRegexp()
+    {
+        $mockClient = new MockHttpClient();
+        $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com', 'query' => ['a' => 'b']]], '.*');
+
+        $this->assertSame('http://example.com/foo?f=g&a=b', $client->request('GET', '/foo?f=g')->getInfo('url'));
+    }
+
+    #[DataProvider('provideMatchingUrls')]
+    public function testMatchingUrls(string $regexp, string $url, array $options)
+    {
+        $mockClient = new MockHttpClient();
+        $client = new ScopingHttpClient($mockClient, $options);
+
+        $response = $client->request('GET', $url);
+        $requestedOptions = $response->getRequestOptions();
+
+        $this->assertSame($options[$regexp]['case'], $requestedOptions['case']);
+    }
+
+    public static function provideMatchingUrls(): iterable
+    {
+        $defaultOptions = [
+            '.*/foo-bar' => ['case' => 1],
+            '.*' => ['case' => 2],
+        ];
+
+        yield ['regexp' => '.*/foo-bar', 'url' => 'http://example.com/foo-bar', 'options' => $defaultOptions];
+        yield ['regexp' => '.*', 'url' => 'http://example.com/bar-foo', 'options' => $defaultOptions];
+        yield ['regexp' => '.*', 'url' => 'http://example.com/foobar', 'options' => $defaultOptions];
+    }
+
+    public function testMatchingUrlsAndOptions()
+    {
+        $defaultOptions = [
+            '.*/foo-bar' => ['headers' => ['X-FooBar' => 'unit-test-foo-bar']],
+            '.*' => ['headers' => ['Content-Type' => 'text/html']],
+        ];
+
+        $mockClient = new MockHttpClient();
+        $client = new ScopingHttpClient($mockClient, $defaultOptions);
+
+        $response = $client->request('GET', 'http://example.com/foo-bar', ['json' => ['url' => 'http://example.com']]);
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('Content-Type: application/json', $requestOptions['headers'][1]);
+        $requestJson = json_decode($requestOptions['body'], true);
+        $this->assertSame('http://example.com', $requestJson['url']);
+        $this->assertSame('X-FooBar: '.$defaultOptions['.*/foo-bar']['headers']['X-FooBar'], $requestOptions['headers'][0]);
+
+        $response = $client->request('GET', 'http://example.com/bar-foo', ['headers' => ['X-FooBar' => 'unit-test']]);
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
+        $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
+
+        $response = $client->request('GET', 'http://example.com/foobar-foo', ['headers' => ['X-FooBar' => 'unit-test']]);
+        $requestOptions = $response->getRequestOptions();
+        $this->assertSame('X-FooBar: unit-test', $requestOptions['headers'][0]);
+        $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
+    }
+
+    public function testForBaseUri()
+    {
+        $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'http://example.com/foo');
+
+        $response = $client->request('GET', '/bar');
+        $this->assertSame('http://example.com/bar', $response->getInfo('url'));
+
+        $response = $client->request('GET', 'http://foo.bar/');
+        $this->assertSame('http://foo.bar/', $response->getInfo('url'));
+    }
+
+    public function testRetryableHttpClientIntegration()
+    {
+        $responses = [
+            new MockResponse('', ['http_code' => 503]),
+            new MockResponse('', ['http_code' => 503]),
+            new MockResponse('', ['http_code' => 503]),
+            new MockResponse(),
+        ];
+
+        $client = ScopingHttpClient::forBaseUri(
+            new RetryableHttpClient(
+                new MockHttpClient($responses),
+                new GenericRetryStrategy(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 0)
+            ),
+            'https://foo.example.com/app/',
+        );
+
+        $response = $client->request('GET', 'santysisi');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('https://foo.example.com/app/santysisi', $response->getInfo('url'));
+    }
+}

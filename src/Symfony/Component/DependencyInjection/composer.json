@@ -1,0 +1,44 @@
+{
+    "name": "symfony/dependency-injection",
+    "type": "library",
+    "description": "Allows you to standardize and centralize the way objects are constructed in your application",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "psr/container": "^1.1|^2.0",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/service-contracts": "^3.6",
+        "symfony/var-exporter": "^8.1"
+    },
+    "require-dev": {
+        "symfony/config": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0"
+    },
+    "conflict": {
+        "ext-psr": "<1.1|>=2"
+    },
+    "provide": {
+        "psr/container-implementation": "1.1|2.0",
+        "symfony/service-implementation": "1.1|2.0|3.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\DependencyInjection\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,418 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Symfony Serializer Mapping Schema",
+  "description": "JSON schema for Symfony's serialization mapping",
+  "type": "object",
+  "additionalProperties": false,
+  "patternProperties": {
+    "^[A-Za-z0-9\\\\_]+$": {
+      "type": "object",
+      "description": "Class metadata configuration",
+      "additionalProperties": false,
+      "properties": {
+        "attributes": {
+          "type": "object",
+          "description": "Attribute metadata configurations",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "object",
+                "description": "Attribute metadata configuration",
+                "additionalProperties": false,
+                "properties": {
+                  "groups": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Serialization groups for this attribute"
+                  },
+                  "max_depth": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "description": "Maximum serialization depth for this attribute"
+                  },
+                  "serialized_name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Custom name for serialization"
+                  },
+                  "serialized_path": {
+                    "type": "string",
+                    "description": "Property path for serialization (e.g., '[one][two]')"
+                  },
+                  "ignore": {
+                    "type": "boolean",
+                    "description": "Whether to ignore this attribute during serialization"
+                  },
+                  "contexts": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "Context entry with optional groups",
+                      "additionalProperties": false,
+                      "properties": {
+                        "context": {
+                          "$ref": "#/definitions/contextObject"
+                        },
+                        "normalization_context": {
+                          "$ref": "#/definitions/contextObject"
+                        },
+                        "denormalization_context": {
+                          "$ref": "#/definitions/contextObject"
+                        },
+                        "groups": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Groups this context applies to"
+                        }
+                      },
+                      "anyOf": [
+                        {
+                          "required": ["context"]
+                        },
+                        {
+                          "required": ["normalization_context"]
+                        },
+                        {
+                          "required": ["denormalization_context"]
+                        }
+                      ]
+                    },
+                    "description": "Context configurations for this attribute"
+                  }
+                }
+              },
+              {
+                "type": "null",
+                "description": "Empty attribute metadata"
+              }
+            ]
+          }
+        },
+        "discriminator_map": {
+          "type": "object",
+          "description": "Class discriminator mapping configuration",
+          "additionalProperties": false,
+          "required": ["type_property", "mapping"],
+          "properties": {
+            "type_property": {
+              "type": "string",
+              "description": "Property name used to determine the class type"
+            },
+            "mapping": {
+              "type": "object",
+              "description": "Mapping from type values to class names",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "default_type": {
+              "type": "string",
+              "description": "Default type when no mapping is found"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "contextObject": {
+      "type": "object",
+      "description": "Context object with key-value pairs",
+      "properties": {
+        "circular_reference_limit": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many loops of circular reference to allow while normalizing"
+        },
+        "object_to_populate": {
+          "type": "object",
+          "description": "Object to be updated instead of creating a new instance"
+        },
+        "groups": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "description": "Groups containing attributes to (de)normalize"
+        },
+        "attributes": {
+          "type": "object",
+          "description": "Attributes to (de)normalize"
+        },
+        "allow_extra_attributes": {
+          "type": "boolean",
+          "description": "Whether to ignore extra attributes or throw an exception"
+        },
+        "default_constructor_arguments": {
+          "type": "object",
+          "description": "Hashmap of classes containing hashmaps of constructor argument => default value"
+        },
+        "callbacks": {
+          "type": "object",
+          "description": "Hashmap of field name => callable to normalize this field"
+        },
+        "circular_reference_handler": {
+          "type": "object",
+          "description": "Handler to call when a circular reference has been detected"
+        },
+        "ignored_attributes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Attributes to be skipped when normalizing an object tree"
+        },
+        "require_all_properties": {
+          "type": "boolean",
+          "description": "Whether to require all properties to be listed in the input"
+        },
+        "enable_max_depth": {
+          "type": "boolean",
+          "description": "Whether to respect the max depth metadata on fields"
+        },
+        "depth_key_pattern": {
+          "type": "string",
+          "description": "Pattern to keep track of the current depth (must contain exactly two string placeholders)"
+        },
+        "disable_type_enforcement": {
+          "type": "boolean",
+          "description": "Whether verifying types match during denormalization"
+        },
+        "skip_null_values": {
+          "type": "boolean",
+          "description": "Whether fields with the value null should be output during normalization"
+        },
+        "skip_uninitialized_values": {
+          "type": "boolean",
+          "description": "Whether uninitialized typed class properties should be excluded during normalization"
+        },
+        "max_depth_handler": {
+          "type": "object",
+          "description": "Callback to allow to set a value for an attribute when the max depth has been reached"
+        },
+        "exclude_from_cache_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Context keys not relevant to determine which attributes to (de)normalize"
+        },
+        "deep_object_to_populate": {
+          "type": "boolean",
+          "description": "Whether to tell the denormalizer to also populate existing objects on attributes"
+        },
+        "preserve_empty_objects": {
+          "type": "boolean",
+          "description": "Whether an empty object should be kept as an object or converted to a list"
+        },
+        "normalize_visibility": {
+          "type": "integer",
+          "description": "Whether fields should be output based on visibility (PropertyNormalizer)"
+        },
+        "format": {
+          "type": "string",
+          "description": "Format of the date (DateTimeNormalizer)"
+        },
+        "timezone": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "description": "Timezone of the date (DateTimeNormalizer)"
+        },
+        "forceTimezone": {
+          "type": "boolean",
+          "description": "Whether to enforce the timezone during denormalization (DateTimeNormalizer)"
+        },
+        "cast": {
+          "enum": ["int", "float"],
+          "description": "Cast type for DateTime (DateTimeNormalizer)"
+        },
+        "encode_options": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "json_encode flags bitmask (JsonEncoder)"
+        },
+        "decode_options": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "json_decode flags bitmask (JsonEncoder)"
+        },
+        "associative": {
+          "type": "boolean",
+          "description": "Whether decoded objects will be given as associative arrays (JsonEncoder)"
+        },
+        "recursion_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum recursion depth (JsonEncoder)"
+        },
+        "as_collection": {
+          "type": "boolean",
+          "description": "Whether the decoded result should be considered as a collection (XmlEncoder/CsvEncoder)"
+        },
+        "decoder_ignored_node_types": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Node types to ignore while decoding (XmlEncoder)"
+        },
+        "encoder_ignored_node_types": {
+          "type": "array",
+          "items": {
+            "type": "integer"
+          },
+          "description": "Node types to ignore while encoding (XmlEncoder)"
+        },
+        "encoding": {
+          "type": "string",
+          "description": "DOMDocument encoding (XmlEncoder)"
+        },
+        "format_output": {
+          "type": "boolean",
+          "description": "Whether to encode with indentation and extra space (XmlEncoder)"
+        },
+        "load_options": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "DOMDocument::loadXml options bitmask (XmlEncoder)"
+        },
+        "save_options": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "DOMDocument::saveXml options bitmask (XmlEncoder)"
+        },
+        "remove_empty_tags": {
+          "type": "boolean",
+          "description": "Whether to keep empty nodes (XmlEncoder)"
+        },
+        "root_node_name": {
+          "type": "string",
+          "description": "Name of the root node (XmlEncoder)"
+        },
+        "standalone": {
+          "type": "boolean",
+          "description": "Whether the document will be standalone (XmlEncoder)"
+        },
+        "type_cast_attributes": {
+          "type": "boolean",
+          "description": "Whether casting numeric string attributes to integers or floats (XmlEncoder)"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version number of the document (XmlEncoder)"
+        },
+        "cdata_wrapping": {
+          "type": "boolean",
+          "description": "Whether to wrap strings within CDATA sections (XmlEncoder)"
+        },
+        "cdata_wrapping_pattern": {
+          "type": "string",
+          "description": "Pattern used to evaluate if a CDATA section should be added (XmlEncoder)"
+        },
+        "ignore_empty_attributes": {
+          "type": "boolean",
+          "description": "Whether to ignore empty attributes (XmlEncoder)"
+        },
+        "preserve_numeric_keys": {
+          "type": "boolean",
+          "description": "Whether to preserve numeric keys in array (XmlEncoder)"
+        },
+        "inline_threshold": {
+          "type": "integer",
+          "description": "Threshold to switch to inline YAML (YamlEncoder)"
+        },
+        "indent_level": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Indentation level (YamlEncoder)"
+        },
+        "flags": {
+          "type": "integer",
+          "description": "Yaml::dump flags bitmask (YamlEncoder)"
+        },
+        "preserved_empty_objects": {
+          "type": "boolean",
+          "description": "Whether to preserve empty objects or convert them to null (YamlEncoder)"
+        },
+        "delimiter": {
+          "type": "string",
+          "maxLength": 1,
+          "description": "Column delimiter character (CsvEncoder)"
+        },
+        "enclosure": {
+          "type": "string",
+          "maxLength": 1,
+          "description": "Field enclosure character (CsvEncoder)"
+        },
+        "escape_char": {
+          "type": "string",
+          "maxLength": 1,
+          "description": "Escape character (CsvEncoder, deprecated)"
+        },
+        "key_separator": {
+          "type": "string",
+          "description": "Key separator when (un)flattening arrays (CsvEncoder)"
+        },
+        "headers": {
+          "type": "array",
+          "description": "Headers (CsvEncoder)"
+        },
+        "escaped_formulas": {
+          "type": "boolean",
+          "description": "Whether formulas should be escaped (CsvEncoder)"
+        },
+        "no_headers": {
+          "type": "boolean",
+          "description": "Whether the input/output is containing headers (CsvEncoder)"
+        },
+        "end_of_line": {
+          "type": "string",
+          "description": "End of line characters (CsvEncoder)"
+        },
+        "output_utf8_bom": {
+          "type": "boolean",
+          "description": "Whether to add the UTF-8 Byte Order Mark (CsvEncoder)"
+        }
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          },
+          {
+            "type": "array"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    }
+  }
+}

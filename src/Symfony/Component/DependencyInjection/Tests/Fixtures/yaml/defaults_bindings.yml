@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        bind:
+            $quz: value
+            $foo: [value]
+
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+
+    foo:
+        class: stdClass

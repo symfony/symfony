@@ -1,0 +1,33 @@
+{
+    "name": "symfony/property-access",
+    "type": "library",
+    "description": "Provides functions to read and write from/to an object or array using a simple string notation",
+    "keywords": ["property", "index", "access", "object", "array", "extraction", "injection", "reflection", "property-path"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/property-info": "^7.4.4|^8.0.4"
+    },
+    "require-dev": {
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/var-exporter": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\PropertyAccess\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

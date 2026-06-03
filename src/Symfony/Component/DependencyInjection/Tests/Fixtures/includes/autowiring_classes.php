@@ -1,0 +1,673 @@
+<?php
+
+namespace Symfony\Component\DependencyInjection\Tests\Compiler;
+
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Contracts\Service\Attribute\Required;
+
+require __DIR__.'/uniontype_classes.php';
+require __DIR__.'/autowiring_classes_80.php';
+require __DIR__.'/intersectiontype_classes.php';
+require __DIR__.'/compositetype_classes.php';
+
+class Foo
+{
+    public static int $counter = 0;
+    public int $foo = 0;
+
+    #[Required]
+    public function cloneFoo(?\stdClass $bar = null): static
+    {
+        ++self::$counter;
+
+        return clone $this;
+    }
+}
+
+class FooVoid
+{
+    public static int $counter = 0;
+
+    public function __invoke(string $name): void
+    {
+        ++self::$counter;
+    }
+}
+
+class Bar
+{
+    public function __construct(Foo $foo)
+    {
+    }
+}
+
+interface AInterface
+{
+}
+
+class A implements AInterface
+{
+    public static function create(Foo $foo)
+    {
+    }
+}
+
+class B extends A
+{
+}
+
+class C
+{
+    public function __construct(A $a)
+    {
+    }
+}
+
+interface DInterface
+{
+}
+
+interface EInterface extends DInterface
+{
+}
+
+interface IInterface
+{
+}
+
+class I implements IInterface
+{
+}
+
+class F extends I implements EInterface
+{
+}
+
+class G
+{
+    public function __construct(DInterface $d, EInterface $e, IInterface $i)
+    {
+    }
+}
+
+class H
+{
+    public function __construct(B $b, DInterface $d)
+    {
+    }
+}
+
+class D
+{
+    public function __construct(A $a, DInterface $d)
+    {
+    }
+}
+
+class E
+{
+    public function __construct(?D $d = null)
+    {
+    }
+}
+
+class J
+{
+    public function __construct(I $i)
+    {
+    }
+}
+
+class K
+{
+    public function __construct(IInterface $i)
+    {
+    }
+}
+
+interface CollisionInterface
+{
+}
+
+class CollisionA implements CollisionInterface
+{
+}
+
+class CollisionB implements CollisionInterface
+{
+}
+
+class UnionClassesWithTarget
+{
+    public function __construct(
+        #[Target('collision')]
+        CollisionA|CollisionB $any,
+    ) {
+    }
+}
+
+class CannotBeAutowired
+{
+    public function __construct(CollisionInterface $collision)
+    {
+    }
+}
+
+class Lille
+{
+}
+
+class Dunglas
+{
+    public function __construct(Lille $l)
+    {
+    }
+}
+
+class LesTilleuls
+{
+    public function __construct(Dunglas $j, Dunglas $k)
+    {
+    }
+}
+
+class BadTypeHintedArgument
+{
+    public function __construct(Dunglas $k, NotARealClass $r)
+    {
+    }
+}
+class BadParentTypeHintedArgument
+{
+    public function __construct(Dunglas $k, OptionalServiceClass $r)
+    {
+    }
+}
+class NotGuessableArgument
+{
+    public function __construct(Foo $k)
+    {
+    }
+}
+class NotGuessableArgumentForSubclass
+{
+    public function __construct(A $k)
+    {
+    }
+}
+class MultipleArguments
+{
+    public function __construct(A $k, $foo, Dunglas $dunglas, array $bar)
+    {
+    }
+}
+
+class MultipleArgumentsOptionalScalar
+{
+    public function __construct(A $a, $foo = 'default_val', ?Lille $lille = null)
+    {
+    }
+}
+class MultipleArgumentsOptionalScalarLast
+{
+    public function __construct(A $a, Lille $lille, $foo = 'some_val')
+    {
+    }
+}
+
+class UnderscoreNamedArgument
+{
+    public function __construct(
+        public \DateTimeImmutable $now_datetime,
+    ) {
+    }
+}
+
+class UnderscoreNamedArgumentWithTarget
+{
+    public function __construct(
+        #[Target('now_datetime')]
+        public \DateTimeImmutable $dt,
+    ) {
+    }
+}
+
+/*
+ * Classes used for testing createResourceForClass
+ */
+class ClassForResource
+{
+    public function __construct($foo, ?Bar $bar = null)
+    {
+    }
+
+    public function setBar(Bar $bar)
+    {
+    }
+}
+class IdenticalClassResource extends ClassForResource
+{
+}
+
+class ClassChangedConstructorArgs extends ClassForResource
+{
+    public function __construct($foo, Bar $bar, $baz)
+    {
+    }
+}
+
+class SetterInjectionCollision
+{
+    #[Required]
+    public function setMultipleInstancesForOneArg(CollisionInterface $collision)
+    {
+        // The CollisionInterface cannot be autowired - there are multiple
+
+        // should throw an exception
+    }
+}
+
+class SetterInjectionCollisionWithTarget
+{
+    #[Required]
+    public function setMultipleInstancesForOneArg(#[Target('collision')] CollisionInterface $col)
+    {
+    }
+}
+
+class Wither
+{
+    public $foo;
+
+    #[Required]
+    public function setFoo(Foo $foo)
+    {
+    }
+
+    #[Required]
+    public function withFoo1(Foo $foo): static
+    {
+        return $this->withFoo2($foo);
+    }
+
+    #[Required]
+    public function withFoo2(Foo $foo): static
+    {
+        $new = clone $this;
+        $new->foo = $foo;
+
+        return $new;
+    }
+}
+
+class SetterInjectionParent
+{
+    #[Required]
+    public function setDependencies(Foo $foo, A $a)
+    {
+        // should be called
+    }
+
+    public function notASetter(A $a)
+    {
+        // #[Required] should be ignored when the child does not also add #[Required]
+    }
+
+    #[Required]
+    public function setWithCallsConfigured(A $a)
+    {
+    }
+
+    #[Required]
+    public function setChildMethodWithoutDocBlock(A $a)
+    {
+    }
+}
+
+
+class SetterInjection extends SetterInjectionParent
+{
+    #[Required]
+    public function setFoo(Foo $foo)
+    {
+        // should be called
+    }
+
+    #[Required]
+    public function setDependencies(Foo $foo, A $a)
+    {
+        // should be called
+    }
+
+    public function setWithCallsConfigured(A $a)
+    {
+        // this method has a calls configured on it
+    }
+
+    public function notASetter(A $a)
+    {
+        // should be called only when explicitly specified
+    }
+}
+
+class NotWireable
+{
+    public function setNotAutowireable(NotARealClass $n)
+    {
+    }
+
+    public function setNotAutowireableBecauseOfATypo(lesTilleuls $sam)
+    {
+    }
+
+    public function setBar()
+    {
+    }
+
+    public function setOptionalNotAutowireable(?NotARealClass $n = null)
+    {
+    }
+
+    public function setDifferentNamespace(\stdClass $n)
+    {
+    }
+
+    public function setOptionalNoTypeHint($foo = null)
+    {
+    }
+
+    public function setOptionalArgNoAutowireable($other = 'default_val')
+    {
+    }
+
+    #[Required]
+    protected function setProtectedMethod(A $a)
+    {
+    }
+}
+
+class PrivateConstructor
+{
+    private function __construct()
+    {
+    }
+}
+
+class ScalarSetter
+{
+    #[Required]
+    public function setDefaultLocale($defaultLocale)
+    {
+    }
+}
+
+interface DecoratorInterface
+{
+}
+
+class DecoratorImpl implements DecoratorInterface
+{
+}
+
+class Decorated implements DecoratorInterface
+{
+    public function __construct($quz = null, ?\NonExistent $nonExistent = null, ?DecoratorInterface $decorated = null, array $foo = [])
+    {
+    }
+}
+
+class Decorator implements DecoratorInterface
+{
+    public function __construct(LoggerInterface $logger, DecoratorInterface $decorated)
+    {
+    }
+}
+
+class DecoratedDecorator implements DecoratorInterface
+{
+    public function __construct(DecoratorInterface $decorator)
+    {
+    }
+}
+
+class NonAutowirableDecorator implements DecoratorInterface
+{
+    public function __construct(LoggerInterface $logger, DecoratorInterface $decorated1, DecoratorInterface $decorated2)
+    {
+    }
+}
+
+final class ElsaAction
+{
+    public function __construct(NotExisting $notExisting)
+    {
+    }
+}
+
+class ParametersLikeDefaultValue
+{
+    public function __construct(string $parameterLike = '%not%one%parameter%here%', string $willBeSetToKeepFirstArgumentDefaultValue = 'ok')
+    {
+    }
+}
+
+class StaticConstructor
+{
+    public function __construct(private string $bar)
+    {
+    }
+
+    public function getBar(): string
+    {
+        return $this->bar;
+    }
+
+    public static function create(string $foo): static
+    {
+        return new self($foo);
+    }
+}
+
+class AAndIInterfaceConsumer
+{
+    public function __construct(
+        #[Autowire(service: 'foo', lazy: true)]
+        AInterface&IInterface $logger,
+    ) {
+    }
+}
+
+interface SingleMethodInterface
+{
+    public function theMethod();
+}
+
+class MyCallable
+{
+    public function __invoke(): void
+    {
+    }
+
+    public static function theMethodImpl(): int
+    {
+        return 124;
+    }
+}
+
+class MyInlineService
+{
+    public function __construct(private readonly ?string $someParam = null)
+    {
+    }
+
+    public function someMethod(): void
+    {
+    }
+
+    public function someMethod1(): void
+    {
+    }
+
+    public function someMethod2(): void
+    {
+    }
+
+    public function getSomeParam(): ?string
+    {
+        return $this->someParam;
+    }
+}
+
+class MyFactory
+{
+    public function __construct()
+    {
+    }
+
+    public function __invoke(mixed $someParam = null): MyInlineService
+    {
+        return new MyInlineService($someParam ?? 'someString');
+    }
+
+    public function createFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public function createFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
+    }
+
+    public static function staticCreateFoo(): MyInlineService
+    {
+        return new MyInlineService('someString');
+    }
+
+    public static function staticCreateFooWithParam(mixed $someParam): MyInlineService
+    {
+        return new MyInlineService($someParam);
+    }
+}
+
+interface LazyProxyTestInterface
+{
+    public function getSelf(): self;
+}
+
+final class FinalLazyProxyImplementation implements LazyProxyTestInterface
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class BaseLazyProxyClass
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class ExtendedLazyProxyClass extends BaseLazyProxyClass
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class LazyProxyInterfaceConsumer
+{
+    public function __construct(#[Autowire(lazy: true)] private readonly LazyProxyTestInterface $dep)
+    {
+    }
+
+    public function getDep(): LazyProxyTestInterface
+    {
+        return $this->dep;
+    }
+}
+
+class LazyProxyInheritanceConsumer
+{
+    public function __construct(#[Autowire(lazy: true)] private readonly BaseLazyProxyClass $dep)
+    {
+    }
+
+    public function getDependency(): BaseLazyProxyClass
+    {
+        return $this->dep;
+    }
+}
+
+class Listener1
+{
+    public function __construct(
+        #[AutowireCallable(service: MyInlineService::class, method: 'someMethod1')]
+        public \Closure $closure,
+    ) {
+    }
+}
+
+class Listener2
+{
+    public function __construct(
+        #[AutowireCallable(service: MyInlineService::class, method: 'someMethod2')]
+        public \Closure $closure,
+        public \stdClass $someOtherService,
+    ) {
+    }
+}
+
+class ListenerResolver
+{
+    public function __construct(public ContainerInterface $container)
+    {
+    }
+}
+
+interface SomeServiceInterface
+{
+    public function getValue(): string;
+}
+
+class SomeServiceClass implements SomeServiceInterface
+{
+    public function getValue(): string
+    {
+        return 'original';
+    }
+}
+
+class DecoratedSomeServiceClass implements SomeServiceInterface
+{
+    public function __construct(private SomeServiceInterface $inner)
+    {
+    }
+
+    public function getValue(): string
+    {
+        return 'decorated:'.$this->inner->getValue();
+    }
+}
+
+class LazyDecoratedServiceConsumer
+{
+    public function __construct(
+        #[Autowire(service: 'some_service', lazy: true)]
+        private SomeServiceInterface $service,
+    ) {
+    }
+
+    public function getValue(): string
+    {
+        return $this->service->getValue();
+    }
+}

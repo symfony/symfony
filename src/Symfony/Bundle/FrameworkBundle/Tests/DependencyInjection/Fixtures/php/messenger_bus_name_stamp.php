@@ -1,0 +1,21 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'lock' => false,
+    'messenger' => [
+        'default_bus' => 'messenger.bus.commands',
+        'buses' => [
+            'messenger.bus.commands' => [
+                'default_middleware' => false,
+                'middleware' => [
+                    'add_bus_name_stamp_middleware',
+                    'send_message',
+                    'handle_message',
+                ],
+            ],
+            'messenger.bus.events' => [
+                'default_middleware' => true,
+            ],
+        ],
+    ],
+]);

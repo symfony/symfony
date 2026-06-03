@@ -1,0 +1,383 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\DependencyInjection\Tests\Dumper;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultArrayAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultObjectAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
+
+class XmlDumperTest extends TestCase
+{
+    protected static string $fixturesPath;
+
+    public static function setUpBeforeClass(): void
+    {
+        self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
+    }
+
+    public function testDump()
+    {
+        $dumper = new XmlDumper(new ContainerBuilder());
+
+        $this->assertXmlStringEqualsGeneratedXmlFile('services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
+    }
+
+    public function testExportParameters()
+    {
+        $container = include self::$fixturesPath.'/containers/container8.php';
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services8.xml', $dumper->dump(), '->dump() dumps parameters');
+    }
+
+    public function testAddService()
+    {
+        $container = include self::$fixturesPath.'/containers/container9.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertEquals(str_replace('%path%', self::$fixturesPath.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR, file_get_contents(self::$fixturesPath.'/xml/services9.xml')), $dumper->dump(), '->dump() dumps services');
+
+        $dumper = new XmlDumper($container = new ContainerBuilder());
+        $container->register('foo', 'FooClass')->addArgument(new \stdClass())->setPublic(true);
+        try {
+            $dumper->dump();
+            $this->fail('->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+        } catch (\Exception $e) {
+            $this->assertInstanceOf(\RuntimeException::class, $e, '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+            $this->assertEquals('Unable to dump a service container if a parameter is an object or a resource, got "stdClass".', $e->getMessage(), '->dump() throws a RuntimeException if the container to be dumped has reference to objects or resources');
+        }
+    }
+
+    public function testDumpAnonymousServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container11.php';
+        $dumper = new XmlDumper($container);
+        $this->assertEquals('<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
+    <service id="foo" class="FooClass" public="true">
+      <argument type="service">
+        <service class="BarClass">
+          <argument type="service">
+            <service class="BazClass"/>
+          </argument>
+        </service>
+      </argument>
+    </service>
+  </services>
+</container>
+', $dumper->dump());
+    }
+
+    public function testDumpEntities()
+    {
+        $container = include self::$fixturesPath.'/containers/container12.php';
+        $dumper = new XmlDumper($container);
+        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
+    <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\">
+      <tag name=\"foo&quot;bar\bar\" foo=\"foo&quot;barřž€\"/>
+      <argument>foo&lt;&gt;&amp;bar</argument>
+    </service>
+  </services>
+</container>
+", $dumper->dump());
+    }
+
+    #[DataProvider('provideDecoratedServicesData')]
+    public function testDumpDecoratedServices($expectedXmlDump, $container)
+    {
+        $dumper = new XmlDumper($container);
+        $this->assertEquals($expectedXmlDump, $dumper->dump());
+    }
+
+    public static function provideDecoratedServicesData()
+    {
+        $fixturesPath = realpath(__DIR__.'/../Fixtures/');
+
+        return [
+            ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
+    <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\" decoration-inner-name=\"bar.woozy\"/>
+  </services>
+</container>
+", include $fixturesPath.'/containers/container15.php'],
+            ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
+    <service id=\"foo\" class=\"FooClass\Foo\" public=\"true\" decorates=\"bar\"/>
+  </services>
+</container>
+", include $fixturesPath.'/containers/container16.php'],
+            ["<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<container xmlns=\"http://symfony.com/schema/dic/services\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd\">
+  <services>
+    <service id=\"service_container\" class=\"Symfony\Component\DependencyInjection\ContainerInterface\" public=\"true\" synthetic=\"true\"/>
+    <service id=\"decorator\" decorates=\"decorated\" decoration-on-invalid=\"null\" decoration-inner-name=\"decorated.inner\" decoration-priority=\"1\"/>
+  </services>
+</container>
+", include $fixturesPath.'/containers/container34.php'],
+        ];
+    }
+
+    #[DataProvider('provideCompiledContainerData')]
+    public function testCompiledContainerCanBeDumped($containerFile)
+    {
+        $fixturesPath = __DIR__.'/../Fixtures';
+        $container = require $fixturesPath.'/containers/'.$containerFile.'.php';
+        $container->compile();
+        $dumper = new XmlDumper($container);
+        $dumper->dump();
+
+        $this->addToAssertionCount(1);
+    }
+
+    public static function provideCompiledContainerData()
+    {
+        return [
+            ['container8'],
+            ['container9'],
+            ['container11'],
+            ['container12'],
+            ['container14'],
+        ];
+    }
+
+    public function testDumpInlinedServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container21.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertXmlStringEqualsGeneratedXmlFile('services21.xml', $dumper->dump());
+    }
+
+    public function testDumpAutowireData()
+    {
+        $container = include self::$fixturesPath.'/containers/container24.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertXmlStringEqualsGeneratedXmlFile('services24.xml', $dumper->dump());
+    }
+
+    public function testTaggedArguments()
+    {
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo');
+        $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, false, ['baz']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', null, false, ['baz', 'qux'], false);
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'Foo')->addTag('foo_tag');
+        $container->register('baz', 'Baz')->addTag('foo_tag');
+        $container->register('qux', 'Qux')->addTag('foo_tag');
+
+        $container->register('foo_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator)
+        ;
+        $container->register('foo2_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator2)
+        ;
+        $container->register('foo3_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator3)
+        ;
+
+        $container->register('foo_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator))
+        ;
+        $container->register('foo2_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator2))
+        ;
+        $container->register('foo3_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator3))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_arguments.xml', $dumper->dump());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testLegacyTaggedArguments()
+    {
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', false, 'getPriority');
+        $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz', 'qux'], false);
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo', 'Foo')->addTag('foo_tag');
+        $container->register('baz', 'Baz')->addTag('foo_tag');
+        $container->register('qux', 'Qux')->addTag('foo_tag');
+
+        $container->register('foo_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator)
+        ;
+        $container->register('foo2_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator2)
+        ;
+        $container->register('foo3_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator3)
+        ;
+
+        $container->register('foo_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator))
+        ;
+        $container->register('foo2_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator2))
+        ;
+        $container->register('foo3_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator3))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('legacy_services_with_tagged_arguments.xml', $dumper->dump());
+    }
+
+    public function testServiceClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_service_closure.xml', $dumper->dump());
+    }
+
+    public function testEnvClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new EnvClosureArgument('%env(FOO)%'))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', null, true))
+            ->addArgument(new EnvClosureArgument('%env(BAR)%', 'def', true))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', 42))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_env_closure.xml', $dumper->dump());
+    }
+
+    public function testDumpAbstractServices()
+    {
+        $container = include self::$fixturesPath.'/containers/container_abstract.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_abstract.xml', $dumper->dump());
+    }
+
+    public function testDumpHandlesEnumeration()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(FooClassWithEnumAttribute::class, FooClassWithEnumAttribute::class)
+            ->setPublic(true)
+            ->addArgument(FooUnitEnum::BAR);
+
+        $container->setParameter('unit_enum', FooUnitEnum::BAR);
+        $container->setParameter('enum_array', [FooUnitEnum::BAR, FooUnitEnum::FOO]);
+
+        $container->compile();
+        $dumper = new XmlDumper($container);
+
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_enumeration.xml', $dumper->dump());
+    }
+
+    #[DataProvider('provideDefaultClasses')]
+    public function testDumpHandlesDefaultAttribute($class, $expectedFile)
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo', $class)
+            ->setPublic(true)
+            ->setAutowired(true)
+            ->setArguments([2 => true]);
+
+        (new AutowirePass())->process($container);
+
+        $dumper = new XmlDumper($container);
+
+        $this->assertSame(file_get_contents(self::$fixturesPath.'/xml/'.$expectedFile), $dumper->dump());
+    }
+
+    public static function provideDefaultClasses()
+    {
+        yield [FooClassWithDefaultArrayAttribute::class, 'services_with_default_array.xml'];
+        yield [FooClassWithDefaultObjectAttribute::class, 'services_with_default_object.xml'];
+        yield [FooClassWithDefaultEnumAttribute::class, 'services_with_default_enumeration.xml'];
+    }
+
+    public function testDumpServiceWithAbstractArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
+            ->setArgument('$baz', new AbstractArgument('should be defined by Pass'))
+            ->setArgument('$bar', 'test');
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_abstract_argument.xml', $dumper->dump());
+    }
+
+    public function testDumpNonScalarTags()
+    {
+        $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
+        $dumper = new XmlDumper($container);
+
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_array_tags.xml', $dumper->dump());
+    }
+
+    private static function assertXmlStringEqualsGeneratedXmlFile(string $expectedFile, string $dumpedCode): void
+    {
+        $expectedFile = self::$fixturesPath.'/xml/'.$expectedFile;
+
+        if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
+            file_put_contents($expectedFile, $dumpedCode);
+            self::markTestIncomplete('TEST_GENERATE_FIXTURES is set');
+        }
+
+        self::assertXmlStringEqualsXmlFile($expectedFile, $dumpedCode);
+    }
+}

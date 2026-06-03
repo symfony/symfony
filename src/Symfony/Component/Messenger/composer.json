@@ -1,0 +1,55 @@
+{
+    "name": "symfony/messenger",
+    "type": "library",
+    "description": "Helps applications send and receive messages to/from other applications or via message queues",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Samuel Roze",
+            "email": "samuel.roze@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "psr/log": "^1|^2|^3",
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "psr/cache": "^1.0|^2.0|^3.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^8.1",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/lock": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/rate-limiter": "^7.4|^8.0",
+        "symfony/routing": "^7.4|^8.0",
+        "symfony/serializer": "^7.4.4|^8.0.4",
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/console": "<7.4",
+        "symfony/dependency-injection": "<8.1",
+        "symfony/event-dispatcher-contracts": "<2.5",
+        "symfony/lock": "<7.4",
+        "symfony/serializer": "<7.4.4|>=8.0,<8.0.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

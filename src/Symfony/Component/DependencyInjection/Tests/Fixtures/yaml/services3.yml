@@ -1,0 +1,5 @@
+parameters:
+    foo: foo
+    values:
+        - true
+        - false

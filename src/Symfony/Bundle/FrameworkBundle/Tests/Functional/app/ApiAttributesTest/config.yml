@@ -1,0 +1,11 @@
+imports:
+    - { resource: ../config/default.yml }
+
+parameters:
+    kernel.runtime_mode.web: true
+
+framework:
+    serializer:
+        enabled: true
+    validation: true
+    property_info: { enabled: true }

@@ -1,0 +1,33 @@
+{
+    "name": "symfony/amazon-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Amazon Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "async-aws/ses": "^1.8",
+        "symfony/mailer": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Amazon\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

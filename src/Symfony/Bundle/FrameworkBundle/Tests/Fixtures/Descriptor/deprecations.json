@@ -1,0 +1,17 @@
+{
+  "remainingCount": 5,
+  "deprecations": [
+    {
+      "message": "Some deprecation message.",
+      "file": "\/path\/to\/some\/file.php",
+      "line": 39,
+      "count": 3
+    },
+    {
+      "message": "An other deprecation message.",
+      "file": "\/path\/to\/an\/other\/file.php",
+      "line": 25,
+      "count": 2
+    }
+  ]
+}

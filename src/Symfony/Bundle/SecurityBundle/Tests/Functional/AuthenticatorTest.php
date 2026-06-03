@@ -1,0 +1,120 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+
+class AuthenticatorTest extends AbstractWebTestCase
+{
+    #[DataProvider('provideEmails')]
+    public function testFirewallUserProvider($email, $withinFirewall)
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'firewall_user_provider.yml']);
+
+        $client->request('GET', '/profile', [], [], [
+            'HTTP_X-USER-EMAIL' => $email,
+        ]);
+
+        if ($withinFirewall) {
+            $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
+        } else {
+            $this->assertJsonStringEqualsJsonString('{"error":"Invalid credentials."}', $client->getResponse()->getContent());
+        }
+    }
+
+    #[DataProvider('provideEmails')]
+    public function testWithoutUserProvider($email, $withinFirewall)
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'no_user_provider.yml']);
+
+        $client->request('GET', '/profile', [], [], [
+            'HTTP_X-USER-EMAIL' => $email,
+        ]);
+
+        $this->assertJsonStringEqualsJsonString('{"email":"'.$email.'"}', $client->getResponse()->getContent());
+    }
+
+    public static function provideEmails(): iterable
+    {
+        yield ['jane@example.org', true];
+        yield ['john@example.org', false];
+    }
+
+    #[DataProvider('provideEmailsWithFirewalls')]
+    public function testLoginUsersWithMultipleFirewalls(string $username, string $firewallContext)
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewall_user_provider.yml']);
+        $client->request('GET', '/main/login/check');
+
+        $client->request('POST', '/'.$firewallContext.'/login/check', [
+            '_username' => $username,
+            '_password' => 'test',
+        ]);
+        $this->assertResponseRedirects('/'.$firewallContext.'/user_profile');
+
+        $client->request('GET', '/'.$firewallContext.'/user_profile');
+        $this->assertEquals('Welcome '.$username.'!', $client->getResponse()->getContent());
+    }
+
+    public static function provideEmailsWithFirewalls(): iterable
+    {
+        yield ['jane@example.org', 'main'];
+        yield ['john@example.org', 'custom'];
+    }
+
+    public function testMultipleFirewalls()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewalls.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+
+        $client->request('GET', '/firewall2/profile');
+        $this->assertResponseRedirects('http://localhost/login');
+    }
+
+    public function testCustomSuccessHandler()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'custom_handlers.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/test');
+
+        $client->request('POST', '/firewall1/dummy_login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'test',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/dummy');
+    }
+
+    public function testCustomFailureHandler()
+    {
+        $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'custom_handlers.yml']);
+
+        $client->request('POST', '/firewall1/login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'wrong',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/login');
+
+        $client->request('POST', '/firewall1/dummy_login', [
+            '_username' => 'jane@example.org',
+            '_password' => 'wrong',
+        ]);
+        $this->assertResponseRedirects('http://localhost/firewall1/dummy_login');
+    }
+}

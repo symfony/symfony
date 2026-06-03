@@ -1,0 +1,74 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
+use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
+use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListener;
+use Symfony\Component\Security\Http\EventListener\IsCsrfTokenValidAttributeListener;
+
+/**
+ * @author Christian Flothmann <christian.flothmann@sensiolabs.de>
+ * @author Wouter de Jong <wouter@wouterj.nl>
+ *
+ * @internal
+ */
+class RegisterCsrfFeaturesPass implements CompilerPassInterface
+{
+    public function process(ContainerBuilder $container): void
+    {
+        $this->registerCsrfProtectionListener($container);
+        $this->registerLogoutHandler($container);
+    }
+
+    private function registerCsrfProtectionListener(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('cache.system')) {
+            $container->removeDefinition('cache.security_is_csrf_token_valid_attribute_expression_language');
+        }
+
+        if (!$container->has('security.authenticator.manager') || !$container->has('security.csrf.token_manager')) {
+            return;
+        }
+
+        $container->register('security.listener.csrf_protection', CsrfProtectionListener::class)
+            ->addArgument(new Reference('security.csrf.token_manager'))
+            ->addTag('kernel.event_subscriber');
+
+        $container->register('controller.is_csrf_token_valid_attribute_listener', IsCsrfTokenValidAttributeListener::class)
+            ->addArgument(new Reference('security.csrf.token_manager'))
+            ->addArgument(new Reference('security.is_csrf_token_valid_attribute_expression_language', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->addTag('kernel.event_subscriber');
+    }
+
+    protected function registerLogoutHandler(ContainerBuilder $container): void
+    {
+        if (!$container->has('security.logout_listener') || !$container->has('security.csrf.token_storage')) {
+            return;
+        }
+
+        $csrfTokenStorage = $container->findDefinition('security.csrf.token_storage');
+        $csrfTokenStorageClass = $container->getParameterBag()->resolveValue($csrfTokenStorage->getClass());
+
+        if (!is_subclass_of($csrfTokenStorageClass, ClearableTokenStorageInterface::class)) {
+            return;
+        }
+
+        $container->register('security.logout.listener.csrf_token_clearing', CsrfTokenClearingLogoutListener::class)
+            ->addArgument(new Reference('security.csrf.token_storage'))
+            ->addTag('kernel.event_subscriber');
+    }
+}

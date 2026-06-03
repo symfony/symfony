@@ -1,0 +1,18 @@
+services:
+    _defaults:
+        bind:
+            NonExistent: ~
+            $quz: quz
+            $factory: factory
+        public: true
+
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+        autowire: true
+        bind:
+            Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface: '@Symfony\Component\DependencyInjection\Tests\Fixtures\Bar'
+            $foo: [ ~ ]
+            iterable $baz: !tagged_iterator { tag: bar }
+
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Bar:
+        factory: [ ~, 'create' ]

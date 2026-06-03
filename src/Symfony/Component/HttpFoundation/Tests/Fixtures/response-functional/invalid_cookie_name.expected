@@ -1,0 +1,6 @@
+The cookie name "Hello + world" contains invalid characters.
+Array
+(
+    [0] => Content-Type: text/plain; charset=utf-8
+)
+shutdown

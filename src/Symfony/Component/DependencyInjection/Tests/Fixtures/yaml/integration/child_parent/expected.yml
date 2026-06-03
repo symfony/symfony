@@ -1,0 +1,9 @@
+services:
+    # child_service in the end should be identical to this
+    child_service_expected:
+        class: stdClass
+        autowire: false
+        public: true
+        lazy: true
+        # ONLY the child tag, the parent tag does not inherit
+        tags: [from_child]

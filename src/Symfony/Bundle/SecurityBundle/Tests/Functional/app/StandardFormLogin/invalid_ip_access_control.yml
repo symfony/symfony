@@ -1,0 +1,21 @@
+imports:
+    - { resource: ./../config/default.yml }
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    johannes: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        default:
+            form_login: ~
+            logout: ~
+
+    access_control:
+        # the '256.357.458.559' IP is wrong on purpose, to check invalid IP errors
+        - { path: ^/unprotected_resource$, ips: [1.1.1.1, '%env(APP_IP)%', 256.357.458.559], roles: IS_AUTHENTICATED_ANONYMOUSLY }

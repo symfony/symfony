@@ -1,0 +1,4 @@
+{% block form_widget_simple %}
+    {%- set type = type|default('text') -%}
+    <input type="{{ type }}" {{ block('widget_attributes') }} value="{{ value }}" rel="theme" />
+{%- endblock form_widget_simple %}

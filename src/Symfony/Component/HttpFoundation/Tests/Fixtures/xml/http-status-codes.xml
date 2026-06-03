@@ -1,0 +1,378 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="http-status-codes.xsl"?>
+<?xml-model href="http-status-codes.rng" schematypens="http://relaxng.org/ns/structure/1.0" ?>
+<registry xmlns="http://www.iana.org/assignments" id="http-status-codes">
+    <title>Hypertext Transfer Protocol (HTTP) Status Code Registry</title>
+    <updated>2021-10-01</updated>
+    <registry id="http-status-codes-1">
+        <title>HTTP Status Codes</title>
+        <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 16.2.1</xref>
+        <registration_rule>IETF Review</registration_rule>
+        <note>1xx: Informational - Request received, continuing process
+            2xx: Success - The action was successfully received, understood, and accepted
+            3xx: Redirection - Further action must be taken in order to complete the request
+            4xx: Client Error - The request contains bad syntax or cannot be fulfilled
+            5xx: Server Error - The server failed to fulfill an apparently valid request
+        </note>
+        <record updated="2021-10-01">
+            <value>100</value>
+            <description>Continue</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.2.1</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>101</value>
+            <description>Switching Protocols</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.2.2</xref>
+        </record>
+        <record>
+            <value>102</value>
+            <description>Processing</description>
+            <xref type="rfc" data="rfc2518"/>
+        </record>
+        <record date="2017-10-30">
+            <value>103</value>
+            <description>Early Hints</description>
+            <xref type="rfc" data="rfc8297"/>
+        </record>
+        <record>
+            <value>104-199</value>
+            <description>Unassigned</description>
+        </record>
+        <record updated="2021-10-01">
+            <value>200</value>
+            <description>OK</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.1</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>201</value>
+            <description>Created</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.2</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>202</value>
+            <description>Accepted</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.3</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>203</value>
+            <description>Non-Authoritative Information</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.4</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>204</value>
+            <description>No Content</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.5</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>205</value>
+            <description>Reset Content</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.6</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>206</value>
+            <description>Partial Content</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.3.7</xref>
+        </record>
+        <record>
+            <value>207</value>
+            <description>Multi-Status</description>
+            <xref type="rfc" data="rfc4918"/>
+        </record>
+        <record>
+            <value>208</value>
+            <description>Already Reported</description>
+            <xref type="rfc" data="rfc5842"/>
+        </record>
+        <record>
+            <value>209-225</value>
+            <description>Unassigned</description>
+        </record>
+        <record>
+            <value>226</value>
+            <description>IM Used</description>
+            <xref type="rfc" data="rfc3229"/>
+        </record>
+        <record>
+            <value>227-299</value>
+            <description>Unassigned</description>
+        </record>
+        <record updated="2021-10-01">
+            <value>300</value>
+            <description>Multiple Choices</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.1</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>301</value>
+            <description>Moved Permanently</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.2</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>302</value>
+            <description>Found</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.3</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>303</value>
+            <description>See Other</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.4</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>304</value>
+            <description>Not Modified</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.5</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>305</value>
+            <description>Use Proxy</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.6</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>306</value>
+            <description>(Unused)</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.7</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>307</value>
+            <description>Temporary Redirect</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.8</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>308</value>
+            <description>Permanent Redirect</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.4.9</xref>
+        </record>
+        <record>
+            <value>309-399</value>
+            <description>Unassigned</description>
+        </record>
+        <record updated="2021-10-01">
+            <value>400</value>
+            <description>Bad Request</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.1</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>401</value>
+            <description>Unauthorized</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.2</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>402</value>
+            <description>Payment Required</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.3</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>403</value>
+            <description>Forbidden</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.4</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>404</value>
+            <description>Not Found</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.5</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>405</value>
+            <description>Method Not Allowed</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.6</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>406</value>
+            <description>Not Acceptable</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.7</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>407</value>
+            <description>Proxy Authentication Required</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.8</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>408</value>
+            <description>Request Timeout</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.9</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>409</value>
+            <description>Conflict</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.10</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>410</value>
+            <description>Gone</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.11</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>411</value>
+            <description>Length Required</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.12</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>412</value>
+            <description>Precondition Failed</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.13</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>413</value>
+            <description>Content Too Large</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.14</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>414</value>
+            <description>URI Too Long</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.15</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>415</value>
+            <description>Unsupported Media Type</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.16</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>416</value>
+            <description>Range Not Satisfiable</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.17</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>417</value>
+            <description>Expectation Failed</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.18</xref>
+        </record>
+        <record date="2021-10-01">
+            <value>418</value>
+            <description>(Unused)</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.19</xref>
+        </record>
+        <record>
+            <value>419-420</value>
+            <description>Unassigned</description>
+        </record>
+        <record date="2021-10-01">
+            <value>421</value>
+            <description>Misdirected Request</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.20</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>422</value>
+            <description>Unprocessable Content</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.21</xref>
+        </record>
+        <record>
+            <value>423</value>
+            <description>Locked</description>
+            <xref type="rfc" data="rfc4918"/>
+        </record>
+        <record>
+            <value>424</value>
+            <description>Failed Dependency</description>
+            <xref type="rfc" data="rfc4918"/>
+        </record>
+        <record date="2018-07-02">
+            <value>425</value>
+            <description>Too Early</description>
+            <xref type="rfc" data="rfc8470"/>
+        </record>
+        <record updated="2021-10-01">
+            <value>426</value>
+            <description>Upgrade Required</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.5.22</xref>
+        </record>
+        <record>
+            <value>427</value>
+            <description>Unassigned</description>
+        </record>
+        <record>
+            <value>428</value>
+            <description>Precondition Required</description>
+            <xref type="rfc" data="rfc6585"/>
+        </record>
+        <record>
+            <value>429</value>
+            <description>Too Many Requests</description>
+            <xref type="rfc" data="rfc6585"/>
+        </record>
+        <record>
+            <value>430</value>
+            <description>Unassigned</description>
+        </record>
+        <record>
+            <value>431</value>
+            <description>Request Header Fields Too Large</description>
+            <xref type="rfc" data="rfc6585"/>
+        </record>
+        <record>
+            <value>432-450</value>
+            <description>Unassigned</description>
+        </record>
+        <record date="2015-12-21">
+            <value>451</value>
+            <description>Unavailable For Legal Reasons</description>
+            <xref type="rfc" data="rfc7725"/>
+        </record>
+        <record>
+            <value>452-499</value>
+            <description>Unassigned</description>
+        </record>
+        <record updated="2021-10-01">
+            <value>500</value>
+            <description>Internal Server Error</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.6.1</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>501</value>
+            <description>Not Implemented</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.6.2</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>502</value>
+            <description>Bad Gateway</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.6.3</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>503</value>
+            <description>Service Unavailable</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.6.4</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>504</value>
+            <description>Gateway Timeout</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.6.5</xref>
+        </record>
+        <record updated="2021-10-01">
+            <value>505</value>
+            <description>HTTP Version Not Supported</description>
+            <xref type="draft" data="RFC-ietf-httpbis-semantics">RFC-ietf-httpbis-semantics, Section 15.6.6</xref>
+        </record>
+        <record>
+            <value>506</value>
+            <description>Variant Also Negotiates</description>
+            <xref type="rfc" data="rfc2295"/>
+        </record>
+        <record>
+            <value>507</value>
+            <description>Insufficient Storage</description>
+            <xref type="rfc" data="rfc4918"/>
+        </record>
+        <record>
+            <value>508</value>
+            <description>Loop Detected</description>
+            <xref type="rfc" data="rfc5842"/>
+        </record>
+        <record>
+            <value>509</value>
+            <description>Unassigned</description>
+        </record>
+        <record>
+            <value>510</value>
+            <description>Not Extended</description>
+            <xref type="rfc" data="rfc2774"/>
+        </record>
+        <record>
+            <value>511</value>
+            <description>Network Authentication Required</description>
+            <xref type="rfc" data="rfc6585"/>
+        </record>
+        <record>
+            <value>512-599</value>
+            <description>Unassigned</description>
+        </record>
+    </registry>
+    <people/>
+</registry>

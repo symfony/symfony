@@ -1,0 +1,311 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Dotenv\Tests\Command;
+
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Dotenv\Command\DebugCommand;
+use Symfony\Component\Dotenv\Dotenv;
+
+class DebugCommandTest extends TestCase
+{
+    #[RunInSeparateProcess]
+    public function testErrorOnUninitializedDotenv()
+    {
+        unset($_SERVER['SYMFONY_DOTENV_VARS']);
+
+        $command = new DebugCommand('dev', __DIR__.'/Fixtures/Scenario1');
+        $command->setHelperSet(new HelperSet([new FormatterHelper()]));
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $output = $tester->getDisplay();
+
+        $this->assertStringContainsString('[ERROR] Dotenv component is not initialized', $output);
+    }
+
+    #[RunInSeparateProcess]
+    public function testEmptyDotEnvVarsList()
+    {
+        $_SERVER['SYMFONY_DOTENV_VARS'] = '';
+
+        $command = new DebugCommand('dev', __DIR__.'/Fixtures/Scenario1');
+        $command->setHelperSet(new HelperSet([new FormatterHelper()]));
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $expectedFormat = <<<'OUTPUT'
+            %a
+             ---------- ------- ------------ ------%S
+              Variable   Value   .env.local   .env%S
+             ---------- ------- ------------ ------%S
+              FOO                baz          bar%S
+              TEST123            n/a          true%S
+             ---------- ------- ------------ ------%S
+
+             // Note that values might be different between web and CLI.%S
+            %a
+            OUTPUT;
+
+        $this->assertStringMatchesFormat($expectedFormat, $tester->getDisplay());
+    }
+
+    public function testScenario1InDevEnv()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'dev');
+
+        // Scanned Files
+        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dev.local', $output);
+        $this->assertStringContainsString('⨯ .env.dev', $output);
+        $this->assertStringContainsString('✓ .env.local', $output);
+        $this->assertStringContainsString('✓ .env'.\PHP_EOL, $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env.prod', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+        $this->assertStringNotContainsString('.env.dist', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.local   .env', $output);
+        $this->assertStringContainsString('FOO        baz     baz          bar', $output);
+        $this->assertStringContainsString('TEST123    true    n/a          true', $output);
+    }
+
+    public function testScenario1InTestEnv()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'test');
+
+        // Scanned Files
+        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.test.local', $output);
+        $this->assertStringContainsString('✓ .env.test', $output);
+        $this->assertStringContainsString('✓ .env'.\PHP_EOL, $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env.prod', $output);
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.dist', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.test   .env', $output);
+        $this->assertStringContainsString('FOO        bar     n/a         bar', $output);
+        $this->assertStringContainsString('TEST123    false   false       true', $output);
+    }
+
+    public function testScenario1InProdEnv()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'prod');
+
+        // Scanned Files
+        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('✓ .env.prod.local', $output);
+        $this->assertStringContainsString('⨯ .env.prod', $output);
+        $this->assertStringContainsString('✓ .env.local', $output);
+        $this->assertStringContainsString('✓ .env'.\PHP_EOL, $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+        $this->assertStringNotContainsString('.env.dist', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.prod.local   .env.local   .env', $output);
+        $this->assertStringContainsString('FOO        baz     n/a               baz          bar', $output);
+        $this->assertStringContainsString('HELLO      world   world             n/a          n/a', $output);
+        $this->assertStringContainsString('TEST123    true    n/a               n/a          true', $output);
+    }
+
+    public function testScenario2InProdEnv()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
+
+        // Scanned Files
+        $this->assertStringContainsString('✓ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.prod.local', $output);
+        $this->assertStringContainsString('✓ .env.prod', $output);
+        $this->assertStringContainsString('⨯ .env.local', $output);
+        $this->assertStringContainsString('✓ .env.dist', $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env'.\PHP_EOL, $output);
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.local.php   .env.prod   .env.dist', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR              BaR         n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
+    }
+
+    public function testScenario2WithCustomPath()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', [], __DIR__.'/Fixtures/Scenario2/.env');
+
+        // Scanned Files
+        $this->assertStringContainsString('✓ Scenario2/.env.local.php', $output);
+        $this->assertStringContainsString('⨯ Scenario2/.env.prod.local', $output);
+        $this->assertStringContainsString('✓ Scenario2/.env.prod', $output);
+        $this->assertStringContainsString('⨯ Scenario2/.env.local', $output);
+        $this->assertStringContainsString('✓ Scenario2/.env.dist', $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env'.\PHP_EOL, $output);
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   Scenario2/.env.local.php   Scenario2/.env.prod   Scenario2/.env.dist', $output);
+        $this->assertStringContainsString('FOO        BaR     BaR                        BaR                   n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234                       1234                  0000', $output);
+    }
+
+    public function testWarningOnEnvAndEnvDistFile()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario3', 'dev');
+
+        // Warning
+        $this->assertStringContainsString('[WARNING] The file .env.dist gets skipped', $output);
+    }
+
+    public function testWarningOnEnvAndEnvDistFileWithCustomPath()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures', 'dev', dotenvPath: __DIR__.'/Fixtures/Scenario3/.env');
+
+        // Warning
+        $this->assertStringContainsString('[WARNING] The file Scenario3/.env.dist gets skipped', $output);
+    }
+
+    public function testWarningOnPhpEnvFile()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
+
+        // Warning
+        $this->assertStringContainsString('[WARNING] Due to existing dump file (.env.local.php)', $output);
+    }
+
+    public function testWarningOnPhpEnvFileWithCustomPath()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', dotenvPath: __DIR__.'/Fixtures/Scenario2/.env');
+
+        // Warning
+        $this->assertStringContainsString('[WARNING] Due to existing dump file (Scenario2/.env.local.php)', $output);
+    }
+
+    public function testScenario1InDevEnvWithNameFilter()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'dev', ['filter' => 'FoO']);
+
+        // Scanned Files
+        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.dev.local', $output);
+        $this->assertStringContainsString('⨯ .env.dev', $output);
+        $this->assertStringContainsString('✓ .env.local', $output);
+        $this->assertStringContainsString('✓ .env'.\PHP_EOL, $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env.prod', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+        $this->assertStringNotContainsString('.env.dist', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.local   .env', $output);
+        $this->assertStringContainsString('FOO        baz     baz          bar', $output);
+        $this->assertStringNotContainsString('TEST123    true    n/a          true', $output);
+    }
+
+    public function testScenario1InProdEnvWithMissingNameFilter()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'prod', ['filter' => 'unknown']);
+
+        // Scanned Files
+        $this->assertStringContainsString('⨯ .env.local.php', $output);
+        $this->assertStringContainsString('✓ .env.prod.local', $output);
+        $this->assertStringContainsString('⨯ .env.prod', $output);
+        $this->assertStringContainsString('✓ .env.local', $output);
+        $this->assertStringContainsString('✓ .env'.\PHP_EOL, $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+        $this->assertStringNotContainsString('.env.dist', $output);
+
+        // Variables
+        $this->assertStringContainsString('[WARNING] No variables match the given filter "unknown".', $output);
+        $this->assertStringNotContainsString('Variable   Value   .env.prod.local   .env.local   .env', $output);
+        $this->assertStringNotContainsString('FOO        baz     n/a               baz          bar', $output);
+        $this->assertStringNotContainsString('HELLO      world   world             n/a          n/a', $output);
+        $this->assertStringNotContainsString('TEST123    true    n/a               n/a          true', $output);
+    }
+
+    public function testScenario2InProdEnvWithNameFilterPrefix()
+    {
+        $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod', ['filter' => 'tes']);
+
+        // Scanned Files
+        $this->assertStringContainsString('✓ .env.local.php', $output);
+        $this->assertStringContainsString('⨯ .env.prod.local', $output);
+        $this->assertStringContainsString('✓ .env.prod', $output);
+        $this->assertStringContainsString('⨯ .env.local', $output);
+        $this->assertStringContainsString('✓ .env.dist', $output);
+
+        // Skipped Files
+        $this->assertStringNotContainsString('.env'.\PHP_EOL, $output);
+        $this->assertStringNotContainsString('.env.dev', $output);
+        $this->assertStringNotContainsString('.env.test', $output);
+
+        // Variables
+        $this->assertStringContainsString('Variable   Value   .env.local.php   .env.prod   .env.dist', $output);
+        $this->assertStringNotContainsString('FOO        BaR     BaR              BaR         n/a', $output);
+        $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
+    }
+
+    #[RunInSeparateProcess]
+    public function testCompletion()
+    {
+        $env = 'prod';
+        $projectDirectory = __DIR__.'/Fixtures/Scenario2';
+
+        $_SERVER['TEST_ENV_KEY'] = $env;
+        (new Dotenv('TEST_ENV_KEY'))->bootEnv($projectDirectory.'/.env');
+
+        $command = new DebugCommand($env, $projectDirectory);
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandCompletionTester($application->get('debug:dotenv'));
+        $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
+    }
+
+    private function executeCommand(string $projectDirectory, string $env, array $input = [], ?string $dotenvPath = null): string
+    {
+        if (null === $dotenvPath) {
+            unset($_SERVER['APP_RUNTIME_OPTIONS']);
+        } elseif (str_starts_with($dotenvPath, $projectDirectory.'/')) {
+            $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => substr($dotenvPath, \strlen($projectDirectory) + 1)];
+        } else {
+            $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => $dotenvPath];
+        }
+
+        $_SERVER['TEST_ENV_KEY'] = $env;
+        (new Dotenv('TEST_ENV_KEY'))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');
+
+        $command = new DebugCommand($env, $projectDirectory);
+        $command->setHelperSet(new HelperSet([new FormatterHelper()]));
+        $tester = new CommandTester($command);
+        $tester->execute($input);
+
+        return $tester->getDisplay();
+    }
+}

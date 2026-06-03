@@ -1,0 +1,33 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Security\Core\Event;
+
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+
+/**
+ * This is a general purpose authentication event.
+ *
+ * @author Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
+class AuthenticationEvent extends Event
+{
+    public function __construct(
+        private TokenInterface $token,
+    ) {
+    }
+
+    public function getAuthenticationToken(): TokenInterface
+    {
+        return $this->token;
+    }
+}

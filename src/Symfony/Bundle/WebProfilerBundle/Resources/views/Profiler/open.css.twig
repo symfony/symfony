@@ -1,0 +1,80 @@
+#header {
+    margin-bottom: 30px;
+}
+
+#source {
+    background: var(--page-background);
+    border: 1px solid var(--menu-border-color);
+    box-shadow: 0 0 0 5px var(--page-background);
+    border-radius: 6px;
+    margin: 0 30px 45px 0;
+    max-width: 960px;
+    padding: 15px 20px;
+}
+.width-full #source {
+    max-width: unset;
+    width: 100%;
+}
+
+#source code {
+    font-size: 15px;
+}
+
+#source .source-file-name {
+    border-bottom: 1px solid var(--table-border-color);
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 15px 0;
+    padding: 0 0 15px;
+}
+#source .source-file-name small {
+    color: var(--color-muted);
+}
+
+#source .source-content {
+    overflow-x: auto;
+}
+#source .source-content ol {
+    margin: 0;
+}
+#source .source-content ol li {
+    margin: 0 0 2px 0;
+    padding-left: 5px;
+    white-space: preserve nowrap;
+}
+#source .source-content ol li::marker {
+    color: var(--color-muted);
+    font-family: var(--font-family-monospace);
+    padding-right: 5px;
+}
+#source .source-content li.selected {
+    background: var(--yellow-100);
+    border-radius: 4px;
+}
+.theme-dark #source .source-content li.selected {
+    background: var(--gray-600);
+}
+#source .source-content li.selected::marker {
+    color: var(--color-text);
+    font-weight: bold;
+}
+
+#source span[style="color: #FF8000"] { color: var(--highlight-comment) !important; }
+#source span[style="color: #007700"] { color: var(--highlight-keyword) !important; }
+#source span[style="color: #0000BB"] { color: var(--color-text) !important; }
+#source span[style="color: #DD0000"] { color: var(--highlight-string) !important; }
+
+.file-metadata dt {
+    color: var(--header-metadata-key);
+    display: block;
+    font-weight: bold;
+}
+.file-metadata dd {
+    color: var(--header-metadata-value);
+    margin: 5px 0 20px;
+
+    /* needed to break the long file paths */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-all;
+}

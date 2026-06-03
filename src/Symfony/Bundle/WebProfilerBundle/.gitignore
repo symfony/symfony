@@ -1,0 +1,4 @@
+vendor/
+composer.lock
+phpunit.xml
+/Resources/views/Script/Mermaid/repo-*

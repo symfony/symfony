@@ -1,0 +1,171 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Validator\Tests\Constraints;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Validator\Constraints\Country;
+use Symfony\Component\Validator\Constraints\CountryValidator;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+
+class CountryValidatorTest extends ConstraintValidatorTestCase
+{
+    private string $defaultLocale;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        \Locale::setDefault($this->defaultLocale);
+    }
+
+    protected function createValidator(): CountryValidator
+    {
+        return new CountryValidator();
+    }
+
+    public function testNullIsValid()
+    {
+        $this->validate(null, new Country());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validate('', new Country());
+
+        $this->assertNoViolation();
+    }
+
+    public function testExpectsStringCompatibleType()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->validate(new \stdClass(), new Country());
+    }
+
+    #[DataProvider('getValidCountries')]
+    public function testValidCountries($country)
+    {
+        $this->validate($country, new Country());
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidCountries()
+    {
+        return [
+            ['GB'],
+            ['AT'],
+            ['MY'],
+        ];
+    }
+
+    #[DataProvider('getInvalidCountries')]
+    public function testInvalidCountries($country)
+    {
+        $constraint = new Country(message: 'myMessage');
+
+        $this->validate($country, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$country.'"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getInvalidCountries()
+    {
+        return [
+            ['foobar'],
+            ['EN'],
+        ];
+    }
+
+    #[DataProvider('getValidAlpha3Countries')]
+    public function testValidAlpha3Countries($country)
+    {
+        $this->validate($country, new Country(alpha3: true));
+
+        $this->assertNoViolation();
+    }
+
+    public static function getValidAlpha3Countries()
+    {
+        return [
+            ['GBR'],
+            ['ATA'],
+            ['MYT'],
+        ];
+    }
+
+    #[DataProvider('getInvalidAlpha3Countries')]
+    public function testInvalidAlpha3Countries($country)
+    {
+        $constraint = new Country(
+            alpha3: true,
+            message: 'myMessage',
+        );
+
+        $this->validate($country, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"'.$country.'"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getInvalidAlpha3Countries()
+    {
+        return [
+            ['foobar'],
+            ['GB'],
+            ['ZZZ'],
+            ['zzz'],
+        ];
+    }
+
+    public function testInvalidAlpha3CountryNamed()
+    {
+        $this->validate(
+            'DE',
+            new Country(alpha3: true, message: 'myMessage')
+        );
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '"DE"')
+            ->setCode(Country::NO_SUCH_COUNTRY_ERROR)
+            ->assertRaised();
+    }
+
+    public function testValidateUsingCountrySpecificLocale()
+    {
+        // in order to test with "en_GB"
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('en_GB');
+
+        $existingCountry = 'GB';
+
+        $this->validate($existingCountry, new Country());
+
+        $this->assertNoViolation();
+    }
+}

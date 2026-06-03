@@ -1,0 +1,24 @@
+{
+    "id": "29e785c1-dd0c-4efc-9d41-909d4109769f",
+    "eventType": "clicked",
+    "occurredAt": "2024-06-10T09:23:31+02:00",
+    "messageUuid": "1684f904-596e-4d9f-ba16-ead5c4d27957",
+    "messageId": "7bb4cd3f5d8ee2bcb5bed8c2ed7def85@s.mailomat.swiss",
+    "recipient": "to@mailomat.swiss",
+    "payload": {
+        "event": "clicked",
+        "timestamp": 1718004211,
+        "message-uuid": "1684f904-596e-4d9f-ba16-ead5c4d27957",
+        "recipient": "to@mailomat.swiss",
+        "message": {
+            "headers": {
+                "message-id": "7bb4cd3f5d8ee2bcb5bed8c2ed7def85@s.mailomat.swiss"
+            }
+        },
+        "url": "http:\/\/mailomat.swiss",
+        "client": {
+            "ip": "127.0.0.1",
+            "user-agent": "Mozilla\/5.0"
+        }
+    }
+}

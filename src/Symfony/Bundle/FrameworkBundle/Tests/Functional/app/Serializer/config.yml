@@ -1,0 +1,21 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    translator: true
+    serializer:
+        enabled: true
+        circular_reference_handler: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\CircularReferenceHandler
+        max_depth_handler: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\MaxDepthHandler
+        default_context:
+            enable_max_depth: true
+    property_info: { enabled: true }
+
+services:
+    serializer.alias:
+        alias: serializer
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\CircularReferenceHandler: ~
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\MaxDepthHandler: ~

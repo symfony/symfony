@@ -1,0 +1,242 @@
+<?php
+
+return [
+    'Names' => [
+        'AED' => [
+            'AED',
+            'Dola laseArab',
+        ],
+        'AOA' => [
+            'AOA',
+            'Kwanza yase Angola',
+        ],
+        'AUD' => [
+            'A$',
+            'Dola yase Australia',
+        ],
+        'BHD' => [
+            'BHD',
+            'Dinari yase Bhahareni',
+        ],
+        'BIF' => [
+            'BIF',
+            'Fulenki yase Bhurundi',
+        ],
+        'BWP' => [
+            'BWP',
+            'Phula yase Botswana',
+        ],
+        'CAD' => [
+            'CA$',
+            'Dola yase Khanada',
+        ],
+        'CDF' => [
+            'CDF',
+            'Fulenki yase Khongo',
+        ],
+        'CHF' => [
+            'CHF',
+            'Fulenki yase Swisi',
+        ],
+        'CNY' => [
+            'CN¥',
+            'Yuan Renminbi yase China',
+        ],
+        'CVE' => [
+            'CVE',
+            'Escudo Caboverdiano',
+        ],
+        'DJF' => [
+            'DJF',
+            'Fulenki yase Jibhuthi',
+        ],
+        'DZD' => [
+            'DZD',
+            'Dinali yase Aljeriya',
+        ],
+        'EGP' => [
+            'EGP',
+            'Phawundi laseGibhide',
+        ],
+        'ERN' => [
+            'ERN',
+            'Nakfa yase Eritrea',
+        ],
+        'ETB' => [
+            'ETB',
+            'Dola laseEthiopia',
+        ],
+        'EUR' => [
+            '€',
+            'Yuro',
+        ],
+        'GBP' => [
+            '£',
+            'Phawundi yase Ngilandi',
+        ],
+        'GHC' => [
+            'GHC',
+            'Sedi yase Ghana',
+        ],
+        'GMD' => [
+            'GMD',
+            'Dalasi yase Gambia',
+        ],
+        'GNS' => [
+            'GNS',
+            'Fulenki yase Gine',
+        ],
+        'INR' => [
+            '₹',
+            'Rupi yase Indiya',
+        ],
+        'JPY' => [
+            'JP¥',
+            'Yeni yase Japhani',
+        ],
+        'KES' => [
+            'KES',
+            'Shilingi yase Kenya',
+        ],
+        'KMF' => [
+            'KMF',
+            'Fulenki yase Khomoro',
+        ],
+        'LRD' => [
+            'LRD',
+            'Dola yase Libheriya',
+        ],
+        'LSL' => [
+            'LSL',
+            'Lothi yase Lesotho',
+        ],
+        'LYD' => [
+            'LYD',
+            'Dinari yase Libya',
+        ],
+        'MAD' => [
+            'MAD',
+            'Dirham yase Morokho',
+        ],
+        'MGA' => [
+            'MGA',
+            'Fulenki yase Malagasi',
+        ],
+        'MRO' => [
+            'MRO',
+            'Ugwiya yase Moritaniya (1973–2017)',
+        ],
+        'MRU' => [
+            'MRU',
+            'Ugwiya yase Moritaniya',
+        ],
+        'MUR' => [
+            'MUR',
+            'Rupi yase Morishasi',
+        ],
+        'MWK' => [
+            'MWK',
+            'Kwacha yase Malawi',
+        ],
+        'MZM' => [
+            'MZM',
+            'Metikali yase Mozambiki',
+        ],
+        'NAD' => [
+            'NAD',
+            'Dola yase Namibiya',
+        ],
+        'NGN' => [
+            'NGN',
+            'Nayira yase Nijeriya',
+        ],
+        'RWF' => [
+            'RWF',
+            'Fulenki yase Ruwanda',
+        ],
+        'SAR' => [
+            'SAR',
+            'Riyal yase Saudi',
+        ],
+        'SCR' => [
+            'SCR',
+            'Rupi yase Seyisheli',
+        ],
+        'SDG' => [
+            'SDG',
+            'Dinari yase Sudani',
+        ],
+        'SDP' => [
+            'SDP',
+            'Phawundi yase Sudani',
+        ],
+        'SHP' => [
+            'SHP',
+            'Phawundindi laseSt Helena',
+        ],
+        'SLE' => [
+            'SLE',
+            'Leyoni',
+        ],
+        'SLL' => [
+            'SLL',
+            'Leyoni (1964—2022)',
+        ],
+        'SOS' => [
+            'SOS',
+            'Shilingi yase Somaliya',
+        ],
+        'STD' => [
+            'STD',
+            'Dobra yase Sao Tome lo Principe (1977–2017)',
+        ],
+        'STN' => [
+            'STN',
+            'Dobra yase Sao Tome lo Principe',
+        ],
+        'SZL' => [
+            'SZL',
+            'Lilangeni',
+        ],
+        'TND' => [
+            'TND',
+            'Dinari yase Tunisiya',
+        ],
+        'TZS' => [
+            'TZS',
+            'Shilingi yase Tanzaniya',
+        ],
+        'UGX' => [
+            'UGX',
+            'Shilingi yase Uganda',
+        ],
+        'USD' => [
+            'US$',
+            'Dola yase Amelika',
+        ],
+        'XAF' => [
+            'FCFA',
+            'Fulenki CFA BEAC',
+        ],
+        'XOF' => [
+            'F CFA',
+            'Fulenki CFA BCEAO',
+        ],
+        'ZAR' => [
+            'ZAR',
+            'Randi yase Afrika ye Zanzi',
+        ],
+        'ZMK' => [
+            'ZMK',
+            'Kwacha yase Zambiya (1968–2012)',
+        ],
+        'ZMW' => [
+            'ZMW',
+            'Kwacha yase Zambiya',
+        ],
+        'ZWD' => [
+            'ZWD',
+            'Dola yase Zimbabwe',
+        ],
+    ],
+];

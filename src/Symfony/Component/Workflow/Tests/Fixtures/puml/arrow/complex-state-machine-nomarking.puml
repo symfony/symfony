@@ -1,0 +1,21 @@
+@startuml
+allow_mixing
+title SimpleDiagram
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam state {
+    BackgroundColor<<initial>> #87b741
+    BackgroundColor<<marked>> #3887C6
+    BorderColor #3887C6
+    BorderColor<<marked>> Black
+    FontColor<<marked>> White
+}
+state "a" <<initial>>
+state "b"
+state "c"
+state "d"
+"a" --> "b": "t1"
+"d" -[#Red]-> "b": "<font color=Grey>My custom transition</font>\n<font color=Grey>label 3</font>"
+"b" -[#Blue]-> "c": "t2"
+"b" --> "d": "t3"
+@enduml

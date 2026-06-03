@@ -1,0 +1,11 @@
+app:
+    resource: ../controller/routing.yml
+
+api:
+    resource: ../controller/routing.yml
+    name_prefix: api_
+    prefix: /api
+
+empty_wildcard:
+    resource: ../controller/empty_wildcard/*
+    prefix: /empty_wildcard

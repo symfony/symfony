@@ -1,0 +1,116 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Config\Tests;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
+use Symfony\Component\Config\Tests\Resource\ResourceStub;
+
+class ConfigCacheTest extends TestCase
+{
+    private string $cacheFile;
+    private string $metaFile;
+
+    protected function setUp(): void
+    {
+        $this->cacheFile = tempnam(sys_get_temp_dir(), 'config_');
+        $this->metaFile = tempnam(sys_get_temp_dir(), 'config_');
+    }
+
+    protected function tearDown(): void
+    {
+        $files = [$this->cacheFile, $this->cacheFile.'.meta', $this->metaFile];
+
+        foreach ($files as $file) {
+            if (file_exists($file)) {
+                @unlink($file);
+            }
+        }
+    }
+
+    #[DataProvider('debugModes')]
+    public function testCacheIsNotValidIfNothingHasBeenCached(bool $debug)
+    {
+        unlink($this->cacheFile); // remove tempnam() side effect
+        $cache = new ConfigCache($this->cacheFile, $debug);
+
+        $this->assertFalse($cache->isFresh());
+    }
+
+    public function testIsAlwaysFreshInProduction()
+    {
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
+
+        $cache = new ConfigCache($this->cacheFile, false);
+        $cache->write('', [$staleResource]);
+
+        $this->assertTrue($cache->isFresh());
+    }
+
+    #[DataProvider('debugModes')]
+    public function testIsFreshWhenNoResourceProvided(bool $debug)
+    {
+        $cache = new ConfigCache($this->cacheFile, $debug);
+        $cache->write('', []);
+        $this->assertTrue($cache->isFresh());
+    }
+
+    public function testFreshResourceInDebug()
+    {
+        $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
+        $p->setValue(null, []);
+
+        $freshResource = new ResourceStub();
+        $freshResource->setFresh(true);
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', [$freshResource]);
+
+        $this->assertTrue($cache->isFresh());
+    }
+
+    public function testStaleResourceInDebug()
+    {
+        $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
+        $p->setValue(null, []);
+
+        $staleResource = new ResourceStub();
+        $staleResource->setFresh(false);
+
+        $cache = new ConfigCache($this->cacheFile, true);
+        $cache->write('', [$staleResource]);
+
+        $this->assertFalse($cache->isFresh());
+    }
+
+    public static function debugModes(): array
+    {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    public function testCacheWithCustomMetaFile()
+    {
+        $this->assertStringEqualsFile($this->metaFile, '');
+
+        $cache = new ConfigCache($this->cacheFile, false, $this->metaFile);
+        $cache->write('foo', [new FileResource(__FILE__)]);
+
+        $this->assertStringNotEqualsFile($this->metaFile, '');
+    }
+}

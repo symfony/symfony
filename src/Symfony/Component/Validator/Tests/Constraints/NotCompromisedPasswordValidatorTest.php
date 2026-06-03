@@ -1,0 +1,222 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Validator\Tests\Constraints;
+
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Validator\Constraints\Luhn;
+use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
+use Symfony\Component\Validator\Constraints\NotCompromisedPasswordValidator;
+use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
+/**
+ * @author Kévin Dunglas <dunglas@gmail.com>
+ */
+class NotCompromisedPasswordValidatorTest extends ConstraintValidatorTestCase
+{
+    private const PASSWORD_TRIGGERING_AN_ERROR = 'apiError';
+    private const PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL = 'https://api.pwnedpasswords.com/range/3EF27'; // https://api.pwnedpasswords.com/range/3EF27 is the range for the value "apiError"
+    private const PASSWORD_LEAKED = 'maman';
+    private const PASSWORD_NOT_LEAKED = ']<0585"%sb^5aa$w6!b38",,72?dp3r4\45b28Hy';
+    private const PASSWORD_NON_UTF8_LEAKED = 'мама';
+    private const PASSWORD_NON_UTF8_NOT_LEAKED = 'м<в0dp3r4\45b28Hy';
+
+    private const RETURN = [
+        '35E033023A46402F94CFB4F654C5BFE44A1:1',
+        '35F079CECCC31812288257CD770AA7968D7:53',
+        '36039744C253F9B2A4E90CBEDB02EBFB82D:5', // UTF-8 leaked password: maman
+        '273CA8A2A78C9B2D724144F4FAF4D221C86:6', // ISO-8859-5 leaked password: мама
+        '3686792BBC66A72D40D928ED15621124CFE:7',
+        '36EEC709091B810AA240179A44317ED415C:2',
+        'EE6EB9C0DFA0F07098CEDB11ECC7AFF9D4E:0', // UTF-8 not leaked password: ]<0585"%sb^5aa$w6!b38",,72?dp3r4\45b28Hy
+        'FC9F37E51AACD6B692A62769267590D46B8:0', // ISO-8859-5 non leaked password: м<в0dp3r4\45b28Hy
+    ];
+
+    protected function createValidator(): ConstraintValidatorInterface
+    {
+        // Pass HttpClient::create() instead of the mock to run the tests against the real API
+        return new NotCompromisedPasswordValidator($this->createHttpClientStub());
+    }
+
+    public function testNullIsValid()
+    {
+        $this->validate(null, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testEmptyStringIsValid()
+    {
+        $this->validate('', new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidPasswordButDisabled()
+    {
+        $r = new \ReflectionProperty($this->validator, 'enabled');
+        $r->setValue($this->validator, false);
+
+        $this->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidPassword()
+    {
+        $constraint = new NotCompromisedPassword();
+        $this->validate(self::PASSWORD_LEAKED, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
+            ->assertRaised();
+    }
+
+    public function testThresholdReached()
+    {
+        $constraint = new NotCompromisedPassword(threshold: 3);
+        $this->validate(self::PASSWORD_LEAKED, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
+            ->assertRaised();
+    }
+
+    public function testThresholdNotReached()
+    {
+        $this->validate(self::PASSWORD_LEAKED, new NotCompromisedPassword(threshold: 10));
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidPassword()
+    {
+        $this->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testNonUtf8CharsetValid()
+    {
+        $this->validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
+
+        $this->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_NOT_LEAKED, 'ISO-8859-5', 'UTF-8'), new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testNonUtf8CharsetInvalid()
+    {
+        $constraint = new NotCompromisedPassword();
+
+        $this->validator = new NotCompromisedPasswordValidator($this->createHttpClientStub(), 'ISO-8859-5');
+
+        $this->validate(mb_convert_encoding(self::PASSWORD_NON_UTF8_LEAKED, 'ISO-8859-5', 'UTF-8'), $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
+            ->assertRaised();
+    }
+
+    public function testInvalidPasswordCustomEndpoint()
+    {
+        $endpoint = 'https://password-check.internal.example.com/range/%s';
+        // 50D74 - first 5 bytes of uppercase SHA1 hash of self::PASSWORD_LEAKED
+        $expectedEndpointUrl = 'https://password-check.internal.example.com/range/50D74';
+        $constraint = new NotCompromisedPassword();
+
+        $this->validator = new NotCompromisedPasswordValidator(
+            $this->createHttpClientStubCustomEndpoint($expectedEndpointUrl),
+            'UTF-8',
+            true,
+            $endpoint
+        );
+        $this->validate(self::PASSWORD_LEAKED, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setCode(NotCompromisedPassword::COMPROMISED_PASSWORD_ERROR)
+            ->assertRaised();
+    }
+
+    public function testEndpointWithInvalidValueInReturn()
+    {
+        $returnValue = implode(
+            "\r\n",
+            [
+                '36039744C253F9B2A4E90CBEDB02EBFB82D:5',
+                'This should not break the validator',
+                '3686792BBC66A72D40D928ED15621124CFE:7',
+                '36EEC709091B810AA240179A44317ED415C:2',
+                '',
+            ]
+        );
+
+        $this->validator = new NotCompromisedPasswordValidator(
+            $this->createHttpClientStub($returnValue),
+            'UTF-8',
+            true,
+            'https://password-check.internal.example.com/range/%s'
+        );
+
+        $this->validate(self::PASSWORD_NOT_LEAKED, new NotCompromisedPassword());
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidConstraint()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->validate(null, new Luhn());
+    }
+
+    public function testInvalidValue()
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->validate([], new NotCompromisedPassword());
+    }
+
+    public function testApiError()
+    {
+        $this->expectException(ExceptionInterface::class);
+        $this->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword());
+    }
+
+    public function testApiErrorSkipped()
+    {
+        $this->expectNotToPerformAssertions();
+
+        $this->validate(self::PASSWORD_TRIGGERING_AN_ERROR, new NotCompromisedPassword(skipOnError: true));
+    }
+
+    private function createHttpClientStub(?string $returnValue = null): HttpClientInterface
+    {
+        return new MockHttpClient(static function ($method, $url) use ($returnValue) {
+            if (self::PASSWORD_TRIGGERING_AN_ERROR_RANGE_URL !== $url) {
+                return new MockResponse($returnValue ?? implode("\r\n", self::RETURN));
+            }
+        });
+    }
+
+    private function createHttpClientStubCustomEndpoint($expectedEndpoint): HttpClientInterface
+    {
+        return new MockHttpClient(function ($method, $url) use ($expectedEndpoint) {
+            $this->assertSame('GET', $method);
+            $this->assertSame($expectedEndpoint, $url);
+
+            return new MockResponse(implode("\r\n", self::RETURN));
+        });
+    }
+}

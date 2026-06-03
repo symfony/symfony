@@ -1,0 +1,10 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Class1
+        public: true
+        arguments: [!service { class: Class2, arguments: [!service { class: Class2 }] }]

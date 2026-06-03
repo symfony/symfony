@@ -1,0 +1,36 @@
+{
+    "name": "symfony/amqp-messenger",
+    "type": "symfony-messenger-bridge",
+    "description": "Symfony AMQP extension Messenger Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "ext-amqp": "*",
+        "symfony/messenger": "^8.1"
+    },
+    "require-dev": {
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\Amqp\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

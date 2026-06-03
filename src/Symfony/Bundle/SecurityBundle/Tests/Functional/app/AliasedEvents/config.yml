@@ -1,0 +1,10 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    providers:
+        dummy:
+            memory: ~
+    firewalls:
+        dummy:
+            security: false

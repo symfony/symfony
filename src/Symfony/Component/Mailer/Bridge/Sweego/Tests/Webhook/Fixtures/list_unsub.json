@@ -1,0 +1,28 @@
+{
+  "event_type": "list_unsub",
+  "timestamp": "2024-09-02T12:55:09+00:00",
+  "swg_uid": "02-5898484-484f2-841d-84ea-a33351589aabc0",
+  "event_id": "0a190ab5-aad8-4874-9c32-0848484f8fc",
+  "channel": "email",
+  "transaction_id": "861aad97-e4e8-4aaf-9322-1b64835760b9",
+  "headers": {
+    "x-campaign-id": "42",
+    "x-campaign-tags": "billing",
+    "x-campaign-type": "transac",
+    "x-client-id": "d6b1222eb484fb8f4g8d4fg8cd4",
+    "x-client-ip": "XXX.XXX.XXX.XXX",
+    "x-mailer": "Sweeg",
+    "x-originating-ip": "XXX.XXX.XXX.XXX",
+    "x-ref-1": "643524",
+    "x-ref-2": "lervcn",
+    "x-ref-3": "o10icr",
+    "x-swg-uid": "02-589edd0e-b7f2-4a1d-a3ea-a333cb9aabc0",
+    "x-transaction-id": "861aad97-e4e8-4aaf-9322-1b64835760b9"
+  },
+  "campaign_tags": "billing",
+  "campaign_type": "transac",
+  "campaign_id": "transac",
+  "recipient": "recipient@example.com",
+  "domain_from": "example.org",
+  "one_click": false
+}

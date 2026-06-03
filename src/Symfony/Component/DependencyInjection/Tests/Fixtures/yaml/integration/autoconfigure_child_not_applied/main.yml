@@ -1,0 +1,8 @@
+imports:
+    - { resource: _child.yml }
+
+services:
+    parent_service:
+        autoconfigure: true
+        abstract: true
+        public: true

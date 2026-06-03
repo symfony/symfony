@@ -1,0 +1,4 @@
+services:
+    bar_service:
+        class:    BarClass
+        autowire: true

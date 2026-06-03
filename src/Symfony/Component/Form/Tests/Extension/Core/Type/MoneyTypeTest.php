@@ -1,0 +1,242 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Form\Tests\Extension\Core\Type;
+
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Intl\Util\IntlTestHelper;
+
+class MoneyTypeTest extends BaseTypeTestCase
+{
+    public const TESTED_TYPE = MoneyType::class;
+
+    private string $defaultLocale;
+
+    protected function setUp(): void
+    {
+        // we test against different locales, so we need the full
+        // implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        parent::setUp();
+
+        $this->defaultLocale = \Locale::getDefault();
+    }
+
+    protected function tearDown(): void
+    {
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
+    }
+
+    public function testPassMoneyPatternToView()
+    {
+        \Locale::setDefault('de_DE');
+
+        $view = $this->factory->create(static::TESTED_TYPE)
+            ->createView();
+
+        $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
+    }
+
+    public function testMoneyPatternWorksForYen()
+    {
+        \Locale::setDefault('en_US');
+
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => 'JPY'])
+            ->createView();
+
+        $this->assertSame('¥ {{ widget }}', $view->vars['money_pattern']);
+    }
+
+    // https://github.com/symfony/symfony/issues/5458
+    public function testPassDifferentPatternsForDifferentCurrencies()
+    {
+        \Locale::setDefault('de_DE');
+
+        $view1 = $this->factory->create(static::TESTED_TYPE, null, ['currency' => 'GBP'])->createView();
+        $view2 = $this->factory->create(static::TESTED_TYPE, null, ['currency' => 'EUR'])->createView();
+
+        $this->assertSame('{{ widget }} £', $view1->vars['money_pattern']);
+        $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
+    }
+
+    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    {
+        parent::testSubmitNull($expected, $norm, '');
+    }
+
+    public function testMoneyPatternWithoutCurrency()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => false])
+            ->createView();
+
+        $this->assertSame('{{ widget }}', $view->vars['money_pattern']);
+    }
+
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10.00', $expectedData = 10.0)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'empty_data' => $emptyData,
+        ]);
+        $form->submit(null);
+
+        $this->assertSame($emptyData, $form->getViewData());
+        $this->assertSame($expectedData, $form->getNormData());
+        $this->assertSame($expectedData, $form->getData());
+    }
+
+    public function testDefaultFormattingWithDefaultRounding()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0]);
+        $form->setData('12345.54321');
+
+        $this->assertSame('12346', $form->createView()->vars['value']);
+    }
+
+    public function testDefaultFormattingWithSpecifiedRounding()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_DOWN]);
+        $form->setData('12345.54321');
+
+        $this->assertSame('12345', $form->createView()->vars['value']);
+    }
+
+    public function testHtml5EnablesSpecificFormatting()
+    {
+        // Since we test against "de_CH", we need the full implementation
+        IntlTestHelper::requireFullIntl($this);
+
+        \Locale::setDefault('de_CH');
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['html5' => true, 'scale' => 2]);
+        $form->setData('12345.6');
+
+        $this->assertSame('12345.60', $form->createView()->vars['value']);
+        $this->assertSame('number', $form->createView()->vars['type']);
+    }
+
+    public function testHtml5AddsStepAttributeIfNotSet()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('any', $view->vars['attr']['step']);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
+            'scale' => 2,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('decimal', $view->vars['attr']['inputmode']);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
+            'scale' => 0,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('numeric', $view->vars['attr']['inputmode']);
+    }
+
+    public function testHtml5DoesNotOverrideUserProvidedStep()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+            'attr' => ['step' => '0.01'],
+        ]);
+        $view = $form->createView();
+        $this->assertSame('0.01', $view->vars['attr']['step']);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
+            'scale' => 2,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('decimal', $view->vars['attr']['inputmode']);
+    }
+
+    public function testDefaultInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100]);
+        $form->submit('12345.67');
+
+        $this->assertSame(1234567.0, $form->getData());
+    }
+
+    public function testIntegerInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100, 'input' => 'integer']);
+        $form->submit('12345.67');
+
+        $this->assertSame(1234567, $form->getData());
+    }
+
+    public function testIntegerInputWithoutDivisor()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'integer']);
+        $form->submit('1234567');
+
+        $this->assertSame(1234567, $form->getData());
+    }
+
+    public function testDefaultFormattingWithScaleAndStringInput()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2, 'input' => 'string']);
+        $form->setData('12345.67890');
+
+        $this->assertSame('12345.68', $form->createView()->vars['value']);
+    }
+
+    public function testStringInputWithFloatData()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a numeric string.');
+
+        $this->factory->create(static::TESTED_TYPE, 12345.6789, [
+            'input' => 'string',
+            'scale' => 2,
+        ]);
+    }
+
+    public function testStringInputWithIntData()
+    {
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('Expected a numeric string.');
+
+        $this->factory->create(static::TESTED_TYPE, 12345, [
+            'input' => 'string',
+            'scale' => 2,
+        ]);
+    }
+
+    public function testSubmitStringInputWithDefaultScale()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
+        $form->submit('1.234');
+
+        $this->assertSame('1.23', $form->getData());
+        $this->assertSame(1.23, $form->getNormData());
+        $this->assertSame('1.23', $form->getViewData());
+    }
+
+    public function testSubmitStringInputWithScale()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string', 'scale' => 3]);
+        $form->submit('1.234');
+
+        $this->assertSame('1.234', $form->getData());
+        $this->assertSame(1.234, $form->getNormData());
+        $this->assertSame('1.234', $form->getViewData());
+    }
+}

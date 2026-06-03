@@ -1,0 +1,219 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        :root {
+            --messenger-error-color: #B0413E;
+        }
+
+        .message-item thead th { position: relative; cursor: pointer; user-select: none; padding-right: 35px; }
+        .message-item tbody tr td:first-child { width: 170px; }
+
+        .message-item .label { float: right; padding: 1px 5px; opacity: .75; margin-left: 5px; }
+        .message-item .toggle-button { position: absolute; right: 6px; top: 6px; opacity: .5; pointer-events: none; color: inherit; }
+        .message-item .icon svg { height: 24px; width: 24px; }
+        .message-item .icon-close svg { transform: rotate(180deg); }
+
+        .message-item .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
+        .message-item .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
+
+        .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid var(--messenger-error-color); }
+
+        .message-item tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
+
+        #collector-content .message-bus .trace {
+            border: var(--border);
+            background: var(--base-0);
+            padding: 10px;
+            margin: 0.5em 0;
+            overflow: auto;
+        }
+        #collector-content .message-bus .trace {
+            font-size: 12px;
+        }
+        #collector-content .message-bus .trace li {
+            margin-bottom: 0;
+            padding: 0;
+        }
+        #collector-content .message-bus .trace li.selected {
+            background: var(--highlight-selected-line);
+        }
+    </style>
+{% endblock %}
+
+{% block toolbar %}
+    {% if collector.messages|length > 0 %}
+        {% set status_color = collector.exceptionsCount ? 'red' %}
+        {% set icon %}
+            {{ source('@WebProfiler/Icon/messenger.svg') }}
+            <span class="sf-toolbar-value">{{ collector.messages|length }}</span>
+        {% endset %}
+
+        {% set text %}
+            {% for bus in collector.buses %}
+                {% set exceptionsCount = collector.exceptionsCount(bus) %}
+                <div class="sf-toolbar-info-piece">
+                    <b>{{ bus }}</b>
+                    <span
+                        title="{{ exceptionsCount }} message(s) with exceptions"
+                        class="sf-toolbar-status sf-toolbar-status-{{ exceptionsCount ? 'red' }}"
+                    >
+                        {{ collector.messages(bus)|length }}
+                    </span>
+                </div>
+            {% endfor %}
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: 'messenger', status: status_color}) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/messenger.svg') }}</span>
+        <strong>Messages</strong>
+        {% if collector.exceptionsCount > 0 %}
+            <span class="count">
+                <span>{{ collector.exceptionsCount }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Messages</h2>
+
+    {% if collector.messages is empty %}
+        <div class="empty empty-panel">
+            <p>No messages have been collected.</p>
+        </div>
+    {% elseif 1 == collector.buses|length %}
+        <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+        {{ _self.render_bus_messages(collector.messages, true) }}
+    {% else %}
+        <div class="sf-tabs message-bus">
+            <div class="tab">
+                {% set messages = collector.messages %}
+                {% set exceptionsCount = collector.exceptionsCount %}
+                <h3 class="tab-title">All<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+
+                <div class="tab-content">
+                    <p class="text-muted">Ordered list of dispatched messages across all your buses</p>
+                    {{ _self.render_bus_messages(messages, true) }}
+                </div>
+            </div>
+
+            {% for bus in collector.buses %}
+                <div class="tab message-bus">
+                    {% set messages = collector.messages(bus) %}
+                    {% set exceptionsCount = collector.exceptionsCount(bus) %}
+                    <h3 class="tab-title">{{ bus }}<span class="badge {{ exceptionsCount ? exceptionsCount == messages|length ? 'status-error' : 'status-some-errors' }}">{{ messages|length }}</span></h3>
+
+                    <div class="tab-content">
+                        <p class="text-muted">Ordered list of messages dispatched on the <code>{{ bus }}</code> bus</p>
+                        {{ _self.render_bus_messages(messages) }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}
+
+{% macro render_bus_messages(messages, showBus = false) %}
+    {% set discr = random() %}
+    {% for dispatchCall in messages %}
+    <table class="message-item">
+        <thead>
+            <tr>
+                <th colspan="2" class="sf-toggle"
+                    data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
+                    data-toggle-initial="{{ loop.first ? 'display' }}"
+                >
+                    <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
+                    {% if dispatchCall.exception is defined %}
+                        <span class="label status-error">exception</span>
+                    {% endif %}
+                    <button class="btn btn-link toggle-button" type="button">
+                        <span class="icon icon-close">{{ source('@WebProfiler/Icon/chevron-down.svg') }}</span>
+                        <span class="icon icon-open">{{ source('@WebProfiler/Icon/chevron-down.svg') }}</span>
+                    </button>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="message-item-{{ discr }}-{{ loop.index0 }}-details" class="sf-toggle-content">
+            <tr>
+                <th scope="row" class="font-normal">Caller</th>
+                <td class="message-bus-dispatch-caller">
+                    In
+                    {% set caller = dispatchCall.caller %}
+                    {% if caller.line %}
+                        {% set link = caller.file|file_link(caller.line) %}
+                        {% if link %}
+                            <a href="{{ link }}" title="{{ caller.file }}">{{ caller.name }}</a>
+                        {% else %}
+                            <abbr title="{{ caller.file }}">{{ caller.name }}</abbr>
+                        {% endif %}
+                    {% else %}
+                        {{ caller.name }}
+                    {% endif %}
+                    line <button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#sf-trace-{{ discr }}-{{ loop.index0 }}">{{ caller.line }}</button>
+
+                    <div class="hidden" id="sf-trace-{{ discr }}-{{ loop.index0 }}">
+                        <div class="trace">
+                            {{ caller.file|file_excerpt(caller.line)|replace({
+                                '#DD0000': 'var(--highlight-string)',
+                                '#007700': 'var(--highlight-keyword)',
+                                '#0000BB': 'var(--highlight-default)',
+                                '#FF8000': 'var(--highlight-comment)',
+                            })|raw }}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% if showBus %}
+                <tr>
+                    <th scope="row" class="font-normal">Bus</th>
+                    <td>{{ dispatchCall.bus }}</td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th scope="row" class="font-normal">Message</th>
+                <td>{{ profiler_dump(dispatchCall.message.value, maxDepth: 2) }}</td>
+            </tr>
+            <tr>
+                <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">when dispatching</span></th>
+                <td>
+                    {% for item in dispatchCall.stamps %}
+                        {{ profiler_dump(item) }}
+                    {% else %}
+                        <span class="text-muted font-normal">No items</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% if dispatchCall.stamps_after_dispatch is defined %}
+                <tr>
+                    <th scope="row" class="font-normal">Envelope stamps <span class="block text-muted">after dispatch</span></th>
+                    <td>
+                        {% for item in dispatchCall.stamps_after_dispatch %}
+                            {{ profiler_dump(item) }}
+                        {% else %}
+                            <span class="text-muted">No items</span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endif %}
+            {% if dispatchCall.exception is defined %}
+                <tr>
+                    <td class="text-bold">Exception</td>
+                    <td>
+                        {{ profiler_dump(dispatchCall.exception.value, maxDepth: 1) }}
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+    {% endfor %}
+{% endmacro %}

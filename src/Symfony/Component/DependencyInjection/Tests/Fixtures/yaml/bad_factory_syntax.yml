@@ -1,0 +1,6 @@
+services:
+    factory:
+        class: Baz
+    invalid_factory:
+        class: FooBarClass
+        factory: '@factory:method'

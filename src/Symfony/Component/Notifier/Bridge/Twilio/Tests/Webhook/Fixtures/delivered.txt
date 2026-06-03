@@ -1,0 +1,1 @@
+SmsSid=SM4262411b90e5464b98a4f66a49c57a97&SmsStatus=delivered&MessageStatus=delivered&To=%2B15622089096&MessagingServiceSid=MG4d9d720b38f7892254869fabdca51e69&MessageSid=SM4262411b90e5464b98a4f66a49c57a97&AccountSid=AC0db966d80e9f1662da09c61287f8bba1&From=%2B16232320112&ApiVersion=2010-04-01

@@ -1,0 +1,177 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Config\Tests\Definition;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
+use Symfony\Component\Config\Definition\ScalarNode;
+use Symfony\Component\Config\Exception\LogicException;
+
+class ScalarNodeTest extends TestCase
+{
+    #[DataProvider('getValidValues')]
+    public function testNormalize($value)
+    {
+        $node = new ScalarNode('test');
+        $this->assertSame($value, $node->normalize($value));
+    }
+
+    public static function getValidValues(): array
+    {
+        return [
+            [false],
+            [true],
+            [null],
+            [''],
+            ['foo'],
+            [0],
+            [1],
+            [0.0],
+            [0.1],
+        ];
+    }
+
+    public function testSetDeprecated()
+    {
+        $childNode = new ScalarNode('foo');
+        $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
+
+        $this->assertTrue($childNode->isDeprecated());
+        $deprecation = $childNode->getDeprecation($childNode->getName(), $childNode->getPath());
+        $this->assertSame('"foo" is deprecated', $deprecation['message']);
+        $this->assertSame('vendor/package', $deprecation['package']);
+        $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: "foo" is deprecated', $childNode->getDeprecationMessage());
+
+        $node = new ArrayNode('root');
+        $node->addChild($childNode);
+
+        $deprecationTriggered = 0;
+        $deprecationHandler = static function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
+            if (\E_USER_DEPRECATED === $level) {
+                return ++$deprecationTriggered;
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
+        };
+
+        $prevErrorHandler = set_error_handler($deprecationHandler);
+        try {
+            $node->finalize([]);
+        } finally {
+            restore_error_handler();
+        }
+        $this->assertSame(0, $deprecationTriggered, '->finalize() should not trigger if the deprecated node is not set');
+
+        $prevErrorHandler = set_error_handler($deprecationHandler);
+        try {
+            $node->finalize(['foo' => '']);
+        } finally {
+            restore_error_handler();
+        }
+        $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
+    }
+
+    public function testNotDeprecatedException()
+    {
+        $childNode = new ScalarNode('foo');
+
+        $this->assertFalse($childNode->isDeprecated());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The node "foo" is not deprecated.');
+        $childNode->getDeprecation('node', 'path');
+    }
+
+    #[DataProvider('getInvalidValues')]
+    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    {
+        $node = new ScalarNode('test');
+
+        $this->expectException(InvalidTypeException::class);
+
+        $node->normalize($value);
+    }
+
+    public static function getInvalidValues(): array
+    {
+        return [
+            [[]],
+            [['foo' => 'bar']],
+            [new \stdClass()],
+        ];
+    }
+
+    public function testNormalizeThrowsExceptionWithoutHint()
+    {
+        $node = new ScalarNode('test');
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage('Invalid type for path "test". Expected "scalar", but got "array".');
+
+        $node->normalize([]);
+    }
+
+    public function testNormalizeThrowsExceptionWithErrorMessage()
+    {
+        $node = new ScalarNode('test');
+        $node->setInfo('"the test value"');
+
+        $this->expectException(InvalidTypeException::class);
+        $this->expectExceptionMessage("Invalid type for path \"test\". Expected \"scalar\", but got \"array\".\nHint: \"the test value\"");
+
+        $node->normalize([]);
+    }
+
+    #[DataProvider('getValidNonEmptyValues')]
+    public function testValidNonEmptyValues($value)
+    {
+        $node = new ScalarNode('test');
+        $node->setAllowEmptyValue(false);
+
+        $this->assertSame($value, $node->finalize($value));
+    }
+
+    public static function getValidNonEmptyValues(): array
+    {
+        return [
+            [false],
+            [true],
+            ['foo'],
+            [0],
+            [1],
+            [0.0],
+            [0.1],
+        ];
+    }
+
+    #[DataProvider('getEmptyValues')]
+    public function testNotAllowedEmptyValuesThrowException($value)
+    {
+        $node = new ScalarNode('test');
+        $node->setAllowEmptyValue(false);
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        $node->finalize($value);
+    }
+
+    public static function getEmptyValues(): array
+    {
+        return [
+            [null],
+            [''],
+        ];
+    }
+}

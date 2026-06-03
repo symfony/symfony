@@ -1,0 +1,6 @@
+{
+  "main.js": "main.123abc.js",
+  "css/styles.css": "css/styles.555def.css",
+  "css/style.css": "css/style.abcdef.css",
+  "main/home.css": "main/home.css"
+}

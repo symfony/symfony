@@ -1,0 +1,20 @@
+{% block lead %}
+{{ email.subject }}
+{% endblock %}
+
+{% block content %}
+{{ content }}
+{% endblock %}
+
+{% block action %}
+{% if action_url %}
+{{ action_text }}: {{ action_url }}
+{% endif %}
+{% endblock %}
+
+{% block exception %}
+{% if exception %}
+Exception stack trace attached.
+{{ exception }}
+{% endif %}
+{% endblock %}

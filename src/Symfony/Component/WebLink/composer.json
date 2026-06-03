@@ -1,0 +1,35 @@
+{
+    "name": "symfony/web-link",
+    "type": "library",
+    "description": "Manages links between resources",
+    "keywords": ["link", "psr13", "http", "http2", "preload", "prefetch", "prerender", "dns-prefetch", "push", "performance"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kévin Dunglas",
+            "email": "dunglas@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "provide": {
+        "psr/link-implementation": "1.0|2.0"
+    },
+    "require": {
+        "php": ">=8.4.1",
+        "psr/link": "^1.1|^2.0"
+    },
+    "require-dev": {
+        "symfony/http-kernel": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\WebLink\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

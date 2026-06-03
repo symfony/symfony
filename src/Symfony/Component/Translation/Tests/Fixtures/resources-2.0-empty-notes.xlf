@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="fr-FR" trgLang="en-US">
+  <file id="messages.en_US">
+    <unit id="Ll7LrI6" name="empty">
+      <segment>
+        <source>empty</source>
+        <target>notes</target>
+      </segment>
+    </unit>
+    <unit id="hU8PAYC" name="full">
+      <notes>
+        <note category="file-source" priority="1">test/path/to/translation/Example.1.html.twig:27</note>
+      </notes>
+      <segment>
+        <source>full</source>
+        <target>notes</target>
+      </segment>
+    </unit>
+  </file>
+</xliff>

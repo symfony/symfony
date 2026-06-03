@@ -1,0 +1,9 @@
+services:
+    child_service_expected:
+        class: stdClass
+        # set explicitly on child (not overridden by parent)
+        autoconfigure: false
+        # set explicitly on child
+        autowire: true
+        tags: [from_defaults]
+        public: true

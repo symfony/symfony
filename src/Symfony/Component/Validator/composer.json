@@ -1,0 +1,60 @@
+{
+    "name": "symfony/validator",
+    "type": "library",
+    "description": "Provides tools to validate values",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/polyfill-ctype": "^1.8",
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/translation-contracts": "^2.5|^3"
+    },
+    "require-dev": {
+        "egulias/email-validator": "^2.1.10|^3|^4",
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/intl": "^7.4|^8.0",
+        "symfony/mime": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/string": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "symfony/type-info": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0"
+    },
+    "conflict": {
+        "doctrine/lexer": "<1.1",
+        "symfony/doctrine-bridge": "<7.4",
+        "symfony/expression-language": "<7.4"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Validator\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/",
+            "/Resources/bin/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

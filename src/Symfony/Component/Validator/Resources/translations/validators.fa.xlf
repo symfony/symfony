@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="fa" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="1">
+                <source>This value should be false.</source>
+                <target>این مقدار باید نادرست (False) باشد.</target>
+            </trans-unit>
+            <trans-unit id="2">
+                <source>This value should be true.</source>
+                <target>این مقدار باید درست (True) باشد.</target>
+            </trans-unit>
+            <trans-unit id="3">
+                <source>This value should be of type {{ type }}.</source>
+                <target>این مقدار باید از نوع {{ type }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="4">
+                <source>This value should be blank.</source>
+                <target>این مقدار باید خالی باشد.</target>
+            </trans-unit>
+            <trans-unit id="5">
+                <source>The value you selected is not a valid choice.</source>
+                <target>مقدار انتخاب شده یک گزینه معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="6">
+                <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
+                <target>شما باید حداقل {{ limit }} گزینه انتخاب نمایید.|شما باید حداقل {{ limit }} گزینه انتخاب نمایید.</target>
+            </trans-unit>
+            <trans-unit id="7">
+                <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
+                <target>شما باید حداکثر {{ limit }} گزینه انتخاب نمایید.|شما باید حداکثر {{ limit }} گزینه انتخاب نمایید.</target>
+            </trans-unit>
+            <trans-unit id="8">
+                <source>One or more of the given values is invalid.</source>
+                <target>یک یا چند مقدار داده شده نامعتبر است.</target>
+            </trans-unit>
+            <trans-unit id="9">
+                <source>This field was not expected.</source>
+                <target>این ورودی مورد انتظار نبود.</target>
+            </trans-unit>
+            <trans-unit id="10">
+                <source>This field is missing.</source>
+                <target>این فیلد وارد نشده است.</target>
+            </trans-unit>
+            <trans-unit id="11">
+                <source>This value is not a valid date.</source>
+                <target>این مقدار یک تاریخ معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="12">
+                <source>This value is not a valid datetime.</source>
+                <target>این مقدار یک تاریخ و زمان معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="13">
+                <source>This value is not a valid email address.</source>
+                <target>این یک آدرس رایانامه (ایمیل) معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="14">
+                <source>The file could not be found.</source>
+                <target>فایل یافت نشد.</target>
+            </trans-unit>
+            <trans-unit id="15">
+                <source>The file is not readable.</source>
+                <target>فایل قابل خواندن نیست.</target>
+            </trans-unit>
+            <trans-unit id="16">
+                <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>فایل بیش از اندازه بزرگ است({{ size }} {{ suffix }}). بیشینه (حداکثر) اندازه مجاز برابر با {{ limit }} {{ suffix }} می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="17">
+                <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
+                <target>نوع mime این فایل نامعتبر است({{ type }}). انواع mime مجاز {{ types }} هستند.</target>
+            </trans-unit>
+            <trans-unit id="18">
+                <source>This value should be {{ limit }} or less.</source>
+                <target>این مقدار باید کوچکتر و یا مساوی {{ limit }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="19">
+                <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
+                <target>این مقدار بسیار طولانی است. باید دارای {{limit}} کاراکتر یا کمتر باشد. | این مقدار بسیار طولانی است. باید دارای {{limit}} کاراکتر یا کمتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="20">
+                <source>This value should be {{ limit }} or more.</source>
+                <target>این مقدار باید بزرگتر و یا مساوی {{ limit }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="21">
+                <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
+                <target>این مقدار بیش از اندازه کوتاه است. باید {{ limit }} کاراکتر یا بیشتر داشته باشد.|این مقدار بیش از اندازه کوتاه است. باید {{ limit }} کاراکتر یا بیشتر داشته باشد.</target>
+            </trans-unit>
+            <trans-unit id="22">
+                <source>This value should not be blank.</source>
+                <target>این مقدار نباید خالی باشد.</target>
+            </trans-unit>
+            <trans-unit id="23">
+                <source>This value should not be null.</source>
+                <target>این مقدار نباید خالی باشد.</target>
+            </trans-unit>
+            <trans-unit id="24">
+                <source>This value should be null.</source>
+                <target>این مقدار باید خالی باشد.</target>
+            </trans-unit>
+            <trans-unit id="25">
+                <source>This value is not valid.</source>
+                <target>این مقدار معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="26">
+                <source>This value is not a valid time.</source>
+                <target>این مقدار یک زمان معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="27">
+                <source>This value is not a valid URL.</source>
+                <target>این مقدار شامل یک URL معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="31">
+                <source>The two values should be equal.</source>
+                <target>دو مقدار باید با یکدیگر برابر باشند.</target>
+            </trans-unit>
+            <trans-unit id="32">
+                <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
+                <target>فایل بیش از اندازه بزرگ است. بیشینه (حداکثر) اندازه مجاز {{ limit }} {{ suffix }} است.</target>
+            </trans-unit>
+            <trans-unit id="33">
+                <source>The file is too large.</source>
+                <target>فایل بیش از اندازه بزرگ است.</target>
+            </trans-unit>
+            <trans-unit id="34">
+                <source>The file could not be uploaded.</source>
+                <target>بارگذاری فایل با شکست مواجه گردید.</target>
+            </trans-unit>
+            <trans-unit id="35">
+                <source>This value should be a valid number.</source>
+                <target>این مقدار باید یک عدد معتبر باشد.</target>
+            </trans-unit>
+            <trans-unit id="36">
+                <source>This file is not a valid image.</source>
+                <target>این فایل یک تصویر معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="37" resname="This is not a valid IP address.">
+                <source>This value is not a valid IP address.</source>
+                <target>این مقدار یک آدرس آی‌پی معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="38">
+                <source>This value is not a valid language.</source>
+                <target>این مقدار یک زبان معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="39">
+                <source>This value is not a valid locale.</source>
+                <target>این مقدار یک محل (locale) معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="40">
+                <source>This value is not a valid country.</source>
+                <target>این مقدار یک کشور معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="41">
+                <source>This value is already used.</source>
+                <target>این مقدار قبلاً استفاده شده است.</target>
+            </trans-unit>
+            <trans-unit id="42">
+                <source>The size of the image could not be detected.</source>
+                <target>اندازه تصویر قابل شناسایی نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="43">
+                <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>عرض تصویر بسیار بزرگ است({{ width }}px). بیشینه (حداکثر) عرض مجاز {{ max_width }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="44">
+                <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>عرض تصویر بسیار کوچک است({{ width }}px). کمینه (حداقل) عرض مورد انتظار {{ min_width }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="45">
+                <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>ارتفاع تصویر بسیار بزرگ است({{ height }}px). بیشینه (حداکثر) ارتفاع مجاز {{ max_height }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="46">
+                <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>ارتفاع تصویر بسیار کوچک است({{ height }}px). کمینه (حداقل) ارتفاع مورد انتظار {{ min_height }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="47">
+                <source>This value should be the user's current password.</source>
+                <target>این مقدار باید رمزعبور فعلی کاربر باشد.</target>
+            </trans-unit>
+            <trans-unit id="48">
+                <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
+                <target> این مقدار باید دقیقا {{ limit }} کاراکتر داشته باشد.| این مقدار باید دقیقا {{ limit }} کاراکتر داشته باشد.</target>
+            </trans-unit>
+            <trans-unit id="49">
+                <source>The file was only partially uploaded.</source>
+                <target>فایل به صورت جزئی بارگذاری گردیده است.</target>
+            </trans-unit>
+            <trans-unit id="50">
+                <source>No file was uploaded.</source>
+                <target>هیچ فایلی بارگذاری نشد.</target>
+            </trans-unit>
+            <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
+                <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
+                <target>هیچ پوشه موقتی در php.ini پیکربندی نشده است، یا پوشه پیکربندی شده وجود ندارد.</target>
+            </trans-unit>
+            <trans-unit id="52">
+                <source>Cannot write temporary file to disk.</source>
+                <target>فایل موقتی را نمی‌توان در دیسک نوشت.</target>
+            </trans-unit>
+            <trans-unit id="53">
+                <source>A PHP extension caused the upload to fail.</source>
+                <target>یک افزونه PHP باعث شد بارگذاری ناموفق باشد.</target>
+            </trans-unit>
+            <trans-unit id="54">
+                <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
+                <target>این مجموعه باید حاوی {{ limit }} عنصر یا بیشتر باشد.|این مجموعه باید حاوی {{ limit }} عنصر یا بیشتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="55">
+                <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
+                <target>این مجموعه باید حاوی {{ limit }} عنصر یا کمتر باشد.|این مجموعه باید حاوی {{ limit }} عنصر یا کمتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="56">
+                <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
+                <target>این مجموعه باید دقیقا حاوی {{ limit }} عنصر باشد.|این مجموعه باید دقیقا حاوی {{ limit }} عنصر باشد.</target>
+            </trans-unit>
+            <trans-unit id="57">
+                <source>Invalid card number.</source>
+                <target>شماره کارت نامعتبر است.</target>
+            </trans-unit>
+            <trans-unit id="58">
+                <source>Unsupported card type or invalid card number.</source>
+                <target>نوع کارت پشتیبانی نمی‌شود و یا شماره کارت نامعتبر می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
+                <source>This value is not a valid International Bank Account Number (IBAN).</source>
+                <target>این مقدار یک شماره شبای معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="60">
+                <source>This value is not a valid ISBN-10.</source>
+                <target>این مقدار یک ISBN-10 معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="61">
+                <source>This value is not a valid ISBN-13.</source>
+                <target>این مقدار یک ISBN-13 معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="62">
+                <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
+                <target>این مقدار یک ISBN-10 معتبر و یا ISBN-13 معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="63">
+                <source>This value is not a valid ISSN.</source>
+                <target>این مقدار یک ISSN معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="64">
+                <source>This value is not a valid currency.</source>
+                <target>این مقدار یک واحد پول معتبر نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="65">
+                <source>This value should be equal to {{ compared_value }}.</source>
+                <target>این مقدار باید برابر با {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="66">
+                <source>This value should be greater than {{ compared_value }}.</source>
+                <target>این مقدار باید از {{ compared_value }} بیشتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="67">
+                <source>This value should be greater than or equal to {{ compared_value }}.</source>
+                <target>این مقدار باید بزرگتر و یا مساوی با {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="68">
+                <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>این مقدار باید برابر {{ compared_value_type }} {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="69">
+                <source>This value should be less than {{ compared_value }}.</source>
+                <target>این مقدار باید کمتر از {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="70">
+                <source>This value should be less than or equal to {{ compared_value }}.</source>
+                <target>این مقدار باید کمتر و یا مساوی با {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="71">
+                <source>This value should not be equal to {{ compared_value }}.</source>
+                <target>این مقدار نباید با {{ compared_value }} برابر باشد.</target>
+            </trans-unit>
+            <trans-unit id="72">
+                <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
+                <target>این مقدار نباید برابر {{ compared_value_type }} {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="73">
+                <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>ابعاد ({{ ratio }}) عکس بیش از حد بزرگ است. بیشینه (حداکثر) ابعاد مجاز {{ max_ratio }} می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="74">
+                <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>ابعاد ({{ ratio }}) عکس بیش از حد کوچک است. کمینه (حداقل) ابعاد مورد انتظار {{ min_ratio }} می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="75">
+                <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
+                <target>این تصویر یک مربع ({{ width }}x{{ height }}px) می‌باشد. تصاویر مربع شکل مجاز نمی‌باشند.</target>
+            </trans-unit>
+            <trans-unit id="76">
+                <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
+                <target>این تصویر افقی ({{ width }}x{{ height }}px) می‌باشد. تصاویر افقی مجاز نمی‌باشند.</target>
+            </trans-unit>
+            <trans-unit id="77">
+                <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
+                <target>این تصویر عمودی ({{ width }}x{{ height }}px) می‌باشد. تصاویر عمودی مجاز نمی‌باشند.</target>
+            </trans-unit>
+            <trans-unit id="78">
+                <source>An empty file is not allowed.</source>
+                <target>فایل خالی مجاز نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="79">
+                <source>The host could not be resolved.</source>
+                <target>میزبان (Host) شناسایی نشد.</target>
+            </trans-unit>
+            <trans-unit id="80">
+                <source>This value does not match the expected {{ charset }} charset.</source>
+                <target>این مقدار مطابق charset مورد انتظار {{ charset }} نمی باشد.</target>
+            </trans-unit>
+            <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
+                <source>This value is not a valid Business Identifier Code (BIC).</source>
+                <target>این مقدار یک کد شناسه کسب‌وکار (BIC) معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="82">
+                <source>Error</source>
+                <target>خطا</target>
+            </trans-unit>
+            <trans-unit id="83" resname="This is not a valid UUID.">
+                <source>This value is not a valid UUID.</source>
+                <target>این مقدار یک UUID معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="84">
+                <source>This value should be a multiple of {{ compared_value }}.</source>
+                <target>این مقدار باید چند برابر {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="85">
+                <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
+                <target>این کد شناسایی کسب‌و‌کار (BIC) با شماره حساب بانکی بین‌المللی (IBAN) {{ iban }} مرتبط نیست.</target>
+            </trans-unit>
+            <trans-unit id="86">
+                <source>This value should be valid JSON.</source>
+                <target>این مقدار باید یک JSON معتبر باشد.</target>
+            </trans-unit>
+            <trans-unit id="87">
+                <source>This collection should contain only unique elements.</source>
+                <target>این مجموعه باید فقط حاوی عناصر یکتا باشد.</target>
+            </trans-unit>
+            <trans-unit id="88">
+                <source>This value should be positive.</source>
+                <target>این مقدار باید مثبت باشد.</target>
+            </trans-unit>
+            <trans-unit id="89">
+                <source>This value should be either positive or zero.</source>
+                <target>این مقدار باید مثبت یا صفر باشد.</target>
+            </trans-unit>
+            <trans-unit id="90">
+                <source>This value should be negative.</source>
+                <target>این مقدار باید منفی باشد.</target>
+            </trans-unit>
+            <trans-unit id="91">
+                <source>This value should be either negative or zero.</source>
+                <target>این مقدار باید منفی یا صفر باشد.</target>
+            </trans-unit>
+            <trans-unit id="92">
+                <source>This value is not a valid timezone.</source>
+                <target>این مقدار یک منطقه‌زمانی (timezone) معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="93">
+                <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
+                <target>این رمزعبور در یک رخنه‌ی اطلاعاتی نشت کرده است. لطفاً از یک رمزعبور دیگر استفاده کنید.</target>
+            </trans-unit>
+            <trans-unit id="94">
+                <source>This value should be between {{ min }} and {{ max }}.</source>
+                <target>این مقدار باید بین {{ min }} و {{ max }} باشد</target>
+            </trans-unit>
+            <trans-unit id="95">
+                <source>This value is not a valid hostname.</source>
+                <target>این مقدار یک hostname معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="96">
+                <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
+                <target>تعداد عناصر این مجموعه باید ضریبی از {{ compared_value }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="97">
+                <source>This value should satisfy at least one of the following constraints:</source>
+                <target>این مقدار باید حداقل یکی از محدودیت‌های زیر را ارضا کند:</target>
+            </trans-unit>
+            <trans-unit id="98">
+                <source>Each element of this collection should satisfy its own set of constraints.</source>
+                <target>هر یک از عناصر این مجموعه باید دسته محدودیت‌های خودش را ارضا کند.</target>
+            </trans-unit>
+            <trans-unit id="99">
+                <source>This value is not a valid International Securities Identification Number (ISIN).</source>
+                <target>این مقدار یک شماره شناسایی بین‌المللی اوراق بهادار (ISIN) معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="100">
+                <source>This value should be a valid expression.</source>
+                <target>این مقدار باید یک عبارت معتبر باشد.</target>
+            </trans-unit>
+            <trans-unit id="101">
+                <source>This value is not a valid CSS color.</source>
+                <target>این مقدار یک رنگ معتبر در CSS نیست.</target>
+            </trans-unit>
+            <trans-unit id="102">
+                <source>This value is not a valid CIDR notation.</source>
+                <target>این مقدار یک نماد معتبر در CIDR نیست.</target>
+            </trans-unit>
+            <trans-unit id="103">
+                <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
+                <target>مقدار ماسک شبکه (NetMask) باید بین {{ min }} و {{ max }} باشد.</target>
+            </trans-unit>
+            <trans-unit id="104">
+                <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
+                <target>نام فایل طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.|نام فایل طولانی است. نام فایل باید {{ filename_max_length }} کاراکتر یا کمتر باشد.</target>
+            </trans-unit>
+            <trans-unit id="105">
+                <source>The password strength is too low. Please use a stronger password.</source>
+                <target>رمز عبور ضعیف است. لطفا از رمز عبور قوی‌تری استفاده کنید.</target>
+            </trans-unit>
+            <trans-unit id="106">
+                <source>This value contains characters that are not allowed by the current restriction-level.</source>
+                <target>این مقدار حاوی کاراکترهایی است که در سطح محدودیت فعلی مجاز نیستند.</target>
+            </trans-unit>
+            <trans-unit id="107">
+                <source>Using invisible characters is not allowed.</source>
+                <target>استفاده از کاراکترهای نامرئی مجاز نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="108">
+                <source>Mixing numbers from different scripts is not allowed.</source>
+                <target>مخلوط کردن اعداد از اسکریپت های مختلف مجاز نیست.</target>
+            </trans-unit>
+            <trans-unit id="109">
+                <source>Using hidden overlay characters is not allowed.</source>
+                <target>استفاده از کاراکترهای همپوشانی پنهان (hidden overlay characters) مجاز نیست.</target>
+            </trans-unit>
+            <trans-unit id="110">
+                <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
+                <target>پسوند فایل ({{ extension }}) نامعتبر است. پسوندهای مجاز {{ extensions }} هستند.</target>
+            </trans-unit>
+            <trans-unit id="111">
+                <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
+                <target>رمزگذاری کاراکتر تشخیص داده شده ({{ detected }}) نامعتبر است. رمزگذاری‌های مجاز {{ encodings }} هستند.</target>
+            </trans-unit>
+            <trans-unit id="112">
+                <source>This value is not a valid MAC address.</source>
+                <target>این مقدار یک آدرس MAC معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="113">
+                <source>This URL is missing a top-level domain.</source>
+                <target>این آدرس دارای دامنه نمی‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="114">
+                <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
+                <target>این مقدار بسیار کوتاه است. باید حداقل یک کلمه داشته باشد.|این مقدار بسیار کوتاه است. باید حداقل {{ min }} کلمه داشته باشد.</target>
+            </trans-unit>
+            <trans-unit id="115">
+                <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
+                <target>این مقدار بیش از حد طولانی است. باید فقط یک کلمه باشد.|این مقدار بیش از حد طولانی است. باید حداکثر {{ max }} کلمه داشته باشد.</target>
+            </trans-unit>
+            <trans-unit id="116">
+                <source>This value does not represent a valid week in the ISO 8601 format.</source>
+                <target>این مقدار یک هفته معتبر در قالب ISO 8601 را نشان نمی‌دهد.</target>
+            </trans-unit>
+            <trans-unit id="117">
+                <source>This value is not a valid week.</source>
+                <target>این مقدار یک هفته معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="118">
+                <source>This value should not be before week "{{ min }}".</source>
+                <target>این مقدار نباید قبل از هفته "{{ min }}" باشد.</target>
+            </trans-unit>
+            <trans-unit id="119">
+                <source>This value should not be after week "{{ max }}".</source>
+                <target>این مقدار نباید بعد از هفته "{{ max }}" باشد.</target>
+            </trans-unit>
+            <trans-unit id="121">
+                <source>This value is not a valid Twig template.</source>
+                <target>این مقدار یک قالب معتبر Twig نیست.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>این فایل یک ویدئوی معتبر نیست.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>اندازه ویدئو قابل تشخیص نبود.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>عرض ویدئو خیلی زیاد است ({{ width }}px). حداکثر عرض مجاز {{ max_width }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>عرض ویدئو خیلی کم است ({{ width }}px). حداقل عرض مورد انتظار {{ min_width }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>ارتفاع ویدئو خیلی زیاد است ({{ height }}px). حداکثر ارتفاع مجاز {{ max_height }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>ارتفاع ویدئو خیلی کم است ({{ height }}px). حداقل ارتفاع مورد انتظار {{ min_height }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>مقدار پیکسل‌های ویدئو خیلی کم است ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>مقدار پیکسل‌های ویدئو خیلی زیاد است ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>نسبت ویدئو خیلی بزرگ است ({{ ratio }}). حداکثر نسبت مجاز {{ max_ratio }} است.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>نسبت ویدئو خیلی کوچک است ({{ ratio }}). نسبت حداقل مورد انتظار {{ min_ratio }} است.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>ویدئو مربعی است ({{ width }}x{{ height }}px). ویدئوهای مربعی مجاز نیستند.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>ویدئو به صورت افقی است ({{ width }}x{{ height }} پیکسل). ویدئوهای افقی مجاز نیستند.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>ویدئو به صورت عمودی است ({{ width }}x{{ height }}px). ویدئوهای عمودی مجاز نیستند.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>فایل ویدئو خراب است.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>ویدئو شامل چندین استریم است. در صورتی که فقط یک استریم مجاز است.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>قالب (کُدک) ویدئویی پشتیبانی نمی‌شود «{{ codec }}».</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>فرمت ویدئو پشتیبانی نمی‌شود "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>فایل تصویر خراب است.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>تصویر پیکسل‌های خیلی کمی دارد ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>تصویر پیکسل‌های خیلی زیادی دارد ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>نام فایل مجاز نیست.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

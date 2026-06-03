@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services https://symfony.com/schema/dic/services/services-1.0.xsd">
+  <services>
+    <service id="service_container" class="Symfony\Component\DependencyInjection\ContainerInterface" public="true" synthetic="true"/>
+    <service id="foo" class="Foo" public="true">
+      <factory method="createFoo">
+        <service class="FooFactory">
+          <factory method="createFooFactory">
+            <service class="Foobar"/>
+          </factory>
+        </service>
+      </factory>
+      <configurator method="configureFoo">
+        <service class="Bar">
+          <configurator method="configureBar">
+            <service class="Baz"/>
+          </configurator>
+        </service>
+      </configurator>
+    </service>
+  </services>
+</container>

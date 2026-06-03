@@ -1,0 +1,102 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\FrameworkBundle\Tests\Kernel;
+
+use Psr\Log\NullLogger;
+use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
+
+class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
+{
+    use MicroKernelTrait {
+        getKernelParameters as public;
+    }
+
+    private string $cacheDir;
+
+    public function onKernelException(ExceptionEvent $event)
+    {
+        if ($event->getThrowable() instanceof Danger) {
+            $event->setResponse(new Response('It\'s dangerous to go alone. Take this ⚔'));
+        }
+    }
+
+    public function halloweenAction()
+    {
+        return new Response('halloween');
+    }
+
+    public function dangerousAction()
+    {
+        throw new Danger();
+    }
+
+    public function getCacheDir(): string
+    {
+        return $this->cacheDir = sys_get_temp_dir().'/sf_micro_kernel';
+    }
+
+    public function getLogDir(): string
+    {
+        return $this->cacheDir;
+    }
+
+    public function getConfigDir(): string
+    {
+        return $this->getCacheDir().'/config';
+    }
+
+    public function __serialize(): array
+    {
+        throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+    }
+
+    protected function configureRoutes(RoutingConfigurator $routes): void
+    {
+        $routes->add('halloween', '/')->controller('kernel::halloweenAction');
+        $routes->add('danger', '/danger')->controller('kernel::dangerousAction');
+    }
+
+    protected function configureContainer(ContainerBuilder $c, LoaderInterface $loader): void
+    {
+        $c->register('logger', NullLogger::class);
+        $c->loadFromExtension('framework', [
+            'secret' => '$ecret',
+        ]);
+
+        $c->setParameter('halloween', 'Have a great day!');
+        $c->register('halloween', 'stdClass')->setPublic(true);
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::EXCEPTION => 'onKernelException',
+        ];
+    }
+}
+
+class Danger extends \RuntimeException
+{
+}

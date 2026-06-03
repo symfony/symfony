@@ -1,0 +1,8 @@
+login:
+  path: /login
+
+logout:
+  path: /logout
+
+admin_bundle:
+  resource: '@SecuredPageBundle/Resources/config/routing.yml'

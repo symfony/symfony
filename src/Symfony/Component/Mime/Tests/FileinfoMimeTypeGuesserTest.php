@@ -1,0 +1,25 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Mime\Tests;
+
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Symfony\Component\Mime\FileinfoMimeTypeGuesser;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
+
+#[RequiresPhpExtension('fileinfo')]
+class FileinfoMimeTypeGuesserTest extends AbstractMimeTypeGuesserTestCase
+{
+    protected function getGuesser(): MimeTypeGuesserInterface
+    {
+        return new FileinfoMimeTypeGuesser();
+    }
+}

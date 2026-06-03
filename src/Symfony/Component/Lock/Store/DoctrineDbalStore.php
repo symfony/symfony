@@ -1,0 +1,332 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Lock\Store;
+
+use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\Exception\TableNotFoundException;
+use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
+use Doctrine\DBAL\Schema\Name\Identifier;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Tools\DsnParser;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\Exception\InvalidTtlException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\Key;
+use Symfony\Component\Lock\PersistingStoreInterface;
+
+/**
+ * DbalStore is a PersistingStoreInterface implementation using a Doctrine DBAL connection.
+ *
+ * Lock metadata are stored in a table. You can use createTable() to initialize
+ * a correctly defined table.
+ *
+ * CAUTION: This store relies on all client and server nodes to have
+ * synchronized clocks for lock expiry to occur at the correct time.
+ * To ensure locks don't expire prematurely; the TTLs should be set with enough
+ * extra time to account for any clock drift between nodes.
+ *
+ * @author Jérémy Derussé <jeremy@derusse.com>
+ */
+class DoctrineDbalStore implements PersistingStoreInterface
+{
+    use DatabaseTableTrait;
+    use ExpiringStoreTrait;
+
+    private Connection $conn;
+
+    /**
+     * List of available options:
+     *  * db_table: The name of the table [default: lock_keys]
+     *  * db_id_col: The column where to store the lock key [default: key_id]
+     *  * db_token_col: The column where to store the lock token [default: key_token]
+     *  * db_expiration_col: The column where to store the expiration [default: key_expiration].
+     *
+     * @param Connection|string $connOrUrl     A DBAL Connection instance or Doctrine URL
+     * @param array             $options       An associative array of options
+     * @param float             $gcProbability Probability expressed as floating number between 0 and 1 to clean old locks
+     * @param int               $initialTtl    The expiration delay of locks in seconds
+     *
+     * @throws InvalidArgumentException When namespace contains invalid characters
+     * @throws InvalidArgumentException When the initial ttl is not valid
+     */
+    public function __construct(Connection|string $connOrUrl, array $options = [], float $gcProbability = 0.01, int $initialTtl = 300)
+    {
+        $this->init($options, $gcProbability, $initialTtl);
+
+        if ($connOrUrl instanceof Connection) {
+            $this->conn = $connOrUrl;
+        } else {
+            if (!class_exists(DriverManager::class)) {
+                throw new InvalidArgumentException('Failed to parse the DSN. Try running "composer require doctrine/dbal".');
+            }
+            $params = (new DsnParser([
+                'db2' => 'ibm_db2',
+                'mssql' => 'pdo_sqlsrv',
+                'mysql' => 'pdo_mysql',
+                'mysql2' => 'pdo_mysql',
+                'postgres' => 'pdo_pgsql',
+                'postgresql' => 'pdo_pgsql',
+                'pgsql' => 'pdo_pgsql',
+                'sqlite' => 'pdo_sqlite',
+                'sqlite3' => 'pdo_sqlite',
+            ]))->parse($connOrUrl);
+
+            $config = new Configuration();
+            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+
+            $this->conn = DriverManager::getConnection($params, $config);
+        }
+    }
+
+    public function save(Key $key): void
+    {
+        $key->reduceLifetime($this->initialTtl);
+
+        $platform = $this->conn->getDatabasePlatform();
+        if ($platform instanceof PostgreSQLPlatform) {
+            $this->doSavePostgres($key);
+        } else {
+            $this->doSave($key);
+        }
+
+        $this->randomlyPrune();
+        $this->checkNotExpired($key);
+    }
+
+    private function doSave(Key $key): void
+    {
+        $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (?, ?, {$this->getCurrentTimestampStatement()} + $this->initialTtl)";
+
+        try {
+            $this->conn->executeStatement($sql, [
+                $this->getKeyName($key),
+                $this->getUniqueToken($key),
+            ], [
+                ParameterType::STRING,
+                ParameterType::STRING,
+            ]);
+        } catch (TableNotFoundException) {
+            if (!$this->conn->isTransactionActive() || $this->platformSupportsTableCreationInTransaction()) {
+                $this->createTable();
+            }
+
+            try {
+                $this->conn->executeStatement($sql, [
+                    $this->getKeyName($key),
+                    $this->getUniqueToken($key),
+                ], [
+                    ParameterType::STRING,
+                    ParameterType::STRING,
+                ]);
+            } catch (DBALException) {
+                $this->putOffExpiration($key, $this->initialTtl);
+            }
+        } catch (DBALException) {
+            // the lock is already acquired. It could be us. Let's try to put off.
+            $this->putOffExpiration($key, $this->initialTtl);
+        }
+    }
+
+    /**
+     * On PostgreSQL a constraint violation aborts the surrounding transaction (SQLSTATE 25P02), so
+     * the legacy "try INSERT, catch, fall back to UPDATE" path turns a benign lock contention into
+     * a fatal error for any caller wrapped in a transaction (Messenger doctrine_transaction
+     * middleware, functional tests using DAMADoctrineTestBundle, ...). Using atomic
+     * INSERT ... ON CONFLICT keeps the conflict resolution server-side and never raises,
+     * preserving the outer transaction.
+     */
+    private function doSavePostgres(Key $key): void
+    {
+        $now = $this->getCurrentTimestampStatement();
+        $sql = "INSERT INTO $this->table ($this->idCol, $this->tokenCol, $this->expirationCol) VALUES (?, ?, $now + $this->initialTtl)"
+            ." ON CONFLICT ($this->idCol) DO UPDATE SET $this->tokenCol = EXCLUDED.$this->tokenCol, $this->expirationCol = EXCLUDED.$this->expirationCol"
+            ." WHERE $this->table.$this->tokenCol = EXCLUDED.$this->tokenCol OR $this->table.$this->expirationCol <= $now";
+
+        $params = [
+            $this->getKeyName($key),
+            $this->getUniqueToken($key),
+        ];
+        $types = [
+            ParameterType::STRING,
+            ParameterType::STRING,
+        ];
+
+        try {
+            $rows = (int) $this->conn->executeStatement($sql, $params, $types);
+        } catch (TableNotFoundException) {
+            // PostgreSQL supports DDL inside a transaction, so we can always create the table.
+            $this->createTable();
+            $rows = (int) $this->conn->executeStatement($sql, $params, $types);
+        }
+
+        if (0 === $rows) {
+            throw new LockConflictedException();
+        }
+    }
+
+    public function putOffExpiration(Key $key, $ttl): void
+    {
+        if ($ttl < 1) {
+            throw new InvalidTtlException(\sprintf('"%s()" expects a TTL greater or equals to 1 second. Got "%s".', __METHOD__, $ttl));
+        }
+
+        $key->reduceLifetime($ttl);
+
+        $sql = "UPDATE $this->table SET $this->expirationCol = {$this->getCurrentTimestampStatement()} + ?, $this->tokenCol = ? WHERE $this->idCol = ? AND ($this->tokenCol = ? OR $this->expirationCol <= {$this->getCurrentTimestampStatement()})";
+        $uniqueToken = $this->getUniqueToken($key);
+
+        $result = $this->conn->executeQuery($sql, [
+            $ttl,
+            $uniqueToken,
+            $this->getKeyName($key),
+            $uniqueToken,
+        ], [
+            ParameterType::INTEGER,
+            ParameterType::STRING,
+            ParameterType::STRING,
+            ParameterType::STRING,
+        ]);
+
+        // If this method is called twice in the same second, the row wouldn't be updated. We have to call exists to know if we are the owner
+        if (!$result->rowCount() && !$this->exists($key)) {
+            throw new LockConflictedException();
+        }
+
+        $this->checkNotExpired($key);
+    }
+
+    public function delete(Key $key): void
+    {
+        $this->conn->delete($this->table, [
+            $this->idCol => $this->getKeyName($key),
+            $this->tokenCol => $this->getUniqueToken($key),
+        ]);
+    }
+
+    public function exists(Key $key): bool
+    {
+        $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = ? AND $this->tokenCol = ? AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
+        $result = $this->conn->fetchOne($sql, [
+            $this->getKeyName($key),
+            $this->getUniqueToken($key),
+        ], [
+            ParameterType::STRING,
+            ParameterType::STRING,
+        ]);
+
+        return (bool) $result;
+    }
+
+    /**
+     * Creates the table to store lock keys which can be called once for setup.
+     *
+     * @throws DBALException When the table already exists
+     */
+    public function createTable(): void
+    {
+        $schema = $this->configureSchema(new Schema(), static fn () => true);
+
+        foreach ($schema->toSql($this->conn->getDatabasePlatform()) as $sql) {
+            $this->conn->executeStatement($sql);
+        }
+    }
+
+    /**
+     * Adds the Table to the Schema if it doesn't exist.
+     *
+     * @param-immediately-invoked-callable $isSameDatabase
+     */
+    public function configureSchema(Schema $schema, \Closure $isSameDatabase): Schema
+    {
+        if ($schema->hasTable($this->table)) {
+            return $schema;
+        }
+
+        if (!$isSameDatabase($this->conn->executeStatement(...))) {
+            return $schema;
+        }
+
+        if (method_exists($schema, 'edit')) {
+            $table = new Table($this->table);
+            $this->configureSchemaTable($table);
+
+            return $schema->edit()->addTable($table)->create();
+        }
+
+        $this->configureSchemaTable($schema->createTable($this->table));
+
+        return $schema;
+    }
+
+    private function configureSchemaTable(Table $table): void
+    {
+        $table->addColumn($this->idCol, 'string', ['length' => 64]);
+        $table->addColumn($this->tokenCol, 'string', ['length' => 44]);
+        $table->addColumn($this->expirationCol, 'integer', ['unsigned' => true]);
+
+        $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($this->idCol))], true));
+    }
+
+    /**
+     * Cleans up the table by removing all expired locks.
+     */
+    private function prune(): void
+    {
+        $sql = "DELETE FROM $this->table WHERE $this->expirationCol <= {$this->getCurrentTimestampStatement()}";
+
+        $this->conn->executeStatement($sql);
+    }
+
+    /**
+     * Provides an SQL function to get the current timestamp regarding the current connection's driver.
+     */
+    private function getCurrentTimestampStatement(): string
+    {
+        $platform = $this->conn->getDatabasePlatform();
+
+        return match (true) {
+            $platform instanceof AbstractMySQLPlatform => 'UNIX_TIMESTAMP(NOW(6))',
+            $platform instanceof SQLitePlatform => "(julianday('now') - 2440587.5) * 86400.0",
+            $platform instanceof PostgreSQLPlatform => 'CAST(EXTRACT(epoch FROM NOW()) AS DOUBLE PRECISION)',
+            $platform instanceof OraclePlatform => "(CAST(systimestamp AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400 + TO_NUMBER(TO_CHAR(systimestamp AT TIME ZONE 'UTC', 'SSSSS.FF'))",
+            $platform instanceof SQLServerPlatform => "CAST(DATEDIFF_BIG(ms, '1970-01-01', SYSUTCDATETIME()) AS FLOAT) / 1000.0",
+            default => (new \DateTimeImmutable())->format('U.u'),
+        };
+    }
+
+    /**
+     * Checks whether current platform supports table creation within transaction.
+     */
+    private function platformSupportsTableCreationInTransaction(): bool
+    {
+        $platform = $this->conn->getDatabasePlatform();
+
+        return match (true) {
+            $platform instanceof PostgreSQLPlatform,
+            $platform instanceof SQLitePlatform,
+            $platform instanceof SQLServerPlatform => true,
+            default => false,
+        };
+    }
+}

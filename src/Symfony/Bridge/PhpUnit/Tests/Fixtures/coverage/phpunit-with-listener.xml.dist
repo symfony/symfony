@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    backupGlobals="false"
+    colors="true"
+    bootstrap="tests/bootstrap.php"
+    failOnRisky="true"
+    failOnWarning="true"
+>
+    <coverage>
+        <include>
+            <directory>src</directory>
+        </include>
+    </coverage>
+    <testsuites>
+        <testsuite name="Fixtures/coverage Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\CoverageListener">
+            <arguments>
+                <null />
+                <boolean>true</boolean>
+            </arguments>
+        </listener>
+    </listeners>
+</phpunit>

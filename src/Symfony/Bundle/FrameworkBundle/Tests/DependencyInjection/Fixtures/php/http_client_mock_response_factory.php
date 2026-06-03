@@ -1,0 +1,21 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'http_client' => [
+        'default_options' => null,
+        'mock_response_factory' => 'my_factory',
+        'scoped_clients' => [
+            'notMocked' => [
+                'base_uri' => 'https://symfony.com',
+                'mock_response_factory' => false,
+            ],
+            'mocked' => [
+                'base_uri' => 'https://symfony.com'
+            ],
+            'mocked_custom_factory' => [
+                'base_uri' => 'https://symfony.com',
+                'mock_response_factory' => 'my_other_factory'
+            ]
+        ]
+    ],
+]);

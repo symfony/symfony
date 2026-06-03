@@ -1,0 +1,17 @@
+{
+    "event": "unsub",
+    "time": 1433334941,
+    "MessageID": 20547674933128000,
+    "Message_GUID": "1ab23cd4-e567-8901-2345-6789f0gh1i2j",
+    "email": "api@mailjet.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 1000,
+    "customcampaign": "",
+    "CustomID": "helloworld",
+    "Payload": "",
+    "mj_list_id": 1,
+    "ip": "127.0.0.1",
+    "geo": "FR",
+    "agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36"
+}
+

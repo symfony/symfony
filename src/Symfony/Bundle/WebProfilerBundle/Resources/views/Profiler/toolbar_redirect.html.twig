@@ -1,0 +1,53 @@
+{% extends '@WebProfiler/Profiler/base.html.twig' %}
+
+{% block title 'Redirection Intercepted' %}
+
+{% block head %}
+    {{ parent() }}
+
+    <style>
+        .sf-redirection-details {
+            background: var(--page-background);
+            box-shadow: inset 0 0 0 1px var(--menu-border-color), 0 0 0 5px var(--page-background);
+            border-radius: 6px;
+            margin: 45px auto 30px;
+            max-width: 800px;
+            padding: 30px 45px;
+        }
+        .sf-redirection-details h1 {
+            font-size: 21px;
+            font-weight: bold;
+            margin: 0 0 10px;
+        }
+        .sf-redirection-details p {
+            margin-top: 0;
+        }
+        .sf-redirection-details .sf-redirection-help {
+            color: var(--color-muted);
+            font-size: 14px;
+            margin: 45px 0 0;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ include('@WebProfiler/Profiler/header.html.twig', with_context: false) }}
+
+        <div class="sf-reset sf-redirection-details">
+            <div class="block-exception">
+                <h1>Redirection Intercepted</h1>
+
+                {% set absolute_url = absolute_url(location) %}
+                <p>This request redirects to <strong>{{ absolute_url }}</strong></p>
+
+                <p><a class="btn" href="{{ absolute_url }}">Follow redirect</a></p>
+
+                <p class="sf-redirection-help">
+                    The redirect was intercepted by the Symfony Web Debug toolbar to help debugging.
+                    For more information, see the "intercept-redirects" option of the Profiler.
+                </p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

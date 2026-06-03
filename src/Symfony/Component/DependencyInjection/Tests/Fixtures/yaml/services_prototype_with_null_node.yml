@@ -1,0 +1,7 @@
+services:
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\:
+        resource: ../Prototype
+        exclude:
+            - '../Prototype/OtherDir'
+            # the following has only a space
+            - # this is a comment to keep the space when editing through PhpStorm

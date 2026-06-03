@@ -1,0 +1,71 @@
+{
+    "name": "symfony/twig-bridge",
+    "type": "symfony-bridge",
+    "description": "Provides integration for Twig with various Symfony components",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/translation-contracts": "^2.5|^3",
+        "twig/twig": "^3.25"
+    },
+    "require-dev": {
+        "egulias/email-validator": "^2.1.10|^3|^4",
+        "league/html-to-markdown": "^5.0",
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
+        "symfony/asset": "^7.4|^8.0",
+        "symfony/asset-mapper": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/emoji": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/form": "^7.4.4|^8.0.4",
+        "symfony/html-sanitizer": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/intl": "^7.4|^8.0",
+        "symfony/mime": "^7.4.9|^8.0.9",
+        "symfony/polyfill-intl-icu": "^1.0",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/routing": "^7.4|^8.0",
+        "symfony/security-acl": "^2.8|^3.0",
+        "symfony/security-core": "^7.4|^8.0",
+        "symfony/security-csrf": "^7.4|^8.0",
+        "symfony/security-http": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0",
+        "symfony/stopwatch": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0",
+        "symfony/validator": "^7.4|^8.0",
+        "symfony/web-link": "^7.4|^8.0",
+        "symfony/workflow": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0",
+        "twig/cssinliner-extra": "^3",
+        "twig/inky-extra": "^3",
+        "twig/markdown-extra": "^3"
+    },
+    "conflict": {
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
+        "phpdocumentor/type-resolver": "<1.5.1",
+        "symfony/form": "<7.4.4|>8.0,<8.0.4",
+        "symfony/mime": "<7.4.9|>8.0,<8.0.9"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Bridge\\Twig\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

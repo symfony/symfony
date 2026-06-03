@@ -1,0 +1,6 @@
+services:
+    my_service:
+        class: \Redis
+
+framework:
+    semaphore: my_service

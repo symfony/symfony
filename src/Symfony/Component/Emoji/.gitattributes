@@ -1,0 +1,7 @@
+/Resources/bin/build.php export-ignore
+/Resources/bin/composer.json export-ignore
+/Resources/bin/Makefile export-ignore
+/Resources/bin/README.md export-ignore
+/Tests export-ignore
+/phpunit.xml.dist export-ignore
+/.git* export-ignore

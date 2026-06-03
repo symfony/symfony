@@ -1,0 +1,3 @@
+en_nofallback:table(nofallback){
+    Entry{"Value"}
+}

@@ -1,0 +1,4 @@
+---
+not_localized:
+    controller: string
+    path: /here

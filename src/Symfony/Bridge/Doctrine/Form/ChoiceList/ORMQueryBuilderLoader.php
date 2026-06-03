@@ -1,0 +1,102 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
+
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Bridge\Doctrine\Types\AbstractUidType;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+
+/**
+ * Loads entities using a {@link QueryBuilder} instance.
+ *
+ * @author Benjamin Eberlei <kontakt@beberlei.de>
+ * @author Bernhard Schussek <bschussek@gmail.com>
+ */
+class ORMQueryBuilderLoader implements EntityLoaderInterface
+{
+    public function __construct(
+        private readonly QueryBuilder $queryBuilder,
+    ) {
+    }
+
+    public function getEntities(): array
+    {
+        return $this->queryBuilder->getQuery()->execute();
+    }
+
+    public function getEntitiesByIds(string $identifier, array $values): array
+    {
+        if (null !== $this->queryBuilder->getMaxResults() || 0 < (int) $this->queryBuilder->getFirstResult()) {
+            // an offset or a limit would apply on results including the where clause with submitted id values
+            // that could make invalid choices valid
+            $choices = [];
+            $metadata = $this->queryBuilder->getEntityManager()->getClassMetadata(current($this->queryBuilder->getRootEntities()));
+
+            foreach ($this->getEntities() as $entity) {
+                if (\in_array((string) current($metadata->getIdentifierValues($entity)), $values, true)) {
+                    $choices[] = $entity;
+                }
+            }
+
+            return $choices;
+        }
+
+        $qb = clone $this->queryBuilder;
+        $alias = current($qb->getRootAliases());
+        $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_'.$identifier;
+        $parameter = str_replace('.', '_', $parameter);
+        $where = $qb->expr()->in($alias.'.'.$identifier, ':'.$parameter);
+
+        // Guess type
+        $entity = current($qb->getRootEntities());
+        $metadata = $qb->getEntityManager()->getClassMetadata($entity);
+        if (\in_array($type = $metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'], true)) {
+            $parameterType = ArrayParameterType::INTEGER;
+
+            // Filter out non-integer values (e.g. ""). If we don't, some
+            // databases such as PostgreSQL fail.
+            $values = array_values(array_filter($values, static fn ($v) => \is_string($v) && ctype_digit($v) || (string) $v === (string) (int) $v));
+        } elseif (null !== $type && (\in_array($type, ['ulid', 'uuid', 'guid'], true) || (Type::hasType($type) && is_subclass_of(Type::getType($type), AbstractUidType::class)))) {
+            $parameterType = ArrayParameterType::STRING;
+
+            // Like above, but we just filter out empty strings.
+            $values = array_values(array_filter($values, static fn ($v) => '' !== (string) $v));
+
+            // Convert values into right type
+            if (Type::hasType($type)) {
+                $doctrineType = Type::getType($type);
+                $platform = $qb->getEntityManager()->getConnection()->getDatabasePlatform();
+                foreach ($values as &$value) {
+                    try {
+                        $value = $doctrineType->convertToDatabaseValue($value, $platform);
+                    } catch (ConversionException $e) {
+                        throw new TransformationFailedException(\sprintf('Failed to transform "%s" into "%s".', $value, $type), 0, $e);
+                    }
+                }
+                unset($value);
+            }
+        } else {
+            $parameterType = ArrayParameterType::STRING;
+        }
+        if (!$values) {
+            return [];
+        }
+
+        return $qb->andWhere($where)
+                  ->getQuery()
+                  ->setParameter($parameter, $values, $parameterType)
+                  ->getResult();
+    }
+}

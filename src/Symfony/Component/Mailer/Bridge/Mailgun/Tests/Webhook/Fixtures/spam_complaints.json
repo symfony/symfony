@@ -1,0 +1,39 @@
+{
+    "signature": {
+        "token": "335da63647194414fe8bbb7c67b3b0585e426bcd10b258dcf4",
+        "timestamp": "1661621468",
+        "signature": "e3c1ce2c6c7a678823e610537eeef59426df9b1b8ed4a49a91e144e71aa64fa9"
+    },
+    "event-data": {
+        "id": "-Agny091SquKnsrW2NEKUA",
+        "timestamp": 1521233123.501324,
+        "log-level": "warn",
+        "event": "complained",
+        "envelope": {
+            "sending-ip": "173.193.210.33"
+        },
+        "flags": {
+            "is-test-mode": false
+        },
+        "message": {
+            "headers": {
+                "to": "Alice <alice@example.com>",
+                "message-id": "20110215055645.25246.63817@app.symfony.com",
+                "from": "Bob <bob@app.symfony.com>",
+                "subject": "Test complained webhook"
+            },
+            "attachments": [],
+            "size": 111
+        },
+        "recipient": "alice@example.com",
+        "campaigns": [],
+        "tags": [
+            "my_tag_1",
+            "my_tag_2"
+        ],
+        "user-variables": {
+            "my_var_1": "Mailgun Variable #1",
+            "my-var-2": "awesome"
+        }
+    }
+}

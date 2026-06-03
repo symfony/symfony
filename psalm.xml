@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="5"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    cacheDirectory="./.github/sa-tools/psalm-cache/"
+    errorBaseline=".github/sa-tools/psalm.baseline.xml"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
+    findUnusedIssueHandlerSuppression="false"
+    ensureOverrideAttribute="false"
+>
+    <projectFiles>
+        <directory name="src" />
+        <ignoreFiles>
+            <directory name="src/Symfony/*/*/Tests" />
+            <directory name="src/Symfony/*/*/*/Tests" />
+            <directory name="src/Symfony/*/*/*/*/Tests" />
+            <directory name="src/Symfony/Component/Intl/Resources/data/" />
+            <directory name="src/Symfony/Component/Emoji/Resources/data/" />
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+
+    <issueHandlers>
+        <UndefinedClass>
+            <errorLevel type="suppress">
+                <!-- These classes have been added in PHP 8.4 -->
+                <referencedClass name="BcMath\Number"/>
+                <!-- These classes have been added in PHP 8.5 -->
+                <referencedClass name="CurlSharePersistentHandle"/>
+            </errorLevel>
+        </UndefinedClass>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <!--
+                    Because we don't analyze our tests or fixtures, we will
+                    get a lot of false positives regarding unused classes.
+                -->
+                <directory name="src/Symfony" />
+            </errorLevel>
+        </UnusedClass>
+        <UnusedConstructor>
+            <errorLevel type="suppress">
+                <!--
+                    We use private constructors to avoid instantiation.
+                    This kind of error is bogus in most cases.
+                -->
+                <directory name="src/Symfony" />
+            </errorLevel>
+        </UnusedConstructor>
+        <UndefinedFunction>
+            <errorLevel type="suppress">
+                <!-- These functions have been added in PHP 8.5 -->
+                <referencedFunction name="curl_share_init_persistent"/>
+            </errorLevel>
+        </UndefinedFunction>
+    </issueHandlers>
+
+    <forbiddenFunctions>
+        <function name="empty"/>
+    </forbiddenFunctions>
+</psalm>

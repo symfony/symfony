@@ -1,0 +1,13 @@
+{% if accessible_label is not defined %}
+    {% set collector_name = (collector is defined and collector) ? collector.name : name %}
+    {% set collector_name_parts = collector_name|split('.') %}
+    {% set accessible_label = collector_name_parts|length > 1
+        ? (collector_name_parts|first|replace({_: ' '})|title ~ ' ' ~ collector_name_parts|last|replace({_: ' '})|title)
+        : collector_name_parts|first|replace({_: ' '})|title %}
+{% endif %}
+<div class="sf-toolbar-block sf-toolbar-block-{{ name }} sf-toolbar-status-{{ status|default('normal') }} {{ additional_classes|default('') }}" data-accessible-label="{{ accessible_label }}" {{ block_attrs|default('')|raw }}>
+    {% if link is not defined or link %}<a href="{{ url('_profiler', {token: token, panel: name}) }}" aria-controls="sf-toolbar-info-{{ name }}-{{ token }}" aria-haspopup="dialog" aria-keyshortcuts="ArrowDown">{% endif %}
+        <div class="sf-toolbar-icon"{% if link is defined and not link %} aria-controls="sf-toolbar-info-{{ name }}-{{ token }}" aria-haspopup="dialog" aria-keyshortcuts="ArrowDown"{% endif %}>{{ icon|default('') }}</div>
+    {% if link|default(false) %}</a>{% endif %}
+        <div class="sf-toolbar-info" id="sf-toolbar-info-{{ name }}-{{ token }}" role="dialog" aria-roledescription="details" aria-label="{{ accessible_label }}" tabindex="-1">{{ text|default('') }}</div>
+</div>

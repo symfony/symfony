@@ -1,0 +1,46 @@
+{
+    "id": "29e785c1-dd0c-4efc-9d41-909d4109769f",
+    "eventType": "failure_perm",
+    "occurredAt": "2024-06-10T09:23:31+02:00",
+    "messageUuid": "1684f904-596e-4d9f-ba16-ead5c4d27957",
+    "messageId": "7bb4cd3f5d8ee2bcb5bed8c2ed7def85@s.mailomat.swiss",
+    "recipient": "non-existent@mailomat.swiss",
+    "payload": {
+        "event": "failure_perm",
+        "timestamp": 1718004211.198222,
+        "message-uuid": "1684f904-596e-4d9f-ba16-ead5c4d27957",
+        "username": "username@s.mailomat.swiss",
+        "sender": "b=6mpthsjrq685ytz5mcc4jsn255=a6d86ea6-d5e6-465e-b41a-ed6486944f62@s.mailomat.swiss",
+        "recipient": "non-existent@mailomat.swiss",
+        "transaction": {
+            "id": "3e1071e0-5bca-455a-be8c-640cf8c63353"
+        },
+        "message": {
+            "headers": {
+                "from": "from@mailomat.swiss",
+                "to": "non-existent@mailomat.swiss",
+                "message-id": "\u003C7bb4cd3f5d8ee2bcb5bed8c2ed7def85@s.mailomat.swiss\u003E",
+                "subject": "subject line"
+            },
+            "size": 1234
+        },
+        "delivery-status": {
+            "attempt-nr": 1,
+            "code": 550,
+            "enhanced-code": "5.1.1",
+            "message": "5.1.1 abc: recipient rejected, address unknown",
+            "duration": 0.198979651,
+            "local": {
+                "ip": "127.0.0.1"
+            },
+            "remote": {
+                "ip": "127.0.0.1",
+                "mx": "mx.example.com",
+                "tls": {
+                    "started": true,
+                    "protocol": "TLSv1.2"
+                }
+            }
+        }
+    }
+}

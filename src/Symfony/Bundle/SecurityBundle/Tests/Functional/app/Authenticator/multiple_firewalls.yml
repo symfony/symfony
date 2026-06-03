@@ -1,0 +1,16 @@
+imports:
+- { resource: ./config.yml }
+- { resource: ./security.yml }
+
+security:
+    firewalls:
+        firewall1:
+            pattern: /firewall1
+            provider: in_memory
+            form_login:
+                check_path: /firewall1/login
+        firewall2:
+            pattern: /firewall2
+            provider: in_memory2
+            form_login:
+                check_path: /firewall2/login

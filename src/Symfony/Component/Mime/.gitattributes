@@ -1,0 +1,4 @@
+/Resources/bin/update_mime_types.php export-ignore
+/Tests export-ignore
+/phpunit.xml.dist export-ignore
+/.git* export-ignore

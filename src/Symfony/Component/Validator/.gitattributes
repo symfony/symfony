@@ -1,0 +1,4 @@
+/Tests export-ignore
+/phpunit.xml.dist export-ignore
+/Resources/bin/sync-iban-formats.php export-ignore
+/.git* export-ignore

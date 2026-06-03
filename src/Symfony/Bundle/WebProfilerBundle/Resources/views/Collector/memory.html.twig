@@ -1,0 +1,24 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {% set status_color = (collector.memory / 1024 / 1024) > 50 ? 'yellow' %}
+        {{ source('@WebProfiler/Icon/memory.svg') }}
+        <span class="sf-toolbar-value">{{ '%.1f'|format(collector.memory / 1024 / 1024) }}</span>
+        <span class="sf-toolbar-label">MiB</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Peak memory usage</b>
+            <span>{{ '%.1f'|format(collector.memory / 1024 / 1024) }} MiB</span>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b>PHP memory limit</b>
+            <span>{{ collector.memoryLimit == -1 ? 'Unlimited' : '%.0f MiB'|format(collector.memoryLimit / 1024 / 1024) }}</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: profiler_url, name: 'time', status: status_color}) }}
+{% endblock %}

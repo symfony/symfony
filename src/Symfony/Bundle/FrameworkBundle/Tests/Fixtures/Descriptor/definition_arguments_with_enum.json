@@ -1,0 +1,17 @@
+{
+    "class": "definition_with_enum",
+    "public": false,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "arguments": [
+        "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\FooUnitEnum::FOO"
+    ],
+    "file": null,
+    "tags": [],
+    "usages": []
+}

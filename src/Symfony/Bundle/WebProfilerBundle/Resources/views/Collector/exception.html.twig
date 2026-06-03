@@ -1,0 +1,45 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block head %}
+    {% if collector.hasexception %}
+        <style>
+            {{ render(controller('web_profiler.controller.exception_panel::stylesheet', {token: token})) }}
+            {{ include('@WebProfiler/Collector/exception.css.twig') }}
+        </style>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.hasexception ? 'label-status-error' : 'disabled' }}">
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/exception.svg') }}</span>
+        <strong>Exception</strong>
+        {% if collector.hasexception %}
+            <span class="count">
+                <span>1</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    {# these styles are needed to override some styles from Exception page, which wasn't
+       updated yet to the new style of the Symfony Profiler #}
+    <style>
+        .tab-navigation li { background: none; border: 0; font-size: 14px; }
+        .tab-navigation li.active { border-radius: 6px; }
+        .tab-navigation li.active .badge { background-color: var(--selected-badge-background); color: var(--selected-badge-color); }
+    </style>
+
+    <h2>Exceptions</h2>
+
+    {% if not collector.hasexception %}
+        <div class="empty empty-panel">
+            <p>No exception was thrown and caught.</p>
+        </div>
+    {% else %}
+        <div class="sf-reset">
+            {{ render(controller('web_profiler.controller.exception_panel::body', {token: token})) }}
+        </div>
+    {% endif %}
+{% endblock %}

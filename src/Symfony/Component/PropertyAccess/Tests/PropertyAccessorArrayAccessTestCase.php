@@ -1,0 +1,91 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\PropertyAccess\Tests;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+abstract class PropertyAccessorArrayAccessTestCase extends TestCase
+{
+    protected PropertyAccessor $propertyAccessor;
+
+    protected function setUp(): void
+    {
+        $this->propertyAccessor = new PropertyAccessor();
+    }
+
+    abstract protected static function getContainer(array $array);
+
+    public static function getValidPropertyPaths(): array
+    {
+        return [
+            [static::getContainer(['firstName' => 'Bernhard']), '[firstName]', 'Bernhard'],
+            [static::getContainer(['person' => static::getContainer(['firstName' => 'Bernhard'])]), '[person][firstName]', 'Bernhard'],
+        ];
+    }
+
+    public static function getInvalidPropertyPaths(): array
+    {
+        return [
+            [static::getContainer(['firstName' => 'Bernhard']), 'firstName', 'Bernhard'],
+            [static::getContainer(['person' => static::getContainer(['firstName' => 'Bernhard'])]), 'person.firstName', 'Bernhard'],
+        ];
+    }
+
+    #[DataProvider('getValidPropertyPaths')]
+    public function testGetValue($collection, $path, $value)
+    {
+        $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
+    }
+
+    public function testGetValueFailsIfNoSuchIndex()
+    {
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
+            ->enableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
+
+        $object = static::getContainer(['firstName' => 'Bernhard']);
+
+        $this->expectException(NoSuchIndexException::class);
+
+        $this->propertyAccessor->getValue($object, '[lastName]');
+    }
+
+    #[DataProvider('getValidPropertyPaths')]
+    public function testSetValue($collection, $path, $value)
+    {
+        $this->propertyAccessor->setValue($collection, $path, 'Updated');
+
+        $this->assertSame('Updated', $this->propertyAccessor->getValue($collection, $path));
+    }
+
+    #[DataProvider('getValidPropertyPaths')]
+    public function testIsReadable($collection, $path, $value)
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
+    }
+
+    #[DataProvider('getValidPropertyPaths')]
+    public function testIsWritable($collection, $path, $value)
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
+    }
+
+    #[DataProvider('getInvalidPropertyPaths')]
+    public function testIsNotWritable($collection, $path, $value)
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable($collection, $path));
+    }
+}

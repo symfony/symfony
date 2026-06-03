@@ -1,0 +1,33 @@
+{
+    "name": "symfony/brevo-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Brevo Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pierre Tanguy",
+            "homepage": "https://github.com/petanguy"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/mailer": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/webhook": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Brevo\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -1,0 +1,119 @@
+{
+    "definitions": {
+        "definition_1": {
+            "class": "Full\\Qualified\\Class1",
+            "public": true,
+            "synthetic": false,
+            "lazy": true,
+            "shared": true,
+            "abstract": true,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "arguments": [
+                {
+                    "type": "service",
+                    "id": ".definition_2"
+                },
+                "%parameter%",
+                {
+                    "class": "inline_service",
+                    "public": false,
+                    "synthetic": false,
+                    "lazy": false,
+                    "shared": true,
+                    "abstract": false,
+                    "autowire": false,
+                    "autoconfigure": false,
+                    "deprecated": false,
+                    "arguments": [
+                        "arg1",
+                        "arg2"
+                    ],
+                    "file": null,
+                    "tags": [],
+                    "usages": []
+                },
+                [
+                    "foo",
+                    {
+                        "type": "service",
+                        "id": ".definition_2"
+                    },
+                    {
+                        "class": "inline_service",
+                        "public": false,
+                        "synthetic": false,
+                        "lazy": false,
+                        "shared": true,
+                        "abstract": false,
+                        "autowire": false,
+                        "autoconfigure": false,
+                        "deprecated": false,
+                        "arguments": [],
+                        "file": null,
+                        "tags": [],
+                        "usages": []
+                    }
+                ],
+                [
+                    {
+                        "type": "service",
+                        "id": "definition_1"
+                    },
+                    {
+                        "type": "service",
+                        "id": ".definition_2"
+                    }
+                ],
+                {
+                    "type": "abstract",
+                    "text": "placeholder"
+                }
+            ],
+            "file": null,
+            "factory_class": "Full\\Qualified\\FactoryClass",
+            "factory_method": "get",
+            "tags": [],
+            "usages": []
+        },
+        "definition_without_class": {
+            "class": "",
+            "public": false,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "arguments": [],
+            "file": null,
+            "tags": [],
+            "usages": []
+        },
+        "service_container": {
+            "class": "Symfony\\Component\\DependencyInjection\\ContainerInterface",
+            "public": true,
+            "synthetic": true,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "description": "ContainerInterface is the interface implemented by service container classes.",
+            "arguments": [],
+            "file": null,
+            "tags": [],
+            "usages": []
+        }
+    },
+    "aliases": {
+        "alias_1": {
+            "service": "service_1",
+            "public": true
+        }
+    },
+    "services": []
+}

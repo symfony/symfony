@@ -1,0 +1,73 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Semaphore\Store;
+
+use Relay\Cluster as RelayCluster;
+use Relay\Relay;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
+use Symfony\Component\Semaphore\PersistingStoreInterface;
+
+/**
+ * StoreFactory create stores and connections.
+ *
+ * @author Jérémy Derussé <jeremy@derusse.com>
+ */
+class StoreFactory
+{
+    /**
+     * Creates a {@see PersistingStoreInterface} from a connection object or DSN.
+     *
+     * Accepted connection types:
+     *  - {@see LockFactory}                    -> {@see LockStore}
+     *  - \Redis, \RedisArray, \RedisCluster    -> {@see RedisStore}
+     *  - {@see Relay}, {@see RelayCluster} (when the Relay extension is loaded)
+     *  - {@see \Predis\ClientInterface}
+     *
+     * Accepted DSN schemes (requires symfony/cache):
+     *  - `redis://`, `rediss://`, `valkey://`, `valkeys://`           -> {@see RedisStore}
+     *
+     * @throws InvalidArgumentException When the connection type or DSN scheme is unsupported,
+     *                                  or when a required dependency (e.g. symfony/cache) is missing
+     */
+    public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
+    {
+        switch (true) {
+            case $connection instanceof LockFactory:
+                return new LockStore($connection);
+
+            case $connection instanceof \Redis:
+            case $connection instanceof Relay:
+            case $connection instanceof RelayCluster:
+            case $connection instanceof \RedisArray:
+            case $connection instanceof \RedisCluster:
+            case $connection instanceof \Predis\ClientInterface:
+                return new RedisStore($connection);
+
+            case !\is_string($connection):
+                throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection::class));
+            case str_starts_with($connection, 'redis:'):
+            case str_starts_with($connection, 'rediss:'):
+            case str_starts_with($connection, 'valkey:'):
+            case str_starts_with($connection, 'valkeys:'):
+                if (!class_exists(AbstractAdapter::class)) {
+                    throw new InvalidArgumentException('Unsupported Redis DSN. Try running "composer require symfony/cache".');
+                }
+                $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
+
+                return new RedisStore($connection);
+        }
+
+        throw new InvalidArgumentException(\sprintf('Unsupported Connection: "%s".', $connection));
+    }
+}

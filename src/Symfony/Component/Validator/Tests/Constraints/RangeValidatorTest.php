@@ -1,0 +1,949 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Component\Validator\Tests\Constraints;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\RangeValidator;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
+use Symfony\Component\Validator\Tests\Constraints\Fixtures\MinMaxTyped;
+use Symfony\Component\Validator\Tests\IcuCompatibilityTrait;
+
+class RangeValidatorTest extends ConstraintValidatorTestCase
+{
+    use IcuCompatibilityTrait;
+
+    protected function createValidator(): RangeValidator
+    {
+        return new RangeValidator();
+    }
+
+    public function testNullIsValid()
+    {
+        $this->validate(null, new Range(min: 10, max: 20));
+
+        $this->assertNoViolation();
+    }
+
+    public static function getTenToTwenty(): array
+    {
+        return [
+            [10.00001],
+            [19.99999],
+            ['10.00001'],
+            ['19.99999'],
+            [10],
+            [20],
+            [10.0],
+            [20.0],
+        ];
+    }
+
+    public static function getLessThanTen()
+    {
+        return [
+            [9.99999, '9.99999'],
+            ['9.99999', '"9.99999"'],
+            [5, '5'],
+            [1.0, '1'],
+        ];
+    }
+
+    public static function getMoreThanTwenty(): array
+    {
+        return [
+            [20.000001, '20.000001'],
+            ['20.000001', '"20.000001"'],
+            [21, '21'],
+            [30.0, '30'],
+        ];
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMinNamed($value)
+    {
+        $constraint = new Range(min: 10);
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMaxNamed($value)
+    {
+        $constraint = new Range(max: 20);
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMinMaxNamed($value)
+    {
+        $constraint = new Range(min: 10, max: 20);
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getLessThanTen')]
+    public function testInvalidValuesMinNamed($value, $formattedValue)
+    {
+        $constraint = new Range(min: 10, minMessage: 'myMessage');
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getMoreThanTwenty')]
+    public function testInvalidValuesMaxNamed($value, $formattedValue)
+    {
+        $constraint = new Range(max: 20, maxMessage: 'myMessage');
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getMoreThanTwenty')]
+    public function testInvalidValuesCombinedMaxNamed($value, $formattedValue)
+    {
+        $constraint = new Range(min: 10, max: 20, notInRangeMessage: 'myNotInRangeMessage');
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLessThanTen')]
+    public function testInvalidValuesCombinedMinNamed($value, $formattedValue)
+    {
+        $constraint = new Range(min: 10, max: 20, notInRangeMessage: 'myNotInRangeMessage');
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public static function getTenthToTwentiethMarch2014(): array
+    {
+        // The provider runs before setUp(), so we need to manually fix
+        // the default timezone
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        $tests = [
+            [new \DateTime('March 10, 2014')],
+            [new \DateTime('March 15, 2014')],
+            [new \DateTime('March 20, 2014')],
+            [new \DateTimeImmutable('March 10, 2014')],
+            [new \DateTimeImmutable('March 15, 2014')],
+            [new \DateTimeImmutable('March 20, 2014')],
+        ];
+
+        date_default_timezone_set($timezone);
+
+        return $tests;
+    }
+
+    public static function getSoonerThanTenthMarch2014(): array
+    {
+        // The provider runs before setUp(), so we need to manually fix
+        // the default timezone
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        $tests = [
+            [new \DateTime('March 20, 2013'), self::normalizeIcuSpaces("Mar 20, 2013, 12:00\u{202F}AM")],
+            [new \DateTime('March 9, 2014'), self::normalizeIcuSpaces("Mar 9, 2014, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 20, 2013'), self::normalizeIcuSpaces("Mar 20, 2013, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 9, 2014'), self::normalizeIcuSpaces("Mar 9, 2014, 12:00\u{202F}AM")],
+        ];
+
+        date_default_timezone_set($timezone);
+
+        return $tests;
+    }
+
+    public static function getLaterThanTwentiethMarch2014(): array
+    {
+        // The provider runs before setUp(), so we need to manually fix
+        // the default timezone
+        $timezone = date_default_timezone_get();
+        date_default_timezone_set('UTC');
+
+        $tests = [
+            [new \DateTime('March 21, 2014'), self::normalizeIcuSpaces("Mar 21, 2014, 12:00\u{202F}AM")],
+            [new \DateTime('March 9, 2015'), self::normalizeIcuSpaces("Mar 9, 2015, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 21, 2014'), self::normalizeIcuSpaces("Mar 21, 2014, 12:00\u{202F}AM")],
+            [new \DateTimeImmutable('March 9, 2015'), self::normalizeIcuSpaces("Mar 9, 2015, 12:00\u{202F}AM")],
+        ];
+
+        date_default_timezone_set($timezone);
+
+        return $tests;
+    }
+
+    #[DataProvider('getTenthToTwentiethMarch2014')]
+    public function testValidDatesMin($value)
+    {
+        $constraint = new Range(min: 'March 10, 2014');
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenthToTwentiethMarch2014')]
+    public function testValidDatesMax($value)
+    {
+        $constraint = new Range(max: 'March 20, 2014');
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenthToTwentiethMarch2014')]
+    public function testValidDatesMinMax($value)
+    {
+        $constraint = new Range(min: 'March 10, 2014', max: 'March 20, 2014');
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getSoonerThanTenthMarch2014')]
+    public function testInvalidDatesMin(\DateTimeInterface $value, string $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $constraint = new Range(
+            min: 'March 10, 2014',
+            minMessage: 'myMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLaterThanTwentiethMarch2014')]
+    public function testInvalidDatesMax(\DateTimeInterface $value, string $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $constraint = new Range(
+            max: 'March 20, 2014',
+            maxMessage: 'myMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLaterThanTwentiethMarch2014')]
+    public function testInvalidDatesCombinedMax(\DateTimeInterface $value, string $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $constraint = new Range(
+            min: 'March 10, 2014',
+            max: 'March 20, 2014',
+            notInRangeMessage: 'myNotInRangeMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getSoonerThanTenthMarch2014')]
+    public function testInvalidDatesCombinedMin($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $constraint = new Range(
+            min: 'March 10, 2014',
+            max: 'March 20, 2014',
+            notInRangeMessage: 'myNotInRangeMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function getInvalidValues(): array
+    {
+        return [
+            [9.999999],
+            [20.000001],
+            ['9.999999'],
+            ['20.000001'],
+            [new \stdClass()],
+        ];
+    }
+
+    public function testNonNumeric()
+    {
+        $constraint = new Range(
+            min: 10,
+            max: 20,
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMinAndMaxNull()
+    {
+        $constraint = new Range(
+            min: 'March 10, 2014',
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMaxAndMinNull()
+    {
+        $constraint = new Range(
+            max: 'March 20, 2014',
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithParsableDatetimeMinAndMax()
+    {
+        $constraint = new Range(
+            min: 'March 10, 2014',
+            max: 'March 20, 2014',
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidDateTimeMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMin()
+    {
+        $constraint = new Range(
+            min: 'March 40, 2014',
+            max: 'March 20, 2014',
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMax()
+    {
+        $constraint = new Range(
+            min: 'March 10, 2014',
+            max: 'March 50, 2014',
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    public function testNonNumericWithNonParsableDatetimeMinAndMax()
+    {
+        $constraint = new Range(
+            min: 'March 40, 2014',
+            max: 'March 50, 2014',
+        );
+
+        $this->validate('abcd', $constraint);
+
+        $this->buildViolation($constraint->invalidMessage)
+            ->setParameter('{{ value }}', '"abcd"')
+            ->setCode(Range::INVALID_CHARACTERS_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('throwsOnInvalidStringDatesProvider')]
+    public function testThrowsOnInvalidStringDates($expectedMessage, $value, $min, $max)
+    {
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $this->validate($value, new Range(
+            min: $min,
+            max: $max,
+        ));
+    }
+
+    public static function throwsOnInvalidStringDatesProvider(): array
+    {
+        return [
+            ['The min value "foo" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), 'foo', null],
+            ['The min value "foo" could not be converted to a "DateTime" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTime(), 'foo', null],
+            ['The max value "foo" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), null, 'foo'],
+            ['The max value "foo" could not be converted to a "DateTime" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTime(), null, 'foo'],
+            ['The min value "bar" could not be converted to a "DateTimeImmutable" instance in the "Symfony\Component\Validator\Constraints\Range" constraint.', new \DateTimeImmutable(), 'bar', 'ccc'],
+        ];
+    }
+
+    public function testNoViolationOnNullObjectWithPropertyPaths()
+    {
+        $this->setObject(null);
+
+        $this->validate(1, new Range(
+            minPropertyPath: 'minPropertyPath',
+            maxPropertyPath: 'maxPropertyPath',
+        ));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMinPropertyPathNamed($value)
+    {
+        $this->setObject(new Limit(10));
+
+        $this->validate($value, new Range(minPropertyPath: 'value'));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMaxPropertyPath($value)
+    {
+        $this->setObject(new Limit(20));
+
+        $this->validate($value, new Range(
+            maxPropertyPath: 'value',
+        ));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMaxPropertyPathNamed($value)
+    {
+        $this->setObject(new Limit(20));
+
+        $this->validate($value, new Range(maxPropertyPath: 'value'));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenToTwenty')]
+    public function testValidValuesMinMaxPropertyPath($value)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $this->validate($value, new Range(
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+        ));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getLessThanTen')]
+    public function testInvalidValuesMinPropertyPath($value, $formattedValue)
+    {
+        $this->setObject(new Limit(10));
+
+        $constraint = new Range(
+            minPropertyPath: 'value',
+            minMessage: 'myMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setParameter('{{ min_limit_path }}', 'value')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getMoreThanTwenty')]
+    public function testInvalidValuesMaxPropertyPath($value, $formattedValue)
+    {
+        $this->setObject(new Limit(20));
+
+        $constraint = new Range(
+            maxPropertyPath: 'value',
+            maxMessage: 'myMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'value')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getMoreThanTwenty')]
+    public function testInvalidValuesCombinedMaxPropertyPathNamed($value, $formattedValue)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $constraint = new Range(
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+            notInRangeMessage: 'myNotInRangeMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLessThanTen')]
+    public function testInvalidValuesCombinedMinPropertyPathNamed($value, $formattedValue)
+    {
+        $this->setObject(new MinMax(10, 20));
+
+        $constraint = new Range(
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+            notInRangeMessage: 'myNotInRangeMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ min }}', 10)
+            ->setParameter('{{ max }}', 20)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLessThanTen')]
+    public function testViolationOnNullObjectWithDefinedMin($value, $formattedValue)
+    {
+        $this->setObject(null);
+
+        $this->validate($value, new Range(
+            min: 10,
+            maxPropertyPath: 'max',
+            minMessage: 'myMessage',
+        ));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 10)
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getMoreThanTwenty')]
+    public function testViolationOnNullObjectWithDefinedMax($value, $formattedValue)
+    {
+        $this->setObject(null);
+
+        $this->validate($value, new Range(
+            minPropertyPath: 'min',
+            max: 20,
+            maxMessage: 'myMessage',
+        ));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $formattedValue)
+            ->setParameter('{{ limit }}', 20)
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getTenthToTwentiethMarch2014')]
+    public function testValidDatesMinPropertyPath($value)
+    {
+        $this->setObject(new Limit('March 10, 2014'));
+
+        $this->validate($value, new Range(minPropertyPath: 'value'));
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenthToTwentiethMarch2014')]
+    public function testValidDatesMaxPropertyPath($value)
+    {
+        $this->setObject(new Limit('March 20, 2014'));
+
+        $constraint = new Range(maxPropertyPath: 'value');
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getTenthToTwentiethMarch2014')]
+    public function testValidDatesMinMaxPropertyPath($value)
+    {
+        $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
+
+        $constraint = new Range(minPropertyPath: 'min', maxPropertyPath: 'max');
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    #[DataProvider('getSoonerThanTenthMarch2014')]
+    public function testInvalidDatesMinPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new Limit('March 10, 2014'));
+
+        $constraint = new Range(
+            minPropertyPath: 'value',
+            minMessage: 'myMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ min_limit_path }}', 'value')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLaterThanTwentiethMarch2014')]
+    public function testInvalidDatesMaxPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new Limit('March 20, 2014'));
+
+        $constraint = new Range(
+            maxPropertyPath: 'value',
+            maxMessage: 'myMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ limit }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max_limit_path }}', 'value')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getLaterThanTwentiethMarch2014')]
+    public function testInvalidDatesCombinedMaxPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
+
+        $constraint = new Range(
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+            notInRangeMessage: 'myNotInRangeMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    #[DataProvider('getSoonerThanTenthMarch2014')]
+    public function testInvalidDatesCombinedMinPropertyPath($value, $dateTimeAsString)
+    {
+        // Conversion of dates to string differs between ICU versions
+        // Make sure we have the correct version loaded
+        IntlTestHelper::requireIntl($this, '57.1');
+
+        $this->setObject(new MinMax('March 10, 2014', 'March 20, 2014'));
+
+        $constraint = new Range(
+            minPropertyPath: 'min',
+            maxPropertyPath: 'max',
+            notInRangeMessage: 'myNotInRangeMessage',
+        );
+
+        $this->validate($value, $constraint);
+
+        $this->buildViolation('myNotInRangeMessage')
+            ->setParameter('{{ value }}', $dateTimeAsString)
+            ->setParameter('{{ min }}', self::normalizeIcuSpaces("Mar 10, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max }}', self::normalizeIcuSpaces("Mar 20, 2014, 12:00\u{202F}AM"))
+            ->setParameter('{{ max_limit_path }}', 'max')
+            ->setParameter('{{ min_limit_path }}', 'min')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testMinPropertyPathReferencingUninitializedProperty()
+    {
+        $object = new MinMaxTyped();
+        $object->max = 5;
+        $this->setObject($object);
+
+        $this->validate(5, new Range(minPropertyPath: 'min', maxPropertyPath: 'max'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testMaxPropertyPathReferencingUninitializedProperty()
+    {
+        $object = new MinMaxTyped();
+        $object->min = 5;
+        $this->setObject($object);
+
+        $this->validate(5, new Range(minPropertyPath: 'min', maxPropertyPath: 'max'));
+
+        $this->assertNoViolation();
+    }
+
+    public static function provideMessageIfMinAndMaxSet(): array
+    {
+        $notInRangeMessage = (new Range(min: ''))->notInRangeMessage;
+
+        return [
+            [
+                [],
+                12,
+                $notInRangeMessage,
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+            [
+                ['notInRangeMessage' => 'not_in_range_message'],
+                12,
+                'not_in_range_message',
+                Range::NOT_IN_RANGE_ERROR,
+            ],
+        ];
+    }
+
+    #[DataProvider('provideMessageIfMinAndMaxSet')]
+    public function testMessageIfMinAndMaxSet(array $constraintExtraOptions, int $value, string $expectedMessage, string $expectedCode)
+    {
+        $constraint = new Range(...array_merge(['min' => 1, 'max' => 10], $constraintExtraOptions));
+        $this->validate($value, $constraint);
+
+        $this
+            ->buildViolation($expectedMessage)
+            ->setParameters(['{{ min }}' => '1', '{{ max }}' => '10', '{{ value }}' => (string) $value])
+            ->setCode($expectedCode)
+            ->assertRaised();
+    }
+
+    public function testValidRelativeRangeWithMockClock()
+    {
+        $clock = new MockClock('2025-01-15 00:00:00 UTC');
+        $this->validator = new RangeValidator(null, $clock);
+
+        // Value is Jan 10, within range [-10 days (Jan 5) .. +10 days (Jan 25)]
+        $value = new \DateTimeImmutable('2025-01-10 00:00:00 UTC');
+        $constraint = new Range(min: '-10 days', max: '+10 days');
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidRelativeRangeWithMockClock()
+    {
+        $clock = new MockClock('2025-01-15 00:00:00 UTC');
+        $this->validator = new RangeValidator(null, $clock);
+
+        // Value is Feb 1, outside range [-10 days (Jan 5) .. +10 days (Jan 25)]
+        $value = new \DateTimeImmutable('2025-02-01 00:00:00 UTC');
+        $constraint = new Range(min: '-10 days', max: '+10 days', notInRangeMessage: 'myMessage');
+
+        $this->validate($value, $constraint);
+
+        $now = $clock->now();
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', self::formatDateTime($value))
+            ->setParameter('{{ min }}', self::formatDateTime($now->modify('-10 days')))
+            ->setParameter('{{ max }}', self::formatDateTime($now->modify('+10 days')))
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    public function testAbsoluteRangeWithMockClock()
+    {
+        $clock = new MockClock('2025-01-15 00:00:00 UTC');
+        $this->validator = new RangeValidator(null, $clock);
+
+        // Absolute dates should still work with a mock clock
+        $value = new \DateTimeImmutable('2025-03-15 00:00:00 UTC');
+        $constraint = new Range(min: '2025-01-01', max: '2025-12-31');
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testBackwardCompatWithoutClock()
+    {
+        // Without setClock(), the validator should still work (falls back to system clock)
+        $value = new \DateTimeImmutable('2025-03-15 00:00:00 UTC');
+        $constraint = new Range(min: '2025-01-01', max: '2025-12-31');
+
+        $this->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    private static function formatDateTime(\DateTimeInterface $value): string
+    {
+        if (class_exists(\IntlDateFormatter::class)) {
+            $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
+
+            return $formatter->format(new \DateTimeImmutable(
+                $value->format('Y-m-d H:i:s.u'),
+                new \DateTimeZone('UTC')
+            ));
+        }
+
+        return $value->format('Y-m-d H:i:s');
+    }
+}
+
+final class Limit
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+}
+
+final class MinMax
+{
+    private $min;
+    private $max;
+
+    public function __construct($min, $max)
+    {
+        $this->min = $min;
+        $this->max = $max;
+    }
+
+    public function getMin()
+    {
+        return $this->min;
+    }
+
+    public function getMax()
+    {
+        return $this->max;
+    }
+}

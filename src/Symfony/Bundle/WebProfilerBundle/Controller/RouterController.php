@@ -1,0 +1,100 @@
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Symfony\Bundle\WebProfilerBundle\Controller;
+
+use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Profiler\Profiler;
+use Symfony\Component\Routing\Matcher\TraceableUrlMatcher;
+use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
+
+/**
+ * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @internal
+ */
+class RouterController
+{
+    /**
+     * @param ExpressionFunctionProviderInterface[] $expressionLanguageProviders
+     */
+    public function __construct(
+        private ?Profiler $profiler,
+        private Environment $twig,
+        private ?UrlMatcherInterface $matcher = null,
+        private ?RouteCollection $routes = null,
+        private iterable $expressionLanguageProviders = [],
+    ) {
+        if ($this->matcher instanceof RouterInterface) {
+            $this->routes ??= $this->matcher->getRouteCollection();
+        }
+    }
+
+    /**
+     * Renders the profiler panel for the given token.
+     *
+     * @throws NotFoundHttpException
+     */
+    public function panelAction(string $token): Response
+    {
+        if (null === $this->profiler) {
+            throw new NotFoundHttpException('The profiler must be enabled.');
+        }
+
+        $this->profiler->disable();
+
+        if (null === $this->matcher || null === $this->routes) {
+            return new Response('The Router is not enabled.', 200, ['Content-Type' => 'text/html']);
+        }
+
+        $profile = $this->profiler->loadProfile($token);
+
+        /** @var RequestDataCollector $request */
+        $request = $profile->getCollector('request');
+
+        return new Response($this->twig->render('@WebProfiler/Router/panel.html.twig', [
+            'request' => $request,
+            'router' => $profile->getCollector('router'),
+            'traces' => $this->getTraces($request, $profile->getMethod()),
+        ]), 200, ['Content-Type' => 'text/html']);
+    }
+
+    /**
+     * Returns the routing traces associated to the given request.
+     */
+    private function getTraces(RequestDataCollector $request, string $method): array
+    {
+        $traceRequest = new Request(
+            $request->getRequestQuery()->all(),
+            $request->getRequestRequest()->all(),
+            $request->getRequestAttributes()->all(),
+            $request->getRequestCookies(true)->all(),
+            [],
+            $request->getRequestServer(true)->all()
+        );
+
+        $context = $this->matcher->getContext();
+        $context->setMethod($method);
+        $matcher = new TraceableUrlMatcher($this->routes, $context);
+        foreach ($this->expressionLanguageProviders as $provider) {
+            $matcher->addExpressionLanguageProvider($provider);
+        }
+
+        return $matcher->getTracesForRequest($traceRequest);
+    }
+}

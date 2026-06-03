@@ -1,0 +1,6 @@
+services:
+    my_service:
+        class: \Redis
+
+framework:
+    lock: my_service

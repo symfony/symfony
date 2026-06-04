@@ -162,6 +162,7 @@ class Configuration implements ConfigurationInterface
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
+        $this->addUriSignerSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addWorkflowSection($rootNode);
         $this->addRouterSection($rootNode);
@@ -347,6 +348,24 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('hinclude_default_template')->defaultNull()->end()
                         ->scalarNode('path')->defaultValue('/_fragment')->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addUriSignerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('uri_signer')
+                    ->info('URI signer configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('expiration')
+                            ->info('Default expiration of signed URIs, in seconds.')
+                            ->defaultNull()
+                        ->end()
                     ->end()
                 ->end()
             ->end()

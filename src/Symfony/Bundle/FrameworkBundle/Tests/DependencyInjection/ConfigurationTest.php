@@ -738,6 +738,9 @@ class ConfigurationTest extends TestCase
                 'path' => '/_fragment',
                 'hinclude_default_template' => null,
             ],
+            'uri_signer' => [
+                'expiration' => null,
+            ],
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,

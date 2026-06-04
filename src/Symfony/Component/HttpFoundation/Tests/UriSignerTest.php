@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Exception\ExpiredSignedUriException;
@@ -28,15 +29,22 @@ class UriSignerTest extends TestCase
     {
         $signer = new UriSigner('foobar');
 
-        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo'));
-        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo?foo=bar'));
-        $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar'));
-
         $this->assertStringContainsString('?_expiration=', $signer->sign('http://example.com/foo', 1));
         $this->assertStringContainsString('&_hash=', $signer->sign('http://example.com/foo', 1));
         $this->assertStringContainsString('?_expiration=', $signer->sign('http://example.com/foo?foo=bar', 1));
         $this->assertStringContainsString('&_hash=', $signer->sign('http://example.com/foo?foo=bar', 1));
         $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar', 1));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testSignWithoutExpiration()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo'));
+        $this->assertStringContainsString('?_hash=', $signer->sign('http://example.com/foo?foo=bar'));
+        $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar'));
     }
 
     public function testCheck()
@@ -53,16 +61,24 @@ class UriSignerTest extends TestCase
         $this->assertFalse($signer->check('http://example.com/foo?_expiration=4070908800&foo=bar&_hash=foo'));
         $this->assertFalse($signer->check('http://example.com/foo?_expiration=4070908800&foo=bar&_hash=foo&bar=foo'));
 
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo')));
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar')));
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&0=integer')));
-
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo', new \DateTimeImmutable('2099-01-01 00:00:00'))));
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar', new \DateTimeImmutable('2099-01-01 00:00:00'))));
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&0=integer', new \DateTimeImmutable('2099-01-01 00:00:00'))));
 
-        $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo'), $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
         $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', 1), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 1));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testCheckWithoutExpiration()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo')));
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar')));
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&0=integer')));
+
+        $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo'), $signer->sign('http://example.com/foo?bar=foo&foo=bar'));
     }
 
     public function testCheckWithDifferentArgSeparator()
@@ -71,12 +87,6 @@ class UriSignerTest extends TestCase
 
         try {
             $signer = new UriSigner('foobar');
-
-            $this->assertSame(
-                'http://example.com/foo?_hash=rIOcC_F3DoEGo_vnESjSp7uU9zA9S_-OLhxgMexoPUM&baz=bay&foo=bar',
-                $signer->sign('http://example.com/foo?foo=bar&baz=bay')
-            );
-            $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
 
             $this->assertSame(
                 'http://example.com/foo?_expiration=2145916800&_hash=xLhnPMzV3KqqHaaUffBUJvtRDAZ4_Z9Y8Sw-gmS-82Q&baz=bay&foo=bar',
@@ -88,28 +98,48 @@ class UriSignerTest extends TestCase
         }
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testCheckWithDifferentArgSeparatorWithoutExpiration()
+    {
+        $oldArgSeparatorOutputValue = ini_set('arg_separator.output', '&amp;');
+
+        try {
+            $signer = new UriSigner('foobar');
+
+            $this->assertSame(
+                'http://example.com/foo?_hash=rIOcC_F3DoEGo_vnESjSp7uU9zA9S_-OLhxgMexoPUM&baz=bay&foo=bar',
+                $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+            );
+            $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+        } finally {
+            ini_set('arg_separator.output', $oldArgSeparatorOutputValue);
+        }
+    }
+
     public function testCheckWithRequest()
     {
         $signer = new UriSigner('foobar');
-
-        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo'))));
-        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar'))));
-        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar&0=integer'))));
 
         $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo', new \DateTimeImmutable('2099-01-01 00:00:00')))));
         $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar', new \DateTimeImmutable('2099-01-01 00:00:00')))));
         $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar&0=integer', new \DateTimeImmutable('2099-01-01 00:00:00')))));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testCheckWithRequestWithoutExpiration()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo'))));
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar'))));
+        $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar&0=integer'))));
+    }
+
     public function testCheckWithDifferentParameter()
     {
         $signer = new UriSigner('foobar', 'qux', 'abc');
-
-        $this->assertSame(
-            'http://example.com/foo?baz=bay&foo=bar&qux=rIOcC_F3DoEGo_vnESjSp7uU9zA9S_-OLhxgMexoPUM',
-            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
-        );
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
 
         $this->assertSame(
             'http://example.com/foo?abc=2145916800&baz=bay&foo=bar&qux=kE4rK2MzeiwrYAKy-_GKvKA6bnzqCbACBdpC3yGnPVU',
@@ -118,16 +148,22 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testCheckWithDifferentParameterWithoutExpiration()
+    {
+        $signer = new UriSigner('foobar', 'qux', 'abc');
+
+        $this->assertSame(
+            'http://example.com/foo?baz=bay&foo=bar&qux=rIOcC_F3DoEGo_vnESjSp7uU9zA9S_-OLhxgMexoPUM',
+            $signer->sign('http://example.com/foo?foo=bar&baz=bay')
+        );
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay')));
+    }
+
     public function testSignerWorksWithFragments()
     {
         $signer = new UriSigner('foobar');
-
-        $this->assertSame(
-            'http://example.com/foo?_hash=EhpAUyEobiM3QTrKxoLOtQq5IsWyWedoXDPqIjzNj5o&bar=foo&foo=bar#foobar',
-            $signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')
-        );
-
-        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')));
 
         $this->assertSame(
             'http://example.com/foo?_expiration=2145916800&_hash=jTdrIE9MJSorNpQmkX6tmOtocxXtHDzIJawcAW4IFYo&bar=foo&foo=bar#foobar',
@@ -137,6 +173,20 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar', new \DateTimeImmutable('2099-01-01 00:00:00'))));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testSignerWorksWithFragmentsWithoutExpiration()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertSame(
+            'http://example.com/foo?_hash=EhpAUyEobiM3QTrKxoLOtQq5IsWyWedoXDPqIjzNj5o&bar=foo&foo=bar#foobar',
+            $signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')
+        );
+
+        $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar')));
+    }
+
     public function testSignWithUriExpiration()
     {
         $signer = new UriSigner('foobar');
@@ -144,6 +194,39 @@ class UriSignerTest extends TestCase
         $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC'))), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 2145916800));
     }
 
+    public function testSignWithDefaultExpiration()
+    {
+        $clock = new MockClock(new \DateTimeImmutable('2000-01-01 00:00:00', new \DateTimeZone('UTC')));
+        $signer = new UriSigner('foobar', clock: $clock, defaultExpiration: new \DateInterval('PT1H'));
+
+        $uri = $signer->sign('http://example.com/foo');
+        $this->assertStringContainsString('_expiration=946688400', $uri);
+        $this->assertTrue($signer->check($uri));
+
+        $this->assertStringContainsString('_expiration=946684800', $signer->sign('http://example.com/foo', 946684800));
+    }
+
+    public function testSignWithDefaultExpirationInSeconds()
+    {
+        $clock = new MockClock(new \DateTimeImmutable('2000-01-01 00:00:00', new \DateTimeZone('UTC')));
+        $signer = new UriSigner('foobar', clock: $clock, defaultExpiration: 3600);
+
+        $uri = $signer->sign('http://example.com/foo');
+        $this->assertStringContainsString('_expiration=946688400', $uri);
+        $this->assertTrue($signer->check($uri));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testSignWithoutExpirationIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Not passing an expiration to "Symfony\Component\HttpFoundation\UriSigner::sign()" is deprecated and will be required in 9.0; pass one explicitly, or set a default via the "$defaultExpiration" argument of "Symfony\Component\HttpFoundation\UriSigner::__construct()".');
+
+        (new UriSigner('foobar'))->sign('http://example.com/foo');
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testSignWithoutExpirationAndWithReservedHashParameter()
     {
         $signer = new UriSigner('foobar');
@@ -153,6 +236,8 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_hash=bar');
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testSignWithoutExpirationAndWithReservedParameter()
     {
         $signer = new UriSigner('foobar');

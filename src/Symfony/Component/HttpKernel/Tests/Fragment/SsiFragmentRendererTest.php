@@ -52,7 +52,7 @@ class SsiFragmentRendererTest extends TestCase
         $altReference = new ControllerReference('alt_controller', [], []);
 
         $this->assertMatchesRegularExpression(
-            '{^<!--#include virtual="/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->$}',
+            '{^<!--#include virtual="/_fragment\?_expiration=.+&_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->$}',
             $strategy->render($reference, $request, ['alt' => $altReference])->getContent()
         );
     }
@@ -70,7 +70,7 @@ class SsiFragmentRendererTest extends TestCase
         $altReference = new ControllerReference('alt_controller', [], []);
 
         $this->assertMatchesRegularExpression(
-            '{^<!--#include virtual="http://localhost/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->$}',
+            '{^<!--#include virtual="http://localhost/_fragment\?_expiration=.+&_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" -->$}',
             $strategy->render($reference, $request, ['alt' => $altReference, 'absolute_uri' => true])->getContent()
         );
     }

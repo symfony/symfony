@@ -13,6 +13,7 @@ namespace Symfony\Bridge\Doctrine\Middleware\Debug;
 
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Middleware as MiddlewareInterface;
+use Doctrine\Persistence\ConnectionRegistry;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -26,11 +27,12 @@ final class Middleware implements MiddlewareInterface
         private readonly DebugDataHolder $debugDataHolder,
         private readonly ?Stopwatch $stopwatch,
         private readonly string $connectionName = 'default',
+        private readonly ?ConnectionRegistry $connectionRegistry = null,
     ) {
     }
 
     public function wrap(DriverInterface $driver): DriverInterface
     {
-        return new Driver($driver, $this->debugDataHolder, $this->stopwatch, $this->connectionName);
+        return new Driver($driver, $this->debugDataHolder, $this->stopwatch, $this->connectionName, $this->connectionRegistry);
     }
 }

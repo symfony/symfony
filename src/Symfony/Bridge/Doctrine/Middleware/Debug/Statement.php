@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Middleware\Debug;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\Middleware\AbstractStatementMiddleware;
 use Doctrine\DBAL\Driver\Result as ResultInterface;
 use Doctrine\DBAL\Driver\Statement as StatementInterface;
@@ -33,10 +34,11 @@ final class Statement extends AbstractStatementMiddleware
         private readonly string $connectionName,
         string $sql,
         private readonly ?Stopwatch $stopwatch = null,
+        ?Connection $connection = null,
     ) {
         parent::__construct($statement);
 
-        $this->query = new Query($sql);
+        $this->query = new Query($sql, $connection);
     }
 
     public function bindValue(int|string $param, mixed $value, ParameterType $type): void

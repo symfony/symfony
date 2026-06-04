@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-31T07:40:14Z
+
+@XananasX7 the email attached to your git commit is a dummy one, maybe you'd like to have another one?
+
+---------------------------------------------------------------------------
+
+by XananasX7 at 2026-05-31T08:13:43Z
+
+Thanks for flagging that @nicolas-grekas — I've updated the commit with my correct author email.
+
+---------------------------------------------------------------------------
+
+by jack-worman at 2026-06-02T12:29:11Z
+
+@nicolas-grekas Would it make sense to write a phpstan plugin to ensure `unserialize()` always specifies `'allowed_classes'`? This would remind the developer to reason about the safety of using `unserialize()`.
+
+And you can always do `['allowed_classes' => true]` to allow everything.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-04T13:00:17Z
+
+@jack-worman worth a try I suppose.

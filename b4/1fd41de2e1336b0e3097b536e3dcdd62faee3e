@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by github-advanced-security[bot] at 2026-05-22T05:24:07Z
+
+You are seeing this message because GitHub Code Scanning has recently been set up for this repository, or this pull request contains the workflow file for the Code Scanning tool.
+
+### What Enabling Code Scanning Means:
+
+- The 'Security' tab will display more code scanning analysis results (e.g., for the default branch).
+- Depending on your configuration and choice of analysis tool, future pull requests will be annotated with code scanning analysis results.
+- You will be able to see the analysis results for the pull request's branch on this [overview](/symfony/symfony/security/code-scanning?query=pr%3A64325+is%3Aopen) once the scans have completed and the checks have passed.
+
+For more information about GitHub Code Scanning, check out [the documentation](https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning).
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-05-22T07:25:09Z
+
+You should have used [.github/sync-packages.php](https://github.com/symfony/symfony/blob/8.1/.github/sync-packages.php) to make this update. Can you synchronize this script please?
+
+I confirmed that [auto-close action works](https://github.com/symfony/ux-translator/pulls?q=is%3Apr+is%3Aclosed) with first-time contributors (I remember we had issues with this profile or users).
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-05-22T08:32:11Z
+
+> You should have used [.github/sync-packages.php](https://github.com/symfony/symfony/blob/8.1/.github/sync-packages.php?rgh-link-date=2026-05-22T07%3A25%3A09Z) to make this update. Can you synchronize this script please?
+
+Oooh you're right, I totally forgot about this one. It's fixed.
+We should definitely have this on UX!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-05T07:08:56Z
+
+I've split the true hardening part in [64457](https://github.com/symfony/symfony/pull/64457)
+Now remains the pinning, which makes me think adding dependenabot should be discussed here, not in a separate PR.

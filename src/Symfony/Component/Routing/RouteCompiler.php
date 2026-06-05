@@ -32,7 +32,7 @@ class RouteCompiler implements RouteCompilerInterface
      *
      * @internal
      */
-    public const VARIABLE_MAXIMUM_LENGTH = 32;
+    public const VARIABLE_MAXIMUM_LENGTH = 128;
 
     /**
      * @throws \InvalidArgumentException if a path variable is named _fragment
@@ -142,8 +142,9 @@ class RouteCompiler implements RouteCompilerInterface
                 throw new \LogicException(\sprintf('Route pattern "%s" cannot reference variable name "%s" more than once.', $pattern, $varName));
             }
 
-            if (\strlen($varName) > self::VARIABLE_MAXIMUM_LENGTH) {
-                throw new \DomainException(\sprintf('Variable name "%s" cannot be longer than %d characters in route pattern "%s". Please use a shorter name.', $varName, self::VARIABLE_MAXIMUM_LENGTH, $pattern));
+            $maxLength = version_compare(\PCRE_VERSION, '10.44') >= 0 ? self::VARIABLE_MAXIMUM_LENGTH : 32;
+            if (\strlen($varName) > $maxLength) {
+                throw new \DomainException(\sprintf('Variable name "%s" cannot be longer than %d characters in route pattern "%s". Please use a shorter name.', $varName, $maxLength, $pattern));
             }
 
             if ($isSeparator && $precedingText !== $precedingChar) {

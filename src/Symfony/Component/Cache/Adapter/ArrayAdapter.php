@@ -303,7 +303,12 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
             if (null === $v) {
                 continue;
             }
-            $values[$k] = serialize($v instanceof DeepCloner ? $v->clone() : $v);
+            try {
+                $values[$k] = serialize($v instanceof DeepCloner ? $v->clone() : $v);
+            } catch (\Exception $e) {
+                unset($values[$k]);
+                CacheItem::log($this->logger, 'Failed to serialize key "{key}": '.$e->getMessage(), ['key' => $k, 'exception' => $e, 'cache-adapter' => get_debug_type($this)]);
+            }
         }
 
         return $values;

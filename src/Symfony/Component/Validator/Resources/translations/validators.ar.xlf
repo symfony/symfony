@@ -556,15 +556,15 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">هذه القيمة ليست XML صالحة.</target>
+                <target>هذه القيمة ليست XML صالحة.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">هذه القيمة لا تتوافق مع مخطط XSD المتوقع.</target>
+                <target>هذه القيمة لا تتوافق مع مخطط XSD المتوقع.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">حمولة XML هذه كبيرة جدًا ({{ size }} بايت): فهي تتجاوز الحد البالغ {{ limit }} بايت.</target>
+                <target>حمولة XML هذه كبيرة جدًا ({{ size }} بايت): فهي تتجاوز الحد البالغ {{ limit }} بايت.</target>
             </trans-unit>
         </body>
     </file>

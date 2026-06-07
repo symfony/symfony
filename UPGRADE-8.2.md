@@ -93,6 +93,25 @@ Loco Translation Provider
  * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument. It has no effect and can be removed.
  * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
 
+Mailer
+------
+
+ * Deprecate sending an S/MIME message unencrypted when a recipient has no certificate (the default
+   `SmimeEncryptedMessageListener::ON_MISSING_CERTIFICATE_SEND_UNENCRYPTED` behavior); it will throw in 9.0.
+   Set the `on_missing_certificate` option (or the `X-SMime-Encrypt` header) to `fail`, `encrypt` or `skip`:
+
+   ```yaml
+   framework:
+       mailer:
+           smime_encrypter:
+               on_missing_certificate: 'fail'
+   ```
+
+ * `DkimSignedMessageListener` now listens with priority `-228` instead of `-128`, so that DKIM signs the
+   S/MIME encrypted message instead of racing `SmimeEncryptedMessageListener` for the same priority. Use the
+   new `DkimSignedMessageListener::PRIORITY`, `SmimeSignedMessageListener::PRIORITY` and
+   `SmimeEncryptedMessageListener::PRIORITY` constants if you register listeners that must run around them.
+
 Messenger
 ---------
 

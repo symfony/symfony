@@ -1157,6 +1157,9 @@ class ConfigurationTest extends TestCase
                 'smime_encrypter' => [
                     'enabled' => false,
                     'repository' => '',
+                    'certificates' => [],
+                    'on_missing_certificate' => 'send_unencrypted',
+                    'encrypt_for_sender' => false,
                     'cipher' => null,
                 ],
             ],

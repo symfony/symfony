@@ -113,6 +113,7 @@ use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
+use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -3231,8 +3232,15 @@ class FrameworkExtension extends Extension
         }
 
         if ($config['smime_encrypter']['enabled']) {
-            $container->setAlias('mailer.smime_encrypter.repository', $config['smime_encrypter']['repository']);
+            if ($config['smime_encrypter']['certificates']) {
+                $container->setDefinition('mailer.smime_encrypter.repository', new Definition(InMemorySmimeCertificateRepository::class, [$config['smime_encrypter']['certificates']]));
+            } else {
+                $container->setAlias('mailer.smime_encrypter.repository', $config['smime_encrypter']['repository']);
+            }
             $container->setParameter('mailer.smime_encrypter.cipher', $config['smime_encrypter']['cipher']);
+            $container->getDefinition('mailer.smime_encrypter.listener')
+                ->setArgument(2, $config['smime_encrypter']['on_missing_certificate'])
+                ->setArgument(3, $config['smime_encrypter']['encrypt_for_sender']);
         } else {
             $container->removeDefinition('mailer.smime_encrypter.listener');
         }

@@ -219,7 +219,7 @@ jobs:
           php -i
 
       - name: Load fixtures
-        uses: docker://bitnamilegacy/openldap@sha256:687f14a22b5c74fb057a57221acdbe7b8c82e2d3619fc380db3af48ec4aa04ed # latest
+        uses: docker://bitnamilegacy/openldap@sha256:966fd39ed25813890e9bd57dac56def163bbcfe64967e0bae59ab018d505bd93 # latest
         with:
           entrypoint: /bin/bash
           args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"

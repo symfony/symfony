@@ -876,6 +876,27 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame(21, $withoutTransform->value, 'Mapping to the other target must not pick up the first target\'s transform');
     }
 
+    public function testClassMapWithMultipleTargetsSharingOneSourceRequiresAnExplicitTarget()
+    {
+        // When several targets share one source, mapping without an explicit
+        // target is genuinely ambiguous: there is no way to know which target
+        // is meant. The mapper must reject it with a clear exception rather
+        // than silently picking an arbitrary one.
+        $classMap = [
+            SharedSource::class => [
+                SharedTargetWithTransform::class,
+                SharedTargetWithoutTransform::class,
+            ],
+        ];
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping for "'.SharedSource::class.'".');
+
+        $mapper->map(new SharedSource());
+    }
+
     public function testMissingSourcePropertiesAreIgnored()
     {
         $mapper = new ObjectMapper();

@@ -1,0 +1,10 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'mailer' => [
+        'dsn' => 'smtp://example.com',
+        'pgp_encrypter' => [
+            'enabled' => true,
+        ],
+    ],
+]);

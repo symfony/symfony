@@ -35,6 +35,9 @@
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1"
     },
+    "suggest": {
+        "symfony/process": "For PGP/MIME signing and encryption support"
+    },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },
         "exclude-from-classmap": [

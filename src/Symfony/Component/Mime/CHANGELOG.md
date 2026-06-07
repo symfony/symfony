@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Support `binary` as a `Content-Transfer-Encoding`
+ * Add PGP/MIME signing and encryption support with the `PgpSigner` and `PgpEncrypter` classes
 
 8.0
 ---

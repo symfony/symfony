@@ -113,7 +113,10 @@ use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
+use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
+use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
+use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -128,6 +131,8 @@ use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface as MessengerTransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Mime\Crypto\PgpEncrypter;
+use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Component\Mime\MimeTypes;
@@ -146,6 +151,7 @@ use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFact
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\TransformCallableInterface;
 use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
+use Symfony\Component\Process\Process;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\ConstructorArgumentTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -3243,6 +3249,59 @@ class FrameworkExtension extends Extension
                 ->setArgument(3, $config['smime_encrypter']['encrypt_for_sender']);
         } else {
             $container->removeDefinition('mailer.smime_encrypter.listener');
+        }
+
+        if ($config['pgp_signer']['enabled']) {
+            if (!class_exists(PgpSigner::class)) {
+                throw new LogicException('PGP/MIME signed messages support cannot be enabled as this version of the Mime component does not support it. Try upgrading "symfony/mime".');
+            }
+            if (!class_exists(PgpMimeSignedMessageListener::class)) {
+                throw new LogicException('PGP/MIME signed messages support cannot be enabled as this version of the Mailer component does not support it.');
+            }
+            if (!class_exists(Process::class)) {
+                throw new LogicException('PGP/MIME signed messages support cannot be enabled as the Process component is not installed. Try running "composer require symfony/process".');
+            }
+            $pgpSigner = $container->getDefinition('mailer.pgp_signer');
+            $pgpSigner->setArgument(0, $config['pgp_signer']['secret_key']);
+            $pgpSigner->setArgument(1, $config['pgp_signer']['public_key']);
+            $pgpSigner->setArgument(2, $config['pgp_signer']['passphrase']);
+            $pgpSigner->setArgument(3, [
+                'binary' => $config['pgp_signer']['binary'],
+                'digest_algorithm' => $config['pgp_signer']['digest_algorithm'],
+            ]);
+        } else {
+            $container->removeDefinition('mailer.pgp_signer');
+            $container->removeDefinition('mailer.pgp_signer.listener');
+        }
+
+        if ($config['pgp_encrypter']['enabled']) {
+            if (!class_exists(PgpEncrypter::class)) {
+                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as this version of the Mime component does not support it. Try upgrading "symfony/mime".');
+            }
+            if (!class_exists(PgpMimeEncryptedMessageListener::class)) {
+                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as this version of the Mailer component does not support it.');
+            }
+            if (!class_exists(Process::class)) {
+                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as the Process component is not installed. Try running "composer require symfony/process".');
+            }
+            if ($config['pgp_encrypter']['keys']) {
+                $container->setDefinition('mailer.pgp_encrypter.repository', new Definition(InMemoryPgpPublicKeyRepository::class, [$config['pgp_encrypter']['keys']]));
+            } else {
+                $container->setAlias('mailer.pgp_encrypter.repository', $config['pgp_encrypter']['repository']);
+            }
+            $pgpEncrypter = $container->getDefinition('mailer.pgp_encrypter');
+            $pgpEncrypter->setArgument(0, [
+                'binary' => $config['pgp_encrypter']['binary'],
+                'cipher_algorithm' => $config['pgp_encrypter']['cipher_algorithm'],
+                'timeout' => $config['pgp_encrypter']['timeout'],
+                'hide_recipients' => $config['pgp_encrypter']['hide_recipients'],
+            ]);
+            $container->getDefinition('mailer.pgp_encrypter.listener')
+                ->setArgument(2, $config['pgp_encrypter']['on_missing_key'])
+                ->setArgument(3, $config['pgp_encrypter']['encrypt_for_sender']);
+        } else {
+            $container->removeDefinition('mailer.pgp_encrypter');
+            $container->removeDefinition('mailer.pgp_encrypter.listener');
         }
 
         if ($webhookEnabled) {

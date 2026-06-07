@@ -26,18 +26,35 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
     private array $attributesCache = [];
 
     /**
-     * @param array<class-string, class-string> $classMap
+     * @var array<class-string, list<class-string>>
+     */
+    private readonly array $classMap;
+
+    /**
+     * @param array<class-string, class-string|list<class-string>> $classMap A single target
+     *                                                                      per source is
+     *                                                                      accepted for
+     *                                                                      backward
+     *                                                                      compatibility.
      */
     public function __construct(
         private readonly ObjectMapperMetadataFactoryInterface $objectMapperMetadataFactory,
-        private readonly array $classMap,
+        array $classMap,
     ) {
+        $normalized = [];
+        foreach ($classMap as $source => $target) {
+            $normalized[$source] = array_values((array) $target);
+        }
+        $this->classMap = $normalized;
     }
 
     public function create(object $object, ?string $property = null, array $context = []): array
     {
         $class = $object::class;
-        $key = $class.($property ? '.'.$property : '');
+        // When several targets share one source, the active target is propagated
+        // via $context to pick the right per-property metadata; cache per target too.
+        $contextTarget = $context['target'] ?? null;
+        $key = $class.($property ? '.'.$property : '').($contextTarget ? '.'.$contextTarget : '');
 
         if (isset($this->attributesCache[$key])) {
             return $this->attributesCache[$key];
@@ -45,17 +62,21 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
 
         $mappings = $this->objectMapperMetadataFactory->create($object, $property, $context);
 
-        if (!$targetClass = $this->classMap[$class] ?? null) {
+        if (!$targets = $this->classMap[$class] ?? null) {
             return $mappings;
         }
 
         if (!$property) {
-            $mappings[] = new Mapping($targetClass);
+            foreach ($targets as $targetClass) {
+                $mappings[] = new Mapping($targetClass);
+            }
 
             return $this->attributesCache[$key] = $mappings;
         }
 
-        $refl = new \ReflectionClass($targetClass);
+        $resolvedTarget = null !== $contextTarget && \in_array($contextTarget, $targets, true) ? $contextTarget : $targets[0];
+
+        $refl = new \ReflectionClass($resolvedTarget);
         foreach ($refl->getProperties() as $reflProperty) {
             $attributes = $reflProperty->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF);
 

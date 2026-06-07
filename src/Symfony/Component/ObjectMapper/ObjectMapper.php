@@ -135,7 +135,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
 
             $propertyName = $property->getName();
-            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
+            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName, ['target' => $mappedTarget::class]);
             foreach ($mappings as $mapping) {
                 $sourcePropertyName = $propertyName;
                 if ($mapping->source && (!$refl->hasProperty($propertyName) || !isset($source->$propertyName))) {

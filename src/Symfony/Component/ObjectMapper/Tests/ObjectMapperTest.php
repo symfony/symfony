@@ -36,6 +36,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSource
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteRequestView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedTargetWithoutTransform;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedTargetWithTransform;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\A as ClassRuleA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\B as ClassRuleB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\C as ClassRuleC;
@@ -847,6 +850,30 @@ final class ObjectMapperTest extends TestCase
         $this->assertEquals('bar', $costRequestView->foo, 'Explicit mapping should work');
         $this->assertEquals(10, $costRequestView->amount, 'Auto-mapping should also work for properties with the same name');
         $this->assertEquals(20, $costRequestView->tax);
+    }
+
+    public function testClassMapWithMultipleTargetsSharingOneSourceAppliesEachTargetsTransform()
+    {
+        // Two distinct targets share the same source: per-property `#[Map(transform:)]`
+        // on each target must be honored when the user maps to that specific target,
+        // rather than being silently dropped because the class map only stores one
+        // target per source.
+        $classMap = [
+            SharedSource::class => [
+                SharedTargetWithTransform::class,
+                SharedTargetWithoutTransform::class,
+            ],
+        ];
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $withTransform = $mapper->map(new SharedSource(), SharedTargetWithTransform::class);
+        $this->assertInstanceOf(SharedTargetWithTransform::class, $withTransform);
+        $this->assertSame(42, $withTransform->value, 'Transform on the explicit target must be applied');
+
+        $withoutTransform = $mapper->map(new SharedSource(), SharedTargetWithoutTransform::class);
+        $this->assertInstanceOf(SharedTargetWithoutTransform::class, $withoutTransform);
+        $this->assertSame(21, $withoutTransform->value, 'Mapping to the other target must not pick up the first target\'s transform');
     }
 
     public function testMissingSourcePropertiesAreIgnored()

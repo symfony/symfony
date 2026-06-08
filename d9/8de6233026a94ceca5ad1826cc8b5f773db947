@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-07T11:19:10Z
+
+Let's target branch 6.4
+
+---------------------------------------------------------------------------
+
+by jack-worman at 2026-06-07T13:01:13Z
+
+> Let's target branch 6.4
+
+Done
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-07T14:15:06Z
+
+Looks like it works, see CI failures ;) could be worth addressing in the same PR, WDYT?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-08T07:32:20Z
+
+Thank you @jack-worman.

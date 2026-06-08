@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-06-08T15:53:35Z
+
+I suggest adding a test with an explicit assertion that the returned value is a list, which makes it clear that we intent the return value to stay a list in the future.

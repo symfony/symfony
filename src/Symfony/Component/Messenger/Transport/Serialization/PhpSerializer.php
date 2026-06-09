@@ -45,11 +45,14 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
             throw new MessageDecodingFailedException('Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
         }
 
-        if (!str_ends_with($encodedEnvelope['body'], '}')) {
-            $encodedEnvelope['body'] = base64_decode($encodedEnvelope['body']);
+        // Some transports append trailing CR/LF to the body; tolerate them as native unserialize() does.
+        $body = rtrim($encodedEnvelope['body'], "\r\n");
+
+        if (!str_ends_with($body, '}')) {
+            $body = base64_decode($body);
         }
 
-        $serializeEnvelope = stripslashes($encodedEnvelope['body']);
+        $serializeEnvelope = stripslashes($body);
 
         return $this->safelyUnserialize($serializeEnvelope);
     }
@@ -59,6 +62,9 @@ class PhpSerializer implements SerializerInterface, MessageTypeAwareSerializerIn
         if (!\is_string($body = $encodedEnvelope['body'] ?? null) || '' === $body) {
             return null;
         }
+
+        // Some transports append trailing CR/LF to the body; tolerate them as native unserialize() does.
+        $body = rtrim($body, "\r\n");
 
         if (!str_ends_with($body, '}') && false === $body = base64_decode($body, true)) {
             return null;

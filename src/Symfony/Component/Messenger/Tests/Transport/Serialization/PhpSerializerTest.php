@@ -51,6 +51,31 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
+    #[DataProvider('provideTrailingWhitespace')]
+    public function testDecodeToleratesTrailingWhitespace(string $suffix)
+    {
+        $serializer = $this->createPhpSerializer();
+
+        $envelope = new Envelope(new DummyMessage('Hello'));
+
+        // Raw body (UTF-8 payload) and base64 body (non-UTF-8 payload) take different
+        // code paths; both must tolerate the trailing bytes some transports append.
+        foreach ([new DummyMessage('Hello'), new DummyMessage("\xE9")] as $message) {
+            $encoded = $serializer->encode(new Envelope($message));
+            $encoded['body'] .= $suffix;
+
+            $this->assertEquals(new Envelope($message), $serializer->decode($encoded));
+            $this->assertSame($message::class, $serializer->getMessageType($encoded));
+        }
+    }
+
+    public static function provideTrailingWhitespace(): iterable
+    {
+        yield 'newline' => ["\n"];
+        yield 'carriage return + newline' => ["\r\n"];
+        yield 'multiple newlines' => ["\n\n"];
+    }
+
     public function testDecodingFailsWithMissingBodyKey()
     {
         $serializer = $this->createPhpSerializer();

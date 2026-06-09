@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
@@ -111,16 +112,53 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
             ...($id ? [new TransportMessageIdStamp($id)] : []),
         ];
 
+        $headers = $amqpEnvelope->getHeaders();
         $data = [
             'body' => false === $body ? '' : $body,
-            'headers' => $amqpEnvelope->getHeaders(),
+            'headers' => $headers,
         ];
 
         try {
-            return $this->serializer->decode($data)->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
+            $envelope = $this->serializer->decode($data)->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
         } catch (MessageDecodingFailedException $e) {
             return MessageDecodingFailedException::wrap($data, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
         }
+
+        if (null === $envelope->last(RedeliveryStamp::class) && $redeliveryStamp = $this->createRedeliveryStamp($headers)) {
+            $envelope = $envelope->with($redeliveryStamp);
+        }
+
+        return $envelope;
+    }
+
+    /**
+     * Builds a RedeliveryStamp from the "x-death" header that brokers such as
+     * RabbitMQ add when a message is dead-lettered, so the redelivery date is
+     * available even when the redelivery was not driven by the Messenger retry
+     * mechanism. Returns null when the header is absent or does not carry a
+     * usable timestamp.
+     */
+    private function createRedeliveryStamp(array $headers): ?RedeliveryStamp
+    {
+        $xDeath = $headers['x-death'] ?? null;
+        if (!\is_array($xDeath) || !\is_array($death = $xDeath[0] ?? null)) {
+            return null;
+        }
+
+        $time = $death['time'] ?? null;
+        if ($time instanceof \DateTimeInterface) {
+            $redeliveredAt = $time;
+        } elseif (\is_int($time) || (\is_string($time) && ctype_digit($time))) {
+            // The broker reports the death time as a UTC timestamp.
+            $redeliveredAt = new \DateTimeImmutable('@'.$time);
+        } else {
+            return null;
+        }
+
+        // The retry count is left at 0: the redelivery was performed by the
+        // broker, not by the Messenger retry mechanism, so it must not feed
+        // the retry counter read by RedeliveryStamp::getRetryCountFromEnvelope().
+        return new RedeliveryStamp(0, $redeliveredAt);
     }
 
     public function ack(Envelope $envelope): void

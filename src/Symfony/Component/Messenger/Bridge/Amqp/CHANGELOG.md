@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add a `RedeliveryStamp` to received messages based on the broker `x-death` header
+
 8.1
 ---
 

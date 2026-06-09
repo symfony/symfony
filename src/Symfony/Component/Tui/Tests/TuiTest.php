@@ -14,10 +14,13 @@ namespace Symfony\Component\Tui\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\InputEvent;
+use Symfony\Component\Tui\Event\MouseEvent;
 use Symfony\Component\Tui\Event\TickEvent;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Input\Keybindings;
+use Symfony\Component\Tui\Input\MouseButton;
+use Symfony\Component\Tui\Input\MouseEventKind;
 use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\StyleSheet;
@@ -550,6 +553,65 @@ class TuiTest extends TestCase
         $terminal->simulateInput('z');
 
         $this->assertSame('z', $received);
+        $tui->stop();
+    }
+
+    public function testMouseSequenceIsDispatchedAsMouseEvent()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+        $tui->start();
+        $tui->enableMouseTracking();
+
+        $received = null;
+        $tui->addListener(static function (MouseEvent $event) use (&$received): void {
+            $received = $event;
+        });
+
+        $terminal->simulateInput("\x1b[<0;5;3M");
+
+        $this->assertInstanceOf(MouseEvent::class, $received);
+        $this->assertSame(4, $received->x);
+        $this->assertSame(2, $received->y);
+        $this->assertSame(MouseButton::Left, $received->button);
+        $this->assertSame(MouseEventKind::Press, $received->kind);
+
+        $tui->stop();
+    }
+
+    public function testEnableMouseTrackingForwardsToTerminal()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+        $tui->start();
+        $terminal->clearOutput();
+
+        $tui->enableMouseTracking();
+        $this->assertStringContainsString("\x1b[?1006h", $terminal->getOutput());
+
+        $terminal->clearOutput();
+        $tui->disableMouseTracking();
+        $this->assertStringContainsString("\x1b[?1006l", $terminal->getOutput());
+
+        $tui->stop();
+    }
+
+    public function testMouseSequenceDoesNotLeakToFocusedWidget()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+
+        $input = new InputWidget();
+        $tui->add($input);
+        $tui->setFocus($input);
+
+        $tui->start();
+        $tui->enableMouseTracking();
+
+        $terminal->simulateInput("\x1b[<0;5;3M");
+
+        $this->assertSame('', $input->getValue());
+
         $tui->stop();
     }
 }

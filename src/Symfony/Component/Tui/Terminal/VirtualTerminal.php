@@ -30,9 +30,13 @@ use Symfony\Component\Tui\Input\StdinBuffer;
  */
 final class VirtualTerminal implements TerminalInterface
 {
+    private const string MOUSE_ENABLE = "\x1b[?1000h\x1b[?1002h\x1b[?1006h";
+    private const string MOUSE_DISABLE = "\x1b[?1006l\x1b[?1002l\x1b[?1000l";
+
     private string $output = '';
     private ?StdinBuffer $stdinBuffer = null;
     private ?\Closure $onResize = null;
+    private bool $mouseTracking = false;
 
     public function __construct(
         private int $columns = 80,
@@ -53,6 +57,10 @@ final class VirtualTerminal implements TerminalInterface
         $this->stdinBuffer->onPaste(static function (string $content) use ($onInput): void {
             $onInput("\x1b[200~".$content."\x1b[201~");
         });
+
+        if ($this->mouseTracking) {
+            $this->write(self::MOUSE_ENABLE);
+        }
     }
 
     public function stop(): void
@@ -124,6 +132,32 @@ final class VirtualTerminal implements TerminalInterface
     public function bell(): void
     {
         $this->write("\x07");
+    }
+
+    public function enableMouseTracking(): void
+    {
+        if ($this->mouseTracking) {
+            return;
+        }
+
+        $this->mouseTracking = true;
+
+        if (null !== $this->stdinBuffer) {
+            $this->write(self::MOUSE_ENABLE);
+        }
+    }
+
+    public function disableMouseTracking(): void
+    {
+        if (!$this->mouseTracking) {
+            return;
+        }
+
+        $this->mouseTracking = false;
+
+        if (null !== $this->stdinBuffer) {
+            $this->write(self::MOUSE_DISABLE);
+        }
     }
 
     public function isVirtual(): bool

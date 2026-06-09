@@ -21,6 +21,7 @@ use Symfony\Component\Tui\Event\TickEvent;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Keybindings;
+use Symfony\Component\Tui\Input\MouseParser;
 use Symfony\Component\Tui\Loop\AdaptativeTicker;
 use Symfony\Component\Tui\Loop\TickRuntimeInterface;
 use Symfony\Component\Tui\Loop\TickScheduler;
@@ -67,6 +68,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private FocusManager $focusManager;
     private TickScheduler $tickScheduler;
     private AdaptativeTicker $adaptativeTicker;
+    private MouseParser $mouseParser;
     private EventDispatcherInterface $eventDispatcher;
 
     /** @var (\Closure(TickEvent): mixed)|null */
@@ -111,6 +113,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->widgetTree->setRoot($this->root);
         $this->tickScheduler = new TickScheduler();
         $this->adaptativeTicker = new AdaptativeTicker($this);
+        $this->mouseParser = new MouseParser();
     }
 
     /**
@@ -376,6 +379,34 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
+     * Enable mouse reporting on the terminal.
+     *
+     * Once enabled, mouse interactions are dispatched as
+     * {@see Event\MouseEvent} through the event
+     * dispatcher; listen for them with {@see addListener()}. Off by default.
+     *
+     * @return $this
+     */
+    public function enableMouseTracking(): static
+    {
+        $this->terminal->enableMouseTracking();
+
+        return $this;
+    }
+
+    /**
+     * Disable mouse reporting previously enabled with {@see enableMouseTracking()}.
+     *
+     * @return $this
+     */
+    public function disableMouseTracking(): static
+    {
+        $this->terminal->disableMouseTracking();
+
+        return $this;
+    }
+
+    /**
      * Set the focused component.
      *
      * @return $this
@@ -478,6 +509,15 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function handleInput(string $data): void
     {
+        // Mouse sequences are dispatched as a MouseEvent and consumed here, so
+        // they never leak into keyboard handling. Terminals only report them
+        // once tracking has been enabled (see enableMouseTracking()).
+        if (null !== $mouse = $this->mouseParser->parse($data)) {
+            $this->eventDispatcher->dispatch($mouse);
+
+            return;
+        }
+
         $event = $this->eventDispatcher->dispatch(new InputEvent($data));
         if ($event->isPropagationStopped()) {
             return;

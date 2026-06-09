@@ -126,6 +126,18 @@ final class TeeTerminal implements TerminalInterface
         $this->secondary->bell();
     }
 
+    public function enableMouseTracking(): void
+    {
+        $this->primary->enableMouseTracking();
+        $this->secondary->enableMouseTracking();
+    }
+
+    public function disableMouseTracking(): void
+    {
+        $this->primary->disableMouseTracking();
+        $this->secondary->disableMouseTracking();
+    }
+
     public function isVirtual(): bool
     {
         return $this->primary->isVirtual();

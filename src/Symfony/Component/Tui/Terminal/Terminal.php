@@ -25,8 +25,12 @@ final class Terminal implements TerminalInterface
 {
     private ?StdinBuffer $stdinBuffer = null;
 
+    private const string MOUSE_ENABLE = "\x1b[?1000h\x1b[?1002h\x1b[?1006h";
+    private const string MOUSE_DISABLE = "\x1b[?1006l\x1b[?1002l\x1b[?1000l";
+
     private string $initialSttyState = '';
     private bool $kittyProtocolActive = false;
+    private bool $mouseTracking = false;
     private bool $started = false;
     private ?string $stdinCallbackId = null;
     private ?string $signalCallbackId = null;
@@ -74,6 +78,11 @@ final class Terminal implements TerminalInterface
 
         // Enable bracketed paste mode
         $this->write("\x1b[?2004h");
+
+        // Enable mouse reporting if it was requested before start()
+        if ($this->mouseTracking) {
+            $this->write(self::MOUSE_ENABLE);
+        }
 
         // Set up signal handlers for resize using Revolt's event loop
         if (\defined('SIGWINCH')) {
@@ -129,6 +138,11 @@ final class Terminal implements TerminalInterface
 
         // Disable bracketed paste mode
         $this->write("\x1b[?2004l");
+
+        // Disable mouse reporting if we enabled it
+        if ($this->mouseTracking) {
+            $this->write(self::MOUSE_DISABLE);
+        }
 
         // Disable Kitty keyboard protocol if we enabled it
         if ($this->kittyProtocolActive) {
@@ -232,6 +246,32 @@ final class Terminal implements TerminalInterface
         }
 
         $this->write("\x07");
+    }
+
+    public function enableMouseTracking(): void
+    {
+        if ($this->mouseTracking) {
+            return;
+        }
+
+        $this->mouseTracking = true;
+
+        if ($this->started) {
+            $this->write(self::MOUSE_ENABLE);
+        }
+    }
+
+    public function disableMouseTracking(): void
+    {
+        if (!$this->mouseTracking) {
+            return;
+        }
+
+        $this->mouseTracking = false;
+
+        if ($this->started) {
+            $this->write(self::MOUSE_DISABLE);
+        }
     }
 
     public function isVirtual(): bool

@@ -110,6 +110,19 @@ interface TerminalInterface
     public function bell(): void;
 
     /**
+     * Enable mouse reporting (button, drag and scroll-wheel events).
+     *
+     * Opt-in: terminals do not report mouse activity until this is called.
+     * The reporting is turned off again on {@see stop()}.
+     */
+    public function enableMouseTracking(): void;
+
+    /**
+     * Disable mouse reporting previously enabled with {@see enableMouseTracking()}.
+     */
+    public function disableMouseTracking(): void;
+
+    /**
      * Whether this is a virtual (non-TTY) terminal.
      */
     public function isVirtual(): bool;

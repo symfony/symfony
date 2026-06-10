@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-06-10T13:34:34Z
+
+This implementation is broken, as proved both by static analysis and by existing tests.
+
+---------------------------------------------------------------------------
+
+by Pelagoss at 2026-06-10T15:50:35Z
+
+> This implementation is broken, as proved both by static analysis and by existing tests.
+
+My bad, I changed the fix to use getRecipients() from the Abstract instead of the $envelope and I was too excited to submit so I forgot params 🤯

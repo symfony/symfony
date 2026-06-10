@@ -138,6 +138,23 @@ class AbstractObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testDenormalizeWithPreInstantiatedObject()
+    {
+        $extractor = new ReflectionExtractor();
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([$normalizer], []);
+        $normalizer->setSerializer($serializer);
+
+        $child = new DummyChild();
+        $child->bar = 'test_value';
+
+        $dummy = $normalizer->denormalize(['child' => $child], DummyWithPreInstantiatedChild::class);
+
+        $this->assertInstanceOf(DummyWithPreInstantiatedChild::class, $dummy);
+        $this->assertSame($child, $dummy->child);
+        $this->assertSame('test_value', $dummy->child->bar);
+    }
+
     public function testDenormalizePlainObject()
     {
         $extractor = new PhpDocExtractor();
@@ -2191,4 +2208,9 @@ class DummyWithIterableOfDtos
             yield from $items;
         })());
     }
+}
+
+class DummyWithPreInstantiatedChild
+{
+    public DummyChild $child;
 }

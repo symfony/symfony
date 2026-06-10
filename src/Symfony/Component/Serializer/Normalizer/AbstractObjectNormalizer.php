@@ -618,6 +618,10 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $expectedTypes[TypeIdentifier::OBJECT === $typeIdentifier && $class ? $class : $typeIdentifier->value] = true;
 
                 if (TypeIdentifier::OBJECT === $typeIdentifier && null !== $class) {
+                    if (\is_object($data) && $data instanceof $class) {
+                        return $data;
+                    }
+
                     if (!$this->serializer instanceof DenormalizerInterface) {
                         throw new LogicException(\sprintf('Cannot denormalize attribute "%s" for class "%s" because injected serializer is not a denormalizer.', $attribute, $class));
                     }

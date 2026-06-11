@@ -49,6 +49,7 @@ class EventDispatcherDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('event', InputArgument::OPTIONAL, 'An event name or a part of the event name'),
                 new InputOption('dispatcher', null, InputOption::VALUE_REQUIRED, 'To view events of a specific event dispatcher', self::DEFAULT_DISPATCHER),
+                new InputOption('dispatchers', null, InputOption::VALUE_NONE, 'To list all available event dispatchers'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw description'),
             ])
@@ -60,6 +61,10 @@ class EventDispatcherDebugCommand extends Command
                 To get specific listeners for an event, specify its name:
 
                   <info>php %command.full_name% kernel.request</info>
+
+                To list all available event dispatchers:
+
+                  <info>php %command.full_name% --dispatchers</info>
 
                 The <info>--format</info> option specifies the format of the command output:
 
@@ -76,6 +81,14 @@ class EventDispatcherDebugCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        if ($input->getOption('dispatchers')) {
+            if ($this->dispatchers instanceof ServiceProviderInterface) {
+                $io->table(['Event Dispatcher'], array_map(static fn ($name) => [$name], array_keys($this->dispatchers->getProvidedServices())));
+            }
+
+            return 0;
+        }
 
         $options = [];
         $dispatcherServiceName = $input->getOption('dispatcher');

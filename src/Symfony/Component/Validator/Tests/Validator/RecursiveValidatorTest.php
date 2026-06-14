@@ -1289,7 +1289,62 @@ class RecursiveValidatorTest extends TestCase
             ['addGetterConstraint'],
         ];
     }
+    public function testGroupSequenceProviderValidatesChildClassesWithCustomGroups()
+    {
+        /* When using GroupSequenceProviderInterface, child objects decorated with
+           #[Assert\Valid] must be validated using groups from the sequence, not
+           just the "Default" group.  issue #64365 */
+        $entity = new GroupSequenceProviderEntity(new GroupSequence(['Default', 'custom_group']));
+        $entity->firstName = 'toolongvalue';
 
+        $entityMetadata = new ClassMetadata(GroupSequenceProviderEntity::class);
+        $entityMetadata->setGroupSequenceProvider(true);
+        $entityMetadata->addPropertyConstraint(
+            'firstName',
+            new Length(max: 3, groups: ['custom_group'])
+        );
+        $this->metadataFactory->addMetadata($entityMetadata);
+
+        $violations = $this->validate($entity, null, 'Default');
+
+        $this->assertCount(1, $violations);
+        $this->assertSame(
+            'This value is too long. It should have 3 characters or less.',
+            $violations[0]->getMessage()
+        );
+    }
+
+    public function testGroupSequenceProviderValidatesChildObjectWithCustomGroups()
+    {
+        /* When using GroupSequenceProviderInterface, child objects decorated with
+           #[Assert\Valid] must be validated using the groups from the provider's
+           sequence, not just the "Default" group. issue #64365 */
+        $entity = new GroupSequenceProviderEntity(new GroupSequence(['GroupSequenceProviderEntity', 'custom_group']));
+        $reference = new Reference();
+        $reference->value = 'invalid';
+
+        $entityMetadata = new ClassMetadata(GroupSequenceProviderEntity::class);
+        $entityMetadata->setGroupSequenceProvider(true);
+        $entityMetadata->addPropertyConstraint('firstName', new Valid());
+        $this->metadataFactory->addMetadata($entityMetadata);
+
+        $referenceMetadata = new ClassMetadata(Reference::class);
+        $referenceMetadata->addPropertyConstraint(
+            'value',
+            new Length(max: 3, groups: ['custom_group'])
+        );
+        $this->metadataFactory->addMetadata($referenceMetadata);
+
+        $entity->firstName = $reference;
+
+        $violations = $this->validate($entity, null, 'Default');
+
+        $this->assertCount(1, $violations);
+        $this->assertSame(
+            'This value is too long. It should have 3 characters or less.',
+            $violations[0]->getMessage()
+        );
+    }
     public static function getTestReplaceDefaultGroup()
     {
         return [

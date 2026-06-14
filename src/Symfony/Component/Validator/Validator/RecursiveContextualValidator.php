@@ -471,7 +471,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $propertyPath,
                     $traversalStrategy,
                     $group,
-                    $defaultOverridden ? Constraint::DEFAULT_GROUP : null,
+                    $defaultOverridden && !$metadata->isGroupSequenceProvider() ? Constraint::DEFAULT_GROUP : null,
                     $context
                 );
 

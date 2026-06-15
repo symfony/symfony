@@ -14,3 +14,19 @@ msgid "apple"
 msgid_plural "apples"
 msgstr[0] "pomme"
 msgstr[1] "pommes"
+
+msgid "{{subject}} has no apple"
+msgid_plural "{{subject}} has apples"
+msgstr[0] "{{subject}} has no apple"
+msgstr[1] "{{subject}} has apples"
+
+msgid "{{subject|quote}} and {{class|raw}}"
+msgstr "{{subject|quote}} and {{class|raw}}"
+
+msgid "{{subject||class}}"
+msgstr "{{subject||class}}"
+
+msgid ""
+msgid_plural ""
+msgstr[0] ""
+msgstr[1] ""

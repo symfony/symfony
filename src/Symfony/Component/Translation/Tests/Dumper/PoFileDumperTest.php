@@ -69,6 +69,14 @@ class PoFileDumperTest extends TestCase
             'Found {count, plural, one{# item|filtered} other{# items|filtered}}' => 'Found {count, plural, one{# item|filtered} other{# items|filtered}}',
             // Legacy plural must still work
             'apple|apples' => 'pomme|pommes',
+            // Pipe between double-brace blocks is still a valid legacy plural
+            '{{subject}} has no apple|{{subject}} has apples' => '{{subject}} has no apple|{{subject}} has apples',
+            // Multiple pipes inside different double-brace blocks
+            '{{subject|quote}} and {{class|raw}}' => '{{subject|quote}} and {{class|raw}}',
+            // Double pipe inside double braces (escaped pipe)
+            '{{subject||class}}' => '{{subject||class}}',
+            // Lone pipe
+            '|' => '|',
         ]);
 
         $dumper = new PoFileDumper();

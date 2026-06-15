@@ -44,8 +44,8 @@ class EsmtpTransport extends SmtpTransport
             // order is important here (roughly most secure and popular first)
             $authenticators = [
                 new Auth\CramMd5Authenticator(),
-                new Auth\LoginAuthenticator(),
                 new Auth\PlainAuthenticator(),
+                new Auth\LoginAuthenticator(),
                 new Auth\XOAuth2Authenticator(),
             ];
         }

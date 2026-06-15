@@ -1,0 +1,16 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+
+msgid "{{subject}} must not be an instance of {{class|quote}}"
+msgstr "{{subject}} must not be an instance of {{class|quote}}"
+
+msgid "Found {count, plural, one{# item|filtered} other{# items|filtered}}"
+msgstr "Found {count, plural, one{# item|filtered} other{# items|filtered}}"
+
+msgid "apple"
+msgid_plural "apples"
+msgstr[0] "pomme"
+msgstr[1] "pommes"

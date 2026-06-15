@@ -67,6 +67,12 @@ class PoFileDumper extends FileDumper
 
     private function getStandardRules(string $id): array
     {
+        // If the string contains a pipe inside double braces, it cannot be a legacy plural string.
+        // e.g. "{{subject}} must not be an instance of {{class|quote}}"
+        if (preg_match('/\{\{[^}]*\|[^}]*\}\}/', $id)) {
+            return [];
+        }
+
         // Partly copied from TranslatorTrait::trans.
         $parts = [];
         if (preg_match('/^\|++$/', $id)) {

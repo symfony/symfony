@@ -58,4 +58,21 @@ class PoFileDumperTest extends TestCase
 
         $this->assertStringEqualsFile(__DIR__.'/../Fixtures/plurals.po', $dumper->formatCatalogue($catalogue, 'messages'));
     }
+
+    public function testDumpPipeInBraces()
+    {
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->add([
+            // Pipe inside double braces must not be treated as a plural separator
+            '{{subject}} must not be an instance of {{class|quote}}' => '{{subject}} must not be an instance of {{class|quote}}',
+            // Pipe inside ICU-style single braces must not be treated as a plural separator
+            'Found {count, plural, one{# item|filtered} other{# items|filtered}}' => 'Found {count, plural, one{# item|filtered} other{# items|filtered}}',
+            // Legacy plural must still work
+            'apple|apples' => 'pomme|pommes',
+        ]);
+
+        $dumper = new PoFileDumper();
+
+        $this->assertStringEqualsFile(__DIR__.'/../Fixtures/pipe-in-braces.po', $dumper->formatCatalogue($catalogue, 'messages'));
+    }
 }

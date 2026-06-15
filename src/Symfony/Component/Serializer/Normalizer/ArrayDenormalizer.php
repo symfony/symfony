@@ -89,8 +89,19 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
             throw new BadMethodCallException(\sprintf('The nested denormalizer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 
-        return str_ends_with($type, '[]')
-            && $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
+        if (!str_ends_with($type, '[]') || !is_iterable($data)) {
+            return false;
+        }
+
+        $itemType = substr($type, 0, -2);
+
+        foreach ($data as $item) {
+            if (!$this->denormalizer->supportsDenormalization($item, $itemType, $format, $context)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

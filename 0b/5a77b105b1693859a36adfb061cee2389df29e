@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T16:40:57Z
+
+Thanks Jérôme, that's much better. I took your version with two small tweaks: kept the no-em-dash house style, and re-added a one-line caveat on the API-surface scan (code that merely *moved*, and additions to `@internal`/`@experimental` classes, are false positives there). Pushed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T19:34:17Z
+
+Good catch, fixed: DEV is now defined as the first maintained version after `latest_stable_version` (the lowest dev branch, since features merge up), instead of the last entry. That stays correct during a parallel X.4 / Y.0 development window. It derives from the existing `latest_stable_version` field, so no `dev_version` field is required, though it could use one if we add it.

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T07:40:34Z
+
+Bug fixes target the lowest maintained branch affected. This env-placeholder detection gap exists identically down to 6.4 (issue #62111 reports all versions), so I rebased the PR onto 6.4; it will merge up from there. Component tests pass.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-06-16T06:44:34Z
+
+Thanks a lot @nicolas-grekas for rebasing it down to 6.4 — makes total sense to fix it at the lowest affected branch and let it merge up. Appreciated! 🙏

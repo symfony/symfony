@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T07:48:10Z
+
+This isn't specific to 8.1: the underlying defect (`prepareForDenormalization()` casting an already-instantiated object with `(array)`) exists unchanged down to 6.4. Could you retarget this to 6.4 so it merges up? One adaptation is needed there: 6.4 has the legacy `validateAndDenormalize(array $types, ...)` signature rather than `Type $type`, so the second guard belongs in that method's object-delegation block. Thanks!
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-15T12:07:03Z
+
+Thanks for the review @nicolas-grekas — agreed on both points, done in `2a0f4e4`.
+
+Retargeted to 6.4 (force-pushed the branch and changed the base): the `(array)` cast in `prepareForDenormalization()` is identical there, so the bug reproduces unchanged — same `MissingConstructorArgumentsException`. On 6.4 the second guard lives in `validateAndDenormalize(array $types, …)`, inside the object-delegation branch (`Type::BUILTIN_TYPE_OBJECT === $builtinType && null !== $class`).
+
+Also dropped the redundant `\is_object()` — `instanceof` already returns false for non-objects.
+
+RED→GREEN re-verified on 6.4; full Serializer suite stays green (1136 tests, 0 failures).

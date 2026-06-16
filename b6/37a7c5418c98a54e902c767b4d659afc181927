@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-05-26T10:55:17Z
+
+Close+reopen to re-trigger CI (push at 10:46 didn't trigger any workflow run, see timeline).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-10T17:48:17Z
+
+Rebased on current 8.1 and pushed, resolving conflicts with the recent no-accessor readability rework (#64584, #64466).
+
+Note that on current 8.1, the #63651 scenario (with a property accessor) and the redeclared-property case already passed. What remains of this PR: the hierarchy-aware property iteration and metadata factories, plus a consistent rule for the no-accessor path: a private property from a parent class behaves like any other non-public property, readable only through magic `__get()`, not raw reflection (see `testNonPublicSourcePropertyWithoutMagicGetIsIgnored`). One exposed by `__get()` is now mapped; without `__get()` it's skipped. I updated `testMapsPrivatePropertyFromParentClassWithoutPropertyAccessor` accordingly (`$id` stays `null`).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-10T17:49:45Z
+
+(I'd appreciate a new review @soyuka @Amoifr )
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-06-11T06:55:55Z
+
+Thanks a lot for the rebase and for resolving the conflicts with the no-accessor rework @nicolas-grekas! 🙏
+
+And as always, you didn't just rebase — you reshaped it. Routing inherited private properties through the exact same "non-public → only via `__get()`" rule instead of special-casing them with raw reflection makes the whole thing far more consistent with how the component already treats every other non-public property. That's a real improvement over my initial take. Your touch, as always. 😄
+
+I checked out the branch and ran the full suite locally — all green (82 tests / 228 assertions), and the three updated tests nicely pin down the three paths (with accessor → `id` mapped, without → `null`, redeclared → child version wins).
+
+LGTM 👍
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-06-12T06:54:24Z
+
+LGTM!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T07:48:12Z
+
+ObjectMapper has existed since 7.4, and this private-parent-property defect is present on 7.4 and 8.0 too, not only 8.1. Could you retarget to 7.4 so the fix reaches all affected branches and merges up? The `ReverseClassObjectMapperMetadataFactory` hunk is 8.1-only and should be dropped there; the trait and the reflection-factory change apply to 7.4. Thanks!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-06-16T06:40:54Z
+
+Retargeted to 7.4 as suggested — dropped the `ReverseClassObjectMapperMetadataFactory` hunk (8.1-only), kept the `ClassHierarchyTrait` + the reflection metadata factory change + the fix. Updated the description accordingly. Full ObjectMapper suite green on 7.4 (59 tests, 153 assertions). Thanks for catching that it goes back further than I had scoped it! 🙏

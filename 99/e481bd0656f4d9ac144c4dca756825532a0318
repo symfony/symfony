@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-06-16T09:33:39Z
+
+Tests should indeed be refactored so that they ignore deprecations only when testing legacy features.
+
+As a rule of thumb, any test ignoring deprecations is a test that we expect to remove when removing the deprecated features. So they should not be the only coverage for non-deprecated features.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-16T09:51:40Z
+
+Split deprecated code paths from `YamlFileLoaderTest::testTaggedArgumentsWithIndex()` and `YamlDumperTest::testTaggedArguments()`.

@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-05-29T10:26:46Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features / 6.4, 7.4, 8.0, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T07:45:12Z
+
+Confirmed as a bug fix for 6.4 (the firewall state leak). Implementing `ResetInterface` only helps if the service is actually reset between requests, so I pushed the missing `kernel.reset` tag on `security.logout_url_generator`. Also corrected the labels (not a feature/deprecation) and set the 6.4 milestone.
+
+---------------------------------------------------------------------------
+
+by KevinMartinsDev at 2026-06-15T08:08:47Z
+
+Thanks for the feedback, good to known 👍

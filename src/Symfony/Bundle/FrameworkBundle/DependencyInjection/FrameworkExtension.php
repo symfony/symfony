@@ -37,6 +37,7 @@ use Symfony\Component\BrowserKit\AbstractBrowser;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\LazyDsnAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -2715,7 +2716,23 @@ class FrameworkExtension extends Extension
                 if (!isset($pool['provider']) && !\is_int($provider)) {
                     $pool['provider'] = $provider;
                 }
-                $definition = new ChildDefinition($adapter);
+
+                $container->resolveEnvPlaceholders($adapter, null, $usedEnvs);
+
+                // A DSN ("redis://...") or an env var holding one selects the backend from the scheme at
+                // runtime, so the pool is built by the adapter factory instead of cloning a fixed adapter.
+                if ($usedEnvs || preg_match('#^[a-z]++:#', $adapter)) {
+                    $definition = new Definition(LazyDsnAdapter::class, [
+                        '', // namespace, set positionally by CachePoolPass
+                        0, // default lifetime, set positionally by CachePoolPass when configured
+                        new Reference('cache.adapter_factory'),
+                        $adapter,
+                        new Reference('cache.default_marshaller', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
+                    ]);
+                    $pool['reset'] ??= 'reset';
+                } else {
+                    $definition = new ChildDefinition($adapter);
+                }
             } else {
                 $definition = new Definition(ChainAdapter::class, [$pool['adapters'], 0]);
                 $pool['reset'] = 'reset';

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `AdapterFactoryInterface`, `DsnAdapterFactory` and per-backend factories to build a cache adapter from a DSN, resolving the backend from its scheme at runtime
+
 8.0
 ---
 

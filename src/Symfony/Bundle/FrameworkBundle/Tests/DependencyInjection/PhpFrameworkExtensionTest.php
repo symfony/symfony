@@ -14,12 +14,15 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use Symfony\Component\Cache\Adapter\LazyDsnAdapter;
+use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -37,6 +40,32 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
         $loader->load($file.'.php');
+    }
+
+    public function testCachePoolConfiguredWithDsn()
+    {
+        $container = $this->createContainerFromFile('cache_dsn', [], true, false);
+        $container->setParameter('cache.prefix.seed', 'test');
+        $container->addCompilerPass(new CachePoolPass());
+        $container->compile();
+
+        // "framework.cache.app" configured with a DSN is built by the adapter factory, not a fixed adapter
+        $appPool = $container->getDefinition('cache.app');
+        $this->assertSame(LazyDsnAdapter::class, $appPool->getClass());
+        $this->assertEquals(new Reference('cache.adapter_factory'), $appPool->getArgument(2));
+        $this->assertSame('redis://localhost', $appPool->getArgument(3));
+
+        // the same DSN support applies to any user-defined pool, not just cache.app/cache.system
+        $customPool = $container->getDefinition('cache.custom_dsn');
+        $this->assertSame(LazyDsnAdapter::class, $customPool->getClass());
+        $this->assertSame('memcached://localhost', $customPool->getArgument(3));
+
+        // an env-var DSN stays an unresolved placeholder: the backend is selected at runtime, not at compile time
+        $envPool = $container->getDefinition('cache.env_dsn');
+        $this->assertSame(LazyDsnAdapter::class, $envPool->getClass());
+        $this->assertEquals(new Reference('cache.adapter_factory'), $envPool->getArgument(2));
+        $container->resolveEnvPlaceholders($envPool->getArgument(3), null, $usedEnvs);
+        $this->assertArrayHasKey('CACHE_DSN', $usedEnvs);
     }
 
     public function testAssetsCannotHavePathAndUrl()

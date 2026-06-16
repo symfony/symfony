@@ -25,6 +25,7 @@ class UnusedTagsPass implements CompilerPassInterface
         'asset_mapper.compiler',
         'assets.package',
         'auto_alias',
+        'cache.adapter_factory',
         'cache.pool',
         'cache.pool.clearer',
         'cache.taggable',

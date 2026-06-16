@@ -17,11 +17,15 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
+use Symfony\Component\Cache\Adapter\DsnAdapterFactory;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Cache\Adapter\MemcachedAdapterFactory;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Adapter\PdoAdapterFactory;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\RedisAdapterFactory;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
@@ -225,6 +229,20 @@ return static function (ContainerConfigurator $container) {
                 null, // use igbinary_serialize() when available
                 '%kernel.debug%',
             ])
+
+        ->set('cache.adapter_factory', DsnAdapterFactory::class)
+            ->args([
+                tagged_iterator('cache.adapter_factory'),
+            ])
+
+        ->set('cache.adapter_factory.redis', RedisAdapterFactory::class)
+            ->tag('cache.adapter_factory')
+
+        ->set('cache.adapter_factory.memcached', MemcachedAdapterFactory::class)
+            ->tag('cache.adapter_factory')
+
+        ->set('cache.adapter_factory.pdo', PdoAdapterFactory::class)
+            ->tag('cache.adapter_factory')
 
         ->set('cache.early_expiration_handler', EarlyExpirationHandler::class)
             ->args([

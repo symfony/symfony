@@ -67,11 +67,16 @@ class PoFileDumper extends FileDumper
 
     private function getStandardRules(string $id): array
     {
-        // Partly copied from TranslatorTrait::trans.
+        $doubleBraceBlock = '\{\{[^}]*\}\}';
+        $simplePipe = '\|';
+        $doublePipe = '\|\|';
+        $nonPipe = '[^\|]';
+
+        // Adapted from TranslatorTrait::trans.
         $parts = [];
-        if (preg_match('/^\|++$/', $id)) {
+        if (preg_match("/^(?:$simplePipe)++$/", $id)) {
             $parts = explode('|', $id);
-        } elseif (preg_match_all('/(?:\{\{[^}]*\}\}|\|\||[^\|])++/', $id, $matches)) {
+        } elseif (preg_match_all("/(?:$doubleBraceBlock|$doublePipe|$nonPipe)++/", $id, $matches)) {
             $parts = $matches[0];
         }
 

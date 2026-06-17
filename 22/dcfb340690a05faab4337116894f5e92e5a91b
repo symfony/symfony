@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-05T06:43:50Z
+
+I'd rather merge this as an improvement.
+Can we also implement something for https://github.com/symfony/symfony/issues/55048 while at it?
+Note that we don't reference issues in comments in the codebase. We also use comment only when they really add value over the code.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-15T14:00:50Z
+
+Thanks for the review @nicolas-grekas — agreed on all three points.
+
+Reworked in `9f857c60c2b`: `csv_headers` now also accepts an associative form `['Prénom' => 'firstName']` on encode (only listed columns are emitted, in order, no auto-append; addresses #55048). Dropped the `@see` issue ref and the narrative comments in the test.
+
+On targeting: I left the base on 6.4 — happy to retarget to 8.1 right away if you prefer landing it in the current cycle, or wait for 8.2 to be branched, your call.

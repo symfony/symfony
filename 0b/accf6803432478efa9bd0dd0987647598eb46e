@@ -1,0 +1,73 @@
+---------------------------------------------------------------------------
+
+by dpi at 2026-06-17T07:15:43Z
+
+Not sure whether to classify this a feature or bug fix so let me know if #64639 or #64640 need to be updated.
+
+---------------------------------------------------------------------------
+
+by dpi at 2026-06-17T07:23:05Z
+
+Tested locally:
+
+>  bin/console messenger:failed:show                                ✘ 1 main ✭ ✚ ✱
+> There are 5 messages pending in the failure transport.
+>  ----------------- ------------------------ --------------------- -------------
+>   Id                Class                    Failed at             Error
+>  ----------------- ------------------------ --------------------- -------------
+>   1781679556721-0   App\Message\DpiMessage   2026-06-17 06:59:16   EXPLOSIONS!
+>   1781679556742-0   App\Message\DpiMessage   2026-06-17 06:59:16   EXPLOSIONS!
+>   1781679557770-0   App\Message\DpiMessage   2026-06-17 06:59:17   EXPLOSIONS!
+>   1781679557781-0   App\Message\DpiMessage   2026-06-17 06:59:17   EXPLOSIONS!
+>   1781679558801-0   App\Message\DpiMessage   2026-06-17 06:59:18   EXPLOSIONS!
+>  ----------------- ------------------------ --------------------- -------------
+>
+>
+>  // Run messenger:failed:show {id} --transport=failed -vv to see message details.
+
++
+
+> bin/console messenger:failed:show 1781679556721-0                    main ✭ ✚ ✱
+> There are 5 messages pending in the failure transport.
+>
+> Failed Message Details
+> ======================
+>
+>  ------------- ------------------------
+>   Class         App\Message\DpiMessage
+>   Message Id    1781679556721-0
+>   Failed at     2026-06-17 06:59:16
+>   Error         EXPLOSIONS!
+>   Error Code    0
+>   Error Class   Exception
+>   Transport     async
+>  ------------- ------------------------
+>
+>  Message history:
+>   * Message failed at 2026-06-17 06:59:09 and was redelivered
+>   * Message failed at 2026-06-17 06:59:10 and was redelivered
+>   * Message failed at 2026-06-17 06:59:12 and was redelivered
+>   * Message failed at 2026-06-17 06:59:16 and was redelivered
+>
+>  Re-run command with -vv to see more message & error details.
+>
+>  Run messenger:failed:retry 1781679556721-0 --transport=failed to retry this message.
+>  Run messenger:failed:remove 1781679556721-0 --transport=failed to delete it.
+
+---------------------------------------------------------------------------
+
+by dpi at 2026-06-17T07:23:56Z
+
+Same behaviour between Symfony Framework and the [Drupal integration](https://www.drupal.org/project/sm).
+
+---------------------------------------------------------------------------
+
+by dpi at 2026-06-17T07:27:00Z
+
+I see there are other tests in Github actions that have run recently that are also failing on a Redis Relay related test, so I don't this Redis related PR has broken the same failing test.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-06-17T07:45:27Z
+
+I would classify it as a bugfix as the intent of https://github.com/symfony/symfony/pull/61462 was clearly to make the listing features work for the redis transport.

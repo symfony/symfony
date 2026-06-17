@@ -70,3 +70,5 @@ Validator
 ---------
 
  * Add argument `$restrictGroups` to `Valid::__construct()`
+ * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
+ * Add argument `$cascadeCurrentGroup` to `GroupSequenceProvider::__construct()`

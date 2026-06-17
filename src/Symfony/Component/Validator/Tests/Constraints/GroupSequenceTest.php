@@ -24,5 +24,17 @@ class GroupSequenceTest extends TestCase
         $sequence = new GroupSequence(['Group 1', 'Group 2']);
 
         $this->assertSame(['Group 1', 'Group 2'], $sequence->groups);
+        $this->assertFalse($sequence->cascadeCurrentGroup);
+    }
+
+    public function testUnserializeSequenceSerializedBeforeCascadeCurrentGroupExisted()
+    {
+        // a validator.mapping.cache entry written before the flag existed carries no "cascadeCurrentGroup"
+        $serialized = 'O:'.\strlen(GroupSequence::class).':"'.GroupSequence::class.'":1:{s:6:"groups";a:1:{i:0;s:7:"Group 1";}}';
+
+        $sequence = unserialize($serialized);
+
+        $this->assertSame(['Group 1'], $sequence->groups);
+        $this->assertFalse($sequence->cascadeCurrentGroup);
     }
 }

@@ -34,6 +34,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
+use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceCascadeEntity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithNamedArguments;
@@ -122,6 +123,19 @@ class XmlFileLoaderTest extends TestCase
         $expected->addPropertyConstraint('title', new ConstraintWithRequiredArgument('X'));
 
         $this->assertEquals($expected, $metadata);
+    }
+
+    public function testLoadGroupSequenceCascadingTheCurrentGroup()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
+        $metadata = new ClassMetadata(GroupSequenceCascadeEntity::class);
+
+        $loader->loadClassMetadata($metadata);
+
+        $groupSequence = $metadata->getGroupSequence();
+
+        $this->assertSame(['Foo', 'GroupSequenceCascadeEntity'], $groupSequence->groups);
+        $this->assertTrue($groupSequence->cascadeCurrentGroup);
     }
 
     public function testLoadGroupSequenceProvider()

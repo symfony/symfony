@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `cascadeCurrentGroup` option to `GroupSequence` and `GroupSequenceProvider`
+ * Remove the unused `GroupSequence::$cascadedGroup` property
  * Add the `restrictGroups` option to the `Valid` constraint
  * Add the `Cron` constraint to validate cron expressions
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`

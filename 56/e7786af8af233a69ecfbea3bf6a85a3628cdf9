@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-17T12:38:15Z
+
+~For 6.4 I suppose, isn't it?~ RelayClusterProxy is 7.4-only
+
+See https://github.com/symfony/symfony/pull/64122 for inspiration on how these should be handled.

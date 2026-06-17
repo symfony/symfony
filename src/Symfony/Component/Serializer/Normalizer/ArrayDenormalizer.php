@@ -89,8 +89,17 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
             throw new BadMethodCallException(\sprintf('The nested denormalizer needs to be set to allow "%s()" to be used.', __METHOD__));
         }
 
-        return str_ends_with($type, '[]')
-            && $this->denormalizer->supportsDenormalization($data, substr($type, 0, -2), $format, $context);
+        if (!str_ends_with($type, '[]') || !\is_array($data)) {
+            return false;
+        }
+
+        $itemType = substr($type, 0, -2);
+
+        foreach ($data as $item) {
+            return $this->denormalizer->supportsDenormalization($item, $itemType, $format, $context);
+        }
+
+        return true;
     }
 
     /**
@@ -103,9 +112,6 @@ class ArrayDenormalizer implements ContextAwareDenormalizerInterface, Denormaliz
         return $this->denormalizer instanceof CacheableSupportsMethodInterface && $this->denormalizer->hasCacheableSupportsMethod();
     }
 
-    /**
-     * @param mixed $key
-     */
     private function validateKeyType(array $builtinTypes, $key, string $path): void
     {
         if (!$builtinTypes) {

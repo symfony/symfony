@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-01-29T11:00:48Z
+
+There are probably more places inside the `RecursiveContextualValidator` where this could be done. What about doing this in `normalizeGroups()` instead?
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-01-29T15:28:10Z
+
+You're right , I updated PR
+
+---------------------------------------------------------------------------
+
+by alamirault at 2023-02-21T18:59:01Z
+
+@xabbuh Are you ok with the new version ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-23T09:33:08Z
+
+@alamirault let's resume this one?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T07:42:00Z
+
+Bug fixes target the lowest maintained branch affected. This TypeError on null groups reproduces unchanged down to 6.4 (`normalizeGroups()` is identical there), so I rebased the PR onto 6.4 to merge up. Component tests pass.

@@ -21,10 +21,12 @@ use Symfony\Component\Validator\Constraints\Collection;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Type;
@@ -317,6 +319,28 @@ class AttributeLoaderTest extends TestCase
         // Check that property constraints are also added
         $this->assertInstanceOf(NotBlank::class, $metadata->getPropertyMetadata('name', $sourceClass)[0]->getConstraints()[0]);
     }
+
+    public function testLoadClassMetadataMergesTargetOwnConstraints()
+    {
+        $targetClass = _AttrMap_TargetWithOwnConstraints::class;
+        $sourceClass = _AttrMap_ExtensionForTargetWithOwnConstraints::class;
+
+        $loader = new AttributeLoader(false, [$targetClass => [$sourceClass]]);
+        $metadata = new ClassMetadata($targetClass);
+
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+
+        // The target's own constraints must be merged with the extension's, not discarded.
+        $constraints = [];
+        foreach ($metadata->getPropertyMetadata('value') as $propertyMetadata) {
+            $constraints = array_merge($constraints, $propertyMetadata->getConstraints());
+        }
+
+        $constraintClasses = array_map('get_class', $constraints);
+        $this->assertCount(2, $constraintClasses);
+        $this->assertContains(Length::class, $constraintClasses, "The target class' own constraints are dropped.");
+        $this->assertContains(Regex::class, $constraintClasses, 'The extension class constraints are dropped.');
+    }
 }
 
 class _AttrMap_Target
@@ -339,6 +363,19 @@ class _AttrMap_Target
 class _AttrMap_Source
 {
     #[NotBlank] public string $name;
+}
+
+class _AttrMap_TargetWithOwnConstraints
+{
+    #[Length(max: 5)]
+    public string $value;
+}
+
+#[ExtendsValidationFor(_AttrMap_TargetWithOwnConstraints::class)]
+class _AttrMap_ExtensionForTargetWithOwnConstraints
+{
+    #[Regex('/^a/')]
+    public string $value;
 }
 
 #[ExtendsValidationFor(_AttrMap_Target::class)]

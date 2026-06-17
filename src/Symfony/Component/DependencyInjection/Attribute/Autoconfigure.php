@@ -20,7 +20,7 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class Autoconfigure
 {
     /**
-     * @param array<array<mixed>>|string[]|null $tags         The tags to add to the service
+     * @param array<array<mixed>>|string[]|null $tags         The tags to add to the service; a tag's attributes may be a \Closure or a [class-string, method] callable that computes them from each tagged service's class-string
      * @param array<array<mixed>>|null          $calls        The calls to be made when instantiating the service
      * @param array<string, mixed>|null         $bind         The bindings to declare for the service
      * @param bool|string|null                  $lazy         Whether the service is lazy-loaded

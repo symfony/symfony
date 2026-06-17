@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-16T16:02:31Z
+
+I would expect frankenphp to restart the worker threads instead. It's notify feature should do the job.
+
+---------------------------------------------------------------------------
+
+by adrianrudnik at 2026-06-16T16:15:05Z
+
+I do not use that feature, it's opt in I think? It would also be fixed by disabling worker mode. It's fine by me to not have this fixed in asset mapper, its just that `CachedMappedAssetFactory` is not a self-healing cache, but practically a runtime Freezer right now, which will also apply to other servers like RoadRunner, Swoole and Revolt.
+
+Feel free to close, at least devs have enough possible angles how to work around it, if someone else stumbles about this.
+
+---------------------------------------------------------------------------
+
+by adrianrudnik at 2026-06-16T16:46:43Z
+
+Sure, thanks for the review! I also looked into frankenphp and how it would be solved over there. Just to document it here, it would require a specific [set of configuration](https://frankenphp.dev/docs/config/#watching-for-file-changes), as `css` files are not within the default file mask of `./**/*.{env,php,twig,yaml,yml}` that is watched:
+
+```caddy
+	frankenphp {
+		worker {
+			file ./public/index.php
+			watch var/tailwind/**/*.css
+		}
+	}
+```
+
+then run it with `--watch`, this also solves it by forcing a worker restart on detected changes.

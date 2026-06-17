@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-05-05T12:29:07Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "8.1 for features / 6.4, 7.4, 8.0 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by gsteel at 2026-05-05T12:37:51Z
+
+Note. It appears that the many CI failures are unrelated
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-05T19:07:28Z
+
+Any link with #63852 by @mtarld ?
+
+---------------------------------------------------------------------------
+
+by gsteel at 2026-05-05T22:09:04Z
+
+@GromNaN
+
+> Could you fill the array in the PR description? This is a feature that will be for the branch 8.2 (8.1 is closed to new features).
+
+There doesn't appear to be an 8.2 release branch yet?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-05-06T04:33:12Z
+
+> There doesn't appear to be an 8.2 release branch yet?
+
+We're actually going to create it in the near future, based on 8.1. For now, just stick with 8.1.
+
+Could you have a look at the PR linked by Nicolas, to ensure there is no duplicate work. Thanks.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-05-06T07:48:14Z
+
+@GromNaN, @nicolas-grekas, there is nothing related :slightly_smiling_face:

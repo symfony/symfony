@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `$projectId` constructor parameter to `CrowdinProvider`
+
 5.4
 ---
 

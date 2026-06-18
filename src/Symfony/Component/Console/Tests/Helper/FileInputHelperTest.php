@@ -45,6 +45,83 @@ class FileInputHelperTest extends TestCase
         }
     }
 
+    public function testDisplayFileStripsTerminalControlCharactersFromName()
+    {
+        $marker = bin2hex(random_bytes(4));
+        // ESC + OSC "set window title" + BEL smuggled into the file name
+        $name = "sf_console_{$marker}_\x1b]0;HIJACK\x07.txt";
+        $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.$name;
+
+        if (false === @file_put_contents($path, 'x')) {
+            $this->markTestSkipped('Filesystem does not allow control characters in filenames.');
+        }
+
+        try {
+            $file = new InputFile($path);
+            $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+
+            (new FileInputHelper())->displayFile($output, $file);
+
+            $display = $output->fetch();
+
+            // The injected escape sequence must not survive into terminal output...
+            $this->assertStringNotContainsString("\x1b]0;", $display);
+            $this->assertStringNotContainsString("\x07", $display);
+            // ...while the printable remainder of the name is still shown.
+            $this->assertStringContainsString('HIJACK', $display);
+            $this->assertStringContainsString($marker, $display);
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function testDisplayFileStripsControlCharactersReassembledAfterAFirstPass()
+    {
+        $marker = bin2hex(random_bytes(4));
+        // Removing the ESC splices "\xc2" and "\x9b" into "\xc2\x9b", the UTF-8
+        // encoding of U+009B (CSI), which a single stripping pass would leave behind.
+        $name = "sf_console_{$marker}_\xc2\x1b\x9b.txt";
+        $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.$name;
+
+        if (false === @file_put_contents($path, 'x')) {
+            $this->markTestSkipped('Filesystem does not allow control characters in filenames.');
+        }
+
+        try {
+            $file = new InputFile($path);
+            $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+
+            (new FileInputHelper())->displayFile($output, $file);
+
+            $display = $output->fetch();
+
+            // A single stripping pass would leave the spliced "\xc2\x9b" (U+009B) behind;
+            // the loop must remove it. (The legitimate OSC 8 link the formatter emits does
+            // contain ESC, so a bare "\x1b" assertion would be wrong here.)
+            $this->assertStringNotContainsString("\xc2\x9b", $display);
+            $this->assertStringContainsString($marker, $display);
+        } finally {
+            @unlink($path);
+        }
+    }
+
+    public function testInvalidFileExceptionStripsControlCharactersFromThePath()
+    {
+        // fromPath() embeds the missing path verbatim into the exception message,
+        // which the console error output renders to the terminal.
+        $path = "/does/not/exist_\x1b]0;HIJACK\x07_\xc2\x1b\x9b";
+
+        try {
+            InputFile::fromPath($path);
+            $this->fail('Expected an InvalidFileException.');
+        } catch (InvalidFileException $e) {
+            $this->assertStringNotContainsString("\x1b", $e->getMessage());
+            $this->assertStringNotContainsString("\x07", $e->getMessage());
+            $this->assertStringNotContainsString("\xc2\x9b", $e->getMessage());
+            $this->assertStringContainsString('HIJACK', $e->getMessage());
+        }
+    }
+
     public function testReadWithPasteDetectionAbortsBeyondMaxBytes()
     {
         $cap = (new \ReflectionClassConstant(FileInputHelper::class, 'MAX_PASTE_BYTES'))->getValue();

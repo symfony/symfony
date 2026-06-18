@@ -29,7 +29,13 @@ trait ConsoleCommandAssertionsTrait
      */
     public static function runCommand(string $name, array $input = [], array $interactiveInputs = [], ?bool $interactive = null, ?bool $decorated = null, ?int $verbosity = null, array $normalizers = []): ExecutionResult
     {
-        $application = new Application(static::getContainer()->get('kernel'));
+        $container = static::getContainer();
+        $application = new Application($container->get('kernel'));
+
+        if ($container->has('console.argument_resolver')) {
+            $application->setArgumentResolver($container->get('console.argument_resolver'));
+        }
+
         $command = $application->find($name);
         $commandTester = new CommandTester($command);
 

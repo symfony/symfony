@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run
+ * Add `env` option to `#[AsCronTask]` and `#[AsPeriodicTask]` to restrict a task to one or more environments
 
 8.1
 ---

@@ -31,6 +31,7 @@ class AsPeriodicTask
      * @param string                   $schedule   The name of the schedule responsible for triggering the task
      * @param string|null              $method     The method to run as the task when the attribute target is a class
      * @param string[]|string|null     $transports One or many transports through which the message scheduling the task will go
+     * @param string[]|string          $env        One or many environments the task is scheduled in; all of them when empty
      */
     public function __construct(
         public readonly string|int $frequency,
@@ -41,6 +42,7 @@ class AsPeriodicTask
         public readonly string $schedule = 'default',
         public readonly ?string $method = null,
         public readonly array|string|null $transports = null,
+        public readonly array|string $env = [],
     ) {
     }
 }

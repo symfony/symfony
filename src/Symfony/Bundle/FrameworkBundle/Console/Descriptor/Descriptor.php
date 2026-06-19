@@ -328,17 +328,26 @@ abstract class Descriptor implements DescriptorInterface
 
     private function getContainerEnvVars(ContainerBuilder $container): array
     {
-        if (!$container->hasParameter('debug.container.dump')) {
+        if (!$container->hasParameter('.debug.container.env_vars')) {
             return [];
         }
 
-        if (!$container->getParameter('debug.container.dump') || !is_file($container->getParameter('debug.container.dump'))) {
-            return [];
+        // a chain ending on the separator, as in "not:default:kernel.runtime_mode.web:", reads a
+        // container parameter rather than the environment, so it has no name to report
+        $envVars = array_values(array_filter($container->getParameter('.debug.container.env_vars'), static fn (string $env): bool => '' !== self::splitEnvName($env)[0]));
+
+        $used = [];
+        foreach ($envVars as $env) {
+            $used[self::splitEnvName($env)[0]] = true;
         }
 
-        $file = file_get_contents($container->getParameter('debug.container.dump'));
-        preg_match_all('{%env\(((?:\w++:)*+\w++)\)%}', $file, $envVars);
-        $envVars = array_unique($envVars[1]);
+        // variables declared in .env that the container never references: they are the point of
+        // the listing, and the compiler knows nothing about them
+        foreach ($this->getDotenvVars() as $name) {
+            if (!isset($used[$name])) {
+                $envVars[] = $name;
+            }
+        }
 
         $bag = $container->getParameterBag();
         $getDefaultParameter = fn (string $name) => parent::get($name);
@@ -349,16 +358,13 @@ abstract class Descriptor implements DescriptorInterface
         $envs = [];
 
         foreach ($envVars as $env) {
-            $processor = 'string';
-            if (false !== $i = strrpos($name = $env, ':')) {
-                $name = substr($env, $i + 1);
-                $processor = substr($env, 0, $i);
-            }
+            [$name, $processor] = self::splitEnvName($env);
             $defaultValue = ($hasDefault = $container->hasParameter("env($name)")) ? $getDefaultParameter("env($name)") : null;
             if (false === ($runtimeValue = $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name))) {
                 $runtimeValue = null;
             }
             $processedValue = ($hasRuntime = null !== $runtimeValue) || $hasDefault ? $getEnvReflection->invoke($container, $env) : null;
+
             $envs["$name$processor"] = [
                 'name' => $name,
                 'processor' => $processor,
@@ -367,11 +373,32 @@ abstract class Descriptor implements DescriptorInterface
                 'runtime_available' => $hasRuntime,
                 'runtime_value' => $runtimeValue,
                 'processed_value' => $processedValue,
+                'used' => isset($used[$name]),
             ];
         }
         ksort($envs);
 
         return array_values($envs);
+    }
+
+    /**
+     * @return array{string, string} the variable name and the processor chain applied to it
+     */
+    private static function splitEnvName(string $env): array
+    {
+        if (false === $i = strrpos($env, ':')) {
+            return [$env, 'string'];
+        }
+
+        return [substr($env, $i + 1), substr($env, 0, $i)];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getDotenvVars(): array
+    {
+        return array_filter(explode(',', $_SERVER['SYMFONY_DOTENV_VARS'] ?? $_ENV['SYMFONY_DOTENV_VARS'] ?? ''));
     }
 
     protected function getServiceEdges(ContainerBuilder $container, string $serviceId): array

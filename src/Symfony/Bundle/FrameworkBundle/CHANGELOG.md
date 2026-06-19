@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
  * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
+ * Report `.env` variables that the container never uses in `debug:container --env-vars`
 
 8.1
 ---

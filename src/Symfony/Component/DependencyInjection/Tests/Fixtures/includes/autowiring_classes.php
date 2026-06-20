@@ -588,3 +588,13 @@ class MyCallable
         return 124;
     }
 }
+
+class EnvAutowireWithMissingArgument
+{
+    public function __construct(
+        #[Autowire(env: 'SOME_ENV')]
+        string $env,
+        string $missing,
+    ) {
+    }
+}

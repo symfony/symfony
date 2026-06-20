@@ -94,7 +94,7 @@
         "symfony/mime": "<7.4.9|>=8.0,<8.0.9",
         "symfony/translation": "<7.4",
         "symfony/webhook": "<7.4",
-        "symfony/workflow": "<7.4"
+        "symfony/workflow": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\FrameworkBundle\\": "" },

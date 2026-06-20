@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `--dispatchers` option to `debug:event-dispatcher` command
+ * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
 
 8.1
 ---

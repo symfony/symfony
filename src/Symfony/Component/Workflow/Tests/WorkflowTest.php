@@ -511,6 +511,44 @@ class WorkflowTest extends TestCase
         $this->assertSame($eventNameExpected, $eventDispatcher->dispatchedEvents);
     }
 
+    public function testApplyDoesNotDispatchEventsBlockListedInEventsToDispatch()
+    {
+        $definition = $this->createComplexWorkflowDefinition();
+        $subject = new Subject();
+        $eventDispatcher = new EventDispatcherMock();
+        // `!workflow.announce` = fire every event except `workflow.announce`. Future
+        // WorkflowEvents keep being dispatched without needing this list to be updated.
+        $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name', ['!'.WorkflowEvents::ANNOUNCE]);
+
+        $workflow->apply($subject, 't1');
+        $workflow->apply($subject, 't2');
+
+        // Sanity: non-block-listed events still fire (a literal-allow-list parser would
+        // suppress everything and the next foreach would pass vacuously — assertNotEmpty
+        // closes that loophole).
+        $this->assertNotEmpty($eventDispatcher->dispatchedEvents, 'Non-block-listed WorkflowEvents must still fire.');
+        $this->assertContains('workflow.workflow_name.transition', $eventDispatcher->dispatchedEvents);
+        foreach ($eventDispatcher->dispatchedEvents as $event) {
+            $this->assertStringNotContainsString('announce', $event, \sprintf('Announce event "%s" must not be dispatched when block-listed via "!" in $eventsToDispatch.', $event));
+        }
+    }
+
+    public function testBlockListingGuardEventThrows()
+    {
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "workflow.guard" event cannot be disabled in $eventsToDispatch for workflow "workflow_name": it is always dispatched.');
+
+        new Workflow($this->createComplexWorkflowDefinition(), new MethodMarkingStore(), new EventDispatcherMock(), 'workflow_name', ['!'.WorkflowEvents::GUARD]);
+    }
+
+    public function testMixingAllowListAndBlockListInEventsToDispatchThrows()
+    {
+        $this->expectException(\Symfony\Component\Workflow\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot mix allow-list and block-list entries in $eventsToDispatch for workflow "mixed": every entry must start with "!" (block-list mode) or none of them must (allow-list mode).');
+
+        new Workflow($this->createComplexWorkflowDefinition(), new MethodMarkingStore(), new EventDispatcherMock(), 'mixed', [WorkflowEvents::COMPLETED, '!'.WorkflowEvents::ANNOUNCE]);
+    }
+
     public function testApplyOnlyDispatchesEventsThatHaveBeenSpecifiedByDefinition()
     {
         $transitions[] = new Transition('a-b', 'a', 'b');

@@ -1,0 +1,21 @@
+framework:
+    workflows:
+        my_workflow:
+            type: state_machine
+            initial_marking: one
+            events_to_dispatch: ['!workflow.announce']
+            marking_store:
+                property: state
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
+            places:
+                - one
+                - two
+                - three
+            transitions:
+                count_to_two:
+                    from: one
+                    to: two
+                count_to_three:
+                    from: two
+                    to: three

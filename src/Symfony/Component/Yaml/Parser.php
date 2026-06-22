@@ -1184,7 +1184,7 @@ class Parser
             if ($this->isCurrentLineBlank()) {
                 $previousLineWasNewline = true;
                 $previousLineWasTerminatedWithBackslash = false;
-            } elseif ('\\' === $this->currentLine[-1]) {
+            } elseif ('"' === $quotation && 1 === (\strlen($this->currentLine) - \strlen(rtrim($this->currentLine, '\\'))) % 2) {
                 $previousLineWasNewline = false;
                 $previousLineWasTerminatedWithBackslash = true;
             } else {

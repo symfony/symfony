@@ -145,6 +145,10 @@ final class ArrayShapeGenerator
             $types[$backedEnumIndex] = '\BackedEnum';
         }
 
+        if (array_intersect($types, [ExprBuilder::TYPE_STRING, '\BackedEnum'])) {
+            $types[] = '\\'.ParamConfigurator::class;
+        }
+
         sort($types);
 
         return $types;

@@ -84,10 +84,10 @@ Helper to extract `id<TAB>source` pairs from a catalog at any ref:
 
 ```bash
 extract() { # $1 = git ref, $2 = path
-  git show "$1:$2" 2>/dev/null | python3 -c '
-import sys, re
-for m in re.finditer(r"<trans-unit id=\"(\d+)\">\s*<source>(.*?)</source>", sys.stdin.read(), re.S):
-    print(m.group(1) + "\t" + m.group(2))'
+  git show "$1:$2" 2>/dev/null | php -r '
+$c = stream_get_contents(STDIN);
+preg_match_all("#<trans-unit id=\"(\d+)\">\s*<source>(.*?)</source>#s", $c, $m, PREG_SET_ORDER);
+foreach ($m as $x) { echo $x[1]."\t".$x[2]."\n"; }'
 }
 ```
 
@@ -119,7 +119,7 @@ review.
 
 ```bash
 # translations.json: {"af": "...", "ar": "...", ..., "zh_TW": "..."}
-python3 scripts/add_message.py \
+php scripts/add_message.php \
   --dir src/Symfony/Component/Validator/Resources/translations \
   --id 146 \
   --source "This value is not a valid cron expression." \

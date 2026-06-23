@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by ThomasLandauer at 2026-04-23T08:37:00Z
+
+IMO this could even target some lower branch (7.4? 6.4?) as *bugfix*. Reason: `framework.ide` is not working right now! So adding a deprecation message doesn't change Symfony's behavior, but rather informs people what to do instead.
+
+In any case, when this gets merged, I can take care of the docs at https://symfony.com/doc/current/reference/configuration/framework.html#ide
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-23T16:23:22Z
+
+Thanks for the thoughtful angle @ThomasLandauer! 🙏
+
+**On the target branch**: you're right that `framework.ide` is effectively broken in the path that motivated this, but I'm wary of sneaking a deprecation notice onto an LTS branch without core team blessing. Symfony's deprecation policy is pretty strict (next-minor only), largely to protect LTS users — apps on 7.4 that set `framework.ide` would start getting warnings on a patch bump without a conscious version upgrade on their side. Happy to retarget if a core maintainer signs off, but I'd rather not unilaterally decide that.
+
+**On the docs**: yes please, that would be awesome! I'll ping you once this lands so you can give the `framework.ide` reference page a good scrub. Really appreciate the offer! 🙌
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-23T17:03:49Z
+
+Adding a deprecation in a patch release is not an option. Updating the documentation for older versions is, of course, a great idea.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-23T17:45:57Z
+
+Thanks for the clarification @GromNaN! 🙏 That settles it — the PR stays as-is on 8.1.
+
+@ThomasLandauer the docs work is all yours whenever you have a moment — you'll know the prose conventions of the reference page far better than I would, and your offer was way too kind to pass up. 😊 Happy to ping you here once this lands so you have the merge as a stable anchor (or feel free to start whenever; the migration story — `framework.ide` → `SYMFONY_IDE` env var — is already actionable today on every supported branch since the env var has been the working path all along).
+
+Thanks again to both of you for keeping this moving!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-06-23T07:16:07Z
+
+Rebased onto `8.2` and bumped the deprecation version accordingly (config, tests, `CHANGELOG`, plus a fresh `UPGRADE-8.2.md`). Thanks for the nudge, @fabpot — `framework.ide` had a good run, time to let `SYMFONY_IDE` take the wheel. 🚗💨

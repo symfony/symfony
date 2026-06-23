@@ -33,6 +33,7 @@ use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintSchemaResolver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\AssetMapperDebugSection;
 use Symfony\Bundle\FrameworkBundle\Debug\Section\ConfigDebugSection;
 use Symfony\Bundle\FrameworkBundle\Debug\Section\ContainerDebugSection;
 use Symfony\Bundle\FrameworkBundle\Debug\Section\EventDispatcherDebugSection;
@@ -135,6 +136,7 @@ return static function (ContainerConfigurator $container) {
                 service('debug.file_link_formatter')->nullOnInvalid(),
             ])
             ->tag('debug.section', ['name' => 'routes', 'priority' => 1100])
+            ->tag('container.remove_if_missing', ['service' => 'router'])
 
         ->set('console.command.debug.section.config', ConfigDebugSection::class)
             ->args([
@@ -160,6 +162,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Message to handlers mapping'),
             ])
             ->tag('debug.section', ['name' => 'messenger', 'priority' => 700])
+            ->tag('container.remove_if_missing', ['service' => 'console.command.messenger_debug'])
 
         ->set('console.command.debug.section.twig', PlaceholderDebugSection::class)
             ->args(['Twig', 'Twig', 'Twig functions, filters, tests, globals and components'])
@@ -182,6 +185,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Validator candidate classes'),
             ])
             ->tag('debug.section', ['name' => 'validator', 'priority' => 400])
+            ->tag('container.remove_if_missing', ['service' => 'validator'])
 
         ->set('console.command.debug.section.serializer', SerializerDebugSection::class)
             ->args([
@@ -192,6 +196,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('Named serializers'),
             ])
             ->tag('debug.section', ['name' => 'serializer', 'priority' => 300])
+            ->tag('container.remove_if_missing', ['service' => 'serializer'])
 
         ->set('console.command.debug.section.i18n', TranslationDebugSection::class)
             ->args([
@@ -206,12 +211,22 @@ return static function (ContainerConfigurator $container) {
                 service('kernel'),
             ])
             ->tag('debug.section', ['name' => 'translations', 'priority' => 200])
+            ->tag('container.remove_if_missing', ['service' => 'console.command.translation_debug'])
 
         ->set('console.command.debug.section.scheduler', SchedulerDebugSection::class)
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),
             ])
             ->tag('debug.section', ['name' => 'scheduler', 'priority' => 0])
+            ->tag('container.remove_if_missing', ['service' => 'console.command.scheduler_debug'])
+
+        ->set('console.command.debug.section.assets', AssetMapperDebugSection::class)
+            ->args([
+                service('asset_mapper'),
+                param('kernel.project_dir'),
+            ])
+            ->tag('debug.section', ['name' => 'assets', 'priority' => 100])
+            ->tag('container.remove_if_missing', ['service' => 'asset_mapper'])
 
         ->set('console.command.debug_autowiring', DebugAutowiringCommand::class)
             ->args([

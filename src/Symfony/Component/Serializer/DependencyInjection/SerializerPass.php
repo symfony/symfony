@@ -68,6 +68,7 @@ class SerializerPass implements CompilerPassInterface
 
         if ($container->hasDefinition('console.command.debug.section.serializer')) {
             $debugSectionDefinition = $container->getDefinition('console.command.debug.section.serializer');
+            $debugSectionDefinition->setArgument(1, $container->getDefinition('serializer.mapping.cache_warmer')->getArgument(0));
             $debugSectionDefinition->setArgument(2, $this->getTaggedServicesData($container, $normalizers, 'serializer.normalizer.default'));
             $debugSectionDefinition->setArgument(3, $this->getTaggedServicesData($container, $encoders, 'serializer.encoder.default'));
             $debugSectionDefinition->setArgument(4, $namedSerializers);

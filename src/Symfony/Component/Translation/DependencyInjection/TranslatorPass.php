@@ -49,6 +49,10 @@ class TranslatorPass implements CompilerPassInterface
             ->replaceArgument(3, $loaders)
         ;
 
+        if ($container->hasDefinition('console.command.debug.section.i18n') && $container->hasDefinition('console.command.translation_debug')) {
+            $container->getDefinition('console.command.debug.section.i18n')->replaceArgument(5, $container->getDefinition('console.command.translation_debug')->getArgument(6));
+        }
+
         if ($container->hasDefinition('validator') && $container->hasDefinition('translation.extractor.visitor.constraint')) {
             $constraintVisitorDefinition = $container->getDefinition('translation.extractor.visitor.constraint');
             $constraintClassNames = [];

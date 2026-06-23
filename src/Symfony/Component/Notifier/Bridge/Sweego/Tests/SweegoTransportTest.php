@@ -119,6 +119,7 @@ final class SweegoTransportTest extends TransportTestCase
             'bat' => null,
             'shorten_urls' => true,
             'shorten_with_protocol' => false,
+            'region' => 'RE',
         ]);
 
         $smsMessage = new SmsMessage('0611223344', 'Hello!', '', $options);

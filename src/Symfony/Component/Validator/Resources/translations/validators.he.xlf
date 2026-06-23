@@ -566,6 +566,10 @@
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
                 <target state="needs-review-translation">מטען ה-XML הזה גדול מדי ({{ size }} בתים): הוא חורג מהמגבלה של {{ limit }} בתים.</target>
             </trans-unit>
+            <trans-unit id="146">
+                <source>This value is not a valid cron expression.</source>
+                <target state="needs-review-translation">ערך זה אינו ביטוי cron תקין.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

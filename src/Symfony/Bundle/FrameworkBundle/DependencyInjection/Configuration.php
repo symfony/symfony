@@ -555,7 +555,7 @@ class Configuration implements ConfigurationInterface
 
                                                 return \in_array('!'.WorkflowEvents::GUARD, $v, true);
                                             })
-                                            ->thenInvalid(\sprintf('The "%s" event cannot be disabled in "events_to_dispatch": it is always dispatched.', WorkflowEvents::GUARD))
+                                            ->thenInvalid('The "workflow.guard" event cannot be disabled in "events_to_dispatch": it is always dispatched.')
                                         ->end()
                                         ->info('Select which Transition events should be dispatched for this Workflow. Prefix an event with "!" to disable it (e.g. ["!workflow.announce"]); future events are dispatched by default in block-list mode.')
                                         ->example(['workflow.enter', 'workflow.transition'])

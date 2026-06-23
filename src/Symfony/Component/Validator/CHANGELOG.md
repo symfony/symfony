@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `Cron` constraint to validate cron expressions
+ * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
 
 8.1
 ---

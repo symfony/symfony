@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
@@ -20,11 +21,13 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithBcMathNumber;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateIntervals;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimeZones;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGmpNumber;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
@@ -376,6 +379,24 @@ class JsonStreamWriterTest extends TestCase
             $dummy,
             Type::object(DummyWithDateTimeZones::class),
         );
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testWriteObjectWithBcMathNumber()
+    {
+        $dummy = new DummyWithBcMathNumber();
+        $dummy->number = new \BcMath\Number('3.14');
+
+        $this->assertWritten('{"number":"3.14"}', $dummy, Type::object(DummyWithBcMathNumber::class));
+    }
+
+    #[RequiresPhpExtension('gmp')]
+    public function testWriteObjectWithGmpNumber()
+    {
+        $dummy = new DummyWithGmpNumber();
+        $dummy->gmp = new \GMP('99999999999999999999');
+
+        $this->assertWritten('{"gmp":"99999999999999999999"}', $dummy, Type::object(DummyWithGmpNumber::class));
     }
 
     public function testWriteObjectWithDollarNamedProperties()

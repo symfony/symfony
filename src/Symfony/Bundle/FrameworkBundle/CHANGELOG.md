@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `--dispatchers` option to `debug:event-dispatcher` command
+
 8.1
 ---
 

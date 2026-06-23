@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `Cron` constraint to validate cron expressions
+
 8.1
 ---
 

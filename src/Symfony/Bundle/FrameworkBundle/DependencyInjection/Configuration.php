@@ -515,16 +515,46 @@ class Configuration implements ConfigurationInterface
                                                 }
 
                                                 foreach ($v as $value) {
-                                                    if (!\in_array($value, WorkflowEvents::ALIASES, true)) {
+                                                    $name = str_starts_with($value, '!') ? substr($value, 1) : $value;
+                                                    if (!\in_array($name, WorkflowEvents::ALIASES, true)) {
                                                         return true;
                                                     }
                                                 }
 
                                                 return false;
                                             })
-                                            ->thenInvalid('The value must be "null" or an array of workflow events (like ["workflow.enter"]).')
+                                            ->thenInvalid('The value must be "null" or an array of workflow events (like ["workflow.enter"]). Prefix an event with "!" to disable it (e.g. ["!workflow.announce"]).')
                                         ->end()
-                                        ->info('Select which Transition events should be dispatched for this Workflow.')
+                                        ->validate()
+                                            ->ifTrue(static function ($v) {
+                                                if (!\is_array($v) || [] === $v) {
+                                                    return false;
+                                                }
+                                                $hasAllowList = false;
+                                                $hasBlockList = false;
+                                                foreach ($v as $value) {
+                                                    if (str_starts_with($value, '!')) {
+                                                        $hasBlockList = true;
+                                                    } else {
+                                                        $hasAllowList = true;
+                                                    }
+                                                }
+
+                                                return $hasAllowList && $hasBlockList;
+                                            })
+                                            ->thenInvalid('Cannot mix allow-list and block-list entries in "events_to_dispatch": every entry must start with "!" (block-list mode) or none of them must (allow-list mode).')
+                                        ->end()
+                                        ->validate()
+                                            ->ifTrue(static function ($v) {
+                                                if (!class_exists(WorkflowEvents::class) || !\is_array($v)) {
+                                                    return false;
+                                                }
+
+                                                return \in_array('!'.WorkflowEvents::GUARD, $v, true);
+                                            })
+                                            ->thenInvalid(\sprintf('The "%s" event cannot be disabled in "events_to_dispatch": it is always dispatched.', WorkflowEvents::GUARD))
+                                        ->end()
+                                        ->info('Select which Transition events should be dispatched for this Workflow. Prefix an event with "!" to disable it (e.g. ["!workflow.announce"]); future events are dispatched by default in block-list mode.')
                                         ->example(['workflow.enter', 'workflow.transition'])
                                     ->end()
                                     ->arrayNode('places', 'place')

@@ -718,6 +718,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame([WorkflowEvents::LEAVE, WorkflowEvents::COMPLETED], $eventsToDispatch);
     }
 
+    public function testWorkflowsWithDisabledEvents()
+    {
+        $container = $this->createContainerFromFile('workflow_with_disabled_events');
+
+        $eventsToDispatch = $container->getDefinition('state_machine.my_workflow')->getArgument('index_4');
+
+        $this->assertSame(['!'.WorkflowEvents::ANNOUNCE], $eventsToDispatch);
+    }
+
     public function testWorkflowTransitionsPerformNoDeepMerging()
     {
         $container = $this->createContainer(['kernel.charset' => 'UTF-8', 'kernel.secret' => 'secret', 'kernel.runtime_environment' => 'test']);

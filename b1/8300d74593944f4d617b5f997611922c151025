@@ -1,0 +1,109 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-05-15T16:18:01Z
+
+I don't like having two ways to configure the same things.
+
+Instead we could do like monologue channel by using an exclamation mark to disable something.
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-20T13:52:20Z
+
+Thanks for the review @lyrixx — agreed, the two-knob design was sloppy. Pivoted to the monolog-channel `!` syntax in `c1f468d`, plus a follow-up `042e91a` covering the Configuration-level validator with two unit tests.
+
+`events_to_dispatch: ['!workflow.announce']` now fires every event except `workflow.announce`, and newly added events stay dispatched by default. `!workflow.guard` also suppresses the `GuardEvent`. Mixing whitelist and blacklist entries throws (`Workflow\Exception\InvalidArgumentException` at the component, `InvalidConfigurationException` at the bundle), matching how monolog channels behave.
+
+Single knob, no new constructor argument.
+
+### RED → GREEN proof
+
+| Suite                                                             | Origin    | Before patch | After patch |
+| ---                                                               | ---       | ---          | ---         |
+| 3 new `Workflow` tests (announce / guard / mix-throws)            | this PR   | ❌ fail       | ✅ pass      |
+| 2 new `ConfigurationTest` tests (mix-throws / blacklist accepted) | this PR   | ❌ fail       | ✅ pass      |
+| 223 existing `Workflow` tests                                     | upstream  | ✅ pass       | ✅ pass      |
+| 44 existing `FrameworkBundle` DI workflow tests                   | upstream  | ✅ pass       | ✅ pass      |
+
+The five new tests fail when run against the pre-pivot `Workflow.php` / `Configuration.php` (prod files stashed) and pass with the patch applied — no false-confidence coverage. The existing 267 tests stay green throughout = no regression.
+
+New test names:
+
+- `WorkflowTest::testApplyDoesNotDispatchEventsBlacklistedInEventsToDispatch`
+- `WorkflowTest::testGuardEventIsSuppressedWhenBlacklistedInEventsToDispatch`
+- `WorkflowTest::testMixingWhitelistAndBlacklistInEventsToDispatchThrows`
+- `ConfigurationTest::testWorkflowEventsToDispatchRejectsMixedWhitelistAndBlacklist`
+- `ConfigurationTest::testWorkflowEventsToDispatchAcceptsBlacklistOnlyList`
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-20T15:00:07Z
+
+Thanks @stof — all four addressed in 7c81732 (rebased on 8.1, branch was 1 commit behind):
+
+- `allow-list` / `block-list` everywhere (code, comments, exception messages, both CHANGELOGs, test names).
+- `(monolog-channel style)` dropped from both CHANGELOG entries.
+- `$eventsToDispatch` docblock: `array|string[]|null` → `string[]|null`.
+- `guardTransition()` simplified to your exact suggestion.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-06-09T05:45:10Z
+
+Can you update the pr description ?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-09T08:50:42Z
+
+Thanks @lyrixx — description updated.
+
+Rebuilt the whole thing with real RED→GREEN logs from an isolated phpunit run (Workflow + Configuration + FrameworkExtension, 6 new tests). The old description described the original `$disabledEvents` constructor approach, which hasn't been the implementation since the `!`-prefix pivot — corrected.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-16T16:43:54Z
+
+Thanks @lyrixx — all addressed in 300205d:
+- guard event is never suppressed, `!workflow.guard` silently ignored
+- block-list converted to allow-list at construct time
+- CHANGELOG entries moved to 8.2
+- dead `str_starts_with`/guard suppression branches removed
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-16T17:04:18Z
+
+ Thanks @lyrixx — all addressed in 300205d:
+
+  - guard event is never suppressed, !workflow.guard silently ignored
+  - block-list converted to allow-list at construct time
+  - CHANGELOG entries moved to 8.2
+  - dead str_starts_with/guard suppression branches removed
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-19T12:53:46Z
+
+Thanks for the reviews @stof @lyrixx — both addressed in 01f1749:
+
+- FrameworkBundle `composer.json`: bumped the `symfony/workflow` conflict to `<8.2`, since a block-list config would produce a broken service definition against older component versions.
+- Squashed the 9 commits into a single one authored by me — the mixed authorship that complicated the merge is gone.
+
+Description rewritten to match the final allow-list-at-construct-time behavior (the guard event is never suppressed).
+
+---------------------------------------------------------------------------
+
+by stof at 2026-06-19T13:02:19Z
+
+> a `!workflow.guard` entry is silently ignored
+
+is it actually silent ? Wouldn't it be caught by the validation of the event names in FrameworkBundle ?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-19T13:54:53Z
+
+Thanks @stof — right to question it: it was silent. `workflow.guard` is in `WorkflowEvents::ALIASES`, so the FrameworkBundle name check accepts `!workflow.guard`, then the component dropped it without feedback. Changed it to fail fast: `InvalidArgumentException` in `Workflow::__construct()` plus a matching config-level `InvalidConfigurationException`, so `events_to_dispatch: ['!workflow.guard']` now errors with *"The "workflow.guard" event cannot be disabled… it is always dispatched."* Pushed in f55eb7a.

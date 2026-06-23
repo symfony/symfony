@@ -33,6 +33,7 @@ class Profile
     private ?self $parent = null;
     private ?string $virtualType = null;
     private bool $hasErrors = false;
+    private bool $hasDump = false;
 
     /**
      * @var Profile[]
@@ -166,6 +167,16 @@ class Profile
         $this->hasErrors = $hasErrors;
     }
 
+    public function hasDump(): bool
+    {
+        return $this->hasDump;
+    }
+
+    public function setHasDump(bool $hasDump): void
+    {
+        $this->hasDump = $hasDump;
+    }
+
     /**
      * Finds children profilers.
      *
@@ -273,6 +284,7 @@ class Profile
             'statusCode' => $this->statusCode,
             'virtualType' => $this->virtualType,
             'hasErrors' => $this->hasErrors,
+            'hasDump' => $this->hasDump,
         ];
     }
 }

@@ -368,6 +368,45 @@ class FileProfilerStorageTest extends TestCase
         $this->assertFalse($tokens[0]['has_errors'], '->find() returns has_errors=false for old CSV lines without the field');
     }
 
+    public function testHasDump()
+    {
+        $profile = new Profile('token_with_dump');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://example.net/');
+        $profile->setMethod('GET');
+        $profile->setStatusCode(200);
+        $profile->setHasDump(true);
+        $this->storage->write($profile);
+
+        $profile = new Profile('token_without_dump');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://example.net/');
+        $profile->setMethod('GET');
+        $profile->setStatusCode(200);
+        $profile->setHasDump(false);
+        $this->storage->write($profile);
+
+        $loadedProfile = $this->storage->read('token_with_dump');
+        $this->assertTrue($loadedProfile->hasDump());
+
+        $loadedProfile = $this->storage->read('token_without_dump');
+        $this->assertFalse($loadedProfile->hasDump());
+    }
+
+    public function testHasDumpBackwardCompatibility()
+    {
+        // Test backward compatibility with old CSV lines that don't have has_errors field
+        $file = $this->tmpDir.'/index.csv';
+        $time = time();
+
+        // Write an old-format CSV line (9 fields, no has_errors)
+        file_put_contents($file, "old_token,127.0.0.1,GET,http://foo.bar/old,{$time},,200,request,,\n");
+
+        $tokens = $this->storage->find('', '', 10, '');
+        $this->assertCount(1, $tokens);
+        $this->assertFalse($tokens[0]['has_dump'], '->find() returns has_dump=false for old CSV lines without the field');
+    }
+
     public function testMultiRowIndexFile()
     {
         $iteration = 3;

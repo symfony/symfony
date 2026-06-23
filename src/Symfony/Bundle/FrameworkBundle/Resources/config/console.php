@@ -25,6 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ConfigDumpReferenceCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
+use Symfony\Bundle\FrameworkBundle\Command\DebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
@@ -39,11 +40,22 @@ use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\ConfigDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\ContainerDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\EventDispatcherDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\FormDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\MessengerDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\PlaceholderDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\RouterDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\SchedulerDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\SerializerDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\TranslationDebugSection;
+use Symfony\Bundle\FrameworkBundle\Debug\Section\ValidatorDebugSection;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
-use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\Form\Command\DebugCommand as FormDebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -140,6 +152,105 @@ return static function (ContainerConfigurator $container) {
 
         ->set('console.command.container_lint', ContainerLintCommand::class)
             ->tag('console.command')
+
+        ->set('console.command.debug', DebugCommand::class)
+            ->args([
+                tagged_iterator('debug.section', 'name'),
+                abstract_arg('debug section names'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.debug.section.container', ContainerDebugSection::class)
+            ->args([
+                service('kernel'),
+                service('debug.file_link_formatter')->nullOnInvalid(),
+            ])
+            ->tag('debug.section', ['name' => 'container', 'priority' => 1200])
+
+        ->set('console.command.debug.section.router', RouterDebugSection::class)
+            ->args([
+                service('router'),
+                service('kernel'),
+                service('debug.file_link_formatter')->nullOnInvalid(),
+            ])
+            ->tag('debug.section', ['name' => 'routes', 'priority' => 1100])
+
+        ->set('console.command.debug.section.config', ConfigDebugSection::class)
+            ->args([
+                service('kernel'),
+                service('container.env_var_processors_locator')->nullOnInvalid(),
+                param('kernel.environment'),
+                param('kernel.project_dir'),
+            ])
+            ->tag('debug.section', ['name' => 'config', 'priority' => 1000])
+
+        ->set('console.command.debug.section.events', EventDispatcherDebugSection::class)
+            ->args([
+                tagged_locator('event_dispatcher.dispatcher', 'name'),
+            ])
+            ->tag('debug.section', ['name' => 'events', 'priority' => 900])
+
+        ->set('console.command.debug.section.security', PlaceholderDebugSection::class)
+            ->args(['Security', 'Sec', 'firewalls, authenticators, access rules, voters and role hierarchy'])
+            ->tag('debug.section', ['name' => 'security', 'priority' => 800])
+
+        ->set('console.command.debug.section.messenger', MessengerDebugSection::class)
+            ->args([
+                abstract_arg('Message to handlers mapping'),
+            ])
+            ->tag('debug.section', ['name' => 'messenger', 'priority' => 700])
+
+        ->set('console.command.debug.section.twig', PlaceholderDebugSection::class)
+            ->args(['Twig', 'Twig', 'Twig functions, filters, tests, globals and components'])
+            ->tag('debug.section', ['name' => 'twig', 'priority' => 600])
+
+        ->set('console.command.debug.section.form', FormDebugSection::class)
+            ->args([
+                service('form.registry'),
+                abstract_arg('Form types'),
+                abstract_arg('Form type extensions'),
+                abstract_arg('Form type guessers'),
+                service('debug.file_link_formatter')->nullOnInvalid(),
+            ])
+            ->tag('debug.section', ['name' => 'form', 'priority' => 500])
+
+        ->set('console.command.debug.section.validator', ValidatorDebugSection::class)
+            ->args([
+                service('validator'),
+                service('validator.builder'),
+                abstract_arg('Validator candidate classes'),
+            ])
+            ->tag('debug.section', ['name' => 'validator', 'priority' => 400])
+
+        ->set('console.command.debug.section.serializer', SerializerDebugSection::class)
+            ->args([
+                service('serializer.mapping.class_metadata_factory'),
+                abstract_arg('Serializer metadata loaders'),
+                abstract_arg('Serializer normalizers'),
+                abstract_arg('Serializer encoders'),
+                abstract_arg('Named serializers'),
+            ])
+            ->tag('debug.section', ['name' => 'serializer', 'priority' => 300])
+
+        ->set('console.command.debug.section.i18n', TranslationDebugSection::class)
+            ->args([
+                service('translator'),
+                service('translation.reader'),
+                service('translation.extractor'),
+                param('translator.default_path'),
+                null, // twig.default_path
+                abstract_arg('Translator paths'),
+                [], // Twig paths appended by TranslatorPathsPass
+                param('kernel.enabled_locales'),
+                service('kernel'),
+            ])
+            ->tag('debug.section', ['name' => 'translations', 'priority' => 200])
+
+        ->set('console.command.debug.section.scheduler', SchedulerDebugSection::class)
+            ->args([
+                tagged_locator('scheduler.schedule_provider', 'name'),
+            ])
+            ->tag('debug.section', ['name' => 'scheduler', 'priority' => 0])
 
         ->set('console.command.debug_autowiring', DebugAutowiringCommand::class)
             ->args([
@@ -323,7 +434,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
-        ->set('console.command.form_debug', DebugCommand::class)
+        ->set('console.command.form_debug', FormDebugCommand::class)
             ->args([
                 service('form.registry'),
                 [], // All form types namespaces are stored here by FormPass

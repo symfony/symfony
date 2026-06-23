@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\FrameworkBundle\Debug\Section\AssetMapperDebugSection;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
 use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
@@ -137,6 +138,13 @@ return static function (ContainerConfigurator $container) {
                     param('kernel.project_dir'),
                 ])
                 ->tag('console.command')
+
+            ->set('console.command.debug.section.assets', AssetMapperDebugSection::class)
+                ->args([
+                    service('asset_mapper'),
+                    param('kernel.project_dir'),
+                ])
+                ->tag('debug.section', ['name' => 'assets', 'priority' => 100])
 
         ->set('asset_mapper_compiler', AssetMapperCompiler::class)
             ->args([

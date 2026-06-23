@@ -67,6 +67,10 @@ class FormPass implements CompilerPassInterface
             $commandDefinition->setArgument(2, array_keys($servicesMap));
         }
 
+        if ($container->hasDefinition('console.command.debug.section.form')) {
+            $container->getDefinition('console.command.debug.section.form')->setArgument(1, array_keys($servicesMap));
+        }
+
         if ($csrfTokenIds && $container->hasDefinition('form.type_extension.csrf')) {
             $csrfExtension = $container->getDefinition('form.type_extension.csrf');
 
@@ -117,6 +121,10 @@ class FormPass implements CompilerPassInterface
             $commandDefinition->setArgument(3, $typeExtensionsClasses);
         }
 
+        if ($container->hasDefinition('console.command.debug.section.form')) {
+            $container->getDefinition('console.command.debug.section.form')->setArgument(2, $typeExtensionsClasses);
+        }
+
         return $typeExtensions;
     }
 
@@ -134,6 +142,10 @@ class FormPass implements CompilerPassInterface
         if ($container->hasDefinition('console.command.form_debug')) {
             $commandDefinition = $container->getDefinition('console.command.form_debug');
             $commandDefinition->setArgument(4, $guessersClasses);
+        }
+
+        if ($container->hasDefinition('console.command.debug.section.form')) {
+            $container->getDefinition('console.command.debug.section.form')->setArgument(3, $guessersClasses);
         }
 
         return new IteratorArgument($guessers);

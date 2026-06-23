@@ -64,6 +64,13 @@ class SerializerPass implements CompilerPassInterface
             $container->getDefinition('serializer')->setArgument('$defaultContext', $defaultContext);
         }
 
+        if ($container->hasDefinition('console.command.debug.section.serializer')) {
+            $debugSectionDefinition = $container->getDefinition('console.command.debug.section.serializer');
+            $debugSectionDefinition->setArgument(2, $this->getTaggedServicesData($container, $normalizers, 'serializer.normalizer.default'));
+            $debugSectionDefinition->setArgument(3, $this->getTaggedServicesData($container, $encoders, 'serializer.encoder.default'));
+            $debugSectionDefinition->setArgument(4, $namedSerializers);
+        }
+
         /** @var ?string $circularReferenceHandler */
         $circularReferenceHandler = $container->hasParameter('.serializer.circular_reference_handler')
             ? $container->getParameter('.serializer.circular_reference_handler') : null;
@@ -151,6 +158,30 @@ class SerializerPass implements CompilerPassInterface
         $serializerDefinition = $container->getDefinition($id);
         $serializerDefinition->replaceArgument(0, $normalizers);
         $serializerDefinition->replaceArgument(1, $encoders);
+    }
+
+    /**
+     * @param Reference[] $services
+     *
+     * @return list<array{id: string, class: string, priority: int, built_in: bool}>
+     */
+    private function getTaggedServicesData(ContainerBuilder $container, array $services, string $tagName): array
+    {
+        $data = [];
+        foreach ($services as $service) {
+            $serviceId = (string) $service;
+            $definition = $container->getDefinition($serviceId);
+            $tag = $definition->getTag($tagName)[0] ?? [];
+
+            $data[] = [
+                'id' => $serviceId,
+                'class' => $container->getParameterBag()->resolveValue($definition->getClass()) ?: $serviceId,
+                'priority' => $tag['priority'] ?? 0,
+                'built_in' => $tag['built_in'] ?? false,
+            ];
+        }
+
+        return $data;
     }
 
     private function configureNamedSerializers(ContainerBuilder $container, ?string $circularReferenceHandler, ?string $maxDepthHandler): void

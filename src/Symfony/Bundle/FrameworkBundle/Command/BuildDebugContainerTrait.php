@@ -40,8 +40,10 @@ trait BuildDebugContainerTrait
 
         if (!$file || !(new ConfigCache($file, true))->isFresh()) {
             $buildContainer = \Closure::bind(function () {
+                /* @psalm-suppress UndefinedMethod */
                 $this->initializeBundles();
 
+                /* @psalm-suppress UndefinedMethod */
                 return $this->buildContainer();
             }, $kernel, $kernel::class);
             $container = $buildContainer();
@@ -50,7 +52,10 @@ trait BuildDebugContainerTrait
             $container->compile();
         } else {
             $buildContainer = \Closure::bind(function () {
+                /* @psalm-suppress TooFewArguments */
                 $containerBuilder = $this->getContainerBuilder();
+
+                /* @psalm-suppress UndefinedMethod */
                 $this->prepareContainer($containerBuilder);
 
                 return $containerBuilder;

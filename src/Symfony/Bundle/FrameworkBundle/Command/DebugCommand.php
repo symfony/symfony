@@ -166,7 +166,7 @@ class DebugCommand extends Command
             return Command::FAILURE;
         }
 
-        if (!$input->isInteractive()) {
+        if (!$input->isInteractive() || !\defined('STDIN') || !stream_isatty(\STDIN) || !stream_isatty(\STDOUT)) {
             $io->getErrorStyle()->error('The interactive UI requires an interactive terminal. Pass a search term or a section option (e.g. "debug --routes app_login") to print the results instead.');
 
             return Command::INVALID;

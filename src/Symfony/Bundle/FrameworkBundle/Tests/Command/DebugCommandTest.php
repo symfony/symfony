@@ -18,6 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Debug\Section\AbstractDebugSection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Process\Process;
 
 class DebugCommandTest extends TestCase
 {
@@ -140,6 +141,18 @@ class DebugCommandTest extends TestCase
 
         $this->assertSame(Command::INVALID, $exitCode);
         $this->assertStringContainsString('interactive terminal', $tester->getErrorOutput());
+    }
+
+    public function testInteractiveUiRequiresATerminal()
+    {
+        $process = new Process([\PHP_BINARY, __DIR__.'/../Fixtures/Console/debug_command_without_terminal.php']);
+        $process->setInput('');
+        $process->setTimeout(10);
+        $process->run();
+
+        $this->assertSame(Command::INVALID, $process->getExitCode());
+        $this->assertSame('', $process->getOutput());
+        $this->assertStringContainsString('interactive terminal', $process->getErrorOutput());
     }
 
     public function testCompleteSuggestsSectionItemLabels()

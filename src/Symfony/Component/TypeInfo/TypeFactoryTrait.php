@@ -217,9 +217,9 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of class-string
+     * @template T of object
      *
-     * @param T|null $className
+     * @param class-string<T>|null $className
      *
      * @return ($className is class-string ? ObjectType<T> : BuiltinType<TypeIdentifier::OBJECT>)
      */
@@ -250,13 +250,13 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of class-string<\UnitEnum>|class-string<\BackedEnum>
+     * @template T of \UnitEnum
      * @template U of BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>
      *
-     * @param T      $className
-     * @param U|null $backingType
+     * @param class-string<T> $className
+     * @param U|null          $backingType
      *
-     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T, U> : BackedEnumType<T, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>))
+     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T&\BackedEnum, U> : BackedEnumType<T&\BackedEnum, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>)
      */
     public static function enum(string $className, ?BuiltinType $backingType = null): EnumType
     {

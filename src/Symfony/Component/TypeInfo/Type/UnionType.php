@@ -21,6 +21,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @template T of Type
  *
+ * @extends Type<mixed>
+ *
  * @implements CompositeTypeInterface<T>
  */
 class UnionType extends Type implements CompositeTypeInterface

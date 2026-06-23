@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Translation\Bridge\Loco\LocoProvider;
 use Symfony\Component\Translation\Exception\ProviderException;
@@ -748,6 +749,75 @@ class LocoProviderTest extends ProviderTestCase
         }
 
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
+    }
+
+    public function testReadForNoLocales()
+    {
+        $responses = [
+            'getLocales' => function (string $method, string $url): MockResponse {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/locales', $url);
+
+                return new JsonMockResponse([['code' => 'en'], ['code' => 'fr']]);
+            },
+            'getEnMessages' => function (string $method, string $url): MockResponse {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/export/locale/en.xlf?filter=messages&status=translated%2Cblank-translation', $url);
+
+                return new MockResponse(<<<'XLIFF'
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                      <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
+                        <header>
+                          <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
+                        </header>
+                        <body>
+                          <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+                            <source>index.hello</source>
+                            <target state="translated">Hello</target>
+                          </trans-unit>
+                        </body>
+                      </file>
+                    </xliff>
+                    XLIFF);
+            },
+            'getFrMessages' => function (string $method, string $url): MockResponse {
+                $this->assertSame('GET', $method);
+                $this->assertSame('https://localise.biz/api/export/locale/fr.xlf?filter=messages&status=translated%2Cblank-translation', $url);
+
+                return new MockResponse(<<<'XLIFF'
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 http://docs.oasis-open.org/xliff/v1.2/os/xliff-core-1.2-strict.xsd">
+                      <file original="https://localise.biz/user/symfony-translation-provider" source-language="en" datatype="database" tool-id="loco">
+                        <header>
+                          <tool tool-id="loco" tool-name="Loco" tool-version="1.0.25 20201211-1" tool-company="Loco"/>
+                        </header>
+                        <body>
+                          <trans-unit id="loco:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+                            <source>index.hello</source>
+                            <target state="translated">Bonjour</target>
+                          </trans-unit>
+                        </body>
+                      </file>
+                    </xliff>
+                    XLIFF);
+            },
+        ];
+
+        $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://localise.biz/api/',
+            'headers' => [
+                'Authorization' => 'Loco API_KEY',
+            ],
+        ]), new XliffFileLoader(), $this->getLogger(), 'en', 'localise.biz/api/');
+
+        $this->assertEquals(
+            ['en', 'fr'],
+            array_map(
+                static fn (MessageCatalogue $catalogue) => $catalogue->getLocale(),
+                $provider->read(['messages'], [])->getCatalogues()
+            ),
+        );
     }
 
     #[DataProvider('getResponsesForReadWithLastModified')]

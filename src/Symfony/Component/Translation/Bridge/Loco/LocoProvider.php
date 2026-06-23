@@ -94,6 +94,7 @@ final class LocoProvider implements ProviderInterface
     public function read(array $domains, array $locales): TranslatorBag
     {
         $domains = $domains ?: ['*'];
+        $locales = $locales ?: $this->getLocales();
         $translatorBag = new TranslatorBag();
         $responses = new \SplObjectStorage();
 
@@ -416,17 +417,12 @@ final class LocoProvider implements ProviderInterface
     private function getLocales(): array
     {
         $response = $this->client->request('GET', 'locales');
-        $content = $response->toArray(false);
 
         if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(\sprintf('Unable to get locales on Loco: "%s".', $response->getContent(false)), $response);
+            throw new ProviderException('Unable to get locales on Loco.', $response);
         }
 
-        return array_reduce($content, static function ($carry, $locale) {
-            $carry[] = $locale['code'];
-
-            return $carry;
-        }, []);
+        return array_column($response->toArray(), 'code');
     }
 
     private function retrieveKeyFromId(string $id, string $domain): string

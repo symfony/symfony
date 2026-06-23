@@ -61,7 +61,7 @@ class EsiFragmentRendererTest extends TestCase
         $altReference = new ControllerReference('alt_controller', [], []);
 
         $this->assertMatchesRegularExpression(
-            '#^<esi:include src="/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />$#',
+            '#^<esi:include src="/_fragment\?_expiration=.+&_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="/_fragment\?_expiration=.+&_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />$#',
             $strategy->render($reference, $request, ['alt' => $altReference])->getContent()
         );
     }
@@ -79,7 +79,7 @@ class EsiFragmentRendererTest extends TestCase
         $altReference = new ControllerReference('alt_controller', [], []);
 
         $this->assertMatchesRegularExpression(
-            '#^<esi:include src="http://localhost/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="http://localhost/_fragment\?_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />$#',
+            '#^<esi:include src="http://localhost/_fragment\?_expiration=.+&_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dmain_controller" alt="http://localhost/_fragment\?_expiration=.+&_hash=.+&_path=_format%3Dhtml%26_locale%3Dfr%26_controller%3Dalt_controller" />$#',
             $strategy->render($reference, $request, ['alt' => $altReference, 'absolute_uri' => true])->getContent()
         );
     }

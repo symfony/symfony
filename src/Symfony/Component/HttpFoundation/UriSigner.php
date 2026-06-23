@@ -28,19 +28,25 @@ class UriSigner
     private const STATUS_MISSING = 3;
     private const STATUS_EXPIRED = 4;
 
+    private ?\DateInterval $defaultExpiration;
+
     /**
-     * @param string $hashParameter       Query string parameter to use
-     * @param string $expirationParameter Query string parameter to use for expiration
+     * @param string                 $hashParameter       Query string parameter to use
+     * @param string                 $expirationParameter Query string parameter to use for expiration
+     * @param \DateInterval|int|null $defaultExpiration   The expiration applied when none is passed to sign(); an int is a number of seconds
      */
     public function __construct(
         #[\SensitiveParameter] private string $secret,
         private string $hashParameter = '_hash',
         private string $expirationParameter = '_expiration',
         private ?ClockInterface $clock = null,
+        \DateInterval|int|null $defaultExpiration = null,
     ) {
         if (!$secret) {
             throw new \InvalidArgumentException('A non-empty secret is required.');
         }
+
+        $this->defaultExpiration = \is_int($defaultExpiration) ? \DateInterval::createFromDateString("$defaultExpiration seconds") : $defaultExpiration;
     }
 
     /**
@@ -53,12 +59,18 @@ class UriSigner
      *                                                              If $expiration is a \DateTimeInterface, it's expected to be the exact date + time.
      *                                                              If $expiration is a \DateInterval, the interval is added to "now" to get the date + time.
      *                                                              If $expiration is an int, it's expected to be a timestamp in seconds of the exact date + time.
-     *                                                              If $expiration is null, no expiration.
+     *                                                              If $expiration is null, the default expiration passed to the constructor is used.
      *
      * The expiration is added as a query string parameter.
      */
     public function sign(string $uri, \DateTimeInterface|\DateInterval|int|null $expiration = null): string
     {
+        $expiration ??= $this->defaultExpiration;
+
+        if (null === $expiration) {
+            trigger_deprecation('symfony/http-foundation', '8.2', 'Not passing an expiration to "%s::sign()" is deprecated and will be required in 9.0; pass one explicitly, or set a default via the "$defaultExpiration" argument of "%s::__construct()".', self::class, self::class);
+        }
+
         $url = parse_url($uri);
         $params = [];
 

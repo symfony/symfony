@@ -76,7 +76,7 @@ class FragmentListenerTest extends TestCase
     public function testWithSignature()
     {
         $signer = new UriSigner('foo');
-        $request = Request::create($signer->sign('http://example.com/_fragment?_path=foo%3Dbar%26_controller%3Dfoo'), 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
+        $request = Request::create($signer->sign('http://example.com/_fragment?_path=foo%3Dbar%26_controller%3Dfoo', new \DateTimeImmutable('2099-01-01 00:00:00')), 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
 
         $listener = new FragmentListener($signer);
         $event = $this->createRequestEvent($request);
@@ -102,7 +102,7 @@ class FragmentListenerTest extends TestCase
     public function testRemovesPathWithControllerNotDefined()
     {
         $signer = new UriSigner('foo');
-        $request = Request::create($signer->sign('http://example.com/_fragment?_path=foo%3Dbar'), 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
+        $request = Request::create($signer->sign('http://example.com/_fragment?_path=foo%3Dbar', new \DateTimeImmutable('2099-01-01 00:00:00')), 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
 
         $listener = new FragmentListener($signer);
         $event = $this->createRequestEvent($request);

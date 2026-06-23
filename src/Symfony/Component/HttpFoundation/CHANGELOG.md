@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Deprecate not passing an expiry to `UriSigner::sign()`
+ * Add the `$defaultExpiration` argument to `UriSigner::__construct()`
+
 8.1
 ---
 

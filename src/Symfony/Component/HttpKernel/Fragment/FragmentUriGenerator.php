@@ -28,6 +28,7 @@ final class FragmentUriGenerator implements FragmentUriGeneratorInterface
         private string $fragmentPath,
         private ?UriSigner $signer = null,
         private ?RequestStack $requestStack = null,
+        private \DateTimeInterface|\DateInterval|int $expiration = new \DateInterval('P5Y'),
     ) {
     }
 
@@ -68,7 +69,7 @@ final class FragmentUriGenerator implements FragmentUriGeneratorInterface
             return $fragmentUri;
         }
 
-        $fragmentUri = $this->signer->sign($fragmentUri);
+        $fragmentUri = $this->signer->sign($fragmentUri, $this->expiration);
 
         return $absolute ? $fragmentUri : substr($fragmentUri, \strlen($request->getSchemeAndHttpHost()));
     }

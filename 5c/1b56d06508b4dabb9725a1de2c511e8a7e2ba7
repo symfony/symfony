@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-03-30T17:03:58Z
+
+@welcoMattic [some automagic](https://github.com/php/php-src/blob/cd753007ce15665620343dc9244b37526c805cb4/ext/gmp/gmp.c#L236-L243) of the engine... 😅 The GMP class has a custom cast hook registered. `(string)` _may_ be faster because it's done at the engine level, but I'm not 100% sure.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-30T07:38:27Z
+
+rebase needed, and also there should be better guarding when running tests without the extension
+I'm getting this right now:
+
+Fatal error: Could not check compatibility between
+GmpNumberValueObjectTransformer::reverseTransform(...): GMP
+and ValueObjectTransformerInterface::reverseTransform(...): object,
+because class GMP is not available

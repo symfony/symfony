@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add IterableToArrayCollectionTransformer for ObjectMapper
+
 8.1
 ---
 

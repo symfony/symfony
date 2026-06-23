@@ -76,6 +76,8 @@ CHANGELOG
  * Add the `framework.request.serializer` and `framework.response.serializer` options
  * Add the `framework.uri_signer.secret` option
  * Add support for the `#[Lock]` attribute on controllers when the Lock component is enabled
+ * Add a unified `debug` command with an interactive full-screen terminal UI (powered by the Tui component),
+   a direct search mode (`debug --routes user_`, `debug csrf`) and a `debug.section` extension point
 
 8.1
 ---

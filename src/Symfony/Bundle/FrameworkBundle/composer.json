@@ -75,6 +75,7 @@
         "symfony/stopwatch": "^7.4|^8.0",
         "symfony/string": "^7.4|^8.0",
         "symfony/translation": "^8.2",
+        "symfony/tui": "^8.1",
         "symfony/twig-bundle": "^7.4|^8.0",
         "symfony/type-info": "^8.2",
         "symfony/uid": "^8.2",

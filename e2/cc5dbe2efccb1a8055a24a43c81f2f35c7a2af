@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T18:00:25Z
+
+I suspect this may be controversial 😉, I'll update tests if it's decided to go ahead.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-05T14:08:31Z
+
+I pushed a second commit that adds the migration paths to go with the deprecation:
+
+- **`UriSigner`**: new `$defaultExpiration` constructor arg (`\DateInterval|int|null`, int = seconds), applied when `sign()` is called without a per-call expiration. Also reworded the deprecation message.
+- **Fragments**: `FragmentUriGenerator` now signs with a 5y default expiration (new `$expiration` arg), so ESI/SSI/hinclude URLs no longer trip the deprecation. 5y because a fragment URL must outlive the cached page that embeds it.
+- **FrameworkBundle**: new `framework.uri_signer.expiration` (seconds), wired into the `uri_signer` service. Defaults to `null` in 8.2 (no behavior change, the deprecation still nudges manual signers); meant to become the standard knob in 9.0. We could set a default in the recipe for 8.2.
+
+~Follow-up (separate PR): cap HttpCache stored TTL and align the fragment signature expiry to it, which would let us drop the 5y default.~
+
+---------------------------------------------------------------------------
+
+by stof at 2026-06-05T14:18:47Z
+
+> Follow-up (separate PR): cap HttpCache stored TTL and align the fragment signature expiry to it, which would let us drop the 5y default.
+
+this is not true, as ESI is not only processed by HttpCache. a production setup would rather use Varnish (or equivalent)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-05T14:25:51Z
+
+> this is not true, as ESI is not only processed by HttpCache. a production setup would rather use Varnish (or equivalent
+
+correct, I'm withdrawing this part, keeping as is should be fine

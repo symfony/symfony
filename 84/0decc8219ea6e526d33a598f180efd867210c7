@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-02T10:16:32Z
+
+This will not actually fix https://github.com/symfony/symfony/issues/63434 as the request use case is narrowing the type for array shapes, which is precisely a case that you have not implemented here.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-04-02T10:35:52Z
+
+Array shape narrowing cannot be expressed with PHPDoc generics alone AFAIK: the shape is built at runtime from `Type` objects, so there's no way to infer the corresponding PHPDoc array shape type from the factory arguments.
+
+This PR covers the cases that are expressible with PHPDoc: builtins (`Type::int()` narrows to `int`), objects (`Type::object(Foo::class)` narrows to `Foo`), enums, collections (narrow to `array`/`iterable`/`object`), etc.
+
+For array shapes (and other complex cases), the path forward would be a PHPStan extension (and a Psalm plugin) that intercepts `Type::arrayShape()` calls, walks the shape argument, and infers the correct type.
+The `@template-covariant T` and `@psalm-assert-if-true =T $value` added here provide the foundation for that.
+
+I'll change the link to the issue from *Fix* to *Related to* so that it does not close it.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-06-17T16:39:18Z
+
+IIRC, we usually don't add changelog entries for such PHPDoc updates. Am I wrong?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-06-17T16:41:25Z
+
+I think this does not qualify as just a PHPDoc update ^^ isn't it?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-06-17T16:43:39Z
+
+If you think this is minor as in provides nothing noticeable to userland, fine!

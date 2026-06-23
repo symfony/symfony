@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2026-05-15T08:02:56Z
+
+The alignment feels super weird,
+<img width="223" height="285" alt="image" src="https://github.com/user-attachments/assets/99bebaf8-d6d9-4db2-a65c-7b25306b0adf" />
+
+can't we align these icons on the left?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2026-05-15T09:08:48Z
+
+Perhaps we can add an additional line under the status code
+Where we align such « hasX » icons ?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-05-15T13:32:21Z
+
+I really expected those icons to be links to the corresponding panel; is there a reason this isn’t the case?
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2026-05-15T15:49:40Z
+
+> I really expected those icons to be links to the corresponding panel; is there a reason this isn’t the case?
+
+I agree, that's a good idea 👍
+
+> The alignment feels super weird
+
+Oops, fixed :
+
+<img width="1916" height="320" alt="image" src="https://github.com/user-attachments/assets/db11c405-9c86-483f-9c85-21f42959ede5" />
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2026-05-15T15:58:00Z
+
+> Perhaps we can add an additional line under the status code Where we align such « hasX » icons ?
+
+<img width="190" height="394" alt="image" src="https://github.com/user-attachments/assets/d6ebed54-75c0-4ceb-9ee2-8448ca1b6baf" />
+
+Do you mean something like this ?
+
+---------------------------------------------------------------------------
+
+by 94noni at 2026-05-16T07:41:43Z
+
+Yes because we can imagine a future where there are more of those hasX labels
+But perhaps early UI discussion ^^
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2026-05-31T07:32:21Z
+
+Rebased on 8.2 and CS fixed

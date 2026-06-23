@@ -72,7 +72,6 @@ $container->loadFromExtension('framework', [
     ],
     'property_info' => true,
     'type_info' => true,
-    'ide' => 'file%%link%%format',
     'request' => [
         'formats' => [
             'csv' => [

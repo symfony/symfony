@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-12T07:49:11Z
+
+I'd say for 8.2 as an improvement
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-12T07:54:51Z
+
+Thanks for the review @nicolas-grekas — agreed, it's an improvement, not a bug fix.
+
+8.2 isn't cut yet (8.1 BETA1 released 2026-05-06, no open PR targets 8.2 today). Should I:
+
+- retarget to 8.1 now so it forward-merges into 8.2 once the branch lands, or
+- hold this PR until 8.2 is cut?
+
+Either way I'll update the Q/A table to reflect "Bug fix? no / New feature? yes" and add a `Mailer/CHANGELOG.md` entry under the chosen target.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-16T13:39:44Z
+
+8.2 branch now exists
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-17T23:30:32Z
+
+Retargeted to 8.2 and updated the Q/A table accordingly (`Bug fix? no` / `New feature? no` — it's a DX improvement). Reworded the PR description to drop the "bug fix" framing. Behaviour unchanged; only the exception message text differs.

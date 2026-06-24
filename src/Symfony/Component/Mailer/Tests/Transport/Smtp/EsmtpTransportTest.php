@@ -90,7 +90,7 @@ class EsmtpTransportTest extends TestCase
         $message->text('.');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid addresses: non-ASCII characters not supported in local-part of email.');
+        $this->expectExceptionMessage('The SMTP server does not support the SMTPUTF8 extension required to send to addresses with non-ASCII characters in their local-part.');
         $transport->send($message);
     }
 

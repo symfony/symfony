@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T14:24:24Z
+
+@nicolas-grekas Thanks for the review. So basically, the user will be responsible for hashing (if they wish)?
+
+A few questions:
+
+1. Why would we not always want to hash? Just to allow the user to expose the true value? I'm worried about the extra work to hash and making it easier to expose sensitive data.
+2. Regarding making `computeHash()` public: there's been some discussion on making a `UriSignerInterface` (to make it easier to configure different signers with different secrets/params). If this happens at some point, I don't think we'd want to have this method on the interface.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-04T15:14:33Z
+
+I was worried that putting the version, even hashed, would leak something about the password - it'd leak *when*  a password changed for example.
+I amended my second commit: the version is now part of the signature check.
+This means no more "Stale" exception, but I think that's minor.
+And this also solves the abstraction concern, which makes sense indeed.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T16:06:08Z
+
+> This means no more "Stale" exception, but I think that's minor.
+
+Can you think of a way to still include this exception? Without it, there's no way to distinguish between and "invalid link" and an "already used link" which was what I was going for. Perhaps minor, but it is useful to provide this information to users.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-04T16:10:31Z
+
+Not without leaking the stability of the version, which means eg the stability of the password.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T16:47:54Z
+
+Ok, so to be crystal clear: If the version changes (ie password changed when used as the version), of course the `_hash` changes, but it isn't clear *why* the `_hash` changed.
+
+Any my example in the description is valid/secure?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-04T16:48:46Z
+
+I just reviewed https://github.com/symfony/symfony/pull/64271 and I'm wondering if we should borrow the same idea instead?
+Looks like we have two very similar solution for the same-ish problem.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-04T16:50:35Z
+
+> my example in the description is valid/secure?
+
+it leaks the fact that the version (the password) didn't change ;)
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T16:52:41Z
+
+> it leaks the fact that the version (the password) didn't change ;)
+
+So how is this better than exposing the `_version` param in the signed uri string?
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T17:06:50Z
+
+> I just reviewed https://github.com/symfony/symfony/pull/64271 and I'm wondering if we should borrow the same idea instead?
+Looks like we have two very similar solution for the same-ish problem.
+
+I agree it would be good if we could merge into a more generic solution for different types of *magic* links:
+- pw reset
+- verify email
+- email change
+- login links
+
+With the option to keep it 100% stateless or keep state (ie # of uses that the link link allows)
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-06-04T17:31:10Z
+
+I'm 👍🏻 with Nicolas' changes!

@@ -35,7 +35,7 @@ class ImportMapVersionCheckerTest extends TestCase
             ->willReturn(new ImportMapEntries($importMapEntries));
 
         $remoteDownloader = $this->createMock(RemotePackageDownloader::class);
-        $remoteDownloader->expects($this->exactly(\count($importMapEntries)))
+        $remoteDownloader->expects($this->exactly(\count(array_filter($importMapEntries, static fn (ImportMapEntry $entry) => $entry->isRemotePackage()))))
             ->method('getDependencies')
             ->with($this->callback(static function ($importName) use ($importMapEntries) {
                 foreach ($importMapEntries as $entry) {
@@ -281,6 +281,25 @@ class ImportMapVersionCheckerTest extends TestCase
             ],
             [],
         ];
+
+        yield 'remote package with a locally-mapped dependency' => [
+            [
+                self::createRemoteEntry('foo', version: '1.0.0'),
+                self::createLocalEntry('bar'),
+            ],
+            [
+                'foo' => ['bar'],
+            ],
+            [
+                [
+                    'url' => '/foo/1.0.0',
+                    'response' => [
+                        'dependencies' => ['bar' => '^2.0.0'],
+                    ],
+                ],
+            ],
+            [],
+        ];
     }
 
     /**
@@ -430,5 +449,10 @@ class ImportMapVersionCheckerTest extends TestCase
         $packageModuleSpecifier ??= $importName;
 
         return ImportMapEntry::createRemote($importName, ImportMapType::JS, '/path/to/'.$importName, $version, $packageModuleSpecifier, false);
+    }
+
+    private static function createLocalEntry(string $importName): ImportMapEntry
+    {
+        return ImportMapEntry::createLocal($importName, ImportMapType::JS, '/path/to/'.$importName, false);
     }
 }

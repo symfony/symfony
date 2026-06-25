@@ -52,6 +52,9 @@ class UrlHelperTest extends TestCase
             ['http://localhost/foo/bar?0#baz', '#baz', '/foo/bar?0'],
             ['http://localhost/foo/bar?baz=1#baz', '?baz=1#baz', '/foo/bar?foo=1'],
             ['http://localhost/foo/baz?baz=1#baz', 'baz?baz=1#baz', '/foo/bar?foo=1'],
+
+            ['mailto:hello@example.localhost', 'mailto:hello@example.localhost', '/'],
+            ['tel:123', 'tel:123', '/'],
         ];
     }
 

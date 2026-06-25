@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Transport\Smtp;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -107,6 +108,10 @@ class SmtpTransport extends AbstractTransport
      */
     public function setLocalDomain(string $domain): static
     {
+        if (preg_match('/[\x00-\x1F\x7F]/', $domain)) {
+            throw new InvalidArgumentException('The local domain name must not contain control characters.');
+        }
+
         if ('' !== $domain && '[' !== $domain[0]) {
             if (filter_var($domain, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
                 $domain = '['.$domain.']';

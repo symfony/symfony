@@ -104,39 +104,56 @@ final class FileInputHelper
         $buffer = '';
         $inPaste = false;
         $pasteBuffer = '';
+        $scanned = 0;
 
-        while (!feof($inputStream)) {
+        while (true) {
             $inputHelper->waitForInput();
-            $char = fread($inputStream, 1);
+            $chunk = fread($inputStream, 8192);
 
-            if (false === $char || '' === $char) {
+            if (false === $chunk || '' === $chunk) {
                 if ('' === $buffer && '' === $pasteBuffer) {
                     throw new MissingInputException('Aborted.');
                 }
                 break;
             }
 
-            $buffer .= $char;
+            $buffer .= $chunk;
 
             if (\strlen($buffer) > self::MAX_PASTE_BYTES) {
                 throw new InvalidFileException(\sprintf('Pasted input exceeds the maximum allowed size of %d bytes.', self::MAX_PASTE_BYTES));
             }
 
-            if (!$inPaste && str_ends_with($buffer, self::PASTE_START)) {
+            // Scan whole reads at once; appending byte by byte is quadratic for large pastes.
+            if (!$inPaste) {
+                // Look back so a marker split across two reads is still matched.
+                $pasteStart = strpos($buffer, self::PASTE_START, max(0, $scanned - \strlen(self::PASTE_START) + 1));
+                $newline = $scanned + strcspn($buffer, "\r\n", $scanned);
+                $hasNewline = $newline < \strlen($buffer);
+
+                if (false === $pasteStart || ($hasNewline && $newline <= $pasteStart + \strlen(self::PASTE_START) - 1)) {
+                    if ($hasNewline) {
+                        $buffer = substr($buffer, 0, $newline);
+                        break;
+                    }
+
+                    $scanned = \strlen($buffer);
+                    continue;
+                }
+
                 $inPaste = true;
-                $buffer = substr($buffer, 0, -\strlen(self::PASTE_START));
-                continue;
+                $buffer = substr($buffer, 0, $pasteStart).substr($buffer, $pasteStart + \strlen(self::PASTE_START));
+                $scanned = $pasteStart;
             }
 
-            if ($inPaste && str_ends_with($buffer, self::PASTE_END)) {
-                $pasteBuffer = substr($buffer, 0, -\strlen(self::PASTE_END));
+            $pasteEnd = strpos($buffer, self::PASTE_END, max(0, $scanned - \strlen(self::PASTE_END) + 1));
+
+            if (false !== $pasteEnd) {
+                $pasteBuffer = substr($buffer, 0, $pasteEnd);
+                $buffer = substr($buffer, 0, $pasteEnd + \strlen(self::PASTE_END));
                 break;
             }
 
-            if (!$inPaste && ("\n" === $char || "\r" === $char)) {
-                $buffer = rtrim($buffer, "\r\n");
-                break;
-            }
+            $scanned = \strlen($buffer);
         }
 
         if ('' !== $pasteBuffer) {

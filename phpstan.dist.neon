@@ -25,3 +25,8 @@ parameters:
         -
             message: '#^Negated boolean expression is always true\.$#'
             path: src/Symfony/Component/Messenger/Worker.php
+        # @implements binds the transformer to one class, but the generated code calls transform()
+        # with whatever the property holds, so each guard is reachable
+        -
+            message: '#^Instanceof between .+ and .+ will always evaluate to true\.$#'
+            path: src/Symfony/Component/JsonStreamer/Transformer/*ValueObjectTransformer.php

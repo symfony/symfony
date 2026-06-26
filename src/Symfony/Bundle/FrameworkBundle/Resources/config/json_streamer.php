@@ -25,6 +25,8 @@ use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransforme
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeZoneValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\GmpNumberValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\UlidValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\UuidValueObjectTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
 
@@ -121,6 +123,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('json_streamer.value_object_transformer')
 
         ->set('.json_streamer.value_object_transformer.gmp_number', GmpNumberValueObjectTransformer::class)
+            ->tag('json_streamer.value_object_transformer')
+
+        ->set('.json_streamer.value_object_transformer.uuid', UuidValueObjectTransformer::class)
+            ->tag('json_streamer.value_object_transformer')
+
+        ->set('.json_streamer.value_object_transformer.ulid', UlidValueObjectTransformer::class)
             ->tag('json_streamer.value_object_transformer')
 
         // cache

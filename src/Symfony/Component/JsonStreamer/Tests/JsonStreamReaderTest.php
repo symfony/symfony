@@ -28,6 +28,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DivideStringAndCastToIntValueTransformer;
@@ -36,6 +37,9 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\StringToBooleanVal
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueObject\Height;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV7;
 
 class JsonStreamReaderTest extends TestCase
 {
@@ -245,6 +249,34 @@ class JsonStreamReaderTest extends TestCase
             $this->assertInstanceOf(DummyWithGmpNumber::class, $read);
             $this->assertEquals(new \GMP('99999999999999999999'), $read->gmp);
         }, '{"gmp":"99999999999999999999"}', Type::object(DummyWithGmpNumber::class));
+    }
+
+    public function testReadObjectWithUids()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $this->assertRead($reader, function (mixed $read) {
+            $this->assertInstanceOf(DummyWithUids::class, $read);
+            $this->assertEquals(Uuid::fromString('a7613e0a-5986-4f29-b3f8-3b6f8e5e6b40'), $read->uuid);
+            $this->assertEquals(UuidV7::fromString('018f7a5e-3c1e-7a4e-8b1a-2c3d4e5f6a7b'), $read->uuidV7);
+            $this->assertEquals(Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV'), $read->ulid);
+        }, '{"uuid":"a7613e0a-5986-4f29-b3f8-3b6f8e5e6b40","uuidV7":"018f7a5e-3c1e-7a4e-8b1a-2c3d4e5f6a7b","ulid":"01ARZ3NDEKTSV4RRFFQ69G5FAV"}', Type::object(DummyWithUids::class));
+    }
+
+    public function testReadObjectWithUidsUsingNonCanonicalFormat()
+    {
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
+
+        $uuid = Uuid::fromString('a7613e0a-5986-4f29-b3f8-3b6f8e5e6b40');
+        $uuidV7 = UuidV7::fromString('018f7a5e-3c1e-7a4e-8b1a-2c3d4e5f6a7b');
+        $ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+
+        $this->assertRead($reader, function (mixed $read) use ($uuid, $uuidV7, $ulid) {
+            $this->assertInstanceOf(DummyWithUids::class, $read);
+            $this->assertEquals($uuid, $read->uuid);
+            $this->assertEquals($uuidV7, $read->uuidV7);
+            $this->assertEquals($ulid, $read->ulid);
+        }, \sprintf('{"uuid":"%s","uuidV7":"%s","ulid":"%s"}', $uuid->toBase58(), $uuidV7->toBase58(), $ulid->toBase58()), Type::object(DummyWithUids::class));
     }
 
     public function testReadUnion()

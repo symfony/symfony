@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">此值不是有效的 XML。</target>
+                <target>這個值不是有效的 XML。</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">此值不符合預期的 XSD 結構描述。</target>
+                <target>這個值不符合預期的 XSD 結構定義。</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">此 XML 酬載過大（{{ size }} 位元組）：超過了 {{ limit }} 位元組的限制。</target>
+                <target>這個 XML 內容過大（{{ size }} 位元組）：超過 {{ limit }} 位元組的限制。</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">此值不是有效的 cron 運算式。</target>
+                <target>這個值不是有效的 cron 表達式。</target>
             </trans-unit>
         </body>
     </file>

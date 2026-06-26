@@ -26,8 +26,8 @@ final class Lexer
     private const MAX_CHUNK_LENGTH = 8192;
     private const MAX_DEPTH = 512;
 
-    private const WHITESPACE_CHARS = [' ' => true, "\r" => true, "\t" => true, "\n" => true];
-    private const STRUCTURE_CHARS = [',' => true, ':' => true, '{' => true, '}' => true, '[' => true, ']' => true];
+    private const WHITESPACE_CHARS = " \r\t\n";
+    private const DELIMITER_CHARS = ",:{}[] \r\t\n\"";
 
     private const TOKEN_DICT_START = 1;
     private const TOKEN_DICT_END = 2;
@@ -67,16 +67,31 @@ final class Lexer
         $inString = $escaping = false;
 
         foreach ($this->getChunks($stream, $offset, $length) as $chunk) {
-            foreach (str_split($chunk) as $byte) {
+            $chunkLength = \strlen($chunk);
+            $cursor = 0;
+
+            while ($cursor < $chunkLength) {
                 if ($escaping) {
                     $escaping = false;
-                    $token .= $byte;
+                    $token .= $chunk[$cursor];
+                    ++$cursor;
 
                     continue;
                 }
 
                 if ($inString) {
+                    if ($span = strcspn($chunk, '"\\', $cursor)) {
+                        $token .= substr($chunk, $cursor, $span);
+                        $cursor += $span;
+
+                        if ($cursor >= $chunkLength) {
+                            break;
+                        }
+                    }
+
+                    $byte = $chunk[$cursor];
                     $token .= $byte;
+                    ++$cursor;
 
                     if ('"' === $byte) {
                         $inString = false;
@@ -87,35 +102,45 @@ final class Lexer
                     continue;
                 }
 
+                if ($span = strcspn($chunk, self::DELIMITER_CHARS, $cursor)) {
+                    $token .= substr($chunk, $cursor, $span);
+                    $cursor += $span;
+
+                    if ($cursor >= $chunkLength) {
+                        break;
+                    }
+                }
+
+                $byte = $chunk[$cursor];
+
                 if ('"' === $byte) {
                     $token .= $byte;
                     $inString = true;
+                    ++$cursor;
 
                     continue;
                 }
 
-                if (isset(self::STRUCTURE_CHARS[$byte]) || isset(self::WHITESPACE_CHARS[$byte])) {
-                    if ('' !== $token) {
-                        $this->validateToken($token, $context);
-                        yield [$token, $currentTokenPosition];
+                if ('' !== $token) {
+                    $this->validateToken($token, $context);
+                    yield [$token, $currentTokenPosition];
 
-                        $currentTokenPosition += \strlen($token);
-                        $token = '';
-                    }
+                    $currentTokenPosition += \strlen($token);
+                    $token = '';
+                }
 
-                    if (!isset(self::WHITESPACE_CHARS[$byte])) {
-                        $this->validateToken($byte, $context);
-                        yield [$byte, $currentTokenPosition];
-                    }
-
-                    if ('' !== $byte) {
-                        ++$currentTokenPosition;
-                    }
+                if ($span = strspn($chunk, self::WHITESPACE_CHARS, $cursor)) {
+                    $currentTokenPosition += $span;
+                    $cursor += $span;
 
                     continue;
                 }
 
-                $token .= $byte;
+                $this->validateToken($byte, $context);
+                yield [$byte, $currentTokenPosition];
+
+                ++$currentTokenPosition;
+                ++$cursor;
             }
         }
 

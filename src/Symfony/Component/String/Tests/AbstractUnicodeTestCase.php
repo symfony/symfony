@@ -629,4 +629,25 @@ END'],
             ]
         );
     }
+
+    /**
+     * @dataProvider provideSpliceMultibyte
+     */
+    public function testSpliceMultibyte(string $expected, string $origin, string $replacement, int $start, ?int $length = null)
+    {
+        $this->assertEquals(
+            static::createFromString($expected),
+            static::createFromString($origin)->splice($replacement, $start, $length)
+        );
+    }
+
+    public static function provideSpliceMultibyte()
+    {
+        return [
+            ['aαb_c', 'aαbβc', '_', 3, 1],
+            ['αXc', 'ααbc', 'X', 1, 2],
+            ['α_δ', 'αβγδ', '_', 1, -1],
+            ['αβ_δ', 'αβγδ', '_', -2, 1],
+        ];
+    }
 }

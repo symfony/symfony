@@ -351,6 +351,7 @@ class Command implements SignalableCommandInterface
         $this->fullDefinition = new InputDefinition();
         $this->fullDefinition->setOptions($this->definition->getOptions());
         $this->fullDefinition->addOptions($this->application->getDefinition()->getOptions());
+        $this->fullDefinition->setTolerateExtraTokens($this->definition->getTolerateExtraTokens());
 
         if ($mergeArgs) {
             $this->fullDefinition->setArguments($this->application->getDefinition()->getArguments());

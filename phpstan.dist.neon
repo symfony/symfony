@@ -15,6 +15,8 @@ parameters:
         - src/Symfony/*/*/*/*/Tests/*
         - src/Symfony/Component/Intl/Resources/data/*
         - src/Symfony/Component/Emoji/Resources/data/*
+        # these templates are include()'d in HtmlErrorRenderer's scope, so they can't be analyzed standalone
+        - src/Symfony/Component/ErrorHandler/Resources/views/*
     ignoreErrors:
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
@@ -30,3 +32,7 @@ parameters:
         -
             message: '#^Instanceof between .+ and .+ will always evaluate to true\.$#'
             path: src/Symfony/Component/JsonStreamer/Transformer/*ValueObjectTransformer.php
+        # private helpers are called from the .html.php templates, which run in the renderer's scope via include()
+        -
+            message: '#^Method Symfony\\Component\\ErrorHandler\\ErrorRenderer\\HtmlErrorRenderer\:\:\w+\(\) is unused\.$#'
+            path: src/Symfony/Component/ErrorHandler/ErrorRenderer/HtmlErrorRenderer.php

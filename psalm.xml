@@ -20,6 +20,8 @@
             <directory name="src/Symfony/*/*/*/*/Tests" />
             <directory name="src/Symfony/Component/Intl/Resources/data/" />
             <directory name="src/Symfony/Component/Emoji/Resources/data/" />
+            <!-- these templates are include()'d in HtmlErrorRenderer's scope, so they can't be analyzed standalone -->
+            <directory name="src/Symfony/Component/ErrorHandler/Resources/views/" />
             <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>

@@ -30,101 +30,154 @@
     }
 
     if (navigator.clipboard) {
-        document.querySelectorAll('[data-clipboard-text]').forEach(function(element) {
+        document.querySelectorAll('[data-clipboard-text]:not([data-processed=true])').forEach(function(element) {
             removeClass(element, 'hidden');
             element.addEventListener('click', function() {
                 navigator.clipboard.writeText(element.getAttribute('data-clipboard-text'));
+                /* briefly swap the copy glyph for a checkmark as feedback */
+                addClass(element, 'is-copied');
+                clearTimeout(element.sfCopiedTimer);
+                element.sfCopiedTimer = setTimeout(function() { removeClass(element, 'is-copied'); }, 1500);
             })
+            element.setAttribute('data-processed', 'true');
         });
     }
 
     (function createTabs() {
-        /* the accessibility options of this component have been defined according to: */
-        /* www.w3.org/WAI/ARIA/apg/example-index/tabs/tabs-manual.html */
+        function activate(controls, tab) {
+            for (var k = 0; k < controls.length; k++) {
+                var control = controls[k];
+                var panel = document.getElementById(control.getAttribute('aria-controls'));
+                var selected = control === tab;
+                control.setAttribute('aria-selected', selected ? 'true' : 'false');
+                if (selected) { control.removeAttribute('tabindex'); } else { control.setAttribute('tabindex', '-1'); }
+                if (panel) { selected ? panel.removeAttribute('hidden') : panel.setAttribute('hidden', ''); }
+            }
+        }
+
         var tabGroups = document.querySelectorAll('.sf-tabs:not([data-processed=true])');
-
-        /* create the tab navigation for each group of tabs */
         for (var i = 0; i < tabGroups.length; i++) {
-            var tabs = tabGroups[i].querySelectorAll(':scope > .tab');
-            var tabNavigation = document.createElement('div');
-            tabNavigation.className = 'tab-navigation';
-            tabNavigation.setAttribute('role', 'tablist');
-
-            var selectedTabId = 'tab-' + i + '-0'; /* select the first tab by default */
-            for (var j = 0; j < tabs.length; j++) {
-                var tabId = 'tab-' + i + '-' + j;
-                var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
-
-                var tabNavigationItem = document.createElement('button');
-                addClass(tabNavigationItem, 'tab-control');
-                tabNavigationItem.setAttribute('data-tab-id', tabId);
-                tabNavigationItem.setAttribute('role', 'tab');
-                tabNavigationItem.setAttribute('aria-controls', tabId);
-                if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
-                if (hasClass(tabs[j], 'disabled')) {
-                    addClass(tabNavigationItem, 'disabled');
-                }
-                tabNavigationItem.innerHTML = tabTitle;
-                tabNavigation.appendChild(tabNavigationItem);
-
-                var tabContent = tabs[j].querySelector('.tab-content');
-                tabContent.parentElement.setAttribute('id', tabId);
-            }
-
-            tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
-            addClass(document.querySelector('[data-tab-id="' + selectedTabId + '"]'), 'active');
-        }
-
-        /* display the active tab and add the 'click' event listeners */
-        for (i = 0; i < tabGroups.length; i++) {
-            tabNavigation = tabGroups[i].querySelectorAll(':scope > .tab-navigation .tab-control');
-
-            for (j = 0; j < tabNavigation.length; j++) {
-                tabId = tabNavigation[j].getAttribute('data-tab-id');
-                var tabPanel = document.getElementById(tabId);
-                tabPanel.setAttribute('role', 'tabpanel');
-                tabPanel.setAttribute('aria-labelledby', tabId);
-                tabPanel.querySelector('.tab-title').className = 'hidden';
-
-                if (hasClass(tabNavigation[j], 'active')) {
-                    tabPanel.className = 'block';
-                    tabNavigation[j].setAttribute('aria-selected', 'true');
-                    tabNavigation[j].removeAttribute('tabindex');
-                } else {
-                    tabPanel.className = 'hidden';
-                    tabNavigation[j].removeAttribute('aria-selected');
-                    tabNavigation[j].setAttribute('tabindex', '-1');
-                }
-
-                tabNavigation[j].addEventListener('click', function(e) {
-                    var activeTab = e.target || e.srcElement;
-
-                    /* needed because when the tab contains HTML contents, user can click */
-                    /* on any of those elements instead of their parent '<button>' element */
-                    while (activeTab.tagName.toLowerCase() !== 'button') {
-                        activeTab = activeTab.parentNode;
-                    }
-
-                    /* get the full list of tabs through the parent of the active tab element */
-                    var tabNavigation = activeTab.parentNode.children;
-                    for (var k = 0; k < tabNavigation.length; k++) {
-                        var tabId = tabNavigation[k].getAttribute('data-tab-id');
-                        document.getElementById(tabId).className = 'hidden';
-                        removeClass(tabNavigation[k], 'active');
-                        tabNavigation[k].removeAttribute('aria-selected');
-                        tabNavigation[k].setAttribute('tabindex', '-1');
-                    }
-
-                    addClass(activeTab, 'active');
-                    activeTab.setAttribute('aria-selected', 'true');
-                    activeTab.removeAttribute('tabindex');
-                    var activeTabId = activeTab.getAttribute('data-tab-id');
-                    document.getElementById(activeTabId).className = 'block';
+            (function (group) {
+                /* only wire the tabs that belong to THIS group, so a nested .sf-tabs keeps its own tablist instead of being merged in */
+                var controls = [];
+                group.querySelectorAll('.tab-navigation [role=tab]').forEach(function(tab) {
+                    if (tab.closest('.sf-tabs') === group) { controls.push(tab); }
                 });
+                if (!controls.length) {
+                    /* no server-rendered tablist: leave the group unclaimed for the profiler's own tabs script */
+                    return;
+                }
+                for (var j = 0; j < controls.length; j++) {
+                    (function (control, index) {
+                        control.addEventListener('click', function() { activate(controls, control); });
+                        control.addEventListener('keydown', function(e) {
+                            var next = null;
+                            if ('ArrowRight' === e.key || 'ArrowDown' === e.key) { next = controls[(index + 1) % controls.length]; }
+                            else if ('ArrowLeft' === e.key || 'ArrowUp' === e.key) { next = controls[(index - 1 + controls.length) % controls.length]; }
+                            else if ('Home' === e.key) { next = controls[0]; }
+                            else if ('End' === e.key) { next = controls[controls.length - 1]; }
+                            if (next) { e.preventDefault(); activate(controls, next); next.focus(); }
+                        });
+                    })(controls[j], j);
+                }
+
+                group.setAttribute('data-processed', 'true');
+            })(tabGroups[i]);
+        }
+    })();
+
+    (function createExceptionChain() {
+        /* selecting an exception in the chain expands it (collapsing the others) and shows its trace panel */
+        var summaries = document.querySelectorAll('.exc-summary');
+        if (!summaries.length) {
+            return;
+        }
+
+        function select(index) {
+            document.querySelectorAll('.exc-item').forEach(function(item) {
+                var summary = item.querySelector('.exc-summary');
+                var expanded = summary.getAttribute('data-exception-index') === index;
+                expanded ? addClass(item, 'is-expanded') : removeClass(item, 'is-expanded');
+                summary.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            });
+            document.querySelectorAll('.exc-panel').forEach(function(panel) {
+                panel.getAttribute('data-exception-index') === index ? addClass(panel, 'is-active') : removeClass(panel, 'is-active');
+            });
+        }
+
+        summaries.forEach(function(summary) {
+            summary.addEventListener('click', function() {
+                select(summary.getAttribute('data-exception-index'));
+            });
+        });
+
+        /* long chains hide their middle exceptions behind a "show more" control */
+        var moreBtn = document.querySelector('.exc-more-btn');
+        if (moreBtn) {
+            moreBtn.addEventListener('click', function() {
+                document.querySelectorAll('.exc-item-hidden').forEach(function(item) { removeClass(item, 'exc-item-hidden'); });
+                moreBtn.closest('.exc-item-more').remove();
+            });
+        }
+    })();
+
+    (function createCopyAsText() {
+        var buttons = [].slice.call(document.querySelectorAll('[data-copy-text]'));
+        if (!buttons.length || !navigator.clipboard) {
+            return; /* leave the buttons hidden when the Clipboard API is unavailable */
+        }
+
+        function textOf(el) { return el ? el.textContent.replace(/ /g, ' ').replace(/[ \t]+\n/g, '\n').trim() : ''; }
+
+        /* rebuilds the Monolog-style one-liner from the DOM so copied logs read like Symfony's own log
+           files; there is no `extra` in debug records, so it always ends with `[]` like LineFormatter */
+        function logAsText(line) {
+            var channel = line.getAttribute('data-channel');
+            var message = line.querySelector('.log-message');
+            var json = line.querySelector('pre.log-json');
+            var context = '[]';
+            if (json) {
+                context = json.textContent;
+                try {
+                    /* the DOM carries the context pretty-printed; log files use the compact form */
+                    context = JSON.stringify(JSON.parse(context));
+                } catch (e) {
+                }
             }
 
-            tabGroups[i].setAttribute('data-processed', 'true');
+            return '[' + line.getAttribute('data-time') + '] '
+                + (channel ? channel + '.' : '')
+                + line.getAttribute('data-level').toUpperCase() + ': '
+                + (message ? message.textContent : '') + ' ' + context + ' []';
         }
+
+        function buildTextContent(btn) {
+            /* each chained exception panel has its own copy button and stack trace */
+            var panel = btn.closest('.exc-panel');
+            var stack = textOf(panel ? panel.querySelector('pre.stacktrace') : document.querySelector('pre.stacktrace'));
+
+            var logLines = [].slice.call(document.querySelectorAll('[data-logs] .log-line'));
+            var logs = logLines.map(logAsText).join('\n').trim();
+
+            var md = '';
+            if (stack) { md += '### Stack trace\n\n```\n' + stack + '\n```\n'; }
+            if (logs) { md += '\n### Logs\n\n```\n' + logs + '\n```\n'; }
+
+            return md;
+        }
+
+        buttons.forEach(function(btn) {
+            btn.removeAttribute('hidden');
+            btn.addEventListener('click', function() {
+                navigator.clipboard.writeText(buildTextContent(btn)).then(function() {
+                    var label = btn.querySelector('.copy-label');
+                    if (!label) { return; }
+                    var previous = label.textContent;
+                    label.textContent = 'Copied!';
+                    setTimeout(function() { label.textContent = previous; }, 1500);
+                });
+            });
+        });
     })();
 
     (function createToggles() {
@@ -184,103 +237,157 @@
         }
     })();
 
-    (function createFilters() {
-        document.querySelectorAll('[data-filters] [data-filter]').forEach(function (filter) {
-            var filters = filter.closest('[data-filters]'),
-                type = 'choice',
-                name = filter.dataset.filter,
-                ucName = name.charAt(0).toUpperCase()+name.slice(1),
-                list = document.createElement('ul'),
-                values = filters.dataset['filter'+ucName] || filters.querySelectorAll('[data-filter-'+name+']'),
-                labels = {},
-                defaults = null,
-                indexed = {},
-                processed = {};
-            if (typeof values === 'string') {
-                type = 'level';
-                labels = values.split(',');
-                values = values.toLowerCase().split(',');
-                defaults = values.length - 1;
-            }
-            addClass(list, 'filter-list');
-            addClass(list, 'filter-list-'+type);
-            values.forEach(function (value, i) {
-                if (value instanceof HTMLElement) {
-                    value = value.dataset['filter'+ucName];
-                }
-                if (value in processed) {
-                    return;
-                }
-                var option = document.createElement('li'),
-                    label = i in labels ? labels[i] : value,
-                    active = false,
-                    matches;
-                if ('' === label) {
-                    option.innerHTML = '<em>(none)</em>';
-                } else {
-                    option.innerText = label;
-                }
-                option.dataset.filter = value;
-                option.setAttribute('title', 1 === (matches = filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').length) ? 'Matches 1 row' : 'Matches '+matches+' rows');
-                indexed[value] = i;
-                list.appendChild(option);
-                addEventListener(option, 'click', function () {
-                    if ('choice' === type) {
-                        filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
-                            if (option.dataset.filter === row.dataset['filter'+ucName]) {
-                                toggleClass(row, 'filter-hidden-'+name);
-                            }
-                        });
-                        toggleClass(option, 'active');
-                    } else if ('level' === type) {
-                        if (i === this.parentNode.querySelectorAll('.active').length - 1) {
-                            return;
-                        }
-                        this.parentNode.querySelectorAll('li').forEach(function (currentOption, j) {
-                            if (j <= i) {
-                                addClass(currentOption, 'active');
-                                if (i === j) {
-                                    addClass(currentOption, 'last-active');
-                                } else {
-                                    removeClass(currentOption, 'last-active');
-                                }
-                            } else {
-                                removeClass(currentOption, 'active');
-                                removeClass(currentOption, 'last-active');
-                            }
-                        });
-                        filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
-                            if (i < indexed[row.dataset['filter'+ucName]]) {
-                                addClass(row, 'filter-hidden-'+name);
-                            } else {
-                                removeClass(row, 'filter-hidden-'+name);
-                            }
-                        });
-                    }
-                });
-                if ('choice' === type) {
-                    active = null === defaults || 0 <= defaults.indexOf(value);
-                } else if ('level' === type) {
-                    active = i <= defaults;
-                    if (active && i === defaults) {
-                        addClass(option, 'last-active');
-                    }
-                }
-                if (active) {
-                    addClass(option, 'active');
-                } else {
-                    filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').forEach(function (row) {
-                        toggleClass(row, 'filter-hidden-'+name);
-                    });
-                }
-                processed[value] = true;
+    (function createVendorFrameToggle() {
+        document.querySelectorAll('.trace-vendor-toggle').forEach(function(toggle) {
+            var box = toggle.closest('.trace-details');
+            if (!box) { return; }
+            addEventListener(toggle, 'click', function() {
+                toggleClass(box, 'trace-show-vendor');
+                toggle.setAttribute('aria-expanded', hasClass(box, 'trace-show-vendor') ? 'true' : 'false');
             });
+        });
+    })();
 
-            if (1 < list.childNodes.length) {
-                filter.appendChild(list);
-                filter.dataset.filtered = '';
+    (function createRawTraceCopy() {
+        if (!navigator.clipboard) {
+            return; /* leave the button hidden when the Clipboard API is unavailable */
+        }
+        document.querySelectorAll('.trace-raw-copy').forEach(function(btn) {
+            removeClass(btn, 'hidden');
+            var card = btn.closest('.trace-raw-card');
+            var pre = card ? card.querySelector('pre') : null;
+            addEventListener(btn, 'click', function() {
+                navigator.clipboard.writeText(pre ? pre.textContent.replace(/[ \t]+\n/g, '\n').trim() : '');
+                addClass(btn, 'is-copied');
+                clearTimeout(btn.sfCopiedTimer);
+                btn.sfCopiedTimer = setTimeout(function() { removeClass(btn, 'is-copied'); }, 1500);
+            });
+        });
+    })();
+
+    (function createLogs() {
+        var root = document.querySelector('[data-logs]');
+        if (!root) {
+            return;
+        }
+
+        var allLines = [].slice.call(root.querySelectorAll('.log-line'));
+        var lines = allLines.filter(function(line) { return hasClass(line, 'has-detail'); });
+
+        function setExpanded(line, expanded) {
+            if (!hasClass(line, 'has-detail')) {
+                return; /* nothing to reveal for context-less rows */
+            }
+            expanded ? addClass(line, 'is-expanded') : removeClass(line, 'is-expanded');
+            var summary = line.querySelector('.log-summary');
+            if (summary) { summary.setAttribute('aria-expanded', expanded ? 'true' : 'false'); }
+        }
+
+        lines.forEach(function(line) {
+            var summary = line.querySelector('.log-summary');
+            if (summary) {
+                addEventListener(summary, 'click', function() { setExpanded(line, !hasClass(line, 'is-expanded')); });
             }
         });
+
+        var expandBtn = root.querySelector('.logs-expand-all');
+        if (expandBtn) {
+            addEventListener(expandBtn, 'click', function() {
+                /* derive the action from the live state so it stays correct after manual toggles/search */
+                var expand = lines.some(function(line) { return !hasClass(line, 'is-expanded'); });
+                lines.forEach(function(line) { setExpanded(line, expand); });
+                expandBtn.setAttribute('aria-expanded', expand ? 'true' : 'false');
+            });
+        }
+
+        /* unified filtering: deep-search query AND per-column (level/channel) selections */
+        var searchQuery = '';
+        var columnFilters = {}; /* { level: {value:true,...}|null, channel: ... }; null = all selected */
+
+        function matches(line) {
+            if (searchQuery) {
+                if (undefined === line.sfHaystack) { line.sfHaystack = line.textContent.toLowerCase(); }
+                if (-1 === line.sfHaystack.indexOf(searchQuery)) { return false; }
+            }
+            for (var key in columnFilters) {
+                var set = columnFilters[key];
+                if (set && !set[line.getAttribute('data-' + key)]) { return false; }
+            }
+            return true;
+        }
+
+        var emptyState = root.querySelector('.logs-empty');
+        function applyFilters() {
+            var anyVisible = false;
+            allLines.forEach(function(line) {
+                var visible = matches(line);
+                line.hidden = !visible;
+                if (visible) {
+                    anyVisible = true;
+                    /* searching reveals matches; otherwise restore each row's default expanded state */
+                    setExpanded(line, searchQuery ? true : '1' === line.getAttribute('data-default-expanded'));
+                }
+            });
+            if (emptyState) { emptyState.hidden = anyVisible; }
+        }
+
+        var search = root.querySelector('.logs-search');
+        if (search) {
+            addEventListener(search, 'input', function() {
+                searchQuery = search.value.trim().toLowerCase();
+                applyFilters();
+            });
+        }
+
+        var openFilter = null;
+        function closeFilter() {
+            if (openFilter) {
+                openFilter.menu.hidden = true;
+                openFilter.trigger.setAttribute('aria-expanded', 'false');
+                openFilter = null;
+            }
+        }
+
+        root.querySelectorAll('.logs-filter').forEach(function(filter) {
+            var key = filter.getAttribute('data-filter');
+            var trigger = filter.querySelector('.logs-filter-trigger');
+            var menu = filter.querySelector('.logs-filter-menu');
+            var boxes = [].slice.call(filter.querySelectorAll('input[type=checkbox]'));
+            var allLink = filter.querySelector('.logs-filter-all');
+
+            function recompute() {
+                /* null-prototype object so channels named like Object.prototype members (e.g. "constructor") filter correctly */
+                var selected = Object.create(null), count = 0;
+                boxes.forEach(function(b) { if (b.checked) { selected[b.value] = true; ++count; } });
+                var allOn = count === boxes.length;
+                columnFilters[key] = allOn ? null : selected;
+                allOn ? removeClass(filter, 'is-filtered') : addClass(filter, 'is-filtered');
+                allLink.textContent = allOn ? 'Select none' : 'Select all';
+                applyFilters();
+            }
+
+            addEventListener(trigger, 'click', function(e) {
+                e.stopPropagation();
+                var willOpen = 'true' !== trigger.getAttribute('aria-expanded');
+                closeFilter();
+                if (willOpen) {
+                    menu.hidden = false;
+                    trigger.setAttribute('aria-expanded', 'true');
+                    openFilter = { menu: menu, trigger: trigger };
+                }
+            });
+            addEventListener(menu, 'click', function(e) { e.stopPropagation(); });
+            boxes.forEach(function(b) { addEventListener(b, 'change', recompute); });
+            addEventListener(allLink, 'click', function() {
+                /* if anything is unchecked, "Select all" checks everything; otherwise clear all */
+                var anyOff = boxes.some(function(b) { return !b.checked; });
+                boxes.forEach(function(b) { b.checked = anyOff; });
+                recompute();
+            });
+        });
+
+        addEventListener(document, 'click', closeFilter);
+        addEventListener(document, 'keydown', function(e) { if ('Escape' === e.key) { closeFilter(); } });
     })();
 })();
 /*]]>*/

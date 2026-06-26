@@ -118,7 +118,7 @@ class HtmlErrorRendererTest extends TestCase
         );
 
         $this->assertStringContainsString(
-            '<em>binary string</em>',
+            '<span class="trace-arg-object">binary string</span>',
             $rendered,
             '->render() returns the HTML content with "binary string" replacement'
         );

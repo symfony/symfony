@@ -119,6 +119,11 @@ class Command implements SignalableCommandInterface
         $this->ignoreValidationErrors = true;
     }
 
+    public function ignoreExtraArguments(): void
+    {
+        $this->definition->setTolerateExtraTokens(true);
+    }
+
     public function setApplication(?Application $application): void
     {
         $this->application = $application;

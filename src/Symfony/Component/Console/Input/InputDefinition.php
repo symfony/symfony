@@ -35,6 +35,7 @@ class InputDefinition
     private array $options = [];
     private array $negations = [];
     private array $shortcuts = [];
+    private bool $tolerateExtraTokens = false;
 
     /**
      * @param array $definition An array of InputArgument and InputOption instance
@@ -349,6 +350,16 @@ class InputDefinition
         }
 
         return $this->negations[$negation];
+    }
+
+    public function getTolerateExtraTokens(): bool
+    {
+        return $this->tolerateExtraTokens;
+    }
+
+    public function setTolerateExtraTokens(bool $tolerate): void
+    {
+        $this->tolerateExtraTokens = $tolerate;
     }
 
     /**

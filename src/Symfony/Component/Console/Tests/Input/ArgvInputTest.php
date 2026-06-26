@@ -858,5 +858,23 @@ class ArgvInputTest extends TestCase
             "A\nB'C",
             "A\nB'C",
         );
+
+        yield 'allow extra tokens' => (function () {
+            $definition = new InputDefinition();
+            $definition->setTolerateExtraTokens(true);
+            $definition->addOption(new InputOption('foo', null));
+            $definition->addArgument(new InputArgument('foo', InputArgument::REQUIRED));
+
+            return [
+                $definition,
+                new ArgvInput([
+                    'docker',
+                    'compose',
+                    'up',
+                ]),
+                null,
+                [],
+            ];
+        })();
     }
 }

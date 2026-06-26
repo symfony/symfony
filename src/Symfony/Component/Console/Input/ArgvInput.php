@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\Input;
 
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Exception\UnexpectedArgumentException;
 
 /**
  * ArgvInput represents an input coming from the CLI arguments.
@@ -74,7 +75,14 @@ class ArgvInput extends Input
         $parseOptions = true;
         $this->parsed = $this->tokens;
         while (null !== $token = array_shift($this->parsed)) {
-            $parseOptions = $this->parseToken($token, $parseOptions);
+            try {
+                $parseOptions = $this->parseToken($token, $parseOptions);
+            } catch (UnexpectedArgumentException $e) {
+                if (true === $this->definition->getTolerateExtraTokens()) {
+                    break;
+                }
+                throw $e;
+            }
         }
     }
 
@@ -196,7 +204,7 @@ class ArgvInput extends Input
                 $message = \sprintf('No arguments expected, got "%s".', $token);
             }
 
-            throw new RuntimeException($message);
+            throw new UnexpectedArgumentException($message);
         }
     }
 

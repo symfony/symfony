@@ -122,6 +122,11 @@ class ArgvInput extends Input
         }
     }
 
+    public function getUnparsedTokens(): array
+    {
+        return $this->parsed;
+    }
+
     /**
      * Parses a short option set.
      *

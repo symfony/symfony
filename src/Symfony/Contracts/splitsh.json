@@ -8,6 +8,7 @@
         "translation-contracts": "Translation"
     },
     "defaults": {
-        "git_constraint": "<1.8.2"
+        "git_constraint": "<1.8.2",
+        "tag_skip": "no_commit"
     }
 }

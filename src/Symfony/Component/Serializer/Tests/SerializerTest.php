@@ -1112,9 +1112,9 @@ class SerializerTest extends TestCase
                 'expectedTypes' => [
                     'int',
                 ],
-                'path' => 'nestedObject[int]',
-                'useMessageForUser' => true,
-                'message' => 'The type of the key "int" must be "int" ("string" given).',
+                'path' => 'nestedObject.int',
+                'useMessageForUser' => false,
+                'message' => 'The type of the "int" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\TestFoo" must be one of "int" ("string" given).',
             ],
             [
                 'currentType' => 'null',

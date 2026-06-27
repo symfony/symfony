@@ -1391,26 +1391,22 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder->append(Finder::create()->in($dir.'a'));
 
         $expected = [
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'a1', 'relativePathname' => 'a1'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'a2', 'relativePathname' => 'a2'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b', 'relativePathname' => 'b'],
+            ['key' => $dir.'a/a1', 'relativePathname' => 'a1'],
+            ['key' => $dir.'a/a2', 'relativePathname' => 'a2'],
+            ['key' => $dir.'a/b', 'relativePathname' => 'b'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b1'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'b1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'b1'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b2'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'b2'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'b2'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'c'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c1'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
-            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2'],
         ];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
-        }
-
-        $this->assertSame($expected, self::formatForAssert($finder));
+        $this->assertEqualsCanonicalizing($expected, self::formatForAssert($finder));
     }
 
     public function testRelativePathWithAppendedFinderForChildDirectory()
@@ -1440,16 +1436,12 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b2'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'c'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c1'],
-            ['key' => $dir.'a/b/c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c1'],
+            ['key' => $dir.'a/b/c/c1', 'relativePathname' => 'c1'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
-            ['key' => $dir.'a/b/c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c2'],
+            ['key' => $dir.'a/b/c/c2', 'relativePathname' => 'c2'],
         ];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
-        }
-
-        $this->assertSame($expected, self::formatForAssert($finder));
+        $this->assertEqualsCanonicalizing($expected, self::formatForAssert($finder));
     }
 
     public function testRelativePathWithAppendedPaths()
@@ -1484,11 +1476,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
         ];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
-        }
-
-        $this->assertSame($expected, self::formatForAssert($finder));
+        $this->assertEqualsCanonicalizing($expected, self::formatForAssert($finder));
     }
 
     public function testRelativePathWithAppendedOnEmptyFinder()

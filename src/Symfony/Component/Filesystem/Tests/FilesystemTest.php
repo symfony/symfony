@@ -1538,6 +1538,18 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($filename);
     }
 
+    public function testTempnamTrimsTrailingWhitespaceFromTruncatedPrefix()
+    {
+        // PHP's tempnam() truncates the prefix to 63 characters; if that leaves a
+        // trailing space, the file creation fails on Windows. See #64722.
+        $prefix = str_repeat('a', 62).' suffix';
+
+        $filename = $this->filesystem->tempnam($this->workspace, $prefix);
+
+        $this->assertFileExists($filename);
+        $this->assertStringNotContainsString(' ', basename($filename));
+    }
+
     public function testTempnamWithFileScheme()
     {
         $scheme = 'file://';

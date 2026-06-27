@@ -161,6 +161,10 @@ class ProxyHelperTest extends TestCase
 
             EOPHP;
 
+        if (\PHP_VERSION_ID >= 80600) {
+            $expected = str_replace('"a\0b"', '"a\000b"', $expected);
+        }
+
         $this->assertSame($expected, ProxyHelper::generateLazyProxy(new \ReflectionClass(TestForProxyHelper::class)));
     }
 

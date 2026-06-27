@@ -566,6 +566,10 @@
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
                 <target>Ez az XML-adattartalom túl nagy ({{ size }} bájt): meghaladja a {{ limit }} bájtos korlátot.</target>
             </trans-unit>
+            <trans-unit id="146">
+                <source>This value is not a valid cron expression.</source>
+                <target state="needs-review-translation">Ez az érték nem érvényes cron kifejezés.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

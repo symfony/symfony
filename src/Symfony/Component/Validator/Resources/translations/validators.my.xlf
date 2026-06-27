@@ -566,6 +566,10 @@
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
                 <target state="needs-review-translation">ဤ XML payload သည် ကြီးလွန်းသည် ({{ size }} bytes)။ ၎င်းသည် {{ limit }} bytes ကန့်သတ်ချက်ကို ကျော်လွန်သည်။</target>
             </trans-unit>
+            <trans-unit id="146">
+                <source>This value is not a valid cron expression.</source>
+                <target state="needs-review-translation">ဤတန်ဖိုးသည် မှန်ကန်သော cron ဖော်ပြချက် မဟုတ်ပါ။</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

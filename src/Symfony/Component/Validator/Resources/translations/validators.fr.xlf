@@ -566,6 +566,10 @@
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
                 <target>Cette charge utile XML est trop volumineuse ({{ size }} octets) : elle dépasse la limite de {{ limit }} octets.</target>
             </trans-unit>
+            <trans-unit id="146">
+                <source>This value is not a valid cron expression.</source>
+                <target state="needs-review-translation">Cette valeur n'est pas une expression cron valide.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

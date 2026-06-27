@@ -29,7 +29,7 @@ final class UrlHelper
 
     public function getAbsoluteUrl(string $path): string
     {
-        if (str_contains($path, '://') || str_starts_with($path, '//')) {
+        if (str_contains($path, '://') || str_starts_with($path, '//') || preg_match('/^[a-z][a-z0-9+.-]*:/i', $path)) {
             return $path;
         }
 

@@ -755,9 +755,7 @@ END'],
         );
     }
 
-    /**
-     * @dataProvider provideSpliceMultibyte
-     */
+    #[DataProvider('provideSpliceMultibyte')]
     public function testSpliceMultibyte(string $expected, string $origin, string $replacement, int $start, ?int $length = null)
     {
         $this->assertEquals(

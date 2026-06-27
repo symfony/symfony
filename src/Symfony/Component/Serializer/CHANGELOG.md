@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Trigger a deprecation when denormalizing an array that is not a list into a `list`-typed property
+
 8.1
 ---
 

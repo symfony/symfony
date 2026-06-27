@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -1515,6 +1517,59 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(1, $actual->foo->count());
     }
 
+    public function testDenormalizeList()
+    {
+        $denormalizer = $this->getDenormalizerForListCollection(Type::list(Type::int()));
+
+        /** @var ListCollection $object */
+        $object = $denormalizer->denormalize(
+            ['list' => [1, 2, 3]],
+            ListCollection::class,
+        );
+
+        $this->assertTrue(array_is_list($object->list));
+        $this->assertCount(3, $object->list);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideDenormalizeListWithArray')]
+    public function testDenormalizeListWithArray(Type $type)
+    {
+        $denormalizer = $this->getDenormalizerForListCollection($type);
+
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.2: Denormalizing an array that is not a list into the "list" property of class "Symfony\Component\Serializer\Tests\Normalizer\ListCollection" is deprecated.');
+
+        /** @var ListCollection $object */
+        $object = $denormalizer->denormalize(
+            ['list' => [1 => 1, 4 => 2, 'foo' => 3]],
+            ListCollection::class
+        );
+
+        $this->assertFalse(array_is_list($object->list));
+        $this->assertCount(3, $object->list);
+    }
+
+    public static function provideDenormalizeListWithArray()
+    {
+        yield 'list<int>' => [Type::list(Type::int())];
+        yield '?list<int>' => [Type::nullable(Type::list(Type::int()))];
+    }
+
+    private function getDenormalizerForListCollection(Type $type)
+    {
+        $extractor = $this->createStub(PhpDocExtractor::class);
+        $extractor->method('getType')->willReturn($type, null);
+
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $arrayDenormalizer = new ArrayDenormalizerDummy();
+        $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
+        $arrayDenormalizer->setSerializer($serializer);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
+    }
+
     public function testTemplateTypeWhenAnObjectIsPassedToDenormalize()
     {
         $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
@@ -1843,6 +1898,12 @@ class StringCollection
 {
     /** @var string[] */
     public $children;
+}
+
+class ListCollection
+{
+    /** @var list<int> */
+    public $list;
 }
 
 class DummyCollection

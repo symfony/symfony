@@ -471,9 +471,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             }
 
             $collectionKeyType = $collectionValueType = null;
+            $isList = false;
             if ($t instanceof CollectionType) {
                 $collectionKeyType = $t->getCollectionKeyType();
                 $collectionValueType = $t->getCollectionValueType();
+                $isList = $t->isList();
             }
 
             while ($t instanceof WrappingTypeInterface) {
@@ -549,6 +551,12 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         case TypeIdentifier::INT:
                             return (int) $data;
                     }
+                }
+
+                if ($isList && \is_array($data) && !array_is_list($data)) {
+                    // In 9.0, throw a NotNormalizableValueException instead of triggering a deprecation:
+                    // throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be a list ("%s" given).', $attribute, $currentClass, get_debug_type($data)), $data, [Type::list()], $context['deserialization_path'] ?? null);
+                    trigger_deprecation('symfony/serializer', '8.2', 'Denormalizing an array that is not a list into the "%s" property of class "%s" is deprecated.', $attribute, $currentClass);
                 }
 
                 if ($collectionValueBaseType = $collectionValueType) {

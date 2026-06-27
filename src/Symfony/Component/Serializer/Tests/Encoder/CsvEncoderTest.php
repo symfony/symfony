@@ -729,6 +729,55 @@ class CsvEncoderTest extends TestCase
         ));
     }
 
+    public function testDecodeWithoutHeaderUsesProvidedHeadersAsKeys()
+    {
+        $csv = <<<'CSV'
+            abc
+            def
+            xyz
+
+            CSV;
+
+        $this->assertSame(
+            [['name' => 'abc'], ['name' => 'def'], ['name' => 'xyz']],
+            $this->encoder->decode($csv, 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::HEADERS_KEY => ['name'],
+            ])
+        );
+
+        $this->assertSame(
+            [['first' => 'a', 'last' => 'b'], ['first' => 'c', 'last' => 'd']],
+            $this->encoder->decode("a,b\nc,d\n", 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::HEADERS_KEY => ['first', 'last'],
+            ])
+        );
+
+        $this->assertSame(
+            [['first' => 'a', 1 => 'b'], ['first' => 'c', 1 => 'd']],
+            $this->encoder->decode("a,b\nc,d\n", 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::HEADERS_KEY => ['first'],
+            ])
+        );
+
+        $this->assertSame(
+            [['user' => ['first' => 'a', 'last' => 'b']]],
+            $this->encoder->decode('a,b', 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::HEADERS_KEY => ['user.first', 'user.last'],
+            ])
+        );
+
+        $this->assertSame(
+            [['a', 'b'], ['c', 'd']],
+            $this->encoder->decode("a,b\nc,d\n", 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+            ])
+        );
+    }
+
     public function testBOMIsAddedOnDemand()
     {
         $value = ['foo' => 'hello', 'bar' => 'hey ho'];

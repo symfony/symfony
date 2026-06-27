@@ -89,6 +89,11 @@ class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
         $reflection = self::$reflectionCache[$class];
 
+        // Denormalization can also populate an object through its constructor, even when it exposes no setters (immutable value objects).
+        if (!$readAttributes && ($constructor = $reflection->getConstructor()) && $constructor->isPublic() && $constructor->getNumberOfParameters() > 0) {
+            return true;
+        }
+
         foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflectionMethod) {
             if ($readAttributes ? $this->isGetMethod($reflectionMethod) : $this->isSetMethod($reflectionMethod)) {
                 return true;

@@ -617,6 +617,20 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertSame($expected, $obj->$method());
     }
 
+    public function testSupportsAndDenormalizeConstructorOnlyObject()
+    {
+        $this->assertTrue($this->normalizer->supportsDenormalization(['x' => 1, 'y' => 2], ImmutableDummy::class));
+
+        $obj = $this->normalizer->denormalize(['x' => 1, 'y' => 2], ImmutableDummy::class);
+        $this->assertSame(1, $obj->getX());
+        $this->assertSame(2, $obj->getY());
+    }
+
+    public function testDoesNotSupportDenormalizationOfNonPublicConstructorOnlyObject()
+    {
+        $this->assertFalse($this->normalizer->supportsDenormalization(['x' => 1], ImmutablePrivateConstructorDummy::class));
+    }
+
     public function testDiscriminatorWithAllowExtraAttributesFalse()
     {
         // Discriminator type property should be allowed with allow_extra_attributes=false
@@ -783,6 +797,43 @@ class GetConstructorDummy
     public function otherMethod()
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class ImmutableDummy
+{
+    public function __construct(
+        private int $x,
+        private int $y,
+    ) {
+    }
+
+    public function getX(): int
+    {
+        return $this->x;
+    }
+
+    public function getY(): int
+    {
+        return $this->y;
+    }
+}
+
+class ImmutablePrivateConstructorDummy
+{
+    private function __construct(
+        private int $x,
+    ) {
+    }
+
+    public static function create(int $x): self
+    {
+        return new self($x);
+    }
+
+    public function getX(): int
+    {
+        return $this->x;
     }
 }
 

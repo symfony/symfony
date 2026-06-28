@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\AbstractCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -32,7 +33,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Command implements SignalableCommandInterface
+class Command extends AbstractCommand implements SignalableCommandInterface
 {
     // see https://tldp.org/LDP/abs/html/exitcodes.html
     public const SUCCESS = 0;
@@ -43,7 +44,6 @@ class Command implements SignalableCommandInterface
     private ?string $name = null;
     private ?string $processTitle = null;
     private array $aliases = [];
-    private InputDefinition $definition;
     private bool $hidden = false;
     private string $help = '';
     private string $description = '';
@@ -61,6 +61,8 @@ class Command implements SignalableCommandInterface
      */
     public function __construct(?string $name = null, ?callable $code = null)
     {
+        parent::__construct();
+
         $this->definition = new InputDefinition();
 
         $attribute = $this->getCommandAttribute($code);

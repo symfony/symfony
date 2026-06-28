@@ -201,7 +201,99 @@ class Application extends AbstractCommand implements ResetInterface
             return 0;
         }
 
-        return parent::doRun($input, $output);
+        try {
+            // Makes ArgvInput::getFirstArgument() able to distinguish an option from an argument.
+            $input->bind($this->getDefinition());
+        } catch (ExceptionInterface) {
+            // Errors must be ignored, full binding/validation happens later when the command is known.
+        }
+
+        $name = $this->getCommandName($input);
+        if (true === $input->hasParameterOption(['--help', '-h'], true)) {
+            if (!$name) {
+                $name = 'help';
+                $input = new ArrayInput(['command_name' => $this->defaultCommand]);
+            } else {
+                $this->wantHelps = true;
+            }
+        }
+
+        if (!$name) {
+            $name = $this->defaultCommand;
+            $definition = $this->getDefinition();
+            $definition->setArguments(array_merge(
+                $definition->getArguments(),
+                [
+                    'command' => new InputArgument('command', InputArgument::OPTIONAL, $definition->getArgument('command')->getDescription(), $name),
+                ]
+            ));
+        }
+
+        try {
+            $this->runningCommand = null;
+            // the command name MUST be the first element of the input
+            $command = $this->find($name);
+        } catch (\Throwable $e) {
+            if (($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) && 1 === \count($alternatives = $e->getAlternatives()) && $input->isInteractive()) {
+                $alternative = $alternatives[0];
+
+                $style = new SymfonyStyle($input, $output);
+                $output->writeln('');
+                $formattedBlock = (new FormatterHelper())->formatBlock(\sprintf('Command "%s" is not defined.', $name), 'error', true);
+                $output->writeln($formattedBlock);
+                if (!$style->confirm(\sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
+                    if (null !== $this->dispatcher) {
+                        $event = new ConsoleErrorEvent($input, $output, $e);
+                        $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
+
+                        return $event->getExitCode();
+                    }
+
+                    return 1;
+                }
+
+                $command = $this->find($alternative);
+            } else {
+                if (null !== $this->dispatcher) {
+                    $event = new ConsoleErrorEvent($input, $output, $e);
+                    $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
+
+                    if (0 === $event->getExitCode()) {
+                        return 0;
+                    }
+
+                    $e = $event->getError();
+                }
+
+                try {
+                    if ($e instanceof CommandNotFoundException && $namespace = $this->findNamespace($name)) {
+                        $helper = new DescriptorHelper();
+                        $helper->describe($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output, $this, [
+                            'format' => 'txt',
+                            'raw_text' => false,
+                            'namespace' => $namespace,
+                            'short' => false,
+                        ]);
+
+                        return isset($event) ? $event->getExitCode() : 1;
+                    }
+
+                    throw $e;
+                } catch (NamespaceNotFoundException) {
+                    throw $e;
+                }
+            }
+        }
+
+        if ($command instanceof LazyCommand) {
+            $command = $command->getCommand();
+        }
+
+        $this->runningCommand = $command;
+        $exitCode = $this->doRunCommand($command, $input, $output);
+        $this->runningCommand = null;
+
+        return $exitCode;
     }
 
     public function reset(): void

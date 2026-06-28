@@ -36,8 +36,8 @@ abstract class AbstractCommand
     protected ?InputDefinition $definition = null;
     protected ?CommandLoaderInterface $commandLoader = null;
     protected ?ArgumentResolverInterface $argumentResolver = null;
-    private ?EventDispatcherInterface $dispatcher = null;
-    private array $commands = [];
+    protected ?EventDispatcherInterface $dispatcher = null;
+    protected array $commands = [];
     protected bool $wantHelps = false;
     protected string $defaultCommand;
     private Terminal $terminal;
@@ -124,89 +124,16 @@ abstract class AbstractCommand
      */
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        try {
-            // Makes ArgvInput::getFirstArgument() able to distinguish an option from an argument.
-            $input->bind($this->getDefinition());
-        } catch (ExceptionInterface) {
-            // Errors must be ignored, full binding/validation happens later when the command is known.
-        }
-
         $name = $this->getCommandName($input);
-        if (true === $input->hasParameterOption(['--help', '-h'], true)) {
-            if (!$name) {
-                $name = 'help';
-                $input = new ArrayInput(['command_name' => $this->defaultCommand]);
-            } else {
-                $this->wantHelps = true;
-            }
-        }
 
         if (!$name) {
-            $name = $this->defaultCommand;
-            $definition = $this->getDefinition();
-            $definition->setArguments(array_merge(
-                $definition->getArguments(),
-                [
-                    'command' => new InputArgument('command', InputArgument::OPTIONAL, $definition->getArgument('command')->getDescription(), $name),
-                ]
-            ));
+            throw new \RuntimeException(
+                'Command name cannot be determined from input'
+            );
         }
 
-        try {
-            $this->runningCommand = null;
-            // the command name MUST be the first element of the input
-            $command = $this->find($name);
-        } catch (\Throwable $e) {
-            if (($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) && 1 === \count($alternatives = $e->getAlternatives()) && $input->isInteractive()) {
-                $alternative = $alternatives[0];
+        $command = $this->find($name);
 
-                $style = new SymfonyStyle($input, $output);
-                $output->writeln('');
-                $formattedBlock = (new FormatterHelper())->formatBlock(\sprintf('Command "%s" is not defined.', $name), 'error', true);
-                $output->writeln($formattedBlock);
-                if (!$style->confirm(\sprintf('Do you want to run "%s" instead? ', $alternative), false)) {
-                    if (null !== $this->dispatcher) {
-                        $event = new ConsoleErrorEvent($input, $output, $e);
-                        $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
-
-                        return $event->getExitCode();
-                    }
-
-                    return 1;
-                }
-
-                $command = $this->find($alternative);
-            } else {
-                if (null !== $this->dispatcher) {
-                    $event = new ConsoleErrorEvent($input, $output, $e);
-                    $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
-
-                    if (0 === $event->getExitCode()) {
-                        return 0;
-                    }
-
-                    $e = $event->getError();
-                }
-
-                try {
-                    if ($e instanceof CommandNotFoundException && $namespace = $this->findNamespace($name)) {
-                        $helper = new DescriptorHelper();
-                        $helper->describe($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output, $this, [
-                            'format' => 'txt',
-                            'raw_text' => false,
-                            'namespace' => $namespace,
-                            'short' => false,
-                        ]);
-
-                        return isset($event) ? $event->getExitCode() : 1;
-                    }
-
-                    throw $e;
-                } catch (NamespaceNotFoundException) {
-                    throw $e;
-                }
-            }
-        }
 
         if ($command instanceof LazyCommand) {
             $command = $command->getCommand();
@@ -517,10 +444,9 @@ abstract class AbstractCommand
             $command = new Command(null, $command);
         }
 
-
         $command->setApplication($this->getApplication());
-        foreach ($command->commands as $command) {
-            $command->setApplication($this->getApplication());
+        foreach ($command->commands as $subCommand) {
+            $subCommand->setApplication($this->getApplication());
         }
 
         if (!$command->isEnabled()) {
@@ -560,7 +486,9 @@ abstract class AbstractCommand
 
         // When the command has a different name than the one used at the command loader level
         if (!isset($this->commands[$name])) {
-            throw new CommandNotFoundException(\sprintf('The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name));
+            throw new CommandNotFoundException(\sprintf(
+                'The "%s" command cannot be found because it is registered under multiple names. Make sure you don\'t set a different name via constructor or "setName()".', $name
+            ));
         }
 
         $command = $this->commands[$name];

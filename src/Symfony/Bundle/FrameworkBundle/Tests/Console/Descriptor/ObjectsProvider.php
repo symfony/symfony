@@ -13,6 +13,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerHigh;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerLow;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerYaml;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -196,6 +199,29 @@ class ObjectsProvider
         $builder->setDefinitions(self::getContainerDefinitionsWithPriorityTags());
 
         return ['builder' => $builder];
+    }
+
+    public static function getContainerBuildersWithTaggedItemPriority()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setDefinitions(self::getContainerDefinitionsWithTaggedItemPriority());
+
+        return ['builder' => $builder];
+    }
+
+    public static function getContainerDefinitionsWithTaggedItemPriority()
+    {
+        return [
+            'handler_high' => (new Definition(TaggedItemHandlerHigh::class))
+                ->setPublic(true)
+                ->addTag('app.handler'),
+            'handler_yaml' => (new Definition(TaggedItemHandlerYaml::class))
+                ->setPublic(true)
+                ->addTag('app.handler', ['priority' => 50]),
+            'handler_low' => (new Definition(TaggedItemHandlerLow::class))
+                ->setPublic(true)
+                ->addTag('app.handler'),
+        ];
     }
 
     public static function getContainerDefinitionsWithPriorityTags()

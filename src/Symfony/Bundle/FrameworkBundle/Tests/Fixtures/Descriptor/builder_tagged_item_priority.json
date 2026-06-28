@@ -1,0 +1,69 @@
+{
+    "definitions": {
+        "handler_yaml": {
+            "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\TaggedItemHandlerYaml",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "file": null,
+            "tags": [
+                {
+                    "name": "app.handler",
+                    "parameters": {
+                        "priority": 50
+                    }
+                }
+            ],
+            "usages": []
+        },
+        "handler_high": {
+            "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\TaggedItemHandlerHigh",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "file": null,
+            "tags": [
+                {
+                    "name": "app.handler",
+                    "parameters": {
+                        "priority": 100
+                    }
+                }
+            ],
+            "usages": []
+        },
+        "handler_low": {
+            "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Fixtures\\TaggedItemHandlerLow",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "file": null,
+            "tags": [
+                {
+                    "name": "app.handler",
+                    "parameters": {
+                        "priority": -100
+                    }
+                }
+            ],
+            "usages": []
+        }
+    },
+    "aliases": [],
+    "services": []
+}

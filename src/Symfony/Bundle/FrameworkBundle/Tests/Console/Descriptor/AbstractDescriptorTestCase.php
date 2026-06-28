@@ -361,4 +361,25 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
         return $data;
     }
+
+    /** @dataProvider getDescribeContainerBuilderWithTaggedItemPriorityTestData */
+    public function testDescribeContainerBuilderWithTaggedItemPriority(ContainerBuilder $builder, $expectedDescription, array $options)
+    {
+        $this->assertDescription($expectedDescription, $builder, $options);
+    }
+
+    public static function getDescribeContainerBuilderWithTaggedItemPriorityTestData(): array
+    {
+        $variations = ['tagged_item_priority' => ['tag' => 'app.handler']];
+        $data = [];
+        foreach (ObjectsProvider::getContainerBuildersWithTaggedItemPriority() as $name => $object) {
+            foreach ($variations as $suffix => $options) {
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
+                $data[] = [$object, $description, $options];
+            }
+        }
+
+        return $data;
+    }
 }

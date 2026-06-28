@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <definition id="handler_yaml" class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerYaml" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+    <tags>
+      <tag name="app.handler">
+        <parameter name="priority">50</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="handler_high" class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerHigh" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+    <tags>
+      <tag name="app.handler">
+        <parameter name="priority">100</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="handler_low" class="Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerLow" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+    <tags>
+      <tag name="app.handler">
+        <parameter name="priority">-100</parameter>
+      </tag>
+    </tags>
+  </definition>
+</container>

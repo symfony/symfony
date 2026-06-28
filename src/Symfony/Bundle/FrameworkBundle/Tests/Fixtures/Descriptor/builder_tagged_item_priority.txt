@@ -1,0 +1,11 @@
+
+[33mSymfony Container Services Tagged with "app.handler" Tag[39m
+[33m========================================================[39m
+
+ -------------- ---------- --------------------------------------------------------------------- 
+ [32m Service ID   [39m [32m priority [39m [32m Class name                                                          [39m 
+ -------------- ---------- --------------------------------------------------------------------- 
+  handler_high   100        Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerHigh  
+  handler_yaml   50         Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerYaml  
+  handler_low    -100       Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItemHandlerLow   
+ -------------- ---------- ---------------------------------------------------------------------

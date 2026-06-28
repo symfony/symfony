@@ -32,6 +32,7 @@ abstract class Input implements RawInputInterface, StreamableInputInterface
     protected $stream;
     protected array $options = [];
     protected array $arguments = [];
+    protected array $attributes = [];
     protected bool $interactive = true;
 
     public function __construct(?InputDefinition $definition = null)
@@ -42,6 +43,24 @@ abstract class Input implements RawInputInterface, StreamableInputInterface
             $this->bind($definition);
             $this->validate();
         }
+    }
+
+    public function setAttribute(string $name, mixed $value): void
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    public function getAttribute(string $name): mixed
+    {
+        if (!array_key_exists($name, $this->attributes)) {
+            throw new RuntimeException(sprintf(
+                'Attribute "%s" not know, known attributes: "%s"',
+                $name,
+                implode('", "', array_keys($this->attributes))
+            ));
+        }
+
+        return $this->attributes[$name];
     }
 
     public function bind(InputDefinition $definition): void

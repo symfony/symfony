@@ -64,6 +64,9 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
+    /**
+     * Return a new Input instance for any sub-command.
+     */
     public function getSubCommandInput(): static
     {
         $tokens = $this->getUnparsedTokens();
@@ -71,6 +74,9 @@ class ArgvInput extends Input
         // create a fake application name as it will be stripped in the ctor
         array_unshift($tokens, '__fake_application_name__');
         $argv = new ArgvInput($tokens);
+
+        // the attributes are inherited
+        $argv->attributes = $this->attributes;
 
         return $argv;
     }
@@ -90,7 +96,7 @@ class ArgvInput extends Input
                 $parseOptions = $this->parseToken($token, $parseOptions);
             } catch (UnexpectedArgumentException $e) {
                 if (true === $this->definition->getTolerateExtraTokens()) {
-                    $this->parsed[] = $token;
+                    array_unshift($this->parsed, $token);
                     break;
                 }
                 throw $e;
@@ -136,7 +142,7 @@ class ArgvInput extends Input
 
     public function getUnparsedTokens(): array
     {
-        return array_reverse($this->parsed);
+        return $this->parsed;
     }
 
     /**

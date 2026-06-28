@@ -517,7 +517,11 @@ abstract class AbstractCommand
             $command = new Command(null, $command);
         }
 
-        $command->setApplication($this);
+
+        $command->setApplication($this->getApplication());
+        foreach ($command->commands as $command) {
+            $command->setApplication($this->getApplication());
+        }
 
         if (!$command->isEnabled()) {
             $command->setApplication(null);
@@ -766,4 +770,6 @@ abstract class AbstractCommand
     {
         return '    '.implode("\n    ", $abbrevs);
     }
+
+    abstract public function getApplication(): ?Application;
 }

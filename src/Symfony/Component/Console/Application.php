@@ -414,6 +414,7 @@ class Application extends AbstractCommand implements ResetInterface
     public function addCommand(callable|Command $command): ?Command
     {
         $this->init();
+
         return parent::addCommand($command);
     }
 
@@ -796,5 +797,10 @@ class Application extends AbstractCommand implements ResetInterface
     protected function getCommandName(InputInterface $input): ?string
     {
         return $this->singleCommand ? $this->defaultCommand : $input->getFirstArgument();
+    }
+
+    public function getApplication(): ?Application
+    {
+        return $this;
     }
 }

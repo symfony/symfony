@@ -697,4 +697,16 @@ abstract class AbstractCommand
     }
 
     abstract public function getApplication(): ?Application;
+
+    /**
+     * Returns the namespace part of the command name.
+     *
+     * This method is not part of public API and should not be used directly.
+     */
+    public function extractNamespace(string $name, ?int $limit = null): string
+    {
+        $parts = explode(':', $name, -1);
+
+        return implode(':', null === $limit ? $parts : \array_slice($parts, 0, $limit));
+    }
 }

@@ -445,9 +445,6 @@ abstract class AbstractCommand
         }
 
         $command->setApplication($this->getApplication());
-        foreach ($command->commands as $subCommand) {
-            $subCommand->setApplication($this->getApplication());
-        }
 
         if (!$command->isEnabled()) {
             $command->setApplication(null);

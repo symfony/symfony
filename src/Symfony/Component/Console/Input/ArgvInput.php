@@ -64,6 +64,17 @@ class ArgvInput extends Input
         parent::__construct($definition);
     }
 
+    public function getSubCommandInput(): static
+    {
+        $tokens = $this->getUnparsedTokens();
+
+        // create a fake application name as it will be stripped in the ctor
+        array_unshift($tokens, '__fake_application_name__');
+        $argv = new ArgvInput($tokens);
+
+        return $argv;
+    }
+
     /** @param list<string> $tokens */
     protected function setTokens(array $tokens): void
     {

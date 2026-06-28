@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Override;
 use Symfony\Component\Console\AbstractCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -126,14 +127,26 @@ class Command extends AbstractCommand implements SignalableCommandInterface
         $this->definition->setTolerateExtraTokens(true);
     }
 
+    #[Override]
+    public function addCommand(callable|Command $command): ?Command
+    {
+        $this->ignoreExtraArguments();
+        return parent::addCommand($command);
+    }
+
     public function setApplication(?Application $application): void
     {
         $this->application = $application;
         if ($application) {
             $this->setHelperSet($application->getHelperSet());
+            foreach ($this->commands as $subCommand) {
+                $subCommand->setApplication($application);
+                $subCommand->setHelperSet($application->getHelperSet());
+            }
         } else {
             $this->helperSet = null;
         }
+
 
         $this->fullDefinition = null;
     }

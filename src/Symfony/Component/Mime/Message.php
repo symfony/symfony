@@ -122,6 +122,44 @@ class Message extends RawMessage
         yield from $body->toIterable();
     }
 
+    public function toStringForArchive(): string
+    {
+        if (null === $body = $this->getBody()) {
+            $body = new TextPart('');
+        }
+
+        return $this->getArchiveHeaders()->toString().$body->toString();
+    }
+
+    public function toIterableForArchive(): iterable
+    {
+        if (null === $body = $this->getBody()) {
+            $body = new TextPart('');
+        }
+
+        yield $this->getArchiveHeaders()->toString();
+        yield from $body->toIterable();
+    }
+
+    private function getArchiveHeaders(): Headers
+    {
+        $headers = clone $this->headers;
+
+        if (!$headers->has('MIME-Version')) {
+            $headers->addTextHeader('MIME-Version', '1.0');
+        }
+
+        if (!$headers->has('Date')) {
+            $headers->addDateHeader('Date', new \DateTimeImmutable());
+        }
+
+        if (!$headers->has('Message-ID')) {
+            $headers->addIdHeader('Message-ID', $this->generateMessageId());
+        }
+
+        return $headers;
+    }
+
     public function ensureValidity(): void
     {
         if (!$this->headers->get('To')?->getBody() && !$this->headers->get('Cc')?->getBody() && !$this->headers->get('Bcc')?->getBody()) {

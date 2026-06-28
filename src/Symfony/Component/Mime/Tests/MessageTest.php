@@ -352,4 +352,24 @@ class MessageTest extends TestCase
             ],
         ];
     }
+
+    public function testToStringForArchiveIncludesBcc()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
+        $message->getHeaders()->addMailboxListHeader('Bcc', ['bcc@symfony.com']);
+
+        $this->assertStringContainsString('Bcc: bcc@symfony.com', $message->toStringForArchive());
+        $this->assertStringNotContainsString('Bcc', $message->toString());
+    }
+
+    public function testToIterableForArchiveIncludesBcc()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
+        $message->getHeaders()->addMailboxListHeader('Bcc', ['bcc@symfony.com']);
+
+        $result = implode('', iterator_to_array($message->toIterableForArchive(), false));
+        $this->assertStringContainsString('Bcc: bcc@symfony.com', $result);
+    }
 }

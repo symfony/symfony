@@ -28,19 +28,25 @@ use Symfony\Component\VarExporter\Internal\Exporter;
 final class VarExporter
 {
     /**
+     * Exports each array item on its own line instead of inlining short flat arrays.
+     */
+    public const NO_INLINE_ARRAY = 1;
+
+    /**
      * Exports a serializable PHP value to PHP code.
      *
      * @param bool                              &$isStaticValue Set to true after execution if the provided value is static, false otherwise
      * @param array<class-string, class-string> &$foundClasses  Classes found in the value are added to this list as both keys and values
+     * @param int                               $flags          A bitmask of self::* constants to tweak the generated code
      *
      * @throws ExceptionInterface When the provided value cannot be serialized
      */
-    public static function export(mixed $value, ?bool &$isStaticValue = null, array &$foundClasses = []): string
+    public static function export(mixed $value, ?bool &$isStaticValue = null, array &$foundClasses = [], int $flags = 0): string
     {
         $isStaticValue = true;
 
         if (!\is_object($value) && !(\is_array($value) && $value) && !\is_resource($value) || $value instanceof \UnitEnum) {
-            return Exporter::export($value);
+            return Exporter::export($value, '', $flags);
         }
 
         if (\is_resource($value)) {
@@ -54,7 +60,7 @@ final class VarExporter
         }
 
         if (\array_key_exists('value', $data)) {
-            return Exporter::export($data['value']);
+            return Exporter::export($data['value'], '', $flags);
         }
 
         $isStaticValue = false;
@@ -68,6 +74,6 @@ final class VarExporter
             $foundClasses[$classes] = $classes;
         }
 
-        return '\deepclone_from_array('.Exporter::export($data).', null, true)';
+        return '\deepclone_from_array('.Exporter::export($data, '', $flags).', null, true)';
     }
 }

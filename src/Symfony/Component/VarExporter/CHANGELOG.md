@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `VarExporter::NO_INLINE_ARRAY` flag to export each array item on its own line
+
 8.1
 ---
 

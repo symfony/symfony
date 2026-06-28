@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\VarExporter\Internal;
 
+use Symfony\Component\VarExporter\VarExporter;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  *
@@ -18,7 +20,7 @@ namespace Symfony\Component\VarExporter\Internal;
  */
 class Exporter
 {
-    public static function export($value, $indent = '')
+    public static function export($value, $indent = '', $flags = 0)
     {
         switch (true) {
             case \is_int($value) || \is_float($value): return var_export($value, true);
@@ -79,11 +81,11 @@ class Exporter
             if (\is_array($v)) {
                 $isFlat = false;
             }
-            $code .= self::export($v, $subIndent).",\n";
+            $code .= self::export($v, $subIndent, $flags).",\n";
             ++$size;
         }
 
-        if (!$isFlat) {
+        if (!$isFlat || ($flags & VarExporter::NO_INLINE_ARRAY)) {
             return "[\n".$code.$indent.']';
         }
 
@@ -101,7 +103,7 @@ class Exporter
                 if (\is_int($k) && $k > $j) {
                     $j = $k;
                 }
-                $code .= self::export($v, $indent);
+                $code .= self::export($v, $indent, $flags);
             }
 
             return $code.']';
@@ -123,7 +125,7 @@ class Exporter
             if (\is_int($k) && $k > $j) {
                 $j = $k;
             }
-            $part .= self::export($v, $subIndent).',';
+            $part .= self::export($v, $subIndent, $flags).',';
 
             if ('' !== $line && $lineSize + $partSize > 20) {
                 $code .= $subIndent.$line."\n";

@@ -319,6 +319,29 @@ class VarExporterTest extends TestCase
 
         $this->assertStringContainsString("['line1'.\"\\n\"\n                .'line2']", $exported);
     }
+
+    public function testNoInlineArray()
+    {
+        $value = ['foo' => ['1', '2', '3']];
+
+        // by default, short flat arrays are inlined
+        $this->assertSame(<<<'PHP'
+            [
+                'foo' => ['1', '2', '3'],
+            ]
+            PHP, VarExporter::export($value));
+
+        // with NO_INLINE_ARRAY, each item is placed on its own line
+        $this->assertSame(<<<'PHP'
+            [
+                'foo' => [
+                    '1',
+                    '2',
+                    '3',
+                ],
+            ]
+            PHP, VarExporter::export($value, flags: VarExporter::NO_INLINE_ARRAY));
+    }
 }
 
 class MyCloneable

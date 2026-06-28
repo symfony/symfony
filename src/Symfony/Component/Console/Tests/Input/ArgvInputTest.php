@@ -861,7 +861,7 @@ class ArgvInputTest extends TestCase
 
         yield 'allow extra tokens' => (function () {
             $definition = new InputDefinition();
-            $definition->setTolerateExtraTokens(true);
+            $definition->setIgnoreExtraArguments(true);
             $definition->addOption(new InputOption('foo', null));
             $definition->addArgument(new InputArgument('foo', InputArgument::REQUIRED));
 

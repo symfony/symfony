@@ -95,7 +95,7 @@ class ArgvInput extends Input
             try {
                 $parseOptions = $this->parseToken($token, $parseOptions);
             } catch (UnexpectedArgumentException $e) {
-                if (true === $this->definition->getTolerateExtraTokens()) {
+                if (true === $this->definition->getIgnoreExtraArguments()) {
                     array_unshift($this->parsed, $token);
                     break;
                 }

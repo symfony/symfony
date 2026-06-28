@@ -124,7 +124,7 @@ class Command extends AbstractCommand implements SignalableCommandInterface
 
     public function ignoreExtraArguments(): void
     {
-        $this->definition->setTolerateExtraTokens(true);
+        $this->definition->setIgnoreExtraArguments(true);
     }
 
     #[Override]
@@ -366,7 +366,7 @@ class Command extends AbstractCommand implements SignalableCommandInterface
         $this->fullDefinition = new InputDefinition();
         $this->fullDefinition->setOptions($this->definition->getOptions());
         $this->fullDefinition->addOptions($this->application->getDefinition()->getOptions());
-        $this->fullDefinition->setTolerateExtraTokens($this->definition->getTolerateExtraTokens());
+        $this->fullDefinition->setIgnoreExtraArguments($this->definition->getIgnoreExtraArguments());
 
         if ($mergeArgs) {
             $this->fullDefinition->setArguments($this->application->getDefinition()->getArguments());

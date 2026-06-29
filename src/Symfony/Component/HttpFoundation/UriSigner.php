@@ -92,7 +92,7 @@ class UriSigner
             throw new LogicException(\sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->expirationParameter));
         }
 
-        if (isset($params[$this->versionParameter])) {
+        if (null !== $version && isset($params[$this->versionParameter])) {
             throw new LogicException(\sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->versionParameter));
         }
 

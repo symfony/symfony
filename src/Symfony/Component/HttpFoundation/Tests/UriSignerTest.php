@@ -256,15 +256,6 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_hash=bar', new \DateTimeImmutable('2099-01-01 00:00:00'));
     }
 
-    public function testSignWithReservedVersionParameter()
-    {
-        $signer = new UriSigner('foobar');
-
-        $this->expectException(LogicException::class);
-
-        $signer->sign('http://example.com/foo?_version=valid', new \DateTimeImmutable('2099-01-01 00:00:00'));
-    }
-
     public function testSignDoesNotExposeVersion()
     {
         $signer = new UriSigner('foobar');

@@ -33,7 +33,6 @@ class UriSigner
     /**
      * @param string                 $hashParameter       Query string parameter to use
      * @param string                 $expirationParameter Query string parameter to use for expiration
-     * @param string                 $versionParameter    Reserved parameter name folded into the signature for versioning
      * @param \DateInterval|int|null $defaultExpiration   The expiration applied when none is passed to sign(); an int is a number of seconds
      */
     public function __construct(
@@ -41,7 +40,6 @@ class UriSigner
         private string $hashParameter = '_hash',
         private string $expirationParameter = '_expiration',
         private ?ClockInterface $clock = null,
-        private string $versionParameter = '_version',
         \DateInterval|int|null $defaultExpiration = null,
     ) {
         if (!$secret) {
@@ -92,21 +90,11 @@ class UriSigner
             throw new LogicException(\sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->expirationParameter));
         }
 
-        if (isset($params[$this->versionParameter])) {
-            throw new LogicException(\sprintf('URI query parameter conflict: parameter name "%s" is reserved.', $this->versionParameter));
-        }
-
         if (null !== $expiration) {
             $params[$this->expirationParameter] = $this->getExpirationTime($expiration);
         }
 
-        $hashParams = $params;
-
-        if (null !== $version) {
-            $hashParams[$this->versionParameter] = $version;
-        }
-
-        $params[$this->hashParameter] = $this->computeHash($this->buildUrl($url, $hashParams));
+        $params[$this->hashParameter] = $this->computeHash($this->buildUrl($url, $params), $version);
 
         return $this->buildUrl($url, $params);
     }
@@ -159,8 +147,14 @@ class UriSigner
         };
     }
 
-    private function computeHash(string $uri): string
+    private function computeHash(string $uri, #[\SensitiveParameter] ?string $version = null): string
     {
+        if (null !== $version) {
+            // the version is folded into the signature without ever being exposed in the URI;
+            // the NUL byte safely separates it from the URI, which can never contain one
+            $uri .= "\0".$version;
+        }
+
         return strtr(rtrim(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)), '='), ['/' => '_', '+' => '-']);
     }
 
@@ -219,13 +213,7 @@ class UriSigner
         $hash = $params[$this->hashParameter];
         unset($params[$this->hashParameter]);
 
-        $hashParams = $params;
-
-        if (null !== $version) {
-            $hashParams[$this->versionParameter] = $version;
-        }
-
-        if (!hash_equals($this->computeHash($this->buildUrl($url, $hashParams)), strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']))) {
+        if (!hash_equals($this->computeHash($this->buildUrl($url, $params), $version), strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']))) {
             return self::STATUS_INVALID;
         }
 

@@ -108,7 +108,6 @@ return static function (ContainerConfigurator $container) {
                 '_hash',
                 '_expiration',
                 service('clock')->nullOnInvalid(),
-                '_version',
             ])
             ->lazy()
         ->alias(UriSigner::class, 'uri_signer')

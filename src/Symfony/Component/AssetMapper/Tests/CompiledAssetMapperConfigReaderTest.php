@@ -44,6 +44,18 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
         $this->assertTrue($reader->configExists('foo.json'));
     }
 
+    public function testConfigExistsIsIgnoredInDebugMode()
+    {
+        $this->filesystem->touch($this->writableRoot.'/foo.json');
+
+        $prodReader = new CompiledAssetMapperConfigReader($this->writableRoot, false);
+        $this->assertTrue($prodReader->configExists('foo.json'));
+
+        // in debug, compiled config must be ignored so dev computes assets dynamically
+        $debugReader = new CompiledAssetMapperConfigReader($this->writableRoot, true);
+        $this->assertFalse($debugReader->configExists('foo.json'));
+    }
+
     public function testLoadConfig()
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);

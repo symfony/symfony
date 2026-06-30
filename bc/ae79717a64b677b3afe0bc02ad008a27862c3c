@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by fabpot at 2026-06-27T06:29:37Z
+
+Some comments from Claude: Consistency problem with "This value"
+
+ The whole Validator file translates This value as 這個數值 (64 occurrences). The
+ PR introduces 這個值 instead in two units:
+
+ • id 143: 這個值不是有效的 XML。 → should be 這個數值不是有效的 XML。
+ • id 144: 這個值不符合預期的 XSD 結構定義。 → should be 這個數值不符合預期的 XSD
+   結構定義。
+
+ For consistency with the rest of the file, these should use 這個數值.
+
+Does it make sense to you?
+
+---------------------------------------------------------------------------
+
+by Link1515 at 2026-06-27T14:34:35Z
+
+Good point on consistency. One concern: in Traditional Chinese, 「數值」 sounds numeric, while these XML/XSD messages refer to the validated input rather than a number. I think 「這個值」 is semantically more accurate here. However, if we want to keep consistency with the rest of the file, we can use 「這個數值」 here.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-06-27T15:38:18Z
+
+You can change them all if you think yours sounds better.
+
+---------------------------------------------------------------------------
+
+by Link1515 at 2026-06-29T01:24:38Z
+
+I changed all instances of "這個數值" to "這個值". I think using "這個值" to translate "value" is more generally applicable.

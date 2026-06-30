@@ -1204,7 +1204,7 @@ class Parser
             }
         } while ($this->moveToNextLine());
 
-        throw new ParseException('Malformed inline YAML string.');
+        throw new ParseException('Unterminated quoted string. If it spans multiple lines, its continuation lines must be indented at least as deeply as where it starts.');
     }
 
     private function lexUnquotedString(int &$cursor): string

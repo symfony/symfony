@@ -1,0 +1,134 @@
+---------------------------------------------------------------------------
+
+by Nayte91 at 2025-11-14T09:32:29Z
+
+> Just wondering: can't this concern be addressed with a transformer?
+
+Absolutely! And this PR aims to get rid of them, as it can be a common use case. Instead of writing everything in this block, I answered you in the main post.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-14T10:00:30Z
+
+Transforming a UnitEnum to its name is a no-go to me. The case name is **not** a canonical scalar representation of an enum.
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2025-11-14T11:48:54Z
+
+> Transforming a UnitEnum to its name is a no-go to me. The case name is **not** a canonical scalar representation of an enum.
+
+For me neither, and I think this doesn't happen in my proposition? Tests throws error when you try to refer to the name instead of value. Did you see any line that uses name instead of value somewhere? I'm checking again!
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2025-11-14T15:40:50Z
+
+Ok few modifications;
+
+- Stof was right, I found a case where Enum mapped into name instead of value, because of reflection! I modified this behavior and ajusted tests (avoiding `case Active = 'Active'`...) to snipe that,
+- Made the DTO a lot simpler and a lot less, because the point to fight with attributes or property names,
+- More test cases,
+- Better error messages,
+- Bad Enum mappings now throw the `MappingTransformException`,
+- Better performances by early returning when no backed-Enums are involved in mapping.
+
+I have some questions:
+1. How about a specific EnumTests class?
+2. How about a specific EnumMapper class?
+3. How about a specific Exception, if `MappingTransformException` seems not relevant for you?
+4. There's a test about "Enum to Enum" mapping; Maybe it's a bit overkill?
+
+I'm pretty happy with implementation here, beside those questions; SRP seems good (in methods, not in classes), exceptions and messages seems useful, tests covers a lot, style seems clean, performances are saved. I will not work on it anymore until your feedback, roast me boyz!
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2025-11-25T15:43:50Z
+
+> suggestion on the approach:
+>
+> * append to the ReflectionObjectMapperMetadataFactory (or create a new ObjectMapperMetadataFactory)
+> * this one detects whether we need a transformation and appends a transform to the Mapping
+> * move enum transformation code to transformers
+>
+> This way we can have less specific code in the object mapper class (also helps when we want to continue #61515 )
+
+I changed the PR to something with your approach; for now, no details, no tests, just to confirm the direction?
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-03-06T11:57:23Z
+
+Here's an update addressing the open points:
+
+- Now obviously target 8.1 (rebase done),
+- Fixed @m0nclous's catched bug,
+- @soyuka's architecture implemented,
+- 7 test methods (BackedEnum→scalar, scalar→BackedEnum, explicit #[Map] + enum, metadata-from-target scenario, UnitEnum error cases, and invalid enum values)
+- 15 test fixtures (in Tests/Fixtures/EnumMapping/)
+- CLI tools compliance (Psalm, PHPDoc, Fabbot's CS, ..)
+- CHANGELOG entry
+
+If accepted, what about symfony-doc? I can redact something. Let's see this point later on.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-03-07T08:38:08Z
+
+This tab is now opened on my laptop I'll find some time to review ;) sorry for taking so much time ^^
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-03-09T12:15:39Z
+
+Every code blocks are outdated, because I ammend my commits instead of doing new ones. Is it a problem?
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-03-18T09:53:42Z
+
+Pushed a new design based on @soyuka feedbacks:
+- specific test file with all scenarios (wanted and not wanted) with various Fixtures' DTOs
+- MetaDataFactory that handles reflection
+- MapEnum transformer that handles logic,
+- small change in ObjectMapper to pass class of source & target, because without it the Factory can't discover the other one.
+
+New design saves reflecting everytime, but in exchange needs to call explicitely the transformer `#[Map(new MapEnum())]`
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-03-19T10:44:08Z
+
+Few more CS improvements since last push:
+- more test cases: failed int to int-backed-Enum and failed string to string-backed-Enum scenarios,
+- way less fixtures to test things out (24 → 9),
+- no more detection logic in `MapEnum` class (way simpler),
+- `MapEnum` now throws only one type of exception: when we fail at `MyBackedEnum::try($invalidValue)`.
+- all the detection logic is now handled by `EnumMappingMetadataFactory::detectEnumMapping()` (a bit bigger)
+- (sort of) improvements inside methods: match, clearer path and code, ... But maybe subjective!
+
+Everything seems way cleaner like this. Roast me.
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-03-20T12:53:45Z
+
+OK I tried this implementation in my own project that use massively ObjectMapper to map in & out enums, and everything blew up.
+
+So there's few modifications I amended:
+- test cases where there is no #[Map] attribute on properties but we want ObjectMapper to map enum to scalar,
+- the decorator wasn't wired in FrameworkBundle (oops) --> [`src/Symfony/Bundle/FrameworkBundle/Resources/config/object_mapper.php`](https://github.com/symfony/symfony/blob/8.1/src/Symfony/Bundle/FrameworkBundle/Resources/config/object_mapper.php)
+- added naked properties handling in `EnumMappingMetadataFactory`
+- also added a cache system for Enum properties, avoiding looping with `\ReflectionEnum()` on them
+
+And now all is green on my project; It's a good hint that the feature is mature!
+
+So there is 1 major change to review here `EnumMappingMetadataFactory::createEnumMappingIfNeeded()` that appeared with this change.
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-05-16T12:07:05Z
+
+Hello, do I have some work to do on this branch to help you merging it?

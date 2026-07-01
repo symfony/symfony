@@ -132,6 +132,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         $mapToProperties = [];
+        $explicitTargets = [];
+        $implicitValues = [];
         foreach ($this->getAllProperties($refl) as $property) {
             if ($property->isStatic()) {
                 continue;
@@ -174,6 +176,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 }
 
                 $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping);
+                $explicitTargets[$targetPropertyName] = true;
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
             }
 
@@ -187,7 +190,12 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+            }
+        }
+
+        foreach ($implicitValues as $propertyName => $value) {
+            if (!isset($explicitTargets[$propertyName])) {
                 $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
             }
         }

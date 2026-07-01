@@ -62,7 +62,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         private string $claim = 'sub',
         private ?LoggerInterface $logger = null,
         private ClockInterface $clock = new Clock(),
+        private int $leeway = 0,
     ) {
+        if (0 > $leeway) {
+            throw new \InvalidArgumentException('The "$leeway" argument must be greater than or equal to 0.');
+        }
     }
 
     public function enableJweSupport(JWKSet $decryptionKeyset, AlgorithmManager $decryptionAlgorithms, bool $enforceEncryption): void
@@ -223,9 +227,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
     {
         // Verify the claims
         $checkers = [
-            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+            new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: $this->leeway, protectedHeaderOnly: true),
+            new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: $this->leeway, protectedHeaderOnly: true),
+            new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: $this->leeway, protectedHeaderOnly: true),
             new Checker\AudienceChecker($this->audience),
             new Checker\IssuerChecker($this->issuers),
         ];
@@ -248,9 +252,9 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
                 new Checker\AlgorithmChecker($this->decryptionAlgorithms->list()),
                 new Checker\CallableChecker('enc', fn ($value) => \in_array($value, $this->decryptionAlgorithms->list())),
                 new Checker\CallableChecker('cty', static fn ($value) => 'JWT' === $value),
-                new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-                new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
-                new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: 0, protectedHeaderOnly: true),
+                new Checker\IssuedAtChecker(clock: $this->clock, allowedTimeDrift: $this->leeway, protectedHeaderOnly: true),
+                new Checker\NotBeforeChecker(clock: $this->clock, allowedTimeDrift: $this->leeway, protectedHeaderOnly: true),
+                new Checker\ExpirationTimeChecker(clock: $this->clock, allowedTimeDrift: $this->leeway, protectedHeaderOnly: true),
             ],
             [new JWETokenSupport()]
         );

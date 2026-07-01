@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add the `leeway` option to the OIDC token handler configuration
  * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
  * Add support for `#[AsTaggedItem]` attribute to configure voter priority
 

@@ -141,6 +141,27 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
+    public function testInvalidOidcTokenHandlerConfigurationWithNegativeLeeway()
+    {
+        $config = [
+            'token_handler' => [
+                'oidc' => [
+                    'algorithms' => ['RS256'],
+                    'issuers' => ['https://www.example.com'],
+                    'audience' => 'audience',
+                    'keyset' => 'keyset',
+                    'leeway' => -1,
+                ],
+            ],
+        ];
+
+        $factory = new AccessTokenFactory($this->createTokenHandlerFactories());
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig($config, $factory);
+    }
+
     public function testOidcTokenHandlerConfigurationWithMultipleAlgorithms()
     {
         $container = new ContainerBuilder();
@@ -151,6 +172,7 @@ class AccessTokenFactoryTest extends TestCase
                     'algorithms' => ['RS256', 'ES256'],
                     'issuers' => ['https://www.example.com'],
                     'audience' => 'audience',
+                    'leeway' => 60,
                     'keyset' => $jwkset,
                 ],
             ],
@@ -172,6 +194,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            '$leeway' => 60,
         ];
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
@@ -292,6 +315,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            '$leeway' => 0,
         ];
         $expectedCalls = [
             [
@@ -347,6 +371,7 @@ class AccessTokenFactoryTest extends TestCase
             'index_2' => 'audience',
             'index_3' => ['https://www.example.com'],
             'index_4' => 'sub',
+            '$leeway' => 0,
         ];
         $expectedCalls = [
             [

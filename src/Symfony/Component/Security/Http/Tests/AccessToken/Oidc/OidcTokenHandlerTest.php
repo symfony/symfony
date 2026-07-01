@@ -22,6 +22,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -126,6 +127,47 @@ class OidcTokenHandlerTest extends TestCase
                 'email' => 'foo@example.com',
             ])),
         ];
+    }
+
+    public function testGetsUserIdentifierFromExpiredTokenWithinConfiguredLeeway()
+    {
+        $clock = new MockClock('2026-06-06T12:00:00+00:00');
+        $time = $clock->now()->getTimestamp();
+        $claims = [
+            'iat' => $time - 3600,
+            'nbf' => $time - 3600,
+            'exp' => $time - 30,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'email' => 'foo@example.com',
+        ];
+        $token = self::buildJWS(json_encode($claims));
+
+        $userBadge = (new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
+            self::AUDIENCE,
+            ['https://www.example.com'],
+            clock: $clock,
+            leeway: 60,
+        ))->getUserBadgeFrom($token);
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
+    }
+
+    public function testRejectsNegativeLeeway()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "$leeway" argument must be greater than or equal to 0.');
+
+        (new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            self::getJWKSet(),
+            self::AUDIENCE,
+            ['https://www.example.com'],
+            leeway: -1,
+        ))->getUserBadgeFrom('invalid');
     }
 
     public function testThrowsAnErrorIfUserPropertyIsMissing()

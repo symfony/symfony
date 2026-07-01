@@ -31,6 +31,7 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
             ->replaceArgument(2, $config['audience'])
             ->replaceArgument(3, $config['issuers'])
             ->replaceArgument(4, $config['claim'])
+            ->replaceArgument('$leeway', $config['leeway'])
             ->addTag('container.reversible')
         );
 
@@ -148,6 +149,11 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                     ->scalarNode('claim')
                         ->info('Claim which contains the user identifier (e.g.: sub, email..).')
                         ->defaultValue('sub')
+                    ->end()
+                    ->integerNode('leeway')
+                        ->info('Leeway in seconds allowed when validating the "iat", "nbf" and "exp" claims.')
+                        ->defaultValue(0)
+                        ->min(0)
                     ->end()
                     ->scalarNode('audience')
                         ->info('Audience set in the token, for validation purpose.')

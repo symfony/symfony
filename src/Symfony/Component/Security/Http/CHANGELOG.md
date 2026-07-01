@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add configurable leeway to `OidcTokenHandler`
  * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
 
 8.0

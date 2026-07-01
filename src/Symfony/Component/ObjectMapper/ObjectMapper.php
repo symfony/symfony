@@ -140,7 +140,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
 
             $propertyName = $property->getName();
-            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
+            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName, [
+                'source' => $source::class,
+                'target' => $targetRefl->getName(),
+            ]);
             $mappings = array_filter($mappings, static fn (Mapping $m): bool => !$m->targetClass || is_a($targetName, $m->targetClass, true));
             foreach ($mappings as $mapping) {
                 $sourcePropertyName = $propertyName;

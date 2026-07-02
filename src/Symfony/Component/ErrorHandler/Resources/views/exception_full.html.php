@@ -32,7 +32,9 @@
             </header>
         <?php } ?>
 
-        <?= $this->include('views/exception.html.php', $context); ?>
+        <main>
+            <?= $this->include('views/exception.html.php', $context); ?>
+        </main>
 
         <script>
             <?= $this->include('assets/js/exception.js'); ?>

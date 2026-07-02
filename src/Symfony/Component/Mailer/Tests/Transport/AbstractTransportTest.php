@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\EventListener\MessageListener;
 use Symfony\Component\Mailer\Exception\LogicException;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
@@ -119,6 +120,42 @@ class AbstractTransportTest extends TestCase
 
         $sentMessage = $transport->send((new TemplatedEmail())->to('me@example.com')->from('me@example.com')->htmlTemplate('tpl'));
         $this->assertMatchesRegularExpression('/Some message/', $sentMessage->getMessage()->toString());
+    }
+
+    public function testSendingRemoteTemplateEmailWithUnsupportedTransport()
+    {
+        $transport = new class(new EventDispatcher()) extends AbstractTransport {
+            protected function doSend(SentMessage $message): void
+            {
+            }
+
+            public function __toString(): string
+            {
+                return 'fake://';
+            }
+        };
+
+        $email = (new RemoteTemplateEmail())
+            ->from('fabien@example.com')
+            ->to('helene@example.com')
+            ->template('welcome', ['firstName' => 'Fabien']);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('does not support sending emails rendered from a remote template');
+
+        $transport->send($email);
+    }
+
+    public function testSendingRemoteTemplateEmailWithSupportedTransport()
+    {
+        $transport = new NullTransport(new EventDispatcher());
+
+        $email = (new RemoteTemplateEmail())
+            ->from('fabien@example.com')
+            ->to('helene@example.com')
+            ->template('welcome', ['firstName' => 'Fabien']);
+
+        $this->assertNotNull($transport->send($email));
     }
 
     public function testRejectMessage()

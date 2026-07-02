@@ -20,8 +20,10 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\DateHeader;
@@ -33,7 +35,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class SendgridApiTransport extends AbstractApiTransport
+class SendgridApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     private const HOST = 'api.%region_dot%sendgrid.com';
 
@@ -92,11 +94,18 @@ class SendgridApiTransport extends AbstractApiTransport
             return $stringified;
         };
 
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+
         $payload = [
             'personalizations' => [],
             'from' => $addressStringifier($envelope->getSender()),
-            'content' => $this->getContent($email),
         ];
+
+        if (null !== $template) {
+            $payload['template_id'] = $template->getReference();
+        } else {
+            $payload['content'] = $this->getContent($email);
+        }
 
         if ($email->getAttachments()) {
             $payload['attachments'] = $this->getAttachments($email);
@@ -104,8 +113,13 @@ class SendgridApiTransport extends AbstractApiTransport
 
         $personalization = [
             'to' => array_map($addressStringifier, $this->getRecipients($email, $envelope)),
-            'subject' => $email->getSubject(),
         ];
+        if (null === $template || null !== $email->getSubject()) {
+            $personalization['subject'] = $email->getSubject();
+        }
+        if (null !== $template && $template->getVariables()) {
+            $personalization['dynamic_template_data'] = $template->getVariables();
+        }
         if ($emails = array_map($addressStringifier, $email->getCc())) {
             $personalization['cc'] = $emails;
         }

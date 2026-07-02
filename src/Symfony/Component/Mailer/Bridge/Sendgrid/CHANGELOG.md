@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `RemoteTemplateEmail` to `SendgridApiTransport`
+
 8.1
 ---
 

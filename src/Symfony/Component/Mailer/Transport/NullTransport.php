@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\SentMessage;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class NullTransport extends AbstractTransport
+final class NullTransport extends AbstractTransport implements RemoteTemplateTransportInterface
 {
     protected function doSend(SentMessage $message): void
     {

@@ -399,7 +399,7 @@ class Email extends Message
         parent::ensureValidity();
     }
 
-    private function ensureBodyValid(): void
+    protected function ensureBodyValid(): void
     {
         if (null === $this->text && null === $this->html && !$this->attachments && null === parent::getBody()) {
             throw new LogicException('A message must have a text or an HTML part or attachments.');

@@ -12,6 +12,7 @@ $container->loadFromExtension('framework', [
                 'base_uri' => 'http://example.com',
                 'headers' => ['bar' => 'baz'],
                 'extra' => ['bar' => 'baz'],
+                'max_connect_duration' => 0.5,
             ],
         ],
     ],

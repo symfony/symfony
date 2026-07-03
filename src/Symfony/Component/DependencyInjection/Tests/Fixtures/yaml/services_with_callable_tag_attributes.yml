@@ -1,0 +1,13 @@
+services:
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedWithCallableInterface:
+            tags:
+                - app.handler: [Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedWithCallableInterface, getTagAttributes]
+
+    foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedWithCallable
+        public: true
+
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\BarTaggedWithCallable
+        public: true

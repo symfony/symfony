@@ -23,8 +23,11 @@ use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -38,9 +41,13 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService1;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfiguredService2;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutowireLocatorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTaggedWithCallable;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTaggedWithClosure;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedWithCallable;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedWithClosure;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticMethodTag;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedIteratorConsumer;
@@ -61,6 +68,9 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService3Configurator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService4;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedService5;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedWithCallableInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedWithClosureInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedWithClosureLocatorConsumer;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -343,6 +353,162 @@ class IntegrationTest extends TestCase
             'main_service_expected',
             $container,
         ];
+    }
+
+    public function testAutoconfiguredTagWithClosureAttributes()
+    {
+        if (\PHP_VERSION_ID < 80500) {
+            $this->markTestSkipped('Closures in constant expressions require PHP 8.5.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('foo', FooTaggedWithClosure::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+        $container->register('bar', BarTaggedWithClosure::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+
+        (new RegisterAutoconfigureAttributesPass())->processClass($container, new \ReflectionClass(TaggedWithClosureInterface::class));
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([['key' => 'foo']], $container->getDefinition('foo')->getTag('app.handler'));
+        $this->assertSame([['key' => 'bar']], $container->getDefinition('bar')->getTag('app.handler'));
+    }
+
+    public function testAutoconfiguredTagWithClosureAttributesViaLocator()
+    {
+        if (\PHP_VERSION_ID < 80500) {
+            $this->markTestSkipped('Closures in constant expressions require PHP 8.5.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(TaggedWithClosureInterface::class)
+            ->setAbstract(true)
+            ->setAutoconfigured(true)
+        ;
+        $container->register('foo', FooTaggedWithClosure::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+        $container->register('bar', BarTaggedWithClosure::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+        $container->register(TaggedWithClosureLocatorConsumer::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $locator = $container->get(TaggedWithClosureLocatorConsumer::class)->getLocator();
+
+        $this->assertSame($container->get('foo'), $locator->get('foo'));
+        $this->assertSame($container->get('bar'), $locator->get('bar'));
+    }
+
+    public function testAutoconfiguredTagWithCallableArrayAttributes()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', FooTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+        $container->register('bar', BarTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+
+        (new RegisterAutoconfigureAttributesPass())->processClass($container, new \ReflectionClass(TaggedWithCallableInterface::class));
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([['key' => 'foo']], $container->getDefinition('foo')->getTag('app.handler'));
+        $this->assertSame([['key' => 'bar']], $container->getDefinition('bar')->getTag('app.handler'));
+    }
+
+    public function testAutoconfiguredTagWithCallableArrayAttributesFromYaml()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Fixtures/yaml'));
+        $loader->load('services_with_callable_tag_attributes.yml');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([['key' => 'foo']], $container->getDefinition('foo')->getTag('app.handler'));
+        $this->assertSame([['key' => 'bar']], $container->getDefinition('bar')->getTag('app.handler'));
+    }
+
+    public function testAutoconfiguredTagAttributesCanComputePriority()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', FooTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+        $container->register('bar', BarTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+            ->setPublic(true)
+        ;
+        $container->registerForAutoconfiguration(TaggedWithCallableInterface::class)
+            ->addTag('app.handler', [static fn (string $class): array => $class::getTagAttributes() + ['priority' => FooTaggedWithCallable::class === $class ? 10 : 20]])
+        ;
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([['key' => 'foo', 'priority' => 10]], $container->getDefinition('foo')->getTag('app.handler'));
+        $this->assertSame([['key' => 'bar', 'priority' => 20]], $container->getDefinition('bar')->getTag('app.handler'));
+    }
+
+    public function testAutoconfiguredTagAttributesMustReturnArray()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', FooTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+        ;
+        $container->registerForAutoconfiguration(TaggedWithCallableInterface::class)
+            ->addTag('app.handler', [static fn (string $class) => 'not-an-array'])
+        ;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('must return an array of attributes, "string" returned.');
+        (new ResolveInstanceofConditionalsPass())->process($container);
+    }
+
+    public function testAutoconfiguredTagWithCallableArrayDoesNotSilenceMethodTypos()
+    {
+        // The method name is not validated upfront, so a typo is reported when the tag is
+        // resolved instead of being silently treated as a literal attributes array.
+        $container = new ContainerBuilder();
+        $container->register('foo', FooTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+        ;
+        $container->registerForAutoconfiguration(TaggedWithCallableInterface::class)
+            ->addTag('app.handler', [TaggedWithCallableInterface::class, 'getTagAttribiutes'])
+        ;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('because that method does not exist');
+        (new ResolveInstanceofConditionalsPass())->process($container);
+    }
+
+    public function testAutoconfiguredTagCallableRejectsNonSubtypeDeclaringClass()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', FooTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+        ;
+        // The declaring class must be a supertype of the tagged service, otherwise the static
+        // method would not be reachable on it; this is reported instead of failing silently.
+        $container->registerForAutoconfiguration(TaggedWithCallableInterface::class)
+            ->addTag('app.handler', [BarTaggedWithCallable::class, 'getTagAttributes'])
+        ;
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot tag "'.FooTaggedWithCallable::class.'" through "'.BarTaggedWithCallable::class.'::getTagAttributes()" because it is not a subtype of');
+        (new ResolveInstanceofConditionalsPass())->process($container);
     }
 
     #[IgnoreDeprecations]

@@ -50,6 +50,19 @@ class TextWrapperTest extends TestCase
         $this->assertLessThanOrEqual(5, AnsiUtils::visibleWidth($lines[1]));
     }
 
+    public function testWrapWhitespaceOnlyLineWithTrailingAnsiCodeRespectsWidth()
+    {
+        // A syntax highlighter emits a color code around an indentation-only line
+        // and closes it with a reset. The trailing reset must not keep the
+        // whitespace from being trimmed, which would exceed the requested width.
+        $styled = "\x1b[38;5;245m".str_repeat(' ', 82)."\x1b[0m";
+        $lines = TextWrapper::wrapTextWithAnsi($styled, 79);
+
+        foreach ($lines as $i => $line) {
+            $this->assertLessThanOrEqual(79, AnsiUtils::visibleWidth($line), \sprintf('Line %d exceeds width: width=%d', $i, AnsiUtils::visibleWidth($line)));
+        }
+    }
+
     public function testWrapAnsiCodesPreservedAcrossLines()
     {
         // Bold text that wraps

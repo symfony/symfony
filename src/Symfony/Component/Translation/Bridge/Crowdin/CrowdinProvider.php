@@ -34,6 +34,11 @@ final class CrowdinProvider implements ProviderInterface
 {
     private const IMPORT_POLL_TIMEOUT_SECONDS = 300;
 
+    private readonly ?string $projectId;
+
+    /**
+     * @param string $projectId
+     */
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly LoaderInterface $loader,
@@ -41,7 +46,15 @@ final class CrowdinProvider implements ProviderInterface
         private readonly XliffFileDumper $xliffFileDumper,
         private readonly string $defaultLocale,
         private readonly string $endpoint,
+        /* string $projectId, */
     ) {
+        if (\func_num_args() < 7) {
+            trigger_deprecation('symfony/crowdin-translation-provider', '8.2', 'The "%s()" method will have a new "string $projectId" argument in version 9.0, not defining it is deprecated.', __METHOD__);
+
+            $this->projectId = null;
+        } else {
+            $this->projectId = func_get_arg(6);
+        }
     }
 
     public function __toString(): string
@@ -287,7 +300,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function addFile(string $domain, string $content): ?array
     {
-        $response = $this->client->request('POST', 'files', [
+        $response = $this->client->request('POST', $this->getProjectEndpoint('files'), [
             'json' => [
                 'storageId' => $this->addStorage($domain, $content),
                 'name' => \sprintf('%s.%s', $domain, 'xlf'),
@@ -313,7 +326,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function updateFile(int $fileId, string $domain, string $content): ?array
     {
-        $response = $this->client->request('PUT', 'files/'.$fileId, [
+        $response = $this->client->request('PUT', $this->getProjectEndpoint('files/'.$fileId), [
             'json' => [
                 'storageId' => $this->addStorage($domain, $content),
             ],
@@ -338,7 +351,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function importTranslations(int $fileId, string $domain, string $content, string $locale): ResponseInterface
     {
-        return $this->client->request('POST', 'translations/imports', [
+        return $this->client->request('POST', $this->getProjectEndpoint('translations/imports'), [
             'json' => [
                 'storageId' => $this->addStorage($domain, $content),
                 'languageIds' => [str_replace('_', '-', $locale)],
@@ -353,7 +366,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function checkImportTranslationsStatus(string $importTranslationId): ResponseInterface
     {
-        return $this->client->request('GET', 'translations/imports/'.$importTranslationId);
+        return $this->client->request('GET', $this->getProjectEndpoint('translations/imports/'.$importTranslationId));
     }
 
     /**
@@ -362,7 +375,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function exportProjectTranslations(string $languageId, int $fileId): ResponseInterface
     {
-        return $this->client->request('POST', 'translations/exports', [
+        return $this->client->request('POST', $this->getProjectEndpoint('translations/exports'), [
             'json' => [
                 'targetLanguageId' => str_replace('_', '-', $languageId),
                 'fileIds' => [$fileId],
@@ -376,7 +389,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function downloadSourceFile(int $fileId): ResponseInterface
     {
-        return $this->client->request('GET', \sprintf('files/%d/download', $fileId));
+        return $this->client->request('GET', $this->getProjectEndpoint(\sprintf('files/%d/download', $fileId)));
     }
 
     /**
@@ -385,7 +398,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function addStorage(string $domain, string $content): int
     {
-        $response = $this->client->request('POST', '../../storages', [
+        $response = $this->client->request('POST', \sprintf('%sstorages', $this->projectId ? '' : '../../'), [
             'headers' => [
                 'Crowdin-API-FileName' => urlencode(\sprintf('%s.%s', $domain, 'xlf')),
                 'Content-Type' => 'application/octet-stream',
@@ -406,7 +419,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function getFileList(): array
     {
-        $response = $this->client->request('GET', 'files');
+        $response = $this->client->request('GET', $this->getProjectEndpoint('files'));
 
         if (200 !== $response->getStatusCode()) {
             throw new ProviderException('Unable to list Crowdin files.', $response);
@@ -427,7 +440,7 @@ final class CrowdinProvider implements ProviderInterface
      */
     private function getLanguageMapping(): array
     {
-        $response = $this->client->request('GET', '');
+        $response = $this->client->request('GET', $this->getProjectEndpoint());
 
         if (200 !== $response->getStatusCode()) {
             throw new ProviderException('Unable to get project info.', $response);
@@ -440,5 +453,13 @@ final class CrowdinProvider implements ProviderInterface
         }
 
         return $mapping;
+    }
+
+    private function getProjectEndpoint(string $endpoint = ''): string
+    {
+        return $this->projectId
+            ? rtrim(\sprintf('projects/%s/%s', $this->projectId, $endpoint), '/')
+            : $endpoint
+        ;
     }
 }

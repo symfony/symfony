@@ -48,11 +48,11 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
         $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
 
         $client = new RetryableHttpClient($this->client, new GenericRetryStrategy(), 3, $this->logger);
-        $client = ScopingHttpClient::forBaseUri($client, \sprintf('https://%s/api/v2/projects/%d/', $endpoint, $this->getUser($dsn)), [
+        $client = ScopingHttpClient::forBaseUri($client, \sprintf('https://%s/api/v2/', $endpoint), [
             'auth_bearer' => $this->getPassword($dsn),
-        ], preg_quote('https://'.$endpoint.'/api/v2/'));
+        ]);
 
-        return new CrowdinProvider($client, $this->loader, $this->logger, $this->xliffFileDumper, $this->defaultLocale, $endpoint);
+        return new CrowdinProvider($client, $this->loader, $this->logger, $this->xliffFileDumper, $this->defaultLocale, $endpoint, $this->getUser($dsn));
     }
 
     protected function getSupportedSchemes(): array

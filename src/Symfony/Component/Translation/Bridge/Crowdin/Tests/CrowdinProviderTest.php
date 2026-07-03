@@ -27,7 +27,6 @@ use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\Test\ProviderTestCase;
 use Symfony\Component\Translation\TranslatorBag;
-use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -38,34 +37,34 @@ class CrowdinProviderTest extends ProviderTestCase
         return $this->loader ??= new XliffFileLoader();
     }
 
-    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?TranslatorBagInterface $translatorBag = null): ProviderInterface
+    public static function createProvider(HttpClientInterface $client, LoaderInterface $loader, LoggerInterface $logger, string $defaultLocale, string $endpoint, ?string $projectId = null): ProviderInterface
     {
-        return new CrowdinProvider($client, $loader, $logger, new XliffFileDumper(), $defaultLocale, $endpoint);
+        return new CrowdinProvider($client, $loader, $logger, new XliffFileDumper(), $defaultLocale, $endpoint, $projectId);
     }
 
     public static function toStringProvider(): iterable
     {
         yield [
             self::createProvider((new MockHttpClient())->withOptions([
-                'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+                'base_uri' => 'https://api.crowdin.com/api/v2/',
                 'auth_bearer' => 'API_TOKEN',
-            ]), new ArrayLoader(), new NullLogger(), 'en', 'api.crowdin.com'),
+            ]), new ArrayLoader(), new NullLogger(), 'en', 'api.crowdin.com', '1'),
             'crowdin://api.crowdin.com',
         ];
 
         yield [
             self::createProvider((new MockHttpClient())->withOptions([
-                'base_uri' => 'https://domain.api.crowdin.com/api/v2/projects/1/',
+                'base_uri' => 'https://domain.api.crowdin.com/api/v2/',
                 'auth_bearer' => 'API_TOKEN',
-            ]), new ArrayLoader(), new NullLogger(), 'en', 'domain.api.crowdin.com'),
+            ]), new ArrayLoader(), new NullLogger(), 'en', 'domain.api.crowdin.com', '1'),
             'crowdin://domain.api.crowdin.com',
         ];
 
         yield [
             self::createProvider((new MockHttpClient())->withOptions([
-                'base_uri' => 'https://api.crowdin.com:99/api/v2/projects/1/',
+                'base_uri' => 'https://api.crowdin.com:99/api/v2/',
                 'auth_bearer' => 'API_TOKEN',
-            ]), new ArrayLoader(), new NullLogger(), 'en', 'api.crowdin.com:99'),
+            ]), new ArrayLoader(), new NullLogger(), 'en', 'api.crowdin.com:99', '1'),
             'crowdin://api.crowdin.com:99',
         ];
     }
@@ -120,7 +119,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -165,9 +164,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ]));
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $provider->write($translatorBag);
     }
@@ -204,7 +203,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -233,9 +232,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ]));
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to create a File in Crowdin for domain "messages".');
@@ -304,7 +303,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -345,9 +344,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ]));
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to update file in Crowdin for file ID "12" and domain "messages".');
@@ -429,7 +428,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -488,9 +487,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ]));
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to upload translations to Crowdin.');
@@ -572,7 +571,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -654,9 +653,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ]));
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $logger, $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $logger, $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $provider->write($translatorBag);
     }
@@ -721,7 +720,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -761,9 +760,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ]));
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $provider->write($translatorBag);
     }
@@ -825,7 +824,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse([
                     'data' => [
@@ -890,9 +889,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $provider->write($translatorBag);
     }
@@ -1038,7 +1037,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse(['data' => ['languageMapping' => []]]);
             },
@@ -1081,7 +1080,7 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
 
         $httpClient = (new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
         ]);
 
@@ -1090,7 +1089,8 @@ class CrowdinProviderTest extends ProviderTestCase
             new XliffFileLoader(),
             $this->getLogger(),
             $this->getDefaultLocale(),
-            'api.crowdin.com/api/v2/projects/1/',
+            'api.crowdin.com',
+            '1',
         );
 
         $provider->write($translatorBag);
@@ -1117,7 +1117,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse([
                     'data' => [
@@ -1150,9 +1150,9 @@ class CrowdinProviderTest extends ProviderTestCase
             ->willReturn($expectedTranslatorBag->getCatalogue($locale));
 
         $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $translatorBag = $crowdinProvider->read([$domain], [$locale]);
 
@@ -1241,7 +1241,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse([
                     'data' => [
@@ -1273,9 +1273,9 @@ class CrowdinProviderTest extends ProviderTestCase
             ->willReturn($expectedTranslatorBag->getCatalogue($locale));
 
         $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $translatorBag = $crowdinProvider->read([$domain], [$locale]);
 
@@ -1334,7 +1334,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse([
                     'data' => [
@@ -1355,9 +1355,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
 
         $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to export file.');
@@ -1383,7 +1383,7 @@ class CrowdinProviderTest extends ProviderTestCase
             },
             'getProject' => function (string $method, string $url): ResponseInterface {
                 $this->assertSame('GET', $method);
-                $this->assertSame('https://api.crowdin.com/api/v2/projects/1/', $url);
+                $this->assertSame('https://api.crowdin.com/api/v2/projects/1', $url);
 
                 return new JsonMockResponse([
                     'data' => [
@@ -1410,9 +1410,9 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
 
         $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage('Unable to download file content.');
@@ -1533,9 +1533,9 @@ class CrowdinProviderTest extends ProviderTestCase
         );
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $provider->delete($deletedStrings);
     }
@@ -1661,9 +1661,9 @@ class CrowdinProviderTest extends ProviderTestCase
         );
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $logger, $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $logger, $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $provider->delete($deletedStrings);
     }
@@ -1781,9 +1781,9 @@ class CrowdinProviderTest extends ProviderTestCase
         );
 
         $provider = self::createProvider((new MockHttpClient($responses))->withOptions([
-            'base_uri' => 'https://api.crowdin.com/api/v2/projects/1/',
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
             'auth_bearer' => 'API_TOKEN',
-        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com/api/v2/projects/1/');
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
 
         $this->expectException(ProviderException::class);
         $this->expectExceptionMessage(

@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Ushbu qiymat haqiqiy XML emas.</target>
+                <target>Bu qiymat haqiqiy XML emas.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Ushbu qiymat kutilgan XSD sxemasiga mos kelmaydi.</target>
+                <target>Ushbu qiymat kutilgan XSD sxemasiga mos kelmaydi.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Bu XML yuki juda katta ({{ size }} bayt): u {{ limit }} bayt chegarasidan oshib ketadi.</target>
+                <target>Bu XML yuki juda katta ({{ size }} bayt): u {{ limit }} bayt chegarasidan oshib ketadi.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Ushbu qiymat yaroqli cron ifodasi emas.</target>
+                <target>Ushbu qiymat to'g'ri cron ifodasi emas.</target>
             </trans-unit>
         </body>
     </file>

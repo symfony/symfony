@@ -31,6 +31,7 @@
         "symfony/http-kernel": "^8.1",
         "symfony/polyfill-mbstring": "^1.0",
         "symfony/polyfill-php85": "^1.33",
+        "symfony/polyfill-php86": "^1.35",
         "symfony/routing": "^7.4|^8.0",
         "symfony/service-contracts": "^3.7.1",
         "symfony/var-exporter": "^8.1"

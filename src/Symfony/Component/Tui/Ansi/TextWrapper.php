@@ -254,7 +254,9 @@ final class TextWrapper
             $wrapped[] = rtrim($currentLine);
         }
 
-        return $wrapped ?: [''];
+        // Trailing whitespace kept before an ANSI reset (e.g. from a highlighted
+        // blank line) can push a line past the requested width; clamp each line.
+        return $wrapped ? array_map(static fn (string $line): string => AnsiUtils::truncateToWidth($line, $width, ''), $wrapped) : [''];
     }
 
     /**

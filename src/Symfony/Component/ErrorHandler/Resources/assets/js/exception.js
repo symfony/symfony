@@ -234,6 +234,8 @@
             }
             addClass(list, 'filter-list');
             addClass(list, 'filter-list-'+type);
+            list.setAttribute('role', 'menu');
+            list.setAttribute('aria-label', 'Filter by ' + name);
             values.forEach(function (value, i) {
                 if (value instanceof HTMLElement) {
                     value = value.dataset['filter'+ucName];
@@ -245,30 +247,71 @@
                     label = i in labels ? labels[i] : value,
                     active = false,
                     matches;
+                /* a real checkbox so Space toggles it and its checked state is exposed natively, */
+                /* no custom JS needed; the <li> itself is just a transparent wrapper */
+                option.setAttribute('role', 'none');
+                var checkboxId = 'filter-option-' + name + '-' + i;
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = checkboxId;
+                checkbox.setAttribute('role', 'menuitemcheckbox');
+                /* roving tabindex (APG menu pattern): only the first item is tabbable, the rest */
+                /* are reached with the up/down arrows below */
+                checkbox.setAttribute('tabindex', 0 === i ? '0' : '-1');
+                var optionLabel = document.createElement('label');
+                optionLabel.setAttribute('for', checkboxId);
                 if ('' === label) {
-                    option.innerHTML = '<em>(none)</em>';
+                    optionLabel.innerHTML = '<em>(none)</em>';
                 } else {
-                    option.innerText = label;
+                    optionLabel.innerText = label;
                 }
                 option.dataset.filter = value;
-                option.setAttribute('title', 1 === (matches = filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').length) ? 'Matches 1 row' : 'Matches '+matches+' rows');
+                /* set here, not on the (role="none") <li>, so it reaches assistive technologies too */
+                checkbox.setAttribute('title', 1 === (matches = filters.querySelectorAll('[data-filter-'+name+'="'+value+'"]').length) ? 'Matches 1 row' : 'Matches '+matches+' rows');
+                option.appendChild(checkbox);
+                option.appendChild(optionLabel);
                 indexed[value] = i;
                 list.appendChild(option);
-                addEventListener(option, 'click', function () {
+                addEventListener(checkbox, 'keydown', function (e) {
+                    if ('ArrowUp' !== e.key && 'ArrowDown' !== e.key) {
+                        return;
+                    }
+
+                    e.preventDefault();
+
+                    var checkboxesOfList = Array.prototype.slice.call(list.querySelectorAll('input[type=checkbox]'));
+                    var currentIndex = checkboxesOfList.indexOf(checkbox);
+                    var newIndex = currentIndex + ('ArrowDown' === e.key ? 1 : -1);
+                    newIndex = (newIndex + checkboxesOfList.length) % checkboxesOfList.length;
+
+                    checkbox.setAttribute('tabindex', '-1');
+                    checkboxesOfList[newIndex].setAttribute('tabindex', '0');
+                    checkboxesOfList[newIndex].focus();
+                });
+                addEventListener(checkbox, 'change', function () {
                     if ('choice' === type) {
                         filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
                             if (option.dataset.filter === row.dataset['filter'+ucName]) {
                                 toggleClass(row, 'filter-hidden-'+name);
                             }
                         });
-                        toggleClass(option, 'active');
+                        if (checkbox.checked) {
+                            addClass(option, 'active');
+                        } else {
+                            removeClass(option, 'active');
+                        }
                     } else if ('level' === type) {
-                        if (i === this.parentNode.querySelectorAll('.active').length - 1) {
+                        /* re-clicking the current threshold must not uncheck it; use "last-active" */
+                        /* (untouched by the native toggle) rather than checkbox.checked to detect that */
+                        if (hasClass(option, 'last-active')) {
+                            checkbox.checked = true;
                             return;
                         }
-                        this.parentNode.querySelectorAll('li').forEach(function (currentOption, j) {
+                        list.querySelectorAll('li').forEach(function (currentOption, j) {
+                            var currentCheckbox = currentOption.querySelector('input[type=checkbox]');
                             if (j <= i) {
                                 addClass(currentOption, 'active');
+                                currentCheckbox.checked = true;
                                 if (i === j) {
                                     addClass(currentOption, 'last-active');
                                 } else {
@@ -277,6 +320,7 @@
                             } else {
                                 removeClass(currentOption, 'active');
                                 removeClass(currentOption, 'last-active');
+                                currentCheckbox.checked = false;
                             }
                         });
                         filters.querySelectorAll('[data-filter-'+name+']').forEach(function (row) {
@@ -296,6 +340,7 @@
                         addClass(option, 'last-active');
                     }
                 }
+                checkbox.checked = active;
                 if (active) {
                     addClass(option, 'active');
                 } else {
@@ -307,6 +352,65 @@
             });
 
             if (1 < list.childNodes.length) {
+                /* lets keyboard and screen reader users open the list; mouse users keep doing */
+                /* it by hovering, as before (see :hover in the CSS) */
+                var toggle = document.createElement('button');
+                toggle.type = 'button';
+                addClass(toggle, 'filter-toggle');
+                toggle.innerHTML = filter.innerHTML;
+                toggle.setAttribute('aria-haspopup', 'menu');
+                toggle.setAttribute('aria-expanded', 'false');
+                /* the list's <li> are hidden by CSS while closed, but the <ul role="menu"> itself */
+                /* isn't; without this, screen readers can stumble on it while closed (e.g. when a */
+                /* whole hidden tabpanel becomes visible at once) */
+                list.setAttribute('aria-hidden', 'true');
+
+                var closeFilter = function () {
+                    removeClass(filter, 'filter-open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                    list.setAttribute('aria-hidden', 'true');
+                };
+
+                addEventListener(toggle, 'click', function () {
+                    if (hasClass(filter, 'filter-open')) {
+                        closeFilter();
+                    } else {
+                        addClass(filter, 'filter-open');
+                        toggle.setAttribute('aria-expanded', 'true');
+                        list.removeAttribute('aria-hidden');
+                        /* opening a menu moves focus to the item with tabindex 0 (kept in sync by */
+                        /* the arrow keys below), not left on the button (APG menu-button pattern) */
+                        var firstItem = list.querySelector('[tabindex="0"]');
+                        if (firstItem) {
+                            firstItem.focus();
+                        }
+                    }
+                });
+
+                addEventListener(filter, 'keydown', function (e) {
+                    if ('Escape' === e.key && hasClass(filter, 'filter-open')) {
+                        closeFilter();
+                        toggle.focus();
+                    }
+                });
+
+                addEventListener(document, 'click', function (e) {
+                    if (hasClass(filter, 'filter-open') && !filter.contains(e.target)) {
+                        closeFilter();
+                    }
+                });
+
+                /* closes on focus leaving rather than the mouse leaving: once opened by click or */
+                /* keyboard, .filter-open keeps it open regardless of the mouse. This also closes it */
+                /* when focus moves straight to another filter's toggle */
+                addEventListener(filter, 'focusout', function (e) {
+                    if (hasClass(filter, 'filter-open') && !filter.contains(e.relatedTarget)) {
+                        closeFilter();
+                    }
+                });
+
+                filter.innerHTML = '';
+                filter.appendChild(toggle);
                 filter.appendChild(list);
                 filter.dataset.filtered = '';
             }

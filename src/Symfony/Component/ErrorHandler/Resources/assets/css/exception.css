@@ -250,8 +250,21 @@ thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-vis
 [data-filters] { position: relative; }
 [data-filtered] { cursor: pointer; }
 [data-filtered]:after { content: '\00a0\25BE'; }
-[data-filtered]:hover .filter-list li { display: inline-flex; }
+[data-filtered]:hover .filter-list li,
+[data-filtered].filter-open .filter-list li { display: inline-flex; }
 [class*="filter-hidden-"] { display: none; }
+
+.filter-toggle {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    font-weight: inherit;
+    color: inherit;
+    text-align: inherit;
+    cursor: pointer;
+}
 .filter-list { position: absolute; border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; }
 .filter-list :after { content: ''; }
 .filter-list li {
@@ -261,9 +274,23 @@ thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-vis
     display: none;
     list-style: none;
     margin: 0;
-    padding: 5px 10px;
+    padding: 0;
+    position: relative;
     text-align: left;
     font-weight: normal;
+}
+.filter-list li label {
+    display: block;
+    padding: 5px 10px;
+    cursor: inherit;
+}
+/* hidden but still focusable via its <label>; the coloured "chip" look comes from the <li>/<label> */
+.filter-list li input[type="checkbox"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    opacity: 0;
 }
 .filter-list li.active {
     background: var(--tab-background);
@@ -277,8 +304,9 @@ thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-vis
 .filter-list-level li { cursor: s-resize; }
 .filter-list-level li.active { cursor: n-resize; }
 .filter-list-level li.last-active { cursor: default; }
-.filter-list-level li.last-active:before { content: '\2714\00a0'; }
-.filter-list-choice li:before { content: '\2714\00a0'; color: transparent; }
+/* the "/ ''" alt text keeps screen readers from reading the checkmark as part of the label */
+.filter-list-level li.last-active:before { content: '\2714\00a0' / ''; }
+.filter-list-choice li:before { content: '\2714\00a0' / ''; color: transparent; }
 .filter-list-choice li.active:before { color: unset; }
 
 .container { max-width: 1024px; margin: 0 auto; padding: 0 15px; }

@@ -16,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,9 +40,6 @@ use Symfony\Component\Translation\Writer\TranslationWriterInterface;
 #[AsCommand(name: 'translation:extract', description: 'Extract missing translations keys from code to translation files')]
 class TranslationExtractCommand extends Command
 {
-    private const ASC = 'asc';
-    private const DESC = 'desc';
-    private const SORT_ORDERS = [self::ASC, self::DESC];
     private const FORMATS = [
         'xlf12' => ['xlf', '1.2'],
         'xlf20' => ['xlf', '2.0'],
@@ -210,13 +208,12 @@ class TranslationExtractCommand extends Command
 
         $operation->moveMessagesToIntlDomainsIfPossible('new');
 
-        if ($sort = $input->getOption('sort')) {
-            $sort = strtolower($sort);
-            if (!\in_array($sort, self::SORT_ORDERS, true)) {
-                $errorIo->error(['Wrong sort order', 'Supported formats are: '.implode(', ', self::SORT_ORDERS).'.']);
+        try {
+            $sort = self::parseSort($input->getOption('sort'));
+        } catch (InvalidOptionException $e) {
+            $errorIo->error(['Wrong sort order', $e->getMessage()]);
 
-                return 1;
-            }
+            return Command::FAILURE;
         }
 
         // show compiled list of messages
@@ -235,11 +232,10 @@ class TranslationExtractCommand extends Command
 
                 $domainMessagesCount = \count($list);
 
-                if (self::DESC === $sort) {
-                    rsort($list);
-                } else {
-                    sort($list);
-                }
+                match ($sort) {
+                    \SortDirection::Descending => rsort($list),
+                    default => sort($list),
+                };
 
                 $io->section(\sprintf('Messages extracted for domain "<info>%s</info>" (%d message%s)', $domain, $domainMessagesCount, $domainMessagesCount > 1 ? 's' : ''));
                 $io->listing($list);
@@ -270,7 +266,7 @@ class TranslationExtractCommand extends Command
             }
 
             $operationResult = $operation->getResult();
-            if ($sort) {
+            if (null !== $sort) {
                 $operationResult = $this->sortCatalogue($operationResult, $sort);
             }
 
@@ -288,6 +284,33 @@ class TranslationExtractCommand extends Command
         $io->success($resultMessage.'.');
 
         return 0;
+    }
+
+    private static function parseSort(?string $sort): ?\SortDirection
+    {
+        if (null === $sort) {
+            return null;
+        }
+
+        return match (strtolower($sort)) {
+            'asc' => \SortDirection::Ascending,
+            'desc' => \SortDirection::Descending,
+            default => throw new InvalidOptionException('Supported formats are: '.implode(', ', self::getValidSortOptions()).'.'),
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function getValidSortOptions(): array
+    {
+        return array_map(
+            static fn (\SortDirection $enum): string => match ($enum) {
+                \SortDirection::Ascending => 'asc',
+                \SortDirection::Descending => 'desc',
+            },
+            \SortDirection::cases()
+        );
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
@@ -340,7 +363,7 @@ class TranslationExtractCommand extends Command
         }
 
         if ($input->mustSuggestOptionValuesFor('sort')) {
-            $suggestions->suggestValues(self::SORT_ORDERS);
+            $suggestions->suggestValues(self::getValidSortOptions());
         }
     }
 
@@ -377,7 +400,7 @@ class TranslationExtractCommand extends Command
         return $filteredCatalogue;
     }
 
-    private function sortCatalogue(MessageCatalogue $catalogue, string $sort): MessageCatalogue
+    private function sortCatalogue(MessageCatalogue $catalogue, \SortDirection $sort): MessageCatalogue
     {
         $sortedCatalogue = new MessageCatalogue($catalogue->getLocale());
 
@@ -385,22 +408,20 @@ class TranslationExtractCommand extends Command
             // extract intl-icu messages only
             $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
             if ($intlMessages = $catalogue->all($intlDomain)) {
-                if (self::DESC === $sort) {
-                    krsort($intlMessages);
-                } elseif (self::ASC === $sort) {
-                    ksort($intlMessages);
-                }
+                match ($sort) {
+                    \SortDirection::Descending => krsort($intlMessages),
+                    \SortDirection::Ascending => ksort($intlMessages),
+                };
 
                 $sortedCatalogue->add($intlMessages, $intlDomain);
             }
 
             // extract all messages and subtract intl-icu messages
             if ($messages = array_diff($catalogue->all($domain), $intlMessages)) {
-                if (self::DESC === $sort) {
-                    krsort($messages);
-                } elseif (self::ASC === $sort) {
-                    ksort($messages);
-                }
+                match ($sort) {
+                    \SortDirection::Descending => krsort($messages),
+                    \SortDirection::Ascending => ksort($messages),
+                };
 
                 $sortedCatalogue->add($messages, $domain);
             }

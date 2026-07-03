@@ -1268,6 +1268,21 @@ class ParserTest extends TestCase
         $this->parser->parse($yaml);
     }
 
+    public function testParseUnterminatedQuotedStringException()
+    {
+        $yaml = <<<'EOF'
+            foo:
+                bar: 'first line
+                    second line
+            '
+            EOF;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unterminated quoted string');
+
+        $this->parser->parse($yaml);
+    }
+
     public function testExplicitStringCasting()
     {
         $yaml = <<<'EOF'

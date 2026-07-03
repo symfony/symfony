@@ -565,19 +565,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Kjo vlerë nuk është një XML i vlefshëm.</target>
+                <target>Kjo vlerë nuk është XML i vlefshëm.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Kjo vlerë nuk përputhet me skemën XSD të pritur.</target>
+                <target>Kjo vlerë nuk përputhet me skemën e pritur XSD.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Kjo ngarkesë XML është shumë e madhe ({{ size }} bajt): tejkalon kufirin prej {{ limit }} bajt.</target>
+                <target>Kjo ngarkesë XML është shumë e madhe ({{ size }} bajt): tejkalon kufirin prej {{ limit }} bajt.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Kjo vlerë nuk është një shprehje cron e vlefshme.</target>
+                <target>Kjo vlerë nuk është një shprehje e vlefshme cron.</target>
             </trans-unit>
         </body>
     </file>

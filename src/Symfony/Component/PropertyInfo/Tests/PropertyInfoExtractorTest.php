@@ -58,8 +58,8 @@ class PropertyInfoExtractorTest extends AbstractPropertyInfoExtractorTest
         yield ['baz', Type::int()];
         yield ['bal', Type::object(\DateTimeImmutable::class)];
         yield ['parent', Type::object(ParentDummy::class)];
-        yield ['collection', Type::array(Type::object(\DateTimeImmutable::class), Type::int())];
-        yield ['nestedCollection', Type::array(Type::array(Type::string(), Type::int()), Type::int())];
+        yield ['collection', Type::array(Type::object(\DateTimeImmutable::class))];
+        yield ['nestedCollection', Type::array(Type::array(Type::string()))];
         yield ['mixedCollection', Type::array()];
         yield ['B', Type::object(ParentDummy::class)];
         yield ['Id', Type::int()];
@@ -68,9 +68,9 @@ class PropertyInfoExtractorTest extends AbstractPropertyInfoExtractorTest
         yield ['h', Type::nullable(Type::string())];
         yield ['i', Type::nullable(Type::union(Type::string(), Type::int()))];
         yield ['j', Type::nullable(Type::object(\DateTimeImmutable::class))];
-        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::array(Type::int(), Type::int()))];
-        yield ['nonNullableCollectionOfNullableElements', Type::array(Type::nullable(Type::int()), Type::int())];
-        yield ['nullableCollectionOfMultipleNonNullableElementTypes', Type::nullable(Type::array(Type::union(Type::int(), Type::string()), Type::int()))];
+        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::array(Type::int()))];
+        yield ['nonNullableCollectionOfNullableElements', Type::array(Type::nullable(Type::int()))];
+        yield ['nullableCollectionOfMultipleNonNullableElementTypes', Type::nullable(Type::array(Type::union(Type::int(), Type::string())))];
         yield ['xTotals', Type::array()];
         yield ['YT', Type::string()];
         yield ['emptyVar', null];

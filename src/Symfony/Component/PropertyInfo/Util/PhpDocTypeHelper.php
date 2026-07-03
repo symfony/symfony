@@ -253,10 +253,9 @@ final class PhpDocTypeHelper
         }
 
         if (str_ends_with($docType, '[]') && $type instanceof Array_) {
-            $collectionKeyTypes = new LegacyType(LegacyType::BUILTIN_TYPE_INT);
             $collectionValueTypes = $this->getTypes($type->getValueType());
 
-            return new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, $collectionKeyTypes, $collectionValueTypes);
+            return new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, $nullable, null, true, null, $collectionValueTypes);
         }
 
         if ((str_starts_with($docType, 'list<') || str_starts_with($docType, 'array<')) && $type instanceof Array_) {

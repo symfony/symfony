@@ -265,6 +265,18 @@ thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-vis
     text-align: inherit;
     cursor: pointer;
 }
+/* wraps the open/close icons (see createToggles() in exception.js); block avoids the empty */
+/* inline-block "strut" height that would otherwise push the content down */
+.sf-toggle-button {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    font-size: 0;
+    line-height: 0;
+}
 .filter-list { position: absolute; border: var(--border); box-shadow: var(--shadow); margin: 0; padding: 0; display: flex; flex-direction: column; }
 .filter-list :after { content: ''; }
 .filter-list li {

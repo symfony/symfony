@@ -1,7 +1,7 @@
 <div class="trace trace-as-html" id="trace-box-<?= $index; ?>">
     <div class="trace-details">
         <div class="trace-head">
-            <div class="sf-toggle" data-toggle-selector="#trace-html-<?= $index; ?>" data-toggle-initial="<?= $expand ? 'display' : ''; ?>">
+            <div class="sf-toggle" data-toggle-selector="#trace-html-<?= $index; ?>" data-toggle-initial="<?= $expand ? 'display' : ''; ?>" data-toggle-label="Toggle stack trace">
                 <span class="icon icon-close"><?= $this->include('assets/images/icon-minus-square-o.svg'); ?></span>
                 <span class="icon icon-open"><?= $this->include('assets/images/icon-plus-square-o.svg'); ?></span>
                 <?php

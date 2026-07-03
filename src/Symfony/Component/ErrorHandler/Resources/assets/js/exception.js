@@ -166,12 +166,36 @@
 
             addClass(element, 'sf-toggle-content');
 
+            /* wrap just the icons in a real <button>: the row itself can contain a link, and a */
+            /* <button> can't contain one; inserted in place so nothing shifts visually */
+            var iconClose = toggles[i].querySelector('.icon-close');
+            var iconOpen = toggles[i].querySelector('.icon-open');
+            var toggleButton = document.createElement('button');
+            toggleButton.type = 'button';
+            addClass(toggleButton, 'sf-toggle-button');
+            var firstIcon = iconClose || iconOpen;
+            if (firstIcon) {
+                firstIcon.parentNode.insertBefore(toggleButton, firstIcon);
+            }
+            if (iconClose) {
+                toggleButton.appendChild(iconClose);
+            }
+            if (iconOpen) {
+                toggleButton.appendChild(iconOpen);
+            }
+            /* fixed label: the toggle's own text is read again right after as normal content, */
+            /* so reusing it as the button's name (e.g. via aria-labelledby) would repeat it twice */
+            toggleButton.setAttribute('aria-label', toggles[i].getAttribute('data-toggle-label') || 'Toggle details');
+            toggleButton.setAttribute('aria-controls', element.id);
+
             if (toggles[i].hasAttribute('data-toggle-initial') && toggles[i].getAttribute('data-toggle-initial') == 'display') {
                 addClass(toggles[i], 'sf-toggle-on');
                 addClass(element, 'sf-toggle-visible');
+                toggleButton.setAttribute('aria-expanded', 'true');
             } else {
                 addClass(toggles[i], 'sf-toggle-off');
                 addClass(element, 'sf-toggle-hidden');
+                toggleButton.setAttribute('aria-expanded', 'false');
             }
 
             addEventListener(toggles[i], 'click', function(e) {
@@ -194,6 +218,7 @@
                 toggleClass(toggle, 'sf-toggle-off');
                 toggleClass(element, 'sf-toggle-hidden');
                 toggleClass(element, 'sf-toggle-visible');
+                toggle.querySelector('.sf-toggle-button').setAttribute('aria-expanded', hasClass(toggle, 'sf-toggle-on') ? 'true' : 'false');
 
                 /* the toggle doesn't change its contents when clicking on it */
                 if (!toggle.hasAttribute('data-toggle-alt-content')) {

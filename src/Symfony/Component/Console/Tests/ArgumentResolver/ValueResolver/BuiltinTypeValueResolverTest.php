@@ -121,6 +121,56 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
+    public function testDelegatesToDateTimeValueResolverForDateTimeArgument()
+    {
+        $resolver = new BuiltinTypeValueResolver();
+
+        $input = new ArrayInput(['date' => '2026-01-15'], new InputDefinition([
+            new InputArgument('date'),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[Argument]
+                \DateTimeImmutable $date,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = $resolver->resolve('date', $input, $member);
+
+        // BuiltinTypeValueResolver returns empty for \DateTimeInterface types - DateTimeValueResolver handles them
+        $this->assertSame([], $result);
+    }
+
+    public function testDelegatesToDateTimeValueResolverForDateTimeOption()
+    {
+        $resolver = new BuiltinTypeValueResolver();
+
+        $input = new ArrayInput(['--date' => '2026-01-15'], new InputDefinition([
+            new InputOption('date', mode: InputOption::VALUE_REQUIRED),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[Option]
+                ?\DateTimeImmutable $date = null,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = $resolver->resolve('date', $input, $member);
+
+        // BuiltinTypeValueResolver returns empty for \DateTimeInterface types - DateTimeValueResolver handles them
+        $this->assertSame([], $result);
+    }
+
     public function testResolveBoolOption()
     {
         $resolver = new BuiltinTypeValueResolver();

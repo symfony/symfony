@@ -373,11 +373,11 @@ final class PhpDocTypeHelper
         }
 
         if ($docType instanceof Array_ && $this->hasNoExplicitKeyType($docType) && str_starts_with($docTypeString, 'array<')) {
-            return Type::list($this->getType($docType->getValueType()));
+            return Type::array($this->getType($docType->getValueType()));
         }
 
         if (str_ends_with($docTypeString, '[]') && $docType instanceof Array_) {
-            return Type::list($this->getType($docType->getValueType()));
+            return Type::array($this->getType($docType->getValueType()));
         }
 
         if (str_starts_with($docTypeString, 'list<') && $docType instanceof Array_) {
@@ -387,7 +387,7 @@ final class PhpDocTypeHelper
         }
 
         if (str_starts_with($docTypeString, 'array<') && $docType instanceof Array_) {
-            // array<value> is converted to x[] which is handled above
+            // array<value> is handled above
             // so it's only necessary to handle array<key, value> here
             $collectionKeyType = $this->getType($docType->getKeyType());
             $collectionValueType = $this->getType($docType->getValueType());

@@ -681,13 +681,13 @@ class PhpDocExtractorTest extends TestCase
         yield ['foo3', Type::callable(), null, null];
         yield ['foo4', Type::null(), null, null];
         yield ['foo5', Type::mixed(), null, null];
-        yield ['files', Type::union(Type::list(Type::object(\SplFileInfo::class)), Type::resource()), null, null];
+        yield ['files', Type::union(Type::array(Type::object(\SplFileInfo::class)), Type::resource()), null, null];
         yield ['bal', Type::object(\DateTimeImmutable::class), 'A short description ignoring template.', "A long description...\n\n...over several lines."];
         yield ['parent', Type::object(ParentDummy::class), null, null];
-        yield ['collection', Type::list(Type::object(\DateTimeImmutable::class)), null, null];
-        yield ['nestedCollection', Type::list(Type::list(Type::string())), null, null];
+        yield ['collection', Type::array(Type::object(\DateTimeImmutable::class)), null, null];
+        yield ['nestedCollection', Type::array(Type::array(Type::string())), null, null];
         yield ['mixedCollection', Type::array(), null, null];
-        yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class))), null, null];
+        yield ['nullableTypedCollection', Type::nullable(Type::array(Type::object(Dummy::class))), null, null];
         yield ['unionWithMixed', Type::mixed(), null, null];
         yield ['a', Type::int(), 'A.', null];
         yield ['b', Type::nullable(Type::object(ParentDummy::class)), 'B.', null];
@@ -710,7 +710,7 @@ class PhpDocExtractorTest extends TestCase
         }
 
         yield ['j', Type::nullable(Type::object(\DateTimeImmutable::class)), null, null];
-        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::list(Type::int())), null, null];
+        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::array(Type::int())), null, null];
         yield ['donotexist', null, null, null];
         yield ['staticGetter', null, null, null];
         yield ['staticSetter', null, null, null];
@@ -757,13 +757,13 @@ class PhpDocExtractorTest extends TestCase
         yield ['foo3', Type::callable()];
         yield ['foo4', Type::null()];
         yield ['foo5', Type::mixed()];
-        yield ['files', Type::union(Type::list(Type::object(\SplFileInfo::class)), Type::resource())];
+        yield ['files', Type::union(Type::array(Type::object(\SplFileInfo::class)), Type::resource())];
         yield ['bal', Type::object(\DateTimeImmutable::class)];
         yield ['parent', Type::object(ParentDummy::class)];
-        yield ['collection', Type::list(Type::object(\DateTimeImmutable::class))];
-        yield ['nestedCollection', Type::list(Type::list(Type::string()))];
+        yield ['collection', Type::array(Type::object(\DateTimeImmutable::class))];
+        yield ['nestedCollection', Type::array(Type::array(Type::string()))];
         yield ['mixedCollection', Type::array()];
-        yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class)))];
+        yield ['nullableTypedCollection', Type::nullable(Type::array(Type::object(Dummy::class)))];
         yield ['unionWithMixed', Type::mixed()];
         yield ['a', null];
         yield ['b', null];
@@ -782,7 +782,7 @@ class PhpDocExtractorTest extends TestCase
         }
 
         yield ['j', Type::nullable(Type::object(\DateTimeImmutable::class))];
-        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::list(Type::int()))];
+        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::array(Type::int()))];
         yield ['donotexist', null];
         yield ['staticGetter', null];
         yield ['staticSetter', null];
@@ -826,13 +826,13 @@ class PhpDocExtractorTest extends TestCase
         yield ['foo3', Type::callable()];
         yield ['foo4', Type::null()];
         yield ['foo5', Type::mixed()];
-        yield ['files', Type::union(Type::list(Type::object(\SplFileInfo::class)), Type::resource())];
+        yield ['files', Type::union(Type::array(Type::object(\SplFileInfo::class)), Type::resource())];
         yield ['bal', Type::object(\DateTimeImmutable::class)];
         yield ['parent', Type::object(ParentDummy::class)];
-        yield ['collection', Type::list(Type::object(\DateTimeImmutable::class))];
-        yield ['nestedCollection', Type::list(Type::list(Type::string()))];
+        yield ['collection', Type::array(Type::object(\DateTimeImmutable::class))];
+        yield ['nestedCollection', Type::array(Type::array(Type::string()))];
         yield ['mixedCollection', Type::array()];
-        yield ['nullableTypedCollection', Type::nullable(Type::list(Type::object(Dummy::class)))];
+        yield ['nullableTypedCollection', Type::nullable(Type::array(Type::object(Dummy::class)))];
         yield ['unionWithMixed', Type::mixed()];
         yield ['a', null];
         yield ['b', null];
@@ -851,9 +851,9 @@ class PhpDocExtractorTest extends TestCase
         }
 
         yield ['j', Type::nullable(Type::object(\DateTimeImmutable::class))];
-        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::list(Type::int()))];
-        yield ['nonNullableCollectionOfNullableElements', Type::list(Type::nullable(Type::int()))];
-        yield ['nullableCollectionOfMultipleNonNullableElementTypes', Type::nullable(Type::list(Type::union(Type::int(), Type::string())))];
+        yield ['nullableCollectionOfNonNullableElements', Type::nullable(Type::array(Type::int()))];
+        yield ['nonNullableCollectionOfNullableElements', Type::array(Type::nullable(Type::int()))];
+        yield ['nullableCollectionOfMultipleNonNullableElementTypes', Type::nullable(Type::array(Type::union(Type::int(), Type::string())))];
         yield ['donotexist', null];
         yield ['staticGetter', null];
         yield ['staticSetter', null];

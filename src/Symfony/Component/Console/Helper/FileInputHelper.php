@@ -102,18 +102,25 @@ final class FileInputHelper
         $buffer = '';
         $inPaste = false;
         $pasteBuffer = '';
+        $chunk = '';
+        $chunkPos = 0;
 
-        while (!feof($inputStream)) {
-            $inputHelper->waitForInput();
-            $char = fread($inputStream, 1);
+        while (true) {
+            if ($chunkPos >= \strlen($chunk)) {
+                $inputHelper->waitForInput();
+                $chunk = fread($inputStream, 8192);
 
-            if (false === $char || '' === $char) {
-                if ('' === $buffer && '' === $pasteBuffer) {
-                    throw new MissingInputException('Aborted.');
+                if (false === $chunk || '' === $chunk) {
+                    if ('' === $buffer && '' === $pasteBuffer) {
+                        throw new MissingInputException('Aborted.');
+                    }
+                    break;
                 }
-                break;
+
+                $chunkPos = 0;
             }
 
+            $char = $chunk[$chunkPos++];
             $buffer .= $char;
 
             if (\strlen($buffer) > self::MAX_PASTE_BYTES) {

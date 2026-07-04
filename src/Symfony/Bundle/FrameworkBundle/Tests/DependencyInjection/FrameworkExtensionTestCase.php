@@ -2368,6 +2368,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'extra' => [
                 'bar' => 'baz',
             ],
+            'max_connect_duration' => 0.5,
             'query' => [],
             'resolve' => [],
         ];
@@ -2453,6 +2454,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('proxy.org', $defaultOptions['proxy']);
         $this->assertSame(3.5, $defaultOptions['timeout']);
         $this->assertSame(10.1, $defaultOptions['max_duration']);
+        $this->assertSame(1.5, $defaultOptions['max_connect_duration']);
         $this->assertSame('127.0.0.1', $defaultOptions['bindto']);
         $this->assertTrue($defaultOptions['verify_peer']);
         $this->assertTrue($defaultOptions['verify_host']);

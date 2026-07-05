@@ -184,9 +184,7 @@ trait FilesystemCommonTrait
 
     public function __destruct()
     {
-        if (method_exists(parent::class, '__destruct')) {
-            parent::__destruct();
-        }
+        parent::__destruct();
         if (isset($this->tmpSuffix) && is_file($this->directory.$this->tmpSuffix)) {
             unlink($this->directory.$this->tmpSuffix);
         }

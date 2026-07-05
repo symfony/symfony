@@ -139,6 +139,7 @@ use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\Notifier\Transport\TransportFactoryInterface as NotifierTransportFactoryInterface;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\ConditionCallableInterface;
+use Symfony\Component\ObjectMapper\Metadata\EnumMappingMetadataFactory;
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\TransformCallableInterface;
@@ -636,6 +637,10 @@ class FrameworkExtension extends Extension
 
             if (!class_exists(ReverseClassObjectMapperMetadataFactory::class)) {
                 $container->removeDefinition('object_mapper.metadata_factory.reverse_class');
+            }
+
+            if (!class_exists(EnumMappingMetadataFactory::class)) {
+                $container->removeDefinition('object_mapper.metadata_factory.enum');
             }
         }
 

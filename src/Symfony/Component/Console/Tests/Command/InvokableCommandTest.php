@@ -18,6 +18,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\MapDateTime;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Command\Command;
@@ -495,6 +496,25 @@ class InvokableCommandTest extends TestCase
 
         $tester = new CommandTester($command);
         $tester->execute(['name' => 'test']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testDefaultArgumentResolversWithMapDateTimeArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            #[Argument, MapDateTime]
+            \DateTimeImmutable $date,
+        ): int {
+            Assert::assertInstanceOf(\DateTimeImmutable::class, $date);
+            Assert::assertSame('2026-01-15', $date->format('Y-m-d'));
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $tester->execute(['date' => '2026-01-15']);
 
         $tester->assertCommandIsSuccessful();
     }

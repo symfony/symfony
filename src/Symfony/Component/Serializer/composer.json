@@ -36,7 +36,7 @@
         "symfony/messenger": "^7.4|^8.0",
         "symfony/mime": "^7.4|^8.0",
         "symfony/property-access": "^8.1.2",
-        "symfony/property-info": "^7.4.15|^8.0.15",
+        "symfony/property-info": "^7.4.15|~8.0.15|^8.1.2",
         "symfony/translation-contracts": "^2.5|^3",
         "symfony/type-info": "^7.4|^8.0",
         "symfony/uid": "^7.4|^8.0",

@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-07-05T02:44:53Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by munzzyy at 2026-07-05T02:58:45Z
+
+Some context on the change: the Finnish string used *yritystunnusta* (from *yritystunnus*, Finland's business ID / Y-tunnus), which is the wrong term here. A BIC identifies a bank, so *pankkitunnusta* (*pankkitunnus*, bank identifier) is the right word. Only trans-unit 85 in `validators.fi.xlf` changes.
+
+The three red checks look unrelated to a one-line translation edit: PHPStan is flagging a `method_exists(..., '__destruct')` call in the Cache component, and Integration (8.1) is one of the service-backed suites. Glad to rebase or adjust if I've missed a real connection.

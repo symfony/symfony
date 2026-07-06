@@ -266,7 +266,7 @@ class TranslationExtractCommand extends Command
             }
 
             $operationResult = $operation->getResult();
-            if (null !== $sort) {
+            if ($sort) {
                 $operationResult = $this->sortCatalogue($operationResult, $sort);
             }
 

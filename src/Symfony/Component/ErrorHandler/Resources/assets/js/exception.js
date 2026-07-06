@@ -82,9 +82,12 @@
             for (j = 0; j < tabNavigation.length; j++) {
                 tabId = tabNavigation[j].getAttribute('data-tab-id');
                 var tabPanel = document.getElementById(tabId);
+                var tabPanelTitle = tabPanel.querySelector('.tab-title');
                 tabPanel.setAttribute('role', 'tabpanel');
-                tabPanel.setAttribute('aria-labelledby', tabId);
-                tabPanel.querySelector('.tab-title').className = 'hidden';
+                tabPanel.setAttribute('tabindex', '0');
+                tabPanelTitle.id = tabId + '-label';
+                tabPanel.setAttribute('aria-labelledby', tabPanelTitle.id);
+                addClass(tabPanelTitle, 'hidden');
 
                 if (hasClass(tabNavigation[j], 'active')) {
                     tabPanel.className = 'block';

@@ -75,6 +75,24 @@
             addClass(document.querySelector('[data-tab-id="' + selectedTabId + '"]'), 'active');
         }
 
+        /* activates a tab: shows its panel and hides the others in the same group */
+        var activateTab = function(tab) {
+            var tabsOfGroup = tab.parentNode.children;
+            for (var i = 0; i < tabsOfGroup.length; i++) {
+                var tabId = tabsOfGroup[i].getAttribute('data-tab-id');
+                document.getElementById(tabId).className = 'hidden';
+                removeClass(tabsOfGroup[i], 'active');
+                tabsOfGroup[i].removeAttribute('aria-selected');
+                tabsOfGroup[i].setAttribute('tabindex', '-1');
+            }
+
+            addClass(tab, 'active');
+            tab.setAttribute('aria-selected', 'true');
+            tab.removeAttribute('tabindex');
+            var activeTabId = tab.getAttribute('data-tab-id');
+            document.getElementById(activeTabId).className = 'block';
+        };
+
         /* display the active tab and add the 'click' event listeners */
         for (i = 0; i < tabGroups.length; i++) {
             tabNavigation = tabGroups[i].querySelectorAll(':scope > .tab-navigation .tab-control');
@@ -108,21 +126,30 @@
                         activeTab = activeTab.parentNode;
                     }
 
-                    /* get the full list of tabs through the parent of the active tab element */
-                    var tabNavigation = activeTab.parentNode.children;
-                    for (var k = 0; k < tabNavigation.length; k++) {
-                        var tabId = tabNavigation[k].getAttribute('data-tab-id');
-                        document.getElementById(tabId).className = 'hidden';
-                        removeClass(tabNavigation[k], 'active');
-                        tabNavigation[k].removeAttribute('aria-selected');
-                        tabNavigation[k].setAttribute('tabindex', '-1');
+                    activateTab(activeTab);
+                });
+
+                /* left/right arrow keys move focus to the previous/next tab and activate it */
+                /* (www.w3.org/WAI/ARIA/apg/patterns/tabs/#keyboardinteraction) */
+                tabNavigation[j].addEventListener('keydown', function(e) {
+                    var key = e.key;
+                    if ('ArrowLeft' !== key && 'ArrowRight' !== key) {
+                        return;
                     }
 
-                    addClass(activeTab, 'active');
-                    activeTab.setAttribute('aria-selected', 'true');
-                    activeTab.removeAttribute('tabindex');
-                    var activeTabId = activeTab.getAttribute('data-tab-id');
-                    document.getElementById(activeTabId).className = 'block';
+                    e.preventDefault();
+
+                    var tabsOfGroup = Array.prototype.slice.call(this.parentNode.children);
+                    var currentIndex = tabsOfGroup.indexOf(this);
+                    var newIndex = currentIndex;
+                    /* skip disabled tabs, without looping forever if they all are */
+                    do {
+                        newIndex = (newIndex + ('ArrowRight' === key ? 1 : -1) + tabsOfGroup.length) % tabsOfGroup.length;
+                    } while (tabsOfGroup[newIndex].disabled && newIndex !== currentIndex);
+
+                    var newTab = tabsOfGroup[newIndex];
+                    activateTab(newTab);
+                    newTab.focus();
                 });
             }
 

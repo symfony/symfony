@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Http\NetworkException;
 use AsyncAws\Core\Test\ResultMockFactory;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
@@ -289,6 +290,40 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
         $connection->get();
+    }
+
+    public function testDestructDoesNotThrowOnNetworkFailure()
+    {
+        $httpClient = new MockHttpClient(new MockResponse('', ['error' => 'Connection timed out']));
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        try {
+            $connection->get();
+            $this->fail('The receive should have failed.');
+        } catch (NetworkException) {
+        }
+
+        unset($connection);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testResetClearsTheFailedResponse()
+    {
+        $httpClient = new MockHttpClient(new MockResponse('', ['error' => 'Connection timed out']));
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        try {
+            $connection->get();
+            $this->fail('The receive should have failed.');
+        } catch (NetworkException) {
+        }
+
+        $connection->reset();
+
+        $this->addToAssertionCount(1);
     }
 
     /**

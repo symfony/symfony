@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
@@ -77,7 +78,11 @@ class Connection
 
     public function __destruct()
     {
-        $this->reset();
+        try {
+            $this->reset();
+        } catch (AsyncAwsException) {
+            // requeuing in-flight messages on shutdown is best effort and must not throw from the destructor
+        }
     }
 
     /**
@@ -373,8 +378,14 @@ class Connection
     public function reset(): void
     {
         if (null !== $this->currentResponse) {
-            // fetch current response in order to requeue in transit messages
-            if (!$this->fetchMessage()) {
+            try {
+                // fetch current response in order to requeue in transit messages
+                if (!$this->fetchMessage()) {
+                    $this->currentResponse->cancel();
+                    $this->currentResponse = null;
+                }
+            } catch (AsyncAwsException) {
+                // the response failed (e.g. because of a network error) and cannot be reused
                 $this->currentResponse->cancel();
                 $this->currentResponse = null;
             }

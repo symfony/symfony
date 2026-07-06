@@ -62,7 +62,7 @@
                 tabNavigationItem.setAttribute('aria-controls', tabId);
                 if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
                 if (hasClass(tabs[j], 'disabled')) {
-                    addClass(tabNavigationItem, 'disabled');
+                    tabNavigationItem.disabled = true;
                 }
                 tabNavigationItem.innerHTML = tabTitle;
                 tabNavigation.appendChild(tabNavigationItem);

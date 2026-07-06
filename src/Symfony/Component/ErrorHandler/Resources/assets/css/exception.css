@@ -216,8 +216,9 @@ thead.sf-toggle-content.sf-toggle-visible, tbody.sf-toggle-content.sf-toggle-vis
     text-align: center;
     white-space: nowrap;
 }
-.tab-navigation .tab-control.disabled {
+.tab-navigation .tab-control:disabled {
     color: var(--tab-disabled-color);
+    cursor: default;
 }
 .tab-navigation .tab-control.active {
     background-color: var(--tab-active-background);

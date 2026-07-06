@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerLintCommand;
 use Symfony\Bundle\FrameworkBundle\Command\DebugAutowiringCommand;
 use Symfony\Bundle\FrameworkBundle\Command\EventDispatcherDebugCommand;
+use Symfony\Bundle\FrameworkBundle\Command\ProfilerDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsDecryptToLocalCommand;
@@ -227,6 +228,12 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.scheduler_debug', SchedulerDebugCommand::class)
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.profiler_dump', ProfilerDumpCommand::class)
+            ->args([
+                service('profiler'),
             ])
             ->tag('console.command')
 

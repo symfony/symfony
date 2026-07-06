@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
+use AsyncAws\Core\Exception\Http\NetworkException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsFifoStamp;
@@ -18,6 +19,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsSender;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsXrayTraceHeaderStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class AmazonSqsSenderTest extends TestCase
@@ -85,6 +87,25 @@ class AmazonSqsSenderTest extends TestCase
         $serializer->method('encode')->with($envelope)->willReturn($encoded);
 
         $sender = new AmazonSqsSender($connection, $serializer);
+        $sender->send($envelope);
+    }
+
+    public function testItConvertsNetworkExceptionDuringSendIntoTransportException()
+    {
+        $envelope = new Envelope(new DummyMessage('Oy'));
+        $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('send')->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+
+        $sender = new AmazonSqsSender($connection, $serializer);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
         $sender->send($envelope);
     }
 }

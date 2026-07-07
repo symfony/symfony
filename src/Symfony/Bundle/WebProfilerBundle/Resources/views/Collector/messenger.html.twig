@@ -131,6 +131,7 @@
                 <th colspan="2" class="sf-toggle"
                     data-toggle-selector="#message-item-{{ discr }}-{{ loop.index0 }}-details"
                     data-toggle-initial="{{ loop.first ? 'display' }}"
+                    data-toggle-label="Toggle message details"
                 >
                     <span class="dump-inline">{{ profiler_dump(dispatchCall.message.type) }}</span>
                     {% if dispatchCall.exception is defined %}

@@ -8,7 +8,7 @@
     <framework:config http-method-override="false" handle-all-throwables="true">
         <framework:annotations enabled="false" />
         <framework:php-errors log="true" />
-        <framework:cache>
+        <framework:cache default-valkey-provider="valkey://valkey-host">
             <framework:pool name="cache.foo" adapter="cache.adapter.apcu" default-lifetime="30" />
             <framework:pool name="cache.baz" adapter="cache.adapter.filesystem" default-lifetime="7" />
             <framework:pool name="cache.foobar" adapter="cache.adapter.psr6" default-lifetime="10" provider="app.cache_pool" />

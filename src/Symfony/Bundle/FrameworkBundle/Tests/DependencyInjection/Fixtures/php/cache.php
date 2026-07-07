@@ -6,6 +6,7 @@ $container->loadFromExtension('framework', [
     'handle_all_throwables' => true,
     'php_errors' => ['log' => true],
     'cache' => [
+        'default_valkey_provider' => 'valkey://valkey-host',
         'pools' => [
             'cache.foo' => [
                 'adapter' => 'cache.adapter.apcu',

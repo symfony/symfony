@@ -568,6 +568,19 @@ class ProcessTest extends TestCase
         $this->assertEquals("foo\r\n", $process->getOutput());
     }
 
+    public function testPTYInWindowsEnvironment()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('PTY mode is not supported on Windows platform.');
+        if ('\\' !== \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test is for Windows platform only');
+        }
+
+        $process = $this->getProcess('echo "foo" >> /dev/null');
+        $process->setPty(false);
+        $process->setPty(true);
+    }
+
     public function testMustRun()
     {
         $process = $this->getProcess('echo foo');

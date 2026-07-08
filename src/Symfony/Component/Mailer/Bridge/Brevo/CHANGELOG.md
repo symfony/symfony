@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+* Allow configuring the SMTP port through the DSN
+
 6.4
 ---
 

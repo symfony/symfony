@@ -115,6 +115,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformC
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformSourceProperty\Source as TransformSourcePropertySource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformSourceProperty\Target as TransformSourcePropertyTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\Post;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\PostView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Unreadable\Order;
@@ -917,5 +919,17 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(MappedChildEntityDto::class, $target);
         $this->assertSame('Test', $target->name);
         $this->assertNull($target->secret);
+    }
+
+    public function testTransformReceivesMappedSourceValueWithNonThrowingPropertyAccessor()
+    {
+        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessorBuilder()->disableExceptionOnInvalidPropertyPath()->getPropertyAccessor());
+
+        $target = $mapper->map(new TransformSourcePropertySource(), TransformSourcePropertyTarget::class);
+
+        // a non-throwing property accessor must not make the unrelated target property name look readable on the
+        // source, otherwise the #[Map(source: ...)] property is read as null and the transform receives null
+        $this->assertInstanceOf(TransformSourcePropertyTarget::class, $target);
+        $this->assertSame('ABC', $target->targetProperty);
     }
 }

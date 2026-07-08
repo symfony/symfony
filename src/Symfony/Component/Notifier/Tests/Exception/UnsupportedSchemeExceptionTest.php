@@ -74,6 +74,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\PagerDuty\PagerDutyTransportFactory::class => false,
             Bridge\Plivo\PlivoTransportFactory::class => false,
             Bridge\Primotexto\PrimotextoTransportFactory::class => false,
+            Bridge\Prelude\PreludeTransportFactory::class => false,
             Bridge\Pushover\PushoverTransportFactory::class => false,
             Bridge\Pushy\PushyTransportFactory::class => false,
             Bridge\Redlink\RedlinkTransportFactory::class => false,
@@ -169,6 +170,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['ovhcloud', 'symfony/ovh-cloud-notifier'];
         yield ['pagerduty', 'symfony/pager-duty-notifier'];
         yield ['plivo', 'symfony/plivo-notifier'];
+        yield ['prelude', 'symfony/prelude-notifier'];
         yield ['primotexto', 'symfony/primotexto-notifier'];
         yield ['pushover', 'symfony/pushover-notifier'];
         yield ['redlink', 'symfony/redlink-notifier'];

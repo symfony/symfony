@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by munzzyy at 2026-07-06T02:13:04Z
+
+Heads up: this always-true check is currently what fails the PHPStan job on unrelated 6.4 PRs. The job diffs the PR analysis against the target branch and reports `Call to function method_exists() with 'Symfony\Component\Cache\Adapter\AbstractAdapter' and '__destruct' will always evaluate to true.` as new, even on PRs that only touch validator translation files (#64803 through #64811 here, #64772 from another author). To rule out a stale base I re-pushed #64803 and a fresh run fails the same way: https://github.com/symfony/symfony/actions/runs/28763202447/job/85282394179. FilesystemCommonTrait.php hasn't changed on 6.4 since April, so those branches carry the exact code the target has - the diff still lands the error on the PR side. Once this is merged I'll rebase the affected PRs.

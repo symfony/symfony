@@ -1047,6 +1047,14 @@ class Process implements \IteratorAggregate
      */
     public function setPty(bool $bool): static
     {
+        if ('\\' === \DIRECTORY_SEPARATOR && $bool) {
+            throw new RuntimeException('PTY mode is not supported on Windows platform.');
+        }
+
+        if ($bool && !self::isPtySupported()) {
+            throw new RuntimeException('PTY mode requires pty to be read/writable.');
+        }
+
         $this->pty = $bool;
 
         return $this;

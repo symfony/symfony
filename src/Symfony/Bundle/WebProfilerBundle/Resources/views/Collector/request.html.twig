@@ -271,7 +271,7 @@
             </div>
         </div>
 
-        <div class="tab {{ collector.sessionmetadata is empty ? 'disabled' }}">
+        <div class="tab {{ collector.sessionmetadata is empty and collector.sessionusages is empty ? 'disabled' }}">
             <h3 class="tab-title">Session{% if collector.sessionusages is not empty %} <span class="badge">{{ collector.sessionusages|length }}</span>{% endif %}</h3>
 
             <div class="tab-content">

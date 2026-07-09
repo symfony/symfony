@@ -285,6 +285,23 @@ class Application implements ResetInterface
 
                 $command = $this->find($alternative);
             } else {
+                // describing a namespace is not an error: do not dispatch ConsoleEvents::ERROR for it
+                try {
+                    if ($e instanceof CommandNotFoundException && $namespace = $this->findNamespace($name)) {
+                        $helper = new DescriptorHelper();
+                        $helper->describe($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output, $this, [
+                            'format' => 'txt',
+                            'raw_text' => false,
+                            'namespace' => $namespace,
+                            'short' => false,
+                        ]);
+
+                        return 1;
+                    }
+                } catch (NamespaceNotFoundException) {
+                    // no namespace matches the given name, report the original error below
+                }
+
                 if (null !== $this->dispatcher) {
                     $event = new ConsoleErrorEvent($input, $output, $e);
                     $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
@@ -296,23 +313,7 @@ class Application implements ResetInterface
                     $e = $event->getError();
                 }
 
-                try {
-                    if ($e instanceof CommandNotFoundException && $namespace = $this->findNamespace($name)) {
-                        $helper = new DescriptorHelper();
-                        $helper->describe($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output, $this, [
-                            'format' => 'txt',
-                            'raw_text' => false,
-                            'namespace' => $namespace,
-                            'short' => false,
-                        ]);
-
-                        return isset($event) ? $event->getExitCode() : 1;
-                    }
-
-                    throw $e;
-                } catch (NamespaceNotFoundException) {
-                    throw $e;
-                }
+                throw $e;
             }
         }
 

@@ -593,6 +593,46 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('The foo:bar1 command', $display);
     }
 
+    public function testRunNamespaceDoesNotDispatchTheErrorEvent()
+    {
+        putenv('COLUMNS=120');
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add(new \FooCommand());
+
+        $dispatched = false;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.error', static function () use (&$dispatched) {
+            $dispatched = true;
+        });
+        $application->setDispatcher($dispatcher);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo'], ['decorated' => false]);
+
+        $this->assertStringContainsString('Available commands for the "foo" namespace:', trim($tester->getDisplay(true)));
+        $this->assertFalse($dispatched, '->run() does not dispatch ConsoleEvents::ERROR when it describes a namespace');
+    }
+
+    public function testRunUnknownCommandDispatchesTheErrorEvent()
+    {
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->add(new \FooCommand());
+
+        $dispatched = false;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener('console.error', static function () use (&$dispatched) {
+            $dispatched = true;
+        });
+        $application->setDispatcher($dispatcher);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'unknown'], ['decorated' => false]);
+
+        $this->assertTrue($dispatched, '->run() dispatches ConsoleEvents::ERROR when the command does not exist');
+    }
+
     public function testFindAlternativeExceptionMessageMultiple()
     {
         putenv('COLUMNS=120');

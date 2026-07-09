@@ -93,6 +93,22 @@ abstract class Constraint
     }
 
     /**
+     * @template T
+     *
+     * @param T|ValidationPipe<T> $value
+     *
+     * @return ValidationPipe<T>
+     */
+    final public function __invoke(mixed $value): ValidationPipe
+    {
+        if (!$value instanceof ValidationPipe) {
+            return new ValidationPipe($value, [$this]);
+        }
+
+        return $value->pipe($this);
+    }
+
+    /**
      * Sets the value of a lazily initialized option.
      *
      * Corresponding properties are added to the object on first access. Hence

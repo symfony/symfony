@@ -13,13 +13,27 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\CustomRegex;
 
 class ConstraintTest extends TestCase
 {
+    public function testInvokingTheConstraintRunsValidation()
+    {
+        $notBlankValue = 'not-blank';
+        $blankValue = '';
+
+        $notBlank = new NotBlank();
+        $notBlank($notBlankValue); // no exception
+
+        $this->expectException(ValidationFailedException::class);
+        $notBlank($blankValue);
+    }
+
     public function testAddDefaultGroupAddsGroup()
     {
         $constraint = new ConstraintA(null, null, ['Default']);

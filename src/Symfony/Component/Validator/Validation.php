@@ -22,7 +22,47 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class Validation
 {
     /**
+     * @var Constraint[]
+     */
+    private array $constraints;
+
+    private ?\Closure $validate = null;
+
+    /**
+     * Instances of this class are invokable and validate the value they are called with,
+     * which makes them suitable for use with the pipe operator:
+     *
+     *     $email = $input |> new Validation(new NotBlank(), new Email());
+     */
+    public function __construct(
+        private readonly Constraint|ValidatorInterface|null $constraintOrValidator = null,
+        Constraint ...$constraints,
+    ) {
+        $this->constraints = $constraints;
+    }
+
+    /**
+     * Validates the value against the constraints and returns it.
+     *
+     * @template T
+     *
+     * @param T $value
+     *
+     * @return T The $value
+     */
+    public function __invoke(mixed $value): mixed
+    {
+        $this->validate ??= self::createCallable($this->constraintOrValidator, ...$this->constraints);
+
+        return ($this->validate)($value);
+    }
+
+    /**
      * Creates a callable chain of constraints.
+     *
+     * @phpstan-return callable<T>(T $value): T
+     *
+     * @psalm-return callable(mixed $value): mixed
      */
     public static function createCallable(Constraint|ValidatorInterface|null $constraintOrValidator = null, Constraint ...$constraints): callable
     {
@@ -77,12 +117,5 @@ final class Validation
     public static function createValidatorBuilder(): ValidatorBuilder
     {
         return new ValidatorBuilder();
-    }
-
-    /**
-     * This class cannot be instantiated.
-     */
-    private function __construct()
-    {
     }
 }

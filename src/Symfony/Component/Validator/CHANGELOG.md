@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Make `Validation` instantiable and invokable, so it can be used as a validation step with the pipe operator (`$value |> new Validation(new NotBlank())`)
  * Add the `Cron` constraint to validate cron expressions
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
 

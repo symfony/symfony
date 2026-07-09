@@ -210,7 +210,10 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         $this->stopped = false;
         $this->lastTickAt = null;
         $this->lastTickBusyHint = null;
-        $this->terminal->start($this->handleInput(...), $this->requestRender(...), function (): void {
+        // A resize forces a full repaint: multiplexers (dtach, tmux) send
+        // SIGWINCH on reattach, when the previous screen content cannot be
+        // trusted, even at an unchanged size
+        $this->terminal->start($this->handleInput(...), fn () => $this->requestRender(true), function (): void {
             $this->keybindings->setKittyProtocolActive(true);
         });
         $this->terminal->hideCursor();

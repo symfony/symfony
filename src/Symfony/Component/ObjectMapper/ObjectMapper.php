@@ -127,7 +127,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $refl = $this->getSourceReflectionClass($source) ?? $targetRefl;
 
         // When source contains no metadata, we read metadata on the target instead
-        if ($refl === $targetRefl) {
+        if ($readMetadataFromTarget = $refl === $targetRefl) {
             $readMetadataFrom = $mappedTarget;
         }
 
@@ -140,10 +140,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             $propertyName = $property->getName();
             $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
             foreach ($mappings as $mapping) {
-                $sourcePropertyName = $propertyName;
-                if ($mapping->source && !$this->isReadable($source, $propertyName)) {
-                    $sourcePropertyName = $mapping->source;
-                }
+                // when metadata is read from the source, $mapping->source describes the
+                // reverse mapping and must not be resolved against $source
+                $sourcePropertyName = $readMetadataFromTarget ? $mapping->source ?? $propertyName : $propertyName;
 
                 $targetPropertyName = $mapping->target ?? $propertyName;
                 if (false === $if = $mapping->if) {

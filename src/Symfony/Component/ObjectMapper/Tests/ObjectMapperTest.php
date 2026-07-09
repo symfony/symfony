@@ -44,6 +44,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\Address;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\User as UserEmbeddedMapping;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\UserDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedSource as ExplicitSourceNestedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedTarget as ExplicitSourceNestedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Source as ExplicitSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Target as ExplicitSourceTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
@@ -67,6 +71,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Target;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\A as MapTargetToSourceA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\B as MapTargetToSourceB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\C as MapTargetToSourceC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\A as MultipleTargetPropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as MultipleTargetPropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
@@ -409,6 +414,29 @@ final class ObjectMapperTest extends TestCase
         $b = $mapper->map($a, MapTargetToSourceB::class);
         $this->assertInstanceOf(MapTargetToSourceB::class, $b);
         $this->assertSame('str', $b->target);
+    }
+
+    public function testMapTargetToSourceIsIgnoredWhenMappingFromTheSource()
+    {
+        $b = new MapTargetToSourceB('str');
+        $mapper = new ObjectMapper();
+        $c = $mapper->map($b, MapTargetToSourceC::class);
+        $this->assertInstanceOf(MapTargetToSourceC::class, $c);
+        $this->assertSame('str', $c->target);
+    }
+
+    public function testExplicitSourceTakesPrecedenceOverSameNamedProperty()
+    {
+        $mapper = new ObjectMapper();
+        $target = $mapper->map(new ExplicitSource(), ExplicitSourceTarget::class);
+        $this->assertSame('from-reasonText', $target->reason);
+    }
+
+    public function testExplicitSourceSupportsPropertyPath()
+    {
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
+        $target = $mapper->map(new ExplicitSourceNestedSource(), ExplicitSourceNestedTarget::class);
+        $this->assertSame('from-nested-description', $target->reason);
     }
 
     public function testMultipleTargetMapProperty()

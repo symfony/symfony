@@ -21,6 +21,7 @@ CHANGELOG
  * Add support for reading objects properties with `Unique` constraint `fields` option
  * Add an optional `$mappedClasses` argument to `Mapping\Loader\LoaderChain::__construct()`, to declare which classes each loader maps
  * Add `ValidatorBuilder::addMappedClasses()`, to declare which classes each mapping file maps
+ * Make `Constraint` objects invokable, so they can be used in validation pipes (`$value |> new NotBlank()`)
 
 8.1
 ---

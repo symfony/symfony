@@ -50,7 +50,8 @@
             tabNavigation.className = 'tab-navigation';
             tabNavigation.setAttribute('role', 'tablist');
 
-            var selectedTabId = 'tab-' + i + '-0'; /* select the first tab by default */
+            var selectedTabId = null;
+            var firstEnabledTabId = null;
             for (var j = 0; j < tabs.length; j++) {
                 var tabId = 'tab-' + i + '-' + j;
                 var tabTitle = tabs[j].querySelector('.tab-title').innerHTML;
@@ -60,10 +61,12 @@
                 tabNavigationItem.setAttribute('data-tab-id', tabId);
                 tabNavigationItem.setAttribute('role', 'tab');
                 tabNavigationItem.setAttribute('aria-controls', tabId);
-                if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
                 if (hasClass(tabs[j], 'disabled')) {
                     tabNavigationItem.disabled = true;
+                } else if (null === firstEnabledTabId) {
+                    firstEnabledTabId = tabId;
                 }
+                if (hasClass(tabs[j], 'active')) { selectedTabId = tabId; }
                 tabNavigationItem.innerHTML = tabTitle;
                 tabNavigation.appendChild(tabNavigationItem);
 
@@ -72,7 +75,9 @@
             }
 
             tabGroups[i].insertBefore(tabNavigation, tabGroups[i].firstChild);
-            addClass(document.querySelector('[data-tab-id="' + selectedTabId + '"]'), 'active');
+            /* fall back to the first enabled tab (not necessarily the first tab) when none */
+            /* is explicitly marked active, so the default selection is never a disabled tab */
+            addClass(document.querySelector('[data-tab-id="' + (selectedTabId || firstEnabledTabId || ('tab-' + i + '-0')) + '"]'), 'active');
         }
 
         /* activates a tab: shows its panel and hides the others in the same group */

@@ -568,7 +568,7 @@
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Это значение не является корректным выражением cron.</target>
+                <target>Это значение не является корректным выражением cron.</target>
             </trans-unit>
         </body>
     </file>

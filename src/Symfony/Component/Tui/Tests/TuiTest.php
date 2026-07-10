@@ -323,6 +323,25 @@ class TuiTest extends TestCase
         $this->assertStringContainsString('Hello', $terminal->getOutput());
     }
 
+    public function testSameSizeResizeRepaintsTheFullScreen()
+    {
+        // Multiplexers send SIGWINCH on reattach even at an unchanged size;
+        // the new terminal is blank, so diff-only rendering would show nothing
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+
+        $tui->add(new TextWidget('Hello'));
+        $tui->start();
+        $tui->processRender();
+
+        $terminal->clearOutput();
+
+        $terminal->simulateResize(40, 10);
+        $tui->processRender();
+
+        $this->assertStringContainsString('Hello', $terminal->getOutput());
+    }
+
     public function testInputEventCanConsumeGlobalInputBeforeFocusedWidget()
     {
         $terminal = new VirtualTerminal(40, 10);

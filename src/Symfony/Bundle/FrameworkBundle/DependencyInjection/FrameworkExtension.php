@@ -2833,8 +2833,17 @@ class FrameworkExtension extends Extension
             $defaultTransportId = 'http_client.mock_transport';
         }
 
+        $realTransportId = 'http_client.transport';
+
         if ('http_client.transport' !== $defaultTransportId) {
-            $container->getDefinition('http_client')->setArgument(0, [new Reference($defaultTransportId)]);
+            // Decorate "http_client.transport" instead of replacing it as the transport of "http_client", so that
+            // decorators registered on "http_client.transport" remain in the chain when a mock factory is configured.
+            // The highest priority makes the mock the innermost decorator: decorators keep running around it whatever
+            // their own priority. The undecorated transport stays available under "http_client.transport.real" for
+            // scoped clients that opt out with "mock_response_factory: false".
+            $container->getDefinition($defaultTransportId)
+                ->setDecoratedService('http_client.transport', $realTransportId = 'http_client.transport.real', \PHP_INT_MAX);
+            $defaultTransportId = 'http_client.transport';
         }
 
         foreach ($config['scoped_clients'] as $name => $scopeConfig) {
@@ -2852,7 +2861,7 @@ class FrameworkExtension extends Extension
             unset($scopeConfig['retry_failed']);
 
             if (false === $mockResponseFactory = $scopeConfig['mock_response_factory'] ?? $defaultMockResponseFactory) {
-                $transportId = 'http_client.transport';
+                $transportId = $realTransportId;
             } elseif ($mockResponseFactory === $defaultMockResponseFactory) {
                 $transportId = $defaultTransportId;
             } elseif (\is_string($mockResponseFactory)) {

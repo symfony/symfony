@@ -2578,13 +2578,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('.http_client.mock_transport.my_factory'));
         $this->assertTrue($container->hasDefinition('.http_client.mock_transport.my_other_factory'));
 
+        // opted-out clients point at the undecorated real transport, renamed by the mock decoration
         $definition = $container->getDefinition('notMocked');
         $arguments = $definition->getArgument(0);
-        $this->assertSame('http_client.transport', (string) $arguments[0]);
+        $this->assertSame('http_client.transport.real', (string) $arguments[0]);
 
+        // "mocked" inherits the top-level factory, which decorates "http_client.transport" in place
         $definition = $container->getDefinition('mocked');
         $arguments = $definition->getArgument(0);
-        $this->assertSame('.http_client.mock_transport.my_factory', (string) $arguments[0]);
+        $this->assertSame('http_client.transport', (string) $arguments[0]);
 
         $definition = $container->getDefinition('mocked_custom_factory');
         $arguments = $definition->getArgument(0);
@@ -2598,13 +2600,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('http_client.mock_transport'));
         $this->assertTrue($container->hasDefinition('.http_client.mock_transport.my_response_factory'));
 
+        // opted-out clients point at the undecorated real transport, renamed by the mock decoration
         $definition = $container->getDefinition('notMocked');
         $arguments = $definition->getArgument(0);
-        $this->assertSame('http_client.transport', (string) $arguments[0]);
+        $this->assertSame('http_client.transport.real', (string) $arguments[0]);
 
+        // "mocked" inherits the top-level boolean factory, which decorates "http_client.transport" in place
         $definition = $container->getDefinition('mocked');
         $arguments = $definition->getArgument(0);
-        $this->assertSame('http_client.mock_transport', (string) $arguments[0]);
+        $this->assertSame('http_client.transport', (string) $arguments[0]);
 
         $definition = $container->getDefinition('mocked_with_factory');
         $arguments = $definition->getArgument(0);
@@ -2615,11 +2619,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');
 
+        // The root client keeps using "http_client.transport"; the mock decorates it in place so decorators
+        // registered on "http_client.transport" are preserved.
         $definition = $container->getDefinition('http_client');
         $arguments = $definition->getArgument(0);
         $this->assertCount(1, $arguments);
         $this->assertInstanceOf(Reference::class, $arguments[0]);
-        $this->assertSame('.http_client.mock_transport.my_factory', (string) $arguments[0]);
+        $this->assertSame('http_client.transport', (string) $arguments[0]);
+
+        $decoratedService = $container->getDefinition('.http_client.mock_transport.my_factory')->getDecoratedService();
+        $this->assertSame('http_client.transport', $decoratedService[0]);
+        $this->assertSame('http_client.transport.real', $decoratedService[1]);
+        $this->assertSame(\PHP_INT_MAX, $decoratedService[2]);
     }
 
     public function testHttpClientRootClientMockedFromBooleanTopLevel()
@@ -2630,7 +2641,33 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $arguments = $definition->getArgument(0);
         $this->assertCount(1, $arguments);
         $this->assertInstanceOf(Reference::class, $arguments[0]);
-        $this->assertSame('http_client.mock_transport', (string) $arguments[0]);
+        $this->assertSame('http_client.transport', (string) $arguments[0]);
+
+        $decoratedService = $container->getDefinition('http_client.mock_transport')->getDecoratedService();
+        $this->assertSame('http_client.transport', $decoratedService[0]);
+        $this->assertSame('http_client.transport.real', $decoratedService[1]);
+        $this->assertSame(\PHP_INT_MAX, $decoratedService[2]);
+    }
+
+    /**
+     * Configuring a mock response factory must decorate "http_client.transport" in place, not replace it as the
+     * transport referenced by "http_client". Otherwise any decorator registered on "http_client.transport" (a
+     * common way to add cross-cutting behavior, e.g. dispatching an event per request) is silently removed from
+     * the chain as soon as a mock factory is configured.
+     */
+    public function testHttpClientMockResponseFactoryKeepsTransportDecoratable()
+    {
+        $container = $this->createContainerFromFile('http_client_mock_response_factory');
+
+        // "http_client" keeps using "http_client.transport", so decorators registered on it stay in the chain.
+        $this->assertSame('http_client.transport', (string) $container->getDefinition('http_client')->getArgument(0)[0]);
+
+        // The mock is wired as the innermost decorator of "http_client.transport", not as its replacement, so
+        // decorators registered with any priority keep wrapping it.
+        $decoratedService = $container->getDefinition('.http_client.mock_transport.my_factory')->getDecoratedService();
+        $this->assertNotNull($decoratedService, 'The mock transport must decorate "http_client.transport".');
+        $this->assertSame('http_client.transport', $decoratedService[0]);
+        $this->assertSame(\PHP_INT_MAX, $decoratedService[2]);
     }
 
     public function testHttpClientRootClientNotMockedByDefault()

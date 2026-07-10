@@ -533,4 +533,11 @@ class ExpressionLanguageTest extends TestCase
         $parsed = $el->parse('1 + 1', []);
         $this->assertSame($parsed, $el->parse($parsed, []));
     }
+
+    public function testCountFunction()
+    {
+        $language = new ExpressionLanguage();
+        $this->assertSame(3, $language->evaluate('count([1, 2, 3])'));
+        $this->assertSame(0, $language->evaluate('count([])'));
+    }
 }

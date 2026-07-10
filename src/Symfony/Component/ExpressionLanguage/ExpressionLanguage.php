@@ -140,7 +140,7 @@ class ExpressionLanguage
 
     protected function registerFunctions(): void
     {
-        $basicPhpFunctions = ['constant', 'min', 'max'];
+        $basicPhpFunctions = ['constant', 'min', 'max', 'count'];
         foreach ($basicPhpFunctions as $function) {
             $this->addFunction(ExpressionFunction::fromPhp($function));
         }

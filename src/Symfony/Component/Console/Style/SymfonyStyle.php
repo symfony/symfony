@@ -378,10 +378,15 @@ class SymfonyStyle extends OutputStyle
             if ($this->output instanceof ConsoleSectionOutput) {
                 // add the new line of the `return` to submit the input to ConsoleSectionOutput, because ConsoleSectionOutput is holding all it's lines.
                 // this is relevant when a `ConsoleSectionOutput::clear` is called.
+                // the section already renders the prompt as a whole line, so an extra
+                // newLine() here would leave a doubled blank line below the answer; only
+                // keep the buffer in sync so autoPrependBlock() spaces the next block.
                 $this->output->addNewLineOfInputSubmit();
+                $this->bufferedOutput->write("\n\n");
+            } else {
+                $this->newLine();
+                $this->bufferedOutput->write("\n");
             }
-            $this->newLine();
-            $this->bufferedOutput->write("\n");
         }
 
         return $answer;

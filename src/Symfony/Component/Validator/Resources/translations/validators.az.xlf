@@ -324,7 +324,7 @@
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Bu dəyər {{ compare_value }} dəyərinin bölənlərindən biri olmalıdır.</target>
+                <target>Bu dəyər {{ compared_value }} dəyərinin bölənlərindən biri olmalıdır.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>

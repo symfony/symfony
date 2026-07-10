@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-07-07T13:18:05Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-07-07T13:33:31Z
+
+Please add a testcase
+
+---------------------------------------------------------------------------
+
+by mrossard at 2026-07-07T14:38:08Z
+
+> Please add a testcase
+
+Meant to do it later but this repo doesn't allow draft PRs, sorry.

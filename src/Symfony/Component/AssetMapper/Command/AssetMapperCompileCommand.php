@@ -88,8 +88,8 @@ final class AssetMapperCompileCommand extends Command
         $io->comment(\sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
 
         if ($this->isDebug) {
-            $io->warning(\sprintf(
-                'Debug mode is enabled in your project: Symfony will not serve any changed assets until you delete the files in the "%s" directory again.',
+            $io->note(\sprintf(
+                'Debug mode is enabled: the compiled files in "%s" are ignored and only used when debug is off (e.g. in production).',
                 $this->shortenPath(\dirname($manifestPath))
             ));
         }

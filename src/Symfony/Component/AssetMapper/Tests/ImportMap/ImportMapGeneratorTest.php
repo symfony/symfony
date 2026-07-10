@@ -273,6 +273,42 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($expectedData, $manager->getRawImportMapData());
     }
 
+    public function testGetRawImportMapDataUsesCompiledFileWhenNotDebug()
+    {
+        $compiledData = ['app' => ['path' => '/assets/app-compiled.js', 'type' => 'js']];
+
+        $this->compiledConfigReader = new CompiledAssetMapperConfigReader(self::$writableRoot, debug: false);
+        $this->compiledConfigReader->saveConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME, $compiledData);
+
+        $manager = $this->createImportMapGenerator();
+        // the live configuration resolves to a different path; the compiled file must win
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js')]);
+        $this->mockAssetMapper([new MappedAsset('app.js', publicPath: '/assets/app-live.js')]);
+
+        $this->assertSame($compiledData, $manager->getRawImportMapData());
+    }
+
+    public function testGetRawImportMapDataIgnoresCompiledFileInDebug()
+    {
+        $compiledData = ['app' => ['path' => '/assets/app-compiled.js', 'type' => 'js']];
+
+        $this->compiledConfigReader = new CompiledAssetMapperConfigReader(self::$writableRoot, debug: true);
+        $this->compiledConfigReader->saveConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME, $compiledData);
+
+        $manager = $this->createImportMapGenerator();
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js')]);
+        $this->mockAssetMapper([new MappedAsset('app.js', publicPath: '/assets/app-live.js')]);
+        $this->configReader
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(static fn (string $path) => str_starts_with($path, '.') ? Path::join('/fake/root', $path) : $path);
+
+        // debug ignores the compiled importmap.json and recomputes from source
+        $this->assertSame(
+            ['app' => ['path' => '/assets/app-live.js', 'type' => 'js']],
+            $manager->getRawImportMapData(),
+        );
+    }
+
     public static function getRawImportMapDataTests(): iterable
     {
         yield 'it returns remote downloaded entry' => [

@@ -18,6 +18,7 @@ use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Factory\MappedAssetFactoryInterface;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Filesystem\Filesystem;
 
 class AssetMapperTest extends TestCase
 {
@@ -52,6 +53,29 @@ class AssetMapperTest extends TestCase
 
         // check the manifest is used
         $this->assertSame('/final-assets/file4.checksumfrommanifest.js', $assetMapper->getPublicPath('file4.js'));
+    }
+
+    public function testCompiledManifestIsIgnoredInDebugMode()
+    {
+        $repository = new AssetMapperRepository(['dir1' => '', 'dir2' => '', 'dir3' => ''], __DIR__.'/Fixtures');
+
+        $filesystem = new Filesystem();
+        $writableRoot = __DIR__.'/Fixtures/debug_compiled_manifest';
+        $filesystem->dumpFile($writableRoot.'/manifest.json', json_encode(['file1.css' => '/from-manifest/file1.css']));
+
+        try {
+            $factory = $this->createStub(MappedAssetFactoryInterface::class);
+            $factory->method('createMappedAsset')
+                ->willReturn(new MappedAsset('file1.css', publicPath: '/dynamically-computed/file1.css'));
+
+            // debug: true -> the compiled manifest is ignored, the public path is computed dynamically
+            $debugReader = new CompiledAssetMapperConfigReader($writableRoot, true);
+            $assetMapper = new AssetMapper($repository, $factory, $debugReader);
+
+            $this->assertSame('/dynamically-computed/file1.css', $assetMapper->getPublicPath('file1.css'));
+        } finally {
+            $filesystem->remove($writableRoot);
+        }
     }
 
     public function testAllAssets()

@@ -13,6 +13,7 @@ namespace Symfony\Component\Scheduler\Tests\Trigger;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Trigger\JitterTrigger;
+use Symfony\Component\Scheduler\Trigger\PeriodicalTrigger;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class JitterTriggerTest extends TestCase
@@ -38,5 +39,22 @@ class JitterTriggerTest extends TestCase
         $values = array_unique($values);
 
         $this->assertGreaterThan(1, \count($values));
+    }
+
+    public function testDoesNotSkipRunsWithJitter()
+    {
+        $from = new \DateTimeImmutable('2026-07-07 16:30:00');
+        $inner = new PeriodicalTrigger(10, $from);
+        $trigger = new JitterTrigger($inner, 15);
+
+        // The first run at 16:30:00 was executed at 16:30:12 due to a 12s jitter.
+        $run = $from->modify('+12 seconds');
+
+        $nextRun = $trigger->getNextRunDate($run);
+
+        $this->assertNotNull($nextRun);
+        // The slot at 16:30:10 is already ran, so the next scheduled run is 16:30:20 + a random jitter up to 15s.
+        $this->assertGreaterThanOrEqual($from->modify('+20 seconds')->getTimestamp(), $nextRun->getTimestamp());
+        $this->assertLessThanOrEqual($from->modify('+35 seconds')->getTimestamp(), $nextRun->getTimestamp());
     }
 }

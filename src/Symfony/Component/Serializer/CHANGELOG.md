@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Allow passing an associative array to `CsvEncoder::HEADERS_KEY` to map and reorder columns when encoding
  * Trigger a deprecation when denormalizing an array that is not a list into a `list`-typed property
 
 8.1

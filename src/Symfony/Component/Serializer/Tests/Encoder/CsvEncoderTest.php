@@ -264,6 +264,83 @@ class CsvEncoderTest extends TestCase
         $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
     }
 
+    public function testEncodeWithAssociativeHeaders()
+    {
+        $data = [
+            ['firstName' => 'Alice', 'lastName' => 'A', 'age' => 30],
+            ['firstName' => 'Bob', 'lastName' => 'B', 'age' => 25],
+        ];
+
+        $this->assertSame(
+            "Prénom,Nom\nAlice,A\nBob,B\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::HEADERS_KEY => ['Prénom' => 'firstName', 'Nom' => 'lastName'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersAndNestedPaths()
+    {
+        $data = [
+            ['user' => ['first' => 'Alice', 'last' => 'A']],
+            ['user' => ['first' => 'Bob', 'last' => 'B']],
+        ];
+
+        $this->assertSame(
+            "firstName,lastName\nAlice,A\nBob,B\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::HEADERS_KEY => ['firstName' => 'user.first', 'lastName' => 'user.last'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersFillsMissingPathsWithEmptyString()
+    {
+        $data = [
+            ['firstName' => 'Alice', 'lastName' => 'A'],
+            ['firstName' => 'Bob', 'lastName' => 'B'],
+        ];
+
+        $this->assertSame(
+            "Prénom,Missing\nAlice,\nBob,\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::HEADERS_KEY => ['Prénom' => 'firstName', 'Missing' => 'unknown'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersHonorsKeySeparator()
+    {
+        $data = [
+            ['user' => ['first' => 'Alice']],
+            ['user' => ['first' => 'Bob']],
+        ];
+
+        $this->assertSame(
+            "firstName\nAlice\nBob\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::KEY_SEPARATOR_KEY => '-',
+                CsvEncoder::HEADERS_KEY => ['firstName' => 'user-first'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersAndNoHeaders()
+    {
+        $data = [
+            ['firstName' => 'Alice', 'lastName' => 'A'],
+            ['firstName' => 'Bob', 'lastName' => 'B'],
+        ];
+
+        $this->assertSame(
+            "Alice,A\nBob,B\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::HEADERS_KEY => ['Prénom' => 'firstName', 'Nom' => 'lastName'],
+            ])
+        );
+    }
+
     public function testEncodeFormulas()
     {
         $this->encoder = new CsvEncoder([CsvEncoder::ESCAPE_FORMULAS_KEY => true]);

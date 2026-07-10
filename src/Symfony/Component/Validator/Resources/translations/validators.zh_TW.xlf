@@ -164,7 +164,7 @@
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>圖片寬度過小 ({{ width }}px)。允許的最小寬度為 {{ max_width }}px。</target>
+                <target>圖片寬度過小 ({{ width }}px)。允許的最小寬度為 {{ min_width }}px。</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
@@ -172,7 +172,7 @@
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>圖片高度過小 ({{ height }}px)。允許的最小高度為 {{ max_height }}px。</target>
+                <target>圖片高度過小 ({{ height }}px)。允許的最小高度為 {{ min_height }}px。</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>

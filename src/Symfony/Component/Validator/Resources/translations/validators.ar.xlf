@@ -284,7 +284,7 @@
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>نسبة العرض على الارتفاع للصورة صغيرة جدا ({{ ratio }}). الحد الأدنى للنسبة المسموح به هو {{ max_ratio }}.</target>
+                <target>نسبة العرض على الارتفاع للصورة صغيرة جدا ({{ ratio }}). الحد الأدنى للنسبة المسموح به هو {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>

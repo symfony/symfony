@@ -328,7 +328,7 @@
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>Banku Identifikazioko Kode hau ez dago lotuta {{ IBAN }} IBAN-rekin.</target>
+                <target>Banku Identifikazioko Kode hau ez dago lotuta {{ iban }} IBAN-rekin.</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>

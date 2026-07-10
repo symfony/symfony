@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `framework.cache.default_provider` to configure `cache.app` with a DSN
+ * Add `framework.messenger.reject_redelivered_messages` to allow disabling the `RejectRedeliveredMessageMiddleware`
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
  * Add `--dispatchers` option to `debug:event-dispatcher` command
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead

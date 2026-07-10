@@ -81,6 +81,7 @@ use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFac
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Transport\TransportFactory;
@@ -1117,6 +1118,44 @@ abstract class FrameworkExtensionTestCase extends TestCase
             [['serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
             $definition->getTag('messenger.message')
         );
+    }
+
+    public function testMessengerRejectRedeliveredMessagesEnabledByDefault()
+    {
+        $container = $this->createContainerFromFile('messenger', [], true, false);
+        $container->compile();
+
+        $this->assertContains(
+            ['id' => 'reject_redelivered_message_middleware'],
+            $container->getParameter('messenger.bus.default.middleware')
+        );
+    }
+
+    public function testMessengerRejectRedeliveredMessagesCanBeDisabled()
+    {
+        $container = $this->createContainerFromFile('messenger_reject_redelivered_messages_disabled', [], true, false);
+        $container->compile();
+
+        $this->assertNotContains(
+            ['id' => 'reject_redelivered_message_middleware'],
+            $container->getParameter('messenger.bus.default.middleware')
+        );
+        $this->assertTrue($container->hasDefinition('messenger.middleware.reject_redelivered_message_middleware'));
+    }
+
+    public function testMessengerRejectRedeliveredMessagesCanStillBeListedOnABusWhenDisabled()
+    {
+        $container = $this->createContainerFromFile('messenger_reject_redelivered_messages_disabled_explicit_bus', [], true, false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
+
+        $this->assertNotContains('messenger.middleware.reject_redelivered_message_middleware', $this->getBusMiddlewareIds($container, 'messenger.bus.default'));
+        $this->assertContains('messenger.middleware.reject_redelivered_message_middleware', $this->getBusMiddlewareIds($container, 'messenger.bus.commands'));
+    }
+
+    private function getBusMiddlewareIds(ContainerBuilder $container, string $busId): array
+    {
+        return array_map(strval(...), $container->getDefinition($busId)->getArgument(0)->getValues());
     }
 
     public function testMessengerWithoutConsole()

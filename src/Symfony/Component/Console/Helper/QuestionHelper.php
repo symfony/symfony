@@ -143,7 +143,7 @@ class QuestionHelper extends Helper
                     stream_set_blocking($inputStream, true);
                 }
 
-                $ret = $this->readInput($inputStream, $question);
+                $ret = $this->readInput($inputStream, $output, $question);
 
                 if (!$isBlocked) {
                     stream_set_blocking($inputStream, false);
@@ -252,147 +252,359 @@ class QuestionHelper extends Helper
         $output->writeln($message);
     }
 
+    private function runInputEngine($inputStream, OutputInterface $output, array $customHandlers = [], ?\stdClass $state = null): string
+    {
+        $cursor = new Cursor($output, $inputStream);
+        $helper ??= new TerminalInputHelper($inputStream);
+
+        $state ??= new \stdClass();
+        $state->buffer ??= '';
+        $state->offset ??= 0; // Represents how many characters FROM THE RIGHT the cursor is
+        $state->done ??= false;
+
+        $defaultHandlers = [
+            // Ctrl+A: Go to beginning
+            "\001" => static function ($state, $cursor) {
+                $steps = (mb_strlen($state->buffer) - $state->offset);
+                if ($steps > 0) {
+                    $cursor->moveLeft(mb_strlen($state->buffer) - $state->offset);
+                }
+                $state->offset = mb_strlen($state->buffer);
+            },
+            // Ctrl+E: Go to end
+            "\005" => static function ($state, $cursor) {
+                if ($state->offset > 0) {
+                    $cursor->moveRight($state->offset);
+                }
+                $state->offset = 0;
+            },
+            // Left Arrow
+            "\033[D" => static function ($state, $cursor) {
+                if ($state->offset < mb_strlen($state->buffer)) {
+                    $cursor->moveLeft(1);
+                    ++$state->offset;
+                }
+            },
+            // Right Arrow
+            "\033[C" => static function ($state, $cursor) {
+                if ($state->offset > 0) {
+                    $cursor->moveRight(1);
+                    --$state->offset;
+                }
+            },
+            "\n" => static function ($state, $cursor, $output) {
+                $output->write("\n");
+                $state->done = true;
+            },
+            // Backspace
+            "\177" => static function ($state, $cursor, $output) {
+                $length = mb_strlen($state->buffer);
+
+                // If the cursor is at the very beginning of the line, backspace does nothing
+                if ($state->offset === $length) {
+                    return;
+                }
+
+                // Calculate our index from the left
+                $cursorPosition = $length - $state->offset;
+
+                // Get the character being deleted to determine its terminal width
+                $charToDelete = mb_substr($state->buffer, $cursorPosition - 1, 1);
+                $charWidth = \Symfony\Component\String\s($charToDelete)->width(false);
+
+                // Split the string, explicitly skipping the 1 character behind the cursor
+                $leftPart = mb_substr($state->buffer, 0, $cursorPosition - 1);
+                $rightPart = mb_substr($state->buffer, $cursorPosition);
+
+                // Mutate the state
+                $state->buffer = $leftPart.$rightPart;
+
+                // Visually move the cursor back by the character's width
+                $cursor->moveLeft($charWidth);
+                $cursor->savePosition();
+
+                // Print the right half of the string to shift everything left on screen
+                $output->write($rightPart);
+
+                // Erase the leftover "ghost" character at the far right end
+                $cursor->clearLineAfter();
+
+                // Snap the cursor back to the user's editing point
+                $cursor->restorePosition();
+            },
+
+            // Default character insertion
+            'default' => static function ($char, $state, $cursor, $output) {
+                $length = mb_strlen($state->buffer);
+                $cursorPosition = $length - $state->offset;
+
+                // Split the string and inject the new character in the middle
+                $leftPart = mb_substr($state->buffer, 0, $cursorPosition);
+                $rightPart = mb_substr($state->buffer, $cursorPosition);
+
+                // Mutate the state
+                $state->buffer = $leftPart.$char.$rightPart;
+
+                // Visually print the new character (this implicitly moves the terminal cursor right by 1)
+                $output->write($char);
+
+                // If we are at the end of the string, we don't need to redraw anything else
+                if (0 === $state->offset) {
+                    return;
+                }
+
+                // Otherwise, save the cursor position, draw the rest of the string, and snap back
+                $cursor->savePosition();
+                $output->write($rightPart);
+                $cursor->clearLineAfter();
+                $cursor->restorePosition();
+            },
+        ];
+
+        $handlers = array_merge($defaultHandlers, $customHandlers);
+
+        shell_exec('stty -icanon -echo');
+
+        try {
+            while (!feof($inputStream)) {
+                $helper->waitForInput();
+                $c = fread($inputStream, 1);
+
+                if (false === $c || ('' === $state->buffer && '' === $c)) {
+                    throw new MissingInputException('Aborted.');
+                }
+
+                // Resolve Escape Sequences (Arrows)
+                if ("\033" === $c) {
+                    $c .= fread($inputStream, 1);
+                    if (isset($c[1]) && '[' === $c[1]) {
+                        do {
+                            $char = fread($inputStream, 1);
+                            $c .= $char;
+                        } while ('' !== $char && !preg_match('/[\x40-\x7E]/', $char) && !feof($inputStream));
+                    }
+                }
+                // Resolve Multi-byte UTF-8
+                elseif ("\x80" <= $c) {
+                    $c .= fread($inputStream, ["\xC0" => 1, "\xD0" => 1, "\xE0" => 2, "\xF0" => 3][$c & "\xF0"]);
+                }
+                // Dispatch Event
+                if (isset($handlers[$c])) {
+                    $handlers[$c]($state, $cursor, $output);
+                } elseif (!str_starts_with($c, "\033") && \ord($c) >= 32) {
+                    $handlers['default']($c, $state, $cursor, $output);
+                }
+                if ($state->done) {
+                    break;
+                }
+            }
+        } finally {
+            // Restore terminal to normal! (No minus signs)
+            shell_exec('stty icanon echo');
+            $helper->finish();
+        }
+
+        return $state->buffer;
+    }
+
+    private function redrawAutocompleteGhostText($state, $cursor, $output, Question $question): void
+    {
+        // Only draw ghost text if the cursor is at the end of the line
+        if ($state->offset > 0) {
+            return;
+        }
+
+        $numMatches = \count($state->matches);
+
+        if ($numMatches > 0 && -1 !== $state->matchIndex) {
+            $cursor->savePosition();
+
+            $mostRecentValue = $this->mostRecentlyEnteredValue($state->buffer);
+            $charactersEntered = \strlen($mostRecentValue);
+
+            // Extract the remaining matching text snippet
+            $suggestionTail = substr($state->matches[$state->matchIndex], $charactersEntered);
+            $escapedGhostText = OutputFormatter::escapeTrailingBackslash($suggestionTail);
+
+            // Write out the visual suggestion in standard inverted block colors
+            $output->write('<hl>'.$escapedGhostText.'</hl>');
+
+            $cursor->restorePosition();
+        }
+    }
+
     /**
      * Autocompletes a question.
      *
-     * @param resource                  $inputStream
-     * @param callable(string):string[] $autocomplete
+     * @param resource $inputStream
      *
      * @param-immediately-invoked-callable $autocomplete
      */
-    private function autocomplete(OutputInterface $output, Question $question, $inputStream, callable $autocomplete): string
+    private function autocomplete(OutputInterface $output, Question $question, $inputStream, callable $autocompleteCallback): string
     {
-        $cursor = new Cursor($output, $inputStream);
+        // 1. Setup the initial state
+        $state = new \stdClass();
+        $state->buffer = '';
+        $state->offset = 0;
+        $state->done = false;
+        $state->ret = '';
+        $state->matches = $autocompleteCallback($state->ret);
+        $state->matchIndex = -1;
 
-        $fullChoice = '';
-        $ret = '';
-
-        $i = 0;
-        $ofs = -1;
-        $matches = $autocomplete($ret);
-        $numMatches = \count($matches);
-        $inputHelper = new TerminalInputHelper($inputStream);
-
-        // Disable icanon (so we can fread each keypress) and echo (we'll do echoing here instead)
-        shell_exec('stty -icanon -echo');
-
-        // Add highlighted text style
+        // Add highlighted text style to terminal output
         $output->getFormatter()->setStyle('hl', new OutputFormatterStyle('black', 'white'));
 
-        // Read a keypress
-        while (!feof($inputStream)) {
-            $inputHelper->waitForInput();
-            $c = fread($inputStream, 1);
-
-            // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
-            if (false === $c || ('' === $ret && '' === $c && null === $question->getDefault())) {
-                // Restore the terminal so it behaves normally again
-                $inputHelper->finish();
-                throw new MissingInputException('Aborted while asking: '.$question->getQuestion());
-            } elseif ("\177" === $c) { // Backspace Character
-                if (0 === $numMatches && 0 !== $i) {
-                    --$i;
-                    $cursor->moveLeft(s($fullChoice)->slice(-1)->width(false));
-
-                    $fullChoice = self::substr($fullChoice, 0, $i);
+        // 2. Define custom key handlers for the Autocomplete State Machine
+        $autocompleteHandlers = [
+            // Up Arrow: Cycle backwards through suggestions
+            "\033[A" => function ($state, $cursor, $output) use ($question) {
+                $numMatches = \count($state->matches);
+                if (0 === $numMatches) {
+                    return;
                 }
 
-                if (0 === $i) {
-                    $ofs = -1;
-                    $matches = $autocomplete($ret);
-                    $numMatches = \count($matches);
-                } else {
-                    $numMatches = 0;
+                if (-1 === $state->matchIndex) {
+                    $state->matchIndex = 0;
                 }
 
-                // Pop the last character off the end of our string
-                $ret = self::substr($ret, 0, $i);
-            } elseif ("\033" === $c) {
-                // Did we read an escape sequence?
-                $c .= fread($inputStream, 2);
+                $state->matchIndex = ($numMatches + $state->matchIndex - 1) % $numMatches;
+                $this->redrawAutocompleteGhostText($state, $cursor, $output, $question);
+            },
 
-                // A = Up Arrow. B = Down Arrow
-                if (isset($c[2]) && ('A' === $c[2] || 'B' === $c[2])) {
-                    if ('A' === $c[2] && -1 === $ofs) {
-                        $ofs = 0;
+            // Down Arrow: Cycle forwards through suggestions
+            "\033[B" => function ($state, $cursor, $output) use ($question) {
+                $numMatches = \count($state->matches);
+                if (0 === $numMatches) {
+                    return;
+                }
+
+                $state->matchIndex = ($state->matchIndex + 1) % $numMatches;
+                $this->redrawAutocompleteGhostText($state, $cursor, $output, $question);
+            },
+
+            // Tab Key: Complete the current selection
+            "\t" => function ($state, $cursor, $output) use ($autocompleteCallback) {
+                $numMatches = \count($state->matches);
+                if ($numMatches > 0 && -1 !== $state->matchIndex) {
+                    if ($state->offset > 0) {
+                        $cursor->moveRight($state->offset);
+                        $state->offset = 0;
                     }
+                    $oldBuffer = $state->buffer;
+                    $state->buffer = (string) $state->matches[$state->matchIndex];
 
-                    if (0 === $numMatches) {
-                        continue;
-                    }
+                    // Write the completed characters to the terminal screen
+                    $remaining = substr($state->buffer, \strlen($this->mostRecentlyEnteredValue($oldBuffer)));
+                    $output->write($remaining);
 
-                    $ofs += ('A' === $c[2]) ? -1 : 1;
-                    $ofs = ($numMatches + $ofs) % $numMatches;
+                    // Refresh matches for multi-select scenario
+                    $state->ret = $state->buffer;
+                    $state->matches = array_filter(
+                        $autocompleteCallback($state->ret),
+                        static fn ($match) => '' === $state->ret || str_starts_with($match, $state->ret)
+                    );
+                    $state->matchIndex = -1;
                 }
-            } elseif ('' === $c || \ord($c) < 32) {
-                if ("\t" === $c || "\n" === $c) {
-                    if ($numMatches > 0 && -1 !== $ofs) {
-                        $ret = (string) $matches[$ofs];
-                        // Echo out remaining chars for current match
-                        $remainingCharacters = substr($ret, \strlen($this->mostRecentlyEnteredValue($fullChoice)));
-                        $output->write($remainingCharacters);
-                        $fullChoice .= $remainingCharacters;
-                        $i = (false === $encoding = mb_detect_encoding($fullChoice, null, true)) ? \strlen($fullChoice) : mb_strlen($fullChoice, $encoding);
+            },
 
-                        $matches = array_filter(
-                            $autocomplete($ret),
-                            static fn ($match) => '' === $ret || str_starts_with($match, $ret)
-                        );
-                        $numMatches = \count($matches);
-                        $ofs = -1;
-                    }
-
-                    if ("\n" === $c) {
-                        $output->write($c);
-                        break;
-                    }
-
-                    $numMatches = 0;
+            // Backspace
+            "\177" => function ($state, $cursor, $output) use ($question, $autocompleteCallback) {
+                $length = mb_strlen($state->buffer);
+                if ($state->offset === $length) {
+                    return;
                 }
 
-                continue;
-            } else {
-                if ("\x80" <= $c) {
-                    $c .= fread($inputStream, ["\xC0" => 1, "\xD0" => 1, "\xE0" => 2, "\xF0" => 3][$c & "\xF0"]);
-                }
+                $cursorPosition = $length - $state->offset;
+                $charToDelete = mb_substr($state->buffer, $cursorPosition - 1, 1);
+                $charWidth = \Symfony\Component\String\s($charToDelete)->width(false);
 
-                $output->write($c);
-                $ret .= $c;
-                $fullChoice .= $c;
-                ++$i;
+                $leftPart = mb_substr($state->buffer, 0, $cursorPosition - 1);
+                $rightPart = mb_substr($state->buffer, $cursorPosition);
 
-                $tempRet = $ret;
+                $state->buffer = $leftPart.$rightPart;
+                $state->ret = $state->buffer; // Keep synchronized for standard filtering
 
-                if ($question instanceof ChoiceQuestion && $question->isMultiselect()) {
-                    $tempRet = $this->mostRecentlyEnteredValue($fullChoice);
-                }
+                // Reset matching context
+                $state->matches = $autocompleteCallback($state->ret);
+                $state->matchIndex = (0 === mb_strlen($state->ret)) ? -1 : 0;
 
-                $numMatches = 0;
-                $ofs = 0;
-
-                foreach ($autocomplete($ret) as $value) {
-                    // If typed characters match the beginning chunk of value (e.g. [AcmeDe]moBundle)
-                    if (str_starts_with($value, $tempRet)) {
-                        $matches[$numMatches++] = $value;
-                    }
-                }
-            }
-
-            $cursor->clearLineAfter();
-
-            if ($numMatches > 0 && -1 !== $ofs) {
+                $cursor->moveLeft($charWidth);
                 $cursor->savePosition();
-                // Write highlighted text, complete the partially entered response
-                $charactersEntered = \strlen($this->mostRecentlyEnteredValue($fullChoice));
-                $output->write('<hl>'.OutputFormatter::escapeTrailingBackslash(substr($matches[$ofs], $charactersEntered)).'</hl>');
+                $output->write($rightPart);
+                $cursor->clearLineAfter();
                 $cursor->restorePosition();
-            }
-        }
 
-        // Restore the terminal so it behaves normally again
-        $inputHelper->finish();
+                $this->redrawAutocompleteGhostText($state, $cursor, $output, $question);
+            },
 
-        return $fullChoice;
+            // Enter Key
+            "\n" => function ($state, $cursor, $output) {
+                $numMatches = \count($state->matches);
+
+                // If the user presses enter while highlighting a suggestion, accept it first
+                if ($numMatches > 0 && -1 !== $state->matchIndex) {
+                    if ($state->offset > 0) {
+                        $cursor->moveRight($state->offset);
+                        $state->offset = 0;
+                    }
+                    $oldBuffer = $state->buffer;
+                    $state->buffer = (string) $state->matches[$state->matchIndex];
+                    $remaining = substr($state->buffer, \strlen($this->mostRecentlyEnteredValue($oldBuffer)));
+                    $output->write($remaining);
+                }
+
+                $output->write("\n");
+                $state->done = true;
+            },
+
+            // Default: Character input logic
+            'default' => function ($char, $state, $cursor, $output) use ($question, $autocompleteCallback) {
+                $length = mb_strlen($state->buffer);
+                $cursorPosition = $length - $state->offset;
+
+                $leftPart = mb_substr($state->buffer, 0, $cursorPosition);
+                $rightPart = mb_substr($state->buffer, $cursorPosition);
+
+                $state->buffer = $leftPart.$char.$rightPart;
+                $state->ret = $state->buffer;
+
+                $output->write($char);
+
+                if ($state->offset > 0) {
+                    $cursor->savePosition();
+                    $output->write($rightPart);
+                    $cursor->clearLineAfter();
+                    $cursor->restorePosition();
+                }
+
+                $tempRet = $state->ret;
+                if ($question instanceof ChoiceQuestion && $question->isMultiselect()) {
+                    $tempRet = $this->mostRecentlyEnteredValue($state->buffer);
+                }
+
+                // Recalculate completions based on fresh typing
+                $state->matches = [];
+                $state->matchIndex = 0;
+
+                foreach ($autocompleteCallback($state->ret) as $value) {
+                    if (str_starts_with($value, $tempRet)) {
+                        $state->matches[] = $value;
+                    }
+                }
+
+                if (empty($state->matches)) {
+                    $state->matchIndex = -1;
+                }
+
+                if (0 === $state->offset) {
+                    $cursor->clearLineAfter();
+                }
+                $this->redrawAutocompleteGhostText($state, $cursor, $output, $question);
+            },
+        ];
+
+        // 3. Kick off your engine wrapper using the custom handler payload!
+        return $this->runInputEngine($inputStream, $output, $autocompleteHandlers, $state);
     }
 
     private function mostRecentlyEnteredValue(string $entered): string
@@ -451,7 +663,7 @@ class QuestionHelper extends Helper
             throw new RuntimeException('Unable to hide the response.');
         }
 
-        $value = $this->doReadInput($inputStream, helper: $inputHelper);
+        $value = $this->doReadInput($inputStream, $output, helper: $inputHelper);
 
         if (4095 === \strlen($value)) {
             $errOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
@@ -551,7 +763,7 @@ class QuestionHelper extends Helper
      * @param resource $inputStream The handler resource
      * @param Question $question    The question being asked
      */
-    private function readInput($inputStream, Question $question): string|false
+    private function readInput($inputStream, OutputInterface $output, Question $question): string|false
     {
         if (null !== $question->getTimeout() && $this->isInteractiveInput($inputStream)) {
             $read = [$inputStream];
@@ -567,7 +779,7 @@ class QuestionHelper extends Helper
 
         if (!$question->isMultiline()) {
             $cp = $this->setIOCodepage();
-            $ret = $this->doReadInput($inputStream);
+            $ret = $this->doReadInput($inputStream, $output);
 
             return $this->resetIOCodepage($cp, $ret);
         }
@@ -578,7 +790,7 @@ class QuestionHelper extends Helper
         }
 
         $cp = $this->setIOCodepage();
-        $ret = $this->doReadInput($multiLineStreamReader, "\x4");
+        $ret = $this->doReadInput($multiLineStreamReader, $output, "\x4");
 
         if (stream_get_meta_data($inputStream)['seekable']) {
             fseek($inputStream, ftell($multiLineStreamReader));
@@ -652,31 +864,27 @@ class QuestionHelper extends Helper
     /**
      * @param resource $inputStream
      */
-    private function doReadInput($inputStream, ?string $exitChar = null, ?TerminalInputHelper $helper = null): string
+    private function doReadInput($inputStream, OutputInterface $output, ?string $exitChar = null, ?TerminalInputHelper $helper = null): string
     {
-        $ret = '';
-        $helper ??= new TerminalInputHelper($inputStream, false);
+        $customHandlers = [];
 
-        while (!feof($inputStream)) {
-            $helper->waitForInput();
-            $char = fread($inputStream, 1);
-
-            // as opposed to fgets(), fread() returns an empty string when the stream content is empty, not false.
-            if (false === $char || ('' === $ret && '' === $char)) {
-                throw new MissingInputException('Aborted.');
-            }
-
-            if (\PHP_EOL === "{$ret}{$char}" || $exitChar === $char) {
-                break;
-            }
-
-            $ret .= $char;
-
-            if (null === $exitChar && "\n" === $char) {
-                break;
-            }
+        // If the developer specified a custom exit character (like EOF),
+        // we map that character to close the loop.
+        if (null !== $exitChar) {
+            $customHandlers[$exitChar] = static function ($state, $cursor, $output) {
+                $state->done = true;
+            };
         }
 
-        return $ret;
+        // Add the \PHP_EOL edge case from the original code
+        $customHandlers["\r"] = static function ($state, $cursor, $output) use ($exitChar) {
+            if (null === $exitChar) {
+                $output->write("\n");
+                $state->done = true;
+            }
+        };
+
+        // Call the engine we just built
+        return $this->runInputEngine($inputStream, $output, $customHandlers);
     }
 }

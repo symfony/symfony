@@ -38,7 +38,8 @@
         "symfony/stopwatch": "^7.4|^8.0",
         "symfony/uid": "^7.4|^8.0",
         "symfony/validator": "^7.4|^8.0",
-        "symfony/var-dumper": "^7.4|^8.0"
+        "symfony/var-dumper": "^7.4|^8.0",
+        "friendsofphp/php-cs-fixer": "dev-master"
     },
     "provide": {
         "psr/log-implementation": "1.0|2.0|3.0"

@@ -173,6 +173,10 @@ abstract class CompleteConfigurationTestCase extends TestCase
                     'parameter' => '_switch_user',
                     'role' => 'ROLE_ALLOWED_TO_SWITCH',
                     'target_route' => null,
+                    'path' => null,
+                    'enable_csrf' => null,
+                    'csrf_token_id' => 'switch_user',
+                    'csrf_parameter' => '_csrf_token',
                 ],
                 [
                     'csrf_parameter' => '_csrf_token',

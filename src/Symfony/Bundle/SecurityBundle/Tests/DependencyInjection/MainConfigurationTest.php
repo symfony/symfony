@@ -145,6 +145,22 @@ class MainConfigurationTest extends TestCase
         }
     }
 
+    public function testSwitchUserPathCannotBeEmpty()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'firewalls' => [
+                'main' => [
+                    'switch_user' => ['path' => ''],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "security.firewalls.main.switch_user.path" cannot contain an empty value, but got "".');
+
+        (new Processor())->processConfiguration(new MainConfiguration([], []), [$config]);
+    }
+
     public function testLogoutDeleteCookies()
     {
         $config = [

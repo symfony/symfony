@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add the `logout_form()` function to build a form that logs the user out with a POST
  * Add the `normalize` filter to normalize values with the Serializer component
+ * Add the `impersonation_form()` and `impersonation_exit_form()` functions to build a form that switches the user with a POST
 
 8.1
 ---

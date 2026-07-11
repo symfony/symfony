@@ -25,8 +25,8 @@ use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
-use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
+use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -48,6 +48,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         private ?AccessDecisionManagerInterface $accessDecisionManager = null,
         private ?FirewallMapInterface $firewallMap = null,
         private ?TraceableFirewallListener $firewall = null,
+        private ?ImpersonateUrlGenerator $impersonateUrlGenerator = null,
     ) {
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
@@ -193,13 +194,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                     'authenticators' => $firewallConfig->getAuthenticators(),
                 ];
 
-                // generate exit impersonation path from current request
-                if ($this->data['impersonated'] && null !== $switchUserConfig = $firewallConfig->getSwitchUser()) {
-                    $exitPath = $request->getRequestUri();
-                    $exitPath .= null === $request->getQueryString() ? '?' : '&';
-                    $exitPath .= \sprintf('%s=%s', urlencode($switchUserConfig['parameter']), SwitchUserListener::EXIT_VALUE);
-
-                    $this->data['impersonation_exit_path'] = $exitPath;
+                if ($this->data['impersonated'] && null !== $firewallConfig->getSwitchUser()) {
+                    try {
+                        $this->data['impersonation_exit_path'] = $this->impersonateUrlGenerator?->generateExitPath();
+                    } catch (\Exception) {
+                        // fail silently when the exit impersonation path cannot be generated
+                    }
                 }
             }
         }

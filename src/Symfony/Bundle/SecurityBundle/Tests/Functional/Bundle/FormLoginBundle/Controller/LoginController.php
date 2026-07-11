@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
@@ -60,6 +61,23 @@ class LoginController implements ServiceSubscriberInterface
         return new Response($this->container->get('twig')->render('@FormLogin/Login/logout_form.html.twig'));
     }
 
+    public function impersonationFormAction()
+    {
+        $csrfToken = $this->container->get('csrf')->getToken('switch_user')->getValue();
+
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/impersonate.html.twig', ['csrf_token' => $csrfToken]));
+    }
+
+    public function impersonationLinkAction()
+    {
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/impersonation_link.html.twig'));
+    }
+
+    public function impersonationFormHelperAction()
+    {
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/impersonation_form.html.twig'));
+    }
+
     public function secureAction()
     {
         throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
@@ -69,6 +87,7 @@ class LoginController implements ServiceSubscriberInterface
     {
         return [
             'twig' => Environment::class,
+            'csrf' => CsrfTokenManagerInterface::class,
         ];
     }
 }

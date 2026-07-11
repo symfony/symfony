@@ -191,6 +191,8 @@ return static function (ContainerConfigurator $container) {
             service('request_stack'),
             service('security.firewall.map'),
             service('security.token_storage'),
+            service('router')->nullOnInvalid(),
+            service('security.csrf.token_manager')->nullOnInvalid(),
         ])
 
         // Firewall related services

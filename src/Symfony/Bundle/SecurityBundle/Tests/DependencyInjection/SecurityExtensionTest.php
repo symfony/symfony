@@ -444,6 +444,63 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
+    public function testSwitchUserCsrfTokenManagersAreRegisteredForTheirTokenId()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'custom_manager' => [
+                    'http_basic' => null,
+                    'switch_user' => ['csrf_token_manager' => 'app.csrf_token_manager'],
+                ],
+                'default_manager' => [
+                    'http_basic' => null,
+                    'switch_user' => ['enable_csrf' => true, 'csrf_token_id' => 'other_switch_user'],
+                ],
+                'no_csrf' => [
+                    'http_basic' => null,
+                    'switch_user' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertEquals(
+            ['switch_user' => new ServiceClosureArgument(new Reference('app.csrf_token_manager'))],
+            $container->getDefinition('security.csrf_token_manager_locator')->getArgument(0)
+        );
+    }
+
+    public function testSwitchUserAndLogoutCannotMapTheSameTokenIdToDifferentCsrfTokenManagers()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'main' => [
+                    'http_basic' => null,
+                    'logout' => ['csrf_token_id' => 'shared', 'csrf_token_manager' => 'app.csrf_token_manager'],
+                    'switch_user' => ['csrf_token_id' => 'shared', 'csrf_token_manager' => 'app.other_csrf_token_manager'],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "main" firewall configures a "csrf_token_manager" for the "shared" token id, but another firewall already configured a different one. Give them distinct "csrf_token_id" values.');
+
+        $container->compile();
+    }
+
     public function testRoleHierarchyDumpCommandIsRegisteredWithRoleHierarchy()
     {
         $container = $this->getRawContainer();

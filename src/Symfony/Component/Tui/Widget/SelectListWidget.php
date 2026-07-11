@@ -13,14 +13,20 @@ namespace Symfony\Component\Tui\Widget;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\CancelEvent;
+use Symfony\Component\Tui\Event\MultiSelectEvent;
 use Symfony\Component\Tui\Event\SelectEvent;
 use Symfony\Component\Tui\Event\SelectionChangeEvent;
+use Symfony\Component\Tui\Event\SelectionToggleEvent;
 use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderContext;
 
 /**
  * Interactive selection list with keyboard navigation.
+ *
+ * In single-select mode (default), Enter confirms the highlighted item.
+ * In multiselect mode, Space toggles the highlighted item and Enter confirms
+ * all checked items.
  *
  * Item `label`, `description`, and `value` are rendered to the terminal
  * as-is and are not sanitized. See {@see TextWidget} for the raw-passthrough
@@ -36,35 +42,36 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
     use FocusableTrait;
     use KeybindingsTrait;
 
-    /** @var array<array{value: string, label: string, description?: string}> */
-    private array $filteredItems;
+    /** @var list<int> */
+    private array $filteredItemIndices;
 
     private int $selectedIndex = 0;
     private bool $selected = false;
 
     /**
-     * @param array<array{value: string, label: string, description?: string}> $items
+     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $items
      */
     public function __construct(
         private array $items,
         private int $maxVisible = 5,
+        private bool $multiselect = false,
         ?Keybindings $keybindings = null,
     ) {
-        $this->filteredItems = $items;
+        $this->resetFilteredItems();
         if (null !== $keybindings) {
             $this->setKeybindings($keybindings);
         }
     }
 
     /**
-     * @param array<array{value: string, label: string}> $items
+     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $items
      *
      * @return $this
      */
     public function setItems(array $items): static
     {
         $this->items = $items;
-        $this->filteredItems = $items;
+        $this->resetFilteredItems();
         $this->selectedIndex = 0;
         $this->invalidate();
 
@@ -78,13 +85,13 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
     {
         $filter = strtolower($filter);
 
-        $filteredItems = array_values(array_filter(
+        $filteredItemIndices = array_keys(array_filter(
             $this->items,
             static fn ($item) => str_starts_with(strtolower($item['value']), $filter),
         ));
 
-        if ($filteredItems !== $this->filteredItems) {
-            $this->filteredItems = $filteredItems;
+        if ($filteredItemIndices !== $this->filteredItemIndices) {
+            $this->filteredItemIndices = $filteredItemIndices;
             $this->selectedIndex = 0;
             $this->invalidate();
         }
@@ -97,7 +104,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
      */
     public function setSelectedIndex(int $index): static
     {
-        $index = max(0, min($index, \count($this->filteredItems) - 1));
+        $index = max(0, min($index, \count($this->filteredItemIndices) - 1));
         if ($this->selectedIndex !== $index) {
             $this->selectedIndex = $index;
             $this->invalidate();
@@ -109,11 +116,25 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
     /**
      * Get the currently selected item.
      *
-     * @return array{value: string, label: string, description?: string}|null
+     * @return array{value: string, label: string, description?: string, checked?: bool}|null
      */
     public function getSelectedItem(): ?array
     {
-        return $this->filteredItems[$this->selectedIndex] ?? null;
+        return $this->getFilteredItem($this->selectedIndex);
+    }
+
+    /**
+     * @return list<array{value: string, label: string, description?: string, checked?: bool}>
+     */
+    public function getSelectedItems(): array
+    {
+        if (!$this->multiselect) {
+            return [];
+        }
+
+        return array_values(
+            array_filter($this->items, static fn (array $item) => $item['checked'] ?? false)
+        );
     }
 
     /**
@@ -132,6 +153,26 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
     public function onSelect(callable $callback): static
     {
         return $this->on(SelectEvent::class, $callback);
+    }
+
+    /**
+     * @param callable(MultiSelectEvent): void $callback
+     *
+     * @return $this
+     */
+    public function onMultiSelect(callable $callback): static
+    {
+        return $this->on(MultiSelectEvent::class, $callback);
+    }
+
+    /**
+     * @param callable(SelectionToggleEvent): void $callback
+     *
+     * @return $this
+     */
+    public function onSelectionToggle(callable $callback): static
+    {
+        return $this->on(SelectionToggleEvent::class, $callback);
     }
 
     /**
@@ -162,10 +203,10 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
 
         $kb = $this->getKeybindings();
 
-        if ($this->filteredItems) {
+        if ($this->filteredItemIndices) {
             // Up - wrap to bottom when at top
             if ($kb->matches($data, 'select_up')) {
-                $this->selectedIndex = 0 === $this->selectedIndex ? \count($this->filteredItems) - 1 : $this->selectedIndex - 1;
+                $this->selectedIndex = 0 === $this->selectedIndex ? \count($this->filteredItemIndices) - 1 : $this->selectedIndex - 1;
                 $this->notifySelectionChange();
 
                 return;
@@ -173,7 +214,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
 
             // Down - wrap to top when at bottom
             if ($kb->matches($data, 'select_down')) {
-                $this->selectedIndex = $this->selectedIndex === \count($this->filteredItems) - 1 ? 0 : $this->selectedIndex + 1;
+                $this->selectedIndex = $this->selectedIndex === \count($this->filteredItemIndices) - 1 ? 0 : $this->selectedIndex + 1;
                 $this->notifySelectionChange();
 
                 return;
@@ -187,8 +228,14 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             }
 
             if ($kb->matches($data, 'select_page_down') || $kb->matches($data, 'cursor_right')) {
-                $this->selectedIndex = min(\count($this->filteredItems) - 1, $this->selectedIndex + $this->maxVisible);
+                $this->selectedIndex = min(\count($this->filteredItemIndices) - 1, $this->selectedIndex + $this->maxVisible);
                 $this->notifySelectionChange();
+
+                return;
+            }
+
+            if ($this->multiselect && $kb->matches($data, 'choice_toggle')) {
+                $this->toggleCurrentItem();
 
                 return;
             }
@@ -217,7 +264,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         $lines = [];
 
         // No items match filter
-        if (!$this->filteredItems) {
+        if (!$this->filteredItemIndices) {
             $line = $this->applyElement('no-match', '  No matching items');
             $lines[] = $line;
 
@@ -229,21 +276,21 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             0,
             min(
                 $this->selectedIndex - (int) floor($this->maxVisible / 2),
-                \count($this->filteredItems) - $this->maxVisible,
+                \count($this->filteredItemIndices) - $this->maxVisible,
             ),
         );
-        $endIndex = min($startIndex + $this->maxVisible, \count($this->filteredItems));
+        $endIndex = min($startIndex + $this->maxVisible, \count($this->filteredItemIndices));
 
         // Compute max label width from visible items for alignment
         $maxLabelWidth = 0;
         for ($i = $startIndex; $i < $endIndex; ++$i) {
-            $maxLabelWidth = max($maxLabelWidth, AnsiUtils::visibleWidth($this->filteredItems[$i]['label']));
+            $maxLabelWidth = max($maxLabelWidth, AnsiUtils::visibleWidth($this->getFilteredItem($i)['label']));
         }
         $labelColumnWidth = min(30, $maxLabelWidth);
 
         // Render visible items
         for ($i = $startIndex; $i < $endIndex; ++$i) {
-            $item = $this->filteredItems[$i];
+            $item = $this->getFilteredItem($i);
             $isSelected = $i === $this->selectedIndex;
             $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
             $line = $this->renderItem($item, $isSelected, $description, $columns, $labelColumnWidth);
@@ -251,8 +298,8 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         }
 
         // Add scroll indicator if needed
-        if ($startIndex > 0 || $endIndex < \count($this->filteredItems)) {
-            $scrollText = \sprintf('  (%d/%d)', $this->selectedIndex + 1, \count($this->filteredItems));
+        if ($startIndex > 0 || $endIndex < \count($this->filteredItemIndices)) {
+            $scrollText = \sprintf('  (%d/%d)', $this->selectedIndex + 1, \count($this->filteredItemIndices));
             $line = $this->applyElement('scroll-info', AnsiUtils::truncateToWidth($scrollText, $columns - 2, ''));
             $lines[] = $line;
         }
@@ -274,19 +321,21 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             'select_cancel' => [Key::ESCAPE, 'ctrl+c'],
             'cursor_left' => [Key::LEFT, 'ctrl+b'],
             'cursor_right' => [Key::RIGHT, 'ctrl+f'],
+            'choice_toggle' => [Key::SPACE],
         ];
     }
 
     /**
-     * @param array{value: string, label: string, description?: string} $item
+     * @param array{value: string, label: string, description?: string, checked?: bool} $item
      */
     private function renderItem(array $item, bool $isSelected, ?string $description, int $columns, int $labelColumnWidth): string
     {
         $displayValue = $item['label'];
+        $checkbox = $this->multiselect ? (($item['checked'] ?? false) ? '[x] ' : '[ ] ') : '';
         $alignedWidth = $labelColumnWidth + 2;
 
         if ($isSelected) {
-            $prefix = '→ ';
+            $prefix = '→ '.$checkbox;
             $selectedStyle = $this->resolveElement('selected');
 
             if (null !== $description && $columns > 40) {
@@ -300,7 +349,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
                 if ($remainingColumns > 10) {
                     $truncatedDesc = AnsiUtils::truncateToWidth($description, $remainingColumns, '');
 
-                    return $selectedStyle->apply("→ {$truncatedValue}{$spacing}{$truncatedDesc}");
+                    return $selectedStyle->apply("→ {$checkbox}{$truncatedValue}{$spacing}{$truncatedDesc}");
                 }
             }
 
@@ -310,7 +359,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         }
 
         // Non-selected item
-        $prefix = '  ';
+        $prefix = '  '.$checkbox;
 
         if (null !== $description && $columns > 40) {
             $maxValueColumns = min($labelColumnWidth, $columns - \strlen($prefix) - 4);
@@ -334,16 +383,44 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         return $prefix.AnsiUtils::truncateToWidth($displayValue, $maxColumns, '');
     }
 
+    private function resetFilteredItems(): void
+    {
+        $this->filteredItemIndices = array_keys($this->items);
+    }
+
     private function normalizeDescription(string $description): string
     {
         // Convert multiline to single line
         return trim(preg_replace('/[\r\n]+/', ' ', $description));
     }
 
+    private function toggleCurrentItem(): void
+    {
+        if (!$this->multiselect) {
+            return;
+        }
+
+        if (null === $itemIndex = $this->filteredItemIndices[$this->selectedIndex] ?? null) {
+            return;
+        }
+
+        $this->items[$itemIndex]['checked'] = $checked = !($this->items[$itemIndex]['checked'] ?? false);
+
+        $this->invalidate();
+        $this->dispatch(new SelectionToggleEvent($this, $this->items[$itemIndex], $checked, $this->getSelectedItems()));
+    }
+
     private function confirmSelection(): void
     {
         $this->selected = true;
-        if (null !== $selectedItem = $this->filteredItems[$this->selectedIndex] ?? null) {
+
+        if ($this->multiselect) {
+            $this->dispatch(new MultiSelectEvent($this, $this->getSelectedItems()));
+
+            return;
+        }
+
+        if (null !== $selectedItem = $this->getFilteredItem($this->selectedIndex)) {
             $this->dispatch(new SelectEvent($this, $selectedItem));
         }
     }
@@ -351,8 +428,16 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
     private function notifySelectionChange(): void
     {
         $this->invalidate();
-        if (null !== $selectedItem = $this->filteredItems[$this->selectedIndex] ?? null) {
+        if (null !== $selectedItem = $this->getFilteredItem($this->selectedIndex)) {
             $this->dispatch(new SelectionChangeEvent($this, $selectedItem));
         }
+    }
+
+    /**
+     * @return array{value: string, label: string, description?: string, checked?: bool}|null
+     */
+    private function getFilteredItem(int $index): ?array
+    {
+        return isset($this->filteredItemIndices[$index]) ? $this->items[$this->filteredItemIndices[$index]] : null;
     }
 }

@@ -14,29 +14,29 @@ namespace Symfony\Component\Tui\Event;
 use Symfony\Component\Tui\Widget\SelectListWidget;
 
 /**
- * Event dispatched when the highlighted item changes in a SelectList.
- *
- * This fires when the user moves the cursor (arrow keys, scroll), not
- * when they confirm a selection (that's {@see SelectEvent}).
+ * Event dispatched when an item is checked or unchecked in a multi-select SelectList.
  *
  * @experimental
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class SelectionChangeEvent extends AbstractEvent
+class SelectionToggleEvent extends AbstractEvent
 {
     /**
-     * @param array{value: string, label: string, description?: string, checked?: bool} $item
+     * @param array{value: string, label: string, description?: string, checked?: bool}       $item
+     * @param list<array{value: string, label: string, description?: string, checked?: bool}> $selectedItems
      */
     public function __construct(
         SelectListWidget $target,
         private readonly array $item,
+        private readonly bool $checked,
+        private readonly array $selectedItems,
     ) {
         parent::__construct($target);
     }
 
     /**
-     * Get the full highlighted item array.
+     * Get the toggled item.
      *
      * @return array{value: string, label: string, description?: string, checked?: bool}
      */
@@ -46,26 +46,25 @@ class SelectionChangeEvent extends AbstractEvent
     }
 
     /**
-     * Get the highlighted item's value.
+     * Get the toggled item value.
      */
     public function getValue(): string
     {
         return $this->item['value'];
     }
 
-    /**
-     * Get the highlighted item's label.
-     */
-    public function getLabel(): string
+    public function isChecked(): bool
     {
-        return $this->item['label'];
+        return $this->checked;
     }
 
     /**
-     * Get the highlighted item's description, if any.
+     * Get the currently selected item arrays after the toggle.
+     *
+     * @return list<array{value: string, label: string, description?: string, checked?: bool}>
      */
-    public function getDescription(): ?string
+    public function getSelectedItems(): array
     {
-        return $this->item['description'] ?? null;
+        return $this->selectedItems;
     }
 }

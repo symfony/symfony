@@ -54,7 +54,10 @@ abstract class AbstractFactory implements AuthenticatorFactoryInterface
 
         $builder
             ->scalarNode('provider')->end()
-            ->booleanNode('remember_me')->defaultTrue()->end()
+            ->booleanNode('remember_me')
+                ->defaultTrue()
+                ->setDeprecated('symfony/security-bundle', '8.2', 'Setting the "%path%.%node%" configuration option has no effect and is deprecated. It will be removed in Symfony 9.0.')
+            ->end()
             ->scalarNode('success_handler')->end()
             ->scalarNode('failure_handler')->end()
         ;

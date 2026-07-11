@@ -15,7 +15,6 @@ security:
         default:
             form_login:
                 check_path: login
-                remember_me: true
             remember_me:
                 always_remember_me: true
                 secret: secret

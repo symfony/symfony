@@ -23,6 +23,11 @@ HttpFoundation
 
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
 
+SecurityBundle
+--------------
+
+ * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect
+
 Serializer
 ----------
 

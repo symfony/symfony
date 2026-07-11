@@ -16,7 +16,6 @@ security:
             logout: ~
             form_login:
                 check_path: login
-                remember_me: true
 
     access_control:
         - { path: ^/profile, roles: ROLE_USER }

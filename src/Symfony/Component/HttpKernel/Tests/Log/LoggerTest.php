@@ -214,19 +214,21 @@ class LoggerTest extends TestCase
         do {
             usleep(100);
             $subSecond = fmod(microtime(true), 1);
-        } while (0.001 > $subSecond || 0.9 < $subSecond);
+        } while (0.002 > $subSecond || 0.9 < $subSecond);
 
-        $before = (int) (1000 * microtime(true));
+        $before = microtime(true);
         $logger->debug('test');
-        $after = (int) (1000 * microtime(true));
+        $after = microtime(true);
 
         ['timestamp' => $timestamp, 'timestamp_rfc3339' => $rfc3339] = $logger->getLogs()[0];
         $recorded = \DateTimeImmutable::createFromFormat(\DATE_RFC3339_EXTENDED, $rfc3339);
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $recorded);
         $this->assertSame($timestamp, $recorded->getTimestamp());
-        $this->assertGreaterThanOrEqual($before, (int) $recorded->format('Uv'));
-        $this->assertLessThanOrEqual($after, (int) $recorded->format('Uv'));
+
+        // the recorded time is truncated to the millisecond, so it can sit just below $before
+        $this->assertGreaterThan($before - 0.001, (float) $recorded->format('U.v'));
+        $this->assertLessThanOrEqual($after, (float) $recorded->format('U.v'));
     }
 }
 

@@ -9,3 +9,9 @@ services:
         autoconfigure: true
     Symfony\Component\ObjectMapper\Transform\MapCollection:
         autoconfigure: true
+    # the #[Map] attribute is collected from the classes the container scans, which in an
+    # application the default App\ loader covers
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ParentEntityResource:
+        autoconfigure: true
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\NestedEntityResource:
+        autoconfigure: true

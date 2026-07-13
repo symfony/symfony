@@ -14,8 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\CollectionSource;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\CollectionSourceItem;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\CollectionTarget;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\NestedEntity;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\NestedEntityResource;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectMapped;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectToBeMapped;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ParentEntity;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ParentEntityResource;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -48,5 +52,19 @@ class ObjectMapperTest extends AbstractWebTestCase
         $this->assertCount(2, $mapped->items);
         $this->assertSame('foo', $mapped->items[0]->getName());
         $this->assertSame('bar', $mapped->items[1]->getName());
+    }
+
+    public function testMapNestedObjectWhoseClassDeclaresNoMapping()
+    {
+        static::bootKernel(['test_case' => 'ObjectMapper']);
+
+        $objectMapper = static::getContainer()->get('object_mapper.alias');
+
+        /** @var ParentEntityResource $mapped */
+        $mapped = $objectMapper->map(new ParentEntity('Laptop', new NestedEntity('Electronics')), ParentEntityResource::class);
+
+        $this->assertSame('Laptop', $mapped->name);
+        $this->assertInstanceOf(NestedEntityResource::class, $mapped->nested);
+        $this->assertSame('Electronics', $mapped->nested->name);
     }
 }

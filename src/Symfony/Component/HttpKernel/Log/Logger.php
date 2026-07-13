@@ -162,14 +162,16 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
         $request = $this->requestStack->getCurrentRequest();
         $key = $request ? spl_object_id($request) : '';
 
+        $now = new \DateTimeImmutable();
+
         $this->logs[$key][] = [
             'channel' => null,
             'context' => $context,
             'message' => $message,
             'priority' => self::PRIORITIES[$level],
             'priorityName' => $level,
-            'timestamp' => time(),
-            'timestamp_rfc3339' => date(\DATE_RFC3339_EXTENDED),
+            'timestamp' => $now->getTimestamp(),
+            'timestamp_rfc3339' => $now->format(\DATE_RFC3339_EXTENDED),
         ];
 
         $this->errorCount[$key] ??= 0;

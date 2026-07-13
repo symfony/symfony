@@ -1083,7 +1083,7 @@ class Application implements ResetInterface
 
                         // If the command is signalable, we call the handleSignal() method
                         if (\in_array($signal, $commandSignals, true)) {
-                            $exitCode = $command->handleSignal($signal, $exitCode);
+                            $exitCode = $command->handleSignal($signal, $exitCode, $input, $output);
                         }
 
                         if (\SIGALRM === $signal) {
@@ -1104,12 +1104,12 @@ class Application implements ResetInterface
             }
 
             foreach ($commandSignals as $signal) {
-                $signalRegistry->register($signal, function (int $signal) use ($command): void {
+                $signalRegistry->register($signal, function (int $signal) use ($command, $input, $output): void {
                     if (\SIGALRM === $signal) {
                         $this->scheduleAlarm();
                     }
 
-                    if (false !== $exitCode = $command->handleSignal($signal)) {
+                    if (false !== $exitCode = $command->handleSignal($signal, 0, $input, $output)) {
                         exit($exitCode);
                     }
                 });

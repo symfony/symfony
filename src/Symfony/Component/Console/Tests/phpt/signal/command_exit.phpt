@@ -35,7 +35,7 @@ class MyCommand extends Command
         return [\SIGINT];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         echo "Received signal!";
 

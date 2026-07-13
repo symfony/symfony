@@ -39,7 +39,7 @@ class MyCommand extends Command
         return [\SIGALRM];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         if (\SIGALRM === $signal) {
             echo "Received alarm!";

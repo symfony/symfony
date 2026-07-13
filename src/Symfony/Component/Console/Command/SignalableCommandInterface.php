@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Interface for command reacting to signal.
  *
@@ -30,7 +33,10 @@ interface SignalableCommandInterface
     /**
      * The method will be called when the application is signaled.
      *
+     * @param ?InputInterface $input
+     * @param ?OutputInterface $output
+     *
      * @return int|false The exit code to return or false to continue the normal execution
      */
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false;
+    public function handleSignal(int $signal, int|false $previousExitCode = 0/* , ?InputInterface $input = null, ?OutputInterface $output = null */): int|false;
 }

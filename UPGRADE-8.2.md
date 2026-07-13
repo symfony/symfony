@@ -8,6 +8,11 @@ Read more about this in the [Symfony documentation](https://symfony.com/doc/8.2/
 
 If you're upgrading from a version below 8.1, follow the [8.1 upgrade guide](UPGRADE-8.1.md) first.
 
+Console
+-------
+
+ * Add arguments `?InputInterface $input = null` and `?OutputInterface $output = null` to `SignalableCommandInterface::handleSignal()`
+
 Crowdin Translation Provider
 ----------------------------
 

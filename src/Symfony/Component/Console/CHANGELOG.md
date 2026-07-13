@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add optional input and output arguments to `SignalableCommandInterface::handleSignal()`
+
 8.1
 ---
 

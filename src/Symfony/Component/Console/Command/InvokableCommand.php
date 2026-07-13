@@ -196,9 +196,9 @@ class InvokableCommand implements SignalableCommandInterface
         return $this->signalableCommand?->getSubscribedSignals() ?? [];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
-        return $this->signalableCommand?->handleSignal($signal, $previousExitCode) ?? false;
+        return $this->signalableCommand?->handleSignal($signal, $previousExitCode, $input, $output) ?? false;
     }
 
     public function isInteractive(): bool

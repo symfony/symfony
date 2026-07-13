@@ -90,11 +90,11 @@ final class TraceableCommand extends Command
         return $this->command->getSubscribedSignals();
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         $event = $this->stopwatch->start($this->getName().'.handle_signal');
 
-        $exit = $this->command->handleSignal($signal, $previousExitCode);
+        $exit = $this->command->handleSignal($signal, $previousExitCode, $input, $output);
 
         $event->stop();
 

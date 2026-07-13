@@ -17,7 +17,7 @@ require $vendor.'/vendor/autoload.php';
         return [SIGINT];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         exit(254);
     }

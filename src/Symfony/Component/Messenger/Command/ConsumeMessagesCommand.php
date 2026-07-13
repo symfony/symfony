@@ -346,7 +346,11 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         return $this->signals ?? (SignalRegistry::isSupported() ? [\SIGTERM, \SIGINT, \SIGQUIT, \SIGALRM] : []);
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    /**
+     * @param ?InputInterface $input
+     * @param ?OutputInterface $output
+     */
+    public function handleSignal(int $signal, int|false $previousExitCode = 0/* , ?InputInterface $input = null, ?OutputInterface $output = null */): int|false
     {
         if (!$this->worker) {
             return false;

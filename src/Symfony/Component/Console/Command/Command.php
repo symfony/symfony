@@ -655,9 +655,16 @@ class Command implements SignalableCommandInterface
         return $this->code?->getSubscribedSignals() ?? [];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    /**
+     * @param ?InputInterface $input
+     * @param ?OutputInterface $output
+     */
+    public function handleSignal(int $signal, int|false $previousExitCode = 0/* , ?InputInterface $input = null, ?OutputInterface $output = null */): int|false
     {
-        return $this->code?->handleSignal($signal, $previousExitCode) ?? false;
+        $input = \func_num_args() > 2 ? func_get_arg(2) : null;
+        $output = \func_num_args() > 3 ? func_get_arg(3) : null;
+
+        return $this->code?->handleSignal($signal, $previousExitCode, $input, $output) ?? false;
     }
 
     /**

@@ -19,6 +19,8 @@ use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\MethodBasedTestCommand;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -459,7 +461,7 @@ class InvokableSignalableCommand implements SignalableCommandInterface
         return [];
     }
 
-    public function handleSignal(int $signal, false|int $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, false|int $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         return false;
     }

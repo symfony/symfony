@@ -2273,9 +2273,14 @@ class ApplicationTest extends TestCase
 
         $application = $this->createSignalableApplication($command, null);
         $application->setSignalsToDispatchEvent(\SIGUSR1);
+        $input = new ArrayInput(['signal']);
+        $output = new BufferedOutput();
 
-        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $this->assertSame(1, $application->run($input, $output));
         $this->assertTrue($command->signaled);
+        $this->assertSame(0, $command->previousExitCode);
+        $this->assertSame($input, $command->input);
+        $this->assertSame($output, $command->output);
     }
 
     #[RequiresPhpExtension('pcntl')]
@@ -2357,8 +2362,14 @@ class ApplicationTest extends TestCase
 
         $application = $this->createSignalableApplication($command, $dispatcher);
         $application->setSignalsToDispatchEvent(\SIGUSR1);
-        $this->assertSame(1, $application->run(new ArrayInput(['signal'])));
+        $input = new ArrayInput(['signal']);
+        $output = new BufferedOutput();
+
+        $this->assertSame(1, $application->run($input, $output));
         $this->assertSame([SignalEventSubscriber::class, SignableCommand::class], $command->signalHandlers);
+        $this->assertFalse($command->previousExitCode);
+        $this->assertSame($input, $command->input);
+        $this->assertSame($output, $command->output);
     }
 
     public function testSignalableCommandDoesNotInterruptedOnTermSignals()
@@ -2514,9 +2525,14 @@ class ApplicationTest extends TestCase
 
         $application = $this->createSignalableApplication($command, null);
         $application->setSignalsToDispatchEvent(\SIGUSR1);
+        $input = new ArrayInput(['signal-invokable']);
+        $output = new BufferedOutput();
 
-        $this->assertSame(1, $application->run(new ArrayInput(['signal-invokable'])));
+        $this->assertSame(1, $application->run($input, $output));
         $this->assertTrue($invokable->signaled);
+        $this->assertSame(0, $invokable->previousExitCode);
+        $this->assertSame($input, $invokable->input);
+        $this->assertSame($output, $invokable->output);
     }
 
     #[RequiresPhpExtension('pcntl')]
@@ -2528,7 +2544,7 @@ class ApplicationTest extends TestCase
                 return [\SIGUSR1];
             }
 
-            public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+            public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
             {
                 return false;
             }
@@ -2671,7 +2687,7 @@ class ApplicationTest extends TestCase
                 return [\SIGUSR1];
             }
 
-            public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+            public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
             {
                 return false;
             }
@@ -2695,7 +2711,7 @@ class ApplicationTest extends TestCase
                 return [\SIGUSR1];
             }
 
-            public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+            public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
             {
                 return false;
             }
@@ -3070,15 +3086,23 @@ class BaseSignableCommand extends Command
 #[AsCommand(name: 'signal')]
 class SignableCommand extends BaseSignableCommand
 {
+    public int|false|null $previousExitCode = null;
+    public ?InputInterface $input = null;
+    public ?OutputInterface $output = null;
+
     public function getSubscribedSignals(): array
     {
         return SignalRegistry::isSupported() ? [\SIGUSR1] : [];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         $this->signaled = true;
         $this->signalHandlers[] = __CLASS__;
+
+        $this->previousExitCode = $previousExitCode;
+        $this->input = $input;
+        $this->output = $output;
 
         return false;
     }
@@ -3092,7 +3116,7 @@ class TerminatableCommand extends BaseSignableCommand
         return SignalRegistry::isSupported() ? [\SIGINT] : [];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         $this->signaled = true;
         $this->signalHandlers[] = __CLASS__;
@@ -3126,7 +3150,7 @@ class TerminatableWithEventCommand extends Command implements EventSubscriberInt
         return [\SIGINT];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         $this->shouldContinue = false;
 
@@ -3172,6 +3196,9 @@ class SignalEventSubscriber implements EventSubscriberInterface
 trait SignalableInvokableCommandTrait
 {
     public bool $signaled = false;
+    public int|false|null $previousExitCode = null;
+    public ?InputInterface $input = null;
+    public ?OutputInterface $output = null;
 
     public function __invoke(): int
     {
@@ -3192,9 +3219,13 @@ trait SignalableInvokableCommandTrait
         return SignalRegistry::isSupported() ? [\SIGUSR1] : [];
     }
 
-    public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, int|false $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         $this->signaled = true;
+
+        $this->previousExitCode = $previousExitCode;
+        $this->input = $input;
+        $this->output = $output;
 
         return false;
     }
@@ -3218,7 +3249,7 @@ class AlarmableCommand extends BaseSignableCommand
         return [\SIGALRM];
     }
 
-    public function handleSignal(int $signal, false|int $previousExitCode = 0): int|false
+    public function handleSignal(int $signal, false|int $previousExitCode = 0, ?InputInterface $input = null, ?OutputInterface $output = null): int|false
     {
         if (\SIGALRM === $signal) {
             $this->signaled = true;

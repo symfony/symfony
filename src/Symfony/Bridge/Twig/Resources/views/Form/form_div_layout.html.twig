@@ -222,7 +222,7 @@
 {%- endblock range_widget %}
 
 {%- block button_widget -%}
-    {%- if label is empty -%}
+    {%- if label is null or label == '' -%}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
@@ -297,13 +297,13 @@
 {%- endblock form_label -%}
 
 {%- block form_label_content -%}
-    {%- if label is empty -%}
+    {%- if label is null or label == '' -%}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
                 '%id%': id,
             }) %}
-        {%- else -%}
+        {%- elseif label is not same as(false) -%}
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}

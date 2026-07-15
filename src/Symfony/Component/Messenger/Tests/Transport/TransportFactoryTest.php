@@ -83,6 +83,15 @@ class TransportFactoryTest extends TestCase
             'amqp://foo:barfoo@bar',
             'No transport supports Messenger DSN "amqp://foo:******@bar". Run "composer require symfony/amqp-messenger" to install AMQP transport.',
         ];
+        foreach (['amp-sqlite:///var/messenger.db', 'amp-mysql://localhost/app', 'amp-postgres://localhost/app'] as $dsn) {
+            yield 'with package suggestion '.$dsn => [
+                [false],
+                $dsn,
+                str_contains($dsn, '@') || !str_starts_with($dsn, 'amp-sqlite:')
+                    ? \sprintf('No transport supports Messenger DSN "%s". Run "composer require symfony/amp-sql-messenger" to install AMPHP SQL transport.', $dsn)
+                    : 'No transport supports the given Messenger DSN. Run "composer require symfony/amp-sql-messenger" to install AMPHP SQL transport.',
+            ];
+        }
         yield 'replaces password with stars' => [
             [false],
             'amqp://myuser:mypassword@broker:5672/vhost',

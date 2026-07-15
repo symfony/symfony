@@ -1,0 +1,51 @@
+{
+    "name": "symfony/amp-sql-messenger",
+    "type": "symfony-messenger-bridge",
+    "description": "Symfony AMPHP SQL Messenger Bridge",
+    "keywords": [
+        "messenger",
+        "mariadb",
+        "mysql",
+        "postgresql",
+        "sqlite",
+        "asynchronous"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "amphp/sql": "^2.1",
+        "symfony/messenger": "^8.1"
+    },
+    "require-dev": {
+        "amphp/byte-stream": "^2.0",
+        "amphp/mysql": "^3.1",
+        "amphp/postgres": "^2.2",
+        "fabpot/amphp-sqlite3": "^1.0"
+    },
+    "conflict": {
+        "amphp/byte-stream": "<2.0",
+        "amphp/mysql": "<3.1",
+        "amphp/postgres": "<2.2",
+        "revolt/event-loop": "<1.0.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Messenger\\Bridge\\AmpSql\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

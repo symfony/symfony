@@ -57,6 +57,7 @@ jobs:
           "extension=php_mbstring.dll" >> php.ini
           "extension=php_openssl.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
+          "extension=php_sqlite3.dll" >> php.ini
           "intl.default_locale=en" >> php.ini
           "intl.error_level=0" >> php.ini
           cd ${{ github.workspace }}
@@ -180,6 +181,7 @@ jobs:
           "extension=php_intl.dll" >> php.ini
           "extension=php_fileinfo.dll" >> php.ini
           "extension=php_pdo_sqlite.dll" >> php.ini
+          "extension=php_sqlite3.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
           "extension=php_sodium.dll" >> php.ini
           "intl.default_locale=en" >> php.ini

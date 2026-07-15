@@ -233,7 +233,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
 
         $this->expectException(HttpException::class);
-        $this->expectExceptionMessageMatches('/^The file is too large/');
+        $this->expectExceptionMessageMatches('/^bar: The file is too large/');
 
         $resolver->onKernelControllerArguments($event);
     }
@@ -323,7 +323,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
 
         $this->expectException(HttpException::class);
-        $this->expectExceptionMessageMatches('/^The file is too large/');
+        $this->expectExceptionMessageMatches('/^baz\[1\]: The file is too large/');
 
         $resolver->onKernelControllerArguments($event);
     }
@@ -412,7 +412,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
 
         $this->expectException(HttpException::class);
-        $this->expectExceptionMessageMatches('/^The file is too large/');
+        $this->expectExceptionMessageMatches('/^baz\[1\]: The file is too large/');
 
         $resolver->onKernelControllerArguments($event);
     }

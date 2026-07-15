@@ -10,6 +10,7 @@ CHANGELOG
  * Dispatch `RateLimitExceededEvent` from `RateLimitAttributeListener` when the `#[RateLimit]` attribute rejects a request
  * Seed the query bag from the `_query` route default when a route is matched
  * Deserialize the query parameter named by `#[MapQueryString(key:)]` as JSON when it holds a string, e.g. `?filter={"page":1}`
+ * Prefix the property path to each violation message reported by `RequestPayloadValueResolver`
 
 8.1
 ---

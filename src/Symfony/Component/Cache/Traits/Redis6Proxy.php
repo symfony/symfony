@@ -36,7 +36,7 @@ class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function __construct($options = null)
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->__construct(...\func_get_args());
+        ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->__construct(...\func_get_args());
     }
 
     public function _compress($value): string

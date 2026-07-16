@@ -33,7 +33,7 @@ class Redis5Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function __construct()
     {
-        return ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->__construct(...\func_get_args());
+        ($this->lazyObjectState->realInstance ??= ($this->lazyObjectState->initializer)())->__construct(...\func_get_args());
     }
 
     public function _prefix($key)

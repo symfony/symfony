@@ -189,6 +189,7 @@ class DotenvTest extends TestCase
             // underscores
             ['_FOO=BAR', ['_FOO' => 'BAR']],
             ['_FOO_BAR=FOOBAR', ['_FOO_BAR' => 'FOOBAR']],
+            ['__FOO_BAR=FOOBAR', ['__FOO_BAR' => 'FOOBAR']],
         ];
 
         if ('\\' !== \DIRECTORY_SEPARATOR) {

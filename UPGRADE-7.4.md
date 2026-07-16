@@ -94,7 +94,7 @@ HttpFoundation
 --------------
 
  * Add argument `$subtypeFallback` to `Request::getFormat()`
- * Deprecate using `Request::sendHeaders()` after headers have already been sent; use a `StreamedResponse` instead
+ * Deprecate using `Response::sendHeaders()` after headers have already been sent; use a `StreamedResponse` instead
  * Deprecate method `Request::get()`, use properties `->attributes`, `query` or `request` directly instead
  * Deprecate HTTP method override for methods GET, HEAD, CONNECT and TRACE; it will be ignored in Symfony 8.0
  * Deprecate accepting null `$format` argument to `Request::setFormat()`

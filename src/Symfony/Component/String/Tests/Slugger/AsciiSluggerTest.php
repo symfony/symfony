@@ -121,4 +121,14 @@ class AsciiSluggerTest extends TestCase
 
         $this->assertSame('a-and-a-go-to', (string) $slugger->slug('a 😺, 🐈‍⬛, and a 🦁 go to 🏞️... 😍 🎉 💛', '-'));
     }
+
+    public function testGetLocaleDefaultsToEmptyString()
+    {
+        $slugger = new AsciiSlugger();
+
+        $this->assertSame('', $slugger->getLocale());
+
+        $slugger->setLocale('en');
+        $this->assertSame('en', $slugger->getLocale());
+    }
 }

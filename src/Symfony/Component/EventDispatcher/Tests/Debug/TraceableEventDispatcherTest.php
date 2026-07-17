@@ -164,6 +164,27 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertArrayHasKey('stub', $listeners[0]);
     }
 
+    public function testResetClearsWrappedListenersOnMidDispatchReset()
+    {
+        $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
+        $tdispatcher->addListener('foo', static function () {});
+        // Second listener triggers a reset mid-dispatch. postProcess() then
+        // returns early on null === $callStack and leaves wrappedListeners['foo']
+        // uncleared; subsequent dispatches keep appending WrappedListener
+        // instances unless reset() also clears wrappedListeners.
+        $tdispatcher->addListener('foo', static function () use ($tdispatcher) {
+            $tdispatcher->reset();
+        });
+
+        for ($i = 0; $i < 5; ++$i) {
+            $tdispatcher->dispatch(new Event(), 'foo');
+        }
+
+        $p = (new \ReflectionObject($tdispatcher))->getProperty('wrappedListeners');
+
+        $this->assertSame([], $p->getValue($tdispatcher));
+    }
+
     public function testGetCalledListenersNested()
     {
         $tdispatcher = null;

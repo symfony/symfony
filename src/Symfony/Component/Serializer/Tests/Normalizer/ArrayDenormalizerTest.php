@@ -59,7 +59,7 @@ class ArrayDenormalizerTest extends TestCase
         $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
         $nestedDenormalizer->expects($this->once())
             ->method('supportsDenormalization')
-            ->with($this->anything(), ArrayDummy::class, 'json', ['con' => 'text'])
+            ->with(['foo' => 'one', 'bar' => 'two'], ArrayDummy::class, 'json', ['con' => 'text'])
             ->willReturn(true);
         $denormalizer = new ArrayDenormalizer();
         $denormalizer->setDenormalizer($nestedDenormalizer);
@@ -124,6 +124,19 @@ class ArrayDenormalizerTest extends TestCase
 
         $this->expectException(\BadMethodCallException::class);
         $arrayDenormalizer->supportsDenormalization([], 'string[]');
+    }
+
+    public function testSupportsEmptyArray()
+    {
+        $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
+        $nestedDenormalizer->expects($this->never())
+            ->method('supportsDenormalization');
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+
+        $this->assertTrue(
+            $denormalizer->supportsDenormalization([], __NAMESPACE__.'\ArrayDummy[]')
+        );
     }
 }
 

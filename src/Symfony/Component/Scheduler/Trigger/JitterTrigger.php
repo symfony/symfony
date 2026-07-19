@@ -31,8 +31,25 @@ final class JitterTrigger extends AbstractDecoratedTrigger
 
     public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
     {
-        if (!$nextRun = $this->trigger->getNextRunDate($run)) {
+        // the provided execution time includes jitter, try to get back to the actual time
+        $runWithoutJitter = $run->sub(new \DateInterval(\sprintf('PT%sS', $this->maxSeconds)));
+
+        if (!$nextRun = $this->trigger->getNextRunDate($runWithoutJitter)) {
             return null;
+        }
+
+        // if we get the run that just ran, proceed to the next one
+        while ($nextRun <= $run) {
+            if (!$advanced = $this->trigger->getNextRunDate($nextRun)) {
+                return null;
+            }
+
+            // the decorated trigger no longer advances: stop to avoid an infinite loop
+            if ($advanced <= $nextRun) {
+                break;
+            }
+
+            $nextRun = $advanced;
         }
 
         return $nextRun->add(new \DateInterval(\sprintf('PT%sS', random_int(0, $this->maxSeconds))));

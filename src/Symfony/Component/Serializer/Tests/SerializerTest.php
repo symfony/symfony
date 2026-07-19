@@ -1155,10 +1155,10 @@ class SerializerTest extends TestCase
             ],
             [
                 'currentType' => 'null',
-                'expectedTypes' => ['array'],
+                'expectedTypes' => ['Symfony\Component\Serializer\Tests\Fixtures\Php74Full[]'],
                 'path' => 'anotherCollection',
                 'useMessageForUser' => false,
-                'message' => 'Data expected to be "Symfony\Component\Serializer\Tests\Fixtures\Php74Full[]", "null" given.',
+                'message' => 'The type of the "anotherCollection" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\Php74Full" must be one of "Symfony\Component\Serializer\Tests\Fixtures\Php74Full[]" ("null" given).',
             ],
         ];
 

@@ -33,6 +33,25 @@ class InlineTest extends TestCase
         $this->assertSame($value, Inline::parse($yaml, $flags), \sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }
 
+    #[DataProvider('getNanRepresentations')]
+    public function testParseNan(string $yaml)
+    {
+        $this->assertNan(Inline::parse($yaml));
+    }
+
+    public static function getNanRepresentations(): iterable
+    {
+        yield ['.nan'];
+        yield ['.NaN'];
+        yield ['.NAN'];
+    }
+
+    public function testDumpNan()
+    {
+        $this->assertSame('.NaN', Inline::dump(\NAN));
+        $this->assertNan(Inline::parse(Inline::dump(\NAN)));
+    }
+
     #[DataProvider('getTestsForParseWithMapObjects')]
     public function testParseWithMapObjects($yaml, $value, $flags = Yaml::PARSE_OBJECT_FOR_MAP)
     {

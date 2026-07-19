@@ -182,6 +182,11 @@ class Video extends File
         ?string $unsupportedContainerMessage = null,
         ?array $groups = null,
         mixed $payload = null,
+        array|string|null $extensions = null,
+        ?string $extensionsMessage = null,
+        ?string $filenameCharset = null,
+        ?string $filenameCountUnit = null,
+        ?string $filenameCharsetMessage = null,
     ) {
         static $hasFfprobe;
         if (!$hasFfprobe) {
@@ -214,7 +219,12 @@ class Video extends File
             $uploadExtensionErrorMessage,
             $uploadErrorMessage,
             $groups,
-            $payload
+            $payload,
+            $extensions,
+            $extensionsMessage,
+            $filenameCharset,
+            $filenameCountUnit,
+            $filenameCharsetMessage,
         );
 
         $this->minWidth = $minWidth ?? $this->minWidth;

@@ -1,0 +1,8 @@
+---------------------------------------------------------------------------
+
+by semx at 2026-07-18T17:24:55Z
+
+Heads-up for whoever merges: the two red checks here are both unrelated to the change.
+
+- **`x86 / minimal-exts / lowest-php`** is a flake — the Yaml suite itself passes (`OK`), the job just exits `1` with no failing test. A re-run clears it (I don't have rerun rights on the upstream repo).
+- **`Fabbot / Checks`** fails on its *"Check YAML files for syntax errors"* step: it parses each changed `.yml` as a single document, but `Tests/Fixtures/YtsSpecificationExamples.yml` is a multi-document fixture (65 `---` documents), so `Yaml::parse()` rejects it at line 9 with *"Multiple documents are not supported"*. This is pre-existing to the fixture and not introduced by this PR — it only surfaces because the PR touches that file to update the `.NaN` expectations. Happy to handle those expectations differently if you'd prefer.

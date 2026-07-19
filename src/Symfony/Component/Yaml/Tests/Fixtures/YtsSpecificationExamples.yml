@@ -365,7 +365,7 @@ syck: |
 
 
 ---
-test: Literal perserves newlines
+test: Literal preserves newlines
 todo: true
 spec: 2.13
 yaml: |
@@ -521,6 +521,8 @@ php: |
 # FIX: spec shows parens around -inf and NaN
 test: Floating point
 spec: 2.20
+# dump_skip: assertSame() cannot compare NaN (NAN !== NAN); NaN round-trip is covered by InlineTest.
+dump_skip: true
 yaml: |
   canonical: 1.23015e+3
   exponential: 12.3015e+02
@@ -532,7 +534,7 @@ php: |
     'canonical' => 1230.15,
     'exponential' => 1230.15,
     'negative infinity' => log(0),
-    'not a number' => -log(0),
+    'not a number' => NAN,
     'float as whole number' => (float) 1
   ]
 ---
@@ -1511,6 +1513,8 @@ php: |
    ]
 ---
 test: Float
+# dump_skip: assertSame() cannot compare NaN (NAN !== NAN); NaN round-trip is covered by InlineTest.
+dump_skip: true
 yaml: |
    canonical: 1.23015e+3
    exponential: 12.3015e+02
@@ -1521,7 +1525,7 @@ php: |
     'canonical' => 1230.15,
     'exponential' => 1230.15,
     'negative infinity' => log(0),
-    'not a number' => -log(0)
+    'not a number' => NAN
   ]
 ---
 test: Timestamp

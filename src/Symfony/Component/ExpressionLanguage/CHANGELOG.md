@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `count()` function to ExpressionLanguage
+
 8.1
 ---
 

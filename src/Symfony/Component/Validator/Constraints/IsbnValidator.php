@@ -114,7 +114,7 @@ class IsbnValidator extends ConstraintValidator
                 return Isbn::TOO_SHORT_ERROR;
             }
 
-            if ('X' === $isbn[$i]) {
+            if ('X' === $isbn[$i] && 9 === $i) {
                 $digit = 10;
             } elseif (ctype_digit($isbn[$i])) {
                 $digit = $isbn[$i];

@@ -59,7 +59,7 @@ final class TerminalInputHelper
                 throw new \RuntimeException('Unable to read the terminal settings.');
             }
 
-            $this->initialState = $state;
+            $this->initialState = trim($state);
 
             $this->createSignalHandlers();
         }
@@ -96,7 +96,13 @@ final class TerminalInputHelper
 
         // Safeguard in case an unhandled kill signal exists
         $this->checkForKillSignal();
-        shell_exec('stty '.$this->initialState);
+
+        // The captured "stty -g" state is not guaranteed to be accepted back by "stty" on every
+        // platform/terminal (e.g. some nested pty implementations reject it with "invalid argument"),
+        // and shell_exec() gives no way to detect that failure. Try the exact restore first so
+        // any custom terminal settings survive, but always fall back to "stty sane" so the
+        // terminal is left in a usable state even when the exact restore silently fails.
+        shell_exec('stty '.$this->initialState.' 2>/dev/null || stty sane');
         $this->signalToKill = 0;
 
         foreach ($this->signalHandlers as $signal => $originalHandler) {
@@ -119,9 +125,12 @@ final class TerminalInputHelper
             $this->signalHandlers[$signal] = pcntl_signal_get_handler($signal);
 
             pcntl_signal($signal, function ($signal) {
-                // Save current state, then restore to initial state
+                // Save current state, then restore to initial state. The original signal
+                // handler is about to run, so fall back to "stty sane" if the exact restore
+                // is rejected by "stty" (see the same fallback in finish()), to make sure it
+                // runs with a usable terminal.
                 $currentState = shell_exec('stty -g');
-                shell_exec('stty '.$this->initialState);
+                shell_exec('stty '.$this->initialState.' 2>/dev/null || stty sane');
                 $originalHandler = $this->signalHandlers[$signal];
 
                 if (\is_callable($originalHandler)) {

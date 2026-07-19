@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpClient\Tests\Internal;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\Dechunker;
 
 class DechunkerTest extends TestCase
 {
-    /**
-     * @dataProvider provideValidChunkedData
-     */
+    #[DataProvider('provideValidChunkedData')]
     public function testDechunk(string $expected, string $chunked)
     {
         $dechunker = new Dechunker();
@@ -28,9 +27,7 @@ class DechunkerTest extends TestCase
         $this->assertTrue($dechunker->isFinished());
     }
 
-    /**
-     * @dataProvider provideValidChunkedData
-     */
+    #[DataProvider('provideValidChunkedData')]
     public function testDechunkByteByByte(string $expected, string $chunked)
     {
         $dechunker = new Dechunker();
@@ -57,9 +54,7 @@ class DechunkerTest extends TestCase
         yield 'empty body' => ['', "0\r\n\r\n"];
     }
 
-    /**
-     * @dataProvider provideTruncatedChunkedData
-     */
+    #[DataProvider('provideTruncatedChunkedData')]
     public function testTruncatedData(string $chunked)
     {
         $dechunker = new Dechunker();
@@ -77,9 +72,7 @@ class DechunkerTest extends TestCase
         yield 'partial terminal chunk' => ["b\r\nhello world\r\n0"];
     }
 
-    /**
-     * @dataProvider provideInvalidChunkedData
-     */
+    #[DataProvider('provideInvalidChunkedData')]
     public function testInvalidData(string $chunked)
     {
         $dechunker = new Dechunker();

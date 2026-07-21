@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-07-06T07:43:47Z
+
+It’s a good idea to test compatibility. But we shouldn’t merge it until we're sure Twig 4 is stable.
+
+Twig [4.0.0-alpha1](https://github.com/twigphp/Twig/releases/tag/v4.0.0-alpha1) has been released, but that doesn't guarantee there won't be any further breaking changes before the stable release.
+
+The PR highlights at least one incompatibility that can be fixed.
+```
+1) Symfony\Bridge\Twig\Tests\Node\TransNodeTest::testCompileStrict
+Failed asserting that two strings are equal.
+--- Expected
++++ Actual
+@@ @@
+-'yield $this->env->getExtension('Symfony\Bridge\Twig\Extension\TranslationExtension')->trans("trans %var%", array_merge(["%var%" => ($context["var"] ?? null)], (isset($context["foo"]) || array_key_exists("foo", $context) ? $context["foo"] : (function () { throw new RuntimeError('Variable "foo" does not exist.', 0, $this->source); })())), "messages");'
++'yield $this->env->getExtension('Symfony\Bridge\Twig\Extension\TranslationExtension')->trans("trans %var%", array_merge(["%var%" => ($context["var"] ?? null)], (array_key_exists("foo", $context) ? $context["foo"] : throw new RuntimeError('Variable "foo" does not exist.', 0, $this->source))), "messages");'
+
+/home/runner/work/symfony/symfony/src/Symfony/Bridge/Twig/Tests/Node/TransNodeTest.php:38
+```

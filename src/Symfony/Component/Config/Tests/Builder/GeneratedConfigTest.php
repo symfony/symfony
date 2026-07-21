@@ -18,6 +18,7 @@ use Symfony\Component\Config\Builder\ConfigBuilderInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Tests\Builder\Fixtures\AddToList;
 use Symfony\Component\Config\Tests\Builder\Fixtures\NodeInitialValues;
+use Symfony\Component\Config\Tests\Builder\Fixtures\NodeWithCommentEnd;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\Filesystem\Filesystem;
@@ -149,6 +150,27 @@ class GeneratedConfigTest extends TestCase
         $configBuilder = $this->generateConfigBuilder(NodeInitialValues::class);
         $this->expectException(InvalidConfigurationException::class);
         $configBuilder->someCleverName(['not_exists' => 'foo']);
+    }
+
+    /**
+     * A node comment (info, example, default value...) may contain a comment-closing
+     * sequence, which must not prematurely close the generated docblock and break the file.
+     */
+    public function testCommentEndInNodeCommentDoesNotBreakGeneratedFile()
+    {
+        $outputDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('sf_config_builder', true);
+        $this->tempDir[] = $outputDir;
+
+        (new ConfigBuilderGenerator($outputDir))->build(new NodeWithCommentEnd());
+
+        $generatedFile = $outputDir.'/Symfony/Config/NodeWithCommentEndConfig.php';
+        $this->assertFileExists($generatedFile);
+        $generatedCode = file_get_contents($generatedFile);
+
+        // token_get_all() with TOKEN_PARSE throws a ParseError on invalid PHP, which is
+        // exactly what an unescaped comment-closing sequence in a docblock would produce.
+        $this->assertIsArray(token_get_all($generatedCode, \TOKEN_PARSE));
+        $this->assertStringContainsString('*\/30 * * * *', $generatedCode);
     }
 
     public function testSetExtraKeyMethodIsNotGeneratedWhenAllowExtraKeysIsFalse()

@@ -450,7 +450,7 @@ public function NAME($value): static
             $comment .= '@deprecated '.$node->getDeprecation($node->getName(), $node->getParent()->getName())['message']."\n";
         }
 
-        return $comment ? ' * '.str_replace("\n", "\n * ", rtrim($comment, "\n"))."\n" : '';
+        return $comment ? ' * '.str_replace(['*/', "\n"], ['*\/', "\n * "], rtrim($comment, "\n"))."\n" : '';
     }
 
     /**

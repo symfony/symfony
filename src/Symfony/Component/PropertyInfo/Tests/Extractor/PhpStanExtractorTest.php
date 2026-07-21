@@ -412,6 +412,8 @@ class PhpStanExtractorTest extends TestCase
             ['e', [new Type(Type::BUILTIN_TYPE_OBJECT, true, Dummy::class, false, [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING)])], [new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [new Type(Type::BUILTIN_TYPE_INT)], [new Type(Type::BUILTIN_TYPE_OBJECT, false, \Traversable::class, true, [], [new Type(Type::BUILTIN_TYPE_OBJECT, false, DefaultValue::class)])])]), new Type(Type::BUILTIN_TYPE_OBJECT, false, ParentDummy::class)]],
             ['f', null],
             ['g', [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, [], [new Type(Type::BUILTIN_TYPE_STRING), new Type(Type::BUILTIN_TYPE_INT)])]],
+            ['h', null],
+            ['i', null],
         ];
     }
 

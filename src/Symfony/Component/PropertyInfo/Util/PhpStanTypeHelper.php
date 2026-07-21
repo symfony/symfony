@@ -107,6 +107,10 @@ final class PhpStanTypeHelper
                     // It's safer to fall back to other extractors here, as resolving const types correctly is not easy at the moment
                     return [];
                 }
+                if ($type instanceof IdentifierTypeNode && 'mixed' === $type->name) {
+                    // a union that contains "mixed" is equivalent to "mixed", so it accepts any value
+                    return [];
+                }
                 foreach ($this->extractTypes($type, $nameScope) as $subType) {
                     $types[] = $subType;
                 }

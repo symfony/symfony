@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+8.2
+---
+ * Allow repeating `AsRemoteEventConsumer` attribute
+
 6.4
 ---
 

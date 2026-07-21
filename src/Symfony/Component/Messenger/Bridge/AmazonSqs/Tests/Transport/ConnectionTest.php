@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Http\NetworkException;
 use AsyncAws\Core\Test\ResultMockFactory;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
@@ -20,9 +21,14 @@ use AsyncAws\Sqs\ValueObject\Message;
 use Composer\InstalledVersions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 class ConnectionTest extends TestCase
 {
@@ -289,6 +295,103 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
         $connection->get();
+    }
+
+    public function testDestructDoesNotThrowWhenTheInFlightReceiveCannotBeResumed()
+    {
+        $httpClient = $this->createPollingClientThatCannotResume();
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        $this->assertNull($connection->get());
+
+        unset($connection);
+
+        $this->assertTrue($httpClient->response->getInfo('canceled'));
+    }
+
+    public function testResetDiscardsTheInFlightReceiveThatCannotBeResumed()
+    {
+        $httpClient = $this->createPollingClientThatCannotResume();
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        $this->assertNull($connection->get());
+
+        $connection->reset();
+
+        $this->assertTrue($httpClient->response->getInfo('canceled'));
+    }
+
+    public function testDestructDoesNotThrowOnNetworkFailure()
+    {
+        $httpClient = new MockHttpClient(new MockResponse('', ['error' => 'Connection timed out']));
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        try {
+            $connection->get();
+            $this->fail('The receive should have failed.');
+        } catch (NetworkException) {
+        }
+
+        unset($connection);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testResetDiscardsTheFailedResponseOnNetworkFailure()
+    {
+        $httpClient = new MockHttpClient(new MockResponse('', ['error' => 'Connection timed out']));
+        $client = new SqsClient(['region' => 'eu-west-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, 'https://sqs.eu-west-1.amazonaws.com/123456789012/queue');
+
+        try {
+            $connection->get();
+            $this->fail('The receive should have failed.');
+        } catch (NetworkException) {
+        }
+
+        $connection->reset();
+
+        $this->addToAssertionCount(1);
+    }
+
+    /**
+     * Simulates an in-flight ReceiveMessage long-poll: the first stream() call times out,
+     * leaving the response pending, and any later attempt to resume it throws, like
+     * HttpClient decorators do when the underlying response was already consumed.
+     */
+    private function createPollingClientThatCannotResume(): HttpClientInterface
+    {
+        return new class implements HttpClientInterface {
+            public ?MockResponse $response = null;
+            private int $streamCalls = 0;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return $this->response = new MockResponse();
+            }
+
+            public function stream($responses, ?float $timeout = null): ResponseStreamInterface
+            {
+                if (++$this->streamCalls > 1) {
+                    throw new \LogicException('Instance of "Symfony\Component\HttpClient\Response\CurlResponse" is already consumed and cannot be managed by "Symfony\Component\HttpClient\Response\AsyncResponse". A decorated client should not call any of the response\'s methods in its "request()" method.');
+                }
+
+                $response = $this->response;
+                $timeoutChunk = new ErrorChunk(0, 'Idle timeout reached');
+
+                return new ResponseStream((static function () use ($response, $timeoutChunk) {
+                    yield $response => $timeoutChunk;
+                })());
+            }
+
+            public function withOptions(array $options): static
+            {
+                return $this;
+            }
+        };
     }
 
     /**

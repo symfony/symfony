@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-06-18T01:08:46Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-06-18T01:08:47Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "6.4, 7.4, 8.0, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by jnahmias at 2026-06-18T01:54:14Z
+
+note failure on windows is unrelated to this PR.
+tests for EventDispatcher pass: https://github.com/symfony/symfony/actions/runs/27730040229/job/82034867043?pr=64655#step:8:134
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-18T08:46:08Z
+
+#63723 changed this behavior to reduce memory usage; maybe this issue should be fixed by using a counter?
+
+---------------------------------------------------------------------------
+
+by jnahmias at 2026-06-18T13:55:23Z
+
+> #63723 changed this behavior to reduce memory usage; maybe this issue should be fixed by using a counter?
+
+Hi @MatTheCat,
+yes, I could definitely do that -- but would that be a bc issue as it would change the return value from `getInfo()` and `getCalledListeners()`?
+
+To elaborate, the call to `getCalledListeners()` in the reproducer in #64653 used to return this:
+```
+array(2) {
+  [0]=>
+  array(4) {
+    ["event"]=>
+    string(10) "event.test"
+    ["priority"]=>
+    int(0)
+    ["pretty"]=>
+    string(7) "closure"
+    ["stub"]=>
+    string(9) "closure()"
+  }
+  [1]=>
+  array(4) {
+    ["event"]=>
+    string(10) "event.test"
+    ["priority"]=>
+    int(0)
+    ["pretty"]=>
+    string(7) "closure"
+    ["stub"]=>
+    string(9) "closure()"
+  }
+}
+```
+
+Now, it returns this:
+```
+array(1) {
+  [0]=>
+  array(4) {
+    ["event"]=>
+    string(10) "event.test"
+    ["priority"]=>
+    int(0)
+    ["pretty"]=>
+    string(7) "closure"
+    ["stub"]=>
+    string(9) "closure()"
+  }
+}
+```
+
+I could add a `callCount` member to `WrappedListener`, increment it in `__invoke()`, and then add it to `getInfo()`. That would provide the information needed to count the calls. However, that's still a bc break, no?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-18T15:06:27Z
+
+I don’t think this would qualify as a BC break but I’ll let core team members say.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-20T15:00:51Z
+
+I'd be fine adding callCount, otherwise we're going to reintroduce a leak.

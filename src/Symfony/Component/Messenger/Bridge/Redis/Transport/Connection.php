@@ -541,8 +541,10 @@ class Connection
 
         try {
             $acknowledged = $redis->xack($this->stream, $this->group, [$id]);
-            if ($this->deleteAfterAck) {
-                $acknowledged = $redis->xdel($this->stream, [$id]);
+
+            // the ack decides the outcome: the entry may already be gone from the stream (e.g. trimmed), deleting it is best effort
+            if ($acknowledged && $this->deleteAfterAck && false === $redis->xdel($this->stream, [$id])) {
+                $redis->clearLastError();
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
@@ -563,19 +565,21 @@ class Connection
         $redis = $this->getRedis();
 
         try {
-            $deleted = $redis->xack($this->stream, $this->group, [$id]);
-            if ($this->deleteAfterReject) {
-                $deleted = $redis->xdel($this->stream, [$id]) && $deleted;
+            $rejected = $redis->xack($this->stream, $this->group, [$id]);
+
+            // same as in ack(): the entry may already be gone from the stream, deleting it is best effort
+            if ($rejected && $this->deleteAfterReject && false === $redis->xdel($this->stream, [$id])) {
+                $redis->clearLastError();
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        if (!$deleted) {
+        if (!$rejected) {
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
             }
-            throw new TransportException($error ?? \sprintf('Could not delete message "%s" from the redis stream.', $id));
+            throw new TransportException($error ?? \sprintf('Could not reject redis message "%s".', $id));
         }
 
         unset($this->inflightIds[$id]);

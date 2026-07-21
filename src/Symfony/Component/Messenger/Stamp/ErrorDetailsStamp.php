@@ -43,6 +43,9 @@ final class ErrorDetailsStamp implements StampInterface
         if (!$throwable instanceof RecoverableExceptionInterface && class_exists(FlattenException::class)) {
             $flattenException = FlattenException::createFromThrowable($throwable);
             $flattenException->setTrace([], $throwable->getFile(), $throwable->getLine());
+            foreach ($flattenException->getAllPrevious() as $previous) {
+                $previous->setTrace([], $previous->getFile(), $previous->getLine());
+            }
         }
 
         return new self($throwable::class, $throwable->getCode(), $throwable->getMessage(), $flattenException);

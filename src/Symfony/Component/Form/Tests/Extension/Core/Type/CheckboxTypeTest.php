@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class CheckboxTypeTest extends BaseTypeTestCase
@@ -126,6 +128,19 @@ class CheckboxTypeTest extends BaseTypeTestCase
 
         $this->assertFalse($form->getData());
         $this->assertNull($form->getViewData());
+    }
+
+    public function testSubmitNestedWithEmptyValueAndFalseUncheckedWithClearMissingFalse()
+    {
+        $form = $this->factory
+            ->create(FormType::class, ['check' => true])
+            ->add('check', CheckboxType::class, ['value' => ''])
+        ;
+
+        $form->submit(['check' => '0'], false);
+
+        $this->assertFalse($form->get('check')->getData());
+        $this->assertNull($form->get('check')->getViewData());
     }
 
     public function testSubmitWithEmptyValueAndTrueChecked()

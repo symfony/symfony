@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransfo
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
@@ -63,6 +64,13 @@ class CheckboxType extends AbstractType
         ]);
 
         $resolver->setAllowedTypes('false_values', 'array');
+        $resolver->setNormalizer('false_values', static function (Options $options, array $falseValues): array {
+            if ('' === $options['value'] && !\in_array('0', $falseValues, true)) {
+                $falseValues[] = '0';
+            }
+
+            return $falseValues;
+        });
     }
 
     public function getBlockPrefix(): string

@@ -86,7 +86,14 @@ class ImportMapVersionChecker
                     continue;
                 }
 
-                $dependencyPackageName = $entries->get($dependencyName)->getPackageName();
+                $dependencyEntry = $entries->get($dependencyName);
+
+                // local entries have no version to check and no package name to resolve
+                if (!$dependencyEntry->isRemotePackage()) {
+                    continue;
+                }
+
+                $dependencyPackageName = $dependencyEntry->getPackageName();
 
                 if (!isset($packageDependencies[$dependencyPackageName])) {
                     continue;
@@ -94,8 +101,8 @@ class ImportMapVersionChecker
 
                 $dependencyVersionConstraint = $packageDependencies[$dependencyPackageName];
 
-                if (!$this->isVersionSatisfied($dependencyVersionConstraint, $entries->get($dependencyName)->version)) {
-                    $problems[] = new PackageVersionProblem($packageName, $dependencyPackageName, $dependencyVersionConstraint, $entries->get($dependencyName)->version);
+                if (!$this->isVersionSatisfied($dependencyVersionConstraint, $dependencyEntry->version)) {
+                    $problems[] = new PackageVersionProblem($packageName, $dependencyPackageName, $dependencyVersionConstraint, $dependencyEntry->version);
                 }
             }
         }

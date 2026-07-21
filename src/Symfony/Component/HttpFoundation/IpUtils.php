@@ -56,13 +56,6 @@ class IpUtils
     private const IPV4_DECIMAL_BASE = 10;
     private const IPV4_OCTAL_BASE = 8;
     private const IPV4_HEXADECIMAL_BASE = 16;
-    private const ASCII_ZERO = 48;
-    private const ASCII_NINE = 57;
-    private const ASCII_UPPER_A = 65;
-    private const ASCII_UPPER_F = 70;
-    private const ASCII_LOWER_A = 97;
-    private const ASCII_LOWER_F = 102;
-
     private static array $checkedIps = [];
 
     /**
@@ -258,16 +251,16 @@ class IpUtils
     {
         $ord = \ord($digit);
 
-        if (self::ASCII_ZERO <= $ord && $ord <= self::ASCII_NINE) {
-            return $ord - self::ASCII_ZERO;
+        if (\ord('0') <= $ord && $ord <= \ord('9')) {
+            return $ord - \ord('0');
         }
 
-        if (self::ASCII_LOWER_A <= $ord && $ord <= self::ASCII_LOWER_F) {
-            return $ord - self::ASCII_LOWER_A + self::IPV4_DECIMAL_BASE;
+        if (\ord('a') <= $ord && $ord <= \ord('f')) {
+            return $ord - \ord('a') + self::IPV4_DECIMAL_BASE;
         }
 
-        if (self::ASCII_UPPER_A <= $ord && $ord <= self::ASCII_UPPER_F) {
-            return $ord - self::ASCII_UPPER_A + self::IPV4_DECIMAL_BASE;
+        if (\ord('A') <= $ord && $ord <= \ord('F')) {
+            return $ord - \ord('A') + self::IPV4_DECIMAL_BASE;
         }
 
         return null;

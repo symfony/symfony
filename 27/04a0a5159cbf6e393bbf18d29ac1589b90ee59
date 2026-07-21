@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-10T08:08:37Z
+
+Are we sure we want this fix? I mean, there's indeed an issue but I'm not sure this is the right fix, because this will output ` 30 * * * *` for `*/30 * * * *`. Valid, but not in sync with the code generating it. Maybe I'm nitpicking, I'd be curious to have opinions from other people
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-07-10T09:45:46Z
+
+Good catch. This mirrors the same `str_replace('*/', ' ', ...)` trick PhpDumper already uses (PhpDumper.php:882) for the same problem, so it's not a new pattern here. But you're right it's lossier in this spot, since ArrayShapeGenerator is showing the actual default value to a reader, not mangling an internal doc block nobody reads literally. Splitting the star from the slash instead of collapsing both keeps it recognizable: `str_replace('*/', '* /', ...)` turns `*/30 * * * *` into `* /30 * * * *`, still safe but closer to the real value. Pushing that now.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-10T10:46:08Z
+
+But `* /30 * * * *` is not a valid crontab expression
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-07-10T10:48:30Z
+
+I'll push a fix shortly.
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-07-10T18:00:59Z
+
+Pushed — escaped the slash instead so `*/30 * * * *` now renders as `*\/30 * * * *`, keeping it a valid crontab value with the change visible rather than silently rewritten.

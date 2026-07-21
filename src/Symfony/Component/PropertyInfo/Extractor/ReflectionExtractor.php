@@ -690,8 +690,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                         continue;
                     }
 
-                    // Parameter can be optional to allow things like: method(?array $foo = null)
-                    if ($reflectionMethod->getNumberOfParameters() >= 1) {
+                    // Parameter can be optional to allow things like: method(?array $foo = null),
+                    // but at most one parameter may be required, matching the write-access rules
+                    if ($reflectionMethod->getNumberOfParameters() >= 1 && $reflectionMethod->getNumberOfRequiredParameters() <= 1) {
                         return [$reflectionMethod, $prefix];
                     }
                 } catch (\ReflectionException) {

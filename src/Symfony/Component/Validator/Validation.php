@@ -24,9 +24,9 @@ final class Validation
     /**
      * Creates a callable chain of constraints.
      *
-     * @phpstan-return callable<T>(T $value): T
+     * @return callable(mixed $value): mixed
      *
-     * @psalm-return callable(mixed $value): mixed
+     * @psalm-return callable<T>(T $value): T
      */
     public static function createCallable(Constraint|ValidatorInterface|null $constraintOrValidator = null, Constraint ...$constraints): callable
     {

@@ -15,6 +15,7 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
 use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\MappedAsset;
+use Symfony\Component\Finder\Glob;
 
 /**
  * Provides data needed to write the importmap & preloads.
@@ -93,6 +94,15 @@ class ImportMapGenerator
 
         $allEntries = [];
         foreach ($this->importMapConfigReader->getEntries() as $rootEntry) {
+            if ($rootEntry->isGlob) {
+                foreach ($this->expandGlobEntry($rootEntry) as $globEntry) {
+                    $allEntries[$globEntry->importName] = $globEntry;
+                    $allEntries = $this->addImplicitEntries($globEntry, $allEntries);
+                }
+
+                continue;
+            }
+
             $allEntries[$rootEntry->importName] = $rootEntry;
             $allEntries = $this->addImplicitEntries($rootEntry, $allEntries);
         }
@@ -203,6 +213,50 @@ class ImportMapGenerator
         }
 
         return $currentImportEntries;
+    }
+
+    /**
+     * Expands a glob entry into one local entry per matching file.
+     *
+     * The import name of each entry is the glob entry name (used as a prefix)
+     * concatenated with the matched file path relative to the glob's static
+     * part (the substring before the first wildcard).
+     *
+     * @return ImportMapEntry[]
+     */
+    private function expandGlobEntry(ImportMapEntry $entry): array
+    {
+        $filesystemGlob = $this->importMapConfigReader->convertPathToFilesystemPath($entry->path);
+        $staticPrefix = substr($filesystemGlob, 0, strcspn($filesystemGlob, '*?[{'));
+        $baseDirectory = substr($staticPrefix, 0, strrpos($staticPrefix, '/'));
+
+        if (!is_dir($baseDirectory)) {
+            return [];
+        }
+
+        $regex = Glob::toRegex(substr($filesystemGlob, \strlen($baseDirectory) + 1));
+
+        $entries = [];
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($baseDirectory, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS));
+        foreach ($files as $file) {
+            if (!$file->isFile() || !preg_match($regex, substr($file->getPathname(), \strlen($baseDirectory) + 1))) {
+                continue;
+            }
+
+            $importName = $entry->importName.substr($file->getPathname(), \strlen($staticPrefix));
+            $path = $this->importMapConfigReader->convertFilesystemPathToPath($file->getPathname()) ?? $file->getPathname();
+
+            $entries[$importName] = ImportMapEntry::createLocal(
+                $importName,
+                ImportMapType::tryFrom($file->getExtension()) ?? ImportMapType::JS,
+                $path,
+                false,
+            );
+        }
+
+        ksort($entries);
+
+        return array_values($entries);
     }
 
     /**

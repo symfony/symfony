@@ -23,6 +23,8 @@ final class ImportMapEntry
         public readonly ImportMapType $type,
         /**
          * A logical path, relative path or absolute path to the file.
+         *
+         * For a glob entry, this is the glob pattern to expand.
          */
         public readonly string $path,
         public readonly bool $isEntrypoint,
@@ -34,6 +36,10 @@ final class ImportMapEntry
          * The full "package-name/path" (remote only).
          */
         public readonly ?string $packageModuleSpecifier,
+        /**
+         * Whether "path" is a glob pattern that expands into several entries.
+         */
+        public readonly bool $isGlob = false,
     ) {
     }
 
@@ -45,6 +51,11 @@ final class ImportMapEntry
     public static function createRemote(string $importName, ImportMapType $importMapType, string $path, string $version, string $packageModuleSpecifier, bool $isEntrypoint): self
     {
         return new self($importName, $importMapType, $path, $isEntrypoint, $version, $packageModuleSpecifier);
+    }
+
+    public static function createGlob(string $importName, string $glob): self
+    {
+        return new self($importName, ImportMapType::JS, $glob, false, null, null, true);
     }
 
     public function getPackageName(): string

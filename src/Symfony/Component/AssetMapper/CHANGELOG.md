@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `glob` patterns in `importmap.php` to register multiple files at once
+
 8.0
 ---
 

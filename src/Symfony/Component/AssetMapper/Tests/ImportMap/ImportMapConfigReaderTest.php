@@ -106,6 +106,67 @@ class ImportMapConfigReaderTest extends TestCase
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
 
+    public function testGetGlobEntryAndWriteEntries()
+    {
+        $importMap = <<<'EOF'
+            <?php
+            return [
+                'local_package' => [
+                    'path' => 'app.js',
+                ],
+                '@acme/kits/' => [
+                    'glob' => './vendor/acme/kits/*/*/assets/controllers/*_controller.js',
+                ],
+            ];
+            EOF;
+        file_put_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php', $importMap);
+
+        $reader = new ImportMapConfigReader(
+            __DIR__.'/../Fixtures/importmap_config_reader/importmap.php',
+            $this->createStub(RemotePackageStorage::class),
+        );
+
+        /** @var ImportMapEntry[] $allEntries */
+        $allEntries = iterator_to_array($reader->getEntries());
+        $this->assertCount(2, $allEntries);
+
+        $globEntry = $allEntries[1];
+        $this->assertSame('@acme/kits/', $globEntry->importName);
+        $this->assertTrue($globEntry->isGlob);
+        $this->assertFalse($globEntry->isRemotePackage());
+        $this->assertSame('./vendor/acme/kits/*/*/assets/controllers/*_controller.js', $globEntry->path);
+
+        // now save the original raw data from importmap.php and delete the file
+        $originalImportMapData = (static fn () => eval('?>'.file_get_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php')))();
+        unlink(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php');
+        // dump the entries back to the file
+        $reader->writeEntries($reader->getEntries());
+        $newImportMapData = (static fn () => eval('?>'.file_get_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php')))();
+
+        $this->assertSame($originalImportMapData, $newImportMapData);
+    }
+
+    public function testGetEntriesThrowsWhenGlobIsCombinedWithAnotherOption()
+    {
+        $configPath = __DIR__.'/../Fixtures/importmap_config_reader/importmap.php';
+        file_put_contents($configPath, <<<'EOF'
+            <?php
+            return [
+                '@acme/kits/' => [
+                    'glob' => './assets/*.js',
+                    'path' => 'app.js',
+                ],
+            ];
+            EOF);
+
+        $reader = new ImportMapConfigReader($configPath, $this->createStub(RemotePackageStorage::class));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The importmap entry "@acme/kits/" cannot have both a "glob" and "path" option.');
+
+        $reader->getEntries();
+    }
+
     #[DataProvider('getPathToFilesystemPathTests')]
     public function testConvertPathToFilesystemPath(string $path, string $expectedPath)
     {

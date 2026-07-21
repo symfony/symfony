@@ -19,6 +19,7 @@
         "php": ">=8.4.1",
         "composer/semver": "^3.0",
         "symfony/filesystem": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0"
     },
     "require-dev": {
@@ -26,7 +27,6 @@
         "symfony/browser-kit": "^7.4|^8.0",
         "symfony/console": "^7.4|^8.0",
         "symfony/event-dispatcher-contracts": "^3.0",
-        "symfony/finder": "^7.4|^8.0",
         "symfony/framework-bundle": "^7.4|^8.0",
         "symfony/http-foundation": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",

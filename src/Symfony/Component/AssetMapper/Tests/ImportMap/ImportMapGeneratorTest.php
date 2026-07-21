@@ -743,6 +743,143 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($entrypointData, $manager->findEagerEntrypointImports('foo'));
     }
 
+    public function testGetRawImportMapDataWithGlobEntry()
+    {
+        $manager = $this->createImportMapGenerator();
+
+        $this->filesystem->mkdir(self::$writableRoot.'/kits/shadcn/default/assets/controllers');
+        file_put_contents(self::$writableRoot.'/kits/shadcn/default/assets/controllers/alert_controller.js', '');
+        file_put_contents(self::$writableRoot.'/kits/shadcn/default/assets/controllers/button_controller.js', '');
+
+        $this->mockImportMap([
+            ImportMapEntry::createGlob('@acme/kits/', './kits/*/*/assets/controllers/*_controller.js'),
+        ]);
+
+        $this->configReader
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(static fn (string $path) => str_starts_with($path, '.') ? self::$writableRoot.substr($path, 1) : $path);
+        $this->configReader
+            ->method('convertFilesystemPathToPath')
+            ->willReturnCallback(static fn (string $fsPath) => '.'.substr($fsPath, \strlen(self::$writableRoot)));
+
+        $this->mockAssetMapper([
+            new MappedAsset(
+                './kits/shadcn/default/assets/controllers/alert_controller.js',
+                self::$writableRoot.'/kits/shadcn/default/assets/controllers/alert_controller.js',
+                publicPath: '/assets/alert_controller-d1g35t.js',
+            ),
+            new MappedAsset(
+                './kits/shadcn/default/assets/controllers/button_controller.js',
+                self::$writableRoot.'/kits/shadcn/default/assets/controllers/button_controller.js',
+                publicPath: '/assets/button_controller-d1g35t.js',
+            ),
+        ]);
+
+        $this->assertEquals([
+            '@acme/kits/shadcn/default/assets/controllers/alert_controller.js' => [
+                'path' => '/assets/alert_controller-d1g35t.js',
+                'type' => 'js',
+            ],
+            '@acme/kits/shadcn/default/assets/controllers/button_controller.js' => [
+                'path' => '/assets/button_controller-d1g35t.js',
+                'type' => 'js',
+            ],
+        ], $manager->getRawImportMapData());
+    }
+
+    public function testGetRawImportMapDataWithRecursiveGlobEntry()
+    {
+        $manager = $this->createImportMapGenerator();
+
+        $this->filesystem->mkdir(self::$writableRoot.'/kits/alert');
+        $this->filesystem->mkdir(self::$writableRoot.'/kits/forms/select');
+        file_put_contents(self::$writableRoot.'/kits/alert/alert_controller.js', '');
+        file_put_contents(self::$writableRoot.'/kits/forms/select/choices_controller.js', '');
+        // deeper file that must not match the "*_controller.js" pattern
+        file_put_contents(self::$writableRoot.'/kits/forms/select/helper.js', '');
+
+        $this->mockImportMap([
+            ImportMapEntry::createGlob('@acme/kits/', './kits/**/*_controller.js'),
+        ]);
+
+        $this->configReader
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(static fn (string $path) => str_starts_with($path, '.') ? self::$writableRoot.substr($path, 1) : $path);
+        $this->configReader
+            ->method('convertFilesystemPathToPath')
+            ->willReturnCallback(static fn (string $fsPath) => '.'.substr($fsPath, \strlen(self::$writableRoot)));
+
+        $this->mockAssetMapper([
+            new MappedAsset(
+                './kits/alert/alert_controller.js',
+                self::$writableRoot.'/kits/alert/alert_controller.js',
+                publicPath: '/assets/alert_controller-d1g35t.js',
+            ),
+            new MappedAsset(
+                './kits/forms/select/choices_controller.js',
+                self::$writableRoot.'/kits/forms/select/choices_controller.js',
+                publicPath: '/assets/choices_controller-d1g35t.js',
+            ),
+        ]);
+
+        $this->assertEquals([
+            '@acme/kits/alert/alert_controller.js' => [
+                'path' => '/assets/alert_controller-d1g35t.js',
+                'type' => 'js',
+            ],
+            '@acme/kits/forms/select/choices_controller.js' => [
+                'path' => '/assets/choices_controller-d1g35t.js',
+                'type' => 'js',
+            ],
+        ], $manager->getRawImportMapData());
+    }
+
+    public function testGetRawImportMapDataWithGlobEntryMatchingMultipleTypes()
+    {
+        $manager = $this->createImportMapGenerator();
+
+        $this->filesystem->mkdir(self::$writableRoot.'/theme');
+        file_put_contents(self::$writableRoot.'/theme/app.js', '');
+        file_put_contents(self::$writableRoot.'/theme/app.css', '');
+        // must not match the "{js,css}" brace pattern
+        file_put_contents(self::$writableRoot.'/theme/readme.md', '');
+
+        $this->mockImportMap([
+            ImportMapEntry::createGlob('@acme/theme/', './theme/*.{js,css}'),
+        ]);
+
+        $this->configReader
+            ->method('convertPathToFilesystemPath')
+            ->willReturnCallback(static fn (string $path) => str_starts_with($path, '.') ? self::$writableRoot.substr($path, 1) : $path);
+        $this->configReader
+            ->method('convertFilesystemPathToPath')
+            ->willReturnCallback(static fn (string $fsPath) => '.'.substr($fsPath, \strlen(self::$writableRoot)));
+
+        $this->mockAssetMapper([
+            new MappedAsset(
+                './theme/app.css',
+                self::$writableRoot.'/theme/app.css',
+                publicPath: '/assets/app-d1g35t.css',
+            ),
+            new MappedAsset(
+                './theme/app.js',
+                self::$writableRoot.'/theme/app.js',
+                publicPath: '/assets/app-d1g35t.js',
+            ),
+        ]);
+
+        $this->assertEquals([
+            '@acme/theme/app.css' => [
+                'path' => '/assets/app-d1g35t.css',
+                'type' => 'css',
+            ],
+            '@acme/theme/app.js' => [
+                'path' => '/assets/app-d1g35t.js',
+                'type' => 'js',
+            ],
+        ], $manager->getRawImportMapData());
+    }
+
     private function createImportMapGenerator(): ImportMapGenerator
     {
         $this->compiledConfigReader ??= $this->createStub(CompiledAssetMapperConfigReader::class);

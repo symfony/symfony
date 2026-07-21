@@ -48,9 +48,19 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
+            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier', 'glob'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(\sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
+            }
+
+            if (isset($data['glob'])) {
+                if ($conflictingKeys = array_intersect(array_diff($validKeys, ['glob']), array_keys($data))) {
+                    throw new RuntimeException(\sprintf('The importmap entry "%s" cannot have both a "glob" and "%s" option.', $importName, implode('", "', $conflictingKeys)));
+                }
+
+                $entries->add(ImportMapEntry::createGlob($importName, $data['glob']));
+
+                continue;
             }
 
             $type = ImportMapType::tryFrom($data['type'] ?? 'js') ?? throw new RuntimeException(\sprintf('The importmap entry "%s" has an invalid "type" value "%s". Valid values are: "%s".', $importName, $data['type'], implode('", "', array_column(ImportMapType::cases(), 'value'))));
@@ -89,7 +99,9 @@ class ImportMapConfigReader
         $importMapConfig = [];
         foreach ($entries as $entry) {
             $config = [];
-            if ($entry->isRemotePackage()) {
+            if ($entry->isGlob) {
+                $config['glob'] = $entry->path;
+            } elseif ($entry->isRemotePackage()) {
                 $config['version'] = $entry->version;
                 if ($entry->packageModuleSpecifier !== $entry->importName) {
                     $config['package_specifier'] = $entry->packageModuleSpecifier;
@@ -120,6 +132,11 @@ class ImportMapConfigReader
              * - "entrypoint" (JavaScript only) set to true for any module that will
              *     be used as an "entrypoint" (and passed to the importmap() Twig function).
              *
+             * - "glob" is a glob pattern (relative to this file) expanded into one
+             *     entry per matching file; the import name is used as a prefix and the
+             *     path relative to the glob's static part (before the first wildcard)
+             *     is appended to it.
+             *
              * The "importmap:require" command can be used to add new entries to this file.
              *
              * @return array<string, array{    // Import name as key, description of the imported file as value
@@ -131,6 +148,8 @@ class ImportMapConfigReader
              *     package_specifier?: string, // Remote "package-name/path" specifier, defaults to the import name
              *     type?: 'js'|'css'|'json',
              *     entrypoint?: bool,
+             * }|array{
+             *     glob: string,               // A glob pattern expanded into one entry per matching file
              * }>
              */
             return $map;

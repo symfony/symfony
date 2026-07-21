@@ -231,6 +231,9 @@ abstract class Kernel extends AbstractKernel implements KernelInterface, Reboota
         ];
 
         foreach ($this->bundles as $name => $bundle) {
+            if ($bundle instanceof BundleAdapter) {
+                $parameters['kernel.bundles'][$name] = $bundle->getInnerBundle()::class;
+            }
             $parameters['kernel.bundles_metadata'][$name]['namespace'] = $bundle->getNamespace();
         }
 

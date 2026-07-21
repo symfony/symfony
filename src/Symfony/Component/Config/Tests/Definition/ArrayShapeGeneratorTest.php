@@ -182,6 +182,25 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString('node?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Deprecated: The "node" option is deprecated. // This is a boolean node. Set to true to enable it. Set to false to disable it. // Default: true', ArrayShapeGenerator::generate($root));
     }
 
+    public function testPhpDocDoesNotCloseCommentBlock()
+    {
+        $child = new ScalarNode('schedule');
+        $child->setInfo('Cron expression for when normal/incremental syncs should run');
+        $child->setDefaultValue('*/30 * * * *');
+
+        $root = new ArrayNode('root');
+        $root->addChild($child);
+        $root->addChild(new EnumNode('preset', values: ['*/5 * * * *', '*/30 * * * *']));
+
+        $generated = ArrayShapeGenerator::generate($root);
+
+        // A "*/" in the info, default value or an enum value would prematurely close the surrounding doc block and generate invalid PHP.
+        $this->assertStringNotContainsString('*/', $generated);
+        // The slash is escaped so the values stay recognizable instead of being dropped.
+        $this->assertStringContainsString('*\\/30 * * * *', $generated);
+        $this->assertStringContainsString('"*\\/5 * * * *"|"*\\/30 * * * *"', $generated);
+    }
+
     public function testPhpDocShapeSingleLevel()
     {
         $root = new ArrayNode('root');

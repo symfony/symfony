@@ -24,6 +24,7 @@ use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\UnknownSizeStream;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class HttplugClientTest extends TestCase
@@ -117,6 +118,20 @@ class HttplugClientTest extends TestCase
         $body = json_decode((string) $response->getBody(), true);
 
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
+    }
+
+    public function testRequestWithEmptyUnknownSizeBodyDoesNotPassAStreamingBody()
+    {
+        $client = new HttplugClient(new MockHttpClient(function (string $method, string $url, array $options): MockResponse {
+            $this->assertSame('TRACE', $method);
+            $this->assertSame('', $options['body']);
+
+            return new MockResponse();
+        }));
+        $body = new UnknownSizeStream('', seekable: false);
+        $body->getContents();
+
+        $client->sendRequest($client->createRequest('TRACE', 'http://localhost')->withBody($body));
     }
 
     public function testNetworkException()

@@ -331,6 +331,10 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             $this->setGroupSequenceProvider(true);
         }
 
+        if (TraversalStrategy::IMPLICIT === $this->traversalStrategy) {
+            $this->traversalStrategy = $source->getTraversalStrategy();
+        }
+
         foreach ($source->getConstraints() as $constraint) {
             $this->addConstraint(clone $constraint);
         }

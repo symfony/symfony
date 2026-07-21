@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow message group IDs on standard queues
+
 7.4
 ---
 

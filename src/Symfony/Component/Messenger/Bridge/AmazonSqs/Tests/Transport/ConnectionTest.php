@@ -468,6 +468,23 @@ class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
+    public function testSendWithMessageGroupIdOnStandardQueue()
+    {
+        $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue';
+        $client = $this->createMock(SqsClient::class);
+        $client->expects($this->once())->method('sendMessage')->with([
+            'QueueUrl' => $queueUrl,
+            'MessageBody' => 'body',
+            'MessageAttributes' => [],
+            'MessageSystemAttributes' => [],
+            'DelaySeconds' => 30,
+            'MessageGroupId' => 'group',
+        ]);
+
+        $connection = new Connection(['queue_name' => 'queue', 'auto_setup' => false], $client, $queueUrl);
+        $connection->send('body', [], 30, 'group', 'deduplication');
+    }
+
     public function testKeepaliveWithTooSmallTtl()
     {
         $client = $this->createMock(SqsClient::class);

@@ -100,7 +100,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
                 $headers['Content-Length'] = [$size];
             }
 
-            if (0 === $size) {
+            if (0 === $size || (0 > $size && !$body->isSeekable() && $body->eof())) {
                 $body = '';
             } elseif (0 < $size && $size < 1 << 21) {
                 if ($body->isSeekable()) {

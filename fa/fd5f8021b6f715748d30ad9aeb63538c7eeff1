@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by kaznovac at 2026-07-08T14:08:36Z
+
+static analysis failure is unrelated
+
+`Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler\PhpConfigReferenceDumpPassTest::testProcessGeneratesExpectedReferenceFile` test failed as it seems to test released (not-updated by this commit) dependency injection component version vs updated framework fixture expectation

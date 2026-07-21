@@ -121,6 +121,8 @@ class IpUtilsTest extends TestCase
             'invalid proxy wildcard' => ['192.168.20.13', '*'],
             'invalid proxy missing netmask' => ['192.168.20.13', '0.0.0.0'],
             'invalid request IP with invalid proxy wildcard' => ['0.0.0.0', '*'],
+            'invalid octal request IP' => ['08', '0.0.0.0/8'],
+            'invalid short request IP with empty part' => ['127..1', '127.0.0.0/8'],
         ];
     }
 
@@ -181,6 +183,10 @@ class IpUtilsTest extends TestCase
         return [
             // private
             ['127.0.0.1',       true],
+            ['2130706433',      true],
+            ['017700000001',    true],
+            ['0x7f000001',      true],
+            ['127.1',           true],
             ['10.0.0.1',        true],
             ['192.168.0.1',     true],
             ['192.0.2.1',       true],

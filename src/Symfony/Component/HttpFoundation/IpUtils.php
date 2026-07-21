@@ -23,7 +23,7 @@ class IpUtils
         '10.0.0.0/8',     // RFC1918
         '192.168.0.0/16', // RFC1918
         '192.0.2.0/24',   // Documentation Ranges TEST-NET-1 (RFC 5737)
-        '198.51.100.0/24',// Documentation Ranges TEST-NET-2 (RFC 5737)
+        '198.51.100.0/24', // Documentation Ranges TEST-NET-2 (RFC 5737)
         '203.0.113.0/24', // Documentation Ranges TEST-NET-3 (RFC 5737)
         '172.16.0.0/12',  // RFC1918
         '169.254.0.0/16', // RFC3927
@@ -44,6 +44,24 @@ class IpUtils
         '64:ff9b::/96',   // NAT64 well-known prefix (RFC 6052)
         '64:ff9b:1::/48', // NAT64 local-use prefix (RFC 8215)
     ];
+
+    private const IPV4_MAX = 0xFFFFFFFF;
+    private const IPV4_MAX_PART = 0xFF;
+    private const IPV4_MAX_TWO_PARTS_SUFFIX = 0xFFFFFF;
+    private const IPV4_MAX_THREE_PARTS_SUFFIX = 0xFFFF;
+    private const IPV4_PART_COUNT = 4;
+    private const IPV4_FIRST_PART_SHIFT = 24;
+    private const IPV4_SECOND_PART_SHIFT = 16;
+    private const IPV4_THIRD_PART_SHIFT = 8;
+    private const IPV4_DECIMAL_BASE = 10;
+    private const IPV4_OCTAL_BASE = 8;
+    private const IPV4_HEXADECIMAL_BASE = 16;
+    private const ASCII_ZERO = 48;
+    private const ASCII_NINE = 57;
+    private const ASCII_UPPER_A = 65;
+    private const ASCII_UPPER_F = 70;
+    private const ASCII_LOWER_A = 97;
+    private const ASCII_LOWER_F = 102;
 
     private static array $checkedIps = [];
 
@@ -92,6 +110,12 @@ class IpUtils
         }
 
         if (!filter_var($requestIp, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
+            if (null === $requestIp = self::normalizeIp4($requestIp)) {
+                return self::setCacheResult($cacheKey, false);
+            }
+        }
+
+        if (!filter_var($requestIp, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
             return self::setCacheResult($cacheKey, false);
         }
 
@@ -115,6 +139,138 @@ class IpUtils
         }
 
         return self::setCacheResult($cacheKey, 0 === substr_compare(\sprintf('%032b', ip2long($requestIp)), \sprintf('%032b', ip2long($address)), 0, $netmask));
+    }
+
+    private static function normalizeIp4(string $requestIp): ?string
+    {
+        $parts = explode('.', $requestIp);
+
+        if (self::IPV4_PART_COUNT < \count($parts)) {
+            return null;
+        }
+
+        $numbers = [];
+        foreach ($parts as $part) {
+            if ('' === $part || null === $number = self::parseIp4Part($part)) {
+                return null;
+            }
+
+            $numbers[] = $number;
+        }
+
+        $long = match (\count($numbers)) {
+            1 => self::normalizeIp4SinglePart($numbers),
+            2 => self::normalizeIp4TwoParts($numbers),
+            3 => self::normalizeIp4ThreeParts($numbers),
+            self::IPV4_PART_COUNT => self::normalizeIp4FourParts($numbers),
+            default => null,
+        };
+
+        return null === $long ? null : long2ip($long);
+    }
+
+    private static function normalizeIp4SinglePart(array $numbers): ?int
+    {
+        return $numbers[0] <= self::IPV4_MAX ? $numbers[0] : null;
+    }
+
+    private static function normalizeIp4TwoParts(array $numbers): ?int
+    {
+        if ($numbers[0] > self::IPV4_MAX_PART || $numbers[1] > self::IPV4_MAX_TWO_PARTS_SUFFIX) {
+            return null;
+        }
+
+        return ($numbers[0] << self::IPV4_FIRST_PART_SHIFT) | $numbers[1];
+    }
+
+    private static function normalizeIp4ThreeParts(array $numbers): ?int
+    {
+        if ($numbers[0] > self::IPV4_MAX_PART
+            || $numbers[1] > self::IPV4_MAX_PART
+            || $numbers[2] > self::IPV4_MAX_THREE_PARTS_SUFFIX
+        ) {
+            return null;
+        }
+
+        return ($numbers[0] << self::IPV4_FIRST_PART_SHIFT)
+            | ($numbers[1] << self::IPV4_SECOND_PART_SHIFT)
+            | $numbers[2];
+    }
+
+    private static function normalizeIp4FourParts(array $numbers): ?int
+    {
+        if ($numbers[0] > self::IPV4_MAX_PART
+            || $numbers[1] > self::IPV4_MAX_PART
+            || $numbers[2] > self::IPV4_MAX_PART
+            || $numbers[3] > self::IPV4_MAX_PART
+        ) {
+            return null;
+        }
+
+        return ($numbers[0] << self::IPV4_FIRST_PART_SHIFT)
+            | ($numbers[1] << self::IPV4_SECOND_PART_SHIFT)
+            | ($numbers[2] << self::IPV4_THIRD_PART_SHIFT)
+            | $numbers[3];
+    }
+
+    private static function parseIp4Part(string $part): ?int
+    {
+        if (str_starts_with($part, '0x') || str_starts_with($part, '0X')) {
+            return self::parseIp4PartNumber(substr($part, 2), self::IPV4_HEXADECIMAL_BASE);
+        }
+
+        if (str_starts_with($part, '0') && '0' !== $part) {
+            return self::parseIp4PartNumber($part, self::IPV4_OCTAL_BASE);
+        }
+
+        return self::parseIp4PartNumber($part, self::IPV4_DECIMAL_BASE);
+    }
+
+    private static function parseIp4PartNumber(string $part, int $base): ?int
+    {
+        if ('' === $part) {
+            return null;
+        }
+
+        $number = 0;
+        $length = \strlen($part);
+
+        for ($i = 0; $i < $length; ++$i) {
+            if (null === $digit = self::parseIp4Digit($part[$i])) {
+                return null;
+            }
+
+            if ($digit >= $base) {
+                return null;
+            }
+
+            $number = $number * $base + $digit;
+
+            if ($number > self::IPV4_MAX) {
+                return null;
+            }
+        }
+
+        return $number;
+    }
+
+    private static function parseIp4Digit(string $digit): ?int
+    {
+        $ord = \ord($digit);
+
+        if (self::ASCII_ZERO <= $ord && $ord <= self::ASCII_NINE) {
+            return $ord - self::ASCII_ZERO;
+        }
+
+        if (self::ASCII_LOWER_A <= $ord && $ord <= self::ASCII_LOWER_F) {
+            return $ord - self::ASCII_LOWER_A + self::IPV4_DECIMAL_BASE;
+        }
+
+        if (self::ASCII_UPPER_A <= $ord && $ord <= self::ASCII_UPPER_F) {
+            return $ord - self::ASCII_UPPER_A + self::IPV4_DECIMAL_BASE;
+        }
+
+        return null;
     }
 
     /**

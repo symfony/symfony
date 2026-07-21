@@ -182,7 +182,10 @@ abstract class ConstraintValidatorTestCase extends TestCase
 
     protected function setGroup(?string $group)
     {
-        $this->group = $group;
+        if (null !== $group) {
+            $this->group = $group;
+        }
+
         $this->context->setGroup($group);
     }
 

@@ -233,6 +233,7 @@ class TraceableEventDispatcher implements EventDispatcherInterface, ResetInterfa
     public function reset()
     {
         $this->callStack = null;
+        $this->wrappedListeners = [];
         $this->orphanedEvents = [];
         $this->currentRequestHash = '';
         $this->dispatchDepth = [];

@@ -7,7 +7,7 @@
   descriptor:åèä \<argument_name\>
 
 <comment>Arguments:</comment>
-  <info>argument_åèä</info>   
+  <info>argument_åèä</info>      
 
 <comment>Options:</comment>
   <info>-o, --option_åèä</info>  

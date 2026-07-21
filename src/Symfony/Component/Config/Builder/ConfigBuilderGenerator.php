@@ -483,7 +483,7 @@ public function NAME($value): static
             $comment .= '@deprecated '.$node->getDeprecationMessage()."\n";
         }
 
-        return $comment ? ' * '.str_replace("\n", "\n * ", rtrim($comment, "\n"))."\n" : '';
+        return $comment ? ' * '.str_replace(['*/', "\n"], ['*\/', "\n * "], rtrim($comment, "\n"))."\n" : '';
     }
 
     /**

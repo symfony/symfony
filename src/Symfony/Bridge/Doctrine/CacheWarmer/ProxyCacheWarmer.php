@@ -62,7 +62,7 @@ class ProxyCacheWarmer implements CacheWarmerInterface
             $em->getProxyFactory()->generateProxyClasses($classes);
 
             foreach (scandir($proxyCacheDir) as $file) {
-                if (!is_dir($file = $proxyCacheDir.'/'.$file)) {
+                if (str_ends_with($file, '.php') && !is_dir($file = $proxyCacheDir.'/'.$file)) {
                     $files[] = $file;
                 }
             }

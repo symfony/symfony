@@ -52,7 +52,7 @@
         "symfony/twig-bridge": "^6.4|^7.0|^8.0",
         "symfony/validator": "^6.4|^7.0|^8.0",
         "symfony/yaml": "^6.4|^7.0|^8.0",
-        "twig/twig": "^3.15",
+        "twig/twig": "^3.15|^4.0",
         "web-token/jwt-library": "^3.3.2|^4.0"
     },
     "conflict": {

@@ -280,10 +280,16 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, static fn ($a, $b) => $a == $b ? 0 : 1);
         $extra = array_replace($extra, $queryParameters);
 
-        array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {
+        $seen = [];
+        array_walk_recursive($extra, $caster = static function (&$v) use (&$caster, &$seen, $name) {
             if (\is_object($v)) {
+                if (isset($seen[$id = spl_object_id($v)])) {
+                    throw new InvalidParameterException(\sprintf('Parameters for route "%s" cannot contain a circular reference (in object of class "%s").', $name, get_debug_type($v)));
+                }
                 if ($vars = get_object_vars($v)) {
+                    $seen[$id] = true;
                     array_walk_recursive($vars, $caster);
+                    unset($seen[$id]);
                     $v = $vars;
                 } elseif ($v instanceof \Stringable) {
                     $v = (string) $v;

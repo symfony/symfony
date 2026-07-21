@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
@@ -146,6 +147,22 @@ class PhpArrayAdapterTest extends AdapterTestCase
         $values = eval(substr(file_get_contents(self::$file), 6));
 
         $this->assertSame($expected, $values, 'Warm up should create a PHP file that OPCache can load in memory');
+    }
+
+    public function testDeleteItemsOnUninitializedAdapter()
+    {
+        // A stored (read-only) key must be handled the same way whether the
+        // adapter has been initialized yet or not, and identically to deleteItem().
+        (new PhpArrayAdapter(self::$file, new NullAdapter()))->warmUp(['foo' => 'stored-value']);
+
+        $fallback = new ArrayAdapter();
+        $fallback->save($fallback->getItem('foo')->set('fallback-value'));
+
+        // Fresh, not-yet-initialized instance; deleteItems() is the first call.
+        $adapter = new PhpArrayAdapter(self::$file, $fallback);
+
+        $this->assertFalse($adapter->deleteItems(['foo']), 'A stored key cannot be deleted.');
+        $this->assertTrue($fallback->hasItem('foo'), 'A stored key must not be deleted from the fallback pool.');
     }
 }
 

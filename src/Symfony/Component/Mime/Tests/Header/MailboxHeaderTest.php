@@ -72,6 +72,21 @@ class MailboxHeaderTest extends TestCase
         $this->assertSame('=?utf-8?Q?Fab=C3=AFen__P=C3=B6tencier?= <fabïen@symfony.com>', $header->getBodyAsString());
     }
 
+    public function testSpacesBetweenEncodedWordsAreNotDropped()
+    {
+        // decoders ignore linear whitespace between two adjacent encoded words (RFC 2047 section 6.2),
+        // so the whitespace must be folded into the encoded words themselves
+        $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com', 'Fabïen  Pötencier  Länge'));
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen__P=C3=B6tencier__L=C3=A4nge?= <fabïen@symfony.com>', $header->getBodyAsString());
+
+        $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com', 'Fabïen   Pötencier'));
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen___P=C3=B6tencier?= <fabïen@symfony.com>', $header->getBodyAsString());
+
+        // whitespace adjacent to unencoded text is significant and stays out of the encoded words
+        $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com', 'Fabïen  Pötencier and  Länge  Grüße'));
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen__P=C3=B6tencier?= and  =?utf-8?Q?L=C3=A4nge__Gr=C3=BC=C3=9Fe?= <fabïen@symfony.com>', $header->getBodyAsString());
+    }
+
     public function testToString()
     {
         $header = new MailboxHeader('Sender', new Address('fabien@symfony.com'));

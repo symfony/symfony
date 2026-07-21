@@ -52,6 +52,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\EnvAutowireWithMissingArgument;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
@@ -809,6 +810,20 @@ class PhpDumperTest extends TestCase
         $dumper->dump();
 
         $this->assertGreaterThan(0, $container->getEnvCounters()['FOO']);
+    }
+
+    public function testEnvUsedByRemovedAutowiredServiceIsNotReportedAsNeverUsed()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', EnvAutowireWithMissingArgument::class)
+            ->setAutowired(true)
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertGreaterThan(0, $container->getEnvCounters()['SOME_ENV']);
     }
 
     public function testCircularDynamicEnv()

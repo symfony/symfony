@@ -39,7 +39,7 @@ class UnknownSizeStream implements StreamInterface
         return $this->seekable;
     }
 
-    public function seek(int $offset, int $whence = \SEEK_SET): void
+    public function seek($offset, $whence = \SEEK_SET): void
     {
         if (!$this->seekable) {
             throw new \RuntimeException('Stream is not seekable.');
@@ -83,7 +83,7 @@ class UnknownSizeStream implements StreamInterface
         return false;
     }
 
-    public function write(string $string): int
+    public function write($string): int
     {
         throw new \RuntimeException('Stream is not writable.');
     }
@@ -93,7 +93,7 @@ class UnknownSizeStream implements StreamInterface
         return true;
     }
 
-    public function read(int $length): string
+    public function read($length): string
     {
         return $this->inner->read($length);
     }
@@ -103,7 +103,7 @@ class UnknownSizeStream implements StreamInterface
         return $this->inner->getContents();
     }
 
-    public function getMetadata(?string $key = null): mixed
+    public function getMetadata($key = null): mixed
     {
         return $this->inner->getMetadata($key);
     }

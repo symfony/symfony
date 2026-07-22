@@ -24,6 +24,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDocDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
@@ -61,6 +63,17 @@ class PhpDocExtractorTest extends TestCase
     protected function setUp(): void
     {
         $this->extractor = new PhpDocExtractor();
+    }
+
+    public function testAdderWithSeveralRequiredParametersIsIgnored()
+    {
+        $this->assertNull($this->extractor->getType(MultiParameterAdderDocDummy::class, 'link'));
+    }
+
+    public function testRejectedCandidateMethodsAreIgnored()
+    {
+        $this->assertNull($this->extractor->getType(RejectedCandidateDocDummy::class, 'foo'));
+        $this->assertNull($this->extractor->getType(RejectedCandidateDocDummy::class, 'bar'));
     }
 
     #[IgnoreDeprecations]

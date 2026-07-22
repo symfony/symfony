@@ -45,6 +45,11 @@ final class SigningSerializer implements SerializerInterface
 
     public function decode(array $encodedEnvelope): Envelope
     {
+        // no message type requires signing: act as a pass-through for the inner serializer
+        if (!$this->signedMessageTypes) {
+            return $this->inner->decode($encodedEnvelope);
+        }
+
         $headers = $encodedEnvelope['headers'] ?? [];
         $sign = $headers['Body-Sign'] ?? null;
 

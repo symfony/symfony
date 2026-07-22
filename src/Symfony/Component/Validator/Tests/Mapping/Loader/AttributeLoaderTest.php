@@ -277,7 +277,7 @@ class AttributeLoaderTest extends TestCase
         $metadata = new ClassMetadata($targetClass);
 
         $this->assertTrue($loader->loadClassMetadata($metadata));
-        $this->assertInstanceOf(NotBlank::class, $metadata->getPropertyMetadata('name', $sourceClass)[0]->getConstraints()[0]);
+        $this->assertInstanceOf(NotBlank::class, $metadata->getPropertyMetadata('name')[0]->getConstraints()[0]);
     }
 
     public function testLoadClassMetadataWithClassLevelConstraints()
@@ -317,7 +317,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals('this.name != null', $expressionConstraint->expression);
 
         // Check that property constraints are also added
-        $this->assertInstanceOf(NotBlank::class, $metadata->getPropertyMetadata('name', $sourceClass)[0]->getConstraints()[0]);
+        $this->assertInstanceOf(NotBlank::class, $metadata->getPropertyMetadata('name')[0]->getConstraints()[0]);
     }
 
     public function testLoadClassMetadataMergesTargetOwnConstraints()

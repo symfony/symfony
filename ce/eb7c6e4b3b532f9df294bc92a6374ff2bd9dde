@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-29T07:46:36Z
+
+Converting to draft: there is something I don’t understand; sorry for the noise.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-29T08:05:58Z
+
+Okay you cannot use `RequiresPhpExtension` against libraries :sweat_smile:
+
+PR ready.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-13T08:21:33Z
+
+Worth mentioning that U+0007 (amongst other characters) is [invalid for XML 1.0](https://www.w3.org/TR/xml/#charsets) but [valid for XML 1.1](https://www.w3.org/TR/xml11/#charsets); serializing it as U+FFFD seems wrong in both cases.
+
+This probably should be considered as a bug in libxml2 but I don’t know what should be done Symfony side.

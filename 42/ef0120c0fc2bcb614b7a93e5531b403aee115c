@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-07-22T12:33:45Z
+
+you should rebase your branch to fix conflicts
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-22T13:00:13Z
+
+Done, rebased on the latest 8.1. The conflict was in the CHANGELOG (kept all entries) since IpUtils and its test auto-merged cleanly with the new RFC subnets. Thanks @stof!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-22T17:15:37Z
+
+why not 7.4?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-22T17:16:17Z
+
+Even 6.4?

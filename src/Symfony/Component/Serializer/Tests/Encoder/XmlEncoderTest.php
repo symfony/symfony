@@ -414,6 +414,10 @@ class XmlEncoderTest extends TestCase
 
     public function testEncodeException()
     {
+        if (\LIBXML_LOADED_VERSION >= 21300) {
+            $this->markTestSkipped('libxml outputs a replacement character reference (&#xFFFD;) instead of failing.');
+        }
+
         $this->expectException(NotEncodableValueException::class);
         $this->encoder->encode('Invalid character: '.\chr(7), 'xml');
     }

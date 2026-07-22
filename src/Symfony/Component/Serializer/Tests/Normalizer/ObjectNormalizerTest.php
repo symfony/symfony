@@ -1615,6 +1615,92 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame('FOO', $denormalized->foo);
         $this->assertSame('BAR', $denormalized->bar);
     }
+
+    public function testInaccessibleAttributeIsIgnoredByDefault()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $object = $normalizer->denormalize(['secret' => 'shh', 'known' => 'ok'], InaccessibleAttributesDummy::class);
+
+        $this->assertSame('ok', $object->known);
+        $this->assertSame('', $object->getSecret());
+    }
+
+    public function testInaccessibleAttributeIsReported()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Failed to denormalize attribute "secret" value for class "'.InaccessibleAttributesDummy::class.'": The method "setSecret" in class "'.InaccessibleAttributesDummy::class.'" was found but does not have public access.');
+
+        $normalizer->denormalize(['secret' => 'shh'], InaccessibleAttributesDummy::class, null, [ObjectNormalizer::THROW_ON_INACCESSIBLE_ATTRIBUTES => true]);
+    }
+
+    public function testInaccessibleAttributeIsCollectedWithTheOtherDenormalizationErrors()
+    {
+        $normalizer = new ObjectNormalizer();
+        $exceptions = [];
+
+        $normalizer->denormalize(['secret' => 'shh'], InaccessibleAttributesDummy::class, null, [
+            ObjectNormalizer::THROW_ON_INACCESSIBLE_ATTRIBUTES => true,
+            AbstractObjectNormalizer::COLLECT_DENORMALIZATION_ERRORS => true,
+            'not_normalizable_value_exceptions' => &$exceptions,
+            'deserialization_path' => 'payload',
+        ]);
+
+        $this->assertCount(1, $exceptions);
+        $this->assertSame('payload.secret', $exceptions[0]->getPath());
+    }
+
+    public function testUnknownAndReadOnlyAttributesStayIgnoredWhenReportingIsOn()
+    {
+        $normalizer = new ObjectNormalizer();
+
+        $object = $normalizer->denormalize(
+            ['unknown' => 1, 'computed' => 'x', 'known' => 'ok'],
+            InaccessibleAttributesDummy::class,
+            null,
+            [ObjectNormalizer::THROW_ON_INACCESSIBLE_ATTRIBUTES => true],
+        );
+
+        $this->assertSame('ok', $object->known);
+    }
+
+    public function testDiscriminatorTypePropertyStaysIgnoredWhenReportingIsOn()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(
+            ['type' => ObjectNormalizerDiscriminatorSub::TYPE, 'foo' => 'FOO', 'bar' => 'BAR'],
+            ObjectNormalizerDiscriminatorBase::class,
+            null,
+            [ObjectNormalizer::THROW_ON_INACCESSIBLE_ATTRIBUTES => true, AbstractNormalizer::GROUPS => ['*']],
+        );
+
+        $this->assertInstanceOf(ObjectNormalizerDiscriminatorSub::class, $denormalized);
+        $this->assertSame('BAR', $denormalized->bar);
+    }
+}
+
+class InaccessibleAttributesDummy
+{
+    public string $known = '';
+    private string $secret = '';
+
+    private function setSecret(string $secret): void
+    {
+        $this->secret = $secret;
+    }
+
+    public function getSecret(): string
+    {
+        return $this->secret;
+    }
+
+    public function getComputed(): string
+    {
+        return 'computed';
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy

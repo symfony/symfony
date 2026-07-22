@@ -35,6 +35,15 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ObjectNormalizer extends AbstractObjectNormalizer
 {
+    /**
+     * Whether to throw when the property accessor refuses to write an attribute the metadata reports as writable.
+     *
+     * Attributes the metadata does not know about are unaffected, they never reach the accessor; use
+     * ALLOW_EXTRA_ATTRIBUTES to reject those. The discriminator type property is also unaffected, since
+     * it is a wire-format marker that usually has no setter.
+     */
+    public const THROW_ON_INACCESSIBLE_ATTRIBUTES = 'throw_on_inaccessible_attributes';
+
     use AccessorCollisionResolverTrait;
 
     private static $reflectionCache = [];
@@ -122,8 +131,15 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
     {
         try {
             $this->propertyAccessor->setValue($object, $attribute, $value);
-        } catch (NoSuchPropertyException) {
-            // Properties not found are ignored
+        } catch (NoSuchPropertyException $e) {
+            if (!($context[self::THROW_ON_INACCESSIBLE_ATTRIBUTES] ?? $this->defaultContext[self::THROW_ON_INACCESSIBLE_ATTRIBUTES] ?? false)
+                || $attribute === $this->classDiscriminatorResolver?->getMappingForMappedObject($object)?->getTypeProperty()
+            ) {
+                // Properties not found are ignored
+                return;
+            }
+
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to denormalize attribute "%s" value for class "%s": %s', $attribute, $object::class, $e->getMessage()), $value, ['unknown'], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         } catch (PropertyAccessInvalidArgumentException $e) {
             throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to denormalize attribute "%s" value for class "%s": %s', $attribute, $object::class, $e->getMessage()), $value, $e instanceof InvalidTypeException ? [$e->expectedType] : ['unknown'], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         }

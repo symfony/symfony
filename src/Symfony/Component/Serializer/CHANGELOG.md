@@ -7,6 +7,7 @@ CHANGELOG
  * Allow passing an associative array to `CsvEncoder::HEADERS_KEY` to map and reorder columns when encoding
  * Use the discriminator property of an object to pick its type when several types map to the same class; the first declared type is used when the property is unset or unknown
  * Trigger a deprecation when denormalizing an array that is not a list into a `list`-typed property
+ * Add `ObjectNormalizer::THROW_ON_INACCESSIBLE_ATTRIBUTES` context option, and the matching `ObjectNormalizerContextBuilder::withThrowOnInaccessibleAttributes()`, to report attributes the property accessor refuses to write instead of ignoring them
 
 8.1
 ---

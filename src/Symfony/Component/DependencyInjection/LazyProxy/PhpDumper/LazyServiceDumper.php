@@ -88,7 +88,7 @@ final class LazyServiceDumper implements DumperInterface
         $proxyClass = $this->getProxyClass($definition, $asGhostObject);
 
         if (!$asGhostObject) {
-            if ($definition->getClass() === $proxyClass) {
+            if (ltrim($definition->getClass(), '\\') === $proxyClass) {
                 return <<<EOF
                             if (true === \$lazyLoad) {
                                 $instantiation new \ReflectionClass('$proxyClass')->newLazyProxy(static fn () => $factoryCode);
@@ -149,7 +149,7 @@ final class LazyServiceDumper implements DumperInterface
             }
         }
 
-        if ($definition->getClass() === $proxyClass) {
+        if (ltrim($definition->getClass(), '\\') === $proxyClass) {
             return '';
         }
 

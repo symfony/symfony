@@ -176,6 +176,63 @@ class SigningSerializerTest extends TestCase
         $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
     }
 
+    public function testDecodeDoesNotRejectUnknownTypeWhenNoMessageTypeRequiresSignature()
+    {
+        $inner = new class implements SerializerInterface, MessageTypeAwareSerializerInterface {
+            public function getMessageType(array $encodedEnvelope): ?string
+            {
+                return null;
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                return new Envelope(new DummyMessage('hello'));
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'irrelevant'];
+            }
+        };
+
+        $serializer = new SigningSerializer($inner, 'secret-key', []);
+
+        $decoded = $serializer->decode(['body' => 'irrelevant']);
+
+        $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
+    }
+
+    public function testDecodePassesHeadersThroughWhenNoMessageTypeRequiresSignature()
+    {
+        $inner = new class implements SerializerInterface, MessageTypeAwareSerializerInterface {
+            public array $receivedHeaders = [];
+
+            public function getMessageType(array $encodedEnvelope): ?string
+            {
+                return null;
+            }
+
+            public function decode(array $encodedEnvelope): Envelope
+            {
+                $this->receivedHeaders = $encodedEnvelope['headers'] ?? [];
+
+                return new Envelope(new DummyMessage('hello'));
+            }
+
+            public function encode(Envelope $envelope): array
+            {
+                return ['body' => 'irrelevant'];
+            }
+        };
+
+        $serializer = new SigningSerializer($inner, 'secret-key', []);
+
+        $decoded = $serializer->decode(['body' => 'irrelevant', 'headers' => ['Body-Sign' => 'not-a-valid-signature', 'Sign-Algo' => 'sha256']]);
+
+        $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
+        $this->assertSame(['Body-Sign' => 'not-a-valid-signature', 'Sign-Algo' => 'sha256'], $inner->receivedHeaders);
+    }
+
     public function testDecodeRejectsMessageWithoutSignatureWhenTypeAwareInnerSerializerCannotDetermineType()
     {
         $inner = new class implements SerializerInterface, MessageTypeAwareSerializerInterface {

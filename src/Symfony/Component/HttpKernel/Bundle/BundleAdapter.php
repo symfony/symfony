@@ -67,4 +67,9 @@ final class BundleAdapter implements BundleInterface
     {
         $this->bundle->setContainer($container);
     }
+
+    public function getInnerBundle(): BaseBundleInterface
+    {
+        return $this->bundle;
+    }
 }

@@ -18,11 +18,36 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
+class TestCustomValidator extends ConstraintValidator
+{
+    public function validate($value, Constraint $constraint): void
+    {
+        $validator = $this->context
+            ->getValidator()
+            ->inContext($this->context);
+
+        $validator
+            ->atPath('k1')
+            ->validate($value, [
+                new NotNull(),
+            ]);
+    }
+}
+
 class ConstraintValidatorTestCaseTest extends ConstraintValidatorTestCase
 {
     protected function createValidator(): TestCustomValidator
     {
         return new TestCustomValidator();
+    }
+
+    public function testSetGroupAllowsNull()
+    {
+        $this->setGroup('Other');
+        $this->setGroup(null);
+
+        $this->assertSame('Other', $this->group);
+        $this->assertNull($this->context->getGroup());
     }
 
     public function testAssertingContextualValidatorRemainingExpectationsThrow()
@@ -49,22 +74,6 @@ class ConstraintValidatorTestCaseTest extends ConstraintValidatorTestCase
             ->atPath('k2')
             ->validate('ccc', [
                 new DateTime(),
-            ]);
-    }
-}
-
-class TestCustomValidator extends ConstraintValidator
-{
-    public function validate($value, Constraint $constraint): void
-    {
-        $validator = $this->context
-            ->getValidator()
-            ->inContext($this->context);
-
-        $validator
-            ->atPath('k1')
-            ->validate($value, [
-                new NotNull(),
             ]);
     }
 }

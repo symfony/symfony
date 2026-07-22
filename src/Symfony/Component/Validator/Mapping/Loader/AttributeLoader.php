@@ -46,13 +46,22 @@ class AttributeLoader implements LoaderInterface
 
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
-        if (!$sourceClasses = $this->mappedClasses[$metadata->getClassName()] ??= $this->allowAnyClass ? [$metadata->getClassName()] : []) {
+        $className = $metadata->getClassName();
+
+        if (!$sourceClasses = $this->mappedClasses[$className] ??= $this->allowAnyClass ? [$className] : []) {
             return false;
+        }
+
+        // When a class is the target of #[ExtendsValidationFor], its mapping only lists the
+        // extension classes. The target's own constraints must still be loaded and merged,
+        // so make sure the class is always part of its own source classes.
+        if (!\in_array($className, $sourceClasses, true)) {
+            array_unshift($sourceClasses, $className);
         }
 
         $success = false;
         foreach ($sourceClasses as $sourceClass) {
-            $reflClass = $metadata->getClassName() === $sourceClass ? $metadata->getReflectionClass() : new \ReflectionClass($sourceClass);
+            $reflClass = $className === $sourceClass ? $metadata->getReflectionClass() : new \ReflectionClass($sourceClass);
             $success = $this->doLoadClassMetadata($reflClass, $metadata) || $success;
         }
 

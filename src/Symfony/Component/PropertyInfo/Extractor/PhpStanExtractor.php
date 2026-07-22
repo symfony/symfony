@@ -428,22 +428,28 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
             try {
                 $method = new \ReflectionMethod($class, $methodName);
                 if ($method->isStatic()) {
+                    $method = null;
+
                     continue;
                 }
 
                 if (self::ACCESSOR === $type && \in_array((string) $method->getReturnType(), ['void', 'never'], true)) {
+                    $method = null;
+
                     continue;
                 }
 
                 if (
                     (
                         (self::ACCESSOR === $type && !$method->getNumberOfRequiredParameters())
-                        || (self::MUTATOR === $type && $method->getNumberOfParameters() >= 1)
+                        || (self::MUTATOR === $type && $method->getNumberOfParameters() >= 1 && $method->getNumberOfRequiredParameters() <= 1)
                     )
                     && $this->canAccessMemberBasedOnItsVisibility($method)
                 ) {
                     break;
                 }
+
+                $method = null;
             } catch (\ReflectionException) {
                 // Try the next prefix if the method doesn't exist
             }

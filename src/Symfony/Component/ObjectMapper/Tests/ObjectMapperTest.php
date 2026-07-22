@@ -71,6 +71,14 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\Address;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\User as UserEmbeddedMapping;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\UserDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedSource as ExplicitSourceNestedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedTarget as ExplicitSourceNestedTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Source as ExplicitSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Target as ExplicitSourceTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ChildSource as ExplicitTargetPriorityChildSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ConditionalSource as ExplicitTargetPriorityConditionalSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ReversedSource as ExplicitTargetPriorityReversedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\Source as ExplicitTargetPrioritySource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
@@ -99,6 +107,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Target;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\A as MapTargetToSourceA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\B as MapTargetToSourceB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\C as MapTargetToSourceC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\A as MultipleSourcePropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\B as MultipleSourcePropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\C as MultipleSourcePropertyC;
@@ -158,6 +167,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformC
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformSourceProperty\Source as TransformSourcePropertySource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformSourceProperty\Target as TransformSourcePropertyTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\Draft;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\DraftView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Uninitialized\Post;
@@ -467,6 +478,29 @@ final class ObjectMapperTest extends TestCase
         $b = $mapper->map($a, MapTargetToSourceB::class);
         $this->assertInstanceOf(MapTargetToSourceB::class, $b);
         $this->assertSame('str', $b->target);
+    }
+
+    public function testMapTargetToSourceIsIgnoredWhenMappingFromTheSource()
+    {
+        $b = new MapTargetToSourceB('str');
+        $mapper = new ObjectMapper();
+        $c = $mapper->map($b, MapTargetToSourceC::class);
+        $this->assertInstanceOf(MapTargetToSourceC::class, $c);
+        $this->assertSame('str', $c->target);
+    }
+
+    public function testExplicitSourceTakesPrecedenceOverSameNamedProperty()
+    {
+        $mapper = new ObjectMapper();
+        $target = $mapper->map(new ExplicitSource(), ExplicitSourceTarget::class);
+        $this->assertSame('from-reasonText', $target->reason);
+    }
+
+    public function testExplicitSourceSupportsPropertyPath()
+    {
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
+        $target = $mapper->map(new ExplicitSourceNestedSource(), ExplicitSourceNestedTarget::class);
+        $this->assertSame('from-nested-description', $target->reason);
     }
 
     public function testMultipleTargetMapProperty()
@@ -1092,6 +1126,39 @@ final class ObjectMapperTest extends TestCase
         $mapper->map($source);
     }
 
+    public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPrioritySource());
+        $this->assertSame('from-customerEmail', $target->email);
+    }
+
+    public function testExplicitMappingTakesPriorityRegardlessOfDeclarationOrder()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPriorityReversedSource());
+        $this->assertSame('from-customerEmail', $target->email);
+    }
+
+    public function testSkippedConditionalMappingKeepsImplicitValue()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPriorityConditionalSource());
+        $this->assertSame('from-email', $target->email);
+    }
+
+    public function testExplicitMappingTakesPriorityOverInheritedImplicitProperty()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPriorityChildSource());
+
+        $this->assertSame('from-customerEmail', $target->email);
+    }
+
     public function testConditionalMappingAppliedToConstructorArguments()
     {
         $mapper = new ObjectMapper();
@@ -1382,5 +1449,17 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(MappedChildEntityDto::class, $target);
         $this->assertSame('Test', $target->name);
         $this->assertNull($target->secret);
+    }
+
+    public function testTransformReceivesMappedSourceValueWithNonThrowingPropertyAccessor()
+    {
+        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessorBuilder()->disableExceptionOnInvalidPropertyPath()->getPropertyAccessor());
+
+        $target = $mapper->map(new TransformSourcePropertySource(), TransformSourcePropertyTarget::class);
+
+        // a non-throwing property accessor must not make the unrelated target property name look readable on the
+        // source, otherwise the #[Map(source: ...)] property is read as null and the transform receives null
+        $this->assertInstanceOf(TransformSourcePropertyTarget::class, $target);
+        $this->assertSame('ABC', $target->targetProperty);
     }
 }

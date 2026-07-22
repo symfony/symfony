@@ -1748,6 +1748,26 @@ class ParserTest extends TestCase
         $this->assertSame($expected, $this->parser->parse($yaml));
     }
 
+    public function testTrailingBackslashesBeforeNewlineInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+            foobar: "foo\\\\
+                bar"
+            YAML;
+
+        $this->assertSame(['foobar' => 'foo\\ bar'], $this->parser->parse($yaml));
+    }
+
+    public function testTrailingBackslashInSingleQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+            foobar: 'foo\\
+                bar'
+            YAML;
+
+        $this->assertSame(['foobar' => 'foo\\ bar'], $this->parser->parse($yaml));
+    }
+
     #[DataProvider('wrappedUnquotedStringsProvider')]
     public function testWrappedUnquotedStringWithMultipleSpacesInValue(string $yaml, array $expected)
     {

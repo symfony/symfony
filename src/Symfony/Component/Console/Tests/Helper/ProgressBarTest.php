@@ -1118,6 +1118,17 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->finish();
     }
 
+    public function testMultiCharProgressCharacterNearCompletion()
+    {
+        $bar = new ProgressBar($output = $this->getOutputStream(), 28, 0);
+        $bar->setProgressCharacter('=>');
+        $bar->start();
+        $bar->setProgress(27);
+
+        rewind($output->getStream());
+        $this->assertStringContainsString(' 27/28 [============================>]  96%', stream_get_contents($output->getStream()));
+    }
+
     #[DataProvider('provideFormat')]
     public function testFormatsWithoutMax($format)
     {

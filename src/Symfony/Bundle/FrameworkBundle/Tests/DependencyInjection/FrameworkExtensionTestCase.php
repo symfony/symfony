@@ -2141,6 +2141,22 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame($redisUrl, $url);
     }
 
+    public function testCacheDefaultValkeyProvider()
+    {
+        $container = $this->createContainerFromFile('cache');
+
+        foreach (['cache.adapter.valkey', 'cache.adapter.valkey_tag_aware'] as $id) {
+            $this->assertTrue($container->hasDefinition($id), \sprintf('"%s" should be a service, not an alias.', $id));
+            $this->assertSame('cache.default_valkey_provider', $container->getDefinition($id)->getTag('cache.pool')[0]['provider']);
+        }
+
+        $valkeyUrl = 'valkey://valkey-host';
+        $providerId = '.cache_connection.'.ContainerBuilder::hash($valkeyUrl);
+
+        $this->assertTrue($container->hasDefinition($providerId));
+        $this->assertSame($valkeyUrl, $container->getDefinition($providerId)->getArgument(0));
+    }
+
     public function testCachePoolServices()
     {
         $container = $this->createContainerFromFile('cache', [], true, false);

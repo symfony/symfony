@@ -82,7 +82,11 @@ class Connection
 
     public function __destruct()
     {
-        $this->reset();
+        try {
+            $this->reset();
+        } catch (\Throwable) {
+            // requeuing in-transit messages on shutdown is best effort and must not throw from a destructor
+        }
     }
 
     /**
@@ -415,10 +419,17 @@ class Connection
     public function reset(): void
     {
         if (null !== $this->currentResponse) {
-            // fetch current response in order to requeue in transit messages
-            if (!$this->fetchPendingMessages()) {
-                $this->currentResponse->cancel();
+            try {
+                // fetch current response in order to requeue in transit messages
+                if (!$this->fetchPendingMessages()) {
+                    $this->currentResponse->cancel();
+                    $this->currentResponse = null;
+                }
+            } catch (\Throwable) {
+                // discard the in-flight response that cannot be reused so the connection stays usable
+                $response = $this->currentResponse;
                 $this->currentResponse = null;
+                $response->cancel();
             }
         }
 

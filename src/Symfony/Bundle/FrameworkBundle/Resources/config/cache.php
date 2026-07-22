@@ -142,7 +142,16 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
-        ->alias('cache.adapter.valkey', 'cache.adapter.redis')
+
+        ->set('cache.adapter.valkey')
+            ->parent('cache.adapter.redis')
+            ->abstract()
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_valkey_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
 
         ->set('cache.adapter.redis_tag_aware', RedisTagAwareAdapter::class)
             ->abstract()
@@ -159,7 +168,16 @@ return static function (ContainerConfigurator $container) {
                 'reset' => 'reset',
             ])
             ->tag('monolog.logger', ['channel' => 'cache'])
-        ->alias('cache.adapter.valkey_tag_aware', 'cache.adapter.redis_tag_aware')
+
+        ->set('cache.adapter.valkey_tag_aware')
+            ->parent('cache.adapter.redis_tag_aware')
+            ->abstract()
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_valkey_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
 
         ->set('cache.adapter.memcached', MemcachedAdapter::class)
             ->abstract()

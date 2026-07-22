@@ -37,7 +37,7 @@ class TextDescriptor extends Descriptor
         }
 
         $totalWidth = $options['total_width'] ?? Helper::width($argument->getName());
-        $spacingWidth = $totalWidth - \strlen($argument->getName());
+        $spacingWidth = $totalWidth - Helper::width($argument->getName());
 
         $this->writeText(\sprintf('  <info>%s</info>  %s%s%s',
             $argument->getName(),

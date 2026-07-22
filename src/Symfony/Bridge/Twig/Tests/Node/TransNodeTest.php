@@ -50,6 +50,10 @@ class TransNodeTest extends TestCase
 
     protected function getVariableGetterWithStrictCheck($name)
     {
+        if (Environment::MAJOR_VERSION >= 4) {
+            return \sprintf('(array_key_exists("%1$s", $context) ? $context["%1$s"] : throw new RuntimeError(\'Variable "%1$s" does not exist.\', 0, $this->source))', $name);
+        }
+
         return \sprintf('(isset($context["%1$s"]) || array_key_exists("%1$s", $context) ? $context["%1$s"] : (function () { throw new RuntimeError(\'Variable "%1$s" does not exist.\', 0, $this->source); })())', $name);
     }
 }

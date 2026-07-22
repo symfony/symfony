@@ -17,7 +17,12 @@
             "properties": {
               "resource": { "type": "string" },
               "type": { "type": ["string", "null"] },
-              "ignore_errors": { "type": "boolean" }
+              "ignore_errors": {
+                "oneOf": [
+                  { "type": "boolean" },
+                  { "const": "not_found" }
+                ]
+              }
             },
             "required": ["resource"],
             "additionalProperties": false

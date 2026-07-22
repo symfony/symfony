@@ -18,6 +18,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDocDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyGeneric;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\IFace;
@@ -45,6 +47,17 @@ class PhpStanExtractorTest extends TestCase
     {
         $this->extractor = new PhpStanExtractor();
         $this->phpDocExtractor = new PhpDocExtractor();
+    }
+
+    public function testAdderWithSeveralRequiredParametersIsIgnored()
+    {
+        $this->assertNull($this->extractor->getTypes(MultiParameterAdderDocDummy::class, 'link'));
+    }
+
+    public function testRejectedCandidateMethodsAreIgnored()
+    {
+        $this->assertNull($this->extractor->getTypes(RejectedCandidateDocDummy::class, 'foo'));
+        $this->assertNull($this->extractor->getTypes(RejectedCandidateDocDummy::class, 'bar'));
     }
 
     /**

@@ -20,6 +20,9 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AsymmetricVisibility;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71DummyExtended;
@@ -317,6 +320,16 @@ class ReflectionExtractorTest extends TestCase
             ['nothing', null],
             ['collection', [new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Traversable'), new Type(Type::BUILTIN_TYPE_OBJECT, false, 'Countable')]],
         ];
+    }
+
+    public function testExtractTypeFromPropertyDeclarationWhenAdderRequiresSeveralParameters()
+    {
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, true, MultiParameterAdderValue::class)], $this->extractor->getTypes(MultiParameterAdderDummy::class, 'link'));
+    }
+
+    public function testIsNotWritableWhenAdderRequiresSeveralParameters()
+    {
+        $this->assertFalse($this->extractor->isWritable(MultiParameterAdderParentDummy::class, 'link'));
     }
 
     public function testReadonlyPropertiesAreNotWriteable()

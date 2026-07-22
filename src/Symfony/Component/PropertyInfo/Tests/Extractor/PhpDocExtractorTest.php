@@ -16,6 +16,8 @@ use phpDocumentor\Reflection\PseudoTypes\IntMaskOf;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDocDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\RejectedCandidateDocDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentUsingTrait;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Extractor\ChildOfParentWithPromotedSelfDocBlock;
@@ -46,6 +48,17 @@ class PhpDocExtractorTest extends TestCase
     protected function setUp(): void
     {
         $this->extractor = new PhpDocExtractor();
+    }
+
+    public function testAdderWithSeveralRequiredParametersIsIgnored()
+    {
+        $this->assertNull($this->extractor->getTypes(MultiParameterAdderDocDummy::class, 'link'));
+    }
+
+    public function testRejectedCandidateMethodsAreIgnored()
+    {
+        $this->assertNull($this->extractor->getTypes(RejectedCandidateDocDummy::class, 'foo'));
+        $this->assertNull($this->extractor->getTypes(RejectedCandidateDocDummy::class, 'bar'));
     }
 
     /**

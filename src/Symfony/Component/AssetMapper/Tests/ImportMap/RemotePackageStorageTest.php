@@ -52,7 +52,7 @@ class RemotePackageStorageTest extends TestCase
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessageMatches('#^file_put_contents\(('.$vendorDir.'/module_specifier/module_specifier.index.js)?\): Failed to open stream: Permission denied$#');
+        $this->expectExceptionMessageMatches('#^file_put_contents\(('.preg_quote($vendorDir.'/module_specifier/module_specifier.index.js', '#').')?\): Failed to open stream: Permission denied$#');
 
         try {
             $storage->save($entry, 'any content');

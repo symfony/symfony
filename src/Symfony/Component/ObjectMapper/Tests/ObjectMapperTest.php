@@ -48,6 +48,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedSource as
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\NestedTarget as ExplicitSourceNestedTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Source as ExplicitSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitSource\Target as ExplicitSourceTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ChildSource as ExplicitTargetPriorityChildSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ConditionalSource as ExplicitTargetPriorityConditionalSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\ReversedSource as ExplicitTargetPriorityReversedSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ExplicitTargetPriority\Source as ExplicitTargetPrioritySource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
@@ -813,6 +817,39 @@ final class ObjectMapperTest extends TestCase
         $source = new MultipleTargetPropertyA();
         $mapper = new ObjectMapper();
         $mapper->map($source);
+    }
+
+    public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPrioritySource());
+        $this->assertSame('from-customerEmail', $target->email);
+    }
+
+    public function testExplicitMappingTakesPriorityRegardlessOfDeclarationOrder()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPriorityReversedSource());
+        $this->assertSame('from-customerEmail', $target->email);
+    }
+
+    public function testSkippedConditionalMappingKeepsImplicitValue()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPriorityConditionalSource());
+        $this->assertSame('from-email', $target->email);
+    }
+
+    public function testExplicitMappingTakesPriorityOverInheritedImplicitProperty()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new ExplicitTargetPriorityChildSource());
+
+        $this->assertSame('from-customerEmail', $target->email);
     }
 
     public function testConditionalMappingAppliedToConstructorArguments()

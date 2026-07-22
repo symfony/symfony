@@ -85,7 +85,13 @@ class AutowirePass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Autowire) {
-            return $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
+            $value = $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
+            // count env vars referenced by the attribute right away, so that removing the
+            // owning service (e.g. unused with an unrelated autowiring error) does not later
+            // report the env var as never used
+            $this->container->resolveEnvPlaceholders($value);
+
+            return $value;
         }
 
         if ($value instanceof AutowireDecorated) {

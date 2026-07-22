@@ -46,7 +46,7 @@
         "symfony/validator": "^7.4|^8.0",
         "symfony/var-dumper": "^7.4|^8.0",
         "symfony/var-exporter": "^7.4|^8.0",
-        "twig/twig": "^3.21"
+        "twig/twig": "^3.21|^4.0"
     },
     "provide": {
         "psr/log-implementation": "1.0|2.0|3.0"

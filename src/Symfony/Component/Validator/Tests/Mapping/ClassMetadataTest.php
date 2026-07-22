@@ -16,17 +16,20 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Cascade;
 use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\GroupDefinitionException;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityIntersection;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntityUnion;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
+use Symfony\Component\Validator\Tests\Fixtures\CustomArrayObject;
 use Symfony\Component\Validator\Tests\Fixtures\GroupSequenceProviderChildEntity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
@@ -311,6 +314,27 @@ class ClassMetadataTest extends TestCase
         $metadata->mergeConstraints($parent);
 
         $this->assertTrue($metadata->isGroupSequenceProvider());
+    }
+
+    public function testMergeConstraintsMergesTraversalStrategy()
+    {
+        $traversable = new ClassMetadata(CustomArrayObject::class);
+        $traversable->addConstraint(new Traverse(false));
+
+        $this->metadata->mergeConstraints($traversable);
+
+        $this->assertSame(TraversalStrategy::NONE, $this->metadata->getTraversalStrategy());
+    }
+
+    public function testMergeConstraintsDoesNotOverrideExplicitTraversalStrategy()
+    {
+        $traversable = new ClassMetadata(CustomArrayObject::class);
+        $traversable->addConstraint(new Traverse(false));
+
+        $this->metadata->addConstraint(new Traverse());
+        $this->metadata->mergeConstraints($traversable);
+
+        $this->assertSame(TraversalStrategy::TRAVERSE, $this->metadata->getTraversalStrategy());
     }
 
     /**

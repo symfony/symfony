@@ -470,6 +470,37 @@ class ConnectionTest extends TestCase
         $connection->ack('1');
     }
 
+    public function testDeleteAfterAckDoesNotFailWhenAlreadyDeleted()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(1);
+        $redis->expects($this->exactly(1))->method('xdel')
+            ->with('queue', ['1'])
+            ->willReturn(0);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $connection->ack('1');
+    }
+
+    public function testAckThrowsWhenNotAcknowledged()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(0);
+        $redis->expects($this->never())->method('xdel');
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not acknowledge redis message "1".');
+        $connection->ack('1');
+    }
+
     public function testDeleteAfterReject()
     {
         $redis = $this->createRedisMock();
@@ -482,6 +513,37 @@ class ConnectionTest extends TestCase
             ->willReturn(1);
 
         $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis);
+        $connection->reject('1');
+    }
+
+    public function testDeleteAfterRejectDoesNotFailWhenAlreadyDeleted()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(1);
+        $redis->expects($this->exactly(1))->method('xdel')
+            ->with('queue', ['1'])
+            ->willReturn(0);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis);
+        $connection->reject('1');
+    }
+
+    public function testRejectThrowsWhenNotInPendingList()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(1))->method('xack')
+            ->with('queue', 'symfony', ['1'])
+            ->willReturn(0);
+        $redis->expects($this->never())->method('xdel');
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not reject redis message "1".');
         $connection->reject('1');
     }
 

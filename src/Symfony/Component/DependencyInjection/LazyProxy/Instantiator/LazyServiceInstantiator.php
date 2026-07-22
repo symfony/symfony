@@ -38,7 +38,7 @@ final class LazyServiceInstantiator implements InstantiatorInterface
             eval($dumper->getProxyCode($definition, $id));
         }
 
-        if ($definition->getClass() === $proxyClass) {
+        if (ltrim($definition->getClass(), '\\') === $proxyClass) {
             return $class->newLazyProxy($realInstantiator);
         }
 

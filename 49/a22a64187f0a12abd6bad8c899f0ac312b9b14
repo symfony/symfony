@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by QuantumBreakz at 2026-07-21T18:48:53Z
+
+The `Windows / x86 / minimal-exts / lowest-php` job seems to have timed out or disconnected abruptly after 10 minutes. There are no test failures in the log (it cut off during `HttpClient` tests). Since I don't have permission to restart the workflow, could a maintainer please re-run the failed job?

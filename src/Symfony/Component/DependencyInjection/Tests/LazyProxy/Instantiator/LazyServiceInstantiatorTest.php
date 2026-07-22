@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\LazyProxy\Instantiator;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Definition;
@@ -41,5 +42,33 @@ class LazyServiceInstantiatorTest extends TestCase
         $this->assertSame(0, $instance->calls);
         $this->assertSame('Hello from the abstract class!', $proxy->say());
         $this->assertSame(1, $instance->calls);
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testInstantiateProxyWithFactoryAndLeadingBackslashClassName()
+    {
+        $instantiator = new LazyServiceInstantiator();
+
+        $definition = (new Definition('\\'.LazyProxiedTestService::class))
+            ->setFactory([LazyProxiedTestService::class, 'create'])
+            ->setLazy(true);
+
+        $proxy = $instantiator->instantiateProxy(new Container(), $definition, 'foo', static fn () => LazyProxiedTestService::create());
+
+        $this->assertInstanceOf(LazyProxiedTestService::class, $proxy);
+        $this->assertSame('hello', $proxy->say());
+    }
+}
+
+class LazyProxiedTestService
+{
+    public static function create(): self
+    {
+        return new self();
+    }
+
+    public function say(): string
+    {
+        return 'hello';
     }
 }

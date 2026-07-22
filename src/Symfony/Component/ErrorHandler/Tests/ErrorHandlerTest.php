@@ -136,7 +136,7 @@ class ErrorHandlerTest extends TestCase
     public function testFailureCall()
     {
         $this->expectException(\ErrorException::class);
-        $this->expectExceptionMessageMatches('/^fopen\(unknown\.txt\): [Ff]ailed to open stream: No such file or directory$/');
+        $this->expectExceptionMessageMatches('/^fopen\((unknown\.txt)?\): Failed to open stream: No such file or directory$/');
 
         ErrorHandler::call('fopen', 'unknown.txt', 'r');
     }

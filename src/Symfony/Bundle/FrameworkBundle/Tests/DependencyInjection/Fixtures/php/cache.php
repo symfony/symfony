@@ -2,6 +2,7 @@
 
 $container->loadFromExtension('framework', [
     'cache' => [
+        'default_valkey_provider' => 'valkey://valkey-host',
         'pools' => [
             'cache.foo' => [
                 'adapter' => 'cache.adapter.apcu',

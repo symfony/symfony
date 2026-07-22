@@ -128,12 +128,14 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $refl = $this->getSourceReflectionClass($source) ?? $targetRefl;
 
         // When source contains no metadata, we read metadata on the target instead
-        if ($refl === $targetRefl) {
+        if ($readMetadataFromTarget = $refl === $targetRefl) {
             $readMetadataFrom = $mappedTarget;
         }
 
         $mapToProperties = [];
         $targetName = $targetRefl->getName();
+        $explicitTargets = [];
+        $implicitValues = [];
         foreach ($this->getAllProperties($refl) as $property) {
             if ($property->isStatic()) {
                 continue;
@@ -143,10 +145,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
             $mappings = array_filter($mappings, static fn (Mapping $m): bool => !$m->targetClass || is_a($targetName, $m->targetClass, true));
             foreach ($mappings as $mapping) {
-                $sourcePropertyName = $propertyName;
-                if ($mapping->source && !$this->isReadable($source, $propertyName)) {
-                    $sourcePropertyName = $mapping->source;
-                }
+                // when metadata is read from the source, $mapping->source describes the
+                // reverse mapping and must not be resolved against $source
+                $sourcePropertyName = $readMetadataFromTarget ? $mapping->source ?? $propertyName : $propertyName;
 
                 $targetPropertyName = $mapping->target ?? $propertyName;
                 if (false === $if = $mapping->if) {
@@ -179,6 +180,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 }
 
                 $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping);
+                $explicitTargets[$targetPropertyName] = true;
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
             }
 
@@ -196,8 +198,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
-                $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
+                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+
                 continue;
             }
 
@@ -215,6 +217,12 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 && array_any($innerMetadata, static fn (Mapping $m): bool => \is_string($m->target) && is_a($targetName, $m->target, true))
             ) {
                 ($this->objectMapper ?? $this)->map($rawValue, $mappedTarget);
+            }
+        }
+
+        foreach ($implicitValues as $propertyName => $value) {
+            if (!isset($explicitTargets[$propertyName])) {
+                $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
             }
         }
 

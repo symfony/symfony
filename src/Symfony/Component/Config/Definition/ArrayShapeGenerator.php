@@ -21,7 +21,9 @@ final class ArrayShapeGenerator
 {
     public static function generate(NodeInterface $node): string
     {
-        return str_replace("\n", "\n * ", self::doGeneratePhpDoc($node));
+        // "*/" anywhere in the shape (a comment, an enum value, a node name) would prematurely
+        // close the surrounding doc block, so the slash is escaped to keep the value readable
+        return str_replace(['*/', "\n"], ['*\/', "\n * "], self::doGeneratePhpDoc($node));
     }
 
     private static function doGeneratePhpDoc(NodeInterface $node, int $nestingLevel = 1): string
@@ -141,6 +143,10 @@ final class ArrayShapeGenerator
         $types = array_unique($types);
         if (false !== $backedEnumIndex = array_search(ExprBuilder::TYPE_BACKED_ENUM, $types, true)) {
             $types[$backedEnumIndex] = '\BackedEnum';
+        }
+
+        if (array_intersect($types, [ExprBuilder::TYPE_STRING, '\BackedEnum'])) {
+            $types[] = '\\'.ParamConfigurator::class;
         }
 
         sort($types);

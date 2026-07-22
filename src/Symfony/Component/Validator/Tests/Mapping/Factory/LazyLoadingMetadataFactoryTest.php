@@ -16,10 +16,12 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Mapping\TraversalStrategy;
 use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
@@ -80,6 +82,25 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         ];
 
         $this->assertEquals($constraints, $metadata->getConstraints());
+    }
+
+    public function testMergeParentTraversalStrategy()
+    {
+        $loader = new class implements LoaderInterface {
+            public function loadClassMetadata(ClassMetadata $metadata): bool
+            {
+                if (EntityParent::class === $metadata->getClassName()) {
+                    $metadata->addConstraint(new Traverse(false));
+                }
+
+                return true;
+            }
+        };
+
+        $factory = new LazyLoadingMetadataFactory($loader);
+        $metadata = $factory->getMetadataFor(self::CLASS_NAME);
+
+        $this->assertSame(TraversalStrategy::NONE, $metadata->getTraversalStrategy());
     }
 
     public function testCachedMetadata()

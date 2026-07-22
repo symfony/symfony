@@ -671,3 +671,13 @@ class LazyDecoratedServiceConsumer
         return $this->service->getValue();
     }
 }
+
+class EnvAutowireWithMissingArgument
+{
+    public function __construct(
+        #[Autowire(env: 'SOME_ENV')]
+        string $env,
+        string $missing,
+    ) {
+    }
+}

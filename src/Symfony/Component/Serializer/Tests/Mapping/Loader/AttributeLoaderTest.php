@@ -301,6 +301,21 @@ class AttributeLoaderTest extends TestCase
         $this->assertContains('default', $classMetadata->getAttributesMetadata()['name']->getGroups());
     }
 
+    public function testLoadClassMetadataMergesTargetOwnAttributes()
+    {
+        $targetClass = _AttrMap_TargetWithOwnAttributes::class;
+        $sourceClass = _AttrMap_ExtensionForTargetWithOwnAttributes::class;
+
+        $loader = new AttributeLoader(false, [$targetClass => [$sourceClass]]);
+        $classMetadata = new ClassMetadata($targetClass);
+
+        $this->assertTrue($loader->loadClassMetadata($classMetadata));
+
+        $attributeMetadata = $classMetadata->getAttributesMetadata()['value'];
+        $this->assertSame(['own'], $attributeMetadata->getGroups(), "The target class' own attributes are dropped.");
+        $this->assertSame('extended_value', $attributeMetadata->getSerializedName(), 'The extension class attributes are dropped.');
+    }
+
     protected function getLoaderForContextMapping(): AttributeLoader
     {
         return $this->loader;
@@ -319,6 +334,7 @@ class _AttrMap_Target
 
 use Symfony\Component\Serializer\Attribute\ExtendsSerializationFor;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 #[ExtendsSerializationFor(_AttrMap_Target::class)]
 class _AttrMap_Source
@@ -333,4 +349,17 @@ class _AttrMap_ClassLevelSource
 {
     #[Groups(['default'])]
     public string $name = '';
+}
+
+class _AttrMap_TargetWithOwnAttributes
+{
+    #[Groups(['own'])]
+    public string $value = '';
+}
+
+#[ExtendsSerializationFor(_AttrMap_TargetWithOwnAttributes::class)]
+class _AttrMap_ExtensionForTargetWithOwnAttributes
+{
+    #[SerializedName('extended_value')]
+    public string $value = '';
 }

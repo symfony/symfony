@@ -179,7 +179,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping);
+                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping, $targetPropertyName);
                 $explicitTargets[$targetPropertyName] = true;
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
             }
@@ -198,7 +198,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, null, $propertyName);
 
                 continue;
             }
@@ -308,7 +308,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         return $source->{$propertyName};
     }
 
-    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null): mixed
+    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null, ?string $targetPropertyName = null): mixed
     {
         if ($mapping?->transform) {
             $value = $this->applyTransforms($mapping, $value, $source, $target);
@@ -317,6 +317,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         if (
             \is_object($value)
             && ($innerMetadata = $this->metadataFactory->create($value))
+            && ($innerMetadata = $this->filterMetadataByPropertyType($innerMetadata, $target, $targetPropertyName))
             && ($mapTo = $this->getMapTarget($innerMetadata, $value, $source, $target, true))
             && (\is_string($mapTo->target) && class_exists($mapTo->target))
         ) {
@@ -399,6 +400,40 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         return $mapTo;
+    }
+
+    /**
+     * Narrows the mappings of a nested object to the one matching the declared type of the property it is mapped into.
+     *
+     * A nested class declaring several #[Map] targets yields one Mapping per target. When the
+     * destination property is typed, only one of them can be assigned to it, so the mapping is not ambiguous.
+     *
+     * @param Mapping[] $metadata
+     *
+     * @return Mapping[]
+     */
+    private function filterMetadataByPropertyType(array $metadata, object $target, ?string $targetPropertyName): array
+    {
+        if (null === $targetPropertyName || 2 > \count($metadata)) {
+            return $metadata;
+        }
+
+        if (!$property = $this->getPropertyFromHierarchy(new \ReflectionClass($target), $targetPropertyName)) {
+            return $metadata;
+        }
+
+        $type = $property->getType();
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+            return $metadata;
+        }
+
+        $propertyClass = $type->getName();
+        $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => \is_string($m->target)
+            && class_exists($m->target)
+            && is_a($m->target, $propertyClass, true)
+        ));
+
+        return 1 === \count($filtered) ? $filtered : $metadata;
     }
 
     private function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed

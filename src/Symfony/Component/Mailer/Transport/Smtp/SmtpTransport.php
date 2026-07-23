@@ -108,6 +108,10 @@ class SmtpTransport extends AbstractTransport
      */
     public function setLocalDomain(string $domain): static
     {
+        if (preg_match('/[\x00-\x1F\x7F]/', $domain)) {
+            throw new InvalidArgumentException('The local domain name must not contain control characters.');
+        }
+
         if ('' !== $domain && '[' !== $domain[0]) {
             if (filter_var($domain, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4)) {
                 $domain = '['.$domain.']';

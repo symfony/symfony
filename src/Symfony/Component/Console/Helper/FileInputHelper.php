@@ -81,10 +81,12 @@ final class FileInputHelper
 
     public function displayFile(OutputInterface $output, InputFile $file): void
     {
-        $link = \sprintf('<href=file://%s>%s</>', OutputFormatter::escape($file->getRealPath()), OutputFormatter::escape($file->getFilename()));
+        $path = self::sanitizeForDisplay((string) $file->getRealPath());
+        $filename = self::sanitizeForDisplay($file->getFilename());
+        $link = \sprintf('<href=file://%s>%s</>', OutputFormatter::escape($path), OutputFormatter::escape($filename));
 
         if ($output->isVeryVerbose()) {
-            $output->writeln(\sprintf('<info>%s</info> %s (<comment>%s, %s</comment>)', "\u{1F4CE}", $link, OutputFormatter::escape($file->getMimeType() ?? 'unknown'), $file->getHumanReadableSize()));
+            $output->writeln(\sprintf('<info>%s</info> %s (<comment>%s, %s</comment>)', "\u{1F4CE}", $link, OutputFormatter::escape(self::sanitizeForDisplay($file->getMimeType() ?? 'unknown')), $file->getHumanReadableSize()));
         } else {
             $output->writeln(\sprintf('<info>%s</info> %s', "\u{1F4CE}", $link));
         }
@@ -196,6 +198,27 @@ final class FileInputHelper
         }
 
         return null;
+    }
+
+    /**
+     * Strips terminal-escape introducer bytes from a file name or path before it is
+     * echoed back to the user, so a crafted name cannot inject escape sequences.
+     * OutputFormatter::escape() only neutralizes "<" and ">", not control bytes.
+     *
+     * Removes C0 controls (except TAB and LF), DEL, and the UTF-8 encoding of C1
+     * controls, matching Tui's StringUtils::stripControlBytes() (see GH#64297).
+     *
+     * The replacement is repeated until it reaches a fixed point: removing a byte
+     * can splice two survivors into a fresh control sequence (e.g. "\xc2\x1b\x9b"
+     * leaves "\xc2\x9b", the UTF-8 encoding of U+009B), so a single pass is not enough.
+     */
+    private static function sanitizeForDisplay(string $value): string
+    {
+        do {
+            $value = preg_replace("/[\x00-\x08\x0b-\x1f\x7f]|\xc2[\x80-\x9f]/", '', $value, -1, $count) ?? '';
+        } while ($count > 0);
+
+        return $value;
     }
 
     private function isDisplayableImage(InputFile $file): bool

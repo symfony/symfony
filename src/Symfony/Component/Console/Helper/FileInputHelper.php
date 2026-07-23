@@ -206,7 +206,7 @@ final class FileInputHelper
      * OutputFormatter::escape() only neutralizes "<" and ">", not control bytes.
      *
      * Removes C0 controls (except TAB and LF), DEL, and the UTF-8 encoding of C1
-     * controls, matching Tui's StringUtils::stripControlBytes() (see GH#64297).
+     * controls, matching Tui's StringUtils::stripControlBytes().
      *
      * The replacement is repeated until it reaches a fixed point: removing a byte
      * can splice two survivors into a fresh control sequence (e.g. "\xc2\x1b\x9b"

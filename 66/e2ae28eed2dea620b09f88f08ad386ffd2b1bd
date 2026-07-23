@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-25T09:06:29Z
+
+> a field that is required but maps to a nullable value
+
+Isn’t it another way to describe an optional field? Could the “fix” be to not mark those fields as required?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-06-25T09:22:19Z
+
+> Isn’t it another way to describe an optional field? Could the “fix” be to not mark those fields as required?
+
+This is exactly what I commented on the issue.

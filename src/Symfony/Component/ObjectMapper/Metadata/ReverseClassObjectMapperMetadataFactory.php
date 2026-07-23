@@ -15,7 +15,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\ClassHierarchyTrait;
 
 /**
- * Maps classes based on attributes found on the target's properties.
+ * Maps classes based on attributes found on the target class and its properties.
  *
  * @author Florent Blaison <florent.blaison@gmail.com>
  */
@@ -55,7 +55,20 @@ final class ReverseClassObjectMapperMetadataFactory implements ObjectMapperMetad
 
         if (!$property) {
             foreach ($targetClasses as $targetClass) {
-                if (!array_any($mappings, static fn (Mapping $m): bool => $m->target === $targetClass)) {
+                if (array_any($mappings, static fn (Mapping $m): bool => $m->target === $targetClass)) {
+                    continue;
+                }
+
+                $matched = false;
+                foreach ((new \ReflectionClass($targetClass))->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                    $map = $attribute->newInstance();
+                    if ($map->source && is_a($class, $map->source, true)) {
+                        $matched = true;
+                        $mappings[] = new Mapping($targetClass, null, $map->if, $map->transform);
+                    }
+                }
+
+                if (!$matched) {
                     $mappings[] = new Mapping($targetClass);
                 }
             }

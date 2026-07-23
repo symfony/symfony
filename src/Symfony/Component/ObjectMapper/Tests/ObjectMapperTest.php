@@ -30,20 +30,28 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Amount;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedFlatTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedInnerSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedOtherTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedOuterSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\BasePayment;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\BasePaymentView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceAndAutoMappedView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetChild;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Invoice;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\InvoiceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetParent;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Payment;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PaymentView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PreMappedSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PreMappedTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PrivateMappedChildView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RefundPayment;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RichDomainUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RichDomainUserView;
@@ -1035,6 +1043,55 @@ final class ObjectMapperTest extends TestCase
         $withoutTransform = $mapper->map(new SharedSource(), SharedTargetWithoutTransform::class);
         $this->assertInstanceOf(SharedTargetWithoutTransform::class, $withoutTransform);
         $this->assertSame(21, $withoutTransform->value);
+    }
+
+    public function testClassMapKeepsClassLevelTransformDeclaredOnTarget()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [Payment::class => PaymentView::class],
+        ));
+
+        $view = $mapper->map(new Payment(new Amount(4200)));
+
+        $this->assertInstanceOf(PaymentView::class, $view);
+        $this->assertSame(4200, $view->amountCents);
+
+        $view = $mapper->map(new Payment(new Amount(100)), PaymentView::class);
+
+        $this->assertInstanceOf(PaymentView::class, $view);
+        $this->assertSame(100, $view->amountCents);
+    }
+
+    public function testClassMapKeepsClassLevelTransformDeclaredForAParentSourceClass()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [RefundPayment::class => BasePaymentView::class],
+        ));
+
+        $view = $mapper->map(new RefundPayment(new Amount(500)));
+
+        $this->assertInstanceOf(BasePaymentView::class, $view);
+        $this->assertSame(500, $view->amountCents);
+    }
+
+    public function testClassMapKeepsEveryConditionalClassLevelMapDeclaredOnTarget()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [Invoice::class => InvoiceView::class],
+        ));
+
+        $view = $mapper->map(new Invoice(100, 'EUR'));
+
+        $this->assertInstanceOf(InvoiceView::class, $view);
+        $this->assertSame('100 EUR', $view->label);
+
+        $view = $mapper->map(new Invoice(50, 'USD'));
+
+        $this->assertInstanceOf(InvoiceView::class, $view);
+        $this->assertSame('50 USD', $view->label);
     }
 
     public function testClassMapWithMultipleTargetsSharingOneSourceRequiresAnExplicitTarget()

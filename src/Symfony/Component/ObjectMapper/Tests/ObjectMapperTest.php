@@ -85,6 +85,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransfor
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ChildWithoutClassTransformerTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\InnerTargetA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSource as MultiTargetOuterSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSourceWithRenamedProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTarget as MultiTargetOuterTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithInterfaceProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithRenamedProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithUntypedProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\FinalInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\PartialInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PrivateParentProperty\ChildEntity;
@@ -811,6 +818,47 @@ final class ObjectMapperTest extends TestCase
         $source = new MultipleTargetPropertyA();
         $mapper = new ObjectMapper();
         $mapper->map($source);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsIsResolvedByItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new MultiTargetOuterSource(), MultiTargetOuterTarget::class);
+
+        $this->assertInstanceOf(InnerTargetA::class, $target->inner);
+        $this->assertSame('inner-value', $target->inner->value);
+    }
+
+    public function testNestedRenamedPropertyWithSeveralMapTargetsIsResolvedByItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new OuterSourceWithRenamedProperty());
+
+        $this->assertInstanceOf(OuterTargetWithRenamedProperty::class, $target);
+        $this->assertInstanceOf(InnerTargetA::class, $target->nested);
+        $this->assertSame('inner-value', $target->nested->value);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsThrowsWhenUntyped()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping');
+
+        $mapper->map(new MultiTargetOuterSource(), OuterTargetWithUntypedProperty::class);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsThrowsWhenTypedWithAnInterfaceBothTargetsImplement()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping');
+
+        $mapper->map(new MultiTargetOuterSource(), OuterTargetWithInterfaceProperty::class);
     }
 
     public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()

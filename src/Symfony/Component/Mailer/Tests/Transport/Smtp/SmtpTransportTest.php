@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
@@ -137,6 +138,28 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("MAIL FROM:<sender@xn--exmple-cua.org>\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<recipient@xn--exmple-cua.org>\r\n", $stream->getCommands());
         $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
+    }
+
+    #[DataProvider('provideLocalDomainsWithControlCharacters')]
+    public function testSetLocalDomainRejectsControlCharacters(string $domain)
+    {
+        $transport = new SmtpTransport(new DummyStream());
+
+        $this->expectException(\Symfony\Component\Mailer\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The local domain name must not contain control characters.');
+
+        $transport->setLocalDomain($domain);
+    }
+
+    public static function provideLocalDomainsWithControlCharacters(): iterable
+    {
+        yield 'CRLF' => ["evil\r\nMAIL FROM:<injected@example.org>"];
+        yield 'CR only' => ["example.org\r"];
+        yield 'LF only' => ["example.org\n"];
+        yield 'NUL byte' => ["example.org\x00"];
+        yield 'HTAB' => ["example.org\t"];
+        yield 'DEL (0x7F)' => ["example.org\x7F"];
+        yield 'control char in the middle' => ["exam\x01ple.org"];
     }
 
     public function testMessageIdFromServerIsEmbeddedInSentMessageEvent()

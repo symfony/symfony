@@ -38,12 +38,8 @@ class DumpListener implements EventSubscriberInterface
     ) {
     }
 
-    /**
-     * @param ?ConsoleCommandEvent $event
-     */
-    public function configure(/* ?ConsoleCommandEvent $event = null */): void
+    public function configure(?ConsoleCommandEvent $event = null): void
     {
-        $event = 1 <= \func_num_args() ? func_get_arg(0) : null;
         $input = $event?->getInput();
 
         $cloner = $this->cloner;

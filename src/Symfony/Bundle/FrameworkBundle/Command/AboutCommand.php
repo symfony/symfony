@@ -53,17 +53,8 @@ class AboutCommand extends Command
         /** @var KernelInterface $kernel */
         $kernel = $this->getApplication()->getKernel();
 
-        if (method_exists($kernel, 'getBuildDir')) {
-            $buildDir = $kernel->getBuildDir();
-        } else {
-            $buildDir = $kernel->getCacheDir();
-        }
-
-        if (method_exists($kernel, 'getShareDir')) {
-            $shareDir = $kernel->getShareDir();
-        } else {
-            $shareDir = $kernel->getCacheDir();
-        }
+        $buildDir = $kernel->getBuildDir();
+        $shareDir = $kernel->getShareDir();
 
         $xdebugMode = getenv('XDEBUG_MODE') ?: \ini_get('xdebug.mode');
 

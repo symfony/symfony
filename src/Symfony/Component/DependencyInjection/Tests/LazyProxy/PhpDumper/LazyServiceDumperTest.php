@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper;
 
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -66,14 +65,42 @@ class LazyServiceDumperTest extends TestCase
         $dumper->getProxyCode($definition);
     }
 
-    #[RequiresPhp('>=8.3.0')]
     public function testReadonlyClass()
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(ReadOnlyClass::class))->setLazy(true);
 
         $this->assertTrue($dumper->isProxyCandidate($definition));
-        $this->assertStringContainsString(\PHP_VERSION_ID >= 80400 ? '' : 'readonly class ReadOnlyClassGhost', $dumper->getProxyCode($definition));
+        $this->assertStringContainsString('', $dumper->getProxyCode($definition));
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testFactoryWithLeadingBackslashClass()
+    {
+        $dumper = new LazyServiceDumper();
+        $definition = (new Definition('\\'.LazyProxiedService::class))
+            ->setFactory([LazyProxiedService::class, 'create'])
+            ->setLazy(true);
+
+        // getProxyClass() returns the reflection-normalized name, i.e. without the leading backslash
+        $this->assertSame(LazyProxiedService::class, $dumper->getProxyClass($definition, false));
+
+        // a leading backslash on the class name must still take the native lazy path:
+        // no decorated proxy class is generated...
+        $this->assertSame('', $dumper->getProxyCode($definition));
+
+        // ...and the factory code relies on newLazyProxy() instead of the broken decorator
+        $factoryCode = $dumper->getProxyFactoryCode($definition, 'svc', 'self::getSvcService($container, false)');
+        $this->assertStringContainsString('newLazyProxy', $factoryCode);
+        $this->assertStringNotContainsString('createLazyProxy', $factoryCode);
+    }
+}
+
+class LazyProxiedService
+{
+    public static function create(): self
+    {
+        return new self();
     }
 }
 

@@ -55,20 +55,25 @@ final class HttpClientKernel implements HttpKernelInterface
             'body' => $body,
         ] + $request->attributes->get('http_client_options', []));
 
-        $response = new Response($response->getContent(!$catch), $response->getStatusCode(), $response->getHeaders(!$catch));
-
-        $response->headers->remove('X-Body-File');
-        $response->headers->remove('X-Body-Eval');
-        $response->headers->remove('X-Content-Digest');
-
-        $response->headers = new class($response->headers->all()) extends ResponseHeaderBag {
+        $headers = new class($response->getHeaders(!$catch)) extends ResponseHeaderBag {
             protected function computeCacheControlValue(): string
             {
                 return $this->getCacheControlHeader(); // preserve the original value
             }
         };
+        $headers->remove('X-Body-File');
+        $headers->remove('X-Body-Eval');
+        $headers->remove('X-Content-Digest');
 
-        return $response;
+        try {
+            return new Response($response->getContent(!$catch), $response->getStatusCode(), $headers);
+        } catch (\TypeError) {
+            // BC with Symfony < 8.1
+            $response = new Response($response->getContent(!$catch), $response->getStatusCode());
+            $response->headers = $headers;
+
+            return $response;
+        }
     }
 
     private function getBody(Request $request): ?AbstractPart

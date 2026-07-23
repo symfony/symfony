@@ -64,11 +64,8 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     #[DataProvider('provideSanitizeBody')]
-    public function testSanitizeBody(string $input, string $expected, ?string $legacyExpected = null)
+    public function testSanitizeBody(string $input, string $expected)
     {
-        if (\PHP_VERSION_ID < 80400) {
-            $expected = $legacyExpected ?? $expected;
-        }
         $this->assertSame($expected, $this->createSanitizer()->sanitize($input));
     }
 
@@ -87,7 +84,6 @@ class HtmlSanitizerAllTest extends TestCase
             [
                 '< Hello',
                 '&lt; Hello',
-                ' Hello',
             ],
             [
                 'Lorem & Ipsum',
@@ -132,7 +128,6 @@ class HtmlSanitizerAllTest extends TestCase
             [
                 '<<a href="javascript:evil"/>a href="javascript:evil"/>',
                 '&lt;<a>a href&#61;&#34;javascript:evil&#34;/&gt;</a>',
-                '<a>a href&#61;&#34;javascript:evil&#34;/&gt;</a>',
             ],
             [
                 '<a href="javascript:alert(\'ok\')">Test</a>',
@@ -169,12 +164,10 @@ class HtmlSanitizerAllTest extends TestCase
             [
                 '<<img src="javascript:evil"/>iframe src="javascript:evil"/>',
                 '&lt;<img />iframe src&#61;&#34;javascript:evil&#34;/&gt;',
-                '<img />iframe src&#61;&#34;javascript:evil&#34;/&gt;',
             ],
             [
                 '<<img src="javascript:evil"/>img src="javascript:evil"/>',
                 '&lt;<img />img src&#61;&#34;javascript:evil&#34;/&gt;',
-                '<img />img src&#61;&#34;javascript:evil&#34;/&gt;',
             ],
             [
                 '<IMG SRC="javascript:alert(\'XSS\');">',
@@ -219,12 +212,10 @@ class HtmlSanitizerAllTest extends TestCase
             [
                 '<IMG SRC=&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041>',
                 '<img />',
-                '<img src="&amp;#0000106&amp;#0000097&amp;#0000118&amp;#0000097&amp;#0000115&amp;#0000099&amp;#0000114&amp;#0000105&amp;#0000112&amp;#0000116&amp;#0000058&amp;#0000097&amp;#0000108&amp;#0000101&amp;#0000114&amp;#0000116&amp;#0000040&amp;#0000039&amp;#0000088&amp;#0000083&amp;#0000083&amp;#0000039&amp;#0000041" />',
             ],
             [
                 '<IMG SRC=&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&#x58&#x53&#x53&#x27&#x29>',
                 '<img />',
-                '<img src="&amp;#x6A&amp;#x61&amp;#x76&amp;#x61&amp;#x73&amp;#x63&amp;#x72&amp;#x69&amp;#x70&amp;#x74&amp;#x3A&amp;#x61&amp;#x6C&amp;#x65&amp;#x72&amp;#x74&amp;#x28&amp;#x27&amp;#x58&amp;#x53&amp;#x53&amp;#x27&amp;#x29" />',
             ],
             [
                 '<IMG DYNSRC="javascript:alert(\'XSS\')">',
@@ -531,7 +522,6 @@ class HtmlSanitizerAllTest extends TestCase
             [
                 '<table>Lorem ipsum</table>',
                 'Lorem ipsum<table></table>',
-                '<table>Lorem ipsum</table>',
             ],
             [
                 '<ul>Lorem ipsum</ul>',
@@ -545,12 +535,8 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     #[DataProvider('provideSanitizeTable')]
-    public function testSanitizeTable(string $input, string $expected, ?string $legacyExpected = null)
+    public function testSanitizeTable(string $input, string $expected)
     {
-        if (\PHP_VERSION_ID < 80400) {
-            $expected = $legacyExpected ?? $expected;
-        }
-
         $this->assertSame($expected, $this->createSanitizer()->sanitizeFor('table', $input));
     }
 
@@ -564,32 +550,26 @@ class HtmlSanitizerAllTest extends TestCase
             [
                 '<tbody>Lorem ipsum</tbody>',
                 '<tbody></tbody>',
-                '<tbody>Lorem ipsum</tbody>',
             ],
             [
                 '<td>Lorem ipsum</td>',
                 '<tbody><tr><td>Lorem ipsum</td></tr></tbody>',
-                '<td>Lorem ipsum</td>',
             ],
             [
                 '<tfoot>Lorem ipsum</tfoot>',
                 '<tfoot></tfoot>',
-                '<tfoot>Lorem ipsum</tfoot>',
             ],
             [
                 '<thead>Lorem ipsum</thead>',
                 '<thead></thead>',
-                '<thead>Lorem ipsum</thead>',
             ],
             [
                 '<th>Lorem ipsum</th>',
                 '<tbody><tr><th>Lorem ipsum</th></tr></tbody>',
-                '<th>Lorem ipsum</th>',
             ],
             [
                 '<tr>Lorem ipsum</tr>',
                 '<tbody><tr></tr></tbody>',
-                '<tr>Lorem ipsum</tr>',
             ],
         ];
     }

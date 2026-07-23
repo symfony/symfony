@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\Extension\Validator\Type;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -27,15 +28,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FormTypeValidatorExtension extends BaseValidatorExtension
 {
-    private ViolationMapper $violationMapper;
+    private readonly ViolationMapperInterface $violationMapper;
 
     public function __construct(
         private ValidatorInterface $validator,
-        private bool $legacyErrorMessages = true,
+        bool|ViolationMapperInterface|null $violationMapper = null,
         ?FormRendererInterface $formRenderer = null,
         ?TranslatorInterface $translator = null,
     ) {
-        $this->violationMapper = new ViolationMapper($formRenderer, $translator);
+        if (\is_bool($violationMapper)) {
+            trigger_deprecation('symfony/form', '8.1', \sprintf('Passing a boolean as a second argument of "%s"\'s constructor is deprecated; pass a "%s" instead.', self::class, ViolationMapperInterface::class));
+            $violationMapper = null;
+        }
+        $this->violationMapper = $violationMapper ?? new ViolationMapper($formRenderer, $translator);
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void

@@ -29,11 +29,11 @@ class Interact implements InteractiveAttributeInterface
         }
 
         if (!$method->isPublic() || $method->isStatic()) {
-            throw new LogicException(\sprintf('The interactive method "%s::%s()" must be public and non-static.', $method->getDeclaringClass()->getName(), $method->getName()));
+            throw new LogicException(\sprintf('The interactive method "%s::%s()" must be public and non-static.', $method->class, $method->getName()));
         }
 
         if ('__invoke' === $method->getName()) {
-            throw new LogicException(\sprintf('The "%s::__invoke()" method cannot be used as an interactive method.', $method->getDeclaringClass()->getName()));
+            throw new LogicException(\sprintf('The "%s::__invoke()" method cannot be used as an interactive method.', $method->class));
         }
 
         $self->method = $method;

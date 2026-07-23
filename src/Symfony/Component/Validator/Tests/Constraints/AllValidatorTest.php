@@ -28,7 +28,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new All(new Range(min: 4)));
+        $this->validate(null, new All(new Range(min: 4)));
 
         $this->assertNoViolation();
     }
@@ -36,7 +36,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     public function testThrowsExceptionIfNotTraversable()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate('foo.barbar', new All(new Range(min: 4)));
+        $this->validate('foo.barbar', new All(new Range(min: 4)));
     }
 
     #[DataProvider('getValidArguments')]
@@ -50,7 +50,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
             $this->expectValidateValueAt($i++, '['.$key.']', $value, [$constraint]);
         }
 
-        $this->validator->validate($array, new All($constraint));
+        $this->validate($array, new All($constraint));
 
         $this->assertNoViolation();
     }
@@ -69,7 +69,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
             $this->expectValidateValueAt($i++, '['.$key.']', $value, [$constraint1, $constraint2]);
         }
 
-        $this->validator->validate($array, new All($constraints));
+        $this->validate($array, new All($constraints));
 
         $this->assertNoViolation();
     }

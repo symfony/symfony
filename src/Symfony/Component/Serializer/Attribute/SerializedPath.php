@@ -34,14 +34,4 @@ class SerializedPath
             throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a valid property path.', self::class));
         }
     }
-
-    #[\Deprecated('Use the "serializedPath" property instead', 'symfony/serializer:7.4')]
-    public function getSerializedPath(): PropertyPath
-    {
-        return $this->serializedPath;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\SerializedPath::class, false)) {
-    class_alias(SerializedPath::class, \Symfony\Component\Serializer\Annotation\SerializedPath::class);
 }

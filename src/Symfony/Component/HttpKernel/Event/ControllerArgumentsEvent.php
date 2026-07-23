@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Event;
 
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -53,7 +55,7 @@ final class ControllerArgumentsEvent extends KernelEvent
     }
 
     /**
-     * @param array<class-string, list<object>>|null $attributes
+     * @param list<object>|null $attributes
      */
     public function setController(callable $controller, ?array $attributes = null): void
     {
@@ -61,17 +63,26 @@ final class ControllerArgumentsEvent extends KernelEvent
         unset($this->namedArguments);
     }
 
+    /**
+     * @return list<mixed>
+     */
     public function getArguments(): array
     {
         return $this->arguments;
     }
 
+    /**
+     * @param list<mixed> $arguments
+     */
     public function setArguments(array $arguments): void
     {
         $this->arguments = $arguments;
         unset($this->namedArguments);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getNamedArguments(): array
     {
         if (isset($this->namedArguments)) {
@@ -99,12 +110,21 @@ final class ControllerArgumentsEvent extends KernelEvent
     /**
      * @template T of object
      *
-     * @param class-string<T>|null $className
+     * @param class-string<T>|'*'|null $className
      *
-     * @return ($className is null ? array<class-string, list<object>> : list<T>)
+     * @return ($className is null ? array<class-string, list<object>> : ($className is '*' ? list<object> : list<T>))
      */
     public function getAttributes(?string $className = null): array
     {
         return $this->controllerEvent->getAttributes($className);
+    }
+
+    public function evaluate(mixed $value, ?ExpressionLanguage $expressionLanguage): mixed
+    {
+        if (!$value instanceof \Closure && !$value instanceof Expression) {
+            return $value;
+        }
+
+        return $this->controllerEvent->evaluate($value, $expressionLanguage, $this->getNamedArguments());
     }
 }

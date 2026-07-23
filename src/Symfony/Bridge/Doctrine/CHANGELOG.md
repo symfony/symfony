@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add IterableToArrayCollectionTransformer for ObjectMapper
+
+8.1
+---
+
+ * Add option `uid_format` to `EntityType`
+ * Deprecate setting an `$aliasMap` in `RegisterMappingsPass`. Namespace aliases are no longer supported in Doctrine.
+
+8.0
+---
+
+ * Remove support for auto-mapping Doctrine entities to controller arguments; use explicit mapping instead
+ * Make `ProxyCacheWarmer` class `final`
+ * Remove `AbstractDoctrineExtension`, the code is incorporated into the extension classes of Doctrine bundles
+
 7.4
 ---
 

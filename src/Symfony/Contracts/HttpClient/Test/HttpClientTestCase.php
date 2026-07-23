@@ -1152,6 +1152,41 @@ abstract class HttpClientTestCase extends TestCase
         $this->assertLessThan(10, $duration);
     }
 
+    public function testMaxConnectDurationInfo()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+        $response = $client->request('GET', 'http://localhost:8057/', [
+            'max_connect_duration' => 10.0,
+        ]);
+
+        $this->assertSame(10.0, $response->getInfo('max_connect_duration'));
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testMaxConnectDuration()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'http://10.255.255.1/', [
+            'max_connect_duration' => 0.1,
+            'timeout' => 10,
+        ]);
+
+        $start = microtime(true);
+
+        try {
+            $response->getHeaders();
+            $this->fail(TransportExceptionInterface::class.' expected');
+        } catch (TransportExceptionInterface) {
+            $this->addToAssertionCount(1);
+        }
+
+        $duration = microtime(true) - $start;
+
+        $this->assertLessThan(2, $duration, 'Should timeout much faster than the 10s timeout option');
+        $this->assertGreaterThan(0.05, $duration, 'Should take at least some time before timing out');
+    }
+
     public function testWithOptions()
     {
         $client = $this->getHttpClient(__FUNCTION__);

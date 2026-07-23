@@ -37,7 +37,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate(null, $constraint);
+        $this->validate(null, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'null')
@@ -52,7 +52,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate('', $constraint);
+        $this->validate('', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
@@ -69,7 +69,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate($object, $constraint);
+        $this->validate($object, $constraint);
 
         $this->assertNoViolation();
     }
@@ -86,7 +86,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate($object, $constraint);
+        $this->validate($object, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'object')
@@ -103,7 +103,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate($object, $constraint);
+        $this->validate($object, $constraint);
 
         $this->assertNoViolation();
     }
@@ -120,7 +120,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate($object, $constraint);
+        $this->validate($object, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'toString')
@@ -139,7 +139,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->setPropertyPath('data');
         $this->setProperty($object, 'data');
 
-        $this->validator->validate('1', $constraint);
+        $this->validate('1', $constraint);
 
         $this->assertNoViolation();
     }
@@ -158,7 +158,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->setPropertyPath('data');
         $this->setProperty($object, 'data');
 
-        $this->validator->validate('2', $constraint);
+        $this->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
             ->atPath('data')
@@ -181,7 +181,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->setPropertyPath('reference.data');
         $this->setProperty($object, 'data');
 
-        $this->validator->validate('1', $constraint);
+        $this->validate('1', $constraint);
 
         $this->assertNoViolation();
     }
@@ -203,7 +203,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->setPropertyPath('reference.data');
         $this->setProperty($object, 'data');
 
-        $this->validator->validate('2', $constraint);
+        $this->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
             ->atPath('reference.data')
@@ -224,7 +224,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->setPropertyPath('');
         $this->setProperty(null, 'property');
 
-        $this->validator->validate('1', $constraint);
+        $this->validate('1', $constraint);
 
         $this->assertNoViolation();
     }
@@ -244,7 +244,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->setPropertyPath('');
         $this->setProperty(null, 'property');
 
-        $this->validator->validate('2', $constraint);
+        $this->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
             ->atPath('')
@@ -268,9 +268,9 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
                 return true;
             });
 
-        $validator = new ExpressionValidator($expressionLanguage);
-        $validator->initialize($this->createContext());
-        $validator->validate(null, $constraint);
+        $this->validator = new ExpressionValidator($expressionLanguage);
+
+        $this->validate(null, $constraint);
 
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
     }
@@ -284,7 +284,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ],
         );
 
-        $this->validator->validate(1, $constraint);
+        $this->validate(1, $constraint);
 
         $this->assertNoViolation();
     }
@@ -299,7 +299,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             negate: false,
         );
 
-        $this->validator->validate(2, $constraint);
+        $this->validate(2, $constraint);
 
         $this->buildViolation('This value is not valid.')
             ->atPath('property.path')
@@ -324,7 +324,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
 
         $this->expectValidateValue(0, $object->data, $constraints);
 
-        $this->validator->validate($object, $constraint);
+        $this->validate($object, $constraint);
 
         $this->assertNoViolation();
     }
@@ -351,7 +351,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             new ConstraintViolation('error_range', '', [], '', '', 7, null, 'range')
         );
 
-        $this->validator->validate($object, $constraint);
+        $this->validate($object, $constraint);
 
         $this->assertCount(2, $this->context->getViolations());
     }

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -190,6 +188,11 @@ class ParserTest extends TestCase
                 "A YAML file cannot contain tabs as indentation at line 2 (near \"\t bar\").",
             ],
         ];
+    }
+
+    public function testNonBreakingSpaceIsNotAWhitespaceSeparator()
+    {
+        $this->assertSame("-\u{A0}foo", $this->parser->parse("-\u{A0}foo"));
     }
 
     public function testParserIsStateless()
@@ -1044,11 +1047,9 @@ class ParserTest extends TestCase
         return $tests;
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testNullAsDuplicatedData()
     {
-        $this->expectUserDeprecationMessage('Since symfony/yaml 7.2: Duplicate key "child" detected on line 4 whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.');
+        $this->expectException(ParseException::class);
 
         $yaml = <<<EOD
             parent:
@@ -1067,6 +1068,17 @@ class ParserTest extends TestCase
             EOF;
 
         $this->assertSame(['hash' => null], Yaml::parse($input));
+    }
+
+    public function testLeadingCommentBlockIsIgnored()
+    {
+        $yaml = <<<'EOF'
+            # comment 1
+            # comment 2
+            foo: bar
+            EOF;
+
+        $this->assertSame(['foo' => 'bar'], Yaml::parse($yaml));
     }
 
     public function testCommentAtTheRootIndent()
@@ -1252,6 +1264,21 @@ class ParserTest extends TestCase
 
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Non-string keys are not supported. Quote your evaluable mapping keys instead');
+
+        $this->parser->parse($yaml);
+    }
+
+    public function testParseUnterminatedQuotedStringException()
+    {
+        $yaml = <<<'EOF'
+            foo:
+                bar: 'first line
+                    second line
+            '
+            EOF;
+
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unterminated quoted string');
 
         $this->parser->parse($yaml);
     }
@@ -1719,6 +1746,26 @@ class ParserTest extends TestCase
         ];
 
         $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testTrailingBackslashesBeforeNewlineInQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+            foobar: "foo\\\\
+                bar"
+            YAML;
+
+        $this->assertSame(['foobar' => 'foo\\ bar'], $this->parser->parse($yaml));
+    }
+
+    public function testTrailingBackslashInSingleQuotedMultiLineString()
+    {
+        $yaml = <<<YAML
+            foobar: 'foo\\
+                bar'
+            YAML;
+
+        $this->assertSame(['foobar' => 'foo\\ bar'], $this->parser->parse($yaml));
     }
 
     #[DataProvider('wrappedUnquotedStringsProvider')]

@@ -1,17 +1,12 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty')),
-    ],
-    null,
-    [
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty',
+    'objectMeta' => 1,
+    'prepared' => 0,
+    'properties' => [
         'Symfony\\Component\\VarExporter\\Tests\\Fixtures\\BackedProperty' => [
-            'name' => [
-                'name',
-            ],
+            'name' => ['name'],
         ],
     ],
-    $o[0],
-    []
-);
+], null, true);

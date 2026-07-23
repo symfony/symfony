@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Allow setting `queues` to `false` to skip binding the default `messages` queue
+ * Add option `delay[daily_delay_queues]` in the transport definition
+
 7.3
 ---
 

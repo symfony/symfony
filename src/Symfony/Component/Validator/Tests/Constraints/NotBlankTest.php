@@ -11,11 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
@@ -45,24 +42,6 @@ class NotBlankTest extends TestCase
         self::assertTrue($bConstraint->allowNull);
         self::assertSame('trim', $bConstraint->normalizer);
         self::assertSame('myMessage', $bConstraint->message);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new NotBlank(['normalizer' => 'Unknown Callable']);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new NotBlank(['normalizer' => new \stdClass()]);
     }
 }
 

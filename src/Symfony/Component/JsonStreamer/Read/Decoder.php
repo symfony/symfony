@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonStreamer\Read;
 
+use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 
 /**
@@ -36,6 +37,10 @@ final class Decoder
      */
     public static function decodeStream($stream, int $offset = 0, ?int $length = null): mixed
     {
-        return self::decodeString(stream_get_contents($stream, $length ?? -1, $offset));
+        if (false === $contents = stream_get_contents($stream, $length ?? -1, $offset)) {
+            throw new RuntimeException('Failed to read JSON stream.');
+        }
+
+        return self::decodeString($contents);
     }
 }

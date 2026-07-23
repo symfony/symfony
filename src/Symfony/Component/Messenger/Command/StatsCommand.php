@@ -66,11 +66,6 @@ class StatsCommand extends Command
         $errorIo = $io->getErrorStyle();
 
         $format = $input->getOption('format');
-        if ('text' === $format) {
-            trigger_deprecation('symfony/messenger', '7.2', 'The "text" format is deprecated, use "txt" instead.');
-
-            $format = 'txt';
-        }
         if (!\in_array($format, $this->getAvailableFormatOptions(), true)) {
             throw new InvalidArgumentException('Invalid output format.');
         }

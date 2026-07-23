@@ -29,5 +29,5 @@ interface UserAuthenticatorInterface
      * @param BadgeInterface[]     $badges     Optionally, pass some Passport badges to use for the manual login
      * @param array<string, mixed> $attributes Optionally, pass some Passport attributes to use for the manual login
      */
-    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [] /* , array $attributes = [] */): ?Response;
+    public function authenticateUser(UserInterface $user, AuthenticatorInterface $authenticator, Request $request, array $badges = [], array $attributes = []): ?Response;
 }

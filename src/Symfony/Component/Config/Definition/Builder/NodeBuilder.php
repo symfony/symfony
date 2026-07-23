@@ -67,9 +67,8 @@ class NodeBuilder implements NodeParentInterface
      *
      * @return ArrayNodeDefinition<$this>
      */
-    public function arrayNode(string $name/* , ?string $singular = null */): ArrayNodeDefinition
+    public function arrayNode(string $name, ?string $singular = null): ArrayNodeDefinition
     {
-        $singular = 1 < \func_num_args() ? func_get_arg(1) : null;
         if (null !== $singular) {
             if (!$this->parent instanceof ArrayNodeDefinition) {
                 throw new \LogicException('The parent node must be an ArrayNodeDefinition when setting the singular name.');

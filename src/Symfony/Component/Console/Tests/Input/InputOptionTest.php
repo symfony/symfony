@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -83,9 +86,9 @@ class InputOptionTest extends TestCase
         $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
 
         $option = new InputOption('foo', 'f', null);
-        $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueRequired(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
-        $this->assertFalse($option->isValueOptional(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
+        $this->assertFalse($option->acceptValue(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        $this->assertFalse($option->isValueRequired(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
+        $this->assertFalse($option->isValueOptional(), '__construct() gives a "InputOption::VALUE_NONE" mode by default');
 
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
         $this->assertFalse($option->acceptValue(), '__construct() can take "InputOption::VALUE_NONE" as its mode');
@@ -109,6 +112,24 @@ class InputOptionTest extends TestCase
         $this->expectExceptionMessage('Option mode "-1" is not valid.');
 
         new InputOption('foo', 'f', '-1');
+    }
+
+    #[DataProvider('provideCombiningInvalidModes')]
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testCombiningInvalidModesIsDeprecated(int $mode)
+    {
+        $this->expectUserDeprecationMessage('Since symfony/console 8.1: Option "foo" mode should be either none, required or optional.');
+
+        new InputOption('foo', 'f', $mode);
+    }
+
+    public static function provideCombiningInvalidModes(): iterable
+    {
+        yield [InputOption::VALUE_NONE | InputOption::VALUE_REQUIRED];
+        yield [InputOption::VALUE_NONE | InputOption::VALUE_OPTIONAL];
+        yield [InputOption::VALUE_REQUIRED | InputOption::VALUE_OPTIONAL];
+        yield [InputOption::VALUE_NONE | InputOption::VALUE_REQUIRED | InputOption::VALUE_OPTIONAL];
     }
 
     public function testEmptyNameIsInvalid()
@@ -172,6 +193,35 @@ class InputOptionTest extends TestCase
         $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
         $option->setDefault([1, 2]);
         $this->assertSame([1, 2], $option->getDefault(), '->setDefault() changes the default value');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE);
+        $option->setDefault(true);
+        $this->assertTrue($option->getDefault(), '->setDefault() changes the default value');
+
+        $option = new InputOption('foo', null, InputOption::VALUE_NEGATABLE);
+        $option->setDefault(false);
+        $this->assertFalse($option->getDefault(), '->setDefault() changes the default value');
+    }
+
+    public function testDefaultValueWithNegatableMode()
+    {
+        $option = new InputOption('foo', 'f', InputOption::VALUE_NEGATABLE);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('A default value for a negatable option must be a boolean or null.');
+
+        $option->setDefault('default');
+    }
+
+    public function testSetDefaultWithObject()
+    {
+        $default = new \DateTimeImmutable('2024-01-01');
+        $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED, '', $default);
+        $this->assertSame($default, $option->getDefault(), '->getDefault() returns the object default value');
+
+        $newDefault = new \DateTimeImmutable('2024-06-01');
+        $option->setDefault($newDefault);
+        $this->assertSame($newDefault, $option->getDefault(), '->setDefault() changes the default value to an object');
     }
 
     public function testDefaultValueWithValueNoneMode()

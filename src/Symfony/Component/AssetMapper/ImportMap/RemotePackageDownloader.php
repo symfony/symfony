@@ -128,7 +128,11 @@ class RemotePackageDownloader
         }
 
         $installedPath = $this->remotePackageStorage->getStorageDir().'/installed.php';
-        $installed = is_file($installedPath) ? (static fn () => include $installedPath)() : [];
+        $installed = is_file($installedPath) ? \Closure::bind(static fn () => include $installedPath, null, null)() : [];
+
+        if (!\is_array($installed)) {
+            throw new \LogicException(\sprintf('The "%s" file must return an array, got "%s".', $installedPath, get_debug_type($installed)));
+        }
 
         foreach ($installed as $package => $data) {
             if (!isset($data['version'])) {

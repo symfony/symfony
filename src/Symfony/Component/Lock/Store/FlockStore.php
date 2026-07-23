@@ -30,7 +30,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {
-    private ?string $lockPath;
+    private readonly string $lockPath;
 
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory

@@ -17,6 +17,8 @@ use Symfony\Component\TypeInfo\Type\WrappingTypeInterface;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
+ *
+ * @template-covariant T
  */
 abstract class Type implements \Stringable
 {
@@ -24,6 +26,8 @@ abstract class Type implements \Stringable
 
     /**
      * Tells if the type is satisfied by the $specification callable.
+     *
+     * @param-immediately-invoked-callable $specification
      *
      * @param callable(self): bool $specification
      */
@@ -65,6 +69,8 @@ abstract class Type implements \Stringable
 
     /**
      * Tells if the type (or one of its wrapped/composed parts) accepts the given $value.
+     *
+     * @psalm-assert-if-true =T $value
      */
     public function accepts(mixed $value): bool
     {

@@ -11,10 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,8 +25,6 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 
 class FirewallTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     public function testOnKernelRequestRegistersExceptionListener()
     {
         $dispatcher = new EventDispatcher();
@@ -165,33 +160,5 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
 
         $this->assertSame(['firewallListener', 'callableFirewallListener'], $calledListeners);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testCallableListenersAreCalled()
-    {
-        $calledListeners = [];
-
-        $callableListener = static function () use (&$calledListeners) { $calledListeners[] = 'callableListener'; };
-
-        $request = new Request();
-
-        $map = $this->createMock(FirewallMapInterface::class);
-        $map
-            ->expects($this->once())
-            ->method('getListeners')
-            ->with($this->equalTo($request))
-            ->willReturn([[$callableListener], null, null])
-        ;
-
-        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $firewall = new Firewall($map, new EventDispatcher());
-
-        $this->expectUserDeprecationMessage('Since symfony/security-http 7.4: Using a callable as firewall listener is deprecated, extend "Symfony\Component\Security\Http\Firewall\AbstractListener" or implement "Symfony\Component\Security\Http\Firewall\FirewallListenerInterface" instead.');
-        $firewall->onKernelRequest($event);
-
-        $this->assertSame(['callableListener'], $calledListeners);
     }
 }

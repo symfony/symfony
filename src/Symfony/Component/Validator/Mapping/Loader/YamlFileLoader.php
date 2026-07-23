@@ -86,15 +86,7 @@ class YamlFileLoader extends FileLoader
                     $options = $this->parseNodes($options);
                 }
 
-                if (null !== $options && (!\is_array($options) || array_is_list($options))) {
-                    trigger_deprecation('symfony/validator', '7.4', 'Not using a YAML mapping of constraint option names to their values to configure the "%s" constraint is deprecated.', key($childNodes));
-
-                    $options = [
-                        'value' => $options,
-                    ];
-                }
-
-                $values[] = $this->newConstraint(key($childNodes), $options, true);
+                $values[] = $this->newConstraint(key($childNodes), $options);
             } else {
                 if (\is_array($childNodes)) {
                     $childNodes = $this->parseNodes($childNodes);

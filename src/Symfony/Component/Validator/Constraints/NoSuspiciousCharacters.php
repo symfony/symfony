@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
@@ -89,7 +89,6 @@ class NoSuspiciousCharacters extends Constraint
      * @param string[]|null                               $locales          Restrict the string's characters to those normally used with these locales. Pass null to use the default locales configured for the NoSuspiciousCharactersValidator. (defaults to null)
      * @param string[]|null                               $groups
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $restrictionLevelMessage = null,
@@ -106,18 +105,18 @@ class NoSuspiciousCharacters extends Constraint
             throw new LogicException('The intl extension is required to use the NoSuspiciousCharacters constraint.');
         }
 
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->restrictionLevelMessage = $restrictionLevelMessage ?? $this->restrictionLevelMessage;
         $this->invisibleMessage = $invisibleMessage ?? $this->invisibleMessage;
         $this->mixedNumbersMessage = $mixedNumbersMessage ?? $this->mixedNumbersMessage;
         $this->hiddenOverlayMessage = $hiddenOverlayMessage ?? $this->hiddenOverlayMessage;
         $this->checks = $checks ?? $this->checks;
-        $this->restrictionLevel = $restrictionLevel ?? $this->restrictionLevel;
-        $this->locales = $locales ?? $this->locales;
+        $this->restrictionLevel = $restrictionLevel;
+        $this->locales = $locales;
     }
 }

@@ -261,6 +261,51 @@ class CachePoolPassTest extends TestCase
         $this->assertNotSame($parentNamespace, $childNamespace);
     }
 
+    public function testCustomMarshallerForPool()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('cache.prefix.seed', 'test');
+
+        $container->register('cache.default_marshaller');
+        $container->register('app.custom_marshaller');
+
+        $container->register('cache.adapter.filesystem', FilesystemAdapter::class)
+            ->setAbstract(true)
+            ->setArguments([null, 0, null, new Reference('cache.default_marshaller')])
+            ->addTag('cache.pool');
+
+        $container->register('cache.adapter.apcu', ApcuAdapter::class)
+            ->setAbstract(true)
+            ->setArguments([null, 0, null, new Reference('cache.default_marshaller')])
+            ->addTag('cache.pool');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->setAbstract(true)
+            ->addTag('cache.pool');
+
+        $container->register('cache.adapter.chain', ChainAdapter::class)
+            ->setAbstract(true);
+
+        $container->setDefinition('cache.with_marshaller', new ChildDefinition('cache.adapter.filesystem'))
+            ->addTag('cache.pool', ['marshaller' => 'app.custom_marshaller']);
+        $container->setDefinition('cache.apcu_with_marshaller', new ChildDefinition('cache.adapter.apcu'))
+            ->addTag('cache.pool', ['marshaller' => 'app.custom_marshaller']);
+        $container->setDefinition('cache.chain_with_marshaller', new ChildDefinition('cache.adapter.chain'))
+            ->addArgument(['cache.adapter.array', 'cache.adapter.filesystem'])
+            ->addTag('cache.pool', ['marshaller' => 'app.custom_marshaller']);
+
+        $this->cachePoolPass->process($container);
+
+        $expectedMarshallerRef = new Reference('app.custom_marshaller');
+
+        $this->assertEquals($expectedMarshallerRef, $container->getDefinition('cache.with_marshaller')->getArgument(3));
+        $this->assertEquals($expectedMarshallerRef, $container->getDefinition('cache.apcu_with_marshaller')->getArgument(3));
+
+        $adapters = $container->getDefinition('cache.chain_with_marshaller')->getArgument(0);
+        $this->assertArrayNotHasKey('index_3', $adapters[0]->getArguments());
+        $this->assertEquals($expectedMarshallerRef, $adapters[1]->getArgument(3));
+    }
+
     public function testChainAdapterNormalizesDefaultLifetimeDurationString()
     {
         $container = new ContainerBuilder();

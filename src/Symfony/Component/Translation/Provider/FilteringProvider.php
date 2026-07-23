@@ -26,6 +26,7 @@ class FilteringProvider implements ProviderInterface
         private array $locales,
         private array $domains = [],
     ) {
+        $this->locales = array_filter($locales);
     }
 
     public function __toString(): string

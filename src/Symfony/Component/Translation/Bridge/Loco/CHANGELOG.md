@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Calling `LocoProvider::read()` without locale now fetch them all
+
 7.2
 ---
 

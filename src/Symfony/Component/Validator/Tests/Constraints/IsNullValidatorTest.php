@@ -25,7 +25,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new IsNull());
+        $this->validate(null, new IsNull());
 
         $this->assertNoViolation();
     }
@@ -35,7 +35,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new IsNull(message: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)
@@ -48,7 +48,7 @@ class IsNullValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new IsNull(message: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)

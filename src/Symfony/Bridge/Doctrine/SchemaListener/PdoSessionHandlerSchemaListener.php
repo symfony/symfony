@@ -36,7 +36,7 @@ final class PdoSessionHandlerSchemaListener extends AbstractSchemaListener
         $isSameDatabaseChecker = $this->getIsSameDatabaseChecker($connection);
         $sessionHandler = $this->sessionHandler;
 
-        $schema = $this->filterSchemaChanges($schema, $connection, static fn () => $sessionHandler->configureSchema($schema, $isSameDatabaseChecker)) ?? $schema;
+        $schema = $this->filterSchemaChanges($schema, $connection, static fn () => $sessionHandler->configureSchema($schema, $isSameDatabaseChecker));
 
         if (method_exists($event, 'setSchema')) {
             $event->setSchema($schema);

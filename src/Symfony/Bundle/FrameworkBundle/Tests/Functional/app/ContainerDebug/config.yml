@@ -35,3 +35,16 @@ services:
             - '%env(float:key:2:json:JSON)%'
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ContainerExcluded:
         tags: ['container.excluded']
+
+    original_service:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass
+
+    decorator_1:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\WarmedClass
+        decorates: original_service
+        arguments: ['@.inner']
+
+    decorator_2:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass
+        decorates: decorator_1
+        arguments: ['@.inner']

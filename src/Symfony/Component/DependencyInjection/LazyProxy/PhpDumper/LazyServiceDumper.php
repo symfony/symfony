@@ -56,15 +56,6 @@ final class LazyServiceDumper implements DumperInterface
             }
         }
 
-        if (\PHP_VERSION_ID < 80400) {
-            try {
-                $asGhostObject = (bool) ProxyHelper::generateLazyGhost(new \ReflectionClass($class));
-            } catch (LogicException) {
-            }
-
-            return true;
-        }
-
         try {
             $asGhostObject = (bool) (new \ReflectionClass($class))->newLazyGhost(static fn () => null);
         } catch (\Error $e) {
@@ -88,7 +79,7 @@ final class LazyServiceDumper implements DumperInterface
         $proxyClass = $this->getProxyClass($definition, $asGhostObject);
 
         if (!$asGhostObject) {
-            if ($definition->getClass() === $proxyClass) {
+            if (ltrim($definition->getClass(), '\\') === $proxyClass) {
                 return <<<EOF
                             if (true === \$lazyLoad) {
                                 $instantiation new \ReflectionClass('$proxyClass')->newLazyProxy(static fn () => $factoryCode);
@@ -101,18 +92,6 @@ final class LazyServiceDumper implements DumperInterface
             return <<<EOF
                         if (true === \$lazyLoad) {
                             $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyProxy(static fn () => $factoryCode));
-                        }
-
-
-                EOF;
-        }
-
-        if (\PHP_VERSION_ID < 80400) {
-            $factoryCode = \sprintf('static fn ($proxy) => %s', $factoryCode);
-
-            return <<<EOF
-                        if (true === \$lazyLoad) {
-                            $instantiation \$container->createProxy('$proxyClass', static fn () => \\$proxyClass::createLazyGhost($factoryCode));
                         }
 
 
@@ -138,18 +117,10 @@ final class LazyServiceDumper implements DumperInterface
         $proxyClass = $this->getProxyClass($definition, $asGhostObject, $class);
 
         if ($asGhostObject) {
-            if (\PHP_VERSION_ID >= 80400) {
-                return '';
-            }
-
-            try {
-                return ($class?->isReadOnly() ? 'readonly ' : '').'class '.$proxyClass.ProxyHelper::generateLazyGhost($class);
-            } catch (LogicException $e) {
-                throw new InvalidArgumentException(\sprintf('Cannot generate lazy ghost for service "%s".', $id ?? $definition->getClass()), 0, $e);
-            }
+            return '';
         }
 
-        if ($definition->getClass() === $proxyClass) {
+        if (ltrim($definition->getClass(), '\\') === $proxyClass) {
             return '';
         }
 
@@ -186,12 +157,6 @@ final class LazyServiceDumper implements DumperInterface
     {
         $class = 'object' !== $definition->getClass() ? $definition->getClass() : 'stdClass';
         $class = new \ReflectionClass($class);
-
-        if (\PHP_VERSION_ID < 80400) {
-            return preg_replace('/^.*\\\\/', '', $definition->getClass())
-                .($asGhostObject ? 'Ghost' : 'Proxy')
-                .ucfirst(substr(hash('xxh128', $this->salt.'+'.$class->name.'+'.serialize($definition->getTag('proxy'))), -7));
-        }
 
         if ($asGhostObject) {
             return $class->name;

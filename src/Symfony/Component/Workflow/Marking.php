@@ -36,14 +36,10 @@ class Marking
     }
 
     /**
-     * @param int $nbToken
-     *
      * @psalm-param int<1, max> $nbToken
      */
-    public function mark(string $place /* , int $nbToken = 1 */): void
+    public function mark(string $place, int $nbToken = 1): void
     {
-        $nbToken = 1 < \func_num_args() ? func_get_arg(1) : 1;
-
         if ($nbToken < 1) {
             throw new \InvalidArgumentException(\sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
         }
@@ -53,14 +49,10 @@ class Marking
     }
 
     /**
-     * @param int $nbToken
-     *
      * @psalm-param int<1, max> $nbToken
      */
-    public function unmark(string $place /* , int $nbToken = 1 */): void
+    public function unmark(string $place, int $nbToken = 1): void
     {
-        $nbToken = 1 < \func_num_args() ? func_get_arg(1) : 1;
-
         if ($nbToken < 1) {
             throw new \InvalidArgumentException(\sprintf('The number of tokens must be greater than 0, "%s" given.', $nbToken));
         }

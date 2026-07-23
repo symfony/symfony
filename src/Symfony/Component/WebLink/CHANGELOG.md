@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `Link::AS_*` constants for the `as` attribute of `rel=preload` / `rel=modulepreload`
+
 7.4
 ---
 

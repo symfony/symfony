@@ -12,9 +12,9 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Symfony\Component\VarDumper\Caster\ClassDumpStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -23,6 +23,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
+use Symfony\Component\VarDumper\Tests\Fixtures\ClassStringFixture;
 use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -301,7 +302,6 @@ class CliDumperTest extends TestCase
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testVirtualProperties()
     {
         $this->assertDumpEquals(<<<EODUMP
@@ -313,6 +313,46 @@ class CliDumperTest extends TestCase
             }
             EODUMP,
             new VirtualProperty()
+        );
+    }
+
+    #[TestWith(['stdClass'])]
+    #[TestWith(['locale'])]
+    #[TestWith(['FFI\CType'])]
+    public function testBuiltInClassString($classString)
+    {
+        $this->assertDumpMatchesFormat('"'.$classString.'"', $classString);
+    }
+
+    public function testClassString()
+    {
+        class_exists(ClassStringFixture::class);
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            Symfony\Component\VarDumper\Tests\Fixtures\ClassStringFixture {
+            %A+publicStatic (static): "public value"
+            %A#protectedStatic (static): 42
+            %A-privateStatic (static): true
+            %A+notInitialized (static): ? string
+            %A}
+            EODUMP,
+            ClassStringFixture::class
+        );
+    }
+
+    public function testClassDumpStubNested()
+    {
+        class_exists(ClassStringFixture::class);
+        $this->assertDumpMatchesFormat(<<<'EODUMP'
+            array:1 [
+              "foo" => Symfony\Component\VarDumper\Tests\Fixtures\ClassStringFixture {
+            %A+publicStatic (static): "public value"
+            %A#protectedStatic (static): 42
+            %A-privateStatic (static): true
+            %A+notInitialized (static): ? string
+            %A}
+            ]
+            EODUMP,
+            ['foo' => new ClassDumpStub(ClassStringFixture::class)]
         );
     }
 
@@ -361,7 +401,7 @@ class CliDumperTest extends TestCase
                         › 
                       }
                       %A%eTemplate.php:%d { …}
-                      %s%eTests%eDumper%eCliDumperTest.php:%d { …}
+                      %A%eCliDumperTest.php:%d { …}
                 %A  }
                   }
                 %Awrapper_type: "PHP"
@@ -508,10 +548,6 @@ class CliDumperTest extends TestCase
 
     public function testFileLinkFormat()
     {
-        if (!class_exists(FileLinkFormatter::class)) {
-            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
-        }
-
         $data = new Data([
             [
                 new ClassStub(self::class),

@@ -19,6 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener;
 use Symfony\Component\Form\Extension\PasswordHasher\PasswordHasherExtension;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\RepeatedPasswordField;
 use Symfony\Component\Form\Tests\Fixtures\User;
@@ -46,7 +47,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
         return array_merge(parent::getExtensions(), [
             new PasswordHasherExtension(new PasswordHasherListener($this->passwordHasher)),

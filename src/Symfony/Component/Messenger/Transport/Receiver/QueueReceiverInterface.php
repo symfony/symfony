@@ -24,8 +24,9 @@ interface QueueReceiverInterface extends ReceiverInterface
      * Get messages from the specified queue names instead of consuming from all queues.
      *
      * @param string[] $queueNames
+     * @param int      $fetchSize  Best-effort hint about how many messages can be received in one call
      *
      * @return Envelope[]
      */
-    public function getFromQueues(array $queueNames): iterable;
+    public function getFromQueues(array $queueNames/* , int $fetchSize = 1 */): iterable;
 }

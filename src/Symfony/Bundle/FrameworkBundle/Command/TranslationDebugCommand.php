@@ -60,6 +60,7 @@ class TranslationDebugCommand extends Command
         private array $codePaths = [],
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
         parent::__construct();
     }
 

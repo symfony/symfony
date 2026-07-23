@@ -28,12 +28,14 @@ final class Interaction
     }
 
     /**
+     * @param-immediately-invoked-callable $parameterResolver
+     *
      * @param \Closure(\ReflectionFunction $function, InputInterface $input, OutputInterface $output): array $parameterResolver
      */
     public function interact(InputInterface $input, OutputInterface $output, \Closure $parameterResolver): void
     {
         if ($this->owner instanceof MapInput) {
-            $function = $this->attribute->getFunction($this->owner->resolveValue($input));
+            $function = $this->attribute->getFunction($this->owner->createInstance($input));
             $function->invoke(...$parameterResolver($function, $input, $output));
             $this->owner->setValue($input, $function->getClosureThis());
 

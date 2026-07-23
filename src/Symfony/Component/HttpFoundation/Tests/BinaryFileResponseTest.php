@@ -332,6 +332,21 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFileDoesNotExist($path);
     }
 
+    public function testShouldDeleteFileAfterSend()
+    {
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
+
+        $this->assertFalse($response->shouldDeleteFileAfterSend());
+
+        $response->deleteFileAfterSend(true);
+
+        $this->assertTrue($response->shouldDeleteFileAfterSend());
+
+        $response->deleteFileAfterSend(false);
+
+        $this->assertFalse($response->shouldDeleteFileAfterSend());
+    }
+
     public function testAcceptRangeOnUnsafeMethods()
     {
         $request = Request::create('/', 'POST');

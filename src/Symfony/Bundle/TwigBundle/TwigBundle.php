@@ -14,9 +14,9 @@ namespace Symfony\Bundle\TwigBundle;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\AttributeExtensionPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\ExtensionPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\SafeClassPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigEnvironmentPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\TwigLoaderPass;
-use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -37,11 +37,7 @@ class TwigBundle extends Bundle
         $container->addCompilerPass(new AttributeExtensionPass());
         $container->addCompilerPass(new TwigEnvironmentPass());
         $container->addCompilerPass(new TwigLoaderPass());
+        $container->addCompilerPass(new SafeClassPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new RuntimeLoaderPass(), PassConfig::TYPE_BEFORE_REMOVING);
-    }
-
-    public function registerCommands(Application $application): void
-    {
-        // noop
     }
 }

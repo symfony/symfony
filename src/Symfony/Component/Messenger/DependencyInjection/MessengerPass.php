@@ -50,6 +50,8 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $this->registerHandlers($container, $busIds);
+
+        $this->registerTypeMapping($container);
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds): void
@@ -403,5 +405,28 @@ class MessengerPass implements CompilerPassInterface
 
             return $definition->getClass();
         }
+    }
+
+    private function registerTypeMapping(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('messenger.transport.symfony_serializer')) {
+            return;
+        }
+
+        $typeToClassMap = [];
+        foreach ($container->findTaggedResourceIds('messenger.message', false) as $id => $tags) {
+            $class = $container->getDefinition($id)->getClass();
+            foreach ($tags as $tag) {
+                if (!isset($tag['serializedTypeName'])) {
+                    continue;
+                }
+                if (isset($typeToClassMap[$tag['serializedTypeName']])) {
+                    throw new RuntimeException(\sprintf('The serialized type name "%s" is already mapped to class "%s", cannot map it to "%s" as well. Each serialized type must be unique.', $tag['serializedTypeName'], $typeToClassMap[$tag['serializedTypeName']], $class));
+                }
+                $typeToClassMap[$tag['serializedTypeName']] = $class;
+            }
+        }
+
+        $container->getDefinition('messenger.transport.symfony_serializer')->setArgument(3, $typeToClassMap);
     }
 }

@@ -28,7 +28,7 @@ trait InvalidComparisonToValueTestTrait
         $constraint = $this->createConstraint(['value' => $comparedValue]);
         $constraint->message = 'Constraint Message';
 
-        $this->validator->validate($dirtyValue, $constraint);
+        $this->validate($dirtyValue, $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', $dirtyValueAsString)
@@ -49,7 +49,7 @@ trait InvalidComparisonToValueTestTrait
 
         $this->setObject($object);
 
-        $this->validator->validate($dirtyValue, $constraint);
+        $this->validate($dirtyValue, $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', $dirtyValueAsString)

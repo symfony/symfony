@@ -107,7 +107,10 @@ class Configuration implements ConfigurationInterface
                     ->info('Set true to enable support for xsendfile in binary file responses.')
                     ->defaultValue('%env(bool:default::SYMFONY_TRUST_X_SENDFILE_TYPE_HEADER)%')
                 ->end()
-                ->scalarNode('ide')->defaultValue($this->debug ? '%env(default::SYMFONY_IDE)%' : null)->end()
+                ->scalarNode('ide')
+                    ->defaultValue($this->debug ? '%env(default::SYMFONY_IDE)%' : null)
+                    ->setDeprecated('symfony/framework-bundle', '8.2', 'Setting the "%path%.%node%" configuration option is deprecated, use the "SYMFONY_IDE" env var instead.')
+                ->end()
                 ->booleanNode('test')->end()
                 ->scalarNode('default_locale')->defaultValue('en')->end()
                 ->booleanNode('set_locale_from_accept_language')
@@ -162,6 +165,7 @@ class Configuration implements ConfigurationInterface
         $this->addEsiSection($rootNode);
         $this->addSsiSection($rootNode);
         $this->addFragmentsSection($rootNode);
+        $this->addUriSignerSection($rootNode);
         $this->addProfilerSection($rootNode);
         $this->addWorkflowSection($rootNode);
         $this->addRouterSection($rootNode);
@@ -171,7 +175,6 @@ class Configuration implements ConfigurationInterface
         $this->addAssetMapperSection($rootNode, $enableIfStandalone);
         $this->addTranslatorSection($rootNode, $enableIfStandalone);
         $this->addValidationSection($rootNode, $enableIfStandalone);
-        $this->addAnnotationsSection($rootNode);
         $this->addSerializerSection($rootNode, $enableIfStandalone);
         $this->addPropertyAccessSection($rootNode, $willBeAvailable);
         $this->addTypeInfoSection($rootNode, $enableIfStandalone);
@@ -245,6 +248,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addFormSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -303,7 +309,9 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('allow_revalidate')->end()
                         ->integerNode('stale_while_revalidate')->end()
                         ->integerNode('stale_if_error')->end()
-                        ->booleanNode('terminate_on_cache_hit')->end()
+                        ->booleanNode('terminate_on_cache_hit')
+                            ->setDeprecated('symfony/framework-bundle', '8.1', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 9.0.')
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -349,6 +357,24 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    private function addUriSignerSection(ArrayNodeDefinition $rootNode): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('uri_signer')
+                    ->info('URI signer configuration')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('expiration')
+                            ->info('Default expiration of signed URIs, in seconds.')
+                            ->defaultNull()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     private function addProfilerSection(ArrayNodeDefinition $rootNode): void
     {
         $rootNode
@@ -362,7 +388,11 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_main_requests')->defaultFalse()->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
-                        ->booleanNode('collect_serializer_data')->info('Enables the serializer data collector and profiler panel.')->defaultFalse()->end()
+                        ->enumNode('collect_serializer_data')
+                            ->values([true])
+                            ->defaultTrue()
+                            ->setDeprecated('symfony/framework-bundle', '8.1', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 9.0.')
+                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -488,16 +518,46 @@ class Configuration implements ConfigurationInterface
                                                 }
 
                                                 foreach ($v as $value) {
-                                                    if (!\in_array($value, WorkflowEvents::ALIASES, true)) {
+                                                    $name = str_starts_with($value, '!') ? substr($value, 1) : $value;
+                                                    if (!\in_array($name, WorkflowEvents::ALIASES, true)) {
                                                         return true;
                                                     }
                                                 }
 
                                                 return false;
                                             })
-                                            ->thenInvalid('The value must be "null" or an array of workflow events (like ["workflow.enter"]).')
+                                            ->thenInvalid('The value must be "null" or an array of workflow events (like ["workflow.enter"]). Prefix an event with "!" to disable it (e.g. ["!workflow.announce"]).')
                                         ->end()
-                                        ->info('Select which Transition events should be dispatched for this Workflow.')
+                                        ->validate()
+                                            ->ifTrue(static function ($v) {
+                                                if (!\is_array($v) || [] === $v) {
+                                                    return false;
+                                                }
+                                                $hasAllowList = false;
+                                                $hasBlockList = false;
+                                                foreach ($v as $value) {
+                                                    if (str_starts_with($value, '!')) {
+                                                        $hasBlockList = true;
+                                                    } else {
+                                                        $hasAllowList = true;
+                                                    }
+                                                }
+
+                                                return $hasAllowList && $hasBlockList;
+                                            })
+                                            ->thenInvalid('Cannot mix allow-list and block-list entries in "events_to_dispatch": every entry must start with "!" (block-list mode) or none of them must (allow-list mode).')
+                                        ->end()
+                                        ->validate()
+                                            ->ifTrue(static function ($v) {
+                                                if (!class_exists(WorkflowEvents::class) || !\is_array($v)) {
+                                                    return false;
+                                                }
+
+                                                return \in_array('!'.WorkflowEvents::GUARD, $v, true);
+                                            })
+                                            ->thenInvalid('The "workflow.guard" event cannot be disabled in "events_to_dispatch": it is always dispatched.')
+                                        ->end()
+                                        ->info('Select which Transition events should be dispatched for this Workflow. Prefix an event with "!" to disable it (e.g. ["!workflow.announce"]); future events are dispatched by default in block-list mode.')
                                         ->example(['workflow.enter', 'workflow.transition'])
                                     ->end()
                                     ->arrayNode('places', 'place')
@@ -732,10 +792,6 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('resource')->isRequired()->end()
                         ->scalarNode('type')->end()
-                        ->scalarNode('cache_dir')
-                            ->defaultValue('%kernel.build_dir%')
-                            ->setDeprecated('symfony/framework-bundle', '7.1', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 8.0.')
-                        ->end()
                         ->scalarNode('default_uri')
                             ->info('The default URI used to generate URLs in a non-HTTP context.')
                             ->defaultNull()
@@ -797,16 +853,6 @@ class Configuration implements ConfigurationInterface
                             ->defaultValue(0)
                             ->info('Seconds to wait between 2 session metadata updates.')
                         ->end()
-                        ->integerNode('sid_length')
-                            ->min(22)
-                            ->max(256)
-                            ->setDeprecated('symfony/framework-bundle', '7.2', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 8.0. No alternative is provided as PHP 8.4 has deprecated the related option.')
-                        ->end()
-                        ->integerNode('sid_bits_per_character')
-                            ->min(4)
-                            ->max(6)
-                            ->setDeprecated('symfony/framework-bundle', '7.2', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 8.0. No alternative is provided as PHP 8.4 has deprecated the related option.')
-                        ->end()
                     ->end()
                 ->end()
             ->end()
@@ -838,6 +884,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addAssetsSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -919,6 +968,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addAssetMapperSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1040,6 +1092,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addTranslatorSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1127,6 +1182,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addValidationSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1135,9 +1193,6 @@ class Configuration implements ConfigurationInterface
                     ->info('Validation configuration')
                     ->{$enableIfStandalone('symfony/validator', Validation::class)}()
                     ->children()
-                        ->scalarNode('cache')
-                            ->setDeprecated('symfony/framework-bundle', '7.3', 'Setting the "%path%.%node%" configuration option is deprecated. It will be removed in version 8.0.')
-                        ->end()
                         ->booleanNode('enable_attributes')->{class_exists(FullStack::class) ? 'defaultFalse' : 'defaultTrue'}()->end()
                         ->arrayNode('static_method')
                             ->acceptAndWrap(['string'])
@@ -1146,7 +1201,7 @@ class Configuration implements ConfigurationInterface
                             ->treatFalseLike([])
                         ->end()
                         ->scalarNode('translation_domain')->defaultValue('validators')->end()
-                        ->enumNode('email_validation_mode')->values(['html5', 'html5-allow-no-tld', 'strict', 'loose'])->defaultValue('html5')->end()
+                        ->enumNode('email_validation_mode')->values(['html5', 'html5-allow-no-tld', 'strict'])->defaultValue('html5')->end()
                         ->arrayNode('mapping')
                             ->addDefaultsIfNotSet()
                             ->children()
@@ -1165,6 +1220,10 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->booleanNode('disable_translation')
+                            ->defaultFalse()
+                        ->end()
+                        ->booleanNode('property_metadata_existence_check')
+                            ->info('When enabled, validateProperty() and validatePropertyValue() throw an exception if no metadata is found for the given property.')
                             ->defaultFalse()
                         ->end()
                         ->arrayNode('auto_mapping')
@@ -1216,20 +1275,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addAnnotationsSection(ArrayNodeDefinition $rootNode): void
-    {
-        $rootNode
-            ->children()
-                ->arrayNode('annotations')
-                    ->canBeEnabled()
-                    ->validate()
-                        ->ifTrue(static fn ($v) => $v['enabled'])
-                        ->thenInvalid('Enabling the doctrine/annotations integration is not supported anymore.')
-                ->end()
-            ->end()
-        ;
-    }
-
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addSerializerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $defaultContextNode = fn () => (new NodeBuilder())
@@ -1298,6 +1346,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $willBeAvailable
+     */
     private function addPropertyAccessSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
@@ -1318,6 +1369,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addPropertyInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1328,23 +1382,17 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode('with_constructor_extractor')
                             ->info('Registers the constructor extractor.')
+                            ->defaultTrue()
                         ->end()
                     ->end()
                 ->end()
             ->end()
-            ->validate()
-                ->ifTrue(static fn ($v) => $v['property_info']['enabled'] && !isset($v['property_info']['with_constructor_extractor']))
-                ->then(static function ($v) {
-                    $v['property_info']['with_constructor_extractor'] = false;
-
-                    trigger_deprecation('symfony/framework-bundle', '7.3', 'Not setting the "property_info.with_constructor_extractor" option explicitly is deprecated because its default value will change in version 8.0.');
-
-                    return $v;
-                })
-            ->end()
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addTypeInfoSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1367,6 +1415,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $willBeAvailable
+     */
     private function addCacheSection(ArrayNodeDefinition $rootNode, callable $willBeAvailable): void
     {
         $rootNode
@@ -1445,6 +1496,9 @@ class Configuration implements ConfigurationInterface
                                         ->example('"messenger.default_bus" to send early expiration events to the default Messenger bus.')
                                     ->end()
                                     ->scalarNode('clearer')->end()
+                                    ->scalarNode('marshaller')
+                                        ->info('The marshaller service to use for this pool.')
+                                    ->end()
                                 ->end()
                             ->end()
                             ->validate()
@@ -1546,6 +1600,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addLockSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1612,6 +1669,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addSemaphoreSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1667,6 +1727,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addWebLinkSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1679,6 +1742,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addMessengerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1701,37 +1767,22 @@ class Configuration implements ConfigurationInterface
                             ->beforeNormalization()
                                 ->ifArray()
                                 ->then(static function ($config) {
-                                    // If XML config with only one routing attribute
-                                    if (2 === \count($config) && isset($config['message-class']) && isset($config['sender'])) {
-                                        $config = [0 => $config];
-                                    }
-
                                     $newConfig = [];
                                     foreach ($config as $k => $v) {
-                                        if (!\is_int($k)) {
-                                            $newConfig[$k] = [
-                                                'senders' => $v['senders'] ?? (\is_array($v) ? array_values($v) : [$v]),
-                                            ];
-                                        } else {
-                                            $newConfig[$v['message-class']]['senders'] = array_map(
-                                                static fn ($a) => \is_string($a) ? $a : $a['service'],
-                                                array_values($v['sender'])
-                                            );
+                                        if (isset($v['senders'])) {
+                                            trigger_deprecation('symfony/framework-bundle', '8.1', 'Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
                                         }
+                                        $newConfig[$k] = $v['senders'] ?? (\is_array($v) ? array_values($v) : [$v]);
                                     }
 
                                     return $newConfig;
                                 })
                             ->end()
-                            ->prototype('array')
-                                ->acceptAndWrap(['string'], 'senders')
+                            ->arrayPrototype()
+                                ->requiresAtLeastOneElement()
+                                ->acceptAndWrap(['string'])
                                 ->performNoDeepMerging()
-                                ->children()
-                                    ->arrayNode('senders')
-                                        ->requiresAtLeastOneElement()
-                                        ->prototype('scalar')->end()
-                                    ->end()
-                                ->end()
+                                ->scalarPrototype()->end()
                             ->end()
                         ->end()
                         ->arrayNode('serializer')
@@ -1899,6 +1950,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addSchedulerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -1924,6 +1978,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addHttpClientSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2018,6 +2075,9 @@ class Configuration implements ConfigurationInterface
                                 ->floatNode('max_duration')
                                     ->info('The maximum execution time for the request+response as a whole.')
                                 ->end()
+                                ->floatNode('max_connect_duration')
+                                    ->info('The maximum duration allowed for DNS + TCP + TLS connection; a value lower than or equal to 0 means unlimited.')
+                                ->end()
                                 ->scalarNode('bindto')
                                     ->info('A network interface name, IP address, a host name or a UNIX socket to bind to.')
                                 ->end()
@@ -2072,7 +2132,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->scalarNode('mock_response_factory')
-                            ->info('The id of the service that should generate mock responses. It should be either an invokable or an iterable.')
+                            ->info('`true` to always return empty 200 responses, or the id of the service to use to generate mock responses - which should be either an invokable or an iterable.')
                         ->end()
                         ->arrayNode('scoped_clients', 'scoped_client')
                             ->useAttributeAsKey('name')
@@ -2165,6 +2225,9 @@ class Configuration implements ConfigurationInterface
                                     ->floatNode('max_duration')
                                         ->info('The maximum execution time for the request+response as a whole.')
                                     ->end()
+                                    ->floatNode('max_connect_duration')
+                                        ->info('The maximum duration allowed for DNS + TCP + TLS connection; a value lower than or equal to 0 means unlimited.')
+                                    ->end()
                                     ->scalarNode('bindto')
                                         ->info('A network interface name, IP address, a host name or a UNIX socket to bind to.')
                                     ->end()
@@ -2203,6 +2266,9 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->scalarNode('crypto_method')
                                         ->info('The minimum version of TLS to accept; must be one of STREAM_CRYPTO_METHOD_TLSv*_CLIENT constants.')
+                                    ->end()
+                                    ->scalarNode('mock_response_factory')
+                                        ->info('`true` to always return empty 200 responses, `false` to disable mocking, or the id of the service to use to generate mock responses (invokable or iterable).')
                                     ->end()
                                     ->arrayNode('extra')
                                         ->info('Extra options for specific HTTP client.')
@@ -2245,9 +2311,17 @@ class Configuration implements ConfigurationInterface
                         ->defaultTrue()
                     ->end()
                     ->integerNode('max_ttl')
-                        ->info('The maximum TTL (in seconds) allowed for cached responses. Null means no cap.')
-                        ->defaultNull()
-                        ->min(0)
+                        ->info('The maximum TTL (in seconds) allowed for cached responses.')
+                        ->defaultValue(86400)
+                        ->min(1)
+                        ->beforeNormalization()
+                            ->ifNull()
+                            ->then(static function () {
+                                trigger_deprecation('symfony/framework-bundle', '8.1', 'Setting "framework.http_client.default_options.caching.max_ttl" to "null" is deprecated, use a positive integer instead.');
+
+                                return 86400;
+                            })
+                        ->end()
                     ->end()
                 ->end();
     }
@@ -2322,6 +2396,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addMailerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2464,6 +2541,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addNotifierSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2503,6 +2583,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addWebhookSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2512,6 +2595,10 @@ class Configuration implements ConfigurationInterface
                     ->{$enableIfStandalone('symfony/webhook', WebhookController::class)}()
                     ->children()
                         ->scalarNode('message_bus')->defaultValue('messenger.default_bus')->info('The message bus to use.')->end()
+                        ->scalarNode('event_header_name')->defaultValue('Webhook-Event')->end()
+                        ->scalarNode('id_header_name')->defaultValue('Webhook-Id')->end()
+                        ->scalarNode('signature_header_name')->defaultValue('Webhook-Signature')->end()
+                        ->scalarNode('signing_algorithm')->defaultValue('sha256')->end()
                         ->arrayNode('routing')
                             ->normalizeKeys(false)
                             ->useAttributeAsKey('type')
@@ -2532,6 +2619,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addRemoteEventSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2544,6 +2634,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addRateLimiterSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2607,10 +2700,22 @@ class Configuration implements ConfigurationInterface
                                             ->integerNode('amount')->info('Amount of tokens to add each interval.')->defaultValue(1)->end()
                                         ->end()
                                     ->end()
+                                    ->scalarNode('anchor_at')
+                                        ->info('Aligns the "fixed_window" policy to a calendar (e.g. "2024-01-05 00:00:00 UTC" combined with `interval: 1 month` resets the counter on the 5th of each month). UTC if not specified.')
+                                        ->defaultNull()
+                                    ->end()
                                 ->end()
                                 ->validate()
                                     ->ifTrue(static fn ($v) => !\in_array($v['policy'], ['no_limit', 'compound'], true) && !isset($v['limit']))
                                     ->thenInvalid('A limit must be provided when using a policy different than "compound" or "no_limit".')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => isset($v['anchor_at']) && 'fixed_window' !== $v['policy'])
+                                    ->thenInvalid('The "anchor_at" option is only supported with the "fixed_window" policy.')
+                                ->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => isset($v['anchor_at']) && isset($v['interval']) && !preg_match('/\b(months?|years?)\b/i', $v['interval']))
+                                    ->thenInvalid('The "anchor_at" option requires an "interval" of at least one month.')
                                 ->end()
                             ->end()
                         ->end()
@@ -2620,6 +2725,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addUidSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2647,12 +2755,19 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('time_based_uuid_node')
                             ->cannotBeEmpty()
                         ->end()
+                        ->scalarNode('uuid47_secret')
+                            ->info('A high-entropy secret used by the "uuid47_transformer" service. Defaults to "kernel.secret".')
+                            ->defaultNull()
+                        ->end()
                     ->end()
                 ->end()
             ->end()
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addHtmlSanitizerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2665,6 +2780,10 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->children()
+                                    ->enumNode('default_action')
+                                        ->info('Defines how the sanitizer must behave by default.')
+                                        ->values(['drop', 'block', 'allow'])
+                                    ->end()
                                     ->booleanNode('allow_safe_elements')
                                         ->info('Allows "safe" elements and attributes.')
                                         ->defaultFalse()
@@ -2785,6 +2904,9 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
+    /**
+     * @param-immediately-invoked-callable $enableIfStandalone
+     */
     private function addJsonStreamerSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
     {
         $rootNode
@@ -2792,6 +2914,18 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('json_streamer')
                     ->info('JSON streamer configuration')
                     ->{$enableIfStandalone('symfony/json-streamer', StreamWriterInterface::class)}()
+                    ->children()
+                        ->arrayNode('default_options')
+                            ->addDefaultsIfNotSet()
+                            ->ignoreExtraKeys(false)
+                            ->children()
+                                ->booleanNode('include_null_properties')
+                                    ->info('Encode the properties with null value')
+                                    ->defaultFalse()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

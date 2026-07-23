@@ -1,18 +1,10 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['stdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('stdClass')),
-    ],
-    [
-        $r = [],
-        $r[1] = $o[0],
-    ],
-    [],
-    [
-        &$r[1],
-        &$r[1],
-        $o[0],
-    ],
-    []
-);
+return \deepclone_from_array([
+    'classes' => 'stdClass',
+    'objectMeta' => 1,
+    'prepared' => [-1, -1, 0],
+    'mask' => [false, false, true],
+    'refs' => [1 => 0],
+    'refMasks' => [1 => true],
+], null, true);

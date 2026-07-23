@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -54,24 +52,6 @@ class EmailTest extends TestCase
         $email = new Email(normalizer: 'trim');
 
         $this->assertEquals('trim', $email->normalizer);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Email(['normalizer' => 'Unknown Callable']);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Email(['normalizer' => new \stdClass()]);
     }
 
     public function testAttribute()

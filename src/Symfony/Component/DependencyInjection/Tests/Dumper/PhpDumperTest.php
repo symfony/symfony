@@ -52,6 +52,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\EnvAutowireWithMissingArgument;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
@@ -78,7 +79,6 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\VarExporter\LazyObjectInterface;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 require_once __DIR__.'/../Fixtures/includes/classes.php';
@@ -400,7 +400,7 @@ class PhpDumperTest extends TestCase
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $dump = str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump);
         }
-        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services9_lazy_inlined_factories.txt', $dump);
+        $this->assertStringMatchesFormatFile(self::$fixturesPath.'/php/services9_lazy_inlined_factories.txt', $dump);
     }
 
     public function testServicesWithAnonymousFactories()
@@ -620,6 +620,22 @@ class PhpDumperTest extends TestCase
         putenv('Baz');
     }
 
+    public function testEnvParameterWithDot()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('env(dynamic.var)', 'test_value');
+        $container->setParameter('test_with_dot', '%env(dynamic.var)%');
+        $container->compile();
+        $dumper = new PhpDumper($container);
+        $dumped = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_EnvWithDot']);
+
+        $this->assertStringContainsString("'test_with_dot' => \$container->getEnv('dynamic.var')", $dumped, 'Parameter with dot should be in getDynamicParameter');
+
+        if (preg_match('/protected function getDefaultParameters\(\): array\s*\{\s*return \[(.*?)\];/s', $dumped, $matches)) {
+            $this->assertStringNotContainsString("'test_with_dot'", $matches[1], 'Parameter with dot should be dynamic in getDynamicParameter');
+        }
+    }
+
     public function testResolvedBase64EnvParameters()
     {
         $container = new ContainerBuilder();
@@ -811,6 +827,20 @@ class PhpDumperTest extends TestCase
         $this->assertGreaterThan(0, $container->getEnvCounters()['FOO']);
     }
 
+    public function testEnvUsedByRemovedAutowiredServiceIsNotReportedAsNeverUsed()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', EnvAutowireWithMissingArgument::class)
+            ->setAutowired(true)
+        ;
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->dump();
+
+        $this->assertGreaterThan(0, $container->getEnvCounters()['SOME_ENV']);
+    }
+
     public function testCircularDynamicEnv()
     {
         $this->expectException(ParameterCircularReferenceException::class);
@@ -865,7 +895,7 @@ class PhpDumperTest extends TestCase
             'inline_class_loader' => false,
         ]);
         $this->assertStringEqualsFile(
-            self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_non_shared_lazy_public.php',
+            self::$fixturesPath.'/php/services_non_shared_lazy_public.php',
             '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $dump) : $dump
         );
         eval('?>'.$dump);
@@ -873,18 +903,10 @@ class PhpDumperTest extends TestCase
         $container = new \Symfony_DI_PhpDumper_Service_Non_Shared_Lazy();
 
         $foo1 = $container->get('foo');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($foo1))->isUninitializedLazyObject($foo1));
-        } else {
-            $this->assertTrue($foo1->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($foo1))->isUninitializedLazyObject($foo1));
 
         $foo2 = $container->get('foo');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($foo2))->isUninitializedLazyObject($foo2));
-        } else {
-            $this->assertTrue($foo2->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($foo2))->isUninitializedLazyObject($foo2));
 
         $this->assertNotSame($foo1, $foo2);
     }
@@ -911,7 +933,7 @@ class PhpDumperTest extends TestCase
 
         $stringDump = print_r($dumps, true);
         $this->assertStringMatchesFormatFile(
-            self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_non_shared_lazy_as_files.txt',
+            self::$fixturesPath.'/php/services_non_shared_lazy_as_files.txt',
             '\\' === \DIRECTORY_SEPARATOR ? str_replace("'.\\DIRECTORY_SEPARATOR.'", '/', $stringDump) : $stringDump
         );
 
@@ -923,18 +945,10 @@ class PhpDumperTest extends TestCase
         $container = eval('?>'.$lastDump);
 
         $foo1 = $container->get('non_shared_foo');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($foo1))->isUninitializedLazyObject($foo1));
-        } else {
-            $this->assertTrue($foo1->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($foo1))->isUninitializedLazyObject($foo1));
 
         $foo2 = $container->get('non_shared_foo');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($foo2))->isUninitializedLazyObject($foo2));
-        } else {
-            $this->assertTrue($foo2->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($foo2))->isUninitializedLazyObject($foo2));
 
         $this->assertNotSame($foo1, $foo2);
     }
@@ -954,7 +968,7 @@ class PhpDumperTest extends TestCase
             $dumper->setProxyDumper(new \DummyProxyDumper());
         }
 
-        $this->assertStringEqualsGeneratedFile((\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
+        $this->assertStringEqualsGeneratedFile('services_non_shared_lazy'.($asGhostObject ? '_ghost' : '').'.php', $dumper->dump());
     }
 
     public function testNonSharedDuplicates()
@@ -972,6 +986,51 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsGeneratedFile('services_non_shared_duplicates.php', $dumper->dump());
+    }
+
+    public function testNonSharedResettable()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setShared(false)
+            ->setPublic(true)
+            ->addTag('container.tracked_for_reset', ['method' => 'reset']);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsGeneratedFile('services_non_shared_resettable.php', $dumper->dump());
+    }
+
+    public function testNonSharedResettableMultipleMethods()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setShared(false)
+            ->setPublic(true)
+            ->addTag('container.tracked_for_reset', ['method' => 'reset'])
+            ->addTag('container.tracked_for_reset', ['method' => 'clear']);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsGeneratedFile('services_non_shared_resettable_multiple.php', $dumper->dump());
+    }
+
+    public function testNonSharedResettableAsArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')
+            ->setShared(false)
+            ->addTag('container.tracked_for_reset', ['method' => 'reset']);
+        $container->register('bar', 'stdClass')
+            ->setPublic(true)
+            ->addArgument(new Reference('foo'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->assertStringEqualsGeneratedFile('services_non_shared_resettable_as_arg.php', $dumper->dump());
     }
 
     public function testInitializePropertiesBeforeMethodCalls()
@@ -1027,7 +1086,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsGeneratedFile((\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_dedup_lazy.php', $dumper->dump());
+        $this->assertStringEqualsGeneratedFile('services_dedup_lazy.php', $dumper->dump());
     }
 
     public function testLazyArgumentProvideGenerator()
@@ -1723,17 +1782,13 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy']);
-        $this->assertStringEqualsGeneratedFile((\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_wither_lazy.php', $dump);
+        $this->assertStringEqualsGeneratedFile('services_wither_lazy.php', $dump);
         eval('?>'.$dump);
 
         $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy();
 
         $wither = $container->get('wither');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
-        } else {
-            $this->assertTrue($wither->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
         $this->assertInstanceOf(Foo::class, $wither->foo);
     }
 
@@ -1752,25 +1807,17 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
         $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared']);
-        $this->assertStringEqualsGeneratedFile((\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'services_wither_lazy_non_shared.php', $dump);
+        $this->assertStringEqualsGeneratedFile('services_wither_lazy_non_shared.php', $dump);
         eval('?>'.$dump);
 
         $container = new \Symfony_DI_PhpDumper_Service_Wither_Lazy_Non_Shared();
 
         $wither1 = $container->get('wither');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($wither1))->isUninitializedLazyObject($wither1));
-        } else {
-            $this->assertTrue($wither1->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($wither1))->isUninitializedLazyObject($wither1));
         $this->assertInstanceOf(Foo::class, $wither1->foo);
 
         $wither2 = $container->get('wither');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($wither2))->isUninitializedLazyObject($wither2));
-        } else {
-            $this->assertTrue($wither2->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($wither2))->isUninitializedLazyObject($wither2));
         $this->assertInstanceOf(Foo::class, $wither2->foo);
 
         $this->assertNotSame($wither1, $wither2);
@@ -2066,6 +2113,11 @@ class PhpDumperTest extends TestCase
     public function testAutowireClosure()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('env(FOO)', 'foo');
+        $container->setParameter('env(BAR)', 'foo');
+        $container->setParameter('env(HOST)', 'example.com');
+        $container->setParameter('env(PORT)', '6379');
+        $container->setParameter('dsn_template', 'redis://%env(HOST)%:%env(PORT)%');
         $container->register('foo', Foo::class)
             ->setPublic(true);
         $container->register('my_callable', MyCallable::class)
@@ -2091,10 +2143,18 @@ class PhpDumperTest extends TestCase
         $this->assertInstanceOf(\Closure::class, $bar->foo);
         $this->assertInstanceOf(\Closure::class, $bar->baz);
         $this->assertInstanceOf(\Closure::class, $bar->buz);
+        $this->assertInstanceOf(\Closure::class, $bar->getFoo);
+        $this->assertInstanceOf(\Stringable::class, $bar->getBar);
+        $this->assertInstanceOf(\Stringable::class, $bar->getDsn);
+        $this->assertInstanceOf(\Stringable::class, $bar->getDsnFromParam);
         $this->assertSame($container->get('foo'), ($bar->foo)());
         $this->assertSame($container->get('baz'), $bar->baz);
         $this->assertInstanceOf(Foo::class, $fooClone = ($bar->buz)());
         $this->assertNotSame($container->get('foo'), $fooClone);
+        $this->assertSame('foo', ($bar->getFoo)());
+        $this->assertSame('foo', (string) $bar->getBar);
+        $this->assertSame('redis://example.com:6379', (string) $bar->getDsn);
+        $this->assertSame('redis://example.com:6379', (string) $bar->getDsnFromParam);
     }
 
     public function testLazyClosure()
@@ -2148,21 +2208,16 @@ class PhpDumperTest extends TestCase
         $container->compile();
         $dumper = new PhpDumper($container);
 
-        $this->assertStringEqualsGeneratedFile((\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'lazy_autowire_attribute.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute']));
+        $this->assertStringEqualsGeneratedFile('lazy_autowire_attribute.php', $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute']));
 
-        require self::$fixturesPath.'/php/'.(\PHP_VERSION_ID < 80400 ? 'legacy_' : '').'lazy_autowire_attribute.php';
+        require self::$fixturesPath.'/php/lazy_autowire_attribute.php';
 
         $container = new \Symfony_DI_PhpDumper_Test_Lazy_Autowire_Attribute();
 
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
-        if (\PHP_VERSION_ID >= 80400) {
-            $r = new \ReflectionClass(Foo::class);
-            $this->assertTrue($r->isUninitializedLazyObject($container->get('bar')->foo));
-            $this->assertSame($container->get('foo'), $r->initializeLazyObject($container->get('bar')->foo));
-        } else {
-            $this->assertInstanceOf(LazyObjectInterface::class, $container->get('bar')->foo);
-            $this->assertSame($container->get('foo'), $container->get('bar')->foo->initializeLazyObject());
-        }
+        $r = new \ReflectionClass(Foo::class);
+        $this->assertTrue($r->isUninitializedLazyObject($container->get('bar')->foo));
+        $this->assertSame($container->get('foo'), $r->initializeLazyObject($container->get('bar')->foo));
     }
 
     public function testLazyAutowireAttributeOnAlreadyLazyService()
@@ -2185,12 +2240,10 @@ class PhpDumperTest extends TestCase
         $bar = $container->get('bar');
         $this->assertInstanceOf(Foo::class, $bar->foo);
 
-        if (\PHP_VERSION_ID >= 80400) {
-            $r = new \ReflectionClass(Foo::class);
-            $this->assertTrue($r->isUninitializedLazyObject($bar->foo));
-            $this->assertSame(0, $bar->foo->foo);
-            $this->assertFalse($r->isUninitializedLazyObject($bar->foo));
-        }
+        $r = new \ReflectionClass(Foo::class);
+        $this->assertTrue($r->isUninitializedLazyObject($bar->foo));
+        $this->assertSame(0, $bar->foo->foo);
+        $this->assertFalse($r->isUninitializedLazyObject($bar->foo));
     }
 
     public function testLazyAutowireAttributeWithIntersection()
@@ -2213,11 +2266,7 @@ class PhpDumperTest extends TestCase
 
         $dumper = new PhpDumper($container);
 
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertStringEqualsGeneratedFile('lazy_autowire_attribute_with_intersection.php', $dumper->dump());
-        } else {
-            $this->assertStringEqualsGeneratedFile('legacy_lazy_autowire_attribute_with_intersection.php', $dumper->dump());
-        }
+        $this->assertStringEqualsGeneratedFile('lazy_autowire_attribute_with_intersection.php', $dumper->dump());
     }
 
     public function testCallableAdapterConsumer()
@@ -2449,11 +2498,41 @@ class PhpDumperTest extends TestCase
         $this->assertStringContainsString(': ?\stdClass', $code);
     }
 
+    public function testSourceDateEpoch()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setPublic(true);
+        $container->compile();
+
+        $sourceDateEpoch = 1609459200; // 2021-01-01 00:00:00 UTC
+
+        $_SERVER['SOURCE_DATE_EPOCH'] = $sourceDateEpoch;
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__]), true);
+
+        $this->assertStringContainsString("'container.build_time' => {$sourceDateEpoch}", $dump);
+    }
+
+    public function testSourceDateEpochInvalid()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setPublic(true);
+        $container->compile();
+
+        $_SERVER['SOURCE_DATE_EPOCH'] = 'invalid';
+
+        $dumper = new PhpDumper($container);
+        $dump = print_r($dumper->dump(['as_files' => true, 'file' => __DIR__]), true);
+
+        // Should fall back to time() when SOURCE_DATE_EPOCH is invalid
+        $this->assertStringContainsString("'container.build_time' => ", $dump);
+        $this->assertStringNotContainsString("'container.build_time' => 0", $dump);
+    }
+
     private static function assertStringEqualsGeneratedFile(string $expectedFile, string $dumpedCode): void
     {
         $expectedFile = self::$fixturesPath.'/php/'.$expectedFile;
-
-        $dumpedCode = str_replace("class_exists(\\Symfony\\Component\\VarExporter\\Internal\\Hydrator::class);\n", '', $dumpedCode);
 
         if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
             file_put_contents($expectedFile, $dumpedCode);
@@ -2499,6 +2578,14 @@ class LazyClosureConsumer
         public \Closure $buz,
         #[AutowireCallable(service: 'my_callable')]
         public \Closure $bar,
+        #[Autowire(env: 'FOO')]
+        public string|\Closure|null $getFoo = null,
+        #[Autowire(env: 'BAR')]
+        public string|\Stringable $getBar = 'bar',
+        #[Autowire('redis://%env(HOST)%:%env(PORT)%')]
+        public ?\Stringable $getDsn = null,
+        #[Autowire('%dsn_template%')]
+        public ?\Stringable $getDsnFromParam = null,
     ) {
     }
 }

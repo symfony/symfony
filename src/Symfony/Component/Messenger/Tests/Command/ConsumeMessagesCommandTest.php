@@ -21,8 +21,8 @@ use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
@@ -62,11 +63,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -96,11 +93,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -141,11 +134,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, [], new ResetServicesListener($servicesResetter));
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute(array_merge([
             'receivers' => ['dummy-receiver'],
@@ -167,11 +156,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
 
         $this->expectException(InvalidOptionException::class);
@@ -189,6 +174,53 @@ class ConsumeMessagesCommandTest extends TestCase
 
         yield 'Zero second time limit' => ['--time-limit', '0', 'Option "time-limit" must be a positive integer, "0" passed.'];
         yield 'Non-numeric time limit' => ['--time-limit', 'whatever', 'Option "time-limit" must be a positive integer, "whatever" passed.'];
+        yield 'Negative reset interval' => ['--no-reset', '-1', 'Option "no-reset" must be a positive integer, "-1" passed.'];
+    }
+
+    public function testRunWithFetchSizeOption()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', new MessageBus());
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--fetch-size' => '8',
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame([8], $receiver->getFetchSizes());
+    }
+
+    public function testRunWithInvalidFetchSizeOption()
+    {
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', new \stdClass());
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "--fetch-size" option must be a positive integer, "0" given.');
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--fetch-size' => '0',
+        ]);
     }
 
     public function testRunWithTimeLimit()
@@ -207,11 +239,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -250,11 +278,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), $logger);
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -295,11 +319,7 @@ class ConsumeMessagesCommandTest extends TestCase
         );
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             '--all' => true,
@@ -551,5 +571,53 @@ class ConsumeMessagesCommandTest extends TestCase
             '--all' => true,
             '--exclude-receivers' => ['dummy-receiver1', 'dummy-receiver2'],
         ]);
+    }
+
+    #[DataProvider('provideReceiversForCaseInsensitiveMatching')]
+    public function testCaseInsensitiveReceiverMatching(array $receiverNames, array $receivers, array $expectedReceivers)
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = new Container();
+        foreach ($receiverNames as $receiverName) {
+            $receiverLocator->set($receiverName, $receiver);
+        }
+
+        $bus = $this->createStub(MessageBusInterface::class);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), receiverNames: $receiverNames);
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => $receivers,
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString(
+            \sprintf(
+                '[OK] Consuming messages from %s "%s"',
+                1 === \count($expectedReceivers) ? 'transport' : 'transports',
+                implode(', ', $expectedReceivers)
+            ),
+            $tester->getDisplay()
+        );
+    }
+
+    public static function provideReceiversForCaseInsensitiveMatching(): \Traversable
+    {
+        yield [['one', 'one_second', 'second', 'pone'], ['one.*'], ['one', 'one_second']];
+        yield [['one', 'one_second', 'second'], ['one'], ['one']];
+        yield [['one', 'one_second', 'second', 'SECOND'], ['(?i)second'], ['second', 'SECOND']];
+        yield [['one', 'one_second', 'second', 'SECOND', 'ssecond'], ['one', 'one.*', 'second.*'], ['one', 'one_second', 'second']];
+        yield [['pone'], ['.*one'], ['pone']];
     }
 }

@@ -53,14 +53,14 @@ class AmazonSqsIntegrationTest extends TestCase
             usleep(5000);
         }
 
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class, DummyMessage::class => 'special'], $encoded[0]['headers']);
 
         $this->waitUntilElapsed(seconds: 1.0, since: $messageSentAt);
-        $connection->keepalive($encoded['id']);
+        $connection->keepalive($encoded[0]['id']);
         $this->waitUntilElapsed(seconds: 2.0, since: $messageSentAt);
         $this->assertSame(0, $connection->getMessageCount(), 'The queue should be empty since visibility timeout was extended');
-        $connection->delete($encoded['id']);
+        $connection->delete($encoded[0]['id']);
     }
 
     private function waitUntilElapsed(float $seconds, float $since): void

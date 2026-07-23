@@ -26,6 +26,7 @@ class MapCollection implements TransformCallableInterface, ObjectMapperAwareInte
 {
     public function __construct(
         private ?ObjectMapperInterface $objectMapper = null,
+        public readonly ?string $targetClass = null,
     ) {
     }
 
@@ -46,7 +47,7 @@ class MapCollection implements TransformCallableInterface, ObjectMapperAwareInte
         $objectMapper = $this->objectMapper ??= new ObjectMapper();
         $values = [];
         foreach ($value as $k => $v) {
-            $values[$k] = $objectMapper->map($v);
+            $values[$k] = $objectMapper->map($v, $this->targetClass);
         }
 
         return $values;

@@ -54,7 +54,7 @@ class AmazonSqsTransportTest extends TestCase
         ];
 
         $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
-        $connection->method('get')->willReturn($sqsEnvelope);
+        $connection->method('get')->willReturn([$sqsEnvelope]);
 
         $envelopes = iterator_to_array($transport->get());
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());

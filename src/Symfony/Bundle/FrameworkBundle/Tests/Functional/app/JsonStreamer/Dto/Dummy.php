@@ -11,15 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Dto;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Height;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\RangeToStringValueTransformer;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\StringToRangeValueTransformer;
 use Symfony\Component\JsonStreamer\Attribute\JsonStreamable;
 use Symfony\Component\JsonStreamer\Attribute\StreamedName;
 use Symfony\Component\JsonStreamer\Attribute\ValueTransformer;
 
-/**
- * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- */
 #[JsonStreamable]
 class Dummy
 {
@@ -35,4 +33,6 @@ class Dummy
         streamToNative: StringToRangeValueTransformer::class,
     )]
     public array $range = [10, 20];
+
+    public Height|false $height = false;
 }

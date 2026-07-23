@@ -90,7 +90,7 @@ class EsmtpTransportTest extends TestCase
         $message->text('.');
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid addresses: non-ASCII characters not supported in local-part of email.');
+        $this->expectExceptionMessage('The SMTP server does not support the SMTPUTF8 extension required to send to addresses with non-ASCII characters in their local-part.');
         $transport->send($message);
     }
 
@@ -126,7 +126,7 @@ class EsmtpTransportTest extends TestCase
             $transport->send($message);
             $this->fail('Symfony\Component\Mailer\Exception\TransportException to be thrown');
         } catch (TransportException $e) {
-            $this->assertStringStartsWith('Failed to authenticate on SMTP server with username "testuser" using the following authenticators: "CRAM-MD5", "LOGIN", "PLAIN", "XOAUTH2".', $e->getMessage());
+            $this->assertStringStartsWith('Failed to authenticate on SMTP server with username "testuser" using the following authenticators: "CRAM-MD5", "PLAIN", "LOGIN", "XOAUTH2".', $e->getMessage());
         }
 
         $this->assertEquals(
@@ -140,15 +140,15 @@ class EsmtpTransportTest extends TestCase
                 // S: 535 5.7.139 Authentication unsuccessful
                 "RSET\r\n",
                 // S: 250 2.0.0 Resetting
+                "AUTH PLAIN dGVzdHVzZXIAdGVzdHVzZXIAcDRzc3cwcmQ=\r\n",
+                // S: 535 5.7.139 Authentication unsuccessful
+                "RSET\r\n",
+                // S: 250 2.0.0 Resetting
                 "AUTH LOGIN\r\n",
                 // S: 334 VXNlcm5hbWU6
                 "dGVzdHVzZXI=\r\n",
                 // S: 334 UGFzc3dvcmQ6
                 "cDRzc3cwcmQ=\r\n",
-                // S: 535 5.7.139 Authentication unsuccessful
-                "RSET\r\n",
-                // S: 250 2.0.0 Resetting
-                "AUTH PLAIN dGVzdHVzZXIAdGVzdHVzZXIAcDRzc3cwcmQ=\r\n",
                 // S: 535 5.7.139 Authentication unsuccessful
                 "RSET\r\n",
                 // S: 250 2.0.0 Resetting

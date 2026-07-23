@@ -1,15 +1,15 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['Symfony\\Component\\VarExporter\\Tests\\__UnserializeButNo__Serialize'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\__UnserializeButNo__Serialize')),
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\__UnserializeButNo__Serialize',
+    'objectMeta' => [
+        [0, -1],
     ],
-    null,
-    [],
-    $o[0],
-    [
-        [
-            'foo' => 'ccc',
+    'prepared' => 0,
+    'states' => [
+        1 => [
+            0,
+            ['foo' => 'ccc'],
         ],
-    ]
-);
+    ],
+], null, true);

@@ -21,8 +21,8 @@ use Symfony\Component\Semaphore\Key;
  */
 class SemaphoreExpiredException extends \RuntimeException implements ExceptionInterface
 {
-    public function __construct(Key $key, string $message)
+    public function __construct(Key $key, string $message, ?\Throwable $previous = null)
     {
-        parent::__construct(\sprintf('The semaphore "%s" has expired: %s.', $key, $message));
+        parent::__construct(\sprintf('The semaphore "%s" has expired: %s.', $key, $message), 0, $previous);
     }
 }

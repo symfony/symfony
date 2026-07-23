@@ -190,7 +190,7 @@
 
 {% block menu %}
     <span class="label {{ not collector.firewall or not collector.token ? 'disabled' }}">
-        <span class="icon">{{ source('@Security/Collector/icon.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>
 {% endblock %}

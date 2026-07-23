@@ -13,8 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
@@ -25,7 +23,6 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -39,9 +36,9 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
-use Symfony\Component\Serializer\NameConverter\AdvancedNameConverterInterface;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -348,7 +345,6 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->bar);
     }
 
-    #[RequiresMethod(Type::class, 'list')]
     public function testConstructorParameterTypeIsUsedWhenPropertyTypeExtractorReturnsDifferentType()
     {
         $propertyInfoExtractor = new class implements PropertyInfoExtractorInterface {
@@ -393,74 +389,6 @@ class ObjectNormalizerTest extends TestCase
         };
 
         $normalizer = new ObjectNormalizer(null, null, null, $propertyInfoExtractor, null, null, [], $propertyInfoExtractor);
-        $serializer = new Serializer([$normalizer]);
-        $normalizer->setSerializer($serializer);
-
-        $obj = $normalizer->denormalize(
-            ['attributes' => 'displayName,userName'],
-            SerializerConstructorTypeConversionDummy::class,
-            'csv',
-            [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]
-        );
-
-        $this->assertInstanceOf(SerializerConstructorTypeConversionDummy::class, $obj);
-        $this->assertFalse($obj->isAttributeAllowed('displayName'));
-        $this->assertFalse($obj->isAttributeAllowed('userName'));
-    }
-
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testConstructorParameterTypeIsUsedWhenLegacyPropertyTypeExtractorReturnsDifferentType()
-    {
-        $propertyTypeExtractor = new class implements PropertyTypeExtractorInterface {
-            public function getTypes(string $class, string $property, array $context = []): ?array
-            {
-                if (SerializerConstructorTypeConversionDummy::class === $class && 'attributes' === $property) {
-                    return [new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true, new LegacyType(LegacyType::BUILTIN_TYPE_INT), new LegacyType(LegacyType::BUILTIN_TYPE_STRING))];
-                }
-
-                return null;
-            }
-        };
-
-        $propertyInfoExtractor = new class implements PropertyInfoExtractorInterface {
-            public function getType(string $class, string $property, array $context = []): ?Type
-            {
-                return null;
-            }
-
-            public function getTypes(string $class, string $property, array $context = []): ?array
-            {
-                return null;
-            }
-
-            public function getProperties(string $class, array $context = []): ?array
-            {
-                return null;
-            }
-
-            public function isReadable(string $class, string $property, array $context = []): ?bool
-            {
-                return null;
-            }
-
-            public function isWritable(string $class, string $property, array $context = []): ?bool
-            {
-                return !(SerializerConstructorTypeConversionDummy::class === $class && 'attributes' === $property);
-            }
-
-            public function getShortDescription(string $class, string $property, array $context = []): ?string
-            {
-                return null;
-            }
-
-            public function getLongDescription(string $class, string $property, array $context = []): ?string
-            {
-                return null;
-            }
-        };
-
-        $normalizer = new ObjectNormalizer(null, null, null, $propertyTypeExtractor, null, null, [], $propertyInfoExtractor);
         $serializer = new Serializer([$normalizer]);
         $normalizer->setSerializer($serializer);
 
@@ -577,12 +505,7 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]));
 
         $this->expectException(NotNormalizableValueException::class);
-
-        if (class_exists(Type::class) && method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
-        } else {
-            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "int", "float" ("string" given).');
-        }
+        $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
 
         $normalizer->denormalize($data, DummyWithUnion::class, 'xml', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,
@@ -607,8 +530,8 @@ class ObjectNormalizerTest extends TestCase
 
             $this->fail(\sprintf('Expected a "%s".', PartialDenormalizationException::class));
         } catch (PartialDenormalizationException $e) {
-            $this->assertCount(1, $e->getErrors());
-            $error = $e->getErrors()[0];
+            $this->assertCount(1, $e->getNotNormalizableValueErrors());
+            $error = $e->getNotNormalizableValueErrors()[0];
             $this->assertInstanceOf(NotNormalizableValueException::class, $error);
             $this->assertSame('name', $error->getPath());
             $this->assertSame('array', $error->getCurrentType());
@@ -1009,7 +932,7 @@ class ObjectNormalizerTest extends TestCase
             'inner' => ['foo' => 'foo', 'bar' => 'bar'],
             'date' => '1988/01/21',
             'inners' => [['foo' => 1], ['foo' => 2]],
-        ], ObjectOuter::class);
+        ], ObjectOuter::class, null, ['datetime_format' => 'Y/m/d']);
 
         $this->assertSame('foo', $obj->getInner()->foo);
         $this->assertSame('bar', $obj->getInner()->bar);
@@ -1030,7 +953,7 @@ class ObjectNormalizerTest extends TestCase
 
     public function testDoesntHaveIssuesWithUnionConstTypes()
     {
-        if (!class_exists(PhpStanExtractor::class) || !class_exists(PhpDocParser::class)) {
+        if (!class_exists(PhpDocParser::class)) {
             $this->markTestSkipped('phpstan/phpdoc-parser required for this test');
         }
 
@@ -1073,9 +996,9 @@ class ObjectNormalizerTest extends TestCase
         $this->assertFalse($object->canBeFalseOrString);
     }
 
-    public function testAdvancedNameConverter()
+    public function testNameConverterProperties()
     {
-        $nameConverter = new class implements AdvancedNameConverterInterface {
+        $nameConverter = new class implements NameConverterInterface {
             public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string
             {
                 return \sprintf('%s-%s-%s-%s', $propertyName, $class, $format, $context['foo']);

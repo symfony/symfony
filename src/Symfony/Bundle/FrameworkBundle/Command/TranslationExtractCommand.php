@@ -59,6 +59,7 @@ class TranslationExtractCommand extends Command
         private array $codePaths = [],
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
         parent::__construct();
 
         if (!method_exists($writer, 'getFormats')) {

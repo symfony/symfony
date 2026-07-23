@@ -230,6 +230,20 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('it', $request->getLocale());
     }
 
+    public function testEnabledLocalesFiltersEmptyValues()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Accept-Language', 'es,fr;q=0.8,en;q=0.5');
+
+        $listener = new LocaleListener(new RequestStack(), 'de', null, true, ['', null, 'en', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('fr', $request->getLocale());
+    }
+
     public function testFinishRequestWithNoParentResetsRouterContextToDefault()
     {
         $context = new RequestContext();

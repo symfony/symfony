@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Reorder EsmtpTransport authenticators to prefer PLAIN over obsolete LOGIN
+
+8.0
+---
+
+ * Remove `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead
+
 7.4
 ---
 

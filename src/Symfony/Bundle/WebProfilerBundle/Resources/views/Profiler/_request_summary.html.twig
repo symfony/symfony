@@ -56,7 +56,7 @@
 
         {% set referer = request_collector ? request_collector.requestheaders.get('referer') : null %}
         {% if referer %}
-            <dt></dt>
+            <dt>Referer</dt>
             <dd>
                 <span class="icon icon-referer">{{ source('@WebProfiler/Icon/referrer.svg') }}</span>
                 <a href="{{ referer }}" class="referer">Browse referrer URL</a>

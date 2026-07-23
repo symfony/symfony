@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `allowed_time_drift` option to the OIDC token handler configuration
+ * Allow disabling the redirection on successful logout by passing `null` to the `target` option
+ * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect
+
+8.1
+---
+
+ * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
+ * Add support for `#[AsTaggedItem]` attribute to configure voter priority
+ * Add `enforce_key_usage_verification` option to the OIDC token handler discovery configuration to opt out of filtering keys without explicit signature usage
+ * Deprecate the `security.erase_credentials` configuration option and the `security.authentication.manager.erase_credentials` container parameter, as the `eraseCredentials()` method was removed in Symfony 8.0
+
+8.0
+---
+
+ * Remove the deprecated `hide_user_not_found` configuration option, use `expose_security_errors` instead
+ * Remove the deprecated `algorithm` and `key` options from the OIDC token handler configuration, use `algorithms` and `keyset` instead
+ * Remove `LazyFirewallContext::__invoke()`
+ * Make `ExpressionCacheWarmer` class `final`
+ * Remove autowiring aliases for `RateLimiterFactory`; use `RateLimiterFactoryInterface` instead
+
 7.4
 ---
 

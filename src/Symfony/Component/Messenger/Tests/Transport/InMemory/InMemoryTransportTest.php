@@ -69,7 +69,7 @@ class InMemoryTransportTest extends TestCase
         $envelope1 = $this->transport->send($envelope1);
         $envelope2 = new Envelope(new \stdClass());
         $envelope2 = $this->transport->send($envelope2);
-        $this->assertSame([$envelope1, $envelope2], $this->transport->get());
+        $this->assertSame([$envelope1, $envelope2], $this->transport->get(2));
         $this->transport->ack($envelope1);
         $this->assertSame([$envelope2], $this->transport->get());
         $this->transport->reject($envelope2);
@@ -109,13 +109,22 @@ class InMemoryTransportTest extends TestCase
         $this->assertSame([$envelopeDecoded], $serializeTransport->get());
     }
 
+    public function testGetUsesFetchSizeWhenProvided()
+    {
+        $envelope1 = $this->transport->send(new Envelope(new \stdClass()));
+        $envelope2 = $this->transport->send(new Envelope(new \stdClass()));
+
+        $this->assertSame([$envelope1], $this->transport->get(1));
+        $this->assertSame([$envelope1, $envelope2], $this->transport->get(2));
+    }
+
     public function testAcknowledgeSameMessageWithDifferentStamps()
     {
         $envelope1 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);
         $envelope1 = $this->transport->send($envelope1);
         $envelope2 = new Envelope(new \stdClass(), [new AnEnvelopeStamp()]);
         $envelope2 = $this->transport->send($envelope2);
-        $this->assertSame([$envelope1, $envelope2], $this->transport->get());
+        $this->assertSame([$envelope1, $envelope2], $this->transport->get(2));
         $this->transport->ack($envelope1->with(new AnEnvelopeStamp()));
         $this->assertSame([$envelope2], $this->transport->get());
         $this->transport->reject($envelope2->with(new AnEnvelopeStamp()));

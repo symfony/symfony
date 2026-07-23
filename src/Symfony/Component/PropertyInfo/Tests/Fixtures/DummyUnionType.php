@@ -53,4 +53,14 @@ class DummyUnionType
      * @var non-empty-array<string|int>
      */
     public $g;
+
+    /**
+     * @var string|mixed
+     */
+    public $h;
+
+    /**
+     * @var mixed|null
+     */
+    public $i;
 }

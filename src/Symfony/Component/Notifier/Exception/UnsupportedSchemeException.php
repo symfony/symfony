@@ -208,6 +208,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Plivo\PlivoTransportFactory::class,
             'package' => 'symfony/plivo-notifier',
         ],
+        'prelude' => [
+            'class' => Bridge\Prelude\PreludeTransportFactory::class,
+            'package' => 'symfony/prelude-notifier',
+        ],
         'primotexto' => [
             'class' => Bridge\Primotexto\PrimotextoTransportFactory::class,
             'package' => 'symfony/primotexto-notifier',
@@ -255,10 +259,6 @@ class UnsupportedSchemeException extends LogicException
         'slack' => [
             'class' => Bridge\Slack\SlackTransportFactory::class,
             'package' => 'symfony/slack-notifier',
-        ],
-        'sms77' => [
-            'class' => Bridge\Sms77\Sms77TransportFactory::class,
-            'package' => 'symfony/sms77-notifier',
         ],
         'smsapi' => [
             'class' => Bridge\Smsapi\SmsapiTransportFactory::class,

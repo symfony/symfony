@@ -277,11 +277,7 @@ class VarExporterTest extends TestCase
         yield ['readonly', new FooReadonly('k', 'v')];
 
         yield ['named-closure-method', (new TestClass())->testMethod(...)];
-        yield ['named-closure-static', TestClass::testStaticMethod(...), true];
-
-        if (\PHP_VERSION_ID < 80400) {
-            return;
-        }
+        yield ['named-closure-static', TestClass::testStaticMethod(...)];
 
         yield ['backed-property', new BackedProperty('name')];
 
@@ -289,7 +285,7 @@ class VarExporterTest extends TestCase
             return;
         }
 
-        yield ['private-fcc', (new \ReflectionClass(PrivateFCC::class))->getAttributes(PrivateFCC::class)[0]->getArguments()[0], true];
+        yield ['private-fcc', (new \ReflectionClass(PrivateFCC::class))->getAttributes(PrivateFCC::class)[0]->getArguments()[0]];
     }
 
     public function testUnicodeDirectionality()
@@ -313,6 +309,15 @@ class VarExporterTest extends TestCase
         }
 
         $this->assertSame([], $errors);
+    }
+
+    public function testFlatArrayIndent()
+    {
+        $o = new \stdClass();
+        $o->msg = "line1\nline2";
+        $exported = VarExporter::export($o);
+
+        $this->assertStringContainsString("['line1'.\"\\n\"\n                .'line2']", $exported);
     }
 }
 

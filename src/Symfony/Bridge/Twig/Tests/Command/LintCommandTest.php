@@ -177,11 +177,7 @@ class LintCommandTest extends TestCase
         $command = new LintCommand($environment);
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
 
         return $application->find('lint:twig');
     }

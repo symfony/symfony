@@ -19,6 +19,7 @@ use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -170,13 +171,9 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ITERABLE>>
      */
-    public static function iterable(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
+    public static function iterable(?Type $value = null, ?Type $key = null): CollectionType
     {
-        if ($asList) {
-            trigger_deprecation('symfony/type-info', '7.3', 'The third argument of "%s()" is deprecated. Use the "%s::list()" method to create a list instead.', __METHOD__, self::class);
-        }
-
-        return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key, $asList);
+        return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key);
     }
 
     /**
@@ -220,9 +217,9 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of class-string
+     * @template T of object
      *
-     * @param T|null $className
+     * @param class-string<T>|null $className
      *
      * @return ($className is class-string ? ObjectType<T> : BuiltinType<TypeIdentifier::OBJECT>)
      */
@@ -232,13 +229,34 @@ trait TypeFactoryTrait
     }
 
     /**
-     * @template T of class-string<\UnitEnum>|class-string<\BackedEnum>
+     * Builds an {@see ObjectShapeType} from a string-keyed shape map.
+     *
+     * Each entry is either a bare {@see Type} (treated as a required key) or an
+     * array describing the value type and whether the key is optional; a missing
+     * `optional` key defaults to `false`. Object shapes are always sealed.
+     *
+     * @param array<string, array{type: Type, optional?: bool}|Type> $shape
+     */
+    public static function objectShape(array $shape): ObjectShapeType
+    {
+        $shape = array_map(
+            static fn (array|Type $item): array => $item instanceof Type
+                ? ['type' => $item, 'optional' => false]
+                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false],
+            $shape
+        );
+
+        return new ObjectShapeType($shape);
+    }
+
+    /**
+     * @template T of \UnitEnum
      * @template U of BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>
      *
-     * @param T      $className
-     * @param U|null $backingType
+     * @param class-string<T> $className
+     * @param U|null          $backingType
      *
-     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T, U> : BackedEnumType<T, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>))
+     * @return ($className is class-string<\BackedEnum> ? ($backingType is U ? BackedEnumType<T&\BackedEnum, U> : BackedEnumType<T&\BackedEnum, BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>>) : EnumType<T>)
      */
     public static function enum(string $className, ?BuiltinType $backingType = null): EnumType
     {

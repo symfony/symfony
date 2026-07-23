@@ -19,6 +19,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
@@ -43,6 +44,9 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'http_client'])
             ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
+
+        ->set('http_client.mock_transport', MockHttpClient::class)
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('http_client', HttpClientInterface::class)
             ->factory('current')

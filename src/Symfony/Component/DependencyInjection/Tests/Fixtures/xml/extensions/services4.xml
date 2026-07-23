@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-
-<container xmlns="http://symfony.com/schema/dic/services"
-    xmlns:project="http://www.example.com/schema/not_registered_extension">
-  <project:bar />
-</container>

@@ -1,16 +1,17 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['Symfony\\Component\\VarExporter\\Tests\\Fixtures\\Php74Serializable'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\Fixtures\\Php74Serializable')),
-        clone ($p['stdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('stdClass')),
+return \deepclone_from_array([
+    'classes' => ['Symfony\\Component\\VarExporter\\Tests\\Fixtures\\Php74Serializable', 'stdClass'],
+    'objectMeta' => [
+        [0, -2],
+        1,
     ],
-    null,
-    [],
-    $o[0],
-    [
-        [
-            $o[1],
+    'prepared' => 0,
+    'states' => [
+        2 => [
+            0,
+            [1],
+            [true],
         ],
-    ]
-);
+    ],
+], null, true);

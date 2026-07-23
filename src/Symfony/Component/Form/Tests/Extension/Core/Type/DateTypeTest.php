@@ -119,10 +119,6 @@ class DateTypeTest extends BaseTypeTestCase
 
     public function testSubmitFromSingleTextDatePoint()
     {
-        if (!class_exists(DatePoint::class)) {
-            self::markTestSkipped('The DatePoint class is not available.');
-        }
-
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'html5' => false,
             'model_timezone' => 'UTC',
@@ -1206,6 +1202,39 @@ class DateTypeTest extends BaseTypeTestCase
         $form->setData(['year' => '2024', 'month' => '3', 'day' => '31']);
 
         $this->assertSame('113-03-31', $form->getViewData());
+    }
+
+    public function testPassLabelsAsArray()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
+            'labels' => [
+                'year' => 'Year label',
+                'month' => 'Month label',
+                'day' => 'Day label',
+            ],
+        ])
+            ->createView();
+
+        $this->assertSame('Year label', $view['year']->vars['label']);
+        $this->assertSame('Month label', $view['month']->vars['label']);
+        $this->assertSame('Day label', $view['day']->vars['label']);
+    }
+
+    public function testPassLabelsAsPartialArray()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'widget' => 'choice',
+            'labels' => [
+                'year' => 'Year label',
+                'day' => 'Day label',
+            ],
+        ])
+            ->createView();
+
+        $this->assertSame('Year label', $view['year']->vars['label']);
+        $this->assertNull($view['month']->vars['label']);
+        $this->assertSame('Day label', $view['day']->vars['label']);
     }
 
     protected function getTestOptions(): array

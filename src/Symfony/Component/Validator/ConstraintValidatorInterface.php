@@ -15,20 +15,22 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method void validateInContext(mixed $value, Constraint $constraint, ExecutionContextInterface $context)
  */
 interface ConstraintValidatorInterface
 {
     /**
      * Initializes the constraint validator.
      *
-     * @return void
+     * @deprecated since Symfony 8.1, use "validateInContext()" instead
      */
-    public function initialize(ExecutionContextInterface $context);
+    public function initialize(ExecutionContextInterface $context): void;
 
     /**
      * Checks if the passed value is valid.
      *
-     * @return void
+     * @deprecated since Symfony 8.1, use "validateInContext()" instead
      */
-    public function validate(mixed $value, Constraint $constraint);
+    public function validate(mixed $value, Constraint $constraint): void;
 }

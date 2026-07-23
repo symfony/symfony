@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\IsTrueValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -26,35 +24,21 @@ class IsTrueValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new IsTrue());
+        $this->validate(null, new IsTrue());
 
         $this->assertNoViolation();
     }
 
     public function testTrueIsValid()
     {
-        $this->validator->validate(true, new IsTrue());
+        $this->validate(true, new IsTrue());
 
         $this->assertNoViolation();
     }
 
     public function testFalseIsInvalid()
     {
-        $this->validator->validate(false, new IsTrue(message: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', 'false')
-            ->setCode(IsTrue::NOT_TRUE_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testFalseIsInvalidDoctrineStyle()
-    {
-        $this->validator->validate(false, new IsTrue([
-            'message' => 'myMessage',
-        ]));
+        $this->validate(false, new IsTrue(message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'false')

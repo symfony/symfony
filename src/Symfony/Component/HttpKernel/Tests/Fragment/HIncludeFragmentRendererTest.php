@@ -32,7 +32,7 @@ class HIncludeFragmentRendererTest extends TestCase
     {
         $strategy = new HIncludeFragmentRenderer(null, new UriSigner('foo'));
 
-        $this->assertMatchesRegularExpression('#^<hx:include src="/_fragment\?_hash=.+&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>$#', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
+        $this->assertMatchesRegularExpression('#^<hx:include src="/_fragment\?_expiration=.+&amp;_hash=.+&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>$#', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
     }
 
     public function testRenderWithUri()

@@ -37,7 +37,7 @@ class StateMachineGraphvizDumper extends GraphvizDumper
         $label = $this->formatLabel($definition, $withMetadata, $options);
 
         return $this->startDot($options, $label)
-            .$this->addPlaces($places, $withMetadata)
+            .$this->addPlaces($places)
             .$this->addEdges($edges)
             .$this->endDot();
     }

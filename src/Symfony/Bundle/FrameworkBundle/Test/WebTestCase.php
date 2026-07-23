@@ -23,10 +23,17 @@ abstract class WebTestCase extends KernelTestCase
 {
     use WebTestAssertionsTrait;
 
+    private static bool $runtimeModeSet = false;
+
     protected function tearDown(): void
     {
         parent::tearDown();
         self::getClient(null);
+
+        if (self::$runtimeModeSet) {
+            unset($_SERVER['APP_RUNTIME_MODE']);
+            self::$runtimeModeSet = false;
+        }
     }
 
     /**
@@ -39,6 +46,11 @@ abstract class WebTestCase extends KernelTestCase
     {
         if (static::$booted) {
             throw new \LogicException(\sprintf('Booting the kernel before calling "%s()" is not supported, the kernel should only be booted once.', __METHOD__));
+        }
+
+        if (!isset($_SERVER['APP_RUNTIME_MODE'])) {
+            $_SERVER['APP_RUNTIME_MODE'] = 'web=1';
+            self::$runtimeModeSet = true;
         }
 
         $kernel = static::bootKernel($options);

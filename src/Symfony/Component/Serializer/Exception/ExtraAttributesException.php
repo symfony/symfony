@@ -18,6 +18,9 @@ namespace Symfony\Component\Serializer\Exception;
  */
 class ExtraAttributesException extends RuntimeException
 {
+    /**
+     * @param list<string> $extraAttributes
+     */
     public function __construct(
         private readonly array $extraAttributes,
         ?\Throwable $previous = null,
@@ -29,6 +32,8 @@ class ExtraAttributesException extends RuntimeException
 
     /**
      * Get the extra attributes that are not allowed.
+     *
+     * @return list<string>
      */
     public function getExtraAttributes(): array
     {

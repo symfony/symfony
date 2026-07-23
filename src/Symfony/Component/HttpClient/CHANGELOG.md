@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for the `max_connect_duration` option
+ * Add option `extra.use_persistent_connections` to `CurlHttpClient` to control the use of persistent connections introduced in PHP 8.5
+ * Add `GuzzleHttpHandler` that allows using Symfony HttpClient as a Guzzle handler
+ * Add `$allowList` argument to `NoPrivateNetworkHttpClient` to allow specific hosts (e.g. a local proxy) to bypass the private-network filter
+ * Add `DnsResolvingHttpClient` decorator to resolve host names using a custom resolver, including on redirects
+ * Change `$maxTtl` argument of `CachingHttpClient` to default to `86400` (24h) instead of `null`
+ * Deprecate passing `null` as `$maxTtl` to `CachingHttpClient`, pass a positive integer instead
+ * Make `CachingHttpClient` implement `Psr\Log\LoggerAwareInterface` to log when a stale cached response is served because the upstream call failed (`stale-if-error` fallback)
+
+8.0
+---
+
+ * Remove support for passing an instance of `StoreInterface` as `$cache` argument to `CachingHttpClient` constructor, use a `TagAwareCacheInterface` instead
+ * Remove support for amphp/http-client < 5
+ * Remove setLogger() methods on decorators; configure the logger on the wrapped client directly instead
+
 7.4
 ---
 

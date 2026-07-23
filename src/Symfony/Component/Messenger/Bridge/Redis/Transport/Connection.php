@@ -431,27 +431,38 @@ class Connection
         }
     }
 
-    public function get(): ?array
+    /**
+     * @return list<array{id: string, data: mixed}>|null
+     */
+    public function get(int $fetchSize = 1): ?array
     {
+        $fetchSize = max(1, $fetchSize);
+
         if ($this->autoSetup) {
             $this->setup();
         }
 
         $this->handleDelayedMessages();
 
-        if (null !== $message = $this->getPendingMessage()) {
-            return $message;
+        $messages = [];
+
+        while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
+            $messages[] = $message;
         }
 
-        if (null === $this->lastPendingMessageId && $this->nextClaim <= microtime(true)) {
+        if (\count($messages) < $fetchSize && null === $this->lastPendingMessageId && $this->nextClaim <= microtime(true)) {
             $this->claimOldPendingMessages();
 
-            if (null !== $message = $this->getPendingMessage()) {
-                return $message;
+            while (\count($messages) < $fetchSize && null !== $message = $this->getPendingMessage()) {
+                $messages[] = $message;
             }
         }
 
-        return $this->getNewMessage();
+        if (\count($messages) < $fetchSize) {
+            $messages = [...$messages, ...$this->getNewMessages($fetchSize - \count($messages))];
+        }
+
+        return $messages ?: null;
     }
 
     private function handleDelayedMessages(): void
@@ -516,23 +527,26 @@ class Connection
         }
     }
 
-    private function getNewMessage(): ?array
+    /**
+     * @return list<array{id: string, data: mixed}>
+     */
+    private function getNewMessages(int $count): array
     {
-        $messages = $this->xReadGroup('>');
+        $messages = $this->xReadGroup('>', $count);
+        $result = [];
 
         foreach ($messages[$this->stream] ?? [] as $key => $message) {
             $this->inflightIds[$key] = true;
-
-            return [
+            $result[] = [
                 'id' => $key,
                 'data' => $message,
             ];
         }
 
-        return null;
+        return $result;
     }
 
-    private function xReadGroup(string $messageId): array
+    private function xReadGroup(string $messageId, int $count = 1): array
     {
         $redis = $this->getRedis();
 
@@ -541,7 +555,7 @@ class Connection
                 $this->group,
                 $this->consumer,
                 [$this->stream => $messageId],
-                1,
+                $count,
                 1
             );
         } catch (\RedisException|\Relay\Exception $e) {
@@ -565,8 +579,10 @@ class Connection
 
         try {
             $acknowledged = $redis->xack($this->stream, $this->group, [$id]);
-            if ($this->deleteAfterAck) {
-                $acknowledged = $redis->xdel($this->stream, [$id]);
+
+            // the ack decides the outcome: the entry may already be gone from the stream (e.g. trimmed), deleting it is best effort
+            if ($acknowledged && $this->deleteAfterAck && false === $redis->xdel($this->stream, [$id])) {
+                $redis->clearLastError();
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
@@ -587,19 +603,21 @@ class Connection
         $redis = $this->getRedis();
 
         try {
-            $deleted = $redis->xack($this->stream, $this->group, [$id]);
-            if ($this->deleteAfterReject) {
-                $deleted = $redis->xdel($this->stream, [$id]) && $deleted;
+            $rejected = $redis->xack($this->stream, $this->group, [$id]);
+
+            // same as in ack(): the entry may already be gone from the stream, deleting it is best effort
+            if ($rejected && $this->deleteAfterReject && false === $redis->xdel($this->stream, [$id])) {
+                $redis->clearLastError();
             }
         } catch (\RedisException|\Relay\Exception $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
-        if (!$deleted) {
+        if (!$rejected) {
             if ($error = $redis->getLastError() ?: null) {
                 $redis->clearLastError();
             }
-            throw new TransportException($error ?? \sprintf('Could not delete message "%s" from the redis stream.', $id));
+            throw new TransportException($error ?? \sprintf('Could not reject redis message "%s".', $id));
         }
 
         unset($this->inflightIds[$id]);
@@ -821,6 +839,70 @@ class Connection
         }
 
         return $this->redis;
+    }
+
+    public function findAll(?int $limit = null): array
+    {
+        $redis = $this->getRedis();
+
+        try {
+            if (null === $limit) {
+                $range = $redis->xRange($this->stream, '-', '+');
+            } else {
+                $range = $redis->xRange($this->stream, '-', '+', $limit);
+            }
+        } catch (\RedisException|\Relay\Exception $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (!$range) {
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
+            }
+
+            return [];
+        }
+
+        $messages = [];
+        foreach ($range as $id => $data) {
+            $messages[] = [
+                'id' => $id,
+                'data' => $data,
+            ];
+        }
+
+        return $messages;
+    }
+
+    public function find(mixed $id): ?array
+    {
+        if (!\is_string($id)) {
+            return null;
+        }
+
+        $redis = $this->getRedis();
+
+        try {
+            $range = $redis->xRange($this->stream, $id, $id, 1);
+        } catch (\RedisException|\Relay\Exception $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
+
+        if (!$range) {
+            if ($error = $redis->getLastError() ?: null) {
+                $redis->clearLastError();
+            }
+
+            return null;
+        }
+
+        $data = current($range);
+        $messageId = key($range);
+
+        return [
+            'id' => $messageId,
+            'data' => $data,
+        ];
     }
 
     public function close(): void

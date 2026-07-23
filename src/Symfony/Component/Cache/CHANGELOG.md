@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
+
 7.4
 ---
 

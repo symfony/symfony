@@ -17,6 +17,13 @@ where:
  - `SENDER_NAME` is sender ID that was previously added through the user dashboard
  - `VERSION` is API version that you want to use, ex. v2.1, optional
 
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -24,3 +31,6 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor

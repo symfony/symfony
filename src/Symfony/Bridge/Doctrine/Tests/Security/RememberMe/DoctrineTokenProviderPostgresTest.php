@@ -11,7 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Security\RememberMe;
 
-use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\ORM\ORMSetup;
@@ -32,10 +31,9 @@ class DoctrineTokenProviderPostgresTest extends DoctrineTokenProviderTest
 
     protected function bootstrapProvider(): DoctrineTokenProvider
     {
-        $config = class_exists(ORMSetup::class) ? ORMSetup::createConfiguration(true) : new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config = ORMSetup::createConfiguration(true);
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
+        $config->enableNativeLazyObjects(true);
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_pgsql',
@@ -43,12 +41,12 @@ class DoctrineTokenProviderPostgresTest extends DoctrineTokenProviderTest
             'user' => 'postgres',
             'password' => 'password',
         ], $config);
-        $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<<'SQL'
+        $connection->executeStatement(<<<'SQL'
             DROP TABLE IF EXISTS rememberme_token;
             SQL
         );
 
-        $connection->{method_exists($connection, 'executeStatement') ? 'executeStatement' : 'executeUpdate'}(<<<'SQL'
+        $connection->executeStatement(<<<'SQL'
             CREATE TABLE rememberme_token (
                 series   CHAR(88)     UNIQUE PRIMARY KEY NOT NULL,
                 value    VARCHAR(88)  NOT NULL, -- CHAR(88) adds spaces at the end

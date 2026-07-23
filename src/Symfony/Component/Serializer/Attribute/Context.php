@@ -47,32 +47,4 @@ class Context
             }
         }
     }
-
-    #[\Deprecated('Use the "context" property instead', 'symfony/serializer:7.4')]
-    public function getContext(): array
-    {
-        return $this->context;
-    }
-
-    #[\Deprecated('Use the "normalizationContext" property instead', 'symfony/serializer:7.4')]
-    public function getNormalizationContext(): array
-    {
-        return $this->normalizationContext;
-    }
-
-    #[\Deprecated('Use the "denormalizationContext" property instead', 'symfony/serializer:7.4')]
-    public function getDenormalizationContext(): array
-    {
-        return $this->denormalizationContext;
-    }
-
-    #[\Deprecated('Use the "groups" property instead', 'symfony/serializer:7.4')]
-    public function getGroups(): array
-    {
-        return $this->groups;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\Context::class, false)) {
-    class_alias(Context::class, \Symfony\Component\Serializer\Annotation\Context::class);
 }

@@ -1,6 +1,57 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `#[AsControllerAttributeListener]` attribute to declare event listeners for controller attributes
+ * Add the `$expiration` argument to `FragmentUriGenerator::__construct()` and sign fragment URIs with a 5-year expiration by default
+ * Add `hasDump()` method to `Profile` to track profiles with dump
+
+8.1
+---
+
+ * Add `setNonce()` to `DumpDataCollector` to forward CSP nonces to every `HtmlDumper` it instantiates
+ * Add `#[MapRequestHeader]` to map a header from `Request` to a controller argument
+ * Add `hasErrors()` method to `Profile` to track profiles with errors (exceptions or error-level logs)
+ * Validate typed route parameters before calling controllers and return an HTTP error when an invalid value is provided
+ * Add `ControllerAttributeEvent` et al. to dispatch events named after controller attributes
+ * Add support for `UploadedFile` when using `MapRequestPayload`
+ * Add support for bundles as compiler pass
+ * Add support for `SOURCE_DATE_EPOCH` environment variable
+ * Add property `$controllerMetadata` to several kernel events to give listeners access to controller metadata
+ * Add `Request` attribute `_controller_attributes` to decouple controller attributes from their source code
+ * Return attributes as a flat list when using `Controller[Arguments]Event::getAttributes('*')`
+ * Pass `request` and `args` variables to `Cache` attribute expressions containing the `Request` object and controller arguments
+ * Allow using closures with the `Cache` attribute
+ * Allow setting a condition when the `Cache` attribute should be applied
+ * Add `ControllerEvent::evaluate()` et al. to help with evaluating expressions or closures in controller attributes
+ * Deprecate passing a non-flat list of attributes to `Controller::setController()`
+ * Deprecate the `Symfony\Component\HttpKernel\DependencyInjection\Extension` class, use the parent `Symfony\Component\DependencyInjection\Extension\Extension` class instead
+ * Allow using Expression or \Closure for `validationGroups` in `#[MapRequestPayload]` and `#[MapQueryString]`
+ * Deprecate passing a `ControllerArgumentsEvent` to the `ViewEvent` constructor; pass a `ControllerArgumentsMetadata` instead
+ * Support variadic argument with `#[MapRequestPayload]`
+ * Add `#[Serialize]` to serialize values returned by controllers
+ * Add argument `$mapWhenEmpty` to `MapQueryString` and `MapRequestPayload` for always attempting denormalization with empty query and request payload
+ * Deprecate `Bundle::registerCommands()`, use the `#[AsCommand]` attribute or the `console.command` service tag instead of overriding this method
+ * Deprecate `BundleInterface`, use the one from the DependencyInjection component instead
+ * Deprecate `MergeExtensionConfigurationPass`, use the one from the DependencyInjection component instead
+ * Deprecate `FileLocator`, use the one from the DependencyInjection component instead
+ * Add `#[RateLimit]` attribute to declaratively enforce rate limiting on controllers.
+ * Deprecate `ServicesResetter`, `ServicesResetterInterface`, and `ResettableServicePass`, use the ones from the DependencyInjection component instead
+
+8.0
+---
+
+ * Remove `AddAnnotatedClassesToCachePass`
+ * Remove `Extension::getAnnotatedClassesToCompile()` and `Extension::addAnnotatedClassesToCompile()`
+ * Remove `Kernel::getAnnotatedClassesToCompile()` and `Kernel::setAnnotatedClassCache()`
+ * Make `ServicesResetter` class `final`
+ * Add argument `$logChannel` to `ErrorListener::logException()`
+ * Add argument `$event` to `DumpListener::configure()`
+ * Replace `__sleep/wakeup()` by `__(un)serialize()` on kernels and data collectors
+ * Add method `getShareDir()` to `KernelInterface`
+
 7.4
 ---
 

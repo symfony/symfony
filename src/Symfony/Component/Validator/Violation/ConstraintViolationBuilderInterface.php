@@ -22,6 +22,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * execution context.
  *
  * @author Bernhard Schussek <bschussek@gmail.com>
+ *
+ * @method $this setParameter(string $key, string|int|float|\Stringable|\DateTimeInterface $value) Sets a parameter to be inserted into the violation message. Passing a non-string value is supported as of Symfony 8.2.
  */
 interface ConstraintViolationBuilderInterface
 {
@@ -36,16 +38,6 @@ interface ConstraintViolationBuilderInterface
      * @return $this
      */
     public function atPath(string $path): static;
-
-    /**
-     * Sets a parameter to be inserted into the violation message.
-     *
-     * @param string $key   The name of the parameter
-     * @param string $value The value to be inserted in the parameter's place
-     *
-     * @return $this
-     */
-    public function setParameter(string $key, string $value): static;
 
     /**
      * Sets all parameters to be inserted into the violation message.

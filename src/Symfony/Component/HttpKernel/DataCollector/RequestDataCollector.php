@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
@@ -129,6 +130,8 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         $this->data['content'] = $content;
+
+        $this->data['curlCommand'] = $this->computeCurlCommand($request, $content);
 
         foreach ($this->data as $key => $value) {
             if (!\is_array($value)) {
@@ -494,5 +497,62 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         return \is_string($controller) ? $controller : 'n/a';
+    }
+
+    private function computeCurlCommand(Request $request, ?string $content): string
+    {
+        $command = ['curl', '--compressed'];
+
+        $method = $request->getMethod();
+
+        if (Request::METHOD_HEAD === $method) {
+            $command[] = '--head';
+        } elseif (Request::METHOD_GET !== $method) {
+            $command[] = \sprintf('--request %s', $method);
+        }
+
+        $command[] = \sprintf('--url %s', escapeshellarg($request->getUri()));
+
+        foreach ($request->headers->all() as $name => $values) {
+            if (\in_array(strtolower($name), ['host', 'cookie'], true)) {
+                continue;
+            }
+
+            $command[] = '--header '.escapeshellarg(ucwords($name, '-').': '.implode(', ', $values));
+        }
+
+        if ($request->cookies->all()) {
+            $cookies = [];
+            foreach ($request->cookies->all() as $name => $value) {
+                $cookies[] = urlencode($name).'='.urlencode($value);
+            }
+            $command[] = '--cookie '.escapeshellarg(implode('; ', $cookies));
+        }
+
+        if ($content && \in_array($method, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH, Request::METHOD_DELETE], true)) {
+            $command[] = '--data-raw '.$this->escapePayload($content);
+        }
+
+        return implode(" \\\n  ", $command);
+    }
+
+    public function getCurlCommand(): string
+    {
+        return $this->data['curlCommand'] ?? '';
+    }
+
+    private function escapePayload(string $payload): string
+    {
+        static $useProcess;
+
+        if ($useProcess ??= \function_exists('proc_open') && class_exists(Process::class)) {
+            return substr((new Process(['', $payload]))->getCommandLine(), 3);
+        }
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            return '"'.str_replace('"', '""', $payload).'"';
+        }
+
+        return "'".str_replace("'", "'\\''", $payload)."'";
     }
 }

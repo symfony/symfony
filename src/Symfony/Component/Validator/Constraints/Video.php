@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
@@ -131,7 +130,6 @@ class Video extends File
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
      */
-    #[HasNamedArguments]
     public function __construct(
         int|string|null $maxSize = null,
         ?bool $binaryFormat = null,
@@ -182,6 +180,11 @@ class Video extends File
         ?string $unsupportedContainerMessage = null,
         ?array $groups = null,
         mixed $payload = null,
+        array|string|null $extensions = null,
+        ?string $extensionsMessage = null,
+        ?string $filenameCharset = null,
+        ?string $filenameCountUnit = null,
+        ?string $filenameCharsetMessage = null,
     ) {
         static $hasFfprobe;
         if (!$hasFfprobe) {
@@ -214,7 +217,12 @@ class Video extends File
             $uploadExtensionErrorMessage,
             $uploadErrorMessage,
             $groups,
-            $payload
+            $payload,
+            $extensions,
+            $extensionsMessage,
+            $filenameCharset,
+            $filenameCountUnit,
+            $filenameCharsetMessage,
         );
 
         $this->minWidth = $minWidth ?? $this->minWidth;

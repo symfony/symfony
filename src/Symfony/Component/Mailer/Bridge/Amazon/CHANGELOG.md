@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for configuring the port and tls options
+
 7.3
 ---
 

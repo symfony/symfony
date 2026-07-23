@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bridge\Twig\Validator\Constraints\Twig;
 use Symfony\Bridge\Twig\Validator\Constraints\TwigValidator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
@@ -31,11 +32,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $environment = new Environment(new ArrayLoader());
         $environment->addFilter(new TwigFilter('humanize_filter', static fn ($v) => $v));
-        if (class_exists(DeprecatedCallableInfo::class)) {
-            $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
-        } else {
-            $options = ['deprecated' => true];
-        }
+        $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
 
         $environment->addFilter(new TwigFilter('deprecated_filter', static fn ($v) => $v, $options));
 
@@ -45,7 +42,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidValues')]
     public function testTwigIsValid($value)
     {
-        $this->validator->validate($value, new Twig());
+        $this->validate($value, new Twig());
 
         $this->assertNoViolation();
     }
@@ -55,7 +52,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Twig('myMessageTest');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessageTest')
             ->setParameter('{{ error }}', $message)
@@ -72,7 +69,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Twig(skipDeprecations: true);
 
-        $this->validator->validate('{{ name|deprecated_filter }}', $constraint);
+        $this->validate('{{ name|deprecated_filter }}', $constraint);
 
         $this->assertNoViolation();
     }
@@ -81,17 +78,11 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Twig(skipDeprecations: false);
 
-        $this->validator->validate('{{ name|deprecated_filter }}', $constraint);
+        $this->validate('{{ name|deprecated_filter }}', $constraint);
 
-        $line = 1;
-        $error = 'Twig Filter "deprecated_filter" is deprecated in  at line 1 at line 1.';
-        if (class_exists(DeprecatedCallableInfo::class)) {
-            $line = 0;
-            $error = 'Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated.';
-        }
         $this->buildViolation($constraint->message)
-            ->setParameter('{{ error }}', $error)
-            ->setParameter('{{ line }}', $line)
+            ->setParameter('{{ error }}', 'Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated.')
+            ->setParameter('{{ line }}', 0)
             ->setCode(Twig::INVALID_TWIG_ERROR)
             ->assertRaised();
     }
@@ -123,5 +114,15 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
             // Invalid variable syntax
             ['Hello {{ .name }}', 'Unexpected token "operator" of value "." at line 1.', 1],
         ];
+    }
+
+    // TODO remove this in Symfony 9.0 (or earlier, when dropping support for symfony/validator < 8.1)
+    protected function validate(mixed $value, Constraint $constraint): void
+    {
+        if (method_exists(parent::class, 'validate')) {
+            parent::validate($value, $constraint);
+        } else {
+            $this->validator->validate($value, $constraint);
+        }
     }
 }

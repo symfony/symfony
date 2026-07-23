@@ -11,16 +11,11 @@
 
 namespace Symfony\Component\JsonStreamer\Read;
 
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
-use Symfony\Component\VarExporter\LazyGhostTrait;
-use Symfony\Component\VarExporter\ProxyHelper;
 
 /**
- * Instantiates a new $className lazy ghost {@see LazyGhostTrait}.
+ * Instantiates a new $className lazy ghost.
  *
- * Prior to PHP 8.4, the "$className" argument class must not be final.
  * The $initializer must be a callable that sets the actual object values when being called.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -29,25 +24,12 @@ use Symfony\Component\VarExporter\ProxyHelper;
  */
 final class LazyInstantiator
 {
-    private ?Filesystem $fs = null;
-
     /**
-     * @var array{reflection: array<class-string, \ReflectionClass<object>>, lazy_class_name: array<class-string, class-string>}
+     * @var array{reflection: array<class-string, \ReflectionClass<object>>}
      */
     private static array $cache = [
         'reflection' => [],
-        'lazy_class_name' => [],
     ];
-
-    /**
-     * @var array<class-string, true>
-     */
-    private static array $lazyClassesLoaded = [];
-
-    public function __construct(
-        private ?string $lazyGhostsDir = null,
-    ) {
-    }
 
     /**
      * @template T of object
@@ -72,35 +54,6 @@ final class LazyInstantiator
             return $instance;
         }
 
-        // use native lazy ghosts if available
-        if (\PHP_VERSION_ID >= 80400) {
-            return $classReflection->newLazyGhost($initializer);
-        }
-
-        $this->fs ??= new Filesystem();
-
-        if (null === $this->lazyGhostsDir) {
-            throw new InvalidArgumentException('The "$lazyGhostsDir" argument cannot be null when using PHP < 8.4.');
-        }
-
-        $lazyClassName = self::$cache['lazy_class_name'][$className] ??= \sprintf('%sGhost', preg_replace('/\\\\/', '', $className));
-
-        if (isset(self::$lazyClassesLoaded[$className]) && class_exists($lazyClassName)) {
-            return $lazyClassName::createLazyGhost($initializer);
-        }
-
-        if (!is_file($path = \sprintf('%s%s%s.php', $this->lazyGhostsDir, \DIRECTORY_SEPARATOR, hash('xxh128', $className)))) {
-            if (!$this->fs->exists($this->lazyGhostsDir)) {
-                $this->fs->mkdir($this->lazyGhostsDir);
-            }
-
-            $this->fs->dumpFile($path, \sprintf('<?php class %s%s', $lazyClassName, ProxyHelper::generateLazyGhost($classReflection)));
-        }
-
-        require_once $path;
-
-        self::$lazyClassesLoaded[$className] = true;
-
-        return $lazyClassName::createLazyGhost($initializer);
+        return $classReflection->newLazyGhost($initializer);
     }
 }

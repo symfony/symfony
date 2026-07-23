@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for scheduling delivery with the `send_at` API parameter via a `Send-At` date-header
+
 7.4
 ---
 

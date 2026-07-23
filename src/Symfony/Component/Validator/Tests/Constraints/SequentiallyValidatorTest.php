@@ -41,7 +41,7 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
         $this->expectValidateValue(0, $value, [$constraints[0]]);
         $this->expectValidateValue(1, $value, [$constraints[1]]);
 
-        $this->validator->validate($value, new Sequentially($constraints));
+        $this->validate($value, new Sequentially($constraints));
 
         $this->assertNoViolation();
     }
@@ -59,7 +59,7 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
         $this->expectValidateValue(0, $value, [$constraints[0]]);
         $this->expectFailingValueValidation(1, $value, [$constraints[1]], null, new ConstraintViolation('regex error', null, [], null, '', null, null, 'regex'));
 
-        $this->validator->validate($value, new Sequentially($constraints));
+        $this->validate($value, new Sequentially($constraints));
 
         $this->assertCount(1, $this->context->getViolations());
     }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\Doctrine\Middleware\Debug;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\ParameterType;
 
 /**
@@ -28,8 +30,11 @@ class Query
     private ?float $start = null;
     private ?float $duration = null;
 
+    private ?bool $ranOnPrimary = null;
+
     public function __construct(
         private readonly string $sql,
+        private readonly ?Connection $connection = null,
     ) {
     }
 
@@ -42,6 +47,10 @@ class Query
     {
         if (null !== $this->start) {
             $this->duration = microtime(true) - $this->start;
+
+            if ($this->connection instanceof PrimaryReadReplicaConnection) {
+                $this->ranOnPrimary = $this->connection->isConnectedToPrimary();
+            }
         }
     }
 
@@ -100,6 +109,11 @@ class Query
     public function getDuration(): ?float
     {
         return $this->duration;
+    }
+
+    public function ranOnPrimary(): ?bool
+    {
+        return $this->ranOnPrimary;
     }
 
     public function __clone()

@@ -29,6 +29,7 @@ abstract class AbstractCloner implements ClonerInterface
 
         'Symfony\Component\VarDumper\Caster\CutStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
         'Symfony\Component\VarDumper\Caster\CutArrayStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castCutArray'],
+        'Symfony\Component\VarDumper\Caster\ClassDumpStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castClassDump'],
         'Symfony\Component\VarDumper\Caster\ConstStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castStub'],
         'Symfony\Component\VarDumper\Caster\EnumStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castEnum'],
         'Symfony\Component\VarDumper\Caster\ScalarStub' => ['Symfony\Component\VarDumper\Caster\StubCaster', 'castScalar'],
@@ -167,8 +168,6 @@ abstract class AbstractCloner implements ClonerInterface
         'CurlHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurl'],
 
         'Dba\Connection' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
-        ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
-        ':dba persistent' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
 
         'GdImage' => ['Symfony\Component\VarDumper\Caster\GdCaster', 'castGd'],
 

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
@@ -43,22 +42,15 @@ class Collection extends Composite
      * @param bool|null                                      $allowExtraFields   Whether to allow additional keys not declared in the configured fields (defaults to false)
      * @param bool|null                                      $allowMissingFields Whether to allow the collection to lack some fields declared in the configured fields (defaults to false)
      */
-    #[HasNamedArguments]
-    public function __construct(mixed $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
+    public function __construct(?array $fields = null, ?array $groups = null, mixed $payload = null, ?bool $allowExtraFields = null, ?bool $allowMissingFields = null, ?string $extraFieldsMessage = null, ?string $missingFieldsMessage = null)
     {
         if (null === $fields) {
             throw new MissingOptionsException(\sprintf('The options "fields" must be set for constraint "%s".', self::class), ['fields']);
         }
 
-        if (self::isFieldsOption($fields)) {
-            $this->fields = $fields;
-        } else {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        $this->fields = $fields;
 
-            $options = $fields;
-        }
-
-        parent::__construct($options ?? null, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->allowExtraFields = $allowExtraFields ?? $this->allowExtraFields;
         $this->allowMissingFields = $allowMissingFields ?? $this->allowMissingFields;
@@ -78,52 +70,13 @@ class Collection extends Composite
             }
 
             if (!$field instanceof Optional && !$field instanceof Required) {
-                $this->fields[$fieldName] = new Required($field);
+                $this->fields[$fieldName] = new Required($field ?? []);
             }
         }
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getRequiredOptions(): array
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return ['fields'];
     }
 
     protected function getCompositeOption(): string
     {
         return 'fields';
-    }
-
-    private static function isFieldsOption($options): bool
-    {
-        if (!\is_array($options)) {
-            return false;
-        }
-
-        foreach ($options as $optionOrField) {
-            if ($optionOrField instanceof Constraint) {
-                return true;
-            }
-
-            if (null === $optionOrField) {
-                continue;
-            }
-
-            if (!\is_array($optionOrField)) {
-                return false;
-            }
-
-            if ($optionOrField && !($optionOrField[0] ?? null) instanceof Constraint) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }

@@ -133,12 +133,7 @@ class DotenvDumpCommandTest extends TestCase
     private function createCommand(): CommandTester
     {
         $application = new Application();
-        $command = new DotenvDumpCommand(__DIR__);
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand(new DotenvDumpCommand(__DIR__));
 
         return new CommandTester($application->find('dotenv:dump'));
     }

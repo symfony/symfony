@@ -1,6 +1,27 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `count()` function to ExpressionLanguage
+
+8.1
+---
+
+ * Add support for null-safe array access syntax (`foo?.[0]`)
+
+8.0
+---
+
+ * Remove support for passing `null` as the allowed variable names to `ExpressionLanguage::lint()` and `Parser::lint()`,
+   pass the `IGNORE_UNKNOWN_VARIABLES` flag instead to ignore unknown variables during linting
+
+   ```diff
+   -$expressionLanguage->lint($expression, null);
+   +$expressionLanguage->lint($expression, [], ExpressionLanguage::IGNORE_UNKNOWN_VARIABLES);
+   ```
+
 7.2
 ---
 

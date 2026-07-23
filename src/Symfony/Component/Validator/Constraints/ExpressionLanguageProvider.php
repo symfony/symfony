@@ -22,7 +22,7 @@ class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
             new ExpressionFunction('is_valid', static fn (...$arguments) => \sprintf(
                 '0 === $context->getValidator()->inContext($context)->validate(%s)->getViolations()->count()',
                 implode(', ', $arguments)
-            ), static fn (array $variables, ...$arguments) => 0 === $variables['context']->getValidator()->inContext($variables['context'])->validate(...$arguments)->getViolations()->count()),
+            ), static fn (array $variables, ...$arguments): bool => 0 === $variables['context']->getValidator()->inContext($variables['context'])->validate(...$arguments)->getViolations()->count()),
         ];
     }
 }

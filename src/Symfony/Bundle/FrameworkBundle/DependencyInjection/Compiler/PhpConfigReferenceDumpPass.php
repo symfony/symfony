@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AppReference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Routing\Loader\Configurator\RoutesReference;
 
 /**

@@ -33,12 +33,6 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $extension = $this->createMock(ExtensionInterface::class);
         $extension
-            ->method('getXsdValidationBasePath')
-            ->willReturn(false);
-        $extension
-            ->method('getNamespace')
-            ->willReturn('http://example.org/schema/dic/foo');
-        $extension
             ->method('getAlias')
             ->willReturn('foo');
         $extension->expects($this->once())

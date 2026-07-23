@@ -12,8 +12,8 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Languages;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
 
 /**
@@ -39,7 +39,6 @@ class Language extends Constraint
      * @param bool|null     $alpha3 Pass true to validate the language with three-letter code (ISO 639-2 (2T)) or false with two-letter code (ISO 639-1) (defaults to false)
      * @param string[]|null $groups
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -51,11 +50,11 @@ class Language extends Constraint
             throw new LogicException('The Intl component is required to use the Language constraint. Try running "composer require symfony/intl".');
         }
 
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->alpha3 = $alpha3 ?? $this->alpha3;

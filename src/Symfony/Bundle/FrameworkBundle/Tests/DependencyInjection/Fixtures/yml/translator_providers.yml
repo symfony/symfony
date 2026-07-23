@@ -1,10 +1,5 @@
 framework:
-    annotations: false
-    http_method_override: false
-    handle_all_throwables: true
     enabled_locales: [ 'es' ]
-    php_errors:
-        log: true
     translator:
         providers:
             foo_provider:

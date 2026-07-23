@@ -23,7 +23,7 @@ use Symfony\Component\VarDumper\Exception\ThrowingCasterException;
  *
  * @final
  *
- * @internal since Symfony 7.3
+ * @internal
  */
 class ExceptionCaster
 {

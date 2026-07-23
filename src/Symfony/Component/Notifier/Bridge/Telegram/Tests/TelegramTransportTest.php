@@ -31,15 +31,17 @@ final class TelegramTransportTest extends TransportTestCase
 {
     private const FIXTURE_FILE = __DIR__.'/Fixtures/image.png';
 
-    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TelegramTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null, bool $disableHttps = false): TelegramTransport
     {
-        return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
+        return new TelegramTransport('token', $channel, $client ?? new MockHttpClient(), disableHttps: $disableHttps);
     }
 
     public static function toStringProvider(): iterable
     {
         yield ['telegram://api.telegram.org', self::createTransport()];
         yield ['telegram://api.telegram.org?channel=testChannel', self::createTransport(null, 'testChannel')];
+        yield ['telegram://api.telegram.org?sslmode=disable', self::createTransport(null, null, true)];
+        yield ['telegram://api.telegram.org?channel=testChannel&sslmode=disable', self::createTransport(null, 'testChannel', true)];
     }
 
     public static function supportedMessagesProvider(): iterable

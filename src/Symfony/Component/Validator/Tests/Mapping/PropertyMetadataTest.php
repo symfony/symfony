@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
@@ -82,7 +81,6 @@ class PropertyMetadataTest extends TestCase
         $this->assertEquals(42, $metadata->getPropertyValue($entity));
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testGetPropertyValueFromUninitializedPropertyShouldUseHookIfPresent()
     {
         $entity = new EntityWithHook();
@@ -92,7 +90,6 @@ class PropertyMetadataTest extends TestCase
         $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testGetPropertyValueFromUninitializedPropertyShouldReturnNullIfHookFails()
     {
         $entity = new EntityWithHook();
@@ -102,7 +99,6 @@ class PropertyMetadataTest extends TestCase
         $this->assertNull($metadata->getPropertyValue($entity));
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testGetPropertyValueFromUninitializedPropertyWithHookReferencingItself()
     {
         $entity = new EntityWithHook();

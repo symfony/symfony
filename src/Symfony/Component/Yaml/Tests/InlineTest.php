@@ -33,6 +33,25 @@ class InlineTest extends TestCase
         $this->assertSame($value, Inline::parse($yaml, $flags), \sprintf('::parse() converts an inline YAML to a PHP structure (%s)', $yaml));
     }
 
+    #[DataProvider('getNanRepresentations')]
+    public function testParseNan(string $yaml)
+    {
+        $this->assertNan(Inline::parse($yaml));
+    }
+
+    public static function getNanRepresentations(): iterable
+    {
+        yield ['.nan'];
+        yield ['.NaN'];
+        yield ['.NAN'];
+    }
+
+    public function testDumpNan()
+    {
+        $this->assertSame('.NaN', Inline::dump(\NAN));
+        $this->assertNan(Inline::parse(Inline::dump(\NAN)));
+    }
+
     #[DataProvider('getTestsForParseWithMapObjects')]
     public function testParseWithMapObjects($yaml, $value, $flags = Yaml::PARSE_OBJECT_FOR_MAP)
     {
@@ -113,6 +132,13 @@ class InlineTest extends TestCase
         $this->expectException(ParseException::class);
         $this->expectExceptionMessageMatches('#The string "!php/enum SomeEnum::Foo" could not be parsed as an enum.*#');
         Inline::parse('!php/enum SomeEnum::Foo', Yaml::PARSE_EXCEPTION_ON_INVALID_TYPE);
+    }
+
+    public function testParsePhpObjectThrowsExceptionOnNonStringScalar()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('The "!php/object" tag only supports a string value, got "array"');
+        Inline::parse('!php/object !php/enum Symfony\Component\Yaml\Tests\Fixtures\FooUnitEnum', Yaml::PARSE_OBJECT | Yaml::PARSE_CONSTANT);
     }
 
     #[DataProvider('getTestsForDump')]
@@ -324,6 +350,7 @@ class InlineTest extends TestCase
             ['true', true],
             ['12', 12],
             ['-12', -12],
+            ['+12', 12],
             ['1_2', 12],
             ['_12', '_12'],
             ['12_', 12],
@@ -540,6 +567,8 @@ class InlineTest extends TestCase
             ['[\'foo,bar\', \'foo bar\']', ['foo,bar', 'foo bar']],
 
             // mappings
+            ['{}', []],
+            ['{ foo: {} }', ['foo' => []]],
             ['{ foo: bar, bar: foo, \'false\': false, \'null\': null, integer: 12 }', ['foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12]],
             ['{ foo: bar, bar: \'foo: bar\' }', ['foo' => 'bar', 'bar' => 'foo: bar']],
 

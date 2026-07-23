@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
@@ -85,7 +86,13 @@ class AutowirePass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof Autowire) {
-            return $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
+            $value = $this->processValue($this->container->getParameterBag()->resolveValue($value->value));
+            // count env vars referenced by the attribute right away, so that removing the
+            // owning service (e.g. unused with an unrelated autowiring error) does not later
+            // report the env var as never used
+            $this->container->resolveEnvPlaceholders($value);
+
+            return $value;
         }
 
         if ($value instanceof AutowireDecorated) {
@@ -283,6 +290,9 @@ class AutowirePass extends AbstractRecursivePass
             $currentId = $this->currentId;
 
             $getValue = function () use ($type, $parameter, $class, $method, $name, $target, $defaultArgument, $currentId) {
+                if (!$target && null !== ($namedAlias = $this->getCombinedAlias($type, $name)) && $this->canDefinitionBeAutowired($namedAlias)) {
+                    trigger_deprecation('symfony/dependency-injection', '8.1', 'Relying solely on the name of parameter "$%s" of "%s()" to match a named autowiring alias is deprecated; use the "#[Target]" attribute.', $parameter->name, $class !== $currentId ? $class.'::'.$method : $method);
+                }
                 if (!$value = $this->getAutowiredReference($ref = new TypedReference($type, $type, ContainerBuilder::EXCEPTION_ON_INVALID_REFERENCE, $name, $target), false)) {
                     $failureMessage = $this->createTypeNotFoundMessageCallback($ref, \sprintf('argument "$%s" of method "%s()"', $parameter->name, $class !== $currentId ? $class.'::'.$method : $method));
 
@@ -307,12 +317,33 @@ class AutowirePass extends AbstractRecursivePass
                     $attribute = $attribute->newInstance();
                     $value = $attribute instanceof Autowire ? $attribute->value : null;
 
-                    if (\is_string($value) && str_starts_with($value, '%env(') && str_ends_with($value, ')%')) {
-                        if ($parameter->getType() instanceof \ReflectionNamedType && 'bool' === $parameter->getType()->getName() && !str_starts_with($value, '%env(bool:')) {
-                            $attribute = new Autowire(substr_replace($value, 'bool:', 5, 0));
+                    if (\is_string($value)) {
+                        $isPureEnv = str_starts_with($value, '%env(') && str_ends_with($value, ')%') && !str_contains(substr($value, 5, -2), '%');
+                        $default = $parameter->isDefaultValueAvailable() ? $parameter->getDefaultValue() : null;
+
+                        if ($isPureEnv && $parameter->isDefaultValueAvailable() && null === $default && !preg_match('/(?:^%env\(|:)default:/', $value)) {
+                            $value = substr_replace($value, 'default::', 5, 0);
+                            $attribute = new Autowire($value);
                         }
-                        if ($parameter->isDefaultValueAvailable() && $parameter->allowsNull() && null === $parameter->getDefaultValue() && !preg_match('/(^|:)default:/', $value)) {
-                            $attribute = new Autowire(substr_replace($value, 'default::', 5, 0));
+                        if ($isPureEnv && $parameter->getType() instanceof \ReflectionNamedType && 'bool' === $parameter->getType()->getName() && !str_starts_with($value, '%env(bool:')) {
+                            $value = substr_replace($value, 'bool:', 5, 0);
+                            $attribute = new Autowire($value);
+                        }
+
+                        try {
+                            $resolved = $this->container->getParameterBag()->resolveValue($value);
+                        } catch (ParameterNotFoundException) {
+                            $resolved = null;
+                        }
+
+                        if (\is_string($resolved) && preg_match('/env_[a-f0-9]{16}_\w+_[a-f0-9]{32}/', $resolved)) {
+                            foreach (explode('|', $type) as $t) {
+                                if (!\in_array($t, ['Closure', 'Stringable'], true)) {
+                                    continue;
+                                }
+                                $arguments[$index] = new EnvClosureArgument($resolved, $default, 'Stringable' === $t);
+                                continue 3;
+                            }
                         }
                     }
 
@@ -765,10 +796,6 @@ class AutowirePass extends AbstractRecursivePass
         $resolvedType = $this->container->getParameterBag()->resolveValue($resolvedType);
 
         if (!$resolvedType || !$this->container->getReflectionClass($resolvedType, false)) {
-            return $originalType;
-        }
-
-        if (\PHP_VERSION_ID < 80400 && $this->container->getReflectionClass($resolvedType, false)->isFinal()) {
             return $originalType;
         }
 

@@ -16,6 +16,7 @@ use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\VarExporter\DeepCloner;
 
 abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
 {
@@ -45,10 +46,20 @@ abstract class AbstractPhpFileCacheWarmer implements CacheWarmerInterface
             spl_autoload_unregister([ClassExistenceResource::class, 'throwOnRequiredClass']);
         }
 
-        // the ArrayAdapter stores the values serialized
-        // to avoid mutation of the data after it was written to the cache
-        // so here we un-serialize the values first
-        $values = array_map(static fn ($val) => null !== $val ? unserialize($val, ['allowed_classes' => true]) : null, $arrayAdapter->getValues());
+        // the ArrayAdapter stores deep clones of the values to avoid mutation of
+        // the cached data afterwards; older versions store them serialized
+        // instead, so unserialize those (a serialized payload holds a colon,
+        // which the adapter never leaves in a raw string) for backward compatibility
+        $values = $arrayAdapter->getValues(true);
+        foreach ($values as $key => $value) {
+            if (null === $value) {
+                unset($values[$key]);
+            } elseif ($value instanceof DeepCloner) {
+                $values[$key] = $value->clone(null, true);
+            } elseif (\is_string($value) && str_contains($value, ':')) {
+                $values[$key] = unserialize($value, ['allowed_classes' => true]);
+            }
+        }
 
         return $this->warmUpPhpArrayAdapter(new PhpArrayAdapter($this->phpArrayFile, new NullAdapter()), $values);
     }

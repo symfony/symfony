@@ -30,12 +30,13 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4.1",
         "symfony/polyfill-ctype": "^1.8",
-        "symfony/polyfill-mbstring": "~1.0"
+        "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
-        "symfony/json-streamer": "^7.3|^8.0",
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/json-streamer": "^7.4|^8.0",
         "jsonpath-standard/jsonpath-compliance-test-suite": "*"
     },
     "autoload": {

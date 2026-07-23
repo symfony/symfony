@@ -119,4 +119,40 @@ class XliffUtilsTest extends TestCase
 
         return ['php_warnings' => $phpWarnings, 'libxml_errors' => $libxmlErrors];
     }
+
+    public function testValidateSchemaDoesNotResolveExternalEntities()
+    {
+        $networkLoads = [];
+        libxml_set_external_entity_loader(static function (?string $public, string $system, array $context) use (&$networkLoads) {
+            if (preg_match('#^(?:https?|ftp)://#i', $system)) {
+                $networkLoads[] = $system;
+
+                return null;
+            }
+
+            $path = str_starts_with($system, 'file://') ? substr($system, 7) : $system;
+            $resolved = '/' === ($path[0] ?? '') ? $path : ($context['directory'] ?? '').'/'.$path;
+
+            return @fopen(rawurldecode(ltrim($resolved, '/')) ? rawurldecode($resolved) : $resolved, 'r') ?: null;
+        });
+
+        $internal = libxml_use_internal_errors(true);
+
+        try {
+            $dom = new \DOMDocument();
+            $dom->loadXML('<?xml version="1.0"?>'
+                .'<!DOCTYPE xliff [<!ENTITY xxe SYSTEM "http://127.0.0.1:1/payload.dtd">]>'
+                .'<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">'
+                .'<file source-language="en" datatype="plaintext" original="file.ext"><body/></file>'
+                .'</xliff>', \LIBXML_NONET);
+
+            XliffUtils::validateSchema($dom);
+        } finally {
+            libxml_set_external_entity_loader(null);
+            libxml_clear_errors();
+            libxml_use_internal_errors($internal);
+        }
+
+        $this->assertSame([], $networkLoads, 'XliffUtils::validateSchema() must not resolve external entities over the network.');
+    }
 }

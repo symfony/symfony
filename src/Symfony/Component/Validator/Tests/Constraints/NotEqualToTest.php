@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotEqualTo;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -40,15 +38,6 @@ class NotEqualToTest extends TestCase
         self::assertSame('b', $cConstraint->propertyPath);
         self::assertSame('myMessage', $cConstraint->message);
         self::assertSame(['foo'], $cConstraint->groups);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testDoctrineStyle()
-    {
-        $constraint = new NotEqualTo(['value' => 5]);
-
-        $this->assertSame(5, $constraint->value);
     }
 }
 

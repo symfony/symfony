@@ -788,7 +788,7 @@ class EnvVarProcessorTest extends TestCase
 
     public function testGetEnvShuffle()
     {
-        mt_srand(2);
+        srand(2); // to set seed for `shuffle`
 
         $this->assertSame(
             ['bar', 'foo'],

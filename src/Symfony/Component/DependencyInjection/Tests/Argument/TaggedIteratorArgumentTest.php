@@ -12,6 +12,8 @@
 namespace Symfony\Component\DependencyInjection\Tests\Argument;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 
@@ -23,42 +25,44 @@ class TaggedIteratorArgumentTest extends TestCase
 
         $this->assertSame('foo', $taggedIteratorArgument->getTag());
         $this->assertNull($taggedIteratorArgument->getIndexAttribute());
-        $this->assertNull($taggedIteratorArgument->getDefaultIndexMethod());
+        $this->assertNull($taggedIteratorArgument->getDefaultIndexMethod(false));
         $this->assertFalse($taggedIteratorArgument->needsIndexes());
-        $this->assertNull($taggedIteratorArgument->getDefaultPriorityMethod());
+        $this->assertNull($taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
     public function testOnlyTagWithNeedsIndexes()
     {
-        $taggedIteratorArgument = new TaggedIteratorArgument('foo', null, null, true);
+        $taggedIteratorArgument = new TaggedIteratorArgument('foo', null, true);
 
         $this->assertSame('foo', $taggedIteratorArgument->getTag());
         $this->assertSame('foo', $taggedIteratorArgument->getIndexAttribute());
-        $this->assertSame('getDefaultFooName', $taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertSame('getDefaultFooPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
+        $this->assertSame('getDefaultFooName', $taggedIteratorArgument->getDefaultIndexMethod(false));
+        $this->assertSame('getDefaultFooPriority', $taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
     public function testOnlyTagWithNeedsIndexesAndDotTag()
     {
-        $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar', null, null, true);
+        $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar', null, true);
 
         $this->assertSame('foo.bar', $taggedIteratorArgument->getTag());
         $this->assertSame('bar', $taggedIteratorArgument->getIndexAttribute());
-        $this->assertSame('getDefaultBarName', $taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertSame('getDefaultBarPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
+        $this->assertSame('getDefaultBarName', $taggedIteratorArgument->getDefaultIndexMethod(false));
+        $this->assertSame('getDefaultBarPriority', $taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
     public function testOnlyTagWithNeedsIndexesAndDotsTag()
     {
-        $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar.baz.qux', null, null, true);
+        $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar.baz.qux', null, true);
 
         $this->assertSame('foo.bar.baz.qux', $taggedIteratorArgument->getTag());
         $this->assertSame('qux', $taggedIteratorArgument->getIndexAttribute());
-        $this->assertSame('getDefaultQuxName', $taggedIteratorArgument->getDefaultIndexMethod());
-        $this->assertSame('getDefaultQuxPriority', $taggedIteratorArgument->getDefaultPriorityMethod());
+        $this->assertSame('getDefaultQuxName', $taggedIteratorArgument->getDefaultIndexMethod(false));
+        $this->assertSame('getDefaultQuxPriority', $taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
     #[DataProvider('defaultIndexMethodProvider')]
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testDefaultIndexMethod(?string $indexAttribute, ?string $defaultIndexMethod, ?string $expectedDefaultIndexMethod)
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, $defaultIndexMethod);
@@ -106,6 +110,8 @@ class TaggedIteratorArgumentTest extends TestCase
     }
 
     #[DataProvider('defaultPriorityMethodProvider')]
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testDefaultPriorityIndexMethod(?string $indexAttribute, ?string $defaultPriorityMethod, ?string $expectedDefaultPriorityMethod)
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, null, false, $defaultPriorityMethod);

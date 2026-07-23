@@ -15,6 +15,8 @@ use Composer\Autoload\ClassLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\EnvClosure;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -146,7 +148,7 @@ class PhpDumper extends Dumper
             'inline_class_loader' => null,
             'preload_classes' => [],
             'service_locator_tag' => 'container.service_locator',
-            'build_time' => time(),
+            'build_time' => filter_var($_SERVER['SOURCE_DATE_EPOCH'] ?? null, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? time(),
         ], $options);
 
         $this->addGetService = false;
@@ -756,6 +758,20 @@ class PhpDumper extends Dumper
         return true;
     }
 
+    private function getResetMethodsCode(Definition $definition): ?string
+    {
+        if (!$resetTags = $definition->getTag('container.tracked_for_reset')) {
+            return null;
+        }
+
+        $methods = [];
+        foreach ($resetTags as $tag) {
+            $methods[] = $this->export($tag['method']);
+        }
+
+        return implode(', ', $methods);
+    }
+
     private function addServiceMethodCalls(Definition $definition, string $variableName, ?string $sharedNonLazyId): string
     {
         $lastWitherIndex = null;
@@ -1060,6 +1076,8 @@ class PhpDumper extends Dumper
 
         if ($arguments = array_filter([$inlineDef->getProperties(), $inlineDef->getMethodCalls(), $inlineDef->getConfigurator()])) {
             $isSimpleInstance = false;
+        } elseif ($isRootInstance && $this->container->hasDefinition($id) && $this->container->getDefinition($id)->hasTag('container.tracked_for_reset')) {
+            $isSimpleInstance = false;
         } elseif ($definition !== $inlineDef && 2 > $this->inlinedDefinitions[$inlineDef]) {
             return $code;
         }
@@ -1093,6 +1111,10 @@ class PhpDumper extends Dumper
 
         if (!$isRootInstance || $isSimpleInstance) {
             return $code;
+        }
+
+        if ($this->container->hasDefinition($id) && $methodsCode = $this->getResetMethodsCode($this->container->getDefinition($id))) {
+            $code .= \sprintf("\n        \$container->trackForReset(\$instance, [%s]);\n", $methodsCode);
         }
 
         return $code."\n        return \$instance;\n";
@@ -1589,7 +1611,7 @@ class PhpDumper extends Dumper
         return null !== $r
             && (null !== $constructor = $r->getConstructor())
             && 0 === $constructor->getNumberOfRequiredParameters()
-            && Container::class !== $constructor->getDeclaringClass()->name;
+            && Container::class !== $constructor->class;
     }
 
     private function addDefaultParametersMethod(): string
@@ -1611,7 +1633,7 @@ class PhpDumper extends Dumper
             $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w*+'\)|targetDir\.'')/", $export[1])) {
+            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+[\w.]*+'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = \sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
                 $this->dynamicParameters[$key] = true;
             } else {
@@ -1895,6 +1917,13 @@ class PhpDumper extends Dumper
                     return \sprintf('%sfn ()%s => %s', $attribute, $returnedType, $code);
                 }
 
+                if ($value instanceof EnvClosureArgument) {
+                    $closure = \sprintf('fn () => %s', $this->export($value->getValue()));
+                    $code = \sprintf('new \\%s(%s, %s)', EnvClosure::class, $closure, $this->export($value->getDefault()));
+
+                    return $value->isStringable() ? $code : (null !== $value->getDefault() ? $code.'->__invoke(...)' : $closure);
+                }
+
                 if ($value instanceof IteratorArgument) {
                     if (!$values = $value->getValues()) {
                         return 'new RewindableGenerator(fn () => new \EmptyIterator(), 0)';
@@ -1968,7 +1997,13 @@ class PhpDumper extends Dumper
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');
             }
 
-            return $this->addNewInstance($value);
+            $code = $this->addNewInstance($value);
+
+            if ($methodsCode = $this->getResetMethodsCode($value)) {
+                return \sprintf('$container->trackForReset(%s, [%s])', $code, $methodsCode);
+            }
+
+            return $code;
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -2061,7 +2096,7 @@ class PhpDumper extends Dumper
                 if (!$definition->isShared()) {
                     return $code;
                 }
-            } elseif ($this->isTrivialInstance($definition)) {
+            } elseif ($this->isTrivialInstance($definition) && ($definition->isShared() || !$definition->hasTag('container.tracked_for_reset'))) {
                 if ($definition->hasErrors() && $e = $definition->getErrors()) {
                     return \sprintf('throw new RuntimeException(%s)', $this->export(reset($e)));
                 }

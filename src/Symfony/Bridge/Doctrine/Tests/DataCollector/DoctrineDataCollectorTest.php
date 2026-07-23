@@ -279,5 +279,3 @@ class DoctrineDataCollectorTest extends TestCase
         return $collector;
     }
 }
-
-// @php-cs-fixer-ignore fully_qualified_strict_types

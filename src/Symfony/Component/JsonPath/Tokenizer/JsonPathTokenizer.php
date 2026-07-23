@@ -22,7 +22,15 @@ use Symfony\Component\JsonPath\JsonPathUtils;
  */
 final class JsonPathTokenizer
 {
-    private const RFC9535_WHITESPACE_CHARS = [' ', "\t", "\n", "\r"];
+    public const SINGULAR_ARGUMENT_FUNCTIONS = ['length', 'match', 'search'];
+    public const RFC9535_FUNCTION_ARITY = [
+        'length' => 1,
+        'count' => 1,
+        'value' => 1,
+        'match' => 2,
+        'search' => 2,
+    ];
+
     private const BARE_LITERAL_REGEX = '(true|false|null|\d+(\.\d+)?([eE][+-]?\d+)?|\'[^\']*\'|"[^"]*")';
 
     /**
@@ -269,7 +277,7 @@ final class JsonPathTokenizer
 
     private static function isWhitespace(string $char): bool
     {
-        return \in_array($char, self::RFC9535_WHITESPACE_CHARS, true);
+        return \in_array($char, [' ', "\t", "\n", "\r"], true);
     }
 
     private static function isEscaped(array $chars, int $position): bool
@@ -308,7 +316,7 @@ final class JsonPathTokenizer
                 [$left, $right] = array_map('trim', explode($op, $filterExpr, 2));
 
                 // check if either side contains non-singular queries
-                if (self::isNonSingularQuery($left) || self::isNonSingularQuery($right)) {
+                if (self::containsNonSingularRelativeComparisonQuery($left) || self::containsNonSingularRelativeComparisonQuery($right)) {
                     throw new InvalidJsonPathException('Non-singular query is not comparable.', $position);
                 }
 
@@ -363,39 +371,8 @@ final class JsonPathTokenizer
             throw new InvalidJsonPathException('Function result must be compared.', $position);
         }
 
-        if (preg_match('/\b(length|count|value)\s*\(([^)]*)\)/', $filterExpr, $matches)) {
-            $functionName = $matches[1];
-            $args = trim($matches[2]);
-            if (!$args) {
-                throw new InvalidJsonPathException('Function requires exactly one argument.', $position);
-            }
-
-            $argParts = JsonPathUtils::parseCommaSeparatedValues($args);
-            if (1 !== \count($argParts)) {
-                throw new InvalidJsonPathException('Function requires exactly one argument.', $position);
-            }
-
-            $arg = trim($argParts[0]);
-
-            if ('count' === $functionName && preg_match('/^'.self::BARE_LITERAL_REGEX.'$/', $arg)) {
-                throw new InvalidJsonPathException('count() function requires a query argument, not a literal.', $position);
-            }
-
-            if ('length' === $functionName && preg_match('/@\.\*/', $arg)) {
-                throw new InvalidJsonPathException('Function argument must be a singular query.', $position);
-            }
-        }
-
-        if (preg_match('/\b(match|search)\s*\(([^)]*)\)/', $filterExpr, $matches)) {
-            $args = trim($matches[2]);
-            if (!$args) {
-                throw new InvalidJsonPathException('Function requires exactly two arguments.', $position);
-            }
-
-            $argParts = JsonPathUtils::parseCommaSeparatedValues($args);
-            if (2 !== \count($argParts)) {
-                throw new InvalidJsonPathException('Function requires exactly two arguments.', $position);
-            }
+        foreach (self::parseFunctionCalls($filterExpr) as [$functionName, $args]) {
+            self::validateFunctionArguments($functionName, $args, $position);
         }
 
         if (preg_match('/^'.self::BARE_LITERAL_REGEX.'$/', $filterExpr)) {
@@ -406,8 +383,8 @@ final class JsonPathTokenizer
             throw new InvalidJsonPathException('Bare literals in logical expression - literals must be compared.', $position);
         }
 
-        if (preg_match('/\b(match|search|length|count|value)\s*\([^)]*\)\s*[=!]=\s*(true|false)\b/', $filterExpr)
-            || preg_match('/\b(true|false)\s*[=!]=\s*(match|search|length|count|value)\s*\([^)]*\)/', $filterExpr)) {
+        if (preg_match('/\b(length|count|value|match|search)\s*\([^)]*\)\s*[=!]=\s*(true|false)\b/', $filterExpr)
+            || preg_match('/\b(true|false)\s*[=!]=\s*(length|count|value|match|search)\s*\([^)]*\)/', $filterExpr)) {
             throw new InvalidJsonPathException('Function result cannot be compared to boolean literal.', $position);
         }
 
@@ -422,17 +399,169 @@ final class JsonPathTokenizer
         }
     }
 
-    private static function isNonSingularQuery(string $query): bool
+    public static function isNonSingularRelativeQuery(string $query): bool
     {
         if (!str_starts_with($query = trim($query), '@')) {
             return false;
         }
 
-        if (preg_match('/@(\.\.)|(.*\[\*])|(.*\.\*)|(.*\[.*:.*])|(.*\[.*,.*])/', $query)) {
+        if ('@.*' === $query || preg_match('/@(?:\.\.|.*\[.*:.*]|.*\[.*,.*])/', $query)) {
             return true;
         }
 
         return false;
+    }
+
+    private static function containsNonSingularRelativeComparisonQuery(string $query): bool
+    {
+        if (!str_starts_with($query = trim($query), '@')) {
+            return false;
+        }
+
+        return preg_match('/@(?:\.\.|.*\[\*]|.*\.\*|.*\[.*:.*]|.*\[.*,.*])/', $query);
+    }
+
+    private static function validateFunctionArguments(string $functionName, string $args, int $position): void
+    {
+        if (!isset(self::RFC9535_FUNCTION_ARITY[$functionName])) {
+            return;
+        }
+
+        $argStrings = ($args = trim($args)) ? JsonPathUtils::parseCommaSeparatedValues($args) : [];
+        $expectedArgCount = self::RFC9535_FUNCTION_ARITY[$functionName];
+
+        if (\count($argStrings) !== $expectedArgCount) {
+            throw new InvalidJsonPathException(\sprintf('the JsonPath function "%s" requires exactly %d argument(s).', $functionName, $expectedArgCount), $position);
+        }
+
+        if ('count' === $functionName && isset($argStrings[0])) {
+            $arg = trim($argStrings[0]);
+            if (preg_match('/^(true|false|null|\d+(\.\d+)?([eE][+-]?\d+)?|\'[^\']*\'|"[^"]*")$/', $arg)) {
+                throw new InvalidJsonPathException(\sprintf('the JsonPath function "%s" requires a query argument, not a literal.', $functionName), $position);
+            }
+        }
+
+        if (\in_array($functionName, self::SINGULAR_ARGUMENT_FUNCTIONS, true) && isset($argStrings[0])) {
+            $arg = trim($argStrings[0]);
+            if (self::isNonSingularRelativeQuery($arg)) {
+                throw new InvalidJsonPathException(\sprintf('the JsonPath function "%s" argument must be a singular query.', $functionName), $position);
+            }
+        }
+    }
+
+    /**
+     * @return list<array{0: string, 1: string}>
+     */
+    private static function parseFunctionCalls(string $expr): array
+    {
+        $calls = [];
+        $length = \strlen($expr);
+        $inQuote = false;
+        $quoteChar = '';
+
+        for ($i = 0; $i < $length; ++$i) {
+            $char = $expr[$i];
+
+            if ('\\' === $char && $inQuote && isset($expr[$i + 1])) {
+                ++$i;
+                continue;
+            }
+
+            if ('"' === $char || "'" === $char) {
+                if (!$inQuote) {
+                    $inQuote = true;
+                    $quoteChar = $char;
+                } elseif ($quoteChar === $char) {
+                    $inQuote = false;
+                    $quoteChar = '';
+                }
+
+                continue;
+            }
+
+            if ($inQuote || !(ctype_alnum($char) || '_' === $char)) {
+                continue;
+            }
+
+            $start = $i;
+            while (isset($expr[$i + 1]) && (ctype_alnum($expr[$i + 1]) || '_' === $expr[$i + 1])) {
+                ++$i;
+            }
+
+            $functionName = substr($expr, $start, $i - $start + 1);
+
+            if (\in_array($functionName, ['true', 'false', 'null'], true)) {
+                continue;
+            }
+
+            $openParenPos = $i + 1;
+            while (isset($expr[$openParenPos]) && ctype_space($expr[$openParenPos])) {
+                ++$openParenPos;
+            }
+
+            if (!isset($expr[$openParenPos]) || '(' !== $expr[$openParenPos]) {
+                continue;
+            }
+
+            $args = self::extractParenthesizedExpression($expr, $openParenPos);
+            if (null === $args) {
+                continue;
+            }
+
+            $calls[] = [$functionName, trim($args)];
+            array_push($calls, ...self::parseFunctionCalls($args));
+            $i = $openParenPos + \strlen($args) + 1;
+        }
+
+        return $calls;
+    }
+
+    private static function extractParenthesizedExpression(string $expr, int $openParenPos): ?string
+    {
+        if (!isset($expr[$openParenPos]) || '(' !== $expr[$openParenPos]) {
+            return null;
+        }
+
+        $depth = 0;
+        $length = \strlen($expr);
+        $inQuote = false;
+        $quoteChar = '';
+
+        for ($i = $openParenPos; $i < $length; ++$i) {
+            $char = $expr[$i];
+
+            if ('\\' === $char && $inQuote && isset($expr[$i + 1])) {
+                ++$i;
+                continue;
+            }
+
+            if ('"' === $char || "'" === $char) {
+                if (!$inQuote) {
+                    $inQuote = true;
+                    $quoteChar = $char;
+                } elseif ($quoteChar === $char) {
+                    $inQuote = false;
+                    $quoteChar = '';
+                }
+
+                continue;
+            }
+
+            if ($inQuote) {
+                continue;
+            }
+
+            if ('(' === $char) {
+                ++$depth;
+            } elseif (')' === $char) {
+                --$depth;
+                if (0 === $depth) {
+                    return substr($expr, $openParenPos + 1, $i - $openParenPos - 1);
+                }
+            }
+        }
+
+        return null;
     }
 
     private static function validateUnicodeEscape(array $chars, int $index, int $position): void

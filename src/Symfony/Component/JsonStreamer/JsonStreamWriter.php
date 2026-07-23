@@ -18,9 +18,13 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\BcMathNumberValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeZoneValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\GmpNumberValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\JsonStreamer\Write\StreamWriterGenerator;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -30,10 +34,15 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @implements StreamWriterInterface<array{
+ * @psalm-type Options = array{
+ *     date_time_format?: string,
+ *     date_time_timezone?: string|\DateTimeZone,
+ *     date_interval_format?: string,
  *     include_null_properties?: bool,
  *     ...<string, mixed>,
- * }>
+ * }
+ *
+ * @implements StreamWriterInterface<Options>
  */
 final class JsonStreamWriter implements StreamWriterInterface
 {
@@ -44,19 +53,24 @@ final class JsonStreamWriter implements StreamWriterInterface
      */
     private array $streamWriters = [];
 
+    /**
+     * @param Options $defaultOptions
+     */
     public function __construct(
-        private ContainerInterface $valueTransformers,
+        private ContainerInterface $transformers,
         PropertyMetadataLoaderInterface $propertyMetadataLoader,
         string $streamWritersDir,
         ?ConfigCacheFactoryInterface $configCacheFactory = null,
+        private array $defaultOptions = [],
     ) {
-        $this->streamWriterGenerator = new StreamWriterGenerator($propertyMetadataLoader, $streamWritersDir, $configCacheFactory);
+        $this->streamWriterGenerator = new StreamWriterGenerator($propertyMetadataLoader, $transformers, $streamWritersDir, $configCacheFactory);
     }
 
     public function write(mixed $data, Type $type, array $options = []): \Traversable&\Stringable
     {
+        $options += $this->defaultOptions;
         $path = $this->streamWriterGenerator->generate($type, $options);
-        $chunks = ($this->streamWriters[$path] ??= require $path)($data, $this->valueTransformers, $options);
+        $chunks = ($this->streamWriters[$path] ??= require $path)($data, $this->transformers, $options);
 
         return new
         /**
@@ -89,45 +103,47 @@ final class JsonStreamWriter implements StreamWriterInterface
     }
 
     /**
-     * @param array<string, ValueTransformerInterface> $valueTransformers
+     * @param array<string, PropertyValueTransformerInterface|ValueObjectTransformerInterface> $transformers
      */
-    public static function create(array $valueTransformers = [], ?string $streamWritersDir = null): self
+    public static function create(array $transformers = [], ?string $streamWritersDir = null): self
     {
         $streamWritersDir ??= sys_get_temp_dir().'/json_streamer/write';
-        $valueTransformers += [
-            'json_streamer.value_transformer.date_time_to_string' => new DateTimeToStringValueTransformer(),
+        $transformers += [
+            \DateTimeInterface::class => new DateTimeValueObjectTransformer(),
+            \DateInterval::class => new DateIntervalValueObjectTransformer(),
+            \DateTimeZone::class => new DateTimeZoneValueObjectTransformer(),
+            \BcMath\Number::class => new BcMathNumberValueObjectTransformer(),
+            \GMP::class => new GmpNumberValueObjectTransformer(),
         ];
 
-        $valueTransformersContainer = new class($valueTransformers) implements ContainerInterface {
+        $transformersContainer = new class($transformers) implements ContainerInterface {
             public function __construct(
-                private array $valueTransformers,
+                private array $transformers,
             ) {
             }
 
             public function has(string $id): bool
             {
-                return isset($this->valueTransformers[$id]);
+                return isset($this->transformers[$id]);
             }
 
-            public function get(string $id): ValueTransformerInterface
+            public function get(string $id): PropertyValueTransformerInterface|ValueObjectTransformerInterface
             {
-                return $this->valueTransformers[$id];
+                return $this->transformers[$id];
             }
         };
 
         $typeContextFactory = new TypeContextFactory(class_exists(PhpDocParser::class) ? new StringTypeResolver() : null);
 
         $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
-            new DateTimeTypePropertyMetadataLoader(
-                new AttributePropertyMetadataLoader(
-                    new PropertyMetadataLoader(TypeResolver::create()),
-                    $valueTransformersContainer,
-                    TypeResolver::create(),
-                ),
+            new AttributePropertyMetadataLoader(
+                new PropertyMetadataLoader(TypeResolver::create()),
+                $transformersContainer,
+                TypeResolver::create(),
             ),
             $typeContextFactory,
         );
 
-        return new self($valueTransformersContainer, $propertyMetadataLoader, $streamWritersDir);
+        return new self($transformersContainer, $propertyMetadataLoader, $streamWritersDir);
     }
 }

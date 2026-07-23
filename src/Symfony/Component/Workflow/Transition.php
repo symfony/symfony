@@ -46,13 +46,11 @@ class Transition
     }
 
     /**
-     * @param bool $asArc
-     *
      * @return $asArc is true ? array<Arc> : array<string>
      */
-    public function getFroms(/* bool $asArc = false */): array
+    public function getFroms(bool $asArc = false): array
     {
-        if (1 <= \func_num_args() && func_get_arg(0)) {
+        if ($asArc) {
             return $this->fromArcs;
         }
 
@@ -60,13 +58,11 @@ class Transition
     }
 
     /**
-     * @param bool $asArc
-     *
      * @return $asArc is true ? array<Arc> : array<string>
      */
-    public function getTos(/* bool $asArc = false */): array
+    public function getTos(bool $asArc = false): array
     {
-        if (1 <= \func_num_args() && func_get_arg(0)) {
+        if ($asArc) {
             return $this->toArcs;
         }
 

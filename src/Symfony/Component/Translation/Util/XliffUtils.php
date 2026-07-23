@@ -60,18 +60,9 @@ class XliffUtils
     {
         $xliffVersion = static::getVersionNumber($dom);
         $internalErrors = libxml_use_internal_errors(true);
-        if ($shouldEnable = self::shouldEnableEntityLoader()) {
-            $disableEntities = libxml_disable_entity_loader(false);
-        }
-        try {
-            $isValid = @$dom->schemaValidateSource(self::getSchema($xliffVersion));
-            if (!$isValid) {
-                return self::getXmlErrors($internalErrors);
-            }
-        } finally {
-            if ($shouldEnable) {
-                libxml_disable_entity_loader($disableEntities);
-            }
+
+        if (!@$dom->schemaValidateSource(self::getSchema($xliffVersion))) {
+            return self::getXmlErrors($internalErrors);
         }
 
         $dom->normalizeDocument();
@@ -100,31 +91,6 @@ class XliffUtils
         return $errorsAsString;
     }
 
-    private static function shouldEnableEntityLoader(): bool
-    {
-        static $dom, $schema;
-        if (null === $dom) {
-            $dom = new \DOMDocument();
-            $dom->loadXML('<?xml version="1.0"?><test/>');
-
-            $tmpfile = tempnam(sys_get_temp_dir(), 'symfony');
-            register_shutdown_function(static function () use ($tmpfile) {
-                @unlink($tmpfile);
-            });
-            $schema = '<?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:include schemaLocation="'.self::getFileUrl($tmpfile).'" />
-</xsd:schema>';
-            file_put_contents($tmpfile, '<?xml version="1.0" encoding="utf-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <xsd:element name="test" type="testType" />
-  <xsd:complexType name="testType"/>
-</xsd:schema>');
-        }
-
-        return !@$dom->schemaValidateSource($schema);
-    }
-
     private static function getFileUrl(string $path): string
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -143,8 +109,14 @@ class XliffUtils
         if ('1.2' === $xliffVersion) {
             $schemaSource = file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-1.2-transitional.xsd');
             $xmlUri = 'http://www.w3.org/2001/xml.xsd';
-        } elseif ('2.0' === $xliffVersion) {
+        } elseif (\in_array($xliffVersion, ['2.0', '2.1'], true)) {
+            // XLIFF 2.1 adds optional modules (Change Tracking, ITS, ...) on top of 2.0.
+            // We validate 2.1 documents against the 2.0 XSD: 2.1 documents that stick to
+            // the 2.0 core load fine; documents that use 2.1-only modules will fail validation.
             $schemaSource = file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-2.0.xsd');
+            $xmlUri = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
+        } elseif ('2.2' === $xliffVersion) {
+            $schemaSource = file_get_contents(__DIR__.'/../Resources/schemas/xliff-core-2.2.xsd');
             $xmlUri = 'informativeCopiesOf3rdPartySchemas/w3c/xml.xsd';
         } else {
             throw new InvalidArgumentException(\sprintf('No support implemented for loading XLIFF version "%s".', $xliffVersion));

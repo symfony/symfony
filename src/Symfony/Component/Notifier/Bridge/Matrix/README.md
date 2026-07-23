@@ -18,6 +18,13 @@ MATRIX_DSN=matrix://HOST:PORT/?accessToken=ACCESS_TOKEN&ssl=true
 ```
 To get started you need an access token. The simplest way to get that is to open Element in a private (incognito) window in your webbrowser or just use your currently open Element. Go to Settings > Help & About > Advanced > Access Token `click to reveal` and copy your access token.
 
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -27,3 +34,6 @@ Resources
    in the [main Symfony repository](https://github.com/symfony/symfony)
  * [Matrix Playground](https://playground.matrix.org)
  * [Matrix Client-Server API](https://spec.matrix.org/latest/client-server-api/)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor

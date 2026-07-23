@@ -102,6 +102,11 @@ class ValidatorBuilderTest extends TestCase
         $this->assertSame($this->builder, $this->builder->disableTranslation());
     }
 
+    public function testEnablePropertyMetadataExistenceCheck()
+    {
+        $this->assertSame($this->builder, $this->builder->enablePropertyMetadataExistenceCheck());
+    }
+
     public function testGetValidator()
     {
         $this->assertInstanceOf(RecursiveValidator::class, $this->builder->getValidator());

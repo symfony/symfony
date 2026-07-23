@@ -14,7 +14,6 @@ namespace Symfony\Component\HttpFoundation\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -22,8 +21,13 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
+use Symfony\Component\HttpFoundation\FileBag;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
@@ -1092,16 +1096,13 @@ b'])]
         $this->assertSame('POST', $request->getMethod(), '->getMethod() returns the request method if invalid type is defined in query');
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testUnsafeMethodOverride()
     {
         $request = new Request();
         $request->setMethod('POST');
         $request->headers->set('X-HTTP-METHOD-OVERRIDE', 'get');
 
-        $this->expectUserDeprecationMessage('Since symfony/http-foundation 7.4: HTTP method override is deprecated for methods GET, HEAD, CONNECT and TRACE; it will be ignored in Symfony 8.0.');
-        $this->assertSame('GET', $request->getMethod());
+        $this->assertSame('POST', $request->getMethod());
     }
 
     #[DataProvider('getClientIpsProvider')]
@@ -1350,16 +1351,6 @@ b'])]
         ];
     }
 
-    public static function provideMethodsRequiringExplicitBodyParsing()
-    {
-        return [
-            ['PUT'],
-            ['DELETE'],
-            ['PATCH'],
-            ['QUERY'],
-        ];
-    }
-
     public function testToArrayEmpty()
     {
         $req = new Request();
@@ -1422,26 +1413,6 @@ b'])]
         $this->assertEquals('POST', $request->getRealMethod(), '->getRealMethod() returns the uppercased request method, even if it has been overridden');
 
         $this->disableHttpMethodParameterOverride();
-    }
-
-    #[RequiresPhp('<8.4.0')]
-    #[DataProvider('provideMethodsRequiringExplicitBodyParsing')]
-    public function testFormUrlEncodedBodyParsing(string $method)
-    {
-        $_SERVER['REQUEST_METHOD'] = $method;
-        $_SERVER['CONTENT_TYPE'] = 'application/x-www-form-urlencoded';
-
-        MockPhpStreamWrapper::setInputContent('content=mycontent');
-        stream_wrapper_unregister('php');
-        stream_wrapper_register('php', MockPhpStreamWrapper::class);
-
-        try {
-            $request = Request::createFromGlobals();
-
-            $this->assertSame('mycontent', $request->request->get('content'));
-        } finally {
-            stream_wrapper_restore('php');
-        }
     }
 
     public function testOverrideGlobals()
@@ -1575,27 +1546,6 @@ b'])]
         $request->initialize([], [], [], [], [], $server);
 
         $this->assertEquals('/', $request->getPathInfo());
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testGetParameterPrecedence()
-    {
-        $request = new Request();
-        $request->attributes->set('foo', 'attr');
-        $request->query->set('foo', 'query');
-        $request->request->set('foo', 'body');
-
-        $this->assertSame('attr', $request->get('foo'));
-
-        $request->attributes->remove('foo');
-        $this->assertSame('query', $request->get('foo'));
-
-        $request->query->remove('foo');
-        $this->assertSame('body', $request->get('foo'));
-
-        $request->request->remove('foo');
-        $this->assertNull($request->get('foo'));
     }
 
     public function testGetPreferredLanguage()
@@ -3056,58 +3006,42 @@ b'])]
             'html',
         ];
     }
-}
 
-class MockPhpStreamWrapper
-{
-    /** @var resource|null */
-    public $context;
-
-    private static string $inputContent = '';
-    private string $content = '';
-    private int $position = 0;
-
-    public static function setInputContent(string $content): void
+    /**
+     * @return iterable<string, array{0: string, 1: object, 2: string}>
+     */
+    public static function provideDirectPropertyWrites(): iterable
     {
-        self::$inputContent = $content;
+        yield 'attributes' => ['attributes', new ParameterBag(['k' => 'v']), 'pass attributes as a constructor argument or call "initialize()" instead.'];
+        yield 'request' => ['request', new InputBag(['k' => 'v']), 'pass the POST data as a constructor argument or call "initialize()" instead.'];
+        yield 'query' => ['query', new InputBag(['k' => 'v']), 'pass query parameters as a constructor argument or call "initialize()" instead.'];
+        yield 'server' => ['server', new ServerBag(['k' => 'v']), 'pass server parameters as a constructor argument or call "initialize()" instead.'];
+        yield 'files' => ['files', new FileBag(), 'pass files as a constructor argument or call "initialize()" instead.'];
+        yield 'cookies' => ['cookies', new InputBag(['k' => 'v']), 'pass cookies as a constructor argument or call "initialize()" instead.'];
+        yield 'headers' => ['headers', new HeaderBag(['k' => 'v']), 'pass header parameters as a constructor argument or call "initialize()" instead.'];
     }
 
-    public function stream_open(string $path, string $mode, int $options, ?string &$opened_path): bool
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideDirectPropertyWrites')]
+    public function testDirectPropertyWriteIsDeprecated(string $property, object $value, string $extra)
     {
-        if ('php://input' === $path) {
-            $this->content = self::$inputContent;
-            $this->position = 0;
+        $request = new Request();
 
-            return true;
-        }
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/http-foundation 8.1: Directly setting property "%s" of "Symfony\Component\HttpFoundation\Request" is deprecated; %s', $property, $extra));
 
-        return false;
+        $request->{$property} = $value;
     }
 
-    public function stream_read(int $count): string
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDirectPropertyWriteFromSubclassReportsSubclass()
     {
-        $result = substr($this->content, $this->position, $count);
-        $this->position += \strlen($result);
+        $request = new NewRequest();
 
-        return $result;
-    }
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.1: Directly setting property "query" of "Symfony\Component\HttpFoundation\Tests\NewRequest" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.');
 
-    public function stream_eof(): bool
-    {
-        return $this->position >= \strlen($this->content);
-    }
-
-    public function stream_stat(): array
-    {
-        return [
-            'size' => \strlen($this->content),
-            'mode' => 0,
-            'uid' => 0,
-            'gid' => 0,
-            'atime' => 0,
-            'mtime' => 0,
-            'ctime' => 0,
-        ];
+        $request->query = new InputBag(['k' => 'v']);
     }
 }
 

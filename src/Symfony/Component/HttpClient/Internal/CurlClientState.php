@@ -25,6 +25,7 @@ final class CurlClientState extends ClientState
 {
     public ?\CurlMultiHandle $handle;
     public ?\CurlShareHandle $share;
+    public \CurlShareHandle|\CurlSharePersistentHandle|null $persistentShare;
     public bool $performing = false;
 
     /** @var PushedResponse[] */
@@ -47,8 +48,8 @@ final class CurlClientState extends ClientState
         self::$curlVersion ??= curl_version();
         $this->dnsCache = new DnsCache();
 
-        // handle and share are initialized lazily in __get()
-        unset($this->handle, $this->share);
+        // handle, share and persistentShare are initialized lazily in __get()
+        unset($this->handle, $this->share, $this->persistentShare);
     }
 
     public static function originKey(string $scheme, string $host, ?int $port = null): string
@@ -77,9 +78,20 @@ final class CurlClientState extends ClientState
 
     public function __get(string $name): mixed
     {
+        if ('persistentShare' === $name) {
+            if (\PHP_VERSION_ID < 80500) {
+                return $this->persistentShare = $this->share;
+            }
+
+            return $this->persistentShare = curl_share_init_persistent([
+                \CURL_LOCK_DATA_DNS,
+                \CURL_LOCK_DATA_SSL_SESSION,
+                \CURL_LOCK_DATA_CONNECT,
+            ]);
+        }
+
         if ('share' === $name) {
             $this->share = curl_share_init();
-
             curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_DNS);
             curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_SSL_SESSION);
 
@@ -112,6 +124,7 @@ final class CurlClientState extends ClientState
                 $multi = clone $this;
                 $multi->handle = null;
                 $multi->share = null;
+                $multi->persistentShare = null;
                 $multi->pushedResponses = &$this->pushedResponses;
                 $multi->logger = &$this->logger;
                 $multi->handlesActivity = &$this->handlesActivity;

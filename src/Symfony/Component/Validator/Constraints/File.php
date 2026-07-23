@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -110,7 +109,6 @@ class File extends Constraint
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         int|string|null $maxSize = null,
@@ -140,17 +138,17 @@ class File extends Constraint
         ?string $filenameCountUnit = null,
         ?string $filenameCharsetMessage = null,
     ) {
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
-        $this->maxSize = $maxSize ?? $this->maxSize;
-        $this->binaryFormat = $binaryFormat ?? $this->binaryFormat;
+        $this->maxSize = $maxSize;
+        $this->binaryFormat = $binaryFormat;
         $this->mimeTypes = $mimeTypes ?? $this->mimeTypes;
-        $this->filenameMaxLength = $filenameMaxLength ?? $this->filenameMaxLength;
-        $this->filenameCharset = $filenameCharset ?? $this->filenameCharset;
+        $this->filenameMaxLength = $filenameMaxLength;
+        $this->filenameCharset = $filenameCharset;
         $this->filenameCountUnit = $filenameCountUnit ?? $this->filenameCountUnit;
         $this->extensions = $extensions ?? $this->extensions;
         $this->notFoundMessage = $notFoundMessage ?? $this->notFoundMessage;

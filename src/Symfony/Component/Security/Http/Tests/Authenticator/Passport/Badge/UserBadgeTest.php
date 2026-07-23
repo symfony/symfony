@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator\Passport\Badge;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
@@ -32,12 +30,9 @@ class UserBadgeTest extends TestCase
         $badge->getUser();
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testEmptyUserIdentifier()
     {
-        $this->expectUserDeprecationMessage('Since symfony/security-http 7.2: Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
-        // $this->expectException(BadCredentialsException::class)
+        $this->expectException(BadCredentialsException::class);
         new UserBadge('', static fn () => null);
     }
 
@@ -66,17 +61,6 @@ class UserBadgeTest extends TestCase
         $upperAndAscii = static fn (string $identifier) => u($identifier)->ascii()->upper()->toString();
         yield 'Greek to ASCII' => ['ΝιΚόΛΑος', 'NIKOLAOS', $upperAndAscii];
         yield 'Katakana to ASCII' => ['たなかそういち', 'TANAKASOUICHI', $upperAndAscii];
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testUserIdentifierNormalizationTriggersDeprecationForEmptyString()
-    {
-        $badge = new UserBadge('valid_input', null, null, static fn () => '');
-
-        $this->expectUserDeprecationMessage('Since symfony/security-http 7.2: Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
-
-        $this->assertSame('', $badge->getUserIdentifier());
     }
 
     public function testUserIdentifierNormalizationEnforcesMaxLength()

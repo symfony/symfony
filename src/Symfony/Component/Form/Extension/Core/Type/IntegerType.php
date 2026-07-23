@@ -29,6 +29,7 @@ class IntegerType extends AbstractType
     {
         if ($options['grouping']) {
             $view->vars['type'] = 'text';
+            $view->vars['attr']['inputmode'] = 'numeric';
         }
     }
 

@@ -323,7 +323,7 @@ final class TraceableCommand extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (!$this->isInteractive = Command::class !== (new \ReflectionMethod($this->command, 'interact'))->getDeclaringClass()->getName()) {
+        if (!$this->isInteractive = Command::class !== (new \ReflectionMethod($this->command, 'interact'))->class) {
             return;
         }
 

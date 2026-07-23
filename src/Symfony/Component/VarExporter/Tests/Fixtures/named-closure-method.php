@@ -1,11 +1,8 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['Symfony\\Component\\VarExporter\\Tests\\TestClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\TestClass')),
-    ],
-    null,
-    [],
-    $o[0]->testMethod(...),
-    []
-);
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\TestClass',
+    'objectMeta' => 1,
+    'prepared' => [0, 'testMethod'],
+    'mask' => 0,
+], null, true);

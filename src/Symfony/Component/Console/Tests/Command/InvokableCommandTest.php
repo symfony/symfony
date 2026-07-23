@@ -15,8 +15,12 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\MapDateTime;
 use Symfony\Component\Console\Attribute\Option;
+use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -30,7 +34,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithCustomValidatorTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFileAndConstraintsTestCommand;
 
 class InvokableCommandTest extends TestCase
 {
@@ -228,26 +235,6 @@ class InvokableCommandTest extends TestCase
         self::expectExceptionMessage('The value "incorrect" is not valid for the "enum" option. Supported values are "image", "video".');
 
         $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
-    }
-
-    public function testInvalidArgumentType()
-    {
-        $command = new Command('foo');
-        $command->setCode(static function (#[Argument] object $any) {});
-
-        $this->expectException(LogicException::class);
-
-        $command->getDefinition();
-    }
-
-    public function testInvalidOptionType()
-    {
-        $command = new Command('foo');
-        $command->setCode(static function (#[Option] ?object $any = null) {});
-
-        $this->expectException(LogicException::class);
-
-        $command->getDefinition();
     }
 
     public function testExecuteHasPriorityOverInvokeMethod()
@@ -484,6 +471,7 @@ class InvokableCommandTest extends TestCase
             Cursor $cursor,
             SymfonyStyle $io,
             Application $application,
+            Command $command,
         ): int {
             $this->addToAssertionCount(1);
 
@@ -493,9 +481,137 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput([]), new NullOutput());
     }
 
+    public function testDefaultArgumentResolversWithoutApplication()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            \DateTime $date,
+            #[Argument] string $name = 'default',
+        ): int {
+            Assert::assertInstanceOf(\DateTime::class, $date);
+            Assert::assertSame('test', $name);
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $tester->execute(['name' => 'test']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testDefaultArgumentResolversWithMapDateTimeArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            #[Argument, MapDateTime]
+            \DateTimeImmutable $date,
+        ): int {
+            Assert::assertInstanceOf(\DateTimeImmutable::class, $date);
+            Assert::assertSame('2026-01-15', $date->format('Y-m-d'));
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $tester->execute(['date' => '2026-01-15']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testCustomArgumentResolverViaApplication()
+    {
+        $customArgumentResolver = new ArgumentResolver([
+            new CustomTypeValueResolver(),
+            ...ArgumentResolver::getDefaultArgumentValueResolvers(),
+        ]);
+
+        $application = new Application();
+        $application->setArgumentResolver($customArgumentResolver);
+
+        $command = new Command('foo');
+        $command->setCode(static function (
+            CustomType $custom,
+            #[Argument] string $name = 'default',
+        ): int {
+            Assert::assertInstanceOf(CustomType::class, $custom);
+            Assert::assertSame('resolved:from-app-test', $custom->value);
+            Assert::assertSame('app-test', $name);
+
+            return 0;
+        });
+
+        $application->addCommand($command);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['name' => 'app-test']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testCommandInjection()
+    {
+        $application = new Application();
+
+        $command = new Command('test-cmd');
+        $command->setCode(static function (
+            Command $cmd,
+            #[Argument] string $arg = 'default',
+        ): int {
+            Assert::assertInstanceOf(Command::class, $cmd);
+            Assert::assertSame('test-cmd', $cmd->getName());
+            Assert::assertSame('value', $arg);
+
+            return 0;
+        });
+
+        $application->addCommand($command);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['arg' => 'value']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
     public function getSuggestedRoles(CompletionInput $input): array
     {
         return ['ROLE_ADMIN', 'ROLE_USER'];
+    }
+
+    public function testAskWithInputFileAndConstraints()
+    {
+        if (!\extension_loaded('fileinfo')) {
+            $this->markTestSkipped('The "fileinfo" extension is required for this test.');
+        }
+
+        $pngData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+        $tempFile = sys_get_temp_dir().'/test_image_'.uniqid().'.png';
+        file_put_contents($tempFile, $pngData);
+
+        try {
+            $tester = new CommandTester(new InvokableWithInputFileAndConstraintsTestCommand());
+            $tester->setInputs([$tempFile]);
+            $tester->execute([], ['interactive' => true]);
+            $tester->assertCommandIsSuccessful();
+
+            self::assertStringContainsString('Provide an image file:', $tester->getDisplay());
+            self::assertStringContainsString('Filename:', $tester->getDisplay());
+            self::assertStringContainsString('Valid: yes', $tester->getDisplay());
+        } finally {
+            @unlink($tempFile);
+        }
+    }
+
+    public function testAskWithCustomValidatorIsNotOverwritten()
+    {
+        $tester = new CommandTester(new InvokableWithCustomValidatorTestCommand());
+        $tester->setInputs(['invalid', 'valid']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Enter a value:', $tester->getDisplay());
+        self::assertStringContainsString('Value must be "valid"', $tester->getDisplay());
+        self::assertStringContainsString('Value: valid', $tester->getDisplay());
     }
 }
 
@@ -503,4 +619,27 @@ enum StringEnum: string
 {
     case Image = 'image';
     case Video = 'video';
+}
+
+class CustomType
+{
+    public function __construct(public string $value)
+    {
+    }
+}
+
+class CustomTypeValueResolver implements ValueResolverInterface
+{
+    public function resolve(string $argumentName, InputInterface $input, ReflectionMember $member): iterable
+    {
+        $type = $member->getType();
+
+        if (!$type instanceof \ReflectionNamedType || CustomType::class !== $type->getName()) {
+            return [];
+        }
+
+        $name = $input->hasArgument('name') ? $input->getArgument('name') : 'default';
+
+        yield new CustomType('resolved:from-'.$name);
+    }
 }

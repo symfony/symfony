@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
-use ProxyManager\Proxy\LazyLoadingInterface;
-use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Component\DependencyInjection\ServicesResetter as BaseServicesResetter;
+
+trigger_deprecation('symfony/http-kernel', '8.1', 'The "%s" class is deprecated, use "%s" from the DependencyInjection component instead.', ServicesResetter::class, BaseServicesResetter::class);
 
 /**
  * Resets provided services.
@@ -20,42 +21,8 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
  * @author Alexander M. Turek <me@derrabus.de>
  * @author Nicolas Grekas <p@tchwork.com>
  *
- * @final since Symfony 7.2
+ * @deprecated since Symfony 8.1, use ServicesResetter from the DependencyInjection component instead
  */
-class ServicesResetter implements ServicesResetterInterface
+final class ServicesResetter extends BaseServicesResetter implements ServicesResetterInterface
 {
-    /**
-     * @param \Traversable<string, object>   $resettableServices
-     * @param array<string, string|string[]> $resetMethods
-     */
-    public function __construct(
-        private \Traversable $resettableServices,
-        private array $resetMethods,
-    ) {
-    }
-
-    public function reset(): void
-    {
-        foreach ($this->resettableServices as $id => $service) {
-            if ($service instanceof LazyObjectInterface && !$service->isLazyObjectInitialized(true)) {
-                continue;
-            }
-
-            if ($service instanceof LazyLoadingInterface && !$service->isProxyInitialized()) {
-                continue;
-            }
-
-            if (\PHP_VERSION_ID >= 80400 && (new \ReflectionClass($service))->isUninitializedLazyObject($service)) {
-                continue;
-            }
-
-            foreach ((array) $this->resetMethods[$id] as $resetMethod) {
-                if ('?' === $resetMethod[0] && !method_exists($service, $resetMethod = substr($resetMethod, 1))) {
-                    continue;
-                }
-
-                $service->$resetMethod();
-            }
-        }
-    }
 }

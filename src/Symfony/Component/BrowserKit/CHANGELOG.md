@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `AbstractBrowser::useHtml5Parser()`; the native HTML5 parser is used unconditionally
+
 7.4
 ---
 

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `TransportFactoryTestCase`, extend `AbstractTransportFactoryTestCase` instead.
+   To keep using the `testIncompleteDsnException()` and `testMissingRequiredOptionException()` tests, you now need to use `IncompleteDsnTestTrait` or `MissingRequiredOptionTestTrait` respectively.
+
 7.3
 ---
 

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -26,16 +24,13 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Required;
-use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
 use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
-use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
-use Symfony\Component\Validator\Tests\Fixtures\DummyEntityConstraintWithoutNamedArguments;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
@@ -143,24 +138,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testLoadClassMetadataValueOption()
-    {
-        $loader = new YamlFileLoader(__DIR__.'/constraint-mapping-value-option.yml');
-        $metadata = new ClassMetadata(Entity::class);
-
-        $loader->loadClassMetadata($metadata);
-
-        $expected = new ClassMetadata(Entity::class);
-        $expected->addConstraint(new Callback('validateMeStatic'));
-        $expected->addConstraint(new Callback([CallbackClass::class, 'callback']));
-        $expected->addPropertyConstraint('firstName', new Type(type: 'string'));
-        $expected->addPropertyConstraint('firstName', new Choice(choices: ['A', 'B']));
-
-        $this->assertEquals($expected, $metadata);
-    }
-
     public function testLoadClassMetadataWithConstants()
     {
         $loader = new YamlFileLoader(__DIR__.'/mapping-with-constants.yml');
@@ -212,17 +189,5 @@ class YamlFileLoaderTest extends TestCase
         $expected->setGroupSequenceProvider(true);
 
         $this->assertEquals($expected, $metadata);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testLoadConstraintWithoutNamedArgumentsSupport()
-    {
-        $loader = new YamlFileLoader(__DIR__.'/constraint-without-named-arguments-support.yml');
-        $metadata = new ClassMetadata(DummyEntityConstraintWithoutNamedArguments::class);
-
-        $this->expectUserDeprecationMessage('Since symfony/validator 7.3: Using constraints not supporting named arguments is deprecated. Try adding the HasNamedArguments attribute to Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutNamedArguments.');
-
-        $loader->loadClassMetadata($metadata);
     }
 }

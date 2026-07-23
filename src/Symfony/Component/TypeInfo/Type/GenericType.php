@@ -23,6 +23,12 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @template T of BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::ITERABLE>|ObjectType
  *
+ * @extends Type<(
+ *     T is BuiltinType<TypeIdentifier::ARRAY> ? array :
+ *     T is BuiltinType<TypeIdentifier::ITERABLE> ? iterable :
+ *     object
+ * )>
+ *
  * @implements WrappingTypeInterface<T>
  */
 final class GenericType extends Type implements WrappingTypeInterface
@@ -59,6 +65,9 @@ final class GenericType extends Type implements WrappingTypeInterface
         return $this->variableTypes;
     }
 
+    /**
+     * @param-immediately-invoked-callable $specification
+     */
     public function wrappedTypeIsSatisfiedBy(callable $specification): bool
     {
         return $this->getWrappedType()->isSatisfiedBy($specification);

@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Config;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class FileLocatorTest extends TestCase
 {
     public function testLocate()

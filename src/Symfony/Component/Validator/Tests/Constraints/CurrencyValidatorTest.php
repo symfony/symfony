@@ -43,14 +43,14 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Currency());
+        $this->validate(null, new Currency());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Currency());
+        $this->validate('', new Currency());
 
         $this->assertNoViolation();
     }
@@ -58,13 +58,13 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Currency());
+        $this->validate(new \stdClass(), new Currency());
     }
 
     #[DataProvider('getValidCurrencies')]
     public function testValidCurrencies($currency)
     {
-        $this->validator->validate($currency, new Currency());
+        $this->validate($currency, new Currency());
 
         $this->assertNoViolation();
     }
@@ -76,7 +76,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
 
         \Locale::setDefault('en_GB');
 
-        $this->validator->validate($currency, new Currency());
+        $this->validate($currency, new Currency());
 
         $this->assertNoViolation();
     }
@@ -97,7 +97,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Currency(message: 'myMessage');
 
-        $this->validator->validate($currency, $constraint);
+        $this->validate($currency, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$currency.'"')
@@ -110,7 +110,7 @@ class CurrencyValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Currency(message: 'myMessage');
 
-        $this->validator->validate($currency, $constraint);
+        $this->validate($currency, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$currency.'"')

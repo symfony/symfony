@@ -301,6 +301,22 @@ class AppVariableTest extends TestCase
         $tokenStorage->setToken($token);
     }
 
+    public function testSetEnabledLocalesFiltersEmptyValues()
+    {
+        $this->appVariable->setEnabledLocales(['en', '', 'fr', null, 'de']);
+
+        $enabledLocales = $this->appVariable->getEnabled_locales();
+
+        $this->assertSame(['en', 'fr', 'de'], $enabledLocales);
+    }
+
+    public function testSetEnabledLocalesPreservesNonEmptyStringValues()
+    {
+        $this->appVariable->setEnabledLocales(['en', '0', 'fr']);
+
+        $this->assertSame(['en', '0', 'fr'], $this->appVariable->getEnabled_locales());
+    }
+
     private function setFlashMessages($sessionHasStarted = true)
     {
         $flashMessages = [

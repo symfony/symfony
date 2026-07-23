@@ -7,7 +7,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 class TargetDto
 {
     public function __construct(
-        public string  $id,
+        public string $id,
         #[Map(source: 'optional', if: [self::class, 'isDefined'])]
         public ?string $optional = null,
     ) {

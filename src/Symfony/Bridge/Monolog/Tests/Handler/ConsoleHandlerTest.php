@@ -133,14 +133,6 @@ class ConsoleHandlerTest extends TestCase
 
     public static function provideHandleOrBubbleSilentTests(): array
     {
-        // The VERBOSITY_SILENT const is not defined for Console below 7.2, but in that case, the code behaves as before
-        if (!\defined('\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_SILENT')) {
-            return [
-                [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true, true],
-                [OutputInterface::VERBOSITY_NORMAL, Level::Info, false, false],
-            ];
-        }
-
         return [
             [OutputInterface::VERBOSITY_SILENT, Level::Warning, false, false],
             [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true, true],

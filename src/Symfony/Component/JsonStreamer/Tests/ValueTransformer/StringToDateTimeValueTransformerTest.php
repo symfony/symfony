@@ -11,10 +11,14 @@
 
 namespace Symfony\Component\JsonStreamer\Tests\ValueTransformer;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class StringToDateTimeValueTransformerTest extends TestCase
 {
     public function testTransform()

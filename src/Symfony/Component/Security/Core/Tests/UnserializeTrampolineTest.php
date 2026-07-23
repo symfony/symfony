@@ -68,7 +68,6 @@ class UnserializeTrampolineTest extends TestCase
     {
         yield 'UsernamePasswordToken::$firewallName' => [UsernamePasswordToken::class, 3, 1];
         yield 'PreAuthenticatedToken::$firewallName' => [PreAuthenticatedToken::class, 3, 1];
-        yield 'RememberMeToken::$secret' => [RememberMeToken::class, 3, 0];
         yield 'RememberMeToken::$firewallName' => [RememberMeToken::class, 3, 1];
         yield 'SwitchUserToken::$originatedFromUri' => [SwitchUserToken::class, 3, 1];
         yield 'AuthenticationException::$message' => [AuthenticationException::class, 5, 2];

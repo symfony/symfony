@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * A constraint that is composed of other constraints.
@@ -50,14 +50,13 @@ abstract class Composite extends Constraint
      * cached. When constraints are loaded from the cache, no more group
      * checks need to be done.
      */
-    #[HasNamedArguments]
     public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {
         if (null !== $options) {
-            trigger_deprecation('symfony/validator', '7.4', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->initializeNestedConstraints();
 

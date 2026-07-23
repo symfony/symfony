@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `twig.safe_class` resource tag to register safe classes for Twig's escaper
+
+8.0
+---
+
+ * Make `TemplateCacheWarmer` class `final`
+ * Remove the `base_template_class` config option
+
 7.4
 ---
 

@@ -190,7 +190,42 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
         return true;
     }
 
+    /**
+     * @deprecated since Symfony 8.1, use SameOriginCsrfListener instead.
+     */
     public function clearCookies(Request $request, Response $response): void
+    {
+        trigger_deprecation('symfony/security-csrf', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, SameOriginCsrfListener::class);
+
+        $this->doClearCookies($request, $response);
+    }
+
+    /**
+     * @deprecated since Symfony 8.1, use SameOriginCsrfListener instead.
+     */
+    public function persistStrategy(Request $request): void
+    {
+        trigger_deprecation('symfony/security-csrf', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, SameOriginCsrfListener::class);
+
+        $this->doPersistStrategy($request);
+    }
+
+    /**
+     * @deprecated since Symfony 8.1, use SameOriginCsrfListener instead.
+     */
+    public function onKernelResponse(ResponseEvent $event): void
+    {
+        trigger_deprecation('symfony/security-csrf', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, SameOriginCsrfListener::class);
+
+        if (!$event->isMainRequest()) {
+            return;
+        }
+
+        $this->doClearCookies($event->getRequest(), $event->getResponse());
+        $this->doPersistStrategy($event->getRequest());
+    }
+
+    private function doClearCookies(Request $request, Response $response): void
     {
         if (!$request->attributes->has($this->cookieName)) {
             return;
@@ -205,7 +240,7 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
         }
     }
 
-    public function persistStrategy(Request $request): void
+    private function doPersistStrategy(Request $request): void
     {
         if (!$request->attributes->has($this->cookieName)
             || !$request->hasSession(true)
@@ -218,16 +253,6 @@ final class SameOriginCsrfTokenManager implements CsrfTokenManagerInterface
         $usageIndexReference = \PHP_INT_MIN;
         $session->set($this->cookieName, $request->attributes->get($this->cookieName));
         $usageIndexReference = $usageIndexValue;
-    }
-
-    public function onKernelResponse(ResponseEvent $event): void
-    {
-        if (!$event->isMainRequest()) {
-            return;
-        }
-
-        $this->clearCookies($event->getRequest(), $event->getResponse());
-        $this->persistStrategy($event->getRequest());
     }
 
     /**

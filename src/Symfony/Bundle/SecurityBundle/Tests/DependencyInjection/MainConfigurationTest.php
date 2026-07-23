@@ -223,6 +223,18 @@ class MainConfigurationTest extends TestCase
         $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testEraseCredentialsDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.1: Setting the "security.erase_credentials" configuration option is deprecated. It will be removed in Symfony 9.0, as the "eraseCredentials()" method was removed in Symfony 8.0.');
+
+        $config = array_merge(static::$minimalConfig, ['erase_credentials' => false]);
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
     public function testFirewalls()
     {
         $factory = $this->createMock(AuthenticatorFactoryInterface::class);
@@ -257,40 +269,62 @@ class MainConfigurationTest extends TestCase
         yield [['expose_security_errors' => 'all'], ExposeSecurityLevel::All];
     }
 
-    #[DataProvider('provideHideUserNotFoundLegacyData')]
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testExposeSecurityErrorsWithLegacyConfig(array $config, ExposeSecurityLevel $expectedExposeSecurityErrors, ?bool $expectedHideUserNotFound)
+    public function testClearSiteDataDirectivesAcceptAllSupportedValues()
     {
-        $this->expectUserDeprecationMessage('Since symfony/security-bundle 7.3: The "hide_user_not_found" option is deprecated and will be removed in 8.0. Use the "expose_security_errors" option instead.');
-
-        $config = array_merge(static::$minimalConfig, $config);
+        $directives = ['*', 'cache', 'cookies', 'storage', 'clientHints', 'executionContexts', 'prefetchCache', 'prerenderCache'];
+        $config = array_merge(static::$minimalConfig, [
+            'firewalls' => [
+                'stub' => [
+                    'logout' => [
+                        'clear_site_data' => $directives,
+                    ],
+                ],
+            ],
+        ]);
 
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
         $processedConfig = $processor->processConfiguration($configuration, [$config]);
 
-        $this->assertEquals($expectedExposeSecurityErrors, $processedConfig['expose_security_errors']);
-        $this->assertEquals($expectedHideUserNotFound, $processedConfig['hide_user_not_found']);
+        $this->assertSame($directives, $processedConfig['firewalls']['stub']['logout']['clear_site_data']);
     }
 
-    public static function provideHideUserNotFoundLegacyData(): iterable
+    public function testClearSiteDataDirectivesAcceptStringList()
     {
-        yield [['hide_user_not_found' => true], ExposeSecurityLevel::None, true];
-        yield [['hide_user_not_found' => false], ExposeSecurityLevel::All, false];
+        $config = array_merge(static::$minimalConfig, [
+            'firewalls' => [
+                'stub' => [
+                    'logout' => [
+                        'clear_site_data' => 'clientHints, prefetchCache, prerenderCache',
+                    ],
+                ],
+            ],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertSame(['clientHints', 'prefetchCache', 'prerenderCache'], $processedConfig['firewalls']['stub']['logout']['clear_site_data']);
     }
 
-    public function testCannotUseHideUserNotFoundAndExposeSecurityErrorsAtTheSameTime()
+    public function testClearSiteDataDirectivesRejectsUnknownValue()
     {
+        $config = array_merge(static::$minimalConfig, [
+            'firewalls' => [
+                'stub' => [
+                    'logout' => [
+                        'clear_site_data' => ['unknown_directive'],
+                    ],
+                ],
+            ],
+        ]);
+
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You cannot use both "hide_user_not_found" and "expose_security_errors" at the same time.');
 
-        $processor->processConfiguration($configuration, [static::$minimalConfig + [
-            'hide_user_not_found' => true,
-            'expose_security_errors' => ExposeSecurityLevel::None,
-        ]]);
+        $processor->processConfiguration($configuration, [$config]);
     }
 }

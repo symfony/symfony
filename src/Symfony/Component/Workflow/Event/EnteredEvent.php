@@ -15,6 +15,11 @@ use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\WorkflowInterface;
 
+/**
+ * @template T of object
+ *
+ * @extends Event<T>
+ */
 final class EnteredEvent extends Event
 {
     use EventNameTrait {
@@ -22,6 +27,9 @@ final class EnteredEvent extends Event
     }
     use HasContextTrait;
 
+    /**
+     * @param T $subject
+     */
     public function __construct(object $subject, Marking $marking, ?Transition $transition = null, ?WorkflowInterface $workflow = null, array $context = [])
     {
         parent::__construct($subject, $marking, $transition, $workflow);

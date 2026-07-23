@@ -130,7 +130,13 @@ final class DateTimeNormalizer implements NormalizerInterface, DenormalizerInter
                 }
             }
 
-            return $this->enforceTimezone(new $type($data, $timezone), $context);
+            $dateTimeObject = new $type($data, $timezone);
+
+            if (null !== $defaultDateTimeFormat && !\array_key_exists(self::FORMAT_KEY, $context)) {
+                trigger_deprecation('symfony/serializer', '8.1', 'Parsing date "%s" for type "%s" using the loose constructor is deprecated and will throw a "%s" in 9.0 when it does not match the default format "%s". Either fix the input to match the format, or pass "%s" => null in the denormalization context to opt in to the loose parser explicitly.', $data, $type, NotNormalizableValueException::class, $defaultDateTimeFormat, self::FORMAT_KEY);
+            }
+
+            return $this->enforceTimezone($dateTimeObject, $context);
         } catch (NotNormalizableValueException $e) {
             throw $e;
         } catch (\Exception $e) {

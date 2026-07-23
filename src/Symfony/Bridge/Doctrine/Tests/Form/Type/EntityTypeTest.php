@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
@@ -31,17 +32,23 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\UlidIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\UuidIdEntity;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\LazyChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 #[IgnoreDeprecations]
 #[Group('doctrine-dbal-workaround')]
@@ -63,6 +70,15 @@ class EntityTypeTest extends BaseTypeTestCase
 
     protected function setUp(): void
     {
+        if (Type::hasType('uuid')) {
+            Type::overrideType('uuid', UuidType::class);
+        } else {
+            Type::addType('uuid', UuidType::class);
+        }
+        if (!Type::hasType('ulid')) {
+            Type::addType('ulid', UlidType::class);
+        }
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
         $this->emRegistry = $this->createRegistryMock($this->em);
 
@@ -78,6 +94,8 @@ class EntityTypeTest extends BaseTypeTestCase
             $this->em->getClassMetadata(self::SINGLE_STRING_CASTABLE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_STRING_IDENT_CLASS),
+            $this->em->getClassMetadata(UuidIdEntity::class),
+            $this->em->getClassMetadata(UlidIdEntity::class),
         ];
 
         try {
@@ -91,9 +109,9 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
-        return array_merge(parent::getExtensions(), [
+        return array_merge(parent::getExtensions($violationMapper), [
             new DoctrineOrmExtension($this->emRegistry),
         ]);
     }
@@ -238,7 +256,8 @@ class EntityTypeTest extends BaseTypeTestCase
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => static fn () => null,
+            'query_builder' => static function () {
+            },
         ]);
 
         $this->assertEquals([1 => new ChoiceView($entity1, '1', 'Foo'), 2 => new ChoiceView($entity2, '2', 'Bar')], $field->createView()->vars['choices']);
@@ -1769,10 +1788,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testEmptyChoicesWhenLazy()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1791,10 +1806,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testLoadedChoicesWhenLazyAndBoundData()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1814,10 +1825,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testLoadedChoicesWhenLazyAndSubmittedData()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1838,10 +1845,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testEmptyChoicesWhenLazyAndEmptyDataIsSubmitted()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1861,10 +1864,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testErrorOnSubmitInvalidValuesWhenLazyAndCustomQueryBuilder()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1889,5 +1888,109 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertCount(0, $view['entity_one']->vars['choices']);
         $this->assertCount(1, $errors = $form->getErrors(true));
         $this->assertSame('The selected choice is invalid.', $errors->current()->getMessage());
+    }
+
+    public function testUidFormatBase58WithUuid()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base58',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($uuid->toBase58(), $view->vars['choices'][0]->value);
+    }
+
+    public function testUidFormatBase32WithUuid()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base32',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($uuid->toBase32(), $view->vars['choices'][0]->value);
+    }
+
+    public function testUidFormatBase58WithUlid()
+    {
+        $ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+        $entity1 = new UlidIdEntity($ulid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UlidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base58',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($ulid->toBase58(), $view->vars['choices'][0]->value);
+    }
+
+    public function testUidFormatRfc4122WithUlid()
+    {
+        $ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+        $entity1 = new UlidIdEntity($ulid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UlidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'rfc4122',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($ulid->toRfc4122(), $view->vars['choices'][0]->value);
+    }
+
+    public function testSubmitWithUidFormat()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $form = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base58',
+        ]);
+
+        $form->submit($uuid->toBase58());
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($entity1, $form->getData());
+    }
+
+    public function testUidFormatDefaultBehavior()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        // Default behavior: UUID uses __toString() which is RFC4122 format
+        $this->assertSame($uuid->toRfc4122(), $view->vars['choices'][0]->value);
     }
 }

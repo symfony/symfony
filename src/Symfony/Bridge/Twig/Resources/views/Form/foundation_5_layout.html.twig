@@ -261,13 +261,13 @@
         {% set embed_label_classes = parent_label_class|split(' ')|filter(class => class in ['checkbox-inline', 'radio-inline']) %}
         {%- set label_attr = label_attr|merge({class: (label_attr.class|default('') ~ ' ' ~ embed_label_classes|join(' '))|trim}) -%}
     {% endif %}
-    {% if not label %}
+    {% if label is null or label is same as('') %}
         {%- if label_format is not empty -%}
             {% set label = label_format|replace({
                 '%name%': name,
                 '%id%': id,
             }) %}
-        {%- else -%}
+        {%- elseif label is not same as(false) -%}
             {% set label = name|humanize %}
         {%- endif -%}
     {% endif %}

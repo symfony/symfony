@@ -89,10 +89,8 @@ class FlattenExceptionTest extends TestCase
         $flattened = FlattenException::createFromThrowable(new UnsupportedMediaTypeHttpException());
         $this->assertEquals('415', $flattened->getStatusCode());
 
-        if (class_exists(SuspiciousOperationException::class)) {
-            $flattened = FlattenException::createFromThrowable(new SuspiciousOperationException());
-            $this->assertEquals('400', $flattened->getStatusCode());
-        }
+        $flattened = FlattenException::createFromThrowable(new SuspiciousOperationException());
+        $this->assertEquals('400', $flattened->getStatusCode());
     }
 
     public function testHeadersForHttpException()

@@ -103,8 +103,12 @@ class StringTypeResolverTest extends TestCase
         yield [Type::arrayShape(['foo' => Type::bool()], extraValueType: Type::int()), 'array{foo: bool, ...<int>}'];
         yield [Type::arrayShape(['foo' => Type::union(Type::bool(), Type::float(), Type::int(), Type::null(), Type::string()), 'bar' => Type::string()]), 'array{foo: scalar|null, bar: string}'];
 
+        // object
+        yield [Type::object(), 'object'];
+
         // object shape
-        yield [Type::object(), 'object{foo: true, bar: false}'];
+        yield [Type::objectShape(['foo' => Type::true(), 'bar' => Type::false()]), 'object{foo: true, bar: false}'];
+        yield [Type::objectShape(['foo' => ['type' => Type::bool(), 'optional' => true]]), 'object{foo?: bool}'];
 
         // this
         yield [Type::object(Dummy::class), '$this', $typeContextFactory->createFromClassName(Dummy::class, AbstractDummy::class)];

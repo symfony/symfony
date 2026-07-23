@@ -1,6 +1,46 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow computing tag attributes per tagged service when using `#[AutoconfigureTag]`, `#[Autoconfigure]` or `_instanceof`: pass a `\Closure` receiving the concrete class-string (requires PHP 8.5), or a `[class-string, method]` callable resolved against each concrete class (works on PHP 8.4)
+
+8.1
+---
+
+ * Support autowiring env vars as closures or `Stringable` when using `#[Autowire(env: 'FOO')]`
+ * Add `EnvClosureArgument` and `!env_closure` YAML tag to inject env vars as closures or `Stringable` arguments
+ * Add `AddBehaviorDescribingTagsPass` to allow bundles to extend the list of behavior-describing tags
+ * Add Kernel and Bundle infrastructure in the `Kernel\` subnamespace
+ * Add `$extensions` parameter to `MergeExtensionConfigurationPass` to ensure registered extensions are implicitly loaded
+ * Add support for using service stacks as decorators, including `decorates_tag`
+ * Add support for decorating all services with a specific tag using the `container.tag_decorator` resource tag or `#[AsTagDecorator]`
+ * Add support for `SOURCE_DATE_EPOCH` environment variable
+ * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`
+ * Deprecate default index/priority methods when defining tagged locators/iterators; use the `#[AsTaggedItem]` attribute instead
+ * Allow environment variables with `.` in them
+ * Add argument `exclude` to `ContainerConfigurator::import()`
+ * Add `target` parameter to `#[AsAlias]` to create target-specific autowiring aliases
+ * Deprecate named autowiring aliases that don't use `#[Target]`
+ * Allow passing a `Definition` instance to `Definition::setFactory()` and `Definition::setConfigurator()`, its `__invoke()` method will be called
+ * Add `ServicesResetter`, `ServicesResetterInterface`, and `Compiler\ResettableServicePass` (moved from HttpKernel)
+ * Allow resetting non-shared services tagged with `kernel.reset`
+
+8.0
+---
+
+ * Remove support for using `$this` or the loader's internal scope from PHP config files; use the `$loader` variable instead
+ * Remove `ExtensionInterface::getXsdValidationBasePath()` and `getNamespace()` without alternatives, the XML configuration format is no longer supported
+ * Add argument `$throwOnAbstract` to `ContainerBuilder::findTaggedResourceIds()`
+ * Registering a service without a class when its id is a non-existing FQCN throws an error
+ * Remove `#[TaggedIterator]` and `#[TaggedLocator]` attributes, replaced by `#[AutowireLocator]` and `#[AutowireIterator]`
+ * Remove `ContainerBuilder::getAutoconfiguredAttributes()`, replaced by `ContainerBuilder::getAttributeAutoconfigurators()`
+ * Remove `!tagged` tag, use `!tagged_iterator` instead
+ * Add argument `$target` to `ContainerBuilder::registerAliasForArgument()`
+ * Remove support for the XML configuration format
+ * Remove the fluent PHP format for semantic configuration, instantiate builders inline with the config array as argument and return them instead
+
 7.4
 ---
 

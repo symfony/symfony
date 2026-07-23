@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\EnvClosure;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -203,7 +205,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         }
 
         if ('self' === $type) {
-            $type = $parameter->getDeclaringClass()->getName();
+            $type = $parameter->getDeclaringClass()->name;
         }
 
         if ('static' === $type) {
@@ -261,6 +263,8 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 $class = RewindableGenerator::class;
             } elseif ($value instanceof ServiceClosureArgument) {
                 $class = \Closure::class;
+            } elseif ($value instanceof EnvClosureArgument) {
+                $class = $value->isStringable() ? EnvClosure::class : \Closure::class;
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $class = ServiceLocator::class;
             } elseif (\is_object($value)) {

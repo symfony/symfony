@@ -16,13 +16,6 @@ namespace Symfony\Component\HtmlSanitizer\Parser;
  */
 final class NativeParser implements ParserInterface
 {
-    public function __construct()
-    {
-        if (\PHP_VERSION_ID < 80400) {
-            throw new \LogicException(self::class.' requires PHP 8.4 or higher.');
-        }
-    }
-
     public function parse(string $html, string $context = 'body'): ?\Dom\Node
     {
         $document = @\Dom\HTMLDocument::createFromString(\sprintf('<!DOCTYPE html><%s>%s</%1$s>', $context, $html));

@@ -68,6 +68,25 @@ class StreamerDumperTest extends TestCase
         $this->assertStringEqualsFile($path, 'CONTENT');
     }
 
+    public function testDumpDoesNotOverwriteExistingFile()
+    {
+        $path = $this->cacheDir.'/streamer.php';
+
+        mkdir($this->cacheDir, 0o700, true);
+        file_put_contents($path, 'EXISTING');
+
+        $generated = false;
+        $dumper = new StreamerDumper($this->createStub(PropertyMetadataLoaderInterface::class), $this->cacheDir);
+        $dumper->dump(Type::int(), $path, static function () use (&$generated): string {
+            $generated = true;
+
+            return 'CONTENT';
+        });
+
+        $this->assertFalse($generated);
+        $this->assertStringEqualsFile($path, 'EXISTING');
+    }
+
     /**
      * @param list<class-string> $expectedClassNames
      */

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Extension;
 
-use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
@@ -22,7 +21,6 @@ use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 /**
@@ -30,9 +28,12 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  */
 trait ExtensionTrait
 {
+    /**
+     * @param-immediately-invoked-callable $callback
+     */
     private function executeConfiguratorCallback(ContainerBuilder $container, \Closure $callback, ConfigurableExtensionInterface $subject, bool $prepend = false): void
     {
-        $env = $container->getParameter('kernel.environment');
+        $env = $container->hasParameter('kernel.environment') ? $container->getParameter('kernel.environment') : null;
         $loader = $this->createContainerLoader($container, $env, $prepend);
         $file = (new \ReflectionObject($subject))->getFileName();
         $bundleLoader = $loader->getResolver()->resolve($file);
@@ -50,15 +51,13 @@ trait ExtensionTrait
         }
     }
 
-    private function createContainerLoader(ContainerBuilder $container, string $env, bool $prepend): DelegatingLoader
+    private function createContainerLoader(ContainerBuilder $container, ?string $env, bool $prepend): DelegatingLoader
     {
-        $buildDir = $container->getParameter('kernel.build_dir');
         $locator = new FileLocator();
         $resolver = new LoaderResolver([
-            new XmlFileLoader($container, $locator, $env, $prepend),
             new YamlFileLoader($container, $locator, $env, $prepend),
             new IniFileLoader($container, $locator, $env),
-            class_exists(ConfigBuilderGenerator::class) ? new PhpFileLoader($container, $locator, $env, new ConfigBuilderGenerator($buildDir), $prepend) : new PhpFileLoader($container, $locator, $env, $prepend),
+            new PhpFileLoader($container, $locator, $env, $prepend),
             new GlobFileLoader($container, $locator, $env),
             new DirectoryLoader($container, $locator, $env),
             new ClosureLoader($container, $env),

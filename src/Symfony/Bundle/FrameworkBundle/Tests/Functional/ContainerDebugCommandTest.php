@@ -64,6 +64,89 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('public', $tester->getDisplay());
     }
 
+    public function testDecorationStack()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+
+        // Decoration stack should be displayed by default
+        $tester->run(['command' => 'debug:container', 'name' => 'original_service']);
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('Decoration Stack', $display);
+
+        // Check for specific stack items
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\BackslashClass', $display);
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\WarmedClass', $display);
+        $this->assertStringContainsString('Symfony\Bundle\FrameworkBundle\Tests\Fixtures\DeclaredClass', $display);
+
+        // Ensure the service IDs are present in the stack
+        $this->assertStringContainsString('original_service', $display);
+        $this->assertStringContainsString('decorator_1', $display);
+        $this->assertStringContainsString('decorator_2', $display);
+    }
+
+    public function testDecorationStackTxtFormat()
+    {
+        $output = $this->runDecorationStackWithFormat('txt');
+
+        $this->assertStringContainsString('Decoration Stack', $output, 'Failed asserting decoration stack in txt format');
+        $this->assertStringContainsString('original_service', $output, 'Failed asserting service name in txt format');
+    }
+
+    public function testDecorationStackJsonFormat()
+    {
+        $output = $this->runDecorationStackWithFormat('json');
+
+        $data = json_decode($output, true);
+        $this->assertIsArray($data, "Failed asserting output is valid JSON: $output");
+
+        if (isset($data[1])) {
+            $this->assertArrayHasKey('decoration_stack', $data[1], 'Failed checking for decoration_stack key in JSON output (index 1). Available keys: '.implode(', ', array_keys($data[1])));
+            $this->assertIsArray($data[1]['decoration_stack']);
+            $this->assertGreaterThan(1, \count($data[1]['decoration_stack']));
+        } else {
+            $this->assertArrayHasKey('decoration_stack', $data, 'Failed checking for decoration_stack key in JSON output. Available keys: '.implode(', ', array_keys($data)));
+            $this->assertIsArray($data['decoration_stack']);
+            $this->assertGreaterThan(1, \count($data['decoration_stack']));
+        }
+    }
+
+    public function testDecorationStackXmlFormat()
+    {
+        $output = $this->runDecorationStackWithFormat('xml');
+
+        $this->assertStringContainsString('<decoration-stack>', $output, 'Failed asserting XML tag in output');
+        $this->assertStringContainsString('id="original_service"', $output);
+    }
+
+    public function testDecorationStackMdFormat()
+    {
+        $output = $this->runDecorationStackWithFormat('md');
+
+        $this->assertStringContainsString('Decoration Stack', $output, 'Failed asserting decoration stack in md format');
+        $this->assertStringContainsString('original_service', $output, 'Failed asserting service name in md format');
+    }
+
+    public function testNoDecorationStackForNonDecoratedService()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        // Use a service that is not decorated
+        $tester->run(['command' => 'debug:container', 'name' => 'console.command.container_debug']);
+        $display = $tester->getDisplay();
+
+        // Decoration stack section should NOT appear for non-decorated services
+        $this->assertStringNotContainsString('Decoration Stack', $display);
+    }
+
     public function testPrivateAlias()
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
@@ -149,6 +232,19 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
             EOTXT,
             $tester->getDisplay()
         );
+    }
+
+    public function testDescribeUnknownParameter()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--parameter' => '.unknown']);
+
+        $this->assertStringContainsString('You have requested a non-existent parameter ".unknown".', $tester->getDisplay());
     }
 
     public function testDescribeEnvVars()
@@ -343,21 +439,16 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         ];
     }
 
-    public function testShowArgumentsProvidedShouldTriggerDeprecation()
+    private function runDecorationStackWithFormat(string $format): string
     {
-        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
-        $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
-        @unlink($path);
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
 
-        @unlink(static::getContainer()->getParameter('debug.container.dump'));
-
         $tester = new ApplicationTester($application);
-        $tester->run(['command' => 'debug:container', 'name' => 'router', '--show-arguments' => true]);
+        $tester->run(['command' => 'debug:container', 'name' => 'original_service', '--format' => $format]);
 
-        $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[WARNING] The "--show-arguments" option is deprecated, as arguments are now always shown.', $tester->getDisplay());
+        return $tester->getDisplay();
     }
 }

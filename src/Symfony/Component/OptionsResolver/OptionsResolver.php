@@ -65,13 +65,6 @@ class OptionsResolver implements Options
     private array $nested = [];
 
     /**
-     * BC layer. Remove in Symfony 8.0.
-     *
-     * @var array<string, true>
-     */
-    private array $deprecatedNestedOptions = [];
-
-    /**
      * The names of required options.
      */
     private array $required = [];
@@ -222,38 +215,12 @@ class OptionsResolver implements Options
                 // Make sure the option is processed
                 unset($this->resolved[$option]);
 
-                // BC layer. Remove in Symfony 8.0.
-                if (isset($this->deprecatedNestedOptions[$option])) {
-                    unset($this->nested[$option]);
-                }
-
-                return $this;
-            }
-
-            // Remove in Symfony 8.0.
-            if (isset($params[0]) && ($type = $params[0]->getType()) instanceof \ReflectionNamedType && self::class === $type->getName() && (!isset($params[1]) || (($type = $params[1]->getType()) instanceof \ReflectionNamedType && Options::class === $type->getName()))) {
-                trigger_deprecation('symfony/options-resolver', '7.3', 'Defining nested options via "%s()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.', __METHOD__);
-                $this->deprecatedNestedOptions[$option] = true;
-
-                // Store closure for later evaluation
-                $this->nested[$option][] = $value;
-                $this->defaults[$option] = [];
-                $this->defined[$option] = true;
-
-                // Make sure the option is processed and is not lazy anymore
-                unset($this->resolved[$option], $this->lazy[$option]);
-
                 return $this;
             }
         }
 
         // This option is not lazy anymore
         unset($this->lazy[$option]);
-
-        // BC layer. Remove in Symfony 8.0.
-        if (isset($this->deprecatedNestedOptions[$option])) {
-            unset($this->nested[$option]);
-        }
 
         // Yet undefined options can be marked as resolved, because we only need
         // to resolve options with lazy closures, normalizers or validation

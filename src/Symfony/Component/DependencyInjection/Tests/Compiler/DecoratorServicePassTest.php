@@ -281,6 +281,25 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
+    public function testProcessIgnoresBehaviorDescribingTagsParameter()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('container.behavior_describing_tags', ['container.service_locator', 'kernel.event_listener']);
+        $container
+            ->register('foo')
+            ->setTags(['container.service_locator' => [0 => []], 'kernel.event_listener' => [['event' => 'foo']]])
+        ;
+        $container
+            ->register('baz')
+            ->setDecoratedService('foo')
+        ;
+
+        $this->process($container);
+
+        $this->assertEquals(['container.service_locator' => [0 => []]], $container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals(['kernel.event_listener' => [['event' => 'foo']], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
+    }
+
     public function testCannotDecorateSyntheticService()
     {
         $container = new ContainerBuilder();

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -29,16 +27,6 @@ use Symfony\Component\Validator\Tests\Constraints\Fixtures\WhenTestWithClosure;
 
 final class WhenTest extends TestCase
 {
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testMissingOptionsExceptionIsThrown()
-    {
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('The options "expression", "constraints" must be set for constraint "Symfony\Component\Validator\Constraints\When".');
-
-        new When([]);
-    }
-
     public function testMissingConstraints()
     {
         $this->expectException(MissingOptionsException::class);
@@ -153,18 +141,5 @@ final class WhenTest extends TestCase
         ], $fooConstraint->constraints);
         self::assertSame([], $fooConstraint->otherwise);
         self::assertSame(['Default', 'WhenTestWithClosure'], $fooConstraint->groups);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testConstraintsInOptionsArray()
-    {
-        $constraints = [
-            new NotNull(),
-            new Length(min: 10),
-        ];
-        $constraint = new When('true', options: ['constraints' => $constraints]);
-
-        $this->assertSame($constraints, $constraint->constraints);
     }
 }

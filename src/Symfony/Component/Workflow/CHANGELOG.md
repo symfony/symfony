@@ -1,6 +1,91 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow prefixing entries with `!` in the `$eventsToDispatch` constructor argument of `Workflow` and `StateMachine` to permanently disable an event; e.g. `new Workflow(..., eventsToDispatch: ['!workflow.announce'])` fires every event except `workflow.announce`. The GuardEvent can never be suppressed; `!workflow.guard` throws an `InvalidArgumentException`. Mixing allow-list and block-list entries also throws an `InvalidArgumentException`.
+
+8.1
+---
+
+ * Add support for dumping listeners in Graphviz diagrams
+
+8.0
+---
+
+ * Add method `getEnabledTransition()` to `WorkflowInterface`
+ * Add `$nbToken` argument to `Marking::mark()` and `Marking::unmark()`
+ * Add `$asArc` argument to `Transition::getFroms()` and `Transition::getTos()`
+ * Remove `Event::getWorkflow()` method
+
+   *Before*
+   ```php
+   use Symfony\Component\Workflow\Attribute\AsCompletedListener;
+   use Symfony\Component\Workflow\Event\CompletedEvent;
+
+   class MyListener
+   {
+       #[AsCompletedListener('my_workflow', 'to_state2')]
+       public function terminateOrder(CompletedEvent $event): void
+       {
+           $subject = $event->getSubject();
+           if ($event->getWorkflow()->can($subject, 'to_state3')) {
+               $event->getWorkflow()->apply($subject, 'to_state3');
+           }
+       }
+   }
+   ```
+
+   *After*
+   ```php
+   use Symfony\Component\DependencyInjection\Attribute\Target;
+   use Symfony\Component\Workflow\Attribute\AsCompletedListener;
+   use Symfony\Component\Workflow\Event\CompletedEvent;
+   use Symfony\Component\Workflow\WorkflowInterface;
+
+   class MyListener
+   {
+       public function __construct(
+           #[Target('my_workflow')]
+           private readonly WorkflowInterface $workflow,
+       ) {
+       }
+
+       #[AsCompletedListener('my_workflow', 'to_state2')]
+       public function terminateOrder(CompletedEvent $event): void
+       {
+           $subject = $event->getSubject();
+           if ($this->workflow->can($subject, 'to_state3')) {
+               $this->workflow->apply($subject, 'to_state3');
+           }
+       }
+   }
+   ```
+
+   *Or*
+   ```php
+   use Symfony\Component\DependencyInjection\ServiceLocator;
+   use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+   use Symfony\Component\Workflow\Attribute\AsTransitionListener;
+   use Symfony\Component\Workflow\Event\TransitionEvent;
+
+   class GenericListener
+   {
+       public function __construct(
+           #[AutowireLocator('workflow', 'name')]
+           private ServiceLocator $workflows
+       ) {
+       }
+
+       #[AsTransitionListener]
+       public function doSomething(TransitionEvent $event): void
+       {
+           $workflow = $this->workflows->get($event->getWorkflowName());
+       }
+   }
+   ```
+
 7.4
 ---
 

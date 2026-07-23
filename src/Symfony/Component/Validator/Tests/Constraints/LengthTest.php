@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -33,24 +31,6 @@ class LengthTest extends TestCase
         );
 
         $this->assertEquals('trim', $length->normalizer);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Length(['min' => 0, 'max' => 10, 'normalizer' => 'Unknown Callable']);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Length(['min' => 0, 'max' => 10, 'normalizer' => new \stdClass()]);
     }
 
     public function testDefaultCountUnitIsUsed()

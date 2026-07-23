@@ -40,9 +40,8 @@ use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
-use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
-use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
@@ -65,14 +64,13 @@ use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->set('console.error_listener', ErrorListener::class)
-            ->args([
-                service('logger')->nullOnInvalid(),
-            ])
-            ->tag('kernel.event_subscriber')
-            ->tag('monolog.logger', ['channel' => 'console'])
-
         ->set('console.suggest_missing_package_subscriber', SuggestMissingPackageSubscriber::class)
+            ->tag('kernel.event_subscriber')
+
+        ->set('.console.validate_question_input_listener', ValidateQuestionInputListener::class)
+            ->args([
+                service('validator'),
+            ])
             ->tag('kernel.event_subscriber')
 
         ->set('console.command.about', AboutCommand::class)
@@ -147,13 +145,6 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 null,
                 service('debug.file_link_formatter')->nullOnInvalid(),
-            ])
-            ->tag('console.command')
-
-        ->set('console.command.dotenv_debug', DotenvDebugCommand::class)
-            ->args([
-                param('kernel.environment'),
-                param('kernel.project_dir'),
             ])
             ->tag('console.command')
 
@@ -315,6 +306,7 @@ return static function (ContainerConfigurator $container) {
         ->set('console.command.workflow_dump', WorkflowDumpCommand::class)
             ->args([
                 tagged_locator('workflow', 'name'),
+                service('event_dispatcher')->nullOnInvalid(),
             ])
             ->tag('console.command')
 

@@ -12,7 +12,9 @@
 namespace Symfony\Component\AssetMapper\Tests\Compressor;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\Compressor\GzipCompressor;
+use Symfony\Component\AssetMapper\Compressor\ZopfliCompressor;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -42,6 +44,23 @@ class GzipCompressorTest extends TestCase
         $this->filesystem->dumpFile(self::WRITABLE_ROOT.'/foo/bar.js', 'foobar');
 
         (new GzipCompressor())->compress(self::WRITABLE_ROOT.'/foo/bar.js');
+
+        $this->assertFileExists(self::WRITABLE_ROOT.'/foo/bar.js.gz');
+    }
+
+    public function testCompressFallsBackWhenZopfliIsUnsupported()
+    {
+        $zopfli = new ZopfliCompressor();
+        if (null === $reason = $zopfli->getUnsupportedReason()) {
+            $this->markTestSkipped('Zopfli is available; cannot exercise the fallback path.');
+        }
+
+        $this->filesystem->dumpFile(self::WRITABLE_ROOT.'/foo/bar.js', 'foobar');
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')->with($reason);
+
+        (new GzipCompressor($zopfli, null, $logger))->compress(self::WRITABLE_ROOT.'/foo/bar.js');
 
         $this->assertFileExists(self::WRITABLE_ROOT.'/foo/bar.js.gz');
     }

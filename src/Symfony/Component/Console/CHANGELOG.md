@@ -1,6 +1,43 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `ConsoleBundle` for console applications with DI, autodiscovery and autowiring
+ * Pad styled `SymfonyStyle` blocks with the ECH ANSI sequence on decorated outputs so trailing cells are excluded from copy selections
+ * Add optional `$container` parameter to `Application` for automatic service wiring from a PSR container
+ * Add `SymfonyStyle::outlineBlock()` and convenience methods `outlineSuccess()`, `outlineError()`, `outlineWarning()`, `outlineNote()`, `outlineInfo()`, `outlineCaution()` for border-only message blocks with the type label embedded in the top border
+ * Add `TraceableValueResolver` to help inspecting value resolvers performances
+ * [BC BREAK] Add `object` support to input options and arguments' default by changing the `$default` type to `mixed` in `InputArgument`, `InputOption`, `#[Argument]` and `#[Option]`
+ * Add support for pasting images with `#[Ask]` on `InputFile` types, supporting Kitty Graphics and iTerm2 protocols
+ * Add `FileQuestion`, `InputFile`, `InputFileValueResolver`, and `SymfonyStyle::askFile()` for file input handling
+ * Add `Question::setConstraints()` and `ValidateQuestionInputListener` to validate question input using Validator constraints
+ * Add `#[AskChoice]` attribute for interactive choice questions in invokable commands
+ * Add support for method-based commands with `#[AsCommand]` attribute
+ * Add argument resolver support
+ * Add `BackedEnum` and `DateTimeInterface` support to `#[MapInput]`
+ * Add validation constraints support to `#[MapInput]` along with optional `validationGroups` to control which groups are validated
+ * Add `TesterTrait::assertCommandFailed()` to test command
+ * Add `TesterTrait::assertCommandIsInvalid()` to test command
+ * Add a result-based testing API with `CommandTester::run()`, `ExecutionResult`, and `ConsoleAssertionsTrait` to assert output and error streams together
+ * Add optional `$format` argument to `SymfonyStyle::createProgressBar()`, `SymfonyStyle::progressStart()`, and `SymfonyStyle::progressIterate()` to allow passing a custom `ProgressBar` format string
+ * Allow setting a boolean default value on `InputOption::VALUE_NEGATABLE` options
+ * Deprecate passing both `InputArgument::REQUIRED` and `InputArgument::OPTIONAL` modes to `InputArgument` constructor
+ * Deprecate passing more than one out of `InputOption::VALUE_NONE`, `InputOption::VALUE_REQUIRED` and `InputOption::VALUE_OPTIONAL` modes to `InputOption` constructor
+ * Add `RawInputInterface` to expose the original arguments and options and to unparse options, implemented by `Input`
+ * Add support for OSC 9;4 for progress reporting
+
+8.0
+---
+
+ * Make `AsCommand` attribute class `final`
+ * Remove methods `Command::getDefaultName()` and `Command::getDefaultDescription()` in favor of the `#[AsCommand]` attribute
+ * Ensure closures set via `Command::setCode()` method have proper parameter and return types
+ * Add method `isSilent()` to `OutputInterface`
+ * Remove deprecated `Symfony\Component\Console\Application::add()` method in favor of `Symfony\Component\Console\Application::addCommand()`
+ * Add argument `$finishedIndicator` to `ProgressIndicator::finish()`
+
 7.4
 ---
 

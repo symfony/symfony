@@ -204,6 +204,17 @@ class UnstructuredHeaderTest extends TestCase
         );
     }
 
+    public function testWhitespaceRunsBetweenEncodedWordsAreEncodedTogether()
+    {
+        // decoders ignore linear whitespace between two adjacent encoded words (RFC 2047 section 6.2),
+        // so whitespace runs of any length must be folded into the encoded words themselves
+        $header = new UnstructuredHeader('Subject', 'Fabïen  Pötencier  Länge');
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen__P=C3=B6tencier__L=C3=A4nge?=', $header->getBodyAsString());
+
+        $header = new UnstructuredHeader('Subject', "Fabïen \t Pötencier");
+        $this->assertSame('=?utf-8?Q?Fab=C3=AFen_=09_P=C3=B6tencier?=', $header->getBodyAsString());
+    }
+
     public function testLanguageInformationAppearsInEncodedWords()
     {
         /* -- RFC 2231, 5.

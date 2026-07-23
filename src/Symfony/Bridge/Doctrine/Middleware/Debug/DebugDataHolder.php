@@ -24,7 +24,9 @@ class DebugDataHolder
             'sql' => $query->getSql(),
             'params' => $query->getParams(),
             'types' => $query->getTypes(),
-            'executionMS' => $query->getDuration(...),  // stop() may not be called at this point
+            // stop() may not be called at this point
+            'executionMS' => $query->getDuration(...),
+            'ranOnPrimary' => $query->ranOnPrimary(...),
         ];
     }
 
@@ -34,6 +36,9 @@ class DebugDataHolder
             foreach ($dataForConn as $idx => $data) {
                 if (\is_callable($data['executionMS'])) {
                     $this->data[$connectionName][$idx]['executionMS'] = $data['executionMS']();
+                }
+                if (\is_callable($data['ranOnPrimary'])) {
+                    $this->data[$connectionName][$idx]['ranOnPrimary'] = $data['ranOnPrimary']();
                 }
             }
         }

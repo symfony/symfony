@@ -150,8 +150,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 $queryParameters = $parameters['_query'];
                 unset($parameters['_query']);
             } else {
-                trigger_deprecation('symfony/routing', '7.4', 'Parameter "_query" is reserved for passing an array of query parameters. Passing a scalar value is deprecated and will throw an exception in Symfony 8.0.');
-                // throw new InvalidParameterException('Parameter "_query" must be an array of query parameters.');
+                throw new InvalidParameterException('Parameter "_query" must be an array of query parameters.');
             }
         }
 
@@ -280,10 +279,16 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, static fn ($a, $b) => $a == $b ? 0 : 1);
         $extra = array_replace($extra, $queryParameters);
 
-        array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {
+        $seen = [];
+        array_walk_recursive($extra, $caster = static function (&$v) use (&$caster, &$seen, $name) {
             if (\is_object($v)) {
+                if (isset($seen[$id = spl_object_id($v)])) {
+                    throw new InvalidParameterException(\sprintf('Parameters for route "%s" cannot contain a circular reference (in object of class "%s").', $name, get_debug_type($v)));
+                }
                 if ($vars = get_object_vars($v)) {
+                    $seen[$id] = true;
                     array_walk_recursive($vars, $caster);
+                    unset($seen[$id]);
                     $v = $vars;
                 } elseif ($v instanceof \Stringable) {
                     $v = (string) $v;

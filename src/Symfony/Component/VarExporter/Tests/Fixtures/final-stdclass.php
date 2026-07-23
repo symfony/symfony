@@ -1,11 +1,7 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        (\Symfony\Component\VarExporter\Internal\Registry::$factories['Symfony\\Component\\VarExporter\\Tests\\FinalStdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::f('Symfony\\Component\\VarExporter\\Tests\\FinalStdClass'))(),
-    ],
-    null,
-    [],
-    $o[0],
-    []
-);
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\FinalStdClass',
+    'objectMeta' => 1,
+    'prepared' => 0,
+], null, true);

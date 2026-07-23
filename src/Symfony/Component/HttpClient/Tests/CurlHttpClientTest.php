@@ -22,15 +22,16 @@ class CurlHttpClientTest extends HttpClientTestCase
 {
     protected function getHttpClient(string $testCase): CurlHttpClient
     {
+        $usePersistentConnections = str_contains($testCase, 'Persistent');
         if (!str_contains($testCase, 'Push')) {
-            return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false]);
+            return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false, 'extra' => ['use_persistent_connections' => $usePersistentConnections]]);
         }
 
         if (!\defined('CURLMOPT_PUSHFUNCTION') || 0x073D00 > ($v = curl_version())['version_number'] || !(\CURL_VERSION_HTTP2 & $v['features'])) {
             $this->markTestSkipped('curl <7.61 is used or it is not compiled with support for HTTP/2 PUSH');
         }
 
-        return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false], 6, 50);
+        return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false, 'extra' => ['use_persistent_connections' => $usePersistentConnections]], 6, 50);
     }
 
     public function testTimeoutIsNotAFatalError()
@@ -75,11 +76,37 @@ class CurlHttpClientTest extends HttpClientTestCase
 
         self::assertFalse(isset($state->handle));
         self::assertFalse(isset($state->share));
+        self::assertFalse(isset($state->persistentShare));
 
         $client->request('GET', 'http://127.0.0.1:8057/json')->getStatusCode();
 
         self::assertInstanceOf(\CurlMultiHandle::class, $state->handle);
         self::assertInstanceOf(\CurlShareHandle::class, $state->share);
+        self::assertFalse(isset($state->persistentShare));
+    }
+
+    public function testCurlClientPersistentStateInitializesHandlesLazily()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $r = new \ReflectionProperty($client, 'multi');
+        $state = $r->getValue($client);
+
+        self::assertFalse(isset($state->handle));
+        self::assertFalse(isset($state->share));
+        self::assertFalse(isset($state->persistentShare));
+
+        $client->request('GET', 'http://127.0.0.1:8057/json')->getStatusCode();
+
+        self::assertInstanceOf(\CurlMultiHandle::class, $state->handle);
+
+        if (\PHP_VERSION_ID >= 80500) {
+            self::assertFalse(isset($state->share));
+            self::assertInstanceOf(\CurlSharePersistentHandle::class, $state->persistentShare);
+        } else {
+            self::assertInstanceOf(\CurlShareHandle::class, $state->share);
+            self::assertSame($state->share, $state->persistentShare);
+        }
     }
 
     public function testProcessAfterReset()
@@ -133,6 +160,21 @@ class CurlHttpClientTest extends HttpClientTestCase
             'extra' => [
                 'curl' => [
                     \CURLOPT_PRIVATE => 'overridden private',
+                ],
+            ],
+        ]);
+    }
+
+    public function testOverridingMaxConnectDurationUsingCurlOptions()
+    {
+        $httpClient = $this->getHttpClient(__FUNCTION__);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Cannot set "CURLOPT_CONNECTTIMEOUT_MS" with "extra.curl", use option "max_connect_duration" instead.');
+
+        $httpClient->request('GET', 'http://localhost:8057/', [
+            'extra' => [
+                'curl' => [
+                    \CURLOPT_CONNECTTIMEOUT_MS => 5000,
                 ],
             ],
         ]);

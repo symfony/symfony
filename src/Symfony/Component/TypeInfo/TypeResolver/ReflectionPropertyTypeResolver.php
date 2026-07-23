@@ -41,7 +41,7 @@ final class ReflectionPropertyTypeResolver implements TypeResolverInterface
         try {
             return $this->reflectionTypeResolver->resolve($subject->getType(), $typeContext);
         } catch (UnsupportedException $e) {
-            $path = \sprintf('%s::$%s', $subject->getDeclaringClass()->getName(), $subject->getName());
+            $path = \sprintf('%s::$%s', $subject->class, $subject->getName());
 
             throw new UnsupportedException(\sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
         }

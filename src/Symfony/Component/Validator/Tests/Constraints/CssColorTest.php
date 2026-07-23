@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\CssColor;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -61,15 +59,6 @@ final class CssColorTest extends TestCase
             CssColor::HSL,
             CssColor::HSLA,
         ], $constraint->formats);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testDoctrineStyle()
-    {
-        $constraint = new CssColor(['formats' => CssColor::RGB]);
-
-        $this->assertSame(CssColor::RGB, $constraint->formats);
     }
 }
 

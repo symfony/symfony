@@ -31,7 +31,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Collection(fields: [
+        $this->validate(null, new Collection(fields: [
             'foo' => new Range(min: 4),
         ]));
 
@@ -46,7 +46,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => $constraint,
         ]));
 
@@ -56,7 +56,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     public function testThrowsExceptionIfNotTraversable()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate('foobar', new Collection(fields: [
+        $this->validate('foobar', new Collection(fields: [
             'foo' => new Range(min: 4),
         ]));
     }
@@ -78,7 +78,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
                 'bar' => $constraint,
@@ -108,7 +108,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraints,
                 'bar' => $constraints,
@@ -129,7 +129,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
             ],
@@ -152,7 +152,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'baz' => 6,
         ]);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
             ],
@@ -178,7 +178,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
             ],
@@ -198,7 +198,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, '[foo]', $data['foo'], [$constraint]);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
             ],
@@ -214,7 +214,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $constraint = new Range(min: 4);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
             ],
@@ -235,7 +235,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $constraint = new Range(min: 4);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => $constraint,
             ],
@@ -251,7 +251,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'foo' => null,
         ]);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Optional(),
         ]));
 
@@ -262,7 +262,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     {
         $data = $this->prepareTestData([]);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Optional(),
         ]));
 
@@ -281,7 +281,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Optional($constraint),
         ]));
 
@@ -303,7 +303,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Optional($constraints),
         ]));
 
@@ -316,7 +316,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
             'foo' => null,
         ]);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Required(),
         ]));
 
@@ -327,7 +327,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
     {
         $data = $this->prepareTestData([]);
 
-        $this->validator->validate($data, new Collection(
+        $this->validate($data, new Collection(
             fields: [
                 'foo' => new Required(),
             ],
@@ -354,7 +354,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Required($constraint),
         ]));
 
@@ -376,7 +376,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $data = $this->prepareTestData($array);
 
-        $this->validator->validate($data, new Collection([
+        $this->validate($data, new Collection([
             'foo' => new Required($constraints),
         ]));
 
@@ -393,7 +393,7 @@ abstract class CollectionValidatorTestCase extends ConstraintValidatorTestCase
 
         $this->expectValidateValueAt(0, '[foo]', $value['foo'], [$constraint]);
 
-        $this->validator->validate($value, new Collection(
+        $this->validate($value, new Collection(
             fields: [
                 'foo' => $constraint,
             ],

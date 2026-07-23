@@ -36,9 +36,14 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
     ) {
     }
 
-    public function get(): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
     {
-        return $this->getReceiver()->get();
+        $fetchSize = \func_num_args() > 0 ? func_get_arg(0) : 1;
+
+        return $this->getReceiver()->get($fetchSize);
     }
 
     public function ack(Envelope $envelope): void
@@ -83,22 +88,24 @@ class DoctrineTransport implements TransportInterface, SetupableTransportInterfa
 
     /**
      * Adds the Table to the Schema if this transport uses this connection.
-     *
-     * @return Schema The (possibly new) schema with the table added
      */
-    public function configureSchema(Schema $schema, DbalConnection $forConnection, \Closure $isSameDatabase)
+    public function configureSchema(Schema $schema, DbalConnection $forConnection, \Closure $isSameDatabase): Schema
     {
-        return $this->connection->configureSchema($schema, $forConnection, $isSameDatabase) ?? $schema;
+        return $this->connection->configureSchema($schema, $forConnection, $isSameDatabase);
     }
 
     /**
      * Adds extra SQL if the given table was created by the Connection.
      *
      * @return string[]
+     *
+     * @deprecated since Symfony 8.1, to be removed in 9.0
      */
     public function getExtraSetupSqlForTable(Table $createdTable): array
     {
-        return $this->connection->getExtraSetupSqlForTable($createdTable);
+        trigger_deprecation('symfony/messenger', '8.1', 'The "%s()" method is deprecated and will be removed in 9.0.', __METHOD__);
+
+        return [];
     }
 
     private function getReceiver(): DoctrineReceiver

@@ -32,9 +32,9 @@ abstract class AbstractSchemaListener
     /**
      * @param callable(): Schema $configurator returns the (possibly new) schema with the table added
      *
-     * @return Schema The (possibly new) schema after filtering
+     * @param-immediately-invoked-callable $configurator
      */
-    protected function filterSchemaChanges(Schema $schema, Connection $connection, callable $configurator)
+    protected function filterSchemaChanges(Schema $schema, Connection $connection, callable $configurator): Schema
     {
         $filter = $connection->getConfiguration()->getSchemaAssetsFilter();
         $getName = static fn ($object) => $object instanceof NamedObject ? $object->getObjectName()->toString() : $object->getName();
@@ -121,7 +121,7 @@ abstract class AbstractSchemaListener
     protected function getIsSameDatabaseChecker(Connection $connection): \Closure
     {
         return static function (\Closure $exec) use ($connection): bool {
-            $schemaManager = method_exists($connection, 'createSchemaManager') ? $connection->createSchemaManager() : $connection->getSchemaManager();
+            $schemaManager = $connection->createSchemaManager();
             $key = bin2hex(random_bytes(7));
 
             if (method_exists(Table::class, 'editor')) {
@@ -136,12 +136,7 @@ abstract class AbstractSchemaListener
                 $table = new Table('schema_subscriber_check_');
                 $table->addColumn('id', Types::INTEGER, ['autoincrement' => true, 'notnull' => true]);
                 $table->addColumn('random_key', Types::STRING, ['length' => 14, 'notnull' => true]);
-
-                if (class_exists(PrimaryKeyConstraint::class)) {
-                    $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
-                } else {
-                    $table->setPrimaryKey(['id']);
-                }
+                $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
             }
 
             try {

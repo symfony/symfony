@@ -12,10 +12,8 @@
 namespace Symfony\Component\HttpFoundation\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 
-#[RequiresPhp('>=8.4.0')]
 class RequestFunctionalTest extends TestCase
 {
     /** @var resource|false */

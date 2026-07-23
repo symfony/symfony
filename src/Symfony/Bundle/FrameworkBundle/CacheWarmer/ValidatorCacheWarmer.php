@@ -25,10 +25,8 @@ use Symfony\Component\Validator\ValidatorBuilder;
  * Warms up validator metadata.
  *
  * @author Titouan Galopin <galopintitouan@gmail.com>
- *
- * @final since Symfony 7.1
  */
-class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
+final class ValidatorCacheWarmer extends AbstractPhpFileCacheWarmer
 {
     /**
      * @param string $phpArrayFile The PHP file where metadata are cached

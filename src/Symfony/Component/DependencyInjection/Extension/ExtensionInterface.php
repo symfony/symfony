@@ -25,36 +25,14 @@ interface ExtensionInterface
      *
      * @param array<array<mixed>> $configs
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException When provided tag is not defined in this extension
      */
-    public function load(array $configs, ContainerBuilder $container);
-
-    /**
-     * Returns the namespace to be used for this extension (XML namespace).
-     *
-     * @return string
-     *
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
-     */
-    public function getNamespace();
-
-    /**
-     * Returns the base path for the XSD files.
-     *
-     * @return string|false
-     *
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
-     */
-    public function getXsdValidationBasePath();
+    public function load(array $configs, ContainerBuilder $container): void;
 
     /**
      * Returns the recommended alias to use in XML.
      *
      * This alias is also the mandatory prefix to use when using YAML.
-     *
-     * @return string
      */
-    public function getAlias();
+    public function getAlias(): string;
 }

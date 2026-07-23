@@ -276,6 +276,74 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringContainsString('Hasher used      Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher', $this->passwordHasherCommandTester->getDisplay());
     }
 
+    public function testWarningWhenPasswordPassedAsArgumentInInteractiveMode()
+    {
+        $this->passwordHasherCommandTester->execute([
+            'password' => 'p@ssw0rd',
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
+            '--empty-salt' => true,
+        ], ['interactive' => true, 'capture_stderr_separately' => true]);
+
+        $errorOutput = $this->passwordHasherCommandTester->getErrorOutput();
+        $this->assertStringContainsString('[WARNING]', $errorOutput);
+        $this->assertStringContainsString('shell history', $errorOutput);
+        $this->assertStringContainsString('process list', $errorOutput);
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getDisplay());
+    }
+
+    public function testNoWarningWhenPasswordPassedAsArgumentInNonInteractiveMode()
+    {
+        $this->passwordHasherCommandTester->execute([
+            'password' => 'p@ssw0rd',
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
+            '--empty-salt' => true,
+        ], ['interactive' => false, 'capture_stderr_separately' => true]);
+
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getErrorOutput());
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getDisplay());
+        $this->assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getErrorOutput());
+    }
+
+    public function testNoWarningWhenPasswordReadInteractively()
+    {
+        $this->passwordHasherCommandTester->setInputs(['p@ssw0rd']);
+        $this->passwordHasherCommandTester->execute([
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
+            '--empty-salt' => true,
+        ], ['interactive' => true, 'capture_stderr_separately' => true]);
+
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getErrorOutput());
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getDisplay());
+    }
+
+    public function testReadsPasswordFromStdinWhenPasswordIsDashNonInteractive()
+    {
+        $this->passwordHasherCommandTester->setInputs(['p@ssw0rd']);
+        $this->passwordHasherCommandTester->execute([
+            'password' => '-',
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
+            '--empty-salt' => true,
+        ], ['interactive' => false, 'capture_stderr_separately' => true]);
+
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getErrorOutput());
+        $this->assertStringContainsString('Password hashing succeeded', $this->passwordHasherCommandTester->getErrorOutput());
+        $this->assertStringContainsString(' Password hash   p@ssw0rd', $this->passwordHasherCommandTester->getDisplay());
+    }
+
+    public function testReadsPasswordFromStdinWhenPasswordIsDashInteractive()
+    {
+        $this->passwordHasherCommandTester->setInputs(['p@ssw0rd']);
+        $this->passwordHasherCommandTester->execute([
+            'password' => '-',
+            'user-class' => 'Symfony\Component\Security\Core\User\InMemoryUser',
+            '--empty-salt' => true,
+        ], ['interactive' => true, 'capture_stderr_separately' => true]);
+
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getErrorOutput());
+        $this->assertStringNotContainsString('[WARNING]', $this->passwordHasherCommandTester->getDisplay());
+        $this->assertStringContainsString(' Password hash   p@ssw0rd', $this->passwordHasherCommandTester->getDisplay());
+    }
+
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
         $tester = new CommandTester(new UserPasswordHashCommand(new PasswordHasherFactory([]), []));

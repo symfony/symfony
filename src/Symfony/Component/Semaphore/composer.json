@@ -20,14 +20,13 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4.1",
         "psr/log": "^1|^2|^3"
     },
     "require-dev": {
-        "predis/predis": "^1.1|^2.0"
-    },
-    "conflict": {
-        "symfony/cache": "<6.4"
+        "predis/predis": "^1.1|^2.0",
+        "symfony/lock": "^7.4|^8.0",
+        "symfony/serializer": "^6.4|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Semaphore\\": "" },

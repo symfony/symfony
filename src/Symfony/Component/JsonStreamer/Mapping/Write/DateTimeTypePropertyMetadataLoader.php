@@ -13,8 +13,12 @@ namespace Symfony\Component\JsonStreamer\Mapping\Write;
 
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 
+trigger_deprecation('symfony/json-streamer', '8.1', 'The "%s" class is deprecated, Date times are handled as value objects.', DateTimeTypePropertyMetadataLoader::class);
+
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+ *
+ * @deprecated since Symfony 8.1, Date times are handled as value objects
  *
  * @internal
  */

@@ -16,7 +16,6 @@ require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
@@ -25,10 +24,12 @@ use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosure;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -38,7 +39,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -568,11 +568,13 @@ class ContainerBuilderTest extends TestCase
         $builder->register('qux', 'Bar\FooClass')->setFactory(['Bar\FooClass', 'getInstance']);
         $builder->register('bar', 'Bar\FooClass')->setFactory([new Definition('Bar\FooClass'), 'getInstance']);
         $builder->register('baz', 'Bar\FooClass')->setFactory([new Reference('bar'), 'getInstance']);
+        $builder->register('inline', 'BazClass')->setFactory(new Definition('BazInvokableFactory'));
 
         $this->assertTrue($builder->get('foo')->called, '->createService() calls the factory method to create the service instance');
         $this->assertTrue($builder->get('qux')->called, '->createService() calls the factory method to create the service instance');
         $this->assertTrue($builder->get('bar')->called, '->createService() uses anonymous service as factory');
         $this->assertTrue($builder->get('baz')->called, '->createService() uses another service as factory');
+        $this->assertInstanceOf(\BazClass::class, $builder->get('inline'), '->createService() calls __invoke on inline Definition factory');
     }
 
     public function testCreateServiceMethodCalls()
@@ -612,11 +614,13 @@ class ContainerBuilderTest extends TestCase
         $builder->register('foo3', 'Bar\FooClass')->setConfigurator([new Reference('baz'), 'configure']);
         $builder->register('foo4', 'Bar\FooClass')->setConfigurator([$builder->getDefinition('baz'), 'configure']);
         $builder->register('foo5', 'Bar\FooClass')->setConfigurator('foo');
+        $builder->register('foo6', 'Bar\FooClass')->setConfigurator(new Definition('BazInvokableConfigurator'));
 
         $this->assertTrue($builder->get('foo1')->configured, '->createService() calls the configurator');
         $this->assertTrue($builder->get('foo2')->configured, '->createService() calls the configurator');
         $this->assertTrue($builder->get('foo3')->configured, '->createService() calls the configurator');
         $this->assertTrue($builder->get('foo4')->configured, '->createService() calls the configurator');
+        $this->assertTrue($builder->get('foo6')->configured, '->createService() calls __invoke on inline Definition configurator');
 
         try {
             $builder->get('foo5');
@@ -852,24 +856,6 @@ class ContainerBuilderTest extends TestCase
 
         $container->merge($config);
         $this->assertSame([AsTaggedItem::class => [$c1, $c2]], $container->getAttributeAutoconfigurators());
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testGetAutoconfiguredAttributes()
-    {
-        $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c = static function () {});
-
-        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 7.3: The "Symfony\Component\DependencyInjection\ContainerBuilder::getAutoconfiguredAttributes()" method is deprecated, use "getAttributeAutoconfigurators()" instead.');
-        $configurators = $container->getAutoconfiguredAttributes();
-        $this->assertSame($c, $configurators[AsTaggedItem::class]);
-
-        // Method call fails with more than one configurator for a given attribute
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c = static function () {});
-
-        $this->expectException(LogicException::class);
-        $container->getAutoconfiguredAttributes();
     }
 
     public function testResolveEnvValues()
@@ -1162,7 +1148,7 @@ class ContainerBuilderTest extends TestCase
             ->addTag('foo', ['foofoo' => 'foofoo']);
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The resource "myservice" tagged "foo" is missing the "container.excluded" tag.');
+        $this->expectExceptionMessage('The resource "myservice" tagged "foo" is missing the "container.excluded" tag; did you mean to use "resource_tags" instead of "tags"?');
         $builder->findTaggedResourceIds('foo');
     }
 
@@ -1650,6 +1636,79 @@ class ContainerBuilderTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testEnvClosureAutowire()
+    {
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
+        $container->setParameter('env(FOO)', 'foo');
+        $container->setParameter('env(HOST)', 'example.com');
+        $container->setParameter('env(PORT)', '6379');
+        $container->setParameter('dsn_template', 'redis://%env(HOST)%:%env(PORT)%');
+
+        $container->register('consumer', EnvClosureAutowireConsumer::class)
+            ->setPublic(true)
+            ->setAutowired(true)
+        ;
+        $container->compile();
+
+        $consumer = $container->get('consumer');
+
+        $this->assertInstanceOf(\Closure::class, $consumer->getFoo);
+        $this->assertSame('foo', ($consumer->getFoo)());
+
+        $this->assertInstanceOf(EnvClosure::class, $consumer->getFooStringable);
+        $this->assertSame('foo', (string) $consumer->getFooStringable);
+
+        $this->assertInstanceOf(EnvClosure::class, $consumer->getMissingWithDefault);
+        $this->assertSame('fallback', (string) $consumer->getMissingWithDefault);
+
+        $this->assertInstanceOf(EnvClosure::class, $consumer->getDsn);
+        $this->assertSame('redis://example.com:6379', (string) $consumer->getDsn);
+
+        $this->assertInstanceOf(EnvClosure::class, $consumer->getDsnFromParam);
+        $this->assertSame('redis://example.com:6379', (string) $consumer->getDsnFromParam);
+    }
+
+    public function testEnvClosureAutowireRefreshesAcrossEnvCacheReset()
+    {
+        $previous = [
+            'SYMFONY_TEST_HOST' => $_ENV['SYMFONY_TEST_HOST'] ?? null,
+            'SYMFONY_TEST_PORT' => $_ENV['SYMFONY_TEST_PORT'] ?? null,
+        ];
+        $_ENV['SYMFONY_TEST_HOST'] = 'host-1';
+        $_ENV['SYMFONY_TEST_PORT'] = '6379';
+
+        try {
+            $container = new ContainerBuilder(new EnvPlaceholderParameterBag());
+            $container->setParameter('dsn_template', 'redis://%env(SYMFONY_TEST_HOST)%:%env(SYMFONY_TEST_PORT)%');
+            $container->register('consumer', EnvRefreshConsumer::class)
+                ->setPublic(true)
+                ->setAutowired(true)
+            ;
+            $container->compile(true);
+
+            $consumer = $container->get('consumer');
+
+            $this->assertSame('host-1', ($consumer->host)());
+            $this->assertSame('redis://host-1:6379', (string) $consumer->dsn);
+            $this->assertSame('redis://host-1:6379', (string) $consumer->dsnFromParam);
+
+            $_ENV['SYMFONY_TEST_HOST'] = 'host-2';
+            $container->resetEnvCache();
+
+            $this->assertSame('host-2', ($consumer->host)());
+            $this->assertSame('redis://host-2:6379', (string) $consumer->dsn);
+            $this->assertSame('redis://host-2:6379', (string) $consumer->dsnFromParam);
+        } finally {
+            foreach ($previous as $k => $v) {
+                if (null === $v) {
+                    unset($_ENV[$k]);
+                } else {
+                    $_ENV[$k] = $v;
+                }
+            }
+        }
+    }
+
     public function testServiceLocator()
     {
         $container = new ContainerBuilder();
@@ -1966,11 +2025,7 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $wither = $container->get('wither');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
-        } else {
-            $this->assertTrue($wither->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
         $this->assertInstanceOf(Foo::class, $wither->foo);
         $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
@@ -2191,5 +2246,35 @@ class E
     {
         $this->first = $first;
         $this->second = $second;
+    }
+}
+
+class EnvClosureAutowireConsumer
+{
+    public function __construct(
+        #[Autowire(env: 'FOO')]
+        public \Closure $getFoo,
+        #[Autowire(env: 'FOO')]
+        public \Stringable $getFooStringable,
+        #[Autowire(env: 'MISSING')]
+        public string|\Stringable $getMissingWithDefault = 'fallback',
+        #[Autowire('redis://%env(HOST)%:%env(PORT)%')]
+        public ?\Stringable $getDsn = null,
+        #[Autowire('%dsn_template%')]
+        public ?\Stringable $getDsnFromParam = null,
+    ) {
+    }
+}
+
+class EnvRefreshConsumer
+{
+    public function __construct(
+        #[Autowire(env: 'SYMFONY_TEST_HOST')]
+        public \Closure $host,
+        #[Autowire('redis://%env(SYMFONY_TEST_HOST)%:%env(SYMFONY_TEST_PORT)%')]
+        public ?\Stringable $dsn = null,
+        #[Autowire('%dsn_template%')]
+        public ?\Stringable $dsnFromParam = null,
+    ) {
     }
 }

@@ -20,6 +20,8 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @template T of ObjectType|GenericType<ObjectType>|CollectionType<GenericType<ObjectType>>
  *
+ * @extends Type<object>
+ *
  * @implements CompositeTypeInterface<T>
  */
 final class IntersectionType extends Type implements CompositeTypeInterface
@@ -64,6 +66,9 @@ final class IntersectionType extends Type implements CompositeTypeInterface
         return $this->types;
     }
 
+    /**
+     * @param-immediately-invoked-callable $specification
+     */
     public function composedTypesAreSatisfiedBy(callable $specification): bool
     {
         foreach ($this->types as $type) {

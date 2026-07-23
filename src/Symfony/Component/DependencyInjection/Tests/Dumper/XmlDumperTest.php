@@ -15,8 +15,8 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -24,7 +24,6 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\XmlDumper;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultArrayAttribute;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithDefaultEnumAttribute;
@@ -191,23 +190,51 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services24.xml', $dumper->dump());
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testDumpLoad()
+    public function testTaggedArguments()
     {
-        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 7.4: XML configuration format is deprecated, use YAML or PHP instead.');
+        $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo');
+        $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, false, ['baz']);
+        $taggedIterator3 = new TaggedIteratorArgument('foo_tag', null, false, ['baz', 'qux'], false);
 
         $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml'));
-        $loader->load('services_dump_load.xml');
 
-        $this->assertEquals([new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)], $container->getDefinition('foo')->getArguments());
+        $container->register('foo', 'Foo')->addTag('foo_tag');
+        $container->register('baz', 'Baz')->addTag('foo_tag');
+        $container->register('qux', 'Qux')->addTag('foo_tag');
+
+        $container->register('foo_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator)
+        ;
+        $container->register('foo2_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator2)
+        ;
+        $container->register('foo3_tagged_iterator', 'Bar')
+            ->setPublic(true)
+            ->addArgument($taggedIterator3)
+        ;
+
+        $container->register('foo_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator))
+        ;
+        $container->register('foo2_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator2))
+        ;
+        $container->register('foo3_tagged_locator', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new ServiceLocatorArgument($taggedIterator3))
+        ;
 
         $dumper = new XmlDumper($container);
-        $this->assertXmlStringEqualsGeneratedXmlFile('services_dump_load.xml', $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_arguments.xml', $dumper->dump());
     }
 
-    public function testTaggedArguments()
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testLegacyTaggedArguments()
     {
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', false, 'getPriority');
         $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz']);
@@ -246,7 +273,7 @@ class XmlDumperTest extends TestCase
         ;
 
         $dumper = new XmlDumper($container);
-        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_arguments.xml', $dumper->dump());
+        $this->assertXmlStringEqualsGeneratedXmlFile('legacy_services_with_tagged_arguments.xml', $dumper->dump());
     }
 
     public function testServiceClosure()
@@ -258,6 +285,20 @@ class XmlDumperTest extends TestCase
 
         $dumper = new XmlDumper($container);
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_service_closure.xml', $dumper->dump());
+    }
+
+    public function testEnvClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new EnvClosureArgument('%env(FOO)%'))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', null, true))
+            ->addArgument(new EnvClosureArgument('%env(BAR)%', 'def', true))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', 42))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_env_closure.xml', $dumper->dump());
     }
 
     public function testDumpAbstractServices()

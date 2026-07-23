@@ -1,6 +1,30 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `@template-covariant` and its vendor prefixed synonyms
+
+8.1
+---
+
+ * Add `ObjectShapeType` to represent the exact shape of an anonymous object
+ * Resolve tentative return types
+
+8.0
+---
+
+ * Constructing a `CollectionType` instance as a list that is not an array throws an `InvalidArgumentException`
+ * Remove the third `$asList` argument of `TypeFactoryTrait::iterable()`, use `TypeFactoryTrait::list()` instead
+
+   ```diff
+    use Symfony\Component\TypeInfo\Type;
+
+   -$type = Type::iterable(Type::string(), asList: true);
+   +$type = Type::list(Type::string());
+   ```
+
 7.4
 ---
 

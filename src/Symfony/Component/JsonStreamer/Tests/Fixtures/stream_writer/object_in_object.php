@@ -3,7 +3,7 @@
 /**
  * @param Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies $data
  */
-return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
+return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
     try {
         $prefix1 = '';
         yield "{{$prefix1}\"name\":";
@@ -25,6 +25,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $valueTra
         yield \json_encode($data->otherDummyTwo->name, \JSON_THROW_ON_ERROR, 510);
         yield "}}";
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException($e->getMessage(), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithOtherDummies\" to JSON: {$e->getMessage()}.", 0, $e);
     }
 };

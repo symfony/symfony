@@ -310,6 +310,9 @@ abstract class AbstractUnicodeString extends AbstractString
         return $this->pad($length, $pad, \STR_PAD_LEFT);
     }
 
+    /**
+     * @param-immediately-invoked-callable $to
+     */
     public function replaceMatches(string $fromRegexp, string|callable $to): static
     {
         if ($this->ignoreCase) {

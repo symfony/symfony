@@ -11,8 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Types;
 
-use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Types\Type;
@@ -36,9 +34,6 @@ final class DatePointTypeTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!class_exists(DatePoint::class)) {
-            self::markTestSkipped('The DatePoint class is not available.');
-        }
         $this->type = Type::getType(DatePointType::NAME);
     }
 
@@ -55,14 +50,14 @@ final class DatePointTypeTest extends TestCase
     public function testDatePointConvertsToPHPValue()
     {
         $datePoint = new DatePoint();
-        $actual = $this->type->convertToPHPValue($datePoint, self::getSqlitePlatform());
+        $actual = $this->type->convertToPHPValue($datePoint, new SQLitePlatform());
 
         $this->assertSame($datePoint, $actual);
     }
 
     public function testNullConvertsToPHPValue()
     {
-        $actual = $this->type->convertToPHPValue(null, self::getSqlitePlatform());
+        $actual = $this->type->convertToPHPValue(null, new SQLitePlatform());
 
         $this->assertNull($actual);
     }
@@ -71,7 +66,7 @@ final class DatePointTypeTest extends TestCase
     {
         $format = 'Y-m-d H:i:s';
         $dateTime = new \DateTimeImmutable('2025-03-03 12:13:14');
-        $actual = $this->type->convertToPHPValue($dateTime, self::getSqlitePlatform());
+        $actual = $this->type->convertToPHPValue($dateTime, new SQLitePlatform());
         $expected = DatePoint::createFromInterface($dateTime);
 
         $this->assertSame($expected->format($format), $actual->format($format));
@@ -89,16 +84,4 @@ final class DatePointTypeTest extends TestCase
     {
         $this->assertSame('date_point', $this->type->getName());
     }
-
-    private static function getSqlitePlatform(): AbstractPlatform
-    {
-        if (interface_exists(Exception::class)) {
-            // DBAL 4+
-            return new SQLitePlatform();
-        }
-
-        return new \Doctrine\DBAL\Platforms\SqlitePlatform();
-    }
 }
-
-// @php-cs-fixer-ignore fully_qualified_strict_types

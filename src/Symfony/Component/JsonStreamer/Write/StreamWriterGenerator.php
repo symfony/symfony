@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\JsonStreamer\Write;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\JsonStreamer\DataModel\Write\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\DataModelNodeInterface;
-use Symfony\Component\JsonStreamer\DataModel\Write\DateTimeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ScalarNode;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
@@ -29,6 +29,7 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\CollectionType;
 use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
+use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\UnionType;
 
@@ -46,6 +47,7 @@ final class StreamWriterGenerator
 
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
+        private ContainerInterface $transformers,
         private string $streamWritersDir,
         ?ConfigCacheFactoryInterface $cacheFactory = null,
     ) {
@@ -61,7 +63,7 @@ final class StreamWriterGenerator
     {
         $path = \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type));
         $generateContent = function () use ($type, $options): string {
-            $this->phpGenerator ??= new PhpGenerator();
+            $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
             return $this->phpGenerator->generate($this->createDataModel($type, '$data', $options), $options);
         };
@@ -80,6 +82,10 @@ final class StreamWriterGenerator
         $context['original_type'] ??= $type;
         $context['depth'] ??= 0;
 
+        if ($type instanceof IntersectionType) {
+            throw new UnsupportedException(\sprintf('Intersection types are not supported ("%s").', (string) $type));
+        }
+
         if ($type instanceof UnionType) {
             return new CompositeNode($accessor, array_map(fn (Type $t): DataModelNodeInterface => $this->createDataModel($t, $accessor, $options, $context), $type->getTypes()));
         }
@@ -94,10 +100,6 @@ final class StreamWriterGenerator
 
         if ($type instanceof GenericType) {
             $type = $type->getWrappedType();
-        }
-
-        if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
-            return new DateTimeNode($accessor, $type);
         }
 
         if ($type instanceof ObjectType && !$type instanceof EnumType) {
@@ -124,7 +126,8 @@ final class StreamWriterGenerator
 
                 foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                     if (\is_string($valueTransformer)) {
-                        $valueTransformerServiceAccessor = "\$valueTransformers->get('$valueTransformer')";
+                        $valueTransformerServiceAccessor = '$transformers->get('.var_export($valueTransformer, true).')';
+
                         $propertyAccessor = "{$valueTransformerServiceAccessor}->transform($propertyAccessor, ['_current_object' => $accessor] + \$options)";
 
                         continue;
@@ -134,6 +137,10 @@ final class StreamWriterGenerator
                         $functionReflection = new \ReflectionFunction($valueTransformer);
                     } catch (\ReflectionException $e) {
                         throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
+                    }
+
+                    if ($functionReflection->isAnonymous()) {
+                        throw new RuntimeException(\sprintf('Cannot generate accessor for anonymous function "%s".', $functionReflection->getName()));
                     }
 
                     $functionName = !$functionReflection->getClosureCalledClass()

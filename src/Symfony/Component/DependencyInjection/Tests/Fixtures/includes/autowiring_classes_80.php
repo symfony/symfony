@@ -3,6 +3,7 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
+use Symfony\Component\DependencyInjection\Attribute\AsTagDecorator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
@@ -41,6 +42,18 @@ class AutowirePropertyWithTarget
     #[Required]
     #[Target('foo.target')]
     public Foo $foo;
+}
+
+class AutowireReadonlyProperty
+{
+    #[Required]
+    public readonly Foo $foo;
+}
+
+class AutowirePrivateProperty
+{
+    #[Required]
+    private Foo $foo;
 }
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
@@ -236,5 +249,25 @@ class NestedAutowireInlineAttribute
         )]
         public AutowireInlineAttributesBar $inlined,
     ) {
+    }
+}
+
+interface AsTagDecoratorInterface
+{
+}
+
+class AsTagDecoratorFoo implements AsTagDecoratorInterface
+{
+}
+
+class AsTagDecoratorBar implements AsTagDecoratorInterface
+{
+}
+
+#[AsTagDecorator('test.tag')]
+class AsTagDecoratorService implements AsTagDecoratorInterface
+{
+    public function __construct(#[AutowireDecorated] AsTagDecoratorInterface $inner)
+    {
     }
 }

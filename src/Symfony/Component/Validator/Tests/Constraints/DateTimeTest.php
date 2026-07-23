@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\DateTime;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -38,15 +36,6 @@ class DateTimeTest extends TestCase
         self::assertSame('m/d/Y', $cConstraint->format);
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testDoctrineStyle()
-    {
-        $constraint = new DateTime(['format' => 'm/d/Y']);
-
-        $this->assertSame('m/d/Y', $constraint->format);
     }
 }
 

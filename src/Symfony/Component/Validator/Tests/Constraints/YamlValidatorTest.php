@@ -30,14 +30,14 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidValues')]
     public function testYamlIsValid($value)
     {
-        $this->validator->validate($value, new Yaml());
+        $this->validate($value, new Yaml());
 
         $this->assertNoViolation();
     }
 
     public function testYamlWithFlags()
     {
-        $this->validator->validate('date: 2023-01-01', new Yaml(flags: YamlParser::PARSE_DATETIME));
+        $this->validate('date: 2023-01-01', new Yaml(flags: YamlParser::PARSE_DATETIME));
         $this->assertNoViolation();
     }
 
@@ -48,7 +48,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessageTest',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessageTest')
             ->setParameter('{{ error }}', $message)
@@ -60,7 +60,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidFlags()
     {
         $value = 'tags: [!tagged app.myclass]';
-        $this->validator->validate($value, new Yaml());
+        $this->validate($value, new Yaml());
         $this->buildViolation('This value is not valid YAML.')
             ->setParameter('{{ error }}', 'Tags support is not enabled. Enable the "Yaml::PARSE_CUSTOM_TAGS" flag to use "!tagged" at line 1 (near "tags: [!tagged app.myclass]").')
             ->setParameter('{{ line }}', 1)
@@ -79,7 +79,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessageTest',
             flags: YamlParser::PARSE_OBJECT,
         );
-        $this->validator->validate($yamlValue, $constraint);
+        $this->validate($yamlValue, $constraint);
         $this->buildViolation('myMessageTest')
             ->setParameter('{{ error }}', $expectedError)
             ->setParameter('{{ line }}', $yamlLine)

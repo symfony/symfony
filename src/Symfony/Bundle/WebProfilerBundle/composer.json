@@ -16,29 +16,24 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4.1",
         "composer-runtime-api": ">=2.1",
-        "symfony/config": "^7.3|^8.0",
-        "symfony/deprecation-contracts": "^2.5|^3",
-        "symfony/framework-bundle": "^6.4.13|^7.1.6|^8.0",
-        "symfony/http-kernel": "^6.4.13|^7.1.6|^8.0",
-        "symfony/routing": "^6.4|^7.0|^8.0",
-        "symfony/twig-bundle": "^6.4|^7.0|^8.0",
-        "twig/twig": "^3.15"
+        "symfony/config": "^7.4|^8.0",
+        "symfony/framework-bundle": "^7.4|^8.0",
+        "symfony/http-kernel": "^8.1",
+        "symfony/routing": "^7.4|^8.0",
+        "symfony/twig-bundle": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/browser-kit": "^6.4|^7.0|^8.0",
-        "symfony/console": "^6.4|^7.0|^8.0",
-        "symfony/css-selector": "^6.4|^7.0|^8.0",
-        "symfony/runtime": "^6.4.13|^7.1.6|^8.0",
-        "symfony/stopwatch": "^6.4|^7.0|^8.0"
+        "symfony/browser-kit": "^7.4|^8.0",
+        "symfony/console": "^7.4|^8.0",
+        "symfony/css-selector": "^7.4|^8.0",
+        "symfony/runtime": "^7.4|^8.0",
+        "symfony/stopwatch": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/form": "<6.4",
-        "symfony/mailer": "<6.4",
-        "symfony/messenger": "<6.4",
-        "symfony/serializer": "<7.2",
-        "symfony/workflow": "<7.3"
+        "symfony/serializer": "<7.4",
+        "symfony/workflow": "<7.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bundle\\WebProfilerBundle\\": "" },

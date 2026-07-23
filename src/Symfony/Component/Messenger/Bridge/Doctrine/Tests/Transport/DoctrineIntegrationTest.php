@@ -46,8 +46,8 @@ class DoctrineIntegrationTest extends TestCase
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
     }
 
     public function testSendWithDelay()
@@ -60,8 +60,7 @@ class DoctrineIntegrationTest extends TestCase
             ->where('m.body = :body')
             ->setParameter('body', '{"message": "Hi i am delayed"}');
 
-        // DBAL 2 compatibility
-        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        $result = $qb->executeQuery();
 
         $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 
@@ -79,8 +78,7 @@ class DoctrineIntegrationTest extends TestCase
             ->where('m.body = :body')
             ->setParameter('body', '{"message": "Hi, I am not actually delayed"}');
 
-        // DBAL 2 compatibility
-        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        $result = $qb->executeQuery();
 
         $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 
@@ -119,7 +117,7 @@ class DoctrineIntegrationTest extends TestCase
         ]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi available"}', $encoded['body']);
+        $this->assertEquals('{"message": "Hi available"}', $encoded[0]['body']);
     }
 
     public function testItCountMessages()
@@ -184,8 +182,8 @@ class DoctrineIntegrationTest extends TestCase
         ]);
 
         $next = $this->connection->get();
-        $this->assertEquals('{"message": "Hi requeued"}', $next['body']);
-        $this->connection->reject($next['id']);
+        $this->assertEquals('{"message": "Hi requeued"}', $next[0]['body']);
+        $this->connection->reject($next[0]['id']);
     }
 
     public function testTheTransportIsSetupOnGet()
@@ -196,7 +194,7 @@ class DoctrineIntegrationTest extends TestCase
 
         $this->connection->send('the body', ['my' => 'header']);
         $envelope = $this->connection->get();
-        $this->assertEquals('the body', $envelope['body']);
+        $this->assertEquals('the body', $envelope[0]['body']);
     }
 
     private function formatDateTime(\DateTimeImmutable $dateTime): string

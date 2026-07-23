@@ -12,9 +12,6 @@
 namespace Symfony\Component\DomCrawler\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Error\Notice;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +20,6 @@ use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Image;
 use Symfony\Component\DomCrawler\Link;
 
-#[RequiresPhp('>=8.4.0')]
 class CrawlerTest extends TestCase
 {
     public static function getDoctype(): string
@@ -33,7 +29,7 @@ class CrawlerTest extends TestCase
 
     protected function createCrawler($node = null, ?string $uri = null, ?string $baseHref = null)
     {
-        return new Crawler($node, $uri, $baseHref, \PHP_VERSION_ID >= 80400);
+        return new Crawler($node, $uri, $baseHref);
     }
 
     public function testConstructor()
@@ -1341,22 +1337,6 @@ class CrawlerTest extends TestCase
 
         libxml_clear_errors();
         libxml_use_internal_errors($internalErrors);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testHtml5ParserNotSameAsNativeParserForSpecificHtml()
-    {
-        // HTML that creates a bug specific to the DOM extension (see https://github.com/symfony/symfony/issues/28596)
-        $html = '<!DOCTYPE html><html><body><h1><p>Foo</p></h1></body></html>';
-
-        $html5Crawler = new Crawler(null, null, null, true);
-        $html5Crawler->add($html);
-
-        $nativeCrawler = new Crawler(null, null, null, false);
-        $nativeCrawler->add($html);
-
-        $this->assertNotEquals($nativeCrawler->filterXPath('//h1')->text(), $html5Crawler->filterXPath('//h1')->text(), 'Native parser and Html5 parser must be different');
     }
 
     public function testAddHtml5()

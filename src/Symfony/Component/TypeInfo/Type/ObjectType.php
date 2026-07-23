@@ -18,12 +18,14 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
- * @template T of class-string
+ * @template-covariant T of object
+ *
+ * @extends Type<T>
  */
 class ObjectType extends Type
 {
     /**
-     * @param T $className
+     * @param class-string<T> $className
      */
     public function __construct(
         private readonly string $className,
@@ -36,7 +38,7 @@ class ObjectType extends Type
     }
 
     /**
-     * @return T
+     * @return class-string<T>
      */
     public function getClassName(): string
     {

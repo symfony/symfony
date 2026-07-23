@@ -18,6 +18,7 @@ class UnusedTagsPassUtils
     public static function getDefinedTags(): array
     {
         $tags = [
+            'container.tracked_for_reset' => true,
             'proxy' => true,
             'routing.controller' => true,
         ];

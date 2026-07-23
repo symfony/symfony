@@ -43,9 +43,9 @@ trait PriorityTaggedServiceTrait
 
         if ($tagName instanceof TaggedIteratorArgument) {
             $indexAttribute = $tagName->getIndexAttribute();
-            $defaultIndexMethod = $tagName->getDefaultIndexMethod();
+            $defaultIndexMethod = $tagName->getDefaultIndexMethod(false);
             $needsIndexes = $tagName->needsIndexes();
-            $defaultPriorityMethod = $tagName->getDefaultPriorityMethod() ?? 'getDefaultPriority';
+            $defaultPriorityMethod = $tagName->getDefaultPriorityMethod(false) ?? 'getDefaultPriority';
             $exclude = array_merge($exclude, $tagName->getExclude());
             $tagName = $tagName->getTag();
         }
@@ -186,6 +186,8 @@ class PriorityTaggedServiceUtil
         if (!$rm->isPublic()) {
             throw new InvalidArgumentException(implode('be public', $message));
         }
+
+        trigger_deprecation('symfony/dependency-injection', '8.1', 'Calling "%s::%s()" to get the "%s" index is deprecated, use the #[AsTaggedItem] attribute instead.', $class, $defaultMethod, $indexAttribute);
 
         $default = $rm->invoke(null);
 

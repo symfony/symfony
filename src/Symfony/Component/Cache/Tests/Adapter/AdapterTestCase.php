@@ -49,7 +49,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache = $this->createCachePool();
         $cache->clear();
 
-        $value = mt_rand();
+        $value = random_int(0, \PHP_INT_MAX);
 
         $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use ($value) {
             $this->assertSame('foo', $item->getKey());

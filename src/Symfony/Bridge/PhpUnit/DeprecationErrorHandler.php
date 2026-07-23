@@ -65,7 +65,7 @@ class DeprecationErrorHandler
      *
      * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
      */
-    public static function register($mode = 0)
+    public static function register($mode = 0): void
     {
         if (self::$isRegistered) {
             return;
@@ -93,7 +93,7 @@ class DeprecationErrorHandler
         }
     }
 
-    public static function collectDeprecations($outputFile)
+    public static function collectDeprecations($outputFile): void
     {
         $deprecations = [];
         $previousErrorHandler = set_error_handler(static function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
@@ -194,7 +194,7 @@ class DeprecationErrorHandler
     /**
      * @internal
      */
-    public function shutdown()
+    public function shutdown(): void
     {
         $configuration = $this->getConfiguration();
 
@@ -242,7 +242,7 @@ class DeprecationErrorHandler
         });
     }
 
-    private function resetDeprecationGroups()
+    private function resetDeprecationGroups(): void
     {
         $this->deprecationGroups = [
             'unsilenced' => new DeprecationGroup(),

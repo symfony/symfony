@@ -15,16 +15,30 @@
             "homepage": "https://symfony.com/contributors"
         }
     ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "yaml/yaml-test-suite",
+                "version": "2022.01.17",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yaml/yaml-test-suite.git",
+                    "reference": "6ad3d2c62885d82fc349026c136ef560838fdf3d"
+                }
+            }
+        }
+    ],
     "require": {
-        "php": ">=8.2",
-        "symfony/deprecation-contracts": "^2.5|^3",
+        "php": ">=8.4.1",
         "symfony/polyfill-ctype": "^1.8"
     },
     "require-dev": {
-        "symfony/console": "^6.4|^7.0|^8.0"
+        "symfony/console": "^7.4|^8.0",
+        "yaml/yaml-test-suite": "*"
     },
     "conflict": {
-        "symfony/console": "<6.4"
+        "symfony/console": "<7.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Yaml\\": "" },

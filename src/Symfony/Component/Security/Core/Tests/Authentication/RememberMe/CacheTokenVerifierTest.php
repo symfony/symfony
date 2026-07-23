@@ -21,22 +21,22 @@ class CacheTokenVerifierTest extends TestCase
     public function testVerifyCurrentToken()
     {
         $verifier = new CacheTokenVerifier(new ArrayAdapter());
-        $token = new PersistentToken('class', 'user', 'series1@special:chars=/', 'value', new \DateTimeImmutable(), false);
+        $token = new PersistentToken('user', 'series1@special:chars=/', 'value', new \DateTimeImmutable());
         $this->assertTrue($verifier->verifyToken($token, 'value'));
     }
 
     public function testVerifyFailsInvalidToken()
     {
         $verifier = new CacheTokenVerifier(new ArrayAdapter());
-        $token = new PersistentToken('class', 'user', 'series1@special:chars=/', 'value', new \DateTimeImmutable(), false);
+        $token = new PersistentToken('user', 'series1@special:chars=/', 'value', new \DateTimeImmutable());
         $this->assertFalse($verifier->verifyToken($token, 'wrong-value'));
     }
 
     public function testVerifyOutdatedToken()
     {
         $verifier = new CacheTokenVerifier(new ArrayAdapter());
-        $outdatedToken = new PersistentToken('class', 'user', 'series1@special:chars=/', 'value', new \DateTimeImmutable(), false);
-        $newToken = new PersistentToken('class', 'user', 'series1@special:chars=/', 'newvalue', new \DateTimeImmutable(), false);
+        $outdatedToken = new PersistentToken('user', 'series1@special:chars=/', 'value', new \DateTimeImmutable());
+        $newToken = new PersistentToken('user', 'series1@special:chars=/', 'newvalue', new \DateTimeImmutable());
         $verifier->updateExistingToken($outdatedToken, 'newvalue', new \DateTimeImmutable());
         $this->assertTrue($verifier->verifyToken($newToken, 'value'));
     }

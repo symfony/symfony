@@ -12,16 +12,17 @@
 namespace Symfony\Component\Console\Command;
 
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
+use Symfony\Component\Console\ArgumentResolver\ArgumentResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Interact;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Cursor;
-use Symfony\Component\Console\Exception\LogicException;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\Console\Interaction\Interaction;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -41,12 +42,12 @@ class InvokableCommand implements SignalableCommandInterface
      * @var list<Interaction>|null
      */
     private ?array $interactions = null;
-    private bool $triggerDeprecations = false;
     private $code;
 
     public function __construct(
         private readonly Command $command,
         callable $code,
+        private ?ArgumentResolverInterface $argumentResolver = null,
     ) {
         $this->code = $code;
         $this->signalableCommand = $code instanceof SignalableCommandInterface ? $code : null;
@@ -61,12 +62,6 @@ class InvokableCommand implements SignalableCommandInterface
         $statusCode = $this->invokable->invoke(...$this->getParameters($this->invokable, $input, $output));
 
         if (!\is_int($statusCode)) {
-            if ($this->triggerDeprecations) {
-                trigger_deprecation('symfony/console', '7.3', \sprintf('Returning a non-integer value from the command "%s" is deprecated and will throw an exception in Symfony 8.0.', $this->command->getName()));
-
-                return 0;
-            }
-
             throw new \TypeError(\sprintf('The command "%s" must return an integer value in the "%s" method, but "%s" was returned.', $this->command->getName(), $this->invokable->getName(), get_debug_type($statusCode)));
         }
 
@@ -120,8 +115,6 @@ class InvokableCommand implements SignalableCommandInterface
             return $code(...);
         }
 
-        $this->triggerDeprecations = true;
-
         if (null !== (new \ReflectionFunction($code))->getClosureThis()) {
             return $code;
         }
@@ -140,49 +133,62 @@ class InvokableCommand implements SignalableCommandInterface
 
     private function getParameters(\ReflectionFunction $function, InputInterface $input, OutputInterface $output): array
     {
-        $parameters = [];
-        foreach ($function->getParameters() as $parameter) {
-            if ($argument = Argument::tryFrom($parameter)) {
-                $parameters[] = $argument->resolveValue($input);
+        $coreUtilities = [];
+        $needsArgumentResolver = false;
 
-                continue;
-            }
+        foreach ($function->getParameters() as $index => $param) {
+            $type = $param->getType();
 
-            if ($option = Option::tryFrom($parameter)) {
-                $parameters[] = $option->resolveValue($input);
+            if ($type instanceof \ReflectionNamedType) {
+                $argument = match ($type->getName()) {
+                    InputInterface::class => $input,
+                    RawInputInterface::class => $input,
+                    OutputInterface::class => $output,
+                    SymfonyStyle::class => new SymfonyStyle($input, $output, $this->command->getApplication()?->getDispatcher()),
+                    Cursor::class => new Cursor($output),
+                    Application::class => $this->command->getApplication(),
+                    Command::class, self::class => $this->command,
+                    default => null,
+                };
 
-                continue;
-            }
-
-            if ($in = MapInput::tryFrom($parameter)) {
-                $parameters[] = $in->resolveValue($input);
-
-                continue;
-            }
-
-            $type = $parameter->getType();
-
-            if (!$type instanceof \ReflectionNamedType) {
-                if ($this->triggerDeprecations) {
-                    trigger_deprecation('symfony/console', '7.3', \sprintf('Omitting the type declaration for the parameter "$%s" is deprecated and will throw an exception in Symfony 8.0.', $parameter->getName()));
-
+                if (null !== $argument) {
+                    $coreUtilities[$index] = $argument;
                     continue;
                 }
-
-                throw new LogicException(\sprintf('The parameter "$%s" must have a named type. Untyped, Union or Intersection types are not supported.', $parameter->getName()));
             }
 
-            $parameters[] = match ($type->getName()) {
-                InputInterface::class => $input,
-                OutputInterface::class => $output,
-                Cursor::class => new Cursor($output),
-                SymfonyStyle::class => new SymfonyStyle($input, $output),
-                Application::class => $this->command->getApplication(),
-                default => throw new RuntimeException(\sprintf('Unsupported type "%s" for parameter "$%s".', $type->getName(), $parameter->getName())),
-            };
+            $needsArgumentResolver = true;
         }
 
-        return $parameters ?: [$input, $output];
+        if (!$needsArgumentResolver) {
+            return $coreUtilities;
+        }
+
+        if (null === $this->argumentResolver) {
+            $this->argumentResolver = $this->command->getApplication()?->getArgumentResolver() ?? new ArgumentResolver(
+                ArgumentResolver::getDefaultArgumentValueResolvers()
+            );
+        }
+
+        $closure = $function->getClosure();
+        $resolvedArgs = $this->argumentResolver->getArguments($input, $closure, $function);
+
+        $parameters = [];
+        $resolvedIndex = 0;
+
+        foreach ($function->getParameters() as $index => $param) {
+            if (isset($coreUtilities[$index])) {
+                $parameters[] = $coreUtilities[$index];
+            } elseif ($param->isVariadic()) {
+                // Variadic parameters consume all remaining resolved arguments
+                $parameters = [...$parameters, ...\array_slice($resolvedArgs, $resolvedIndex)];
+                break;
+            } else {
+                $parameters[] = $resolvedArgs[$resolvedIndex++] ?? null;
+            }
+        }
+
+        return $parameters;
     }
 
     public function getSubscribedSignals(): array

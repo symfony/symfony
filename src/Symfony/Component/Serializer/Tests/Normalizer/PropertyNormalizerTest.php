@@ -12,7 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -196,7 +195,6 @@ class PropertyNormalizerTest extends TestCase
         $this->assertSame('childProp', $object->childProp);
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testDenormalizeWithAsymmetricPropertyVisibility()
     {
         /** @var SpecialBookDummy $object */
@@ -622,8 +620,8 @@ class PropertyNormalizerTest extends TestCase
 
             $this->fail(\sprintf('Expected a "%s".', PartialDenormalizationException::class));
         } catch (PartialDenormalizationException $e) {
-            $this->assertCount(1, $e->getErrors());
-            $error = $e->getErrors()[0];
+            $this->assertCount(1, $e->getNotNormalizableValueErrors());
+            $error = $e->getNotNormalizableValueErrors()[0];
             $this->assertInstanceOf(NotNormalizableValueException::class, $error);
             $this->assertSame('name', $error->getPath());
             $this->assertSame('array', $error->getCurrentType());

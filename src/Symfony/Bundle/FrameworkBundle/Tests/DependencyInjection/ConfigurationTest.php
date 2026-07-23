@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Configuration;
@@ -28,7 +30,6 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Notifier\Notifier;
 use Symfony\Component\RateLimiter\Policy\TokenBucketLimiter;
 use Symfony\Component\RemoteEvent\RemoteEvent;
@@ -44,9 +45,6 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
             'secret' => 's3cr3t',
             'serializer' => ['default_context' => ['foo' => 'bar']],
         ]]);
@@ -74,9 +72,6 @@ class ConfigurationTest extends TestCase
         $processor->processConfiguration(
             new Configuration(true),
             [[
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'session' => ['name' => $sessionName, 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax'],
             ]]
         );
@@ -99,9 +94,6 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
             'assets' => null,
         ]]);
 
@@ -125,9 +117,6 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
             'asset_mapper' => null,
         ]]);
 
@@ -147,7 +136,7 @@ class ConfigurationTest extends TestCase
             'precompress' => [
                 'enabled' => false,
                 'formats' => [],
-                'extensions' => interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [],
+                'extensions' => CompressorInterface::DEFAULT_EXTENSIONS,
             ],
         ];
 
@@ -166,9 +155,6 @@ class ConfigurationTest extends TestCase
         }
 
         $config = $processor->processConfiguration($configuration, [[
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
             'asset_mapper' => null === $polyfillValue ? [] : [
                 'importmap_polyfill' => $polyfillValue,
             ],
@@ -195,9 +181,6 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'assets' => [
                     'packages' => [
                         $packageName => [],
@@ -229,9 +212,6 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'assets' => $assetConfig,
             ],
         ]);
@@ -275,14 +255,9 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'lock' => $lockConfig,
-            ],
-        ]);
+        $config = $processor->processConfiguration($configuration, [[
+            'lock' => $lockConfig,
+        ]]);
 
         $this->assertArrayHasKey('lock', $config);
 
@@ -340,20 +315,10 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'lock' => [
-                    'payload' => 'flock',
-                ],
+                'lock' => ['payload' => 'flock'],
             ],
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'lock' => [
-                    'payload' => 'semaphore',
-                ],
+                'lock' => ['payload' => 'semaphore'],
             ],
         ]);
 
@@ -373,14 +338,9 @@ class ConfigurationTest extends TestCase
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
-        $config = $processor->processConfiguration($configuration, [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'semaphore' => $semaphoreConfig,
-            ],
-        ]);
+        $config = $processor->processConfiguration($configuration, [[
+            'semaphore' => $semaphoreConfig,
+        ]]);
 
         $this->assertArrayHasKey('semaphore', $config);
 
@@ -430,9 +390,6 @@ class ConfigurationTest extends TestCase
 
         $processor->processConfiguration($configuration, [
             'framework' => [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => null,
                     'buses' => [
@@ -450,9 +407,6 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration(true);
         $config = $processor->processConfiguration($configuration, [
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'messenger' => [
                     'default_bus' => 'existing_bus',
                     'buses' => [
@@ -467,9 +421,6 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'messenger' => [
                     'buses' => [
                         'common_bus' => [
@@ -516,20 +467,15 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The specified default bus "foo" is not configured. Available buses are "bar", "baz".');
 
-        $processor->processConfiguration($configuration, [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'messenger' => [
-                    'default_bus' => 'foo',
-                    'buses' => [
-                        'bar' => null,
-                        'baz' => null,
-                    ],
+        $processor->processConfiguration($configuration, [[
+            'messenger' => [
+                'default_bus' => 'foo',
+                'buses' => [
+                    'bar' => null,
+                    'baz' => null,
                 ],
             ],
-        ]);
+        ]]);
     }
 
     public function testLockCanBeDisabled()
@@ -537,14 +483,9 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $configuration = new Configuration(true);
 
-        $config = $processor->processConfiguration($configuration, [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'lock' => ['enabled' => false],
-            ],
-        ]);
+        $config = $processor->processConfiguration($configuration, [[
+            'lock' => ['enabled' => false],
+        ]]);
 
         $this->assertFalse($config['lock']['enabled']);
     }
@@ -557,31 +498,21 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "framework.lock": At least one resource must be defined.');
 
-        $processor->processConfiguration($configuration, [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'lock' => ['enabled' => true],
-            ],
-        ]);
+        $processor->processConfiguration($configuration, [[
+            'lock' => ['enabled' => true],
+        ]]);
     }
 
     public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'serializer' => [
-                    'default_context' => [
-                        'foo' => 'bar',
-                    ],
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'serializer' => [
+                'default_context' => [
+                    'foo' => 'bar',
                 ],
             ],
-        ]);
+        ]]);
 
         $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
     }
@@ -589,19 +520,14 @@ class ConfigurationTest extends TestCase
     public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled()
     {
         $processor = new Processor();
-        $config = $processor->processConfiguration(new Configuration(true), [
-            [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
-                'serializer' => [
-                    'default_context' => [
-                        'foo' => 'bar',
-                        JsonDecode::DETAILED_ERROR_MESSAGES => false,
-                    ],
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'serializer' => [
+                'default_context' => [
+                    'foo' => 'bar',
+                    JsonDecode::DETAILED_ERROR_MESSAGES => false,
                 ],
             ],
-        ]);
+        ]]);
 
         $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false], $config['serializer']['default_context'] ?? []);
     }
@@ -611,9 +537,6 @@ class ConfigurationTest extends TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [
             [
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'serializer' => [
                     'default_context' => [
                         'foo' => 'bar',
@@ -742,6 +665,89 @@ class ConfigurationTest extends TestCase
         $this->assertSame([['place' => 'c', 'weight' => 1]], $transitions[1]['to']);
     }
 
+    public function testWorkflowEventsToDispatchRejectsMixedAllowListAndBlockList()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Cannot mix allow-list and block-list entries in "events_to_dispatch": every entry must start with "!" (block-list mode) or none of them must (allow-list mode).');
+
+        $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'workflows' => [
+                'workflows' => [
+                    'mixed' => [
+                        'supports' => [self::class],
+                        'places' => ['a', 'b'],
+                        'initial_marking' => 'a',
+                        'events_to_dispatch' => ['workflow.enter', '!workflow.announce'],
+                        'transitions' => [
+                            ['name' => 'go', 'from' => ['a'], 'to' => ['b']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+    }
+
+    public function testWorkflowEventsToDispatchAcceptsBlockListOnlyList()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'workflows' => [
+                'workflows' => [
+                    'block_list' => [
+                        'supports' => [self::class],
+                        'places' => ['a', 'b'],
+                        'initial_marking' => 'a',
+                        'events_to_dispatch' => ['!workflow.announce'],
+                        'transitions' => [
+                            ['name' => 'go', 'from' => ['a'], 'to' => ['b']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $this->assertSame(['!workflow.announce'], $config['workflows']['workflows']['block_list']['events_to_dispatch']);
+    }
+
+    public function testWorkflowEventsToDispatchRejectsBlockListedGuardEvent()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "workflow.guard" event cannot be disabled in "events_to_dispatch": it is always dispatched.');
+
+        $processor->processConfiguration($configuration, [[
+            'http_method_override' => false,
+            'handle_all_throwables' => true,
+            'php_errors' => ['log' => true],
+            'workflows' => [
+                'workflows' => [
+                    'guard_block' => [
+                        'supports' => [self::class],
+                        'places' => ['a', 'b'],
+                        'initial_marking' => 'a',
+                        'events_to_dispatch' => ['!workflow.guard'],
+                        'transitions' => [
+                            ['name' => 'go', 'from' => ['a'], 'to' => ['b']],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+    }
+
     public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys()
     {
         $processor = new Processor();
@@ -815,6 +821,9 @@ class ConfigurationTest extends TestCase
                 'path' => '/_fragment',
                 'hinclude_default_template' => null,
             ],
+            'uri_signer' => [
+                'expiration' => null,
+            ],
             'profiler' => [
                 'enabled' => false,
                 'only_exceptions' => false,
@@ -822,7 +831,7 @@ class ConfigurationTest extends TestCase
                 'dsn' => 'file:%kernel.cache_dir%/profiler',
                 'collect' => true,
                 'collect_parameter' => null,
-                'collect_serializer_data' => false,
+                'collect_serializer_data' => true,
             ],
             'translator' => [
                 'enabled' => !class_exists(FullStack::class),
@@ -849,6 +858,7 @@ class ConfigurationTest extends TestCase
                 'static_method' => ['loadValidatorMetadata'],
                 'translation_domain' => 'validators',
                 'disable_translation' => false,
+                'property_metadata_existence_check' => false,
                 'mapping' => [
                     'paths' => [],
                 ],
@@ -858,9 +868,6 @@ class ConfigurationTest extends TestCase
                     'endpoint' => null,
                 ],
                 'email_validation_mode' => 'html5',
-            ],
-            'annotations' => [
-                'enabled' => false,
             ],
             'serializer' => [
                 'default_context' => ['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true],
@@ -883,7 +890,8 @@ class ConfigurationTest extends TestCase
             ],
             'property_info' => [
                 'enabled' => !class_exists(FullStack::class),
-            ] + (!class_exists(FullStack::class) ? ['with_constructor_extractor' => false] : []),
+                'with_constructor_extractor' => true,
+            ],
             'router' => [
                 'enabled' => false,
                 'default_uri' => null,
@@ -891,7 +899,6 @@ class ConfigurationTest extends TestCase
                 'https_port' => 443,
                 'strict_requirements' => true,
                 'utf8' => true,
-                'cache_dir' => '%kernel.build_dir%',
             ],
             'session' => [
                 'enabled' => false,
@@ -932,7 +939,7 @@ class ConfigurationTest extends TestCase
                 'precompress' => [
                     'enabled' => false,
                     'formats' => [],
-                    'extensions' => interface_exists(CompressorInterface::class) ? CompressorInterface::DEFAULT_EXTENSIONS : [],
+                    'extensions' => CompressorInterface::DEFAULT_EXTENSIONS,
                 ],
             ],
             'cache' => [
@@ -972,7 +979,7 @@ class ConfigurationTest extends TestCase
                 ],
             ],
             'messenger' => [
-                'enabled' => !class_exists(FullStack::class) && interface_exists(MessageBusInterface::class),
+                'enabled' => !class_exists(FullStack::class),
                 'routing' => [],
                 'transports' => [],
                 'failure_transport' => null,
@@ -1051,6 +1058,7 @@ class ConfigurationTest extends TestCase
                 'default_uuid_version' => 7,
                 'name_based_uuid_version' => 5,
                 'time_based_uuid_version' => 7,
+                'uuid47_secret' => null,
             ],
             'html_sanitizer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HtmlSanitizer::class),
@@ -1064,12 +1072,19 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(WebhookController::class),
                 'routing' => [],
                 'message_bus' => 'messenger.default_bus',
+                'event_header_name' => 'Webhook-Event',
+                'id_header_name' => 'Webhook-Id',
+                'signature_header_name' => 'Webhook-Signature',
+                'signing_algorithm' => 'sha256',
             ],
             'remote-event' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),
             ],
             'json_streamer' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(JsonStreamWriter::class),
+                'default_options' => [
+                    'include_null_properties' => false,
+                ],
             ],
         ];
     }
@@ -1088,6 +1103,30 @@ class ConfigurationTest extends TestCase
                     'default' => ['include_built_in_normalizers' => false],
                 ],
             ],
+        ]]);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testTerminateOnCacheHitDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Setting the "framework.http_cache.terminate_on_cache_hit" configuration option is deprecated. It will be removed in version 9.0.');
+
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration(true), [[
+            'http_cache' => ['terminate_on_cache_hit' => true],
+        ]]);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testIdeDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Setting the "framework.ide" configuration option is deprecated, use the "SYMFONY_IDE" env var instead.');
+
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration(true), [[
+            'ide' => 'phpstorm',
         ]]);
     }
 }

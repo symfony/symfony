@@ -16,7 +16,6 @@ use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Schema\Table;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
 
@@ -51,6 +50,54 @@ class PostgreSqlConnectionTest extends TestCase
 
     public function testListenOnConnection()
     {
+        $driverConnection = $this->createStub(Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        $this->assertFalse($connection->isListening());
+
+        $connection->listen();
+
+        $this->assertTrue($connection->isListening());
+
+        $connection->__destruct();
+
+        $this->assertFalse($connection->isListening());
+    }
+
+    public function testWaitForNotifyCallsListenAndGetNotify()
+    {
+        $driverConnection = $this->createMock(Connection::class);
+        $driverConnection->method('executeStatement')->willReturn(1);
+
+        $wrappedConnection = new class {
+            public int $notifyCalls = 0;
+
+            public function getNotify()
+            {
+                ++$this->notifyCalls;
+
+                return false;
+            }
+        };
+
+        $driverConnection
+            ->expects(self::once())
+            ->method('getNativeConnection')
+            ->willReturn($wrappedConnection);
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        $result = $connection->waitForNotify(1000);
+
+        $this->assertFalse($result);
+        $this->assertTrue($connection->isListening());
+        $this->assertSame(1, $wrappedConnection->notifyCalls);
+    }
+
+    public function testGetBlocksOnNotifyWhenNoExternalListenerIsActive()
+    {
         $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
 
@@ -63,25 +110,13 @@ class PostgreSqlConnectionTest extends TestCase
             ->willReturn(new QueryBuilder($driverConnection));
 
         $wrappedConnection = new class {
-            private int $notifyCalls = 0;
-
-            public function pgsqlGetNotify()
-            {
-                ++$this->notifyCalls;
-
-                return false;
-            }
+            public int $notifyCalls = 0;
 
             public function getNotify()
             {
                 ++$this->notifyCalls;
 
                 return false;
-            }
-
-            public function countNotifyCalls()
-            {
-                return $this->notifyCalls;
             }
         };
 
@@ -99,28 +134,50 @@ class PostgreSqlConnectionTest extends TestCase
 
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
-        $connection->get(); // first time we have queueEmptiedAt === null, fallback on the parent implementation
+        // first get(): queueEmptiedAt === null -> parent::get(), sets queueEmptiedAt
+        $connection->get();
+        // second/third get(): queueEmptiedAt !== null -> blocks on getNotify
         $connection->get();
         $connection->get();
 
         $this->assertTrue($connection->isListening());
-
-        $this->assertSame(2, $wrappedConnection->countNotifyCalls());
-
-        $connection->__destruct();
-
-        $this->assertFalse($connection->isListening());
+        $this->assertSame(2, $wrappedConnection->notifyCalls);
     }
 
-    public function testGetExtraSetupSqlWrongTable()
+    public function testGetSkipsBlockingWhenListenCalledExternally()
     {
-        $driverConnection = $this->createStub(Connection::class);
+        $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
+
+        $driverConnection
+            ->method('getDatabasePlatform')
+            ->willReturn(new PostgreSQLPlatform());
+
+        $driverConnection
+            ->method('createQueryBuilder')
+            ->willReturn(new QueryBuilder($driverConnection));
+
+        // getNativeConnection should never be called since blocking is skipped
+        $driverConnection
+            ->expects(self::never())
+            ->method('getNativeConnection');
+
+        $driverResult = $this->createStub(DriverResult::class);
+        $driverResult->method('fetchAssociative')
+            ->willReturn(false);
+        $driverConnection
+            ->method('executeQuery')
+            ->willReturn(new Result($driverResult, $driverConnection));
+
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
-        $table = new Table('queue_table');
-        // don't set the _symfony_messenger_table_name option
-        $this->assertSame([], $connection->getExtraSetupSqlForTable($table));
+        // External listener calls listen()
+        $connection->listen();
+
+        // get() should always delegate to parent without blocking
+        $connection->get();
+        $connection->get();
+        $connection->get();
     }
 
     public function testIsListeningReturnsFalseWhenGetHasNotBeenCalled()
@@ -129,5 +186,70 @@ class PostgreSqlConnectionTest extends TestCase
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
         $this->assertFalse($connection->isListening());
+    }
+
+    public function testListenWithoutDatabaseRegistration()
+    {
+        $driverConnection = $this->createMock(Connection::class);
+        // executeStatement should NOT be called when registerOnDatabase is false
+        $driverConnection->expects(self::never())->method('executeStatement');
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        $connection->listen(registerOnDatabase: false);
+
+        // notifyHandledExternally should still be set (get() skips blocking)
+        $this->assertFalse($connection->isListening());
+    }
+
+    public function testListenWithDatabaseRegistrationIsDefault()
+    {
+        $driverConnection = $this->createMock(Connection::class);
+        // executeStatement will be called for LISTEN and then UNLISTEN in __destruct
+        $driverConnection->expects(self::exactly(2))->method('executeStatement')
+            ->willReturn(1);
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        $connection->listen();
+
+        $this->assertTrue($connection->isListening());
+    }
+
+    public function testGetSkipsBlockingWhenListenCalledWithoutDatabaseRegistration()
+    {
+        $driverConnection = $this->createMock(Connection::class);
+
+        $driverConnection
+            ->method('getDatabasePlatform')
+            ->willReturn(new PostgreSQLPlatform());
+
+        $driverConnection
+            ->method('createQueryBuilder')
+            ->willReturn(new QueryBuilder($driverConnection));
+
+        // getNativeConnection should never be called since blocking is skipped
+        $driverConnection
+            ->expects(self::never())
+            ->method('getNativeConnection');
+
+        // Allow executeStatement for the base get() flow, but not for LISTEN
+        $driverConnection->method('executeStatement')->willReturn(1);
+
+        $driverResult = $this->createStub(DriverResult::class);
+        $driverResult->method('fetchAssociative')
+            ->willReturn(false);
+        $driverConnection
+            ->method('executeQuery')
+            ->willReturn(new Result($driverResult, $driverConnection));
+
+        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
+
+        // External listener calls listen() without database registration
+        $connection->listen(registerOnDatabase: false);
+
+        // get() should always delegate to parent without blocking
+        $connection->get();
+        $connection->get();
     }
 }

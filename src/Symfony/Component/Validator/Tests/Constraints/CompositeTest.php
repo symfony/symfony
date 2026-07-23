@@ -35,11 +35,6 @@ class ConcreteComposite extends Composite
     {
         return ['constraints', 'otherNested'];
     }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'constraints';
-    }
 }
 
 /**

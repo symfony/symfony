@@ -17,6 +17,13 @@ where:
  - `TEST_MODE` the test parameter is used during system connection testing.
    Possible values: 0 (real SMS sent), 1 (test SMS, will not be delivered to the phone and will not be charged)
 
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -24,3 +31,6 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor

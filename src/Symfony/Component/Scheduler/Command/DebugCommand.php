@@ -46,6 +46,7 @@ final class DebugCommand extends Command
             ->addArgument('schedule', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, \sprintf('The schedule name (one of "%s")', implode('", "', $this->scheduleNames)), null, $this->scheduleNames)
             ->addOption('date', null, InputOption::VALUE_REQUIRED, 'The date to use for the next run date', 'now')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Display all recurring messages, including the terminated ones')
+            ->addOption('sort', null, InputOption::VALUE_NONE, 'Sort recurring messages by next run date')
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> lists schedules and their recurring messages:
 
@@ -62,6 +63,12 @@ final class DebugCommand extends Command
                 To also display the terminated recurring messages, use the <info>--all</info> option:
 
                   <info>php %command.full_name% --all</info>
+
+                To sort the displayed recurring messages by their next run date, use the <info>--sort</info> option:
+
+                  <info>php %command.full_name% --sort</info>
+
+                When combined with <info>--all</info>, rows with no next run date are listed first.
 
                 EOF
             )
@@ -100,9 +107,16 @@ final class DebugCommand extends Command
                 $effectiveDate = $checkpoint;
                 $io->comment(\sprintf('Schedule "%s" is stateful: next run dates computed from stored checkpoint %s.', $name, $effectiveDate->format('r')));
             }
+
+            $recurringMessages = array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $effectiveDate), array_fill(0, \count($messages), $input->getOption('all'))));
+
+            if ($input->getOption('sort')) {
+                usort($recurringMessages, static fn (array $a, array $b): int => $a[2] <=> $b[2]);
+            }
+
             $io->table(
                 ['Trigger', 'Provider', 'Next Run'],
-                array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $effectiveDate), array_fill(0, \count($messages), $input->getOption('all')))),
+                array_map(static fn (array $row): array => [$row[0], $row[1], $row[2]?->format('r') ?? '-'], $recurringMessages),
             );
         }
 
@@ -137,14 +151,14 @@ final class DebugCommand extends Command
     }
 
     /**
-     * @return array{0:string,1:string,2:string}|null
+     * @return array{0:string,1:string,2:\DateTimeImmutable|null}|null
      */
     private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date, bool $all): ?array
     {
         $trigger = $recurringMessage->getTrigger();
 
-        $next = $trigger->getNextRunDate($date)?->format('r') ?? '-';
-        if ('-' === $next && !$all) {
+        $next = $trigger->getNextRunDate($date);
+        if (null === $next && !$all) {
             return null;
         }
 

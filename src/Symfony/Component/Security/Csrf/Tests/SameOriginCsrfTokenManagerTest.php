@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Csrf\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -260,6 +262,8 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testClearCookies()
     {
         $csrfTokenManager = new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger());
@@ -272,6 +276,8 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertTrue($response->headers->has('Set-Cookie'));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testPersistStrategyWithStartedSession()
     {
         $session = new Session(new MockArraySessionStorage());
@@ -287,6 +293,8 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame(2 << 8, $session->get('csrf-token'));
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testPersistStrategyWithSessionNotStarted()
     {
         $session = new Session(new MockArraySessionStorage());
@@ -301,6 +309,8 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame([], $session->all());
     }
 
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testOnKernelResponse()
     {
         $csrfTokenManager = new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger());

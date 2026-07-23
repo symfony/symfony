@@ -19,7 +19,6 @@ security:
     default:
       form_login:
         check_path: login
-        remember_me: true
       logout: ~
       stateless: false
 

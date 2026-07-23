@@ -39,6 +39,8 @@ class RouterDebugCommand extends Command
 {
     use BuildDebugContainerTrait;
 
+    private const SORT_COLUMNS = ['name', 'path', 'method', 'scheme', 'host'];
+
     public function __construct(
         private RouterInterface $router,
         private ?FileLinkFormatter $fileLinkFormatter = null,
@@ -55,6 +57,7 @@ class RouterDebugCommand extends Command
                 new InputOption('show-aliases', null, InputOption::VALUE_NONE, 'Show aliases in overview'),
                 new InputOption('format', null, InputOption::VALUE_REQUIRED, \sprintf('The output format ("%s")', implode('", "', $this->getAvailableFormatOptions())), 'txt'),
                 new InputOption('raw', null, InputOption::VALUE_NONE, 'To output raw route(s)'),
+                new InputOption('sort', null, InputOption::VALUE_REQUIRED, \sprintf('Sort routes by the given column ("%s")', implode('", "', self::SORT_COLUMNS))),
                 new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Filter by HTTP method', '', ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
             ])
             ->setHelp(<<<'EOF'
@@ -65,6 +68,10 @@ class RouterDebugCommand extends Command
                 The <info>--format</info> option specifies the format of the command output:
 
                   <info>php %command.full_name% --format=json</info>
+
+                The <info>--sort</info> option sorts the routes by the given column:
+
+                  <info>php %command.full_name% --sort=path</info>
 
                 EOF
             )
@@ -98,6 +105,7 @@ class RouterDebugCommand extends Command
                     'show_aliases' => $input->getOption('show-aliases'),
                     'output' => $io,
                     'method' => $method,
+                    'sort' => $input->getOption('sort'),
                 ]);
 
                 return 0;
@@ -129,6 +137,7 @@ class RouterDebugCommand extends Command
                 'output' => $io,
                 'container' => $container,
                 'method' => $method,
+                'sort' => $input->getOption('sort'),
             ]);
         }
 
@@ -157,6 +166,10 @@ class RouterDebugCommand extends Command
 
         if ($input->mustSuggestOptionValuesFor('format')) {
             $suggestions->suggestValues($this->getAvailableFormatOptions());
+        }
+
+        if ($input->mustSuggestOptionValuesFor('sort')) {
+            $suggestions->suggestValues(self::SORT_COLUMNS);
         }
     }
 

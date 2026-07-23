@@ -15,10 +15,12 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,8 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -137,6 +137,40 @@ class KernelTest extends TestCase
             ->willReturn([$bundle]);
 
         $kernel->boot();
+    }
+
+    public function testDebugBootSetsShellVerbosity()
+    {
+        $envBackup = $_ENV['SHELL_VERBOSITY'] ?? null;
+        $serverBackup = $_SERVER['SHELL_VERBOSITY'] ?? null;
+        $getenvBackup = getenv('SHELL_VERBOSITY');
+        unset($_ENV['SHELL_VERBOSITY'], $_SERVER['SHELL_VERBOSITY']);
+        putenv('SHELL_VERBOSITY');
+
+        try {
+            $kernel = new KernelForTest('test', true);
+            $kernel->boot();
+
+            $this->assertSame(3, $_ENV['SHELL_VERBOSITY']);
+            $this->assertSame(3, $_SERVER['SHELL_VERBOSITY']);
+            $this->assertSame('3', getenv('SHELL_VERBOSITY'));
+        } finally {
+            if (null === $envBackup) {
+                unset($_ENV['SHELL_VERBOSITY']);
+            } else {
+                $_ENV['SHELL_VERBOSITY'] = $envBackup;
+            }
+            if (null === $serverBackup) {
+                unset($_SERVER['SHELL_VERBOSITY']);
+            } else {
+                $_SERVER['SHELL_VERBOSITY'] = $serverBackup;
+            }
+            if (false === $getenvBackup) {
+                putenv('SHELL_VERBOSITY');
+            } else {
+                putenv('SHELL_VERBOSITY='.$getenvBackup);
+            }
+        }
     }
 
     public function testBootSetsTheBootedFlagToTrue()
@@ -320,12 +354,8 @@ class KernelTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
-        $fooBundle = $this->createStub(BundleInterface::class);
-        $fooBundle->method('getName')->willReturn('DuplicateName');
-        $barBundle = $this->createStub(BundleInterface::class);
-        $barBundle->method('getName')->willReturn('DuplicateName');
 
-        $kernel = new KernelForTest('test', false, true, [$fooBundle, $barBundle]);
+        $kernel = new KernelForTest('test', false, true, [new DuplicateNameBundleA(), new DuplicateNameBundleB()]);
         $kernel->boot();
     }
 
@@ -424,7 +454,7 @@ class KernelTest extends TestCase
             }
 
             /**
-             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             * To be removed when symfony/dependency-injection is bumped to 8.0+.
              */
             public function getNamespace(): string
             {
@@ -432,7 +462,7 @@ class KernelTest extends TestCase
             }
 
             /**
-             * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+             * To be removed when symfony/dependency-injection is bumped to 8.0+.
              */
             public function getXsdValidationBasePath(): string|false
             {
@@ -464,6 +494,21 @@ class KernelTest extends TestCase
 
         $this->assertTrue($kernel->warmedUp);
         $this->assertSame(realpath($kernel->getBuildDir()), $kernel->warmedUpBuildDir);
+    }
+
+    public function testWarmupIsNotRunOnSubsequentBoot()
+    {
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertTrue($kernel->warmedUp);
+
+        $kernel->shutdown();
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertFalse($kernel->warmedUp);
     }
 
     public function testServicesResetter()
@@ -605,6 +650,51 @@ class KernelTest extends TestCase
             Request::setTrustedHosts([]);
             Request::setTrustedProxies([], 0);
         }
+    }
+
+    public function testSourceDateEpoch()
+    {
+        $sourceDateEpoch = 1609459200; // 2021-01-01 00:00:00 UTC
+
+        $_SERVER['SOURCE_DATE_EPOCH'] = $sourceDateEpoch;
+
+        $kernel = new class('test', true) extends Kernel {
+            public function registerBundles(): iterable
+            {
+                return [];
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            public function getProjectDir(): string
+            {
+                return __DIR__.'/Fixtures';
+            }
+        };
+
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        $this->assertSame($sourceDateEpoch, $container->getParameter('container.build_time'));
+    }
+
+    public function testSourceDateEpochWithKernelContainerBuildTime()
+    {
+        $sourceDateEpoch = 1609459200; // 2021-01-01 00:00:00 UTC
+        $kernelBuildTime = 1609545600; // 2021-01-02 00:00:00 UTC
+
+        $_SERVER['SOURCE_DATE_EPOCH'] = $sourceDateEpoch;
+
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) use ($kernelBuildTime) {
+            $container->setParameter('kernel.container_build_time', $kernelBuildTime);
+        });
+        $kernel->boot();
+        $container = $kernel->getContainer();
+
+        // kernel.container_build_time should take precedence over SOURCE_DATE_EPOCH
+        $this->assertSame($kernelBuildTime, $container->getParameter('container.build_time'));
     }
 
     /**
@@ -821,4 +911,14 @@ class KernelForTestWithLoadClassCache extends KernelForTest
     public function doLoadClassCache(): void
     {
     }
+}
+
+class DuplicateNameBundleA extends Bundle
+{
+    protected string $name = 'DuplicateName';
+}
+
+class DuplicateNameBundleB extends Bundle
+{
+    protected string $name = 'DuplicateName';
 }

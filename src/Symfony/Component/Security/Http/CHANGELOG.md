@@ -1,6 +1,56 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `allowed_time_drift` option to `OidcTokenHandler` to configure time tolerance for token validation (`iat`, `nbf`, `exp` claims)
+
+8.1
+---
+
+ * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
+ * Add `this` to `#[IsGranted]` subject expression variables when available
+ * Add support for closures and `this` in `#[IsCsrfTokenValid]` when evaluating its `id`
+ * Add `$enforceKeyUsageVerification` argument to `OidcTokenHandler::enableDiscovery()` to allow accepting JWKs lacking `use`/`key_ops` (lax mode)
+ * Deprecate the `$eraseCredentials` argument of `AuthenticatorManager::__construct()`, as the `eraseCredentials()` method was removed in Symfony 8.0
+
+8.0
+---
+
+ * When extending the `RememberMeDetails` class and overriding its constructor, the `$userFqcn` parameter has to be removed from its signature:
+
+   Before:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userFqcn, string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userFqcn, $userIdentifier, $expires, $value);
+       }
+   }
+   ```
+
+   After:
+
+   ```php
+   class CustomRememberMeDetails extends RememberMeDetails
+   {
+       public function __construct(string $userIdentifier, int $expires, string $value)
+       {
+           parent::__construct($userIdentifier, $expires, $value);
+       }
+   }
+   ```
+ * Remove `RememberMeDetails::getUserFqcn()`
+ * Remove callable firewall listeners support, extend `AbstractListener` or implement `FirewallListenerInterface` instead
+ * Remove `AbstractListener::__invoke`
+ * Throw a `BadCredentialsException` when passing an empty string as `$userIdentifier` argument to `UserBadge` constructor
+ * Accept only `ExposeSecurityLevel` enums for `AuthenticatorManager`'s `$exposeSecurityErrors` argument
+ * Respectively accept only `AlgorithmManager` and `JWKSet` for `OidcTokenHandler`'s `$signatureAlgorithm` and `$signatureKeyset` arguments
+ * Add argument `$attributes` to `UserAuthenticatorInterface::authenticateUser()`
+
 7.4
 ---
 

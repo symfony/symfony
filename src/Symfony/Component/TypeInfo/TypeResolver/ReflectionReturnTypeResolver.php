@@ -39,7 +39,7 @@ final class ReflectionReturnTypeResolver implements TypeResolverInterface
         $typeContext ??= $this->typeContextFactory->createFromReflection($subject);
 
         try {
-            return $this->reflectionTypeResolver->resolve($subject->getReturnType(), $typeContext);
+            return $this->reflectionTypeResolver->resolve($subject->getReturnType() ?? $subject->getTentativeReturnType(), $typeContext);
         } catch (UnsupportedException $e) {
             $path = null !== $typeContext
                 ? \sprintf('%s::%s()', $typeContext->calledClassName, $subject->getName())

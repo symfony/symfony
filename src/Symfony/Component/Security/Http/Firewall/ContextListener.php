@@ -178,7 +178,7 @@ class ContextListener extends AbstractListener
             }
         } else {
             if ($user = $token?->getUser()) {
-                if (\PHP_VERSION_ID >= 80400 && ($reflector = new \ReflectionClass($user))->isUninitializedLazyObject($user)) {
+                if (($reflector = new \ReflectionClass($user))->isUninitializedLazyObject($user)) {
                     $reflector->initializeLazyObject($user);
                 } elseif ($user instanceof Proxy && !$user->__isInitialized()) {
                     $user->__load();

@@ -2,9 +2,11 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    http_method_override: false
     type_info: ~
-    json_streamer: ~
+    json_streamer:
+        default_options:
+            include_null_properties: true
+            custom_key: custom_value
 
 services:
     _defaults:
@@ -25,3 +27,5 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Dto\Dummy: ~
     Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\StringToRangeValueTransformer: ~
     Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\RangeToStringValueTransformer: ~
+    json_streamer.value_object_transformer.height:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\HeightValueObjectTransformer

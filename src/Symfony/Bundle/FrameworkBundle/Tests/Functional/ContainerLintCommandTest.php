@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\Argument\ArgumentTrait;
 
 #[Group('functional')]
 class ContainerLintCommandTest extends AbstractWebTestCase
@@ -42,11 +41,7 @@ class ContainerLintCommandTest extends AbstractWebTestCase
     public static function containerLintProvider(): iterable
     {
         yield ['escaped_percent.yml', false, 0, 'The container was linted successfully'];
-
-        if (trait_exists(ArgumentTrait::class)) {
-            yield ['escaped_percent.yml', true, 0, 'The container was linted successfully'];
-        }
-
+        yield ['escaped_percent.yml', true, 0, 'The container was linted successfully'];
         yield ['missing_env_var.yml', false, 0, 'The container was linted successfully'];
         yield ['missing_env_var.yml', true, 1, 'Environment variable not found: "BAR"'];
     }

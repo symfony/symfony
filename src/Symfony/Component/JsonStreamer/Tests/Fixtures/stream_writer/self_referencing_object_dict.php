@@ -3,8 +3,8 @@
 /**
  * @param Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict $data
  */
-return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
-    $generators['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict'] = static function ($data, $depth) use ($valueTransformers, $options, &$generators) {
+return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
+    $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict'] = static function ($data, $depth) use ($transformers, $options, &$generators) {
         if ($depth >= 512) {
             throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException('Maximum stack depth exceeded');
         }
@@ -15,14 +15,14 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $valueTra
         foreach ($data->items as $key1 => $value1) {
             $key1 = \substr(\json_encode($key1), 1, -1);
             yield "{$prefix2}\"{$key1}\":";
-            yield from $generators['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict']($value1, $depth + 1);
+            yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict']($value1, $depth + 1);
             $prefix2 = ',';
         }
         yield "}}";
     };
     try {
-        yield from $generators['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict']($data, 0);
+        yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict']($data, 0);
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException($e->getMessage(), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict\" to JSON: {$e->getMessage()}.", 0, $e);
     }
 };

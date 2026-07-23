@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `DeepCloner` to deep-clone PHP values while preserving copy-on-write benefits
+ * Deprecate `Hydrator` and `Instantiator` classes, use `deepclone_hydrate()` from the deepclone extension instead
+
+8.0
+---
+
+ * Restrict `ProxyHelper::generateLazyProxy()` to generating abstraction-based lazy decorators; use native lazy proxies otherwise
+ * Remove `LazyGhostTrait` and `LazyProxyTrait`, use native lazy objects instead
+ * Remove `ProxyHelper::generateLazyGhost()`, use native lazy objects instead
+
 7.4
 ---
 

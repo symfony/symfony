@@ -14,4 +14,5 @@ namespace Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty;
 class B
 {
     public string $foo;
+    public string $otherFoo;
 }

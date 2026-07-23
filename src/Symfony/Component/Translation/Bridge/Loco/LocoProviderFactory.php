@@ -12,6 +12,9 @@
 namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
+use Symfony\Component\HttpClient\RetryableHttpClient;
+use Symfony\Component\HttpClient\ScopingHttpClient;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\Provider\AbstractProviderFactory;
@@ -45,8 +48,8 @@ final class LocoProviderFactory extends AbstractProviderFactory
         $endpoint .= $dsn->getPort() ? ':'.$dsn->getPort() : '';
         $restrictToStatus = $dsn->getOption('status');
 
-        $client = $this->client->withOptions([
-            'base_uri' => 'https://'.$endpoint.'/api/',
+        $client = new RetryableHttpClient($this->client, new GenericRetryStrategy(), 3, $this->logger);
+        $client = ScopingHttpClient::forBaseUri($client, 'https://'.$endpoint.'/api/', [
             'headers' => [
                 'Authorization' => 'Loco '.$this->getUser($dsn),
             ],

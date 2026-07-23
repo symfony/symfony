@@ -112,6 +112,59 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testAddChoiceToSingleSelect()
+    {
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $option = $this->createNode('option', 'Hello World', ['value' => 'hello_world']);
+        $field->addChoice($option);
+
+        $this->assertNotSame('hello_world', $field->getValue());
+        $field->setValue('hello_world');
+        $this->assertSame('hello_world', $field->getValue(), '->setValue() changes the selected option to dynamically added one');
+
+        $option = $this->createNode('option', 'Mr. Robot', ['value' => 'mr_robot', 'selected' => true]);
+        $field->addChoice($option);
+
+        $this->assertSame('mr_robot', $field->getValue(), '->addChoice() changes the value to added choice if selected attribute is set');
+    }
+
+    public function testAddChoiceToMultipleSelectAppendsSelectedValue()
+    {
+        $node = $this->createSelectNode(['foo' => true, 'bar' => false], ['multiple' => 'multiple']);
+        $field = new ChoiceFormField($node);
+
+        $this->assertSame(['foo'], $field->getValue());
+
+        $option = $this->createNode('option', '', ['value' => 'baz', 'selected' => true]);
+        $field->addChoice($option);
+
+        $this->assertSame(['foo', 'baz'], $field->getValue(), '->addChoice() appends to the value array for a multiple select');
+    }
+
+    public function testAddChoiceRejectsMismatchedTagForSelect()
+    {
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('expected an "option" tag, got "input"');
+
+        $field->addChoice($this->createNode('input', '', ['value' => 'baz']));
+    }
+
+    public function testAddChoiceRejectsMismatchedTagForRadio()
+    {
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
+        $field = new ChoiceFormField($node);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('expected an "input" tag, got "option"');
+
+        $field->addChoice($this->createNode('option', '', ['value' => 'bar']));
+    }
+
     public function testSelectWithEmptyBooleanAttribute()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => true], [], '');
@@ -138,7 +191,7 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $document = new \DOMDocument();
         $newOption = $document->createElement('option', 'baz');
         $newOption->setAttribute('value', 'baz');
-        $newOption->setAttribute('checked', 'checked');
+        $newOption->setAttribute('selected', 'selected');
         $field->addChoice($newOption);
 
         $this->assertEquals(['foo', 'baz'], $field->getValue());

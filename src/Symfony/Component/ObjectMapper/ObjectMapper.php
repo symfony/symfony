@@ -12,9 +12,10 @@
 namespace Symfony\Component\ObjectMapper;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\ObjectMapper\Condition\TargetClass;
+use Symfony\Component\ObjectMapper\Condition\ClassRuleConditionCallableInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
+use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
@@ -127,23 +128,29 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $refl = $this->getSourceReflectionClass($source) ?? $targetRefl;
 
         // When source contains no metadata, we read metadata on the target instead
-        if ($refl === $targetRefl) {
+        if ($readMetadataFromTarget = $refl === $targetRefl) {
             $readMetadataFrom = $mappedTarget;
         }
 
         $mapToProperties = [];
+        $targetName = $targetRefl->getName();
+        $explicitTargets = [];
+        $implicitValues = [];
         foreach ($this->getAllProperties($refl) as $property) {
             if ($property->isStatic()) {
                 continue;
             }
 
             $propertyName = $property->getName();
-            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName);
+            $mappings = $this->metadataFactory->create($readMetadataFrom, $propertyName, [
+                'source' => $source::class,
+                'target' => $targetRefl->getName(),
+            ]);
+            $mappings = array_filter($mappings, static fn (Mapping $m): bool => !$m->targetClass || is_a($targetName, $m->targetClass, true));
             foreach ($mappings as $mapping) {
-                $sourcePropertyName = $propertyName;
-                if ($mapping->source && !$this->isReadable($source, $propertyName)) {
-                    $sourcePropertyName = $mapping->source;
-                }
+                // when metadata is read from the source, $mapping->source describes the
+                // reverse mapping and must not be resolved against $source
+                $sourcePropertyName = $readMetadataFromTarget ? $mapping->source ?? $propertyName : $propertyName;
 
                 $targetPropertyName = $mapping->target ?? $propertyName;
                 if (false === $if = $mapping->if) {
@@ -152,13 +159,14 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                if (
-                    $if
-                    && ($fn = $this->getCallable($if, $this->conditionCallableLocator))
-                    && $fn instanceof TargetClass
-                    && !$this->call($fn, null, $source, $mappedTarget)
-                ) {
-                    continue;
+                $fn = null;
+                $isClassRule = false;
+                if ($if) {
+                    $fn = $this->getCallable($if, $this->conditionCallableLocator, ConditionCallableInterface::class);
+                    $isClassRule = $fn instanceof ClassRuleConditionCallableInterface;
+                    if ($isClassRule && !$this->call($fn, null, $source, $mappedTarget)) {
+                        continue;
+                    }
                 }
 
                 if (!$this->isReadable($source, $sourcePropertyName)
@@ -168,17 +176,22 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                 }
 
                 $value = $this->getRawValue($source, $sourcePropertyName);
-                if ($if && $fn && !$this->call($fn, $value, $source, $mappedTarget)) {
+                if ($fn && !$isClassRule && !$this->call($fn, $value, $source, $mappedTarget)) {
                     unset($ctorArguments[$targetPropertyName]);
 
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping);
+                $value = $this->getSourceValue($source, $mappedTarget, $value, $objectMap, $mapping, $targetPropertyName);
+                $explicitTargets[$targetPropertyName] = true;
                 $this->storeValue($targetPropertyName, $mapToProperties, $ctorArguments, $value);
             }
 
-            if (!$mappings && $targetRefl->hasProperty($propertyName)) {
+            if ($mappings) {
+                continue;
+            }
+
+            if ($targetRefl->hasProperty($propertyName)) {
                 if (!$this->isReadable($source, $propertyName)) {
                     continue;
                 }
@@ -188,7 +201,30 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $value = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap);
+                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, null, $propertyName);
+
+                continue;
+            }
+
+            if (!$this->isReadable($source, $propertyName, $refl)) {
+                continue;
+            }
+
+            $rawValue = $this->getRawValue($source, $propertyName);
+            if (
+                \is_object($rawValue)
+                // a self-referencing relation maps to the same target by definition, merging it would overwrite the target with the related object's values
+                && !$rawValue instanceof $source
+                && !$objectMap->offsetExists($rawValue)
+                && ($innerMetadata = $this->metadataFactory->create($rawValue))
+                && array_any($innerMetadata, static fn (Mapping $m): bool => \is_string($m->target) && is_a($targetName, $m->target, true))
+            ) {
+                ($this->objectMapper ?? $this)->map($rawValue, $mappedTarget);
+            }
+        }
+
+        foreach ($implicitValues as $propertyName => $value) {
+            if (!isset($explicitTargets[$propertyName])) {
                 $this->storeValue($propertyName, $mapToProperties, $ctorArguments, $value);
             }
         }
@@ -222,7 +258,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         return $mappedTarget;
     }
 
-    private function isReadable(object $source, string $propertyName): bool
+    private function isReadable(object $source, string $propertyName, ?\ReflectionClass $refl = null): bool
     {
         if ($this->propertyAccessor) {
             return $this->propertyAccessor->isReadable($source, $propertyName);
@@ -238,18 +274,21 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             return isset($source->{$propertyName});
         }
 
-        $refl = new \ReflectionClass($source);
+        $refl ??= new \ReflectionClass($source);
 
         if (!$refl->hasProperty($propertyName)) {
+            // ReflectionClass doesn't see dynamic properties: property_exists() matched one, and those are always public
             return true;
         }
 
         $property = $refl->getProperty($propertyName);
 
         if (!$property->isPublic()) {
+            // a non-public property can only be read through magic __get()
             return method_exists($source, '__get');
         }
 
+        // an uninitialized property is not readable, unless unset() re-enabled magic methods on it
         return $property->isInitialized($source) || isset($source->{$propertyName});
     }
 
@@ -272,7 +311,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         return $source->{$propertyName};
     }
 
-    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null): mixed
+    private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null, ?string $targetPropertyName = null): mixed
     {
         if ($mapping?->transform) {
             $value = $this->applyTransforms($mapping, $value, $source, $target);
@@ -281,20 +320,21 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         if (
             \is_object($value)
             && ($innerMetadata = $this->metadataFactory->create($value))
+            && ($innerMetadata = $this->filterMetadataByPropertyType($innerMetadata, $target, $targetPropertyName))
             && ($mapTo = $this->getMapTarget($innerMetadata, $value, $source, $target, true))
             && (\is_string($mapTo->target) && class_exists($mapTo->target))
         ) {
-            if ($mapTo->transform) {
-                return $this->applyTransforms($mapTo, $value, $source, $target);
-            }
+            $value = $this->applyTransforms($mapTo, $value, $source, $target);
 
             if ($value === $source) {
                 $value = $target;
             } elseif ($objectMap->offsetExists($value)) {
                 $value = $objectMap[$value];
-            } elseif (\PHP_VERSION_ID < 80400) {
-                return ($this->objectMapper ?? $this)->map($value, $mapTo->target);
             } else {
+                if ($mapTo->transform) {
+                    return $value;
+                }
+
                 $refl = new \ReflectionClass($mapTo->target);
                 $mapper = $this->objectMapper ?? $this;
 
@@ -331,6 +371,8 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     }
 
     /**
+     * @param-immediately-invoked-callable $fn
+     *
      * @param callable(): mixed $fn
      */
     private function call(callable $fn, mixed $value, object $source, ?object $target = null): mixed
@@ -349,7 +391,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     {
         $mapTo = null;
         foreach ($metadata as $mapAttribute) {
-            if (($if = $mapAttribute->if) && ($fn = $this->getCallable($if, $this->conditionCallableLocator)) && !$this->call($fn, $value, $source, $target)) {
+            if (($if = $mapAttribute->if) && ($fn = $this->getCallable($if, $this->conditionCallableLocator, ConditionCallableInterface::class)) && !$this->call($fn, $value, $source, $target)) {
                 continue;
             }
 
@@ -361,6 +403,40 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         return $mapTo;
+    }
+
+    /**
+     * Narrows the mappings of a nested object to the one matching the declared type of the property it is mapped into.
+     *
+     * A nested class declaring several #[Map] targets yields one Mapping per target. When the
+     * destination property is typed, only one of them can be assigned to it, so the mapping is not ambiguous.
+     *
+     * @param Mapping[] $metadata
+     *
+     * @return Mapping[]
+     */
+    private function filterMetadataByPropertyType(array $metadata, object $target, ?string $targetPropertyName): array
+    {
+        if (null === $targetPropertyName || 2 > \count($metadata)) {
+            return $metadata;
+        }
+
+        if (!$property = $this->getPropertyFromHierarchy(new \ReflectionClass($target), $targetPropertyName)) {
+            return $metadata;
+        }
+
+        $type = $property->getType();
+        if (!$type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+            return $metadata;
+        }
+
+        $propertyClass = $type->getName();
+        $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => \is_string($m->target)
+            && class_exists($m->target)
+            && is_a($m->target, $propertyClass, true)
+        ));
+
+        return 1 === \count($filtered) ? $filtered : $metadata;
     }
 
     private function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed
@@ -376,12 +452,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         foreach ($transforms as $transform) {
-            if ($fn = $this->getCallable($transform, $this->transformCallableLocator)) {
-                if ($fn instanceof ObjectMapperAwareInterface) {
-                    $fn = $fn->withObjectMapper($this->objectMapper ?? $this);
-                }
-                $value = $this->call($fn, $value, $source, $target);
+            $fn = $this->getCallable($transform, $this->transformCallableLocator, TransformCallableInterface::class);
+            if ($fn instanceof ObjectMapperAwareInterface) {
+                $fn = $fn->withObjectMapper($this->objectMapper ?? $this);
             }
+            $value = $this->call($fn, $value, $source, $target);
         }
 
         return $value;
@@ -389,18 +464,29 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
     /**
      * @param (string|callable(mixed $value, object $object): mixed) $fn
+     * @param class-string|null                                      $expectedInterface
      */
-    private function getCallable(string|callable $fn, ?ContainerInterface $locator = null): ?callable
+    private function getCallable(string|callable $fn, ?ContainerInterface $locator = null, ?string $expectedInterface = null): callable
     {
         if (\is_callable($fn)) {
+            if ($expectedInterface && \is_object($fn) && !$fn instanceof $expectedInterface) {
+                throw new NoSuchCallableException(\sprintf('"%s" is not a valid callable. Make sure it implements "%s".', get_debug_type($fn), $expectedInterface));
+            }
+
             return $fn;
         }
 
         if ($locator?->has($fn)) {
-            return $locator->get($fn);
+            $callable = $locator->get($fn);
+
+            if ($expectedInterface && !$callable instanceof $expectedInterface) {
+                throw new NoSuchCallableException(\sprintf('"%s" is not a valid callable. Make sure it implements "%s".', $fn, $expectedInterface));
+            }
+
+            return $callable;
         }
 
-        return null;
+        throw new NoSuchCallableException(\sprintf('"%s" is not a valid callable.', $fn).($expectedInterface ? \sprintf(' If you use a class, make sure it implements "%s".', $expectedInterface) : ''));
     }
 
     /**
@@ -417,7 +503,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
 
         if ($source instanceof LazyObjectInterface) {
             $source->initializeLazyObject();
-        } elseif (\PHP_VERSION_ID >= 80400 && $refl->isUninitializedLazyObject($source)) {
+        } elseif ($refl->isUninitializedLazyObject($source)) {
             $refl->initializeLazyObject($source);
         }
 

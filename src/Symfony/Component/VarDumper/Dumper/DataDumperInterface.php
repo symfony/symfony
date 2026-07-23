@@ -20,8 +20,5 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 interface DataDumperInterface
 {
-    /**
-     * @return string|null
-     */
-    public function dump(Data $data);
+    public function dump(Data $data): ?string;
 }

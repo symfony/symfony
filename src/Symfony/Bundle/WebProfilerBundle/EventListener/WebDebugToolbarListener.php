@@ -14,11 +14,13 @@ namespace Symfony\Bundle\WebProfilerBundle\EventListener;
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -90,11 +92,14 @@ class WebDebugToolbarListener implements EventSubscriberInterface
 
         $nonces = [];
         if ($this->cspHandler) {
-            if ($this->dumpDataCollector?->getDumpsCount() > 0) {
-                $this->cspHandler->disableCsp();
-            }
-
             $nonces = $this->cspHandler->updateResponseHeaders($request, $response);
+
+            if ($this->dumpDataCollector?->getDumpsCount() > 0) {
+                $this->dumpDataCollector->setNonce(
+                    $nonces['csp_script_nonce'] ?? null,
+                    $nonces['csp_style_nonce'] ?? null,
+                );
+            }
         }
 
         // do not capture redirects or modify XML HTTP Requests
@@ -112,7 +117,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
+            $content = $this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]);
+
+            if ($response instanceof StreamedResponse) {
+                $response->setCallback(static function () use ($content): void {
+                    echo $content;
+                });
+            } else {
+                $response->setContent($content);
+            }
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -141,6 +154,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         if (self::DISABLED === $this->mode
             || !$response->headers->has('X-Debug-Token')
             || $response->isRedirection()
+            || $response instanceof BinaryFileResponse
             || ($response->headers->has('Content-Type') && !str_contains($response->headers->get('Content-Type') ?? '', 'html'))
             || 'html' !== $request->getRequestFormat()
             || false !== stripos($response->headers->get('Content-Disposition', ''), 'attachment;')
@@ -156,30 +170,53 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      */
     protected function injectToolbar(Response $response, Request $request, array $nonces): void
     {
-        $content = $response->getContent();
-        $pos = strripos($content, '</body>');
+        $debugToken = $response->headers->get('X-Debug-Token');
+        $injectToolbar = function (string $buffer) use ($request, $debugToken, $nonces): string {
+            if (false !== $pos = strripos($buffer, '</body>')) {
+                $toolbar = "\n".str_replace("\n", '', $this->getToolbarHTML($request, $debugToken, $nonces))."\n";
+                $buffer = substr($buffer, 0, $pos).$toolbar.substr($buffer, $pos);
+            }
 
-        if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
-                '@WebProfiler/Profiler/toolbar_js.html.twig',
-                [
-                    'full_stack' => class_exists(FullStack::class),
-                    'excluded_ajax_paths' => $this->excludedAjaxPaths,
-                    'token' => $response->headers->get('X-Debug-Token'),
-                    'request' => $request,
-                    'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
-                    'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
-                ]
-            ))."\n";
-            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
-            $response->setContent($content);
+            return $buffer;
+        };
+
+        if (!$response instanceof StreamedResponse) {
+            $response->setContent($injectToolbar($response->getContent()));
+
+            return;
         }
+
+        $callback = $response->getCallback();
+        $response->setCallback(static function () use ($callback, $injectToolbar): void {
+            ob_start($injectToolbar, 8); // length of '</body>'
+            try {
+                $callback(...\func_get_args());
+            } finally {
+                ob_end_flush();
+            }
+        });
+    }
+
+    private function getToolbarHTML(Request $request, ?string $debugToken, array $nonces): string
+    {
+        return $this->twig->render(
+            '@WebProfiler/Profiler/toolbar_js.html.twig',
+            [
+                'full_stack' => class_exists(FullStack::class),
+                'excluded_ajax_paths' => $this->excludedAjaxPaths,
+                'token' => $debugToken,
+                'request' => $request,
+                'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
+                'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
+            ]
+        );
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::RESPONSE => ['onKernelResponse', -128],
+            // Run after ProfilerListener::onKernelResponse since we need the X-Debug-Token header
+            KernelEvents::RESPONSE => ['onKernelResponse', -2048],
         ];
     }
 }

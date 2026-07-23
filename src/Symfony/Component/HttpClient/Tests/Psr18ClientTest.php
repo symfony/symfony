@@ -20,6 +20,7 @@ use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Psr18NetworkException;
 use Symfony\Component\HttpClient\Psr18RequestException;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Tests\Fixtures\UnknownSizeStream;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class Psr18ClientTest extends TestCase
@@ -57,6 +58,46 @@ class Psr18ClientTest extends TestCase
         $body = json_decode((string) $response->getBody(), true);
 
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
+    }
+
+    public function testRequestWithEmptyUnknownSizeBodyDoesNotPassAStreamingBody()
+    {
+        $factory = new Psr17Factory();
+        $body = new UnknownSizeStream('', seekable: false);
+        $body->getContents();
+        $client = new Psr18Client(new MockHttpClient(function (string $method, string $url, array $options): MockResponse {
+            $this->assertSame('TRACE', $method);
+            $this->assertSame('', $options['body']);
+
+            return new MockResponse();
+        }), $factory, $factory);
+
+        $client->sendRequest($factory->createRequest('TRACE', 'http://localhost')->withBody($body));
+    }
+
+    public function testRequestWithConsumedSeekableUnknownSizeBodyIsRestreamed()
+    {
+        $factory = new Psr17Factory();
+        $body = new UnknownSizeStream('IMPORTANT-PAYLOAD');
+        $body->getContents();
+        $this->assertTrue($body->eof());
+        $client = new Psr18Client(new MockHttpClient(function (string $method, string $url, array $options) use (&$sentBody): MockResponse {
+            $sentBody = $options['body'];
+
+            if (!\is_string($sentBody)) {
+                $received = '';
+                while ('' !== $chunk = $sentBody()) {
+                    $received .= $chunk;
+                }
+                $sentBody = $received;
+            }
+
+            return new MockResponse();
+        }), $factory, $factory);
+
+        $client->sendRequest($factory->createRequest('POST', 'http://localhost')->withBody($body));
+
+        $this->assertSame('IMPORTANT-PAYLOAD', $sentBody);
     }
 
     public function testNetworkException()

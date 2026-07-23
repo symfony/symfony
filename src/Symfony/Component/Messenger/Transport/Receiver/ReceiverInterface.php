@@ -35,15 +35,17 @@ interface ReceiverInterface
      *
      * If applicable, the Envelope should contain a TransportMessageIdStamp.
      *
-     * If a received message cannot be decoded, the message should not
-     * be retried again (e.g. if there's a queue, it should be removed)
-     * and a MessageDecodingFailedException should be thrown.
+     * If a received message cannot be decoded, the transport should return
+     * an Envelope containing a MessageDecodingFailedException so the worker
+     * can route it through the usual failure handling path.
+     *
+     * @param int $fetchSize Best-effort hint about how many messages can be received in one call
      *
      * @return iterable<Envelope>
      *
      * @throws TransportException If there is an issue communicating with the transport
      */
-    public function get(): iterable;
+    public function get(/* int $fetchSize = 1 */): iterable;
 
     /**
      * Acknowledges that the passed message was handled.

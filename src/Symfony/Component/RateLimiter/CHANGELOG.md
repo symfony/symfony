@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add an optional `$anchorAt` argument to `FixedWindowLimiter` to align the window to a calendar reference datetime instead of the first hit
+
 7.3
 ---
 

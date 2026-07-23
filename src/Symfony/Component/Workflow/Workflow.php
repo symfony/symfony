@@ -18,6 +18,7 @@ use Symfony\Component\Workflow\Event\EnterEvent;
 use Symfony\Component\Workflow\Event\GuardEvent;
 use Symfony\Component\Workflow\Event\LeaveEvent;
 use Symfony\Component\Workflow\Event\TransitionEvent;
+use Symfony\Component\Workflow\Exception\InvalidArgumentException;
 use Symfony\Component\Workflow\Exception\LogicException;
 use Symfony\Component\Workflow\Exception\NotEnabledTransitionException;
 use Symfony\Component\Workflow\Exception\UndefinedTransitionException;
@@ -52,13 +53,29 @@ class Workflow implements WorkflowInterface
         WorkflowEvents::ANNOUNCE => self::DISABLE_ANNOUNCE_EVENT,
     ];
 
+    private const DISPATCHABLE_EVENTS = [
+        WorkflowEvents::LEAVE,
+        WorkflowEvents::TRANSITION,
+        WorkflowEvents::ENTER,
+        WorkflowEvents::ENTERED,
+        WorkflowEvents::COMPLETED,
+        WorkflowEvents::ANNOUNCE,
+    ];
+
     private MarkingStoreInterface $markingStore;
 
     /**
-     * @param array|string[]|null $eventsToDispatch When `null` fire all events (the default behaviour).
-     *                                              Setting this to an empty array `[]` means no events are dispatched (except the {@see GuardEvent}).
-     *                                              Passing an array with WorkflowEvents will allow only those events to be dispatched plus
-     *                                              the {@see GuardEvent}.
+     * @param string[]|null $eventsToDispatch Controls which {@see WorkflowEvents} are dispatched:
+     *                                        - `null` (default): fire all events.
+     *                                        - `[]`: fire no event (except the {@see GuardEvent}).
+     *                                        - allow-list, e.g. `['workflow.transition', 'workflow.enter']`: fire only the listed
+     *                                        events plus the {@see GuardEvent}.
+     *                                        - block-list, e.g. `['!workflow.announce']`: fire every event except the listed ones;
+     *                                        future {@see WorkflowEvents} are dispatched by default. The {@see GuardEvent} can
+     *                                        never be suppressed; blocking it with `!workflow.guard` throws an
+     *                                        {@see InvalidArgumentException}.
+     *                                        Mixing allow-list and block-list entries in the same array is not supported and throws
+     *                                        an {@see InvalidArgumentException}.
      */
     public function __construct(
         private Definition $definition,
@@ -68,6 +85,33 @@ class Workflow implements WorkflowInterface
         private ?array $eventsToDispatch = null,
     ) {
         $this->markingStore = $markingStore ?? new MethodMarkingStore();
+
+        if (null !== $this->eventsToDispatch && [] !== $this->eventsToDispatch) {
+            $hasAllowList = false;
+            $hasBlockList = false;
+            foreach ($this->eventsToDispatch as $entry) {
+                if (str_starts_with($entry, '!')) {
+                    $hasBlockList = true;
+                } else {
+                    $hasAllowList = true;
+                }
+            }
+            if ($hasAllowList && $hasBlockList) {
+                throw new InvalidArgumentException(\sprintf('Cannot mix allow-list and block-list entries in $eventsToDispatch for workflow "%s": every entry must start with "!" (block-list mode) or none of them must (allow-list mode).', $name));
+            }
+
+            if ($hasBlockList) {
+                $blockedEvents = [];
+                foreach ($this->eventsToDispatch as $entry) {
+                    $eventName = substr($entry, 1);
+                    if (WorkflowEvents::GUARD === $eventName) {
+                        throw new InvalidArgumentException(\sprintf('The "%s" event cannot be disabled in $eventsToDispatch for workflow "%s": it is always dispatched.', WorkflowEvents::GUARD, $name));
+                    }
+                    $blockedEvents[] = $eventName;
+                }
+                $this->eventsToDispatch = array_values(array_diff(self::DISPATCHABLE_EVENTS, $blockedEvents));
+            }
+        }
     }
 
     public function getMarking(object $subject, array $context = []): Marking

@@ -119,7 +119,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertInstanceOf(\Closure::class, $xHandler);
 
         $app->expects($this->once())
-            ->method(method_exists(Application::class, 'renderThrowable') ? 'renderThrowable' : 'renderException');
+            ->method('renderThrowable');
 
         $xHandler(new \Exception());
     }

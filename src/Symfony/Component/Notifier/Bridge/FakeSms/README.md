@@ -25,6 +25,13 @@ FAKE_SMS_DSN=fakesms+email://mailchimp?to=TO&from=FROM
 FAKE_SMS_DSN=fakesms+logger://default
 ```
 
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -32,3 +39,6 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor

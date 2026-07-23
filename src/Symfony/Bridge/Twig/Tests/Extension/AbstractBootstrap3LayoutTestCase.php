@@ -775,13 +775,14 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'placeholder' => 'Test&Me',
         ]);
 
+        $placeholderHidden = $this->isRequiredPlaceholderHiddenByDefault() ? '[@hidden="hidden"]' : '[not(@hidden)]';
         $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
             '/select
     [@name="name"]
     [@class="my&class form-control"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Test&Me[/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)]'.$placeholderHidden.'[.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -799,13 +800,15 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
             'expanded' => false,
         ]);
 
+        // The hidden attribute is only defaulted for the "placeholder" option:
+        // placeholders injected via view variables render without it.
         $this->assertWidgetMatchesXpath($form->createView(), ['placeholder' => '', 'attr' => ['class' => 'my&class']],
             '/select
     [@name="name"]
     [@class="my&class form-control"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.=""]
+        ./option[@value=""][not(@selected)][not(@disabled)][not(@hidden)][.=""]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]

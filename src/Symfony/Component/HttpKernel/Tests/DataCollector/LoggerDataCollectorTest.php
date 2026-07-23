@@ -184,10 +184,6 @@ class LoggerDataCollectorTest extends TestCase
             0,
         ];
 
-        if (!class_exists(SilencedErrorContext::class)) {
-            return;
-        }
-
         yield 'logs with some deprecations' => [
             1,
             [

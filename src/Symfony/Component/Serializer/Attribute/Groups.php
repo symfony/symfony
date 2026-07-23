@@ -41,17 +41,4 @@ class Groups
             }
         }
     }
-
-    /**
-     * @return string[]
-     */
-    #[\Deprecated('Use the "groups" property instead', 'symfony/serializer:7.4')]
-    public function getGroups(): array
-    {
-        return $this->groups;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\Groups::class, false)) {
-    class_alias(Groups::class, \Symfony\Component\Serializer\Annotation\Groups::class);
 }

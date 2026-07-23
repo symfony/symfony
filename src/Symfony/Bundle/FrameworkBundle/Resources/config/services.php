@@ -11,27 +11,10 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Psr\Clock\ClockInterface as PsrClockInterface;
-use Psr\EventDispatcher\EventDispatcherInterface as PsrEventDispatcherInterface;
-use Symfony\Bundle\FrameworkBundle\CacheWarmer\ConfigBuilderCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\HttpCache\HttpCache;
-use Symfony\Component\Clock\Clock;
-use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
-use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\DependencyInjection\Config\ContainerParametersResourceChecker;
-use Symfony\Component\DependencyInjection\EnvVarProcessor;
+use Symfony\Component\DependencyInjection\Kernel\FileLocator;
 use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\DependencyInjection\ReverseContainer;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface as EventDispatcherInterfaceComponentAlias;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\DependencyInjection\ServicesResetterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,15 +23,13 @@ use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpFoundation\UrlHelper;
 use Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
-use Symfony\Component\HttpKernel\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface;
+use Symfony\Component\HttpKernel\Config\FileLocator as LegacyFileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetterInterface as LegacyServicesResetterInterface;
 use Symfony\Component\HttpKernel\EventListener\LocaleAwareListener;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Runtime\Runner\Symfony\HttpKernelRunner;
 use Symfony\Component\Runtime\Runner\Symfony\ResponseRunner;
@@ -56,34 +37,9 @@ use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Workflow\WorkflowEvents;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 return static function (ContainerConfigurator $container) {
-    // this parameter is used at compile time in RegisterListenersPass
-    $container->parameters()->set('event_dispatcher.event_aliases', array_merge(
-        class_exists(ConsoleEvents::class) ? ConsoleEvents::ALIASES : [],
-        class_exists(FormEvents::class) ? FormEvents::ALIASES : [],
-        KernelEvents::ALIASES,
-        class_exists(WorkflowEvents::class) ? WorkflowEvents::ALIASES : []
-    ));
-
     $container->services()
-
-        ->set('parameter_bag', ContainerBag::class)
-            ->args([
-                service('service_container'),
-            ])
-        ->alias(ContainerBagInterface::class, 'parameter_bag')
-        ->alias(ParameterBagInterface::class, 'parameter_bag')
-
-        ->set('event_dispatcher', EventDispatcher::class)
-            ->public()
-            ->tag('container.hot_path')
-            ->tag('event_dispatcher.dispatcher', ['name' => 'event_dispatcher'])
-        ->alias(EventDispatcherInterfaceComponentAlias::class, 'event_dispatcher')
-        ->alias(EventDispatcherInterface::class, 'event_dispatcher')
-        ->alias(PsrEventDispatcherInterface::class, 'event_dispatcher')
 
         ->set('http_kernel', HttpKernel::class)
             ->public()
@@ -141,19 +97,10 @@ return static function (ContainerConfigurator $container) {
                 tagged_iterator('kernel.cache_clearer'),
             ])
 
-        ->set('kernel')
-            ->synthetic()
-            ->public()
         ->alias(KernelInterface::class, 'kernel')
 
-        ->set('filesystem', Filesystem::class)
-        ->alias(Filesystem::class, 'filesystem')
-
-        ->set('file_locator', FileLocator::class)
-            ->args([
-                service('kernel'),
-            ])
-        ->alias(FileLocator::class, 'file_locator')
+        ->alias(LegacyFileLocator::class, 'file_locator')
+            ->deprecate('symfony/framework-bundle', '8.1', 'The "%alias_id%" alias is deprecated, use "'.FileLocator::class.'" instead.')
 
         ->set('uri_signer', UriSigner::class)
             ->args([
@@ -165,30 +112,8 @@ return static function (ContainerConfigurator $container) {
             ->lazy()
         ->alias(UriSigner::class, 'uri_signer')
 
-        ->set('config_cache_factory', ResourceCheckerConfigCacheFactory::class)
-            ->args([
-                tagged_iterator('config_cache.resource_checker'),
-            ])
-
-        ->set('dependency_injection.config.container_parameters_resource_checker', ContainerParametersResourceChecker::class)
-            ->args([
-                service('service_container'),
-            ])
-            ->tag('config_cache.resource_checker', ['priority' => -980])
-
-        ->set('config.resource.self_checking_resource_checker', SelfCheckingResourceChecker::class)
-            ->tag('config_cache.resource_checker', ['priority' => -990])
-
-        ->set('services_resetter', ServicesResetter::class)
-            ->public()
-        ->alias(ServicesResetterInterface::class, 'services_resetter')
-
-        ->set('reverse_container', ReverseContainer::class)
-            ->args([
-                service('service_container'),
-                service_locator([]),
-            ])
-        ->alias(ReverseContainer::class, 'reverse_container')
+        ->alias(LegacyServicesResetterInterface::class, 'services_resetter')
+            ->deprecate('symfony/framework-bundle', '8.1', 'The "%alias_id%" alias is deprecated, use "'.ServicesResetterInterface::class.'" instead.')
 
         ->set('locale_aware_listener', LocaleAwareListener::class)
             ->args([
@@ -196,14 +121,6 @@ return static function (ContainerConfigurator $container) {
                 service('request_stack'),
             ])
             ->tag('kernel.event_subscriber')
-
-        ->set('container.env_var_processor', EnvVarProcessor::class)
-            ->args([
-                service('service_container'),
-                tagged_iterator('container.env_var_loader'),
-            ])
-            ->tag('container.env_var_processor')
-            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('slugger', AsciiSlugger::class)
             ->args([
@@ -234,16 +151,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('container.getenv'),
             ])
-        ->set('config_builder.warmer', ConfigBuilderCacheWarmer::class)
-            ->args([service(KernelInterface::class), service('logger')->nullOnInvalid()])
-            ->tag('kernel.cache_warmer')
-
-        ->set('clock', Clock::class)
-        ->alias(ClockInterface::class, 'clock')
-        ->alias(PsrClockInterface::class, 'clock')
 
         // register as abstract and excluded, aka not-autowirable types
-        ->set(LoaderInterface::class)->abstract()->tag('container.excluded')
         ->set(Request::class)->abstract()->tag('container.excluded')
         ->set(Response::class)->abstract()->tag('container.excluded')
         ->set(SessionInterface::class)->abstract()->tag('container.excluded')

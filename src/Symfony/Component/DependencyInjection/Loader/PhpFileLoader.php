@@ -11,19 +11,11 @@
 
 namespace Symfony\Component\DependencyInjection\Loader;
 
-use Symfony\Component\Config\Builder\ConfigBuilderGenerator;
-use Symfony\Component\Config\Builder\ConfigBuilderGeneratorInterface;
-use Symfony\Component\Config\Builder\ConfigBuilderInterface;
-use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
-use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\App;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AppReference;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -38,25 +30,9 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
  */
 class PhpFileLoader extends FileLoader
 {
+    use ContentLoaderTrait;
+
     protected bool $autoRegisterAliasesForSinglyImplementedInterfaces = false;
-
-    private ?ConfigBuilderGeneratorInterface $generator;
-
-    public function __construct(
-        ContainerBuilder $container,
-        FileLocatorInterface $locator,
-        ?string $env = null,
-        ConfigBuilderGeneratorInterface|bool|null $generator = null,
-        bool $prepend = false,
-    ) {
-        if (\is_bool($generator)) {
-            $prepend = $generator;
-            $generator = null;
-        }
-        $this->generator = $generator;
-
-        parent::__construct($container, $locator, $env, $prepend);
-    }
 
     public function load(mixed $resource, ?string $type = null): mixed
     {
@@ -85,32 +61,16 @@ class PhpFileLoader extends FileLoader
         $this->instanceof = [];
 
         try {
-            try {
-                if (1 === $result = $load($path, $this->env)) {
-                    $result = null;
-                }
-            } catch (\Error $e) {
-                $load = \Closure::bind(function ($path, $env) use ($container, $loader, $resource, $type) {
-                    return include $path;
-                }, $this, ProtectedPhpFileLoader::class);
-
-                if (1 === $result = $load($path, $this->env)) {
-                    $result = null;
-                }
-
-                throw new LogicException(\sprintf('Using `$this` or its internal scope in config files is not supported anymore, use the `$loader` variable instead in "%s" on line %d.', $e->getFile(), $e->getLine()), $e->getCode(), $e);
+            if (1 === $result = $load($path, $this->env)) {
+                $result = null;
             }
 
             if (\is_object($result) && \is_callable($result)) {
                 $this->callConfigurator($result, new ContainerConfigurator($this->container, $this, $this->instanceof, $path, $resource, $this->env), $path);
             } elseif (\is_array($result)) {
-                $yamlLoader = new YamlFileLoader($this->container, $this->locator, $this->env, $this->prepend);
-                $yamlLoader->setResolver($this->resolver ?? new LoaderResolver([$this]));
-                $loadContent = new \ReflectionMethod(YamlFileLoader::class, 'loadContent');
-
                 ++$this->importing;
                 try {
-                    $loadContent->invoke($yamlLoader, [
+                    $this->loadContent([
                         'imports' => ContainerConfigurator::processValue($result['imports'] ?? []),
                         'parameters' => ContainerConfigurator::processValue($result['parameters'] ?? []),
                         'services' => ContainerConfigurator::processValue($result['services'] ?? [], true),
@@ -137,7 +97,7 @@ class PhpFileLoader extends FileLoader
                             throw new InvalidArgumentException(\sprintf('The "%s" key should contain an array in "%s".', $when, $path));
                         }
 
-                        $loadContent->invoke($yamlLoader, [
+                        $this->loadContent([
                             'imports' => ContainerConfigurator::processValue($result[$when]['imports'] ?? []),
                             'parameters' => ContainerConfigurator::processValue($result[$when]['parameters'] ?? []),
                             'services' => ContainerConfigurator::processValue($result[$when]['services'] ?? [], true),
@@ -181,12 +141,13 @@ class PhpFileLoader extends FileLoader
 
     /**
      * Resolve the parameters to the $callback and execute it.
+     *
+     * @param-immediately-invoked-callable $callback
      */
     private function callConfigurator(callable $callback, ContainerConfigurator $containerConfigurator, string $path): void
     {
         $callback = $callback(...);
         $arguments = [];
-        $configBuilders = [];
         $r = new \ReflectionFunction($callback);
 
         $excluded = true;
@@ -243,14 +204,7 @@ class PhpFileLoader extends FileLoader
                     }
                     // no break
                 default:
-                    try {
-                        $configBuilder = $this->configBuilder($type);
-                    } catch (InvalidArgumentException|\LogicException $e) {
-                        throw new \InvalidArgumentException(\sprintf('Could not resolve argument "%s" for "%s".', $type.' $'.$parameter->getName(), $path), 0, $e);
-                    }
-                    trigger_deprecation('symfony/dependency-injection', '7.4', 'Using fluent builders for semantic configuration is deprecated, instantiate the "%s" class with the config array as argument and return it instead in "%s".', $type, $path);
-                    $configBuilders[] = $configBuilder;
-                    $arguments[] = $configBuilder;
+                    throw new \InvalidArgumentException(\sprintf('Could not resolve argument "%s" for "%s".', $type.' $'.$parameter->getName(), $path));
             }
         }
 
@@ -260,62 +214,5 @@ class PhpFileLoader extends FileLoader
         } finally {
             --$this->importing;
         }
-
-        foreach ($configBuilders as $configBuilder) {
-            $this->loadExtensionConfig($configBuilder->getExtensionAlias(), ContainerConfigurator::processValue($configBuilder->toArray()));
-        }
     }
-
-    /**
-     * @param string $namespace FQCN string for a class implementing ConfigBuilderInterface
-     */
-    private function configBuilder(string $namespace): ConfigBuilderInterface
-    {
-        if (!class_exists(ConfigBuilderGenerator::class)) {
-            throw new \LogicException('You cannot use the config builder as the Config component is not installed. Try running "composer require symfony/config".');
-        }
-
-        if (null === $this->generator) {
-            throw new \LogicException('You cannot use the ConfigBuilders without providing a class implementing ConfigBuilderGeneratorInterface.');
-        }
-
-        // If class exists and implements ConfigBuilderInterface
-        if (class_exists($namespace) && is_subclass_of($namespace, ConfigBuilderInterface::class)) {
-            return new $namespace();
-        }
-
-        // If it does not start with Symfony\Config\ we don't know how to handle this
-        if (!str_starts_with($namespace, 'Symfony\\Config\\')) {
-            throw new InvalidArgumentException(\sprintf('Could not find or generate class "%s".', $namespace));
-        }
-
-        // Try to get the extension alias
-        $alias = Container::underscore(substr($namespace, 15, -6));
-
-        if (str_contains($alias, '\\')) {
-            throw new InvalidArgumentException('You can only use "root" ConfigBuilders from "Symfony\\Config\\" namespace. Nested classes like "Symfony\\Config\\Framework\\CacheConfig" cannot be used.');
-        }
-
-        if (!$this->container->hasExtension($alias)) {
-            $extensions = array_filter(array_map(static fn (ExtensionInterface $ext) => $ext->getAlias(), $this->container->getExtensions()));
-            throw new InvalidArgumentException(UndefinedExtensionHandler::getErrorMessage($namespace, null, $alias, $extensions));
-        }
-
-        $extension = $this->container->getExtension($alias);
-        if (!$extension instanceof ConfigurationExtensionInterface) {
-            throw new \LogicException(\sprintf('You cannot use the config builder for "%s" because the extension does not implement "%s".', $namespace, ConfigurationExtensionInterface::class));
-        }
-
-        $configuration = $extension->getConfiguration([], $this->container);
-        $loader = $this->generator->build($configuration);
-
-        return $loader();
-    }
-}
-
-/**
- * @internal
- */
-final class ProtectedPhpFileLoader extends PhpFileLoader
-{
 }

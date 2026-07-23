@@ -25,7 +25,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Input implements InputInterface, StreamableInputInterface
+abstract class Input implements RawInputInterface, StreamableInputInterface
 {
     protected InputDefinition $definition;
     /** @var resource */
@@ -170,5 +170,39 @@ abstract class Input implements InputInterface, StreamableInputInterface
     public function getStream()
     {
         return $this->stream;
+    }
+
+    public function getRawArguments(): array
+    {
+        return $this->arguments;
+    }
+
+    public function getRawOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function unparse(?array $optionNames = null): array
+    {
+        $rawOptions = $this->getRawOptions();
+
+        $filteredRawOptions = null === $optionNames
+            ? $rawOptions
+            : array_intersect_key($rawOptions, array_fill_keys($optionNames, ''));
+
+        $unparsedOptions = [];
+
+        foreach ($filteredRawOptions as $optionName => $parsedOption) {
+            $option = $this->definition->getOption($optionName);
+
+            $unparsedOptions[] = match (true) {
+                $option->isNegatable() => [\sprintf('--%s%s', $parsedOption ? '' : 'no-', $optionName)],
+                !$option->acceptValue() => [\sprintf('--%s', $optionName)],
+                $option->isArray() => array_map(static fn ($item) => \sprintf('--%s=%s', $optionName, $item), $parsedOption),
+                default => [\sprintf('--%s=%s', $optionName, $parsedOption)],
+            };
+        }
+
+        return array_merge(...$unparsedOptions);
     }
 }

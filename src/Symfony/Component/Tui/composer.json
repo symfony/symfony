@@ -1,0 +1,35 @@
+{
+    "name": "symfony/tui",
+    "type": "library",
+    "description": "Provides a terminal UI framework for building rich, interactive CLI applications in PHP",
+    "keywords": ["tui", "terminal", "console", "cli"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fabien Potencier",
+            "email": "fabien@symfony.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "revolt/event-loop": "^1.0",
+        "symfony/event-dispatcher": "^8.0",
+        "symfony/string": "^8.0"
+    },
+    "require-dev": {
+        "league/commonmark": "^2.9",
+        "tempest/highlight": "^2.16"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Tui\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

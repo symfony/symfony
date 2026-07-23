@@ -33,7 +33,7 @@ trait LazyDecoratorTrait
         $class = $instance ? $instance::class : static::class;
 
         if (self::class === $class && \defined($class.'::LAZY_OBJECT_PROPERTY_SCOPES')) {
-            Hydrator::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
+            Registry::$propertyScopes[$class] ??= $class::LAZY_OBJECT_PROPERTY_SCOPES;
         }
 
         $instance ??= (Registry::$classReflectors[$class] ??= ($r = new \ReflectionClass($class))->hasProperty('lazyObjectState')
@@ -88,14 +88,14 @@ trait LazyDecoratorTrait
         $instance = $this->lazyObjectState->realInstance;
         $class = $this::class;
 
-        $propertyScopes = Hydrator::$propertyScopes[$class] ??= Hydrator::getPropertyScopes($class);
+        $propertyScopes = Registry::$propertyScopes[$class] ??= Registry::getPropertyScopes($class);
         $notByRef = 0;
 
         if ([, , , $access] = $propertyScopes[$name] ?? null) {
-            $notByRef = $access & Hydrator::PROPERTY_NOT_BY_REF || ($access >> 2) & \ReflectionProperty::IS_PRIVATE_SET;
+            $notByRef = $access & Registry::PROPERTY_NOT_BY_REF || ($access >> 2) & \ReflectionProperty::IS_PRIVATE_SET;
         }
 
-        if ($notByRef || 2 !== ((Registry::$parentMethods[$class] ??= Registry::getParentMethods($class))['get'] ?: 2)) {
+        if ($notByRef || 2 !== ((Registry::$parentGet[$class] ??= Registry::getParentGet($class)) ?: 2)) {
             $value = $instance->$name;
 
             return $value;

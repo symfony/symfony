@@ -26,21 +26,21 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Url(requireTld: true));
+        $this->validate(null, new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Url(requireTld: true));
+        $this->validate('', new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringFromObjectIsValid()
     {
-        $this->validator->validate(new EmailProvider(), new Url(requireTld: true));
+        $this->validate(new EmailProvider(), new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
@@ -48,13 +48,13 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Url(requireTld: true));
+        $this->validate(new \stdClass(), new Url(requireTld: true));
     }
 
     #[DataProvider('getValidUrls')]
     public function testValidUrls($url)
     {
-        $this->validator->validate($url, new Url(requireTld: false));
+        $this->validate($url, new Url(requireTld: false));
 
         $this->assertNoViolation();
     }
@@ -62,7 +62,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidUrls')]
     public function testValidUrlsWithNewLine($url)
     {
-        $this->validator->validate($url."\n", new Url(requireTld: false));
+        $this->validate($url."\n", new Url(requireTld: false));
 
         $this->buildViolation('This value is not a valid URL.')
             ->setParameter('{{ value }}', '"'.$url."\n".'"')
@@ -73,7 +73,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidUrlsWithWhitespaces')]
     public function testValidUrlsWithWhitespaces($url)
     {
-        $this->validator->validate($url, new Url(
+        $this->validate($url, new Url(
             normalizer: 'trim',
             requireTld: true,
         ));
@@ -90,7 +90,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             requireTld: false,
         );
 
-        $this->validator->validate($url, $constraint);
+        $this->validate($url, $constraint);
 
         $this->assertNoViolation();
     }
@@ -101,7 +101,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Url(relativeProtocol: true, requireTld: false);
 
-        $this->validator->validate($url."\n", $constraint);
+        $this->validate($url."\n", $constraint);
 
         $this->buildViolation('This value is not a valid URL.')
             ->setParameter('{{ value }}', '"'.$url."\n".'"')
@@ -126,7 +126,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         ];
 
         foreach ($validUrls as $url) {
-            $this->validator->validate($url, $constraint);
+            $this->validate($url, $constraint);
             $this->assertNoViolation();
         }
     }
@@ -146,7 +146,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
         foreach ($invalidUrls as $url) {
             $this->setUp();
-            $this->validator->validate($url, $constraint);
+            $this->validate($url, $constraint);
 
             $this->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', '"'.$url.'"')
@@ -159,10 +159,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Url(protocols: ['*'], relativeProtocol: true, requireTld: true);
 
-        $this->validator->validate('custom://example.com', $constraint);
+        $this->validate('custom://example.com', $constraint);
         $this->assertNoViolation();
 
-        $this->validator->validate('//example.com', $constraint);
+        $this->validate('//example.com', $constraint);
         $this->assertNoViolation();
     }
 
@@ -170,10 +170,10 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Url(protocols: ['*'], requireTld: true);
 
-        $this->validator->validate('custom://example.com', $constraint);
+        $this->validate('custom://example.com', $constraint);
         $this->assertNoViolation();
 
-        $this->validator->validate('custom://localhost', $constraint);
+        $this->validate('custom://localhost', $constraint);
         $this->buildViolation($constraint->tldMessage)
             ->setParameter('{{ value }}', '"custom://localhost"')
             ->setCode(Url::MISSING_TLD_ERROR)
@@ -192,11 +192,11 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         ];
 
         foreach ($validUrls as $url) {
-            $this->validator->validate($url, $constraint);
+            $this->validate($url, $constraint);
             $this->assertNoViolation();
         }
 
-        $this->validator->validate('ftp://example.com', $constraint);
+        $this->validate('ftp://example.com', $constraint);
         $this->buildViolation($constraint->message)
             ->setParameter('{{ value }}', '"ftp://example.com"')
             ->setCode(Url::INVALID_URL_ERROR)
@@ -321,7 +321,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             requireTld: false,
         );
 
-        $this->validator->validate($url, $constraint);
+        $this->validate($url, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$url.'"')
@@ -339,7 +339,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             requireTld: false,
         );
 
-        $this->validator->validate($url, $constraint);
+        $this->validate($url, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$url.'"')
@@ -419,7 +419,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             requireTld: $requireTld,
         );
 
-        $this->validator->validate($url, $constraint);
+        $this->validate($url, $constraint);
 
         $this->assertNoViolation();
     }
@@ -438,7 +438,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Url(requireTld: $requireTld);
 
-        $this->validator->validate($url, $constraint);
+        $this->validate($url, $constraint);
 
         if ($isValid) {
             $this->assertNoViolation();

@@ -12,11 +12,12 @@
 namespace Symfony\Component\ErrorHandler\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\ErrorHandler\Tests\Fixtures\ExtendsDeprecatedParent;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\DeprecatedClass;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
+use Symfony\Component\ErrorHandler\Tests\Fixtures\ExtendsDeprecatedClassInTheSameVendor;
 
 class DebugClassLoaderTest extends TestCase
 {
@@ -59,6 +60,22 @@ class DebugClassLoaderTest extends TestCase
         }
 
         $this->fail('DebugClassLoader did not register');
+    }
+
+    #[RunInSeparateProcess]
+    public function testEnableClearsVendorPrefixCacheOnRemapChange()
+    {
+        $reflClass = new \ReflectionClass(DebugClassLoader::class);
+        $cacheProp = $reflClass->getProperty('vendorPrefixCache');
+        $remapProp = $reflClass->getProperty('namespaceRemappings');
+
+        DebugClassLoader::enable(['App' => 'Symfony']);
+        $cacheProp->setValue(null, ['App\\Foo' => 'Symfony']);
+
+        DebugClassLoader::enable(['App' => 'Acme']);
+
+        $this->assertSame([], $cacheProp->getValue(), 'enable() must clear the vendor prefix cache');
+        $this->assertSame(['App' => 'Acme'], $remapProp->getValue(), 'enable() must replace the namespace remappings');
     }
 
     public function testThrowingClass()
@@ -409,6 +426,44 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
+    public function testVirtualUseWithAbstractClass()
+    {
+        // An abstract class can announce @method annotations the same way an interface does, to give
+        // subclasses time to implement the method before it becomes a real abstract requirement.
+        // ExtendsVirtualAbstractClass extends VirtualAbstract (abstract) and does not implement any of its
+        // @method annotations.
+
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        class_exists('Test\\'.ExtendsVirtualAbstractClass::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([
+            'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualAbstractClass" should implement method "Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualAbstract::abstractClassMethod(): string".',
+            'Class "Test\Symfony\Component\ErrorHandler\Tests\ExtendsVirtualAbstractClass" should implement method "static Symfony\Component\ErrorHandler\Tests\Fixtures\VirtualAbstract::abstractStaticMethod(): \stdClass": Description.',
+        ], $deprecations);
+    }
+
+    public function testVirtualUseWithAbstractClassImplementingTheMethod()
+    {
+        // When the concrete subclass already declares the announced @method, no deprecation is raised.
+
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        class_exists('Test\\'.ExtendsVirtualAbstractClassImpl::class, true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([], $deprecations);
+    }
+
     public function testVirtualUseWithMagicCallInterface()
     {
         // When an interface uses "@method" annotations and, at the same time, requires the __call method to be
@@ -432,6 +487,90 @@ class DebugClassLoaderTest extends TestCase
     public function testEvaluatedCode()
     {
         $this->assertTrue(class_exists(Fixtures\DefinitionInEvaluatedCode::class, true));
+    }
+
+    #[RunInSeparateProcess]
+    #[DataProvider('provideExposeDeprecations')]
+    public function testExposeDeprecations(bool $expectDeprecation, ?array $deprecationsNamespacesMapping)
+    {
+        DebugClassLoader::enable($deprecationsNamespacesMapping);
+
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        new ExtendsDeprecatedClassInTheSameVendor();
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame($expectDeprecation ? [
+            'The "Symfony\Component\ErrorHandler\Tests\Fixtures\ExtendsDeprecatedClassInTheSameVendor" class extends "Symfony\Component\ErrorHandler\Tests\Fixtures\DeprecatedClass" that is deprecated but this is a test deprecation notice.',
+        ] : [], $deprecations);
+    }
+
+    public static function provideExposeDeprecations(): array
+    {
+        return [
+            [false, null], // default current behavior -> should not be exposed
+            [false, []], // no matching (empty array) -> should not be exposed
+            [false, ['No\Matching' => 'foo']], // no matching -> should not be exposed
+            [true, [ExtendsDeprecatedClassInTheSameVendor::class => 'foo']], // only $class matched -> different vendors -> should be exposed
+            [false, ['Symfony\Component\ErrorHandler\Tests\Fixtures' => 'foo']], // both $class and $use matched to same vendor -> should not be exposed
+            [false, ['Symfony\Component\ErrorHandler' => 'foo']], // both $class and $use matched to same vendor -> should not be exposed
+            [false, ['Symfony' => 'foo']], // both $class and $use matched to same vendor -> should not be exposed
+            [true, [ExtendsDeprecatedClassInTheSameVendor::class => 'foo', DeprecatedClass::class => 'bar']], // both matched but to different vendors -> should be exposed
+        ];
+    }
+
+    #[RunInSeparateProcess]
+    #[DataProvider('provideMuteDeprecations')]
+    public function testMuteDeprecations(bool $expectDeprecation, ?array $deprecationsNamespacesMapping)
+    {
+        DebugClassLoader::enable($deprecationsNamespacesMapping);
+
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        class_exists('Test\\'.__NAMESPACE__.'\DeprecatedParentClass', true);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame($expectDeprecation ? [
+            'The "Test\Symfony\Component\ErrorHandler\Tests\DeprecatedParentClass" class extends "Symfony\Component\ErrorHandler\Tests\Fixtures\DeprecatedClass" that is deprecated but this is a test deprecation notice.',
+        ] : [], $deprecations);
+    }
+
+    public static function provideMuteDeprecations(): array
+    {
+        return [
+            [true, null], // default current behavior -> should not be muted
+            [true, []], // no matching (empty array) -> should not be muted
+            [true, ['No\Matching' => 'foo']], // no matching -> should not be muted
+            [true, ['Test' => 'No\Matching']], // only $class matched, vendors differ -> should not be muted
+            [false, ['Test\\'.__NAMESPACE__.'\DeprecatedParentClass' => 'x', 'Symfony\Component\ErrorHandler\Tests\Fixtures\DeprecatedClass' => 'x']], // both matched to same vendor via FQCN -> should be muted
+            [false, ['Test\\'.__NAMESPACE__ => 'x', 'Symfony\Component\ErrorHandler\Tests\Fixtures' => 'x']], // both matched to same vendor via namespace prefix -> should be muted
+            [false, ['Test' => 'Symfony']], // $class matched to 'Symfony', $use default first segment 'Symfony' -> same vendor -> should be muted
+            [true, ['Test' => 'one', 'Symfony' => 'two']], // both matched but to different vendors -> should not be muted
+        ];
+    }
+
+    public function testRootNamespaceDontTriggerDeprecations()
+    {
+        $deprecations = [];
+        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        $e = error_reporting(\E_USER_DEPRECATED);
+
+        require __DIR__.'/Fixtures/RootNamespace.php';
+
+        spl_autoload_call(\RootNamespace::class);
+
+        error_reporting($e);
+        restore_error_handler();
+
+        $this->assertSame([], $deprecations);
     }
 
     public function testReturnType()
@@ -478,7 +617,6 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    #[RequiresPhp('>=8.3.0')]
     public function testReturnTypePhp83()
     {
         $deprecations = [];
@@ -637,6 +775,14 @@ class ClassLoader
         } elseif ('Test\\'.ExtendsVirtualMagicCallInterface::class === $class) {
             eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsVirtualMagicCallInterface implements \\'.__NAMESPACE__.'\Fixtures\VirtualInterfaceWithCall {
                 public function __call(string $name, array $arguments): mixed { return null; }
+            }');
+        } elseif ('Test\\'.ExtendsVirtualAbstractClass::class === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsVirtualAbstractClass extends \\'.__NAMESPACE__.'\Fixtures\VirtualAbstract {
+            }');
+        } elseif ('Test\\'.ExtendsVirtualAbstractClassImpl::class === $class) {
+            eval('namespace Test\\'.__NAMESPACE__.'; class ExtendsVirtualAbstractClassImpl extends \\'.__NAMESPACE__.'\Fixtures\VirtualAbstract {
+                public function abstractClassMethod(): string { return ""; }
+                public static function abstractStaticMethod(): \stdClass { return new \stdClass(); }
             }');
         } elseif ('Test\\'.ReturnType::class === $class) {
             return $fixtureDir.\DIRECTORY_SEPARATOR.'ReturnType.php';

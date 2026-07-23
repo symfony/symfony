@@ -81,7 +81,7 @@ class AsciiSlugger implements SluggerInterface, LocaleAwareInterface
 
     public function getLocale(): string
     {
-        return $this->defaultLocale;
+        return $this->defaultLocale ?? '';
     }
 
     /**

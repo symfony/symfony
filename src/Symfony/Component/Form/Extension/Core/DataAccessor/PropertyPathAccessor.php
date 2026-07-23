@@ -100,10 +100,7 @@ class PropertyPathAccessor implements DataAccessorInterface
                 return null;
             }
 
-            if (!$e instanceof UninitializedPropertyException
-                // For versions without UninitializedPropertyException check the exception message
-                && (class_exists(UninitializedPropertyException::class) || !str_contains($e->getMessage(), 'You should initialize it'))
-            ) {
+            if (!$e instanceof UninitializedPropertyException) {
                 throw $e;
             }
 

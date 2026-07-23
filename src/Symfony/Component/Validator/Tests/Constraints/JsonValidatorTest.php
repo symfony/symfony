@@ -26,7 +26,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidValues')]
     public function testJsonIsValid($value)
     {
-        $this->validator->validate($value, new Json());
+        $this->validate($value, new Json());
 
         $this->assertNoViolation();
     }
@@ -36,7 +36,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Json(message: 'myMessageTest');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessageTest')
             ->setParameter('{{ value }}', '"'.$value.'"')

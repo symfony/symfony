@@ -27,7 +27,7 @@ class ClearSiteDataLogoutListener implements EventSubscriberInterface
 
     /**
      * @param string[] $cookieValue The value for the Clear-Site-Data header.
-     *                              Can be '*' or a subset of 'cache', 'cookies', 'storage', 'executionContexts'.
+     *                              Can be '*' or a subset of 'cache', 'cookies', 'storage', 'clientHints', 'executionContexts', 'prefetchCache', 'prerenderCache'.
      */
     public function __construct(private readonly array $cookieValue)
     {

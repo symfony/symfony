@@ -48,17 +48,7 @@ class DefinitionFileLoader extends FileLoader
             return include $file;
         }, null, null);
 
-        try {
-            $callback = $load($path);
-        } catch (\Error $e) {
-            $load = \Closure::bind(static function ($file) use ($loader) {
-                return include $file;
-            }, null, ProtectedDefinitionFileLoader::class);
-
-            $callback = $load($path);
-
-            trigger_deprecation('symfony/config', '7.4', 'Accessing the internal scope of the loader in config files is deprecated, use only its public API instead in "%s" on line %d.', $e->getFile(), $e->getLine());
-        }
+        $callback = $load($path);
 
         if (\is_object($callback) && \is_callable($callback)) {
             $this->callConfigurator($callback, new DefinitionConfigurator($this->treeBuilder, $this, $path, $resource), $path);
@@ -80,6 +70,9 @@ class DefinitionFileLoader extends FileLoader
         return 'php' === $type;
     }
 
+    /**
+     * @param-immediately-invoked-callable $callback
+     */
     private function callConfigurator(callable $callback, DefinitionConfigurator $configurator, string $path): void
     {
         $callback = $callback(...);

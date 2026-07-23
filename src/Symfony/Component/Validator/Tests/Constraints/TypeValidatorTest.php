@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\TypeValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -31,7 +29,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Type(type: 'integer');
 
-        $this->validator->validate(null, $constraint);
+        $this->validate(null, $constraint);
 
         $this->assertNoViolation();
     }
@@ -40,7 +38,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Type(type: 'string');
 
-        $this->validator->validate('', $constraint);
+        $this->validate('', $constraint);
 
         $this->assertNoViolation();
     }
@@ -52,7 +50,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate('', $constraint);
+        $this->validate('', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '""')
@@ -66,7 +64,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Type(type: $type);
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -127,7 +125,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', $valueAsString)
@@ -194,7 +192,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Type(type: $types);
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -209,23 +207,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidValuesMultipleTypes()
     {
-        $this->validator->validate('12345', new Type(type: ['boolean', 'array'], message: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"12345"')
-            ->setParameter('{{ type }}', implode('|', ['boolean', 'array']))
-            ->setCode(Type::INVALID_TYPE_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidValuesMultipleTypesDoctrineStyle()
-    {
-        $this->validator->validate('12345', new Type([
-            'type' => ['boolean', 'array'],
-            'message' => 'myMessage',
-        ]));
+        $this->validate('12345', new Type(type: ['boolean', 'array'], message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"12345"')

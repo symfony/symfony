@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -28,8 +30,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {
-    public function __construct(private ?PropertyAccessorInterface $propertyAccessor = null)
-    {
+    public function __construct(
+        private ?PropertyAccessorInterface $propertyAccessor = null,
+        private ?ClockInterface $clock = null,
+    ) {
     }
 
     public function validate(mixed $value, Constraint $constraint): void
@@ -63,7 +67,7 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
         // https://php.net/datetime.formats
         if (\is_string($comparedValue) && $value instanceof \DateTimeInterface) {
             try {
-                $comparedValue = new $value($comparedValue);
+                $comparedValue = $this->clock ? $value::createFromInterface(new DatePoint($comparedValue, null, $this->clock->now())) : new $value($comparedValue);
             } catch (\Exception) {
                 throw new ConstraintDefinitionException(\sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, get_debug_type($value), get_debug_type($constraint)));
             }

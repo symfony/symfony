@@ -18,10 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @author Abdellatif Ait boudad <a.aitboudad@gmail.com>
- *
- * @final since Symfony 7.1
  */
-class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, WarmableInterface, ResetInterface
+final class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInterface, LocaleAwareInterface, WarmableInterface, ResetInterface
 {
     public const MESSAGE_DEFINED = 0;
     public const MESSAGE_MISSING = 1;
@@ -76,9 +74,6 @@ class DataCollectorTranslator implements TranslatorInterface, TranslatorBagInter
         return [];
     }
 
-    /**
-     * Gets the fallback locales.
-     */
     public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {

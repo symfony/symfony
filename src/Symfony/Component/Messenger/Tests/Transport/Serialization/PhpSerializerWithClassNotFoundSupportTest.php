@@ -21,13 +21,13 @@ class PhpSerializerWithClassNotFoundSupportTest extends PhpSerializerTest
 {
     public function testDecodingFailsWithBadClass()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-
         $serializer = $this->createPhpSerializer();
 
-        $serializer->decode([
+        $envelope = $serializer->decode([
             'body' => 'O:13:"ReceivedSt0mp":0:{}',
         ]);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
     }
 
     public function testDecodingFailsButCreateClassNotFound()
@@ -40,26 +40,8 @@ class PhpSerializerWithClassNotFoundSupportTest extends PhpSerializerTest
 
         $envelope = $serializer->decode($encodedEnvelope);
 
-        $lastMessageDecodingFailedStamp = $envelope->last(MessageDecodingFailedStamp::class);
-        $this->assertInstanceOf(MessageDecodingFailedStamp::class, $lastMessageDecodingFailedStamp);
-        $message = $envelope->getMessage();
-        // The class does not exist, so we cannot use anything else. The only
-        // purpose of this feature is to aim debugging (so dumping value)
-        ob_start();
-        var_dump($message);
-        $content = ob_get_clean();
-        // remove object ID
-        $content = preg_replace('/#\d+/', '', $content);
-        $expected = <<<EOT
-            object(__PHP_Incomplete_Class) (2) {
-              ["__PHP_Incomplete_Class_Name"]=>
-              string(55) "Symfony\Component\Messenger\Tests\Fixtures\OupsyMessage"
-              ["message":"Symfony\Component\Messenger\Tests\Fixtures\OupsyMessage":private]=>
-              string(5) "Hello"
-            }
-
-            EOT;
-        $this->assertEquals($expected, $content);
+        $this->assertInstanceOf(\__PHP_Incomplete_Class::class, $envelope->getMessage());
+        $this->assertNotNull($envelope->last(MessageDecodingFailedStamp::class));
     }
 
     protected function createPhpSerializer(): PhpSerializer

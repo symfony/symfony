@@ -22,8 +22,12 @@ class IpUtils
         '127.0.0.0/8',    // RFC1700 (Loopback)
         '10.0.0.0/8',     // RFC1918
         '192.168.0.0/16', // RFC1918
+        '192.0.2.0/24',   // Documentation Ranges TEST-NET-1 (RFC 5737)
+        '198.51.100.0/24',// Documentation Ranges TEST-NET-2 (RFC 5737)
+        '203.0.113.0/24', // Documentation Ranges TEST-NET-3 (RFC 5737)
         '172.16.0.0/12',  // RFC1918
         '169.254.0.0/16', // RFC3927
+        '198.18.0.0/15',  // IPv4 Benchmarking (RFC 2544)
         '0.0.0.0/8',      // RFC5735
         '240.0.0.0/4',    // RFC1112
         '100.64.0.0/10',  // RFC6598
@@ -35,6 +39,8 @@ class IpUtils
         '::/96',          // IPv4-compatible IPv6 addresses (RFC 4291 section 2.5.5.1)
         '2002::/16',      // 6to4 (RFC 3056)
         '2001::/32',      // Teredo tunneling (RFC 4380)
+        '2001:db8::/32',  // Documentation Ranges (RFC 3849)
+        '2001:0002::/48', // IPv6 Benchmarking (RFC 5180 and corrections)
         '64:ff9b::/96',   // NAT64 well-known prefix (RFC 6052)
         '64:ff9b:1::/48', // NAT64 local-use prefix (RFC 8215)
     ];
@@ -189,11 +195,8 @@ class IpUtils
      * @param int<0, 4>  $v4Bytes
      * @param int<0, 16> $v6Bytes
      */
-    public static function anonymize(string $ip/* , int $v4Bytes = 1, int $v6Bytes = 8 */): string
+    public static function anonymize(string $ip, int $v4Bytes = 1, int $v6Bytes = 8): string
     {
-        $v4Bytes = 1 < \func_num_args() ? func_get_arg(1) : 1;
-        $v6Bytes = 2 < \func_num_args() ? func_get_arg(2) : 8;
-
         if ($v4Bytes < 0 || $v6Bytes < 0) {
             throw new \InvalidArgumentException('Cannot anonymize less than 0 bytes.');
         }
@@ -247,9 +250,15 @@ class IpUtils
 
     /**
      * Checks if an IPv4 or IPv6 address is contained in the list of private IP subnets.
+     *
+     * @throws \ValueError When $requestIp is not a valid IP address
      */
     public static function isPrivateIp(string $requestIp): bool
     {
+        if (!filter_var($requestIp, \FILTER_VALIDATE_IP)) {
+            throw new \ValueError(\sprintf('"%s" is not a valid IP address.', $requestIp));
+        }
+
         return self::checkIp($requestIp, self::PRIVATE_SUBNETS);
     }
 

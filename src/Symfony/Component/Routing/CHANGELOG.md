@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add a `$trailingSlashOnRoot` argument to `CollectionConfigurator::prefix()` to allow disabling the trailing slash on root routes
+
+8.0
+---
+
+ * Remove support for accessing the internal scope of the loader in PHP config files, use only its public API instead
+ * Providing a non-array `_query` parameter to `UrlGenerator` causes an `InvalidParameterException`
+ * Remove the protected `AttributeClassLoader::$routeAnnotationClass` property and the `setRouteAnnotationClass()` method, use `AttributeClassLoader::setRouteAttributeClass()` instead
+ * Remove class aliases in the `Annotation` namespace, use attributes instead
+ * Remove getters and setters in attribute classes in favor of public properties
+ * Remove support for the XML configuration format
+
 7.4
 ---
 

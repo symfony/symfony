@@ -141,6 +141,7 @@ class Connection
      *     * binding_arguments: Arguments to be used while binding the queue.
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
+     *   * queues: Set to false (or "queues=false" in the DSN query) to skip binding the default "messages" queue when no queues are defined
      *   * exchange:
      *     * name: Name of the exchange. An empty string (name: '') can be used to use the default exchange
      *     * type: Type of exchange (Default: fanout)
@@ -212,12 +213,13 @@ class Connection
             $amqpOptions['password'] = rawurldecode($params['pass']);
         }
 
-        if (!isset($amqpOptions['queues'])) {
-            $amqpOptions['queues'][$exchangeName] = [];
+        if (!\is_array($queuesOptions = $amqpOptions['queues'] ?? true)) {
+            $queuesOptions = filter_var($queuesOptions, \FILTER_VALIDATE_BOOL) ? [$exchangeName => []] : [];
+        } else {
+            $queuesOptions = $amqpOptions['queues'];
         }
 
         $exchangeOptions = $amqpOptions['exchange'];
-        $queuesOptions = $amqpOptions['queues'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
         if (isset($amqpOptions['auto_setup'])) {
             $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL);
@@ -630,6 +632,9 @@ class Connection
         return $amqpStamp?->getRoutingKey() ?? $this->getDefaultPublishRoutingKey();
     }
 
+    /**
+     * @param-immediately-invoked-callable $callable
+     */
     private function withConnectionExceptionRetry(callable $callable): void
     {
         $maxRetries = 3;

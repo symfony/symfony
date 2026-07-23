@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -67,9 +66,8 @@ class Length extends Constraint
      * @param self::COUNT_*|null $countUnit  The character count unit for the length check (defaults to {@see Length::COUNT_CODEPOINTS})
      * @param string[]|null      $groups
      */
-    #[HasNamedArguments]
     public function __construct(
-        int|array|null $exactly = null,
+        ?int $exactly = null,
         ?int $min = null,
         ?int $max = null,
         ?string $charset = null,
@@ -81,32 +79,17 @@ class Length extends Constraint
         ?string $charsetMessage = null,
         ?array $groups = null,
         mixed $payload = null,
-        ?array $options = null,
     ) {
-        if (\is_array($exactly)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($exactly, $options ?? []);
-            $exactly = $options['value'] ?? null;
-        } elseif (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-        }
-
-        $min ??= $options['min'] ?? null;
-        $max ??= $options['max'] ?? null;
-
-        unset($options['value'], $options['min'], $options['max']);
-
         if (null !== $exactly && null === $min && null === $max) {
             $min = $max = $exactly;
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->min = $min;
         $this->max = $max;
         $this->charset = $charset ?? $this->charset;
-        $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->normalizer = $normalizer;
         $this->countUnit = $countUnit ?? $this->countUnit;
         $this->exactMessage = $exactMessage ?? $this->exactMessage;
         $this->minMessage = $minMessage ?? $this->minMessage;

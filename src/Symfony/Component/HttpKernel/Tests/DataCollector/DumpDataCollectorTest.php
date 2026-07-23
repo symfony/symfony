@@ -177,4 +177,33 @@ class DumpDataCollectorTest extends TestCase
         $collector->__destruct();
         $this->assertSame('', ob_get_clean());
     }
+
+    public function testNonceIsForwardedToHtmlDumperOnGetDumps()
+    {
+        $data = new Data([[123]]);
+
+        $collector = new DumpDataCollector();
+        $collector->setNonce('script-abc', 'style-xyz');
+        $collector->dump($data);
+
+        $dumps = $collector->getDumps('html');
+
+        $this->assertCount(1, $dumps);
+        $this->assertStringContainsString('<script nonce="script-abc">', $dumps[0]['data']);
+        $this->assertStringContainsString('<style nonce="style-xyz">', $dumps[0]['data']);
+    }
+
+    public function testNonceFallsBackToScriptNonceForStyle()
+    {
+        $data = new Data([[123]]);
+
+        $collector = new DumpDataCollector();
+        $collector->setNonce('shared-nonce');
+        $collector->dump($data);
+
+        $dumps = $collector->getDumps('html');
+
+        $this->assertStringContainsString('<script nonce="shared-nonce">', $dumps[0]['data']);
+        $this->assertStringContainsString('<style nonce="shared-nonce">', $dumps[0]['data']);
+    }
 }

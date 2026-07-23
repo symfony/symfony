@@ -257,7 +257,7 @@ class MarkdownDescriptor extends Descriptor
         }
 
         if (!(isset($options['omit_tags']) && $options['omit_tags'])) {
-            foreach ($this->sortTagsByPriority($definition->getTags()) as $tagName => $tagData) {
+            foreach ($this->sortTagsByPriority($container ? $this->resolvePriorityServiceTags($container, $definition) : $definition->getTags()) as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
                     $output .= "\n".'- Tag: `'.$tagName.'`';
                     foreach ($parameters as $name => $value) {
@@ -269,6 +269,16 @@ class MarkdownDescriptor extends Descriptor
 
         $inEdges = null !== $container && isset($options['id']) ? $this->getServiceEdges($container, $options['id']) : [];
         $output .= "\n".'- Usages: '.($inEdges ? implode(', ', $inEdges) : 'none');
+
+        if (isset($options['id']) && $container) {
+            $stack = $this->getDecorationStack($container, $options['id']);
+            if (\count($stack) > 1) {
+                $output .= "\n- Decoration Stack:\n";
+                foreach ($stack as $item) {
+                    $output .= \sprintf("  - Id: `%s`\n    Class: `%s`\n    Priority: %d\n", $item['id'], $item['class'], $item['priority']);
+                }
+            }
+        }
 
         $this->write(isset($options['id']) ? \sprintf("### %s\n\n%s\n", $options['id'], $output) : $output);
     }

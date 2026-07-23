@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -264,6 +262,83 @@ class CsvEncoderTest extends TestCase
             CSV;
 
         $this->assertEquals($csv, $this->encoder->encode($value, 'csv', $context));
+    }
+
+    public function testEncodeWithAssociativeHeaders()
+    {
+        $data = [
+            ['firstName' => 'Alice', 'lastName' => 'A', 'age' => 30],
+            ['firstName' => 'Bob', 'lastName' => 'B', 'age' => 25],
+        ];
+
+        $this->assertSame(
+            "Prénom,Nom\nAlice,A\nBob,B\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::HEADERS_KEY => ['Prénom' => 'firstName', 'Nom' => 'lastName'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersAndNestedPaths()
+    {
+        $data = [
+            ['user' => ['first' => 'Alice', 'last' => 'A']],
+            ['user' => ['first' => 'Bob', 'last' => 'B']],
+        ];
+
+        $this->assertSame(
+            "firstName,lastName\nAlice,A\nBob,B\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::HEADERS_KEY => ['firstName' => 'user.first', 'lastName' => 'user.last'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersFillsMissingPathsWithEmptyString()
+    {
+        $data = [
+            ['firstName' => 'Alice', 'lastName' => 'A'],
+            ['firstName' => 'Bob', 'lastName' => 'B'],
+        ];
+
+        $this->assertSame(
+            "Prénom,Missing\nAlice,\nBob,\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::HEADERS_KEY => ['Prénom' => 'firstName', 'Missing' => 'unknown'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersHonorsKeySeparator()
+    {
+        $data = [
+            ['user' => ['first' => 'Alice']],
+            ['user' => ['first' => 'Bob']],
+        ];
+
+        $this->assertSame(
+            "firstName\nAlice\nBob\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::KEY_SEPARATOR_KEY => '-',
+                CsvEncoder::HEADERS_KEY => ['firstName' => 'user-first'],
+            ])
+        );
+    }
+
+    public function testEncodeWithAssociativeHeadersAndNoHeaders()
+    {
+        $data = [
+            ['firstName' => 'Alice', 'lastName' => 'A'],
+            ['firstName' => 'Bob', 'lastName' => 'B'],
+        ];
+
+        $this->assertSame(
+            "Alice,A\nBob,B\n",
+            $this->encoder->encode($data, 'csv', [
+                CsvEncoder::NO_HEADERS_KEY => true,
+                CsvEncoder::HEADERS_KEY => ['Prénom' => 'firstName', 'Nom' => 'lastName'],
+            ])
+        );
     }
 
     public function testEncodeFormulas()
@@ -852,26 +927,5 @@ class CsvEncoderTest extends TestCase
         yield 'array iterator' => [new \ArrayIterator($data)];
         yield 'iterator aggregate' => [new \IteratorIterator(new \ArrayIterator($data))];
         yield 'generator' => [(static fn (): \Generator => yield from $data)()];
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testPassingNonEmptyEscapeCharIsDeprecated()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: Setting the "csv_escape_char" option is deprecated. The option will be removed in 8.0.');
-        $encoder = new CsvEncoder(['csv_escape_char' => '@']);
-
-        $this->assertSame(
-            [[
-                'A, B@"' => 'D',
-                'C' => 'E',
-            ]],
-            $encoder->decode(<<<'CSV'
-                "A, B@"", "C"
-                "D", "E"
-                CSV,
-                'csv'
-            )
-        );
     }
 }

@@ -141,8 +141,7 @@ class DoctrineTokenProviderTest extends TestCase
     {
         $config = ORMSetup::createConfiguration(true);
         $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-
-        $config->setLazyGhostObjectEnabled(true);
+        $config->enableNativeLazyObjects(true);
 
         $connection = DriverManager::getConnection([
             'driver' => 'pdo_sqlite',

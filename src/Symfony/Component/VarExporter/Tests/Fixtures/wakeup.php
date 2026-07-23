@@ -1,25 +1,22 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['Symfony\\Component\\VarExporter\\Tests\\Fixtures\\MyWakeup'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\Fixtures\\MyWakeup')),
-        clone $p['Symfony\\Component\\VarExporter\\Tests\\Fixtures\\MyWakeup'],
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\Fixtures\\MyWakeup',
+    'objectMeta' => [
+        [0, 2],
+        [0, 1],
     ],
-    null,
-    [
+    'prepared' => 0,
+    'properties' => [
         'stdClass' => [
-            'sub' => [
-                $o[1],
-                123,
-            ],
-            'baz' => [
-                1 => 123,
-            ],
+            'sub' => [1, 123],
+            'baz' => [1 => 123],
         ],
     ],
-    $o[0],
-    [
-        1 => 1,
-        0,
-    ]
-);
+    'resolve' => [
+        'stdClass' => [
+            'sub' => [true],
+        ],
+    ],
+    'states' => [1 => 1, 0],
+], null, true);

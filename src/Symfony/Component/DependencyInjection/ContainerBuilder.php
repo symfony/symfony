@@ -22,6 +22,8 @@ use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosure;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
@@ -205,10 +207,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function registerExtension(ExtensionInterface $extension): void
     {
         $this->extensions[$extension->getAlias()] = $extension;
-
-        if (false !== $extension->getNamespace()) {
-            $this->extensionsByNs[$extension->getNamespace() ?? ''] = $extension;
-        }
     }
 
     /**
@@ -1251,6 +1249,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             $callable($service);
         }
 
+        if ($resetTags = $definition->getTag('container.tracked_for_reset')) {
+            $this->trackForReset($service, array_column($resetTags, 'method'));
+        }
+
         return $service;
     }
 
@@ -1274,6 +1276,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         } elseif ($value instanceof ServiceClosureArgument) {
             $reference = $value->getValues()[0];
             $value = fn () => $this->resolveServices($reference);
+        } elseif ($value instanceof EnvClosureArgument) {
+            $expr = $value->getValue();
+            $envClosure = new EnvClosure(fn () => $this->resolveEnvPlaceholders($expr, true), $value->getDefault());
+            $value = $value->isStringable() ? $envClosure : $envClosure->__invoke(...);
         } elseif ($value instanceof IteratorArgument) {
             $value = new RewindableGenerator(function () use ($value, &$inlineServices) {
                 foreach ($value->getValues() as $k => $v) {
@@ -1377,13 +1383,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *          }
      *      }
      *
-     * @param bool $throwOnAbstract
-     *
      * @return array<string, array> An array of tags with the tagged service as key, holding a list of attribute arrays
      */
-    public function findTaggedResourceIds(string $tagName/* , bool $throwOnAbstract = true */): array
+    public function findTaggedResourceIds(string $tagName, bool $throwOnAbstract = true): array
     {
-        $throwOnAbstract = \func_num_args() > 1 ? func_get_arg(1) : true;
         $this->usedTags[] = $tagName;
         $tags = [];
         foreach ($this->getDefinitions() as $id => $definition) {
@@ -1391,7 +1394,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 continue;
             }
             if (!$definition->hasTag('container.excluded')) {
-                throw new InvalidArgumentException(\sprintf('The resource "%s" tagged "%s" is missing the "container.excluded" tag.', $id, $tagName));
+                throw new InvalidArgumentException(\sprintf('The resource "%s" tagged "%s" is missing the "container.excluded" tag; did you mean to use "resource_tags" instead of "tags"?', $id, $tagName));
             }
             $class = $this->parameterBag->resolveValue($definition->getClass());
             if (!$class || $throwOnAbstract && $definition->isAbstract()) {
@@ -1481,13 +1484,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * using camel case: "foo.bar" or "foo_bar" creates an alias bound to
      * "$fooBar"-named arguments with $type as type-hint. Such arguments will
      * receive the service $id when autowiring is used.
-     *
-     * @param ?string $target
      */
-    public function registerAliasForArgument(string $id, string $type, ?string $name = null/* , ?string $target = null */): Alias
+    public function registerAliasForArgument(string $id, string $type, ?string $name = null, ?string $target = null): Alias
     {
         $parsedName = (new Target($name ??= $id))->getParsedName();
-        $target = (\func_num_args() > 3 ? func_get_arg(3) : null) ?? $name;
+        $target ??= $name;
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $parsedName)) {
             if ($id !== $name) {
@@ -1512,27 +1513,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getAutoconfiguredInstanceof(): array
     {
         return $this->autoconfiguredInstanceof;
-    }
-
-    /**
-     * @return array<class-string, callable>
-     *
-     * @deprecated Use {@see getAttributeAutoconfigurators()} instead
-     */
-    public function getAutoconfiguredAttributes(): array
-    {
-        trigger_deprecation('symfony/dependency-injection', '7.3', 'The "%s()" method is deprecated, use "getAttributeAutoconfigurators()" instead.', __METHOD__);
-
-        $autoconfiguredAttributes = [];
-        foreach ($this->autoconfiguredAttributes as $attribute => $configurators) {
-            if (\count($configurators) > 1) {
-                throw new LogicException(\sprintf('The "%s" attribute has %d configurators. Use "getAttributeAutoconfigurators()" to get all of them.', $attribute, \count($configurators)));
-            }
-
-            $autoconfiguredAttributes[$attribute] = $configurators[0];
-        }
-
-        return $autoconfiguredAttributes;
     }
 
     /**

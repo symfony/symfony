@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
-
 /**
  * A sequence of validation groups.
  *
@@ -77,13 +75,8 @@ class GroupSequence
      *
      * @param array<string|string[]|GroupSequence> $groups The groups in the sequence
      */
-    #[HasNamedArguments]
     public function __construct(array $groups)
     {
-        if (!array_is_list($groups)) {
-            trigger_deprecation('symfony/validator', '7.4', 'Support for passing an array of options to "%s()" is deprecated.', __METHOD__);
-        }
-
-        $this->groups = $groups['value'] ?? $groups;
+        $this->groups = $groups;
     }
 }

@@ -17,9 +17,6 @@ use Symfony\Component\Ldap\Exception\ConnectionException;
 
 /**
  * @author Charles Sarrazin <charles@sarraz.in>
- *
- * @method void   saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props =  null)
- * @method string whoami()
  */
 interface LdapInterface
 {
@@ -38,12 +35,12 @@ interface LdapInterface
      *
      * @throws ConnectionException if dn / password could not be bound
      */
-    // public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void;
+    public function saslBind(?string $dn = null, #[\SensitiveParameter] ?string $password = null, ?string $mech = null, ?string $realm = null, ?string $authcId = null, ?string $authzId = null, ?string $props = null): void;
 
     /**
      * Returns authenticated and authorized (for SASL) DN.
      */
-    // public function whoami(): string;
+    public function whoami(): string;
 
     /**
      * Queries a ldap server for entries matching the given criteria.

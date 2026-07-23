@@ -26,10 +26,10 @@ final class TelegramTransportFactoryTest extends AbstractTransportFactoryTestCas
 
     public static function createProvider(): iterable
     {
-        yield [
-            'telegram://host.test?channel=testChannel',
-            'telegram://user:password@host.test?channel=testChannel',
-        ];
+        yield ['telegram://host.test?channel=testChannel', 'telegram://user:password@host.test?channel=testChannel'];
+
+        // Tests for `sslmode` option
+        yield ['telegram://host.test?channel=testChannel&sslmode=disable', 'telegram://user:password@host.test?channel=testChannel&sslmode=disable'];
     }
 
     public static function supportsProvider(): iterable

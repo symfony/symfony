@@ -16,18 +16,10 @@ use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterDatePointTy
 use Symfony\Bridge\Doctrine\Types\DatePointType;
 use Symfony\Bridge\Doctrine\Types\DayPointType;
 use Symfony\Bridge\Doctrine\Types\TimePointType;
-use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RegisterDatePointTypePassTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        if (!class_exists(DatePoint::class)) {
-            self::markTestSkipped('The DatePoint class is not available.');
-        }
-    }
-
     public function testRegistered()
     {
         $container = new ContainerBuilder();

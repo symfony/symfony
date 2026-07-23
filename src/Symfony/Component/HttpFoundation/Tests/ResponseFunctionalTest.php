@@ -75,7 +75,7 @@ class ResponseFunctionalTest extends TestCase
         $p->run();
         $output = $p->getErrorOutput();
 
-        $this->assertSame(3, preg_match_all('#Link: </css/style\.css>; rel="preload"; as="style"#', $output));
-        $this->assertSame(2, preg_match_all('#Link: </js/app\.js>; rel="preload"; as="script"#', $output));
+        $this->assertSame(3, preg_match_all('#Link: </css/style\.css>; rel="preload"; as="style"#', $output), $output);
+        $this->assertSame(2, preg_match_all('#Link: </js/app\.js>; rel="preload"; as="script"#', $output), $output);
     }
 }

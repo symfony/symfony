@@ -43,14 +43,19 @@ final class TypeContextFactory
     private static array $reflectionClassCache = [];
 
     /**
-     * @var array<string,array<string,TypeContext>>
+     * @var array<string, array<string, TypeContext>>
      */
-    private array $intermediateTypeContextCache = [];
+    private array $baseTypeContextCache = [];
 
     /**
-     * @var array<string,array<string,TypeContext>>
+     * @var array<string, array<string, TypeContext>>
      */
     private array $typeContextCache = [];
+
+    /**
+     * @var array<string, array<string, string>>
+     */
+    private array $usesCache = [];
 
     private ?Lexer $phpstanLexer = null;
     private ?PhpDocParser $phpstanParser = null;
@@ -73,7 +78,7 @@ final class TypeContextFactory
 
     public function createFromReflection(\Reflector $reflection): ?TypeContext
     {
-        $declaringClassReflection = match (true) {
+        $classReflection = match (true) {
             $reflection instanceof \ReflectionClass => $reflection,
             $reflection instanceof \ReflectionMethod => $reflection->getDeclaringClass(),
             $reflection instanceof \ReflectionProperty => $reflection->getDeclaringClass(),
@@ -82,16 +87,16 @@ final class TypeContextFactory
             default => null,
         };
 
-        if (null === $declaringClassReflection) {
+        if (null === $classReflection) {
             return null;
         }
 
-        $typeContext = $this->createIntermediateTypeContext($declaringClassReflection->getName(), $declaringClassReflection);
+        $typeContext = $this->createBaseTypeContext($classReflection->getName(), $classReflection);
 
         $templates = match (true) {
-            $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($reflection, $typeContext) + $this->collectTemplates($declaringClassReflection, $typeContext),
-            $reflection instanceof \ReflectionParameter => $this->collectTemplates($reflection->getDeclaringFunction(), $typeContext) + $this->collectTemplates($declaringClassReflection, $typeContext),
-            default => $this->collectTemplates($declaringClassReflection, $typeContext),
+            $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($reflection, $typeContext) + $this->collectTemplates($classReflection, $typeContext),
+            $reflection instanceof \ReflectionParameter => $this->collectTemplates($reflection->getDeclaringFunction(), $typeContext) + $this->collectTemplates($classReflection, $typeContext),
+            default => $this->collectTemplates($classReflection, $typeContext),
         };
 
         $typeContext = new TypeContext(
@@ -108,7 +113,7 @@ final class TypeContextFactory
             $typeContext->namespace,
             $typeContext->uses,
             $typeContext->templates,
-            $this->collectTypeAliases($declaringClassReflection, $typeContext),
+            $this->collectTypeAliases($classReflection, $typeContext),
         );
     }
 
@@ -117,8 +122,8 @@ final class TypeContextFactory
         $calledClassNameReflection = self::$reflectionClassCache[$calledClassName] ??= new \ReflectionClass($calledClassName);
         $declaringClassReflection = self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName);
 
-        $calledClassTypeContext = $this->createIntermediateTypeContext($calledClassNameReflection->getName(), $calledClassNameReflection);
-        $typeContext = $this->createIntermediateTypeContext($calledClassNameReflection->getName(), $declaringClassReflection);
+        $calledClassTypeContext = $this->createBaseTypeContext($calledClassNameReflection->getName(), $calledClassNameReflection);
+        $typeContext = $this->createBaseTypeContext($calledClassNameReflection->getName(), $declaringClassReflection);
 
         $typeContext = new TypeContext(
             $typeContext->calledClassName,
@@ -138,11 +143,11 @@ final class TypeContextFactory
         );
     }
 
-    private function createIntermediateTypeContext(string $calledClassName, \ReflectionClass $declaringClassReflection): TypeContext
+    private function createBaseTypeContext(string $calledClassName, \ReflectionClass $declaringClassReflection): TypeContext
     {
         $declaringClassName = $declaringClassReflection->getName();
 
-        return $this->intermediateTypeContextCache[$declaringClassName][$calledClassName] ??= new TypeContext(
+        return $this->baseTypeContextCache[$declaringClassName][$calledClassName] ??= new TypeContext(
             $calledClassName,
             $declaringClassReflection->getName(),
             trim($declaringClassReflection->getNamespaceName(), '\\'),
@@ -155,6 +160,10 @@ final class TypeContextFactory
      */
     private function collectUses(\ReflectionClass $reflection): array
     {
+        if (isset($this->usesCache[$reflection->getName()])) {
+            return $this->usesCache[$reflection->getName()];
+        }
+
         $fileName = $reflection->getFileName();
         if (!\is_string($fileName) || !is_file($fileName)) {
             return [];
@@ -207,7 +216,7 @@ final class TypeContextFactory
             $traitUses[] = $this->collectUses($traitReflection);
         }
 
-        return array_merge($uses, ...$traitUses);
+        return $this->usesCache[$reflection->getName()] = array_merge($uses, ...$traitUses);
     }
 
     /**
@@ -240,8 +249,24 @@ final class TypeContextFactory
             return [];
         }
 
+        $docNode = $this->getPhpDocNode($rawDocNode);
+
+        $templateTags = [
+            '@template',
+            '@template-covariant',
+            '@psalm-template',
+            '@psalm-template-covariant',
+            '@phpstan-template',
+            '@phpstan-template-covariant',
+        ];
+
+        $tags = [];
+        foreach ($templateTags as $tagName) {
+            $tags = [...$tags, ...$docNode->getTagsByName($tagName)];
+        }
+
         $templates = [];
-        foreach ($this->getPhpDocNode($rawDocNode)->getTagsByName('@template') + $this->getPhpDocNode($rawDocNode)->getTagsByName('@phpstan-template') + $this->getPhpDocNode($rawDocNode)->getTagsByName('@psalm-template') as $tag) {
+        foreach ($tags as $tag) {
             if (!$tag->value instanceof TemplateTagValueNode) {
                 continue;
             }

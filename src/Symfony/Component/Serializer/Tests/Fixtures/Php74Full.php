@@ -30,10 +30,10 @@ final class Php74Full
     public Php74FullWithConstructor $php74FullWithConstructor;
     public Php74FullWithTypedConstructor $php74FullWithTypedConstructor;
     public DummyMessageInterface $dummyMessage;
-    /** @var TestFoo[] $nestedArray */
     public TestFoo $nestedObject;
-    /** @var Php74Full[] */
+    /** @var array<int, Php74Full> */
     public $anotherCollection;
+    public TestFoo $nestedObject2;
 }
 
 final class Php74FullWithConstructor

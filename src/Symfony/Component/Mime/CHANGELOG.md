@@ -6,6 +6,11 @@ CHANGELOG
 
 * Add `Message::toStringForArchive()` and `Message::toIterableForArchive()` to serialize messages with the `Bcc` header preserved
 
+8.0
+---
+
+ * Replace `__sleep/wakeup()` by `__(un)serialize()` on `AbstractPart` implementations
+
 7.4
 ---
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Stamp\StampInterface;
+
 /**
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
@@ -49,6 +51,16 @@ class TraceableMessageBus implements MessageBusInterface
         }
     }
 
+    /**
+     * @return list<array{
+     *     stamps: list<StampInterface>,
+     *     message: object,
+     *     caller: array{name: string, file: string|null, line: int|null},
+     *     callTime: float,
+     *     exception?: \Throwable,
+     *     stamps_after_dispatch: list<StampInterface>,
+     * }>
+     */
     public function getDispatchedMessages(): array
     {
         return $this->dispatchedMessages;
@@ -59,6 +71,9 @@ class TraceableMessageBus implements MessageBusInterface
         $this->dispatchedMessages = [];
     }
 
+    /**
+     * @return array{name: string, file: string|null, line: int|null}
+     */
     private function getCaller(): array
     {
         $trace = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 8);

@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Loader;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -40,16 +38,5 @@ class DefinitionFileLoaderTest extends TestCase
         $this->assertArrayHasKey('foo', $children);
         $this->assertInstanceOf(BaseNode::class, $children['foo']);
         $this->assertSame('test.foo', $children['foo']->getPath(), '->load() loads a PHP file resource');
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testTriggersDeprecationWhenAccessingLoaderInternalScope()
-    {
-        $loader = new DefinitionFileLoader(new TreeBuilder('test'), new FileLocator(__DIR__.'/../../Fixtures/Loader'));
-
-        $this->expectUserDeprecationMessageMatches('{^Since symfony/config 7.4: Accessing the internal scope of the loader in config files is deprecated, use only its public API instead in ".+" on line \d+\.$}');
-
-        $loader->load('legacy_internal_scope.php');
     }
 }

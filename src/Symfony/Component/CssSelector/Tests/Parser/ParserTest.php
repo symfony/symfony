@@ -135,6 +135,16 @@ class ParserTest extends TestCase
             ['div:contains("foo")', ["Function[Element[div]:contains(['foo'])]"]],
             ['div#foobar', ['Hash[Element[div]#foobar]']],
             ['div:not(div.foo)', ['Negation[Element[div]:not(Class[Element[div].foo])]']],
+            ['div:has(div.foo)', ['Relation[Element[div]:has(Selector[Class[Element[div].foo]])]']],
+            ['div:has([type=text])', ["Relation[Element[div]:has(Selector[Attribute[Element[*][type = 'text']]])]"]],
+            ['div:has(div span)', ['Relation[Element[div]:has(Selector[CombinedSelector[Element[div] <followed> Element[span]]])]']],
+            ['div:has(div > span)', ['Relation[Element[div]:has(Selector[CombinedSelector[Element[div] > Element[span]]])]']],
+            ['div:has(:hover)', ['Relation[Element[div]:has(Selector[Pseudo[Element[*]:hover]])]']],
+            ['div:has(div + p > a)', ['Relation[Element[div]:has(Selector[CombinedSelector[CombinedSelector[Element[div] + Element[p]] > Element[a]]])]']],
+            ['div:has(.a, .b)', ['Relation[Element[div]:has(Selector[Class[Element[*].a]], Selector[Class[Element[*].b]])]']],
+            ['div:has(> .a, + .b)', ['Relation[Element[div]:has(> Selector[Class[Element[*].a]], + Selector[Class[Element[*].b]])]']],
+            ['div:has(:scope > a)', ['Relation[Element[div]:has(Selector[CombinedSelector[Pseudo[Element[*]:scope] > Element[a]]])]']],
+            ['div:has(> :scope a)', ['Relation[Element[div]:has(> Selector[CombinedSelector[Pseudo[Element[*]:scope] <followed> Element[a]]])]']],
             ['td ~ th', ['CombinedSelector[Element[td] ~ Element[th]]']],
             ['.foo[data-bar][data-baz=0]', ["Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]"]],
             ['div#foo\.bar', ['Hash[Element[div]#foo.bar]']],
@@ -189,7 +199,34 @@ class ParserTest extends TestCase
             ['foo!', SyntaxErrorException::unexpectedToken('selector', new Token(Token::TYPE_DELIMITER, '!', 3))->getMessage()],
             [':scope > div :scope header', SyntaxErrorException::notAtTheStartOfASelector('scope')->getMessage()],
             [':not(:not(a))', SyntaxErrorException::nestedNot()->getMessage()],
+            ['div:has("foo")', SyntaxErrorException::unexpectedToken('an argument', new Token(Token::TYPE_STRING, 'foo', 9))->getMessage()],
+            ['div:has(123)', SyntaxErrorException::unexpectedToken('an argument', new Token(Token::TYPE_NUMBER, '123', 8))->getMessage()],
+            ['div:has(::before)', SyntaxErrorException::pseudoElementFound('before', 'inside :has()')->getMessage()],
+            ['div:has(a::after)', SyntaxErrorException::pseudoElementFound('after', 'inside :has()')->getMessage()],
+            ['div:has(> ::before)', SyntaxErrorException::pseudoElementFound('before', 'inside :has()')->getMessage()],
         ];
+    }
+
+    public function testHasNestingDepthLimit()
+    {
+        $parser = new Parser();
+        $property = new \ReflectionProperty(Parser::class, 'hasNestingDepth');
+        $property->setValue($parser, 16);
+
+        $this->expectException(SyntaxErrorException::class);
+        $this->expectExceptionMessage(SyntaxErrorException::nestedHas()->getMessage());
+
+        $parser->parse(':has(a)');
+    }
+
+    public function testHasNestingWithinLimitIsAccepted()
+    {
+        $parser = new Parser();
+        $property = new \ReflectionProperty(Parser::class, 'hasNestingDepth');
+        $property->setValue($parser, 15);
+
+        $this->assertCount(1, $parser->parse(':has(a)'));
+        $this->assertSame(15, $property->getValue($parser));
     }
 
     public static function getPseudoElementsTestData()
@@ -251,6 +288,12 @@ class ParserTest extends TestCase
             [':where(#foo)', 0],
             [':where(#foo, :empty, foo)', 0],
             ['#foo:where(#bar:empty)', 100],
+            [':has(*)', 0],
+            [':has(.foo)', 10],
+            [':has(#foo)', 100],
+            [':has(.foo, #foo)', 100],
+            [':has(#foo, :empty, foo)', 100],
+            ['#foo:has(#bar:empty)', 210],
         ];
     }
 

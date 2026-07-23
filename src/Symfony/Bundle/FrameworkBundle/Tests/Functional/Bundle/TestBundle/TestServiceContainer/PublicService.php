@@ -15,10 +15,21 @@ class PublicService
 {
     private NonPublicService $nonPublicService;
     private PrivateService $privateService;
+    private PrivateService $decorated;
+    public object $nonSharedService;
+    public object $nonSharedAlias;
 
-    public function __construct(NonPublicService $nonPublicService, PrivateService $privateService)
-    {
+    public function __construct(
+        NonPublicService $nonPublicService,
+        PrivateService $privateService,
+        PrivateService $decorated,
+        object $nonSharedService,
+        object $nonSharedAlias,
+    ) {
         $this->nonPublicService = $nonPublicService;
         $this->privateService = $privateService;
+        $this->decorated = $decorated;
+        $this->nonSharedService = $nonSharedService;
+        $this->nonSharedAlias = $nonSharedAlias;
     }
 }

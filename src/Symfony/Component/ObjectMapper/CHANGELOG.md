@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add automatic conversion between `BackedEnum` and scalar types (both ways)
+
+8.1
+---
+
+ * Add reverse class-map based on Map attribute
+ * Merge nested properties when targeting the same class
+ * Add a `targetClass` option to `MapCollection`
+ * Add a `TransformObjectMapperAwareInterface` to inject the current object mapper instance to transformers
+ * Add `SourceClass`, `ClassRule`, and `ClassRuleList` condition callables to match mapping rules based on source/target class
+ * Allow `TargetClass` and `SourceClass` to accept arrays of class FQDNs
+ * Add `IsNotNull` built-in condition to skip mapping when a source property value is null
+
 7.4
 ---
 

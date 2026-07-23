@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `inputmode="numeric"` to `IntegerType` when the `grouping` option is enabled
+
+8.1
+---
+
+ * Add support for submitting forms with unchecked checkboxes in request handlers
+ * Add `ResetFlowType` button in `NavigatorFlowType` that you can display with `with_reset` option
+ * Allow injecting a `ViolationMapperInterface` into `FormTypeValidatorExtension`
+ * Deprecate passing boolean as the second argument of `ValidatorExtension` and `FormTypeValidatorExtension`'s constructors; pass a `ViolationMapperInterface` instead
+ * Add argument `$violationMapper` to `ValidatorExtensionTrait` and `TypeTestCase`'s `getExtensions()` methods
+ * Add default `min`/`max` attributes to `BirthdayType` when `widget` is `single_text`
+ * Add `labels` option to `DateType` to customize the year, month and day sub-field labels
+ * Use `translation_domain` instead of `choice_translation_domain` for the expanded `ChoiceType` placeholder
+ * Render the placeholder option of required collapsed `ChoiceType` fields with the `hidden` attribute by default; set the `placeholder_attr` option to `[]` to restore the previous rendering
+
+8.0
+---
+
+ * Change default value of `default_protocol` option in `UrlType` from `'http'` to `null`
+ * Remove the `VersionAwareTest` trait, use feature detection instead
+ * Remove deprecated `ResizeFormListener::preSetData()` method, use `postSetData()` instead
+ * Remove `validation.xml` in `Resources/config`, replaced by attributes on the `Form` class
+
 7.4
 ---
 
@@ -23,6 +49,7 @@ CHANGELOG
  * Add `LazyChoiceLoader` and `choice_lazy` option in `ChoiceType` for loading and rendering choices on demand
  * Use `form.post_set_data` instead of `form.pre_set_data` in `ResizeFormListener`
  * Change the priority of `DataCollectorListener` from 255 to -255
+ * Make `ResizeFormListener::postSetData()` method `final`
 
 7.1
 ---

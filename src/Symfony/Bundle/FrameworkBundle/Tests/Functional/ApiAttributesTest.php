@@ -12,12 +12,16 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\Serialize;
+use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class ApiAttributesTest extends AbstractWebTestCase
@@ -894,6 +898,90 @@ class ApiAttributesTest extends AbstractWebTestCase
             'expectedStatusCode' => 422,
         ];
     }
+
+    #[RequiresMethod(ControllerAttributesListener::class, 'beforeController')]
+    #[DataProvider('serializeProvider')]
+    public function testSerialize(string $uri, string $format, string $expectedResponse, int $expectedStatusCode, array $expectedHeaders = [])
+    {
+        $client = self::createClient(['test_case' => 'ApiAttributesTest']);
+
+        $client->request('GET', $uri);
+
+        $response = $client->getResponse();
+        self::assertSame($expectedStatusCode, $response->getStatusCode());
+
+        match ($format) {
+            'json' => self::assertJsonStringEqualsJsonString($expectedResponse, $response->getContent()),
+            'xml' => self::assertXmlStringEqualsXmlString($expectedResponse, $response->getContent()),
+            'pdf' => null,
+            default => throw new \InvalidArgumentException(\sprintf('Unsupported format "%s".', $format)),
+        };
+
+        foreach ($expectedHeaders as $header => $expectedHeaderValue) {
+            self::assertSame($expectedHeaderValue, $response->headers->get($header));
+        }
+    }
+
+    public static function serializeProvider(): iterable
+    {
+        yield 'serialize controller result into json' => [
+            'uri' => '/serialize-controller-result',
+            'format' => 'json',
+            'expectedResponse' => <<<'JSON'
+                {
+                    "id": 101,
+                    "name": "Laptop",
+                    "createdAt": "31.12.2021 12:34:56"
+                }
+                JSON,
+            'expectedStatusCode' => 201,
+            'expectedHeaders' => [
+                'Content-Type' => 'application/json',
+                'X-Custom-Header' => 'abc',
+            ],
+        ];
+
+        yield 'serialize controller result into json with format passed' => [
+            'uri' => '/serialize-controller-result.json',
+            'format' => 'json',
+            'expectedResponse' => <<<'JSON'
+                {
+                    "id": 101,
+                    "name": "Laptop",
+                    "createdAt": "31.12.2021 12:34:56"
+                }
+                JSON,
+            'expectedStatusCode' => 201,
+            'expectedHeaders' => [
+                'Content-Type' => 'application/json',
+                'X-Custom-Header' => 'abc',
+            ],
+        ];
+
+        yield 'serialize controller result into xml with format passed' => [
+            'uri' => '/serialize-controller-result.xml',
+            'format' => 'xml',
+            'expectedResponse' => <<<'XML'
+                    <response>
+                        <id>101</id>
+                        <name>Laptop</name>
+                        <createdAt>31.12.2021 12:34:56</createdAt>
+                    </response>
+                XML,
+            'expectedStatusCode' => 201,
+            'expectedHeaders' => [
+                'Content-Type' => 'text/xml; charset=UTF-8',
+                'X-Custom-Header' => 'abc',
+            ],
+        ];
+
+        yield 'unsupported format should throw exception' => [
+            'uri' => '/serialize-controller-result.pdf',
+            'format' => 'pdf',
+            'expectedResponse' => '',
+            'expectedStatusCode' => 415,
+        ];
+    }
 }
 
 class WithMapQueryStringToNullableAttributeController
@@ -991,6 +1079,15 @@ class WithMapRequestToNonNullableAttributeWithoutDefaultValueController
     }
 }
 
+class WithSerializeAttributeController
+{
+    #[Serialize(201, ['X-Custom-Header' => 'abc'], [DateTimeNormalizer::FORMAT_KEY => 'd.m.Y H:i:s'])]
+    public function __invoke(): Product
+    {
+        return new Product(101, 'Laptop', new \DateTimeImmutable('2021-12-31T12:34:56+00:00'));
+    }
+}
+
 class QueryString
 {
     public function __construct(
@@ -1017,6 +1114,16 @@ class RequestBody
         #[Assert\Length(min: 10)]
         public readonly string $comment,
         public readonly bool $approved,
+    ) {
+    }
+}
+
+class Product
+{
+    public function __construct(
+        public readonly int $id,
+        public readonly string $name,
+        public readonly \DateTimeImmutable $createdAt,
     ) {
     }
 }

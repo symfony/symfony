@@ -21,9 +21,11 @@ class CollectionConfigurator
 {
     use Traits\AddTrait;
     use Traits\HostTrait;
+    use Traits\PrefixTrait;
     use Traits\RouteTrait;
 
     private string|array|null $host = null;
+    private bool $trailingSlashOnRoot = true;
 
     public function __construct(
         private RouteCollection $parent,
@@ -49,7 +51,7 @@ class CollectionConfigurator
     public function __destruct()
     {
         if (null === $this->prefixes) {
-            $this->collection->addPrefix($this->route->getPath());
+            $this->addPrefix($this->collection, $this->route->getPath(), $this->trailingSlashOnRoot);
         }
         if (null !== $this->host) {
             $this->addHost($this->collection, $this->host);
@@ -73,8 +75,10 @@ class CollectionConfigurator
      *
      * @return $this
      */
-    final public function prefix(string|array $prefix): static
+    final public function prefix(string|array $prefix, bool $trailingSlashOnRoot = true): static
     {
+        $this->trailingSlashOnRoot = $trailingSlashOnRoot;
+
         if (\is_array($prefix)) {
             if (null === $this->parentPrefixes) {
                 // no-op
@@ -118,6 +122,16 @@ class CollectionConfigurator
      */
     private function createRoute(string $path): Route
     {
+        if (!$this->trailingSlashOnRoot && null !== $this->prefixes) {
+            foreach ($this->prefixes as $prefix) {
+                if ($path === $prefix.'/') {
+                    $path = $prefix;
+
+                    break;
+                }
+            }
+        }
+
         return (clone $this->route)->setPath($path);
     }
 }

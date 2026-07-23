@@ -18,10 +18,13 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyWithTemplateAndParentInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanTemplates;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmCovariantTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithRecursiveTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateAndParent;
@@ -165,6 +168,9 @@ class TypeContextFactoryTest extends TestCase
         yield [DummyWithTemplates::class];
         yield [DummyWithPhpstanTemplates::class];
         yield [DummyWithPsalmTemplates::class];
+        yield [DummyWithCovariantTemplates::class];
+        yield [DummyWithPsalmCovariantTemplates::class];
+        yield [DummyWithPhpstanCovariantTemplates::class];
     }
 
     public function testCollectTemplatesWithParent()

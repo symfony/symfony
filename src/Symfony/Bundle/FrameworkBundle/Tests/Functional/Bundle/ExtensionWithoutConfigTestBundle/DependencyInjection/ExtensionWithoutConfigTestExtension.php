@@ -21,7 +21,7 @@ class ExtensionWithoutConfigTestExtension implements ExtensionInterface
     }
 
     /**
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     * To be removed when symfony/dependency-injection is bumped to 8.0+.
      */
     public function getNamespace(): string
     {
@@ -29,7 +29,7 @@ class ExtensionWithoutConfigTestExtension implements ExtensionInterface
     }
 
     /**
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
+     * To be removed when symfony/dependency-injection is bumped to 8.0+.
      */
     public function getXsdValidationBasePath(): string|false
     {

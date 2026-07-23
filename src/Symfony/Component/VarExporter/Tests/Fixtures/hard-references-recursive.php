@@ -1,16 +1,14 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [],
-    [
-        $r = [],
-        $r[1] = [
-            &$r[1],
-        ],
+return \deepclone_from_array([
+    'classes' => '',
+    'objectMeta' => 0,
+    'prepared' => [-1],
+    'mask' => [false],
+    'refs' => [
+        1 => [-1],
     ],
-    [],
-    [
-        &$r[1],
+    'refMasks' => [
+        1 => [false],
     ],
-    []
-);
+], null, true);

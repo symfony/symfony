@@ -38,9 +38,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $url = "pdo-pgsql://postgres:password@$host";
         $params = (new DsnParser())->parse($url);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);
@@ -61,8 +59,8 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($this->connection->get());
     }
@@ -74,8 +72,8 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($connection->get());
     }

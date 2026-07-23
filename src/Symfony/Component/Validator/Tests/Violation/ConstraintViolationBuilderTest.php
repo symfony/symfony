@@ -84,6 +84,29 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid(), $cause));
     }
 
+    public function testNonStringParametersAreSupported()
+    {
+        $date = new \DateTimeImmutable('2024-01-01');
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects(self::once())->method('trans')->willReturn('translated');
+
+        $builder = new ConstraintViolationBuilder($this->violations, new Valid(), $this->messageTemplate, [], $this->root, 'data', 'foo', $translator);
+        $builder
+            ->setParameter('%string%', 'foo')
+            ->setParameter('%int%', 42)
+            ->setParameter('%float%', 3.14)
+            ->setParameter('%date%', $date)
+            ->addViolation();
+
+        $this->assertSame([
+            '%string%' => 'foo',
+            '%int%' => 42,
+            '%float%' => 3.14,
+            '%date%' => $date,
+        ], $this->violations->get(0)->getParameters());
+    }
+
     public function testTranslationDomainFalse()
     {
         $translator = $this->createMock(TranslatorInterface::class);

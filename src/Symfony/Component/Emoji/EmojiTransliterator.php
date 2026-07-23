@@ -83,20 +83,12 @@ final class EmojiTransliterator extends \Transliterator
         return self::create($this->id, \Transliterator::REVERSE);
     }
 
-    /**
-     * @return int
-     */
-    #[\ReturnTypeWillChange]
-    public function getErrorCode(): int|false
+    public function getErrorCode(): int
     {
         return isset($this->transliterator) ? $this->transliterator->getErrorCode() : 0;
     }
 
-    /**
-     * @return string
-     */
-    #[\ReturnTypeWillChange]
-    public function getErrorMessage(): string|false
+    public function getErrorMessage(): string
     {
         return isset($this->transliterator) ? $this->transliterator->getErrorMessage() : '';
     }

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Loader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\FileLocatorInterface;
@@ -23,6 +21,7 @@ use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Routing\Loader\AttributeClassLoader;
 use Symfony\Component\Routing\Loader\PhpFileLoader;
 use Symfony\Component\Routing\Loader\Psr4DirectoryLoader;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
@@ -261,20 +260,6 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testTriggersDeprecationWhenAccessingLoaderInternalScope()
-    {
-        $locator = new FileLocator([__DIR__.'/../Fixtures']);
-        $loader = new PhpFileLoader($locator);
-
-        $this->expectUserDeprecationMessageMatches('{^Since symfony/routing 7.4: Accessing the internal scope of the loader in config files is deprecated, use only its public API instead in ".+" on line \d+\.$}');
-
-        $routes = $loader->load('legacy_internal_scope.php');
-
-        $this->assertInstanceOf(RouteCollection::class, $routes);
-    }
-
     public function testRoutingI18nConfigurator()
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
@@ -292,6 +277,37 @@ class PhpFileLoaderTest extends TestCase
 
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_sub_i18n.php')));
         $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_i18n.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testCollectionPrefixCanDisableTrailingSlashOnRoot()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_collection_prefix_no_trailing_slash.php');
+
+        $expectedCollection = new RouteCollection();
+        $expectedCollection->add('c_slash', new Route('/categories'));
+        $expectedCollection->add('c_empty', new Route('/categories'));
+        $expectedCollection->add('c_show', new Route('/categories/{id}'));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_collection_prefix_no_trailing_slash.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testCollectionLocalizedPrefixCanDisableTrailingSlashOnRoot()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_collection_localized_prefix_no_trailing_slash.php');
+
+        $expectedCollection = new RouteCollection();
+        $expectedCollection->add('c_slash.en', (new Route('/categories'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'c_slash'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_slash.fr', (new Route('/categorias'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_slash'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->add('c_show.en', (new Route('/categories/{id}'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'c_show'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_show.fr', (new Route('/categorias/{id}'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_show'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_collection_localized_prefix_no_trailing_slash.php')));
 
         $this->assertEquals($expectedCollection, $routeCollection);
     }
@@ -384,10 +400,33 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('/x', $routes->get('x')->getPath());
     }
 
+    public function testLoadsArrayRoutesWithHostControllerLocaleConditionRequirementsAndLocalizedPathsAndAlias()
+    {
+        $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
+        $routes = $loader->load('array_routes_full.php');
+
+        $a = $routes->get('a');
+        $this->assertSame('/a', $a->getPath());
+        $this->assertSame('example.com', $a->getHost());
+        $this->assertSame('AppBundle:Blog:show', $a->getDefault('_controller'));
+        $this->assertSame('en', $a->getDefault('_locale'));
+        $this->assertSame("request.headers.get('User-Agent') matches '/firefox/i'", $a->getCondition());
+        $this->assertSame('[a-z]+', $a->getRequirement('slug'));
+
+        $this->assertSame('/b-en', $routes->get('b.en')->getPath());
+        $this->assertSame('/b-fr', $routes->get('b.fr')->getPath());
+
+        $this->assertSame('a', $routes->getAlias('c_alias')->getId());
+    }
+
     public function testYamlImportsAreResolvedWhenProcessingPhpReturnedArrays()
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
+        $yamlFileLoader = new YamlFileLoader($locator);
+        $loaderResolver = new LoaderResolver([$loader, $yamlFileLoader]);
+        $loader->setResolver($loaderResolver);
+        $yamlFileLoader->setResolver($loaderResolver);
 
         $routes = $loader->load('importer-php-returns-array.php');
 

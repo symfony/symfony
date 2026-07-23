@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -151,6 +152,158 @@ class DebugCommandTest extends TestCase
             "  every first day of next month   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
             " ------------------------------- ---------- --------------------------------- \n".
             "\n/", $tester->getDisplay(true));
+    }
+
+    #[DataProvider('provideSorting')]
+    public function testExecuteWithScheduleAndSortOption(bool $sorted, string $expected)
+    {
+        $schedule = new Schedule();
+        $schedule
+            ->add(RecurringMessage::every('3 minutes', new \stdClass()))
+            ->add(RecurringMessage::every('1 minute', new \stdClass()))
+            ->add(RecurringMessage::every('2 minutes', new \stdClass()))
+        ;
+
+        $schedules = $this->createMock(ServiceProviderInterface::class);
+        $schedules
+            ->expects($this->once())
+            ->method('getProvidedServices')
+            ->willReturn(['schedule_name' => $schedule])
+        ;
+        $schedules
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn($schedule)
+        ;
+
+        $command = new DebugCommand($schedules);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--sort' => $sorted], ['decorated' => false]);
+
+        $this->assertMatchesRegularExpression($expected, $tester->getDisplay(true));
+    }
+
+    public static function provideSorting(): iterable
+    {
+        yield 'Not sorted results' => [
+            false,
+            "/\n".
+            "Scheduler\n".
+            "=========\n".
+            "\n".
+            "schedule_name\n".
+            "-------------\n".
+            "\n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  Trigger           Provider   Next Run                         \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "\n/",
+        ];
+
+        yield 'Sorted results' => [
+            true,
+            "/\n".
+            "Scheduler\n".
+            "=========\n".
+            "\n".
+            "schedule_name\n".
+            "-------------\n".
+            "\n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  Trigger           Provider   Next Run                         \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "\n/",
+        ];
+    }
+
+    public function testExecuteWithSortAndAllListsNullNextRunFirst()
+    {
+        $schedule = new Schedule();
+        $schedule
+            ->add(RecurringMessage::every('2 minutes', new \stdClass()))
+            ->add(RecurringMessage::trigger(new CallbackTrigger(static fn () => null, 'terminated'), new \stdClass()))
+            ->add(RecurringMessage::every('1 minute', new \stdClass()))
+        ;
+
+        $schedules = $this->createMock(ServiceProviderInterface::class);
+        $schedules
+            ->expects($this->once())
+            ->method('getProvidedServices')
+            ->willReturn(['schedule_name' => $schedule])
+        ;
+        $schedules
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn($schedule)
+        ;
+
+        $command = new DebugCommand($schedules);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--sort' => true, '--all' => true], ['decorated' => false]);
+
+        $this->assertMatchesRegularExpression("/\n".
+            "Scheduler\n".
+            "=========\n".
+            "\n".
+            "schedule_name\n".
+            "-------------\n".
+            "\n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  Trigger           Provider   Next Run                         \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  terminated        stdClass   -                                \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "\n/", $tester->getDisplay(true));
+    }
+
+    public function testExecuteWithSortPreservesInsertionOrderOnTies()
+    {
+        $schedule = new Schedule();
+        $schedule
+            ->add(RecurringMessage::trigger(new CallbackTrigger(static fn (\DateTimeImmutable $run) => $run->modify('+1 minute'), 'first'), new \stdClass()))
+            ->add(RecurringMessage::trigger(new CallbackTrigger(static fn (\DateTimeImmutable $run) => $run->modify('+1 minute'), 'second'), new \stdClass()))
+            ->add(RecurringMessage::trigger(new CallbackTrigger(static fn (\DateTimeImmutable $run) => $run->modify('+1 minute'), 'third'), new \stdClass()))
+        ;
+
+        $schedules = $this->createMock(ServiceProviderInterface::class);
+        $schedules
+            ->expects($this->once())
+            ->method('getProvidedServices')
+            ->willReturn(['schedule_name' => $schedule])
+        ;
+        $schedules
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn($schedule)
+        ;
+
+        $command = new DebugCommand($schedules);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--sort' => true], ['decorated' => false]);
+
+        $display = $tester->getDisplay(true);
+        $firstPos = strpos($display, 'first');
+        $secondPos = strpos($display, 'second');
+        $thirdPos = strpos($display, 'third');
+
+        $this->assertNotFalse($firstPos);
+        $this->assertNotFalse($secondPos);
+        $this->assertNotFalse($thirdPos);
+        $this->assertLessThan($secondPos, $firstPos);
+        $this->assertLessThan($thirdPos, $secondPos);
     }
 
     public function testExecuteWithStatefulScheduleUsesStoredCheckpoint()

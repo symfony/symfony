@@ -25,7 +25,6 @@ use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageSkipEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\MessageBusInterface;
-use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
@@ -217,10 +216,6 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             $envelope = $messageReceivedEvent->getEnvelope();
 
             $this->displaySingleMessage($envelope, $io, $errorIo);
-
-            if ($envelope->last(MessageDecodingFailedStamp::class)) {
-                throw new \RuntimeException(\sprintf('The message with id "%s" could not decoded, it can only be shown or removed.', $this->getMessageId($envelope) ?? '?'));
-            }
 
             $this->forceExit = true;
             try {

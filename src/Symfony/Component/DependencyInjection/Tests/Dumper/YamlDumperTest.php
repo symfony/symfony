@@ -12,9 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -116,9 +119,8 @@ class YamlDumperTest extends TestCase
 
     public function testTaggedArguments()
     {
-        $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
-        $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
-        $taggedIterator3 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz', 'qux'], false);
+        $taggedIterator = new TaggedIteratorArgument('foo', null, false, ['baz']);
+        $taggedIterator2 = new TaggedIteratorArgument('foo', null, false, ['baz', 'qux'], false);
 
         $container = new ContainerBuilder();
 
@@ -128,15 +130,47 @@ class YamlDumperTest extends TestCase
 
         $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);
         $container->register('foo2_service_tagged_iterator', 'Bar')->addArgument($taggedIterator2);
-        $container->register('foo3_service_tagged_iterator', 'Bar')->addArgument($taggedIterator3);
 
         $container->register('foo_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator));
         $container->register('foo2_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator2));
-        $container->register('foo3_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator3));
         $container->register('bar_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('foo')));
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsGeneratedFile('services_with_tagged_argument.yml', $dumper->dump());
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testDeprecatedTaggedArguments()
+    {
+        $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
+
+        $container = new ContainerBuilder();
+
+        $container->register('foo_service', 'Foo')->addTag('foo');
+        $container->register('baz_service', 'Baz')->addTag('foo');
+        $container->register('qux_service', 'Qux')->addTag('foo');
+
+        $container->register('foo_service_tagged_iterator', 'Bar')->addArgument($taggedIterator);
+
+        $container->register('foo_service_tagged_locator', 'Bar')->addArgument(new ServiceLocatorArgument($taggedIterator));
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsGeneratedFile('services_with_deprecated_tagged_argument.yml', $dumper->dump());
+    }
+
+    public function testTaggedArgumentsOmitsAutoDerivedDefaultMethods()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo_service', 'Foo')->addTag('foo');
+        $container->register('with_index', 'Bar')->addArgument(new TaggedIteratorArgument('foo', 'barfoo'));
+
+        $dumper = new YamlDumper($container);
+        $yaml = $dumper->dump();
+
+        $this->assertStringNotContainsString('default_index_method', $yaml);
+        $this->assertStringNotContainsString('default_priority_method', $yaml);
+        $this->assertStringContainsString('index_by: barfoo', $yaml);
     }
 
     public function testServiceClosure()
@@ -148,6 +182,20 @@ class YamlDumperTest extends TestCase
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsGeneratedFile('services_with_service_closure.yml', $dumper->dump());
+    }
+
+    public function testEnvClosure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new EnvClosureArgument('%env(FOO)%'))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', null, true))
+            ->addArgument(new EnvClosureArgument('%env(BAR)%', 'def', true))
+            ->addArgument(new EnvClosureArgument('%env(FOO)%', 42))
+        ;
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsGeneratedFile('services_with_env_closure.yml', $dumper->dump());
     }
 
     public function testDumpHandlesEnumeration()

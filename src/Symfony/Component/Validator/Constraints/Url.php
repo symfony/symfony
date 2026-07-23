@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
@@ -35,7 +34,7 @@ class Url extends Constraint
     public string $tldMessage = 'This URL is missing a top-level domain.';
     public array $protocols = ['http', 'https'];
     public bool $relativeProtocol = false;
-    public bool $requireTld = false;
+    public bool $requireTld = true;
     /** @var callable|null */
     public $normalizer;
 
@@ -45,7 +44,6 @@ class Url extends Constraint
      * @param string[]|null        $groups
      * @param bool|null            $requireTld       Whether to require the URL to include a top-level domain (defaults to false)
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -57,15 +55,11 @@ class Url extends Constraint
         ?bool $requireTld = null,
         ?string $tldMessage = null,
     ) {
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
-
-        if (null === ($options['requireTld'] ?? $requireTld)) {
-            trigger_deprecation('symfony/validator', '7.1', 'Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".');
-        }
+        parent::__construct(null, $groups, $payload);
 
         if (\is_string($protocols)) {
             $protocols = (array) $protocols;
@@ -74,7 +68,7 @@ class Url extends Constraint
         $this->message = $message ?? $this->message;
         $this->protocols = $protocols ?? $this->protocols;
         $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;
-        $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->normalizer = $normalizer;
         $this->requireTld = $requireTld ?? $this->requireTld;
         $this->tldMessage = $tldMessage ?? $this->tldMessage;
 

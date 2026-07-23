@@ -23,28 +23,4 @@ class DeprecatedAlias
         public readonly string $message = '',
     ) {
     }
-
-    #[\Deprecated('Use the "message" property instead', 'symfony/routing:7.4')]
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
-
-    #[\Deprecated('Use the "aliasName" property instead', 'symfony/routing:7.4')]
-    public function getAliasName(): string
-    {
-        return $this->aliasName;
-    }
-
-    #[\Deprecated('Use the "package" property instead', 'symfony/routing:7.4')]
-    public function getPackage(): string
-    {
-        return $this->package;
-    }
-
-    #[\Deprecated('Use the "version" property instead', 'symfony/routing:7.4')]
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
 }

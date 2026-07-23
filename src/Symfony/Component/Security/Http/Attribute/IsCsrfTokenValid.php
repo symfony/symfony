@@ -12,6 +12,7 @@
 namespace Symfony\Component\Security\Http\Attribute;
 
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\HttpFoundation\Request;
 
 #[\Attribute(\Attribute::IS_REPEATABLE | \Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::TARGET_FUNCTION)]
 final class IsCsrfTokenValid
@@ -25,9 +26,11 @@ final class IsCsrfTokenValid
 
     public function __construct(
         /**
-         * Sets the id, or an Expression evaluated to the id, used when generating the token.
+         * Sets the id, or an Expression or a Closure evaluated to the id, used when generating the token.
+         *
+         * @var string|Expression|\Closure(array<string,mixed>, Request, ?object):string
          */
-        public string|Expression $id,
+        public string|Expression|\Closure $id,
 
         /**
          * Sets the key of the request that contains the actual token value that should be validated.

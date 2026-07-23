@@ -63,6 +63,21 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         }
     }
 
+    /**
+     * The "hidden" placeholder_attr default of required ChoiceType fields depends
+     * on the installed symfony/form version (the default was introduced in 8.1).
+     */
+    protected function isRequiredPlaceholderHiddenByDefault(): bool
+    {
+        $view = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => [],
+            'required' => true,
+            'placeholder' => 'placeholder',
+        ])->createView();
+
+        return (bool) ($view->vars['placeholder_attr']['hidden'] ?? false);
+    }
+
     protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
     {
         // include ampersands everywhere to validate escaping
@@ -820,7 +835,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     [@name="name"]
     [not(@required)]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Select&Anything&Not&Me[/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)][not(@hidden)][.="[trans]Select&Anything&Not&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -842,12 +857,13 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         // The "disabled" attribute was removed again due to a bug in the
         // BlackBerry 10 browser.
         // See https://github.com/symfony/symfony/pull/7678
+        $placeholderHidden = $this->isRequiredPlaceholderHiddenByDefault() ? '[@hidden="hidden"]' : '[not(@hidden)]';
         $this->assertWidgetMatchesXpath($form->createView(), [],
             '/select
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.="[trans]Test&Me[/trans]"]
+        ./option[@value=""][not(@selected)][not(@disabled)]'.$placeholderHidden.'[.="[trans]Test&Me[/trans]"]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]
@@ -868,12 +884,14 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         // The "disabled" attribute was removed again due to a bug in the
         // BlackBerry 10 browser.
         // See https://github.com/symfony/symfony/pull/7678
+        // The hidden attribute is only defaulted for the "placeholder" option:
+        // placeholders injected via view variables render without it.
         $this->assertWidgetMatchesXpath($form->createView(), ['placeholder' => ''],
             '/select
     [@name="name"]
     [@required="required"]
     [
-        ./option[@value=""][not(@selected)][not(@disabled)][.=""]
+        ./option[@value=""][not(@selected)][not(@disabled)][not(@hidden)][.=""]
         /following-sibling::option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
         /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
     ]

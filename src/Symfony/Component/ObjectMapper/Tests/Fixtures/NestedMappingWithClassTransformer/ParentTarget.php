@@ -10,7 +10,7 @@ class ParentTarget
     public ChildWithClassTransformTarget $childWithBothTransformers;
     public bool $transformed = false;
 
-    public static function createFromSource(ParentTarget $value, ParentSource $source): self
+    public static function createFromSource(self $value, ParentSource $source): self
     {
         $value->transformed = true;
 

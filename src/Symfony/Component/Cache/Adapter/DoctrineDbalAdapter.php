@@ -21,6 +21,7 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
@@ -73,6 +74,10 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         array $options = [],
         ?MarshallerInterface $marshaller = null,
     ) {
+        if (!class_exists(PrimaryKeyConstraint::class)) {
+            throw new \LogicException(\sprintf('Using "%s" requires "doctrine/dbal" 4.3 or higher; try running "composer require doctrine/dbal:^4.3".', __CLASS__));
+        }
+
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(\sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
         }
@@ -130,9 +135,9 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
     }
 
     /**
-     * @return Schema The (possibly new) schema with the table added
+     * @param-immediately-invoked-callable $isSameDatabase
      */
-    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase)
+    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): Schema
     {
         if ($schema->hasTable($this->table)) {
             return $schema;
@@ -390,16 +395,9 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         $platform = $this->conn->getDatabasePlatform();
 
-        if (interface_exists(DBALException::class)) {
-            // DBAL 4+
-            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SQLitePlatform';
-        } else {
-            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SqlitePlatform';
-        }
-
         return $this->platformName = match (true) {
             $platform instanceof AbstractMySQLPlatform => 'mysql',
-            $platform instanceof $sqlitePlatformClass => 'sqlite',
+            $platform instanceof SQLitePlatform => 'sqlite',
             $platform instanceof PostgreSQLPlatform => 'pgsql',
             $platform instanceof OraclePlatform => 'oci',
             $platform instanceof SQLServerPlatform => 'sqlsrv',
@@ -450,10 +448,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
 
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($this->idCol))], true));
-        } else {
-            $table->setPrimaryKey([$this->idCol]);
-        }
+        $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($this->idCol))], true));
     }
 }

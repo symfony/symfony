@@ -15,6 +15,13 @@ where:
  - `SMSLONG` (optional) 0 or 1 : allows SMS messages longer than 160 characters
  - `SMSLONGNBR` (optional) integer : allows to check the size of the long SMS sent. You must send the number of concatenated SMS as a value. If our counter indicates a different number, your message will be rejected.
 
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
+
 Resources
 ---------
 
@@ -23,3 +30,6 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor

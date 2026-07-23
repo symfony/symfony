@@ -15,18 +15,19 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
-use Symfony\Component\PropertyInfo\PropertyDocBlockExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
-use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -447,20 +448,7 @@ class AbstractObjectNormalizerTest extends TestCase
     private function getDenormalizerForDummyCollection()
     {
         $extractor = $this->createStub(PhpDocExtractor::class);
-
-        if (method_exists(PhpDocExtractor::class, 'getType')) {
-            $extractor->method('getType')
-                ->willReturn(
-                    Type::list(Type::object(DummyChild::class)),
-                    null,
-                );
-        } else {
-            $extractor->method('getTypes')
-                ->willReturn(
-                    [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('object', false, DummyChild::class))],
-                    null
-                );
-        }
+        $extractor->method('getType')->willReturn(Type::list(Type::object(DummyChild::class)), null);
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -511,20 +499,7 @@ class AbstractObjectNormalizerTest extends TestCase
     private function getDenormalizerForStringCollection()
     {
         $extractor = $this->createStub(PhpDocExtractor::class);
-
-        if (method_exists(PhpDocExtractor::class, 'getType')) {
-            $extractor->method('getType')
-                ->willReturn(
-                    Type::list(Type::string()),
-                    null,
-                );
-        } else {
-            $extractor->method('getTypes')
-                ->willReturn(
-                    [new LegacyType('array', false, null, true, new LegacyType('int'), new LegacyType('string'))],
-                    null
-                );
-        }
+        $extractor->method('getType')->willReturn(Type::list(Type::string()), null);
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -757,7 +732,8 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(AbstractDummySecondChild::class, $denormalizedData);
     }
 
-    public function testDenormalizeBasicTypePropertiesFromXml()
+    #[DataProvider('denormalizeBasicTypePropertiesConversionDataProvider')]
+    public function testDenormalizeBasicTypePropertiesConversion(string $format, array $context = [])
     {
         $denormalizer = $this->getDenormalizerForObjectWithBasicProperties();
 
@@ -778,7 +754,8 @@ class AbstractObjectNormalizerTest extends TestCase
                 'floatNegInf' => '-INF',
             ],
             ObjectWithBasicProperties::class,
-            'xml'
+            $format,
+            $context
         );
 
         $this->assertInstanceOf(ObjectWithBasicProperties::class, $objectWithBooleanProperties);
@@ -802,43 +779,48 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals(-\INF, $objectWithBooleanProperties->floatNegInf);
     }
 
+    public function testDenormalizeBasicTypePropertiesThrowsWithoutTypeConversion()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessageMatches('/must be one of "bool" \("string" given\)/');
+        $denormalizer = $this->getDenormalizerForObjectWithBasicProperties();
+        $denormalizer->denormalize(
+            [
+                'boolTrue1' => 'true',
+            ],
+            ObjectWithBasicProperties::class,
+            'other',
+            [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => false]
+        );
+    }
+
+    public static function denormalizeBasicTypePropertiesConversionDataProvider(): array
+    {
+        return [
+            ['xml', []],
+            ['csv', []],
+            ['other', [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]],
+        ];
+    }
+
     private function getDenormalizerForObjectWithBasicProperties()
     {
         $extractor = $this->createStub(PhpDocExtractor::class);
-
-        if (method_exists(PhpDocExtractor::class, 'getType')) {
-            $extractor->method('getType')
-                ->willReturn(
-                    Type::bool(),
-                    Type::bool(),
-                    Type::bool(),
-                    Type::bool(),
-                    Type::int(),
-                    Type::int(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                    Type::float(),
-                );
-        } else {
-            $extractor->method('getTypes')
-                ->willReturn(
-                    [new LegacyType('bool')],
-                    [new LegacyType('bool')],
-                    [new LegacyType('bool')],
-                    [new LegacyType('bool')],
-                    [new LegacyType('int')],
-                    [new LegacyType('int')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')],
-                    [new LegacyType('float')]
-                );
-        }
+        $extractor->method('getType')
+            ->willReturn(
+                Type::bool(),
+                Type::bool(),
+                Type::bool(),
+                Type::bool(),
+                Type::int(),
+                Type::int(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+                Type::float(),
+            );
 
         $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
         $arrayDenormalizer = new ArrayDenormalizerDummy();
@@ -1052,85 +1034,6 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertInstanceOf(DummyWithIterableOfDtos::class, $result);
         $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->items);
         $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items));
-    }
-
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testDenormalizeMixedConstructorParameterUsesExtractorTypeLegacy()
-    {
-        $extractor = new PropertyInfoExtractor([], [new ReflectionExtractor()]);
-
-        $entityDenormalizer = new class implements DenormalizerInterface {
-            public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
-            {
-                return new DummyEntity((int) $data);
-            }
-
-            public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-            {
-                return DummyEntity::class === $type;
-            }
-
-            public function getSupportedTypes(?string $format): array
-            {
-                return [DummyEntity::class => true];
-            }
-        };
-
-        $serializer = new Serializer([
-            $entityDenormalizer,
-            new ObjectNormalizer(null, null, null, $extractor),
-        ]);
-
-        $result = $serializer->denormalize(['entity' => 42], DummyWithMixedConstructorParamAndEntityGetter::class);
-
-        $this->assertInstanceOf(DummyWithMixedConstructorParamAndEntityGetter::class, $result);
-        $this->assertInstanceOf(DummyEntity::class, $result->getEntity());
-        $this->assertSame(42, $result->getEntity()->id);
-    }
-
-    #[Group('legacy')]
-    #[IgnoreDeprecations]
-    public function testDenormalizeMixedConstructorParameterUsesExtractorTypeLegacyTypes()
-    {
-        $extractor = new class implements PropertyTypeExtractorInterface {
-            public function getTypes(string $class, string $property, array $context = []): ?array
-            {
-                if (DummyWithMixedConstructorParamAndEntityGetter::class === $class && 'entity' === $property) {
-                    return [new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, true, DummyEntity::class)];
-                }
-
-                return null;
-            }
-        };
-
-        $entityDenormalizer = new class implements DenormalizerInterface {
-            public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
-            {
-                return new DummyEntity((int) $data);
-            }
-
-            public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-            {
-                return DummyEntity::class === $type;
-            }
-
-            public function getSupportedTypes(?string $format): array
-            {
-                return [DummyEntity::class => true];
-            }
-        };
-
-        $serializer = new Serializer([
-            $entityDenormalizer,
-            new ObjectNormalizer(null, null, null, $extractor),
-        ]);
-
-        $result = $serializer->denormalize(['entity' => 42], DummyWithMixedConstructorParamAndEntityGetter::class);
-
-        $this->assertInstanceOf(DummyWithMixedConstructorParamAndEntityGetter::class, $result);
-        $this->assertInstanceOf(DummyEntity::class, $result->getEntity());
-        $this->assertSame(42, $result->getEntity()->id);
     }
 
     public function testDenormalizeWithNumberAsSerializedNameAndNoArrayReindex()
@@ -1558,6 +1461,19 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame($expectedFoo, $dummy->foo);
     }
 
+    #[DataProvider('provideDenormalizeWithFilterBoolData')]
+    public function testDenormalizeBooleanTypeWithFilterBoolForTypeConvertingFormats(array $data, ?bool $expectedFoo)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        // FILTER_BOOL must keep working for the formats that convert scalar types (xml and csv):
+        // the result is expected to be identical to using FILTER_BOOL alone.
+        foreach ([XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize($data, BoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+
+            $this->assertSame($expectedFoo, $dummy->foo);
+        }
+    }
     public static function provideDenormalizeWithFilterBoolData(): array
     {
         return [
@@ -1616,6 +1532,59 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(1, $actual->foo->count());
     }
 
+    public function testDenormalizeList()
+    {
+        $denormalizer = $this->getDenormalizerForListCollection(Type::list(Type::int()));
+
+        /** @var ListCollection $object */
+        $object = $denormalizer->denormalize(
+            ['list' => [1, 2, 3]],
+            ListCollection::class,
+        );
+
+        $this->assertTrue(array_is_list($object->list));
+        $this->assertCount(3, $object->list);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideDenormalizeListWithArray')]
+    public function testDenormalizeListWithArray(Type $type)
+    {
+        $denormalizer = $this->getDenormalizerForListCollection($type);
+
+        $this->expectUserDeprecationMessage('Since symfony/serializer 8.2: Denormalizing an array that is not a list into the "list" property of class "Symfony\Component\Serializer\Tests\Normalizer\ListCollection" is deprecated.');
+
+        /** @var ListCollection $object */
+        $object = $denormalizer->denormalize(
+            ['list' => [1 => 1, 4 => 2, 'foo' => 3]],
+            ListCollection::class
+        );
+
+        $this->assertFalse(array_is_list($object->list));
+        $this->assertCount(3, $object->list);
+    }
+
+    public static function provideDenormalizeListWithArray()
+    {
+        yield 'list<int>' => [Type::list(Type::int())];
+        yield '?list<int>' => [Type::nullable(Type::list(Type::int()))];
+    }
+
+    private function getDenormalizerForListCollection(Type $type)
+    {
+        $extractor = $this->createStub(PhpDocExtractor::class);
+        $extractor->method('getType')->willReturn($type, null);
+
+        $denormalizer = new AbstractObjectNormalizerCollectionDummy(null, null, $extractor);
+        $arrayDenormalizer = new ArrayDenormalizerDummy();
+        $serializer = new SerializerCollectionDummy([$arrayDenormalizer, $denormalizer]);
+        $arrayDenormalizer->setSerializer($serializer);
+        $denormalizer->setSerializer($serializer);
+
+        return $denormalizer;
+    }
+
     public function testTemplateTypeWhenAnObjectIsPassedToDenormalize()
     {
         $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
@@ -1637,11 +1606,7 @@ class AbstractObjectNormalizerTest extends TestCase
 
     public function testDenormalizeTemplateType()
     {
-        if (!interface_exists(PropertyDocBlockExtractorInterface::class)) {
-            $this->markTestSkipped('The PropertyInfo component before Symfony 7.1 does not support template types.');
-        }
-
-        $normalizer = new class(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
+        $normalizer = new class(classMetadataFactory: new ClassMetadataFactory(new AttributeLoader()), propertyTypeExtractor: new PropertyInfoExtractor(typeExtractors: [new PhpStanExtractor(), new ReflectionExtractor()])) extends AbstractObjectNormalizerDummy {
             protected function isAllowedAttribute($classOrObject, string $attribute, ?string $format = null, array $context = []): bool
             {
                 return true;
@@ -1658,6 +1623,41 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertCount(1, $denormalizedData->values);
         $this->assertSame('dummy', $denormalizedData->value->type);
         $this->assertSame('dummy', $denormalizedData->values[0]->type);
+    }
+
+    public function testNotNormalizableValueExceptionCurrentTypeUsesAttributeValue()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(propertyAccessor: PropertyAccess::createPropertyAccessor())]);
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('bool');
+
+        try {
+            $serializer->denormalize(['field' => ['value']], DummyBoolField::class);
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('array', $e->getCurrentType());
+
+            throw $e;
+        }
+    }
+
+    public function testNotNormalizableValueExceptionCurrentTypeUsesSetterValueAfterCallbacks()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(propertyAccessor: PropertyAccess::createPropertyAccessor())]);
+
+        $this->expectException(NotNormalizableValueException::class);
+
+        try {
+            $serializer->denormalize(['field' => '123'], DummyIntField::class, null, [
+                AbstractNormalizer::CALLBACKS => [
+                    'field' => static fn () => null,
+                ],
+            ]);
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('null', $e->getCurrentType());
+
+            throw $e;
+        }
     }
 }
 
@@ -1913,6 +1913,12 @@ class StringCollection
 {
     /** @var string[] */
     public $children;
+}
+
+class ListCollection
+{
+    /** @var list<int> */
+    public $list;
 }
 
 class DummyCollection
@@ -2209,6 +2215,16 @@ class DummyGenericsValueWrapper
     public mixed $value;
     /** @var T[] */
     public array $values;
+}
+
+class DummyBoolField
+{
+    public bool $field;
+}
+
+class DummyIntField
+{
+    public int $field;
 }
 
 class DummyEntity

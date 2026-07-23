@@ -58,26 +58,6 @@ final class CsvEncoderContextBuilder implements ContextBuilderInterface
     }
 
     /**
-     * Configures the escape character.
-     *
-     * Must be empty or a single character.
-     *
-     * @deprecated since Symfony 7.2, to be removed in 8.0
-     *
-     * @throws InvalidArgumentException
-     */
-    public function withEscapeChar(?string $escapeChar): static
-    {
-        trigger_deprecation('symfony/serializer', '7.2', 'The "%s" method is deprecated. It will be removed in 8.0.', __METHOD__);
-
-        if (null !== $escapeChar && \strlen($escapeChar) > 1) {
-            throw new InvalidArgumentException(\sprintf('The "%s" escape character must be empty or a single character.', $escapeChar));
-        }
-
-        return $this->with(CsvEncoder::ESCAPE_CHAR_KEY, $escapeChar);
-    }
-
-    /**
      * Configures the key separator when (un)flattening arrays.
      */
     public function withKeySeparator(?string $keySeparator): static

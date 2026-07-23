@@ -147,6 +147,28 @@ class Link implements EvolvableLinkInterface
     // Extra relations
     public const REL_MERCURE = 'mercure';
 
+    // `as` attributes for `REL_PRELOAD` only
+    // @see https://html.spec.whatwg.org/multipage/links.html#preload-destination
+    public const AS_FETCH = 'fetch';
+    public const AS_FONT = 'font';
+    public const AS_IMAGE = 'image';
+    public const AS_TRACK = 'track';
+
+    // `as` attributes for both `REL_PRELOAD` and `REL_MODULEPRELOAD`
+    public const AS_SCRIPT = 'script';
+    public const AS_STYLE = 'style';
+
+    // `as` attributes for `REL_MODULEPRELOAD` only
+    // @see https://html.spec.whatwg.org/multipage/links.html#module-preload-destination
+    // @see https://fetch.spec.whatwg.org/#request-destination-script-like
+    public const AS_AUDIOWORKLET = 'audioworklet';
+    public const AS_JSON = 'json';
+    public const AS_PAINTWORKLET = 'paintworklet';
+    public const AS_SERVICEWORKER = 'serviceworker';
+    public const AS_SHAREDWORKER = 'sharedworker';
+    public const AS_TEXT = 'text';
+    public const AS_WORKER = 'worker';
+
     /**
      * @var string[]
      */

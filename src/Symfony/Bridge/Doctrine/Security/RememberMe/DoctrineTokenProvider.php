@@ -191,9 +191,9 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
     /**
      * Adds the Table to the Schema if "remember me" uses this Connection.
      *
-     * @return Schema The (possibly new) schema with the table added
+     * @param-immediately-invoked-callable $isSameDatabase
      */
-    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase)
+    public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): Schema
     {
         if ($schema->hasTable('rememberme_token')) {
             return $schema;
@@ -241,10 +241,6 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
         $table->addColumn('class', Types::STRING, ['length' => 100, 'default' => '']);
         $table->addColumn('username', Types::STRING, ['length' => 200]);
 
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('series'))], true));
-        } else {
-            $table->setPrimaryKey(['series']);
-        }
+        $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('series'))], true));
     }
 }

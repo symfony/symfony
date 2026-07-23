@@ -14,10 +14,8 @@ namespace Symfony\Bundle\FrameworkBundle\Kernel;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurator;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader as ContainerPhpFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Kernel\KernelTrait;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 use Symfony\Component\Routing\Loader\PhpFileLoader as RoutingPhpFileLoader;
 use Symfony\Component\Routing\RouteCollection;
@@ -30,37 +28,61 @@ use Symfony\Component\Routing\RouteCollection;
  */
 trait MicroKernelTrait
 {
-    /**
-     * Configures the container.
-     *
-     * You can register extensions:
-     *
-     *     $container->extension('framework', [
-     *         'secret' => '%secret%'
-     *     ]);
-     *
-     * Or services:
-     *
-     *     $container->services()->set('halloween', 'FooBundle\HalloweenProvider');
-     *
-     * Or parameters:
-     *
-     *     $container->parameters()->set('halloween', 'lot of fun');
-     */
-    private function configureContainer(ContainerConfigurator $container): void
+    use KernelTrait {
+        registerContainerConfiguration as private doRegisterContainerConfiguration;
+        initializeBundles as protected doInitializeBundles;
+        initializeContainer as protected doInitializeContainer;
+        getKernelParameters as private doGetKernelParameters;
+        getBundlesDefinition as private doGetBundlesDefinition;
+    }
+
+    public function getLogDir(): string
     {
-        $configDir = preg_replace('{/config$}', '/{config}', $this->getConfigDir());
+        return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();
+    }
 
-        $container->import($configDir.'/{packages}/*.{php,yaml}');
-        $container->import($configDir.'/{packages}/'.$this->environment.'/*.{php,yaml}');
+    public function registerBundles(): iterable
+    {
+        if (!is_file($this->getBundlesPath())) {
+            yield new FrameworkBundle();
 
-        if (is_file($this->getConfigDir().'/services.yaml')) {
-            $container->import($configDir.'/services.yaml');
-            $container->import($configDir.'/{services}_'.$this->environment.'.yaml');
-        } else {
-            $container->import($configDir.'/{services}.php');
-            $container->import($configDir.'/{services}_'.$this->environment.'.php');
+            return;
         }
+
+        foreach ($this->getBundlesDefinition() as $class => $envs) {
+            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
+                yield new $class();
+            }
+        }
+    }
+
+    public function registerContainerConfiguration(LoaderInterface $loader): void
+    {
+        $this->doRegisterContainerConfiguration($loader);
+
+        $loader->load(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'router' => [
+                    'resource' => 'kernel::loadRoutes',
+                    'type' => 'service',
+                ],
+            ]);
+
+            $kernelDefinition = $container->getDefinition('kernel');
+            $kernelDefinition->addTag('controller.service_arguments');
+            $kernelDefinition->addTag('routing.route_loader');
+            $kernelDefinition->setAutoconfigured(true);
+        });
+    }
+
+    protected function initializeBundles(): void
+    {
+        parent::initializeBundles();
+    }
+
+    protected function initializeContainer(): void
+    {
+        parent::initializeContainer();
     }
 
     /**
@@ -88,132 +110,6 @@ trait MicroKernelTrait
         if ($fileName = (new \ReflectionObject($this))->getFileName()) {
             $routes->import($fileName, 'attribute');
         }
-    }
-
-    /**
-     * Gets the path to the configuration directory.
-     */
-    private function getConfigDir(): string
-    {
-        return $this->getProjectDir().'/config';
-    }
-
-    /**
-     * Gets the path to the bundles configuration file.
-     */
-    private function getBundlesPath(): string
-    {
-        return $this->getConfigDir().'/bundles.php';
-    }
-
-    public function getCacheDir(): string
-    {
-        if (null !== $dir = $_SERVER['APP_CACHE_DIR'] ?? null) {
-            return $this->getEnvDir($dir);
-        }
-
-        return parent::getCacheDir();
-    }
-
-    public function getBuildDir(): string
-    {
-        if (null !== $dir = $_SERVER['APP_BUILD_DIR'] ?? null) {
-            return $this->getEnvDir($dir);
-        }
-
-        return parent::getBuildDir();
-    }
-
-    public function getShareDir(): ?string
-    {
-        if (null !== $dir = $_SERVER['APP_SHARE_DIR'] ?? null) {
-            if (false === $dir = filter_var($dir, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? $dir) {
-                return null;
-            }
-            if (\is_string($dir)) {
-                return $this->getEnvDir($dir);
-            }
-        }
-
-        return parent::getShareDir();
-    }
-
-    public function getLogDir(): string
-    {
-        return $_SERVER['APP_LOG_DIR'] ?? parent::getLogDir();
-    }
-
-    public function registerBundles(): iterable
-    {
-        if (!is_file($bundlesPath = $this->getBundlesPath())) {
-            yield new FrameworkBundle();
-
-            return;
-        }
-
-        $contents = require $bundlesPath;
-        foreach ($contents as $class => $envs) {
-            if ($envs[$this->environment] ?? $envs['all'] ?? false) {
-                yield new $class();
-            }
-        }
-    }
-
-    public function registerContainerConfiguration(LoaderInterface $loader): void
-    {
-        $loader->load(function (ContainerBuilder $container) use ($loader) {
-            $container->loadFromExtension('framework', [
-                'router' => [
-                    'resource' => 'kernel::loadRoutes',
-                    'type' => 'service',
-                ],
-            ]);
-
-            $kernelClass = str_contains(static::class, "@anonymous\0") ? parent::class : static::class;
-
-            if (!$container->hasDefinition('kernel')) {
-                $container->register('kernel', $kernelClass)
-                    ->addTag('controller.service_arguments')
-                    ->setAutoconfigured(true)
-                    ->setSynthetic(true)
-                    ->setPublic(true)
-                ;
-            }
-
-            $kernelDefinition = $container->getDefinition('kernel');
-            $kernelDefinition->addTag('routing.route_loader');
-
-            $container->addObjectResource($this);
-            $container->fileExists($this->getBundlesPath());
-
-            $configureContainer = new \ReflectionMethod($this, 'configureContainer');
-            $configuratorClass = $configureContainer->getNumberOfParameters() > 0 && ($type = $configureContainer->getParameters()[0]->getType()) instanceof \ReflectionNamedType && !$type->isBuiltin() ? $type->getName() : null;
-
-            if ($configuratorClass && !is_a(ContainerConfigurator::class, $configuratorClass, true)) {
-                $configureContainer->getClosure($this)($container, $loader);
-
-                return;
-            }
-
-            $file = (new \ReflectionObject($this))->getFileName();
-            /** @var ContainerPhpFileLoader $kernelLoader */
-            $kernelLoader = $loader->getResolver()->resolve($file);
-            $kernelLoader->setCurrentDir(\dirname($file));
-            $instanceof = &\Closure::bind(fn &() => $this->instanceof, $kernelLoader, $kernelLoader)();
-
-            $valuePreProcessor = AbstractConfigurator::$valuePreProcessor;
-            AbstractConfigurator::$valuePreProcessor = fn ($value) => $this === $value ? new Reference('kernel') : $value;
-
-            try {
-                $configureContainer->getClosure($this)(new ContainerConfigurator($container, $kernelLoader, $instanceof, $file, $file, $this->getEnvironment()), $loader, $container);
-            } finally {
-                $instanceof = [];
-                $kernelLoader->registerAliasesForSinglyImplementedInterfaces();
-                AbstractConfigurator::$valuePreProcessor = $valuePreProcessor;
-            }
-
-            $container->setAlias($kernelClass, 'kernel')->setPublic(true);
-        });
     }
 
     /**
@@ -246,37 +142,27 @@ trait MicroKernelTrait
     }
 
     /**
-     * Returns the kernel parameters.
-     *
      * @return array<string, array|bool|string|int|float|\UnitEnum|null>
      */
     protected function getKernelParameters(): array
     {
-        $parameters = parent::getKernelParameters();
-        $bundlesPath = $this->getBundlesPath();
-        $bundlesDefinition = !is_file($bundlesPath) ? [FrameworkBundle::class => ['all' => true]] : require $bundlesPath;
-        $knownEnvs = [$this->environment => true];
+        $parameters = $this->doGetKernelParameters();
+        $parameters['kernel.charset'] = $this->getCharset();
 
-        foreach ($bundlesDefinition as $envs) {
-            $knownEnvs += $envs;
+        foreach ($this->bundles as $name => $bundle) {
+            $parameters['kernel.bundles_metadata'][$name]['namespace'] = $bundle->getNamespace();
         }
-        unset($knownEnvs['all']);
-        $parameters['.container.known_envs'] = array_keys($knownEnvs);
-        $parameters['.kernel.config_dir'] = $this->getConfigDir();
-        $parameters['.kernel.bundles_definition'] = $bundlesDefinition;
 
         return $parameters;
     }
 
-    private function getEnvDir(string $dir): string
+    private function getBundlesDefinition(): array
     {
-        if ('' !== $dir && \in_array($dir[0], ['/', '\\'], true)) {
-            return $dir.'/'.$this->environment;
-        }
-        if ('\\' === \DIRECTORY_SEPARATOR && ':' === ($dir[1] ?? '') && 65 <= \ord($dir[0]) && \ord($dir[0]) <= 122 && !\in_array($dir[0], ['[', ']', '^', '_', '`'], true)) {
-            return $dir.'/'.$this->environment;
-        }
+        return $this->doGetBundlesDefinition() ?: [FrameworkBundle::class => ['all' => true]];
+    }
 
-        return $this->getProjectDir().'/'.$dir.'/'.$this->environment;
+    private function getEffectiveBuildDir(): string
+    {
+        return \Closure::bind(fn () => $this->warmupDir, $this, Kernel::class)() ?? $this->getBuildDir();
     }
 }

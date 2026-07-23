@@ -23,12 +23,20 @@ class CompiledAssetMapperConfigReader
 
     public function __construct(
         private readonly string $directory,
+        private readonly bool $debug = false,
     ) {
         $this->filesystem = new Filesystem();
     }
 
     public function configExists(string $filename): bool
     {
+        // In debug mode, the compiled config is ignored so the dev environment always
+        // recomputes assets from source instead of reading metadata that another
+        // environment (e.g. a prior "asset-map:compile" run) may have left behind.
+        if ($this->debug) {
+            return false;
+        }
+
         return is_file(Path::join($this->directory, $filename));
     }
 

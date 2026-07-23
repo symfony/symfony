@@ -12,8 +12,6 @@
 namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -54,16 +52,6 @@ class InMemoryUserTest extends TestCase
 
         $user = new InMemoryUser('robin', 'superpass', [], false);
         $this->assertFalse($user->isEnabled());
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testEraseCredentials()
-    {
-        $user = new InMemoryUser('fabien', 'superpass');
-        $this->expectUserDeprecationMessage(\sprintf('Method %s::eraseCredentials() is deprecated since symfony/security-core 7.3', InMemoryUser::class));
-        $user->eraseCredentials();
-        $this->assertEquals('superpass', $user->getPassword());
     }
 
     public function testToString()

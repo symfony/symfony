@@ -195,11 +195,7 @@ class DebugCommandTest extends TestCase
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
         $command = new DebugCommand($formRegistry);
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandCompletionTester($application->get('debug:form'));
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
@@ -283,11 +279,7 @@ class DebugCommandTest extends TestCase
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
         $command = new DebugCommand($formRegistry, $namespaces, $types);
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
 
         return new CommandTester($application->find('debug:form'));
     }

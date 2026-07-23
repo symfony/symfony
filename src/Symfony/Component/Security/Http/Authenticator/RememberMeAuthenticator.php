@@ -43,34 +43,12 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  */
 class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 {
-    private string $secret;
-    private TokenStorageInterface $tokenStorage;
-    private string $cookieName;
-    private ?LoggerInterface $logger;
-
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param string                $cookieName
-     * @param ?LoggerInterface      $logger
-     */
     public function __construct(
         private RememberMeHandlerInterface $rememberMeHandler,
-        #[\SensitiveParameter] TokenStorageInterface|string $tokenStorage,
-        string|TokenStorageInterface $cookieName,
-        LoggerInterface|string|null $logger = null,
+        private TokenStorageInterface $tokenStorage,
+        private string $cookieName,
+        private ?LoggerInterface $logger = null,
     ) {
-        if (\is_string($tokenStorage)) {
-            trigger_deprecation('symfony/security-http', '7.2', 'The "$secret" argument of "%s()" is deprecated.', __METHOD__);
-
-            $this->secret = $tokenStorage;
-            $tokenStorage = $cookieName;
-            $cookieName = $logger;
-            $logger = \func_num_args() > 4 ? func_get_arg(4) : null;
-        }
-
-        $this->tokenStorage = $tokenStorage;
-        $this->cookieName = $cookieName;
-        $this->logger = $logger;
     }
 
     public function supports(Request $request): ?bool
@@ -109,10 +87,6 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
-        if (isset($this->secret)) {
-            return new RememberMeToken($passport->getUser(), $firewallName, $this->secret);
-        }
-
         return new RememberMeToken($passport->getUser(), $firewallName);
     }
 

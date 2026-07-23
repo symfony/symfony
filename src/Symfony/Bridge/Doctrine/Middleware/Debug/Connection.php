@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Middleware\Debug;
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
 use Doctrine\DBAL\Driver\Middleware\AbstractConnectionMiddleware;
 use Doctrine\DBAL\Driver\Result;
+use Doctrine\Persistence\ConnectionRegistry;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
@@ -29,6 +30,7 @@ final class Connection extends AbstractConnectionMiddleware
         private readonly DebugDataHolder $debugDataHolder,
         private readonly ?Stopwatch $stopwatch,
         private readonly string $connectionName,
+        private readonly ?ConnectionRegistry $connectionRegistry = null,
     ) {
         parent::__construct($connection);
     }
@@ -41,12 +43,14 @@ final class Connection extends AbstractConnectionMiddleware
             $this->connectionName,
             $sql,
             $this->stopwatch,
+            $this->connectionRegistry?->getConnection($this->connectionName),
         );
     }
 
     public function query(string $sql): Result
     {
-        $this->debugDataHolder->addQuery($this->connectionName, $query = new Query($sql));
+        $query = new Query($sql, $this->connectionRegistry?->getConnection($this->connectionName));
+        $this->debugDataHolder->addQuery($this->connectionName, $query);
 
         $this->stopwatch?->start('doctrine', 'doctrine');
         $query->start();
@@ -61,7 +65,8 @@ final class Connection extends AbstractConnectionMiddleware
 
     public function exec(string $sql): int
     {
-        $this->debugDataHolder->addQuery($this->connectionName, $query = new Query($sql));
+        $query = new Query($sql, $this->connectionRegistry?->getConnection($this->connectionName));
+        $this->debugDataHolder->addQuery($this->connectionName, $query);
 
         $this->stopwatch?->start('doctrine', 'doctrine');
         $query->start();
@@ -78,7 +83,7 @@ final class Connection extends AbstractConnectionMiddleware
 
     public function beginTransaction(): void
     {
-        $query = new Query('"START TRANSACTION"');
+        $query = new Query('"START TRANSACTION"', $this->connectionRegistry?->getConnection($this->connectionName));
         $this->debugDataHolder->addQuery($this->connectionName, $query);
 
         $this->stopwatch?->start('doctrine', 'doctrine');
@@ -94,7 +99,7 @@ final class Connection extends AbstractConnectionMiddleware
 
     public function commit(): void
     {
-        $query = new Query('"COMMIT"');
+        $query = new Query('"COMMIT"', $this->connectionRegistry?->getConnection($this->connectionName));
         $this->debugDataHolder->addQuery($this->connectionName, $query);
 
         $this->stopwatch?->start('doctrine', 'doctrine');
@@ -110,7 +115,7 @@ final class Connection extends AbstractConnectionMiddleware
 
     public function rollBack(): void
     {
-        $query = new Query('"ROLLBACK"');
+        $query = new Query('"ROLLBACK"', $this->connectionRegistry?->getConnection($this->connectionName));
         $this->debugDataHolder->addQuery($this->connectionName, $query);
 
         $this->stopwatch?->start('doctrine', 'doctrine');

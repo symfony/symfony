@@ -28,12 +28,12 @@ class IsGranted
     public readonly array $methods;
 
     /**
-     * @param string|Expression|\Closure(IsGrantedContext, mixed $subject):bool         $attribute     The attribute that will be checked against a given authentication token and optional subject
-     * @param array|string|Expression|\Closure(array<string,mixed>, Request):mixed|null $subject       An optional subject - e.g. the current object being voted on
-     * @param string|null                                                               $message       A custom message when access is not granted
-     * @param int|null                                                                  $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
-     * @param int|null                                                                  $exceptionCode If set, will add the exception code to thrown exception
-     * @param string[]|string                                                           $methods       HTTP methods to apply validation to. Empty array means all methods are allowed
+     * @param string|Expression|\Closure(IsGrantedContext, mixed $subject):bool                  $attribute     The attribute that will be checked against a given authentication token and optional subject
+     * @param array|string|Expression|\Closure(array<string,mixed>, Request, ?object):mixed|null $subject       An optional subject - e.g. the current object being voted on
+     * @param string|null                                                                        $message       A custom message when access is not granted
+     * @param int|null                                                                           $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
+     * @param int|null                                                                           $exceptionCode If set, will add the exception code to thrown exception
+     * @param string[]|string                                                                    $methods       HTTP methods to apply validation to. Empty array means all methods are allowed
      */
     public function __construct(
         public string|Expression|\Closure $attribute,

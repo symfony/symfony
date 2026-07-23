@@ -28,19 +28,25 @@ class UriSigner
     private const STATUS_MISSING = 3;
     private const STATUS_EXPIRED = 4;
 
+    private ?\DateInterval $defaultExpiration;
+
     /**
-     * @param string $hashParameter       Query string parameter to use
-     * @param string $expirationParameter Query string parameter to use for expiration
+     * @param string                 $hashParameter       Query string parameter to use
+     * @param string                 $expirationParameter Query string parameter to use for expiration
+     * @param \DateInterval|int|null $defaultExpiration   The expiration applied when none is passed to sign(); an int is a number of seconds
      */
     public function __construct(
         #[\SensitiveParameter] private string $secret,
         private string $hashParameter = '_hash',
         private string $expirationParameter = '_expiration',
         private ?ClockInterface $clock = null,
+        \DateInterval|int|null $defaultExpiration = null,
     ) {
         if (!$secret) {
             throw new \InvalidArgumentException('A non-empty secret is required.');
         }
+
+        $this->defaultExpiration = \is_int($defaultExpiration) ? \DateInterval::createFromDateString("$defaultExpiration seconds") : $defaultExpiration;
     }
 
     /**
@@ -53,20 +59,20 @@ class UriSigner
      *                                                              If $expiration is a \DateTimeInterface, it's expected to be the exact date + time.
      *                                                              If $expiration is a \DateInterval, the interval is added to "now" to get the date + time.
      *                                                              If $expiration is an int, it's expected to be a timestamp in seconds of the exact date + time.
-     *                                                              If $expiration is null, no expiration.
+     *                                                              If $expiration is null, the default expiration passed to the constructor is used.
+     * @param string|null                               $version    A token bound to the URI's state (e.g. a user's password hash, to invalidate a reset link
+     *                                                              when the password changes). It is folded into the signature and never exposed in the URI.
      *
      * The expiration is added as a query string parameter.
      */
-    public function sign(string $uri/* , \DateTimeInterface|\DateInterval|int|null $expiration = null */): string
+    public function sign(string $uri, \DateTimeInterface|\DateInterval|int|null $expiration = null/* , #[\SensitiveParameter] ?string $version = null */): string
     {
-        $expiration = null;
+        $version = 2 < \func_num_args() ? func_get_arg(2) : null;
 
-        if (1 < \func_num_args()) {
-            $expiration = func_get_arg(1);
-        }
+        $expiration ??= $this->defaultExpiration;
 
-        if (null !== $expiration && !$expiration instanceof \DateTimeInterface && !$expiration instanceof \DateInterval && !\is_int($expiration)) {
-            throw new \TypeError(\sprintf('The second argument of "%s()" must be an instance of "%s" or "%s", an integer or null (%s given).', __METHOD__, \DateTimeInterface::class, \DateInterval::class, get_debug_type($expiration)));
+        if (null === $expiration) {
+            trigger_deprecation('symfony/http-foundation', '8.2', 'Not passing an expiration to "%s::sign()" is deprecated and will be required in 9.0; pass one explicitly, or set a default via the "$defaultExpiration" argument of "%s::__construct()".', self::class, self::class);
         }
 
         $url = parse_url($uri);
@@ -88,8 +94,7 @@ class UriSigner
             $params[$this->expirationParameter] = $this->getExpirationTime($expiration);
         }
 
-        $uri = $this->buildUrl($url, $params);
-        $params[$this->hashParameter] = $this->computeHash($uri);
+        $params[$this->hashParameter] = $this->computeHash($this->buildUrl($url, $params), $version);
 
         return $this->buildUrl($url, $params);
     }
@@ -97,29 +102,42 @@ class UriSigner
     /**
      * Checks that a URI contains the correct hash.
      * Also checks if the URI has not expired (If you used expiration during signing).
+     *
+     * @param string|null $version Expected "state" for the given URI
      */
-    public function check(string $uri): bool
+    public function check(string $uri/* , #[\SensitiveParameter] ?string $version = null */): bool
     {
-        return self::STATUS_VALID === $this->doVerify($uri);
+        $version = 1 < \func_num_args() ? func_get_arg(1) : null;
+
+        return self::STATUS_VALID === $this->doVerify($uri, $version);
     }
 
-    public function checkRequest(Request $request): bool
+    /**
+     * @param string|null $version Expected "state" for the given URI
+     */
+    public function checkRequest(Request $request/* , #[\SensitiveParameter] ?string $version = null */): bool
     {
-        return self::STATUS_VALID === $this->doVerify(self::normalize($request));
+        $version = 1 < \func_num_args() ? func_get_arg(1) : null;
+
+        return self::STATUS_VALID === $this->doVerify(self::normalize($request), $version);
     }
 
     /**
      * Verify a Request or string URI.
+     *
+     * @param string|null $version Expected "state" for the given URI
      *
      * @throws UnsignedUriException         If the URI is not signed
      * @throws UnverifiedSignedUriException If the signature is invalid
      * @throws ExpiredSignedUriException    If the URI has expired
      * @throws SignedUriException
      */
-    public function verify(Request|string $uri): void
+    public function verify(Request|string $uri/* , #[\SensitiveParameter] ?string $version = null */): void
     {
+        $version = 1 < \func_num_args() ? func_get_arg(1) : null;
+
         $uri = self::normalize($uri);
-        $status = $this->doVerify($uri);
+        $status = $this->doVerify($uri, $version);
 
         match ($status) {
             self::STATUS_VALID => null,
@@ -129,8 +147,14 @@ class UriSigner
         };
     }
 
-    private function computeHash(string $uri): string
+    private function computeHash(string $uri, #[\SensitiveParameter] ?string $version = null): string
     {
+        if (null !== $version) {
+            // the version is folded into the signature without ever being exposed in the URI;
+            // the NUL byte safely separates it from the URI, which can never contain one
+            $uri .= "\0".$version;
+        }
+
         return strtr(rtrim(base64_encode(hash_hmac('sha256', $uri, $this->secret, true)), '='), ['/' => '_', '+' => '-']);
     }
 
@@ -173,7 +197,7 @@ class UriSigner
     /**
      * @return self::STATUS_*
      */
-    private function doVerify(string $uri): int
+    private function doVerify(string $uri, ?string $version): int
     {
         $url = parse_url($uri);
         $params = [];
@@ -189,7 +213,7 @@ class UriSigner
         $hash = $params[$this->hashParameter];
         unset($params[$this->hashParameter]);
 
-        if (!hash_equals($this->computeHash($this->buildUrl($url, $params)), strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']))) {
+        if (!hash_equals($this->computeHash($this->buildUrl($url, $params), $version), strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']))) {
             return self::STATUS_INVALID;
         }
 

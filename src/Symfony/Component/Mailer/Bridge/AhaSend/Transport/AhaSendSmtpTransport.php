@@ -36,6 +36,7 @@ class AhaSendSmtpTransport extends EsmtpTransport
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
+            $message = clone $message;
             $this->addAhaSendHeaders($message);
         }
 

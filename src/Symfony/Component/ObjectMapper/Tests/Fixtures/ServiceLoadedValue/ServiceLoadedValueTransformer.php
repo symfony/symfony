@@ -27,10 +27,10 @@ class ServiceLoadedValueTransformer implements TransformCallableInterface
     {
         $metadata = $this->metadata->create($value);
 
-        if (\count($metadata) !== 1) {
+        if (1 !== \count($metadata)) {
             throw new \LogicException('Exactly one metadata should be returned.');
         }
-        if ($metadata[0]->target !== LoadedValue::class) {
+        if (LoadedValue::class !== $metadata[0]->target) {
             throw new \LogicException('The target should be '.LoadedValue::class.'.');
         }
 

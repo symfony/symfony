@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\VarExporter;
 
-use Symfony\Component\VarExporter\Internal\Hydrator as InternalHydrator;
+trigger_deprecation('symfony/var-exporter', '8.1', 'The "%s" class is deprecated, use "deepclone_hydrate()" from the deepclone extension instead.', Hydrator::class);
 
 /**
  * Utility class to hydrate the properties of an object.
  *
  * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @deprecated since Symfony 8.1, use deepclone_hydrate() from the deepclone extension instead
  */
 final class Hydrator
 {
@@ -47,30 +49,39 @@ final class Hydrator
      *
      * @template T of object
      *
-     * @param T                                         $instance         The object to hydrate
-     * @param array<string, mixed>                      $properties       The properties to set on the instance
-     * @param array<class-string, array<string, mixed>> $scopedProperties The properties to set on the instance,
-     *                                                                    keyed by their declaring class
+     * @param T                                         $instance    The object to hydrate
+     * @param array<string, mixed>                      $mangledVars The properties to set on the instance
+     * @param array<class-string, array<string, mixed>> $scopedVars  The properties to set on the instance,
+     *                                                               keyed by their declaring class
      *
      * @return T
      */
-    public static function hydrate(object $instance, array $properties = [], array $scopedProperties = []): object
+    public static function hydrate(object $instance, array $mangledVars = [], array $scopedVars = []): object
     {
-        if ($properties) {
+        if ($scopedVars) {
             $class = $instance::class;
-            $propertyScopes = InternalHydrator::$propertyScopes[$class] ??= InternalHydrator::getPropertyScopes($class);
-
-            foreach ($properties as $name => &$value) {
-                [$scope, $name, $writeScope] = $propertyScopes[$name] ?? [$class, $name, $class];
-                $scopedProperties[$writeScope ?? $scope][$name] = &$value;
+            foreach ($scopedVars as $scope => $props) {
+                $isOwnScope = $scope === $class || 'stdClass' === $scope;
+                foreach ($props as $name => &$value) {
+                    $mangledVars[$isOwnScope ? $name : "\0$scope\0$name"] = &$value;
+                }
             }
             unset($value);
         }
 
-        foreach ($scopedProperties as $scope => $properties) {
-            if ($properties) {
-                (InternalHydrator::$simpleHydrators[$scope] ??= InternalHydrator::getSimpleHydrator($scope))($properties, $instance);
+        if (\is_array($splState = $mangledVars["\0"] ?? null)) {
+            unset($mangledVars["\0"]);
+            if ($instance instanceof \SplObjectStorage) {
+                $instance->__unserialize([$splState, []]);
+            } elseif ($instance instanceof \ArrayObject) {
+                $instance->__unserialize([$splState[1] ?? 0, $splState[0] ?? [], [], $splState[2] ?? \ArrayIterator::class]);
+            } elseif ($instance instanceof \ArrayIterator) {
+                $instance->__unserialize([$splState[1] ?? 0, $splState[0] ?? [], []]);
             }
+        }
+
+        if ($mangledVars) {
+            deepclone_hydrate($instance, $mangledVars, \DEEPCLONE_HYDRATE_PRESERVE_REFS);
         }
 
         return $instance;

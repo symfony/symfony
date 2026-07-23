@@ -11,11 +11,8 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Unique;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
@@ -37,24 +34,6 @@ class UniqueTest extends TestCase
 
         [$dConstraint] = $metadata->getPropertyMetadata('d')[0]->getConstraints();
         self::assertSame('intval', $dConstraint->normalizer);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Unique(['normalizer' => 'Unknown Callable']);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Unique(['normalizer' => new \stdClass()]);
     }
 }
 

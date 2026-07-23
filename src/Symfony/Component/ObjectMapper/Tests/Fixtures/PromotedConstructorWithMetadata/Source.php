@@ -17,7 +17,7 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Map;
 class Source
 {
     public function __construct(
-        public int    $number,
+        public int $number,
         public string $name,
     ) {
     }

@@ -1,18 +1,20 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['Symfony\\Component\\VarExporter\\Tests\\FinalArrayIterator'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\FinalArrayIterator')),
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\FinalArrayIterator',
+    'objectMeta' => [
+        [0, -1],
     ],
-    null,
-    [],
-    $o[0],
-    [
-        [
+    'prepared' => 0,
+    'states' => [
+        1 => [
             0,
-            [],
-            [],
-            null,
+            [
+                0,
+                [],
+                [],
+                null,
+            ],
         ],
-    ]
-);
+    ],
+], null, true);

@@ -59,6 +59,14 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertSame('١٢٣٬٤٥٦', $form->getViewData());
     }
 
+    public function testNumericInputmodeWhenGrouping()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, ['grouping' => true])->createView();
+
+        $this->assertSame('text', $view->vars['type']);
+        $this->assertSame('numeric', $view->vars['attr']['inputmode']);
+    }
+
     public function testSubmitRejectsFloats()
     {
         $form = $this->factory->create(static::TESTED_TYPE);

@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -43,7 +44,6 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Show arguments in services'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Display tagged services for an application'),
@@ -68,10 +68,6 @@ class ContainerDebugCommand extends Command
                 To get specific information about a service, specify its name:
 
                   <info>php %command.full_name% validator</info>
-
-                To get specific information about a service including all its arguments, use the <info>--show-arguments</info> flag:
-
-                  <info>php %command.full_name% validator --show-arguments</info>
 
                 To see available types that can be used for autowiring, use the <info>--types</info> flag:
 
@@ -151,10 +147,6 @@ class ContainerDebugCommand extends Command
             $tag = $this->findProperTagName($input, $errorIo, $object, $tag);
             $options = ['tag' => $tag];
         } elseif ($name = $input->getArgument('name')) {
-            if ($input->getOption('show-arguments')) {
-                $errorIo->warning('The "--show-arguments" option is deprecated, as arguments are now always shown.');
-            }
-
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = ['id' => $name];
         } elseif ($input->getOption('deprecations')) {
@@ -191,6 +183,12 @@ class ContainerDebugCommand extends Command
             if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
                 $errorIo->note(\sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
             }
+        } catch (ParameterNotFoundException $e) {
+            if (isset($options['parameter']) && $options['parameter'] === $e->getKey()) {
+                throw new InvalidArgumentException(\sprintf('You have requested a non-existent parameter "%s".', $options['parameter']));
+            }
+
+            throw $e;
         } catch (ServiceNotFoundException $e) {
             if ('' !== $e->getId() && '@' === $e->getId()[0]) {
                 throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);

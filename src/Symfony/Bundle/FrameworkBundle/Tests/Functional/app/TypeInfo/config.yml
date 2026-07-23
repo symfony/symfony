@@ -2,7 +2,6 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    http_method_override: false
     type_info:
         aliases:
             CustomAlias: int

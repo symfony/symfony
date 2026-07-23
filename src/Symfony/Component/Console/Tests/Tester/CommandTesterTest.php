@@ -14,7 +14,10 @@ namespace Symfony\Component\Console\Tests\Tester;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AskChoice;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -26,14 +29,19 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tester\ConsoleAssertionsTrait;
 use Symfony\Component\Console\Tests\Fixtures\InvokableExtendingCommandTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveAttributesTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveChoiceAttributeTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveHiddenQuestionAttributeTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\MethodBasedTestCommand;
 
 class CommandTesterTest extends TestCase
 {
+    use ConsoleAssertionsTrait;
+
     protected Command $command;
     protected CommandTester $tester;
 
@@ -322,6 +330,26 @@ class CommandTesterTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
+    public function testCallableMethodCommands()
+    {
+        $command = new MethodBasedTestCommand();
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame('cmd0', $tester->getDisplay());
+
+        $tester = new CommandTester($command->cmd1(...));
+        $tester->execute([]);
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame('cmd1', $tester->getDisplay());
+
+        $tester = new CommandTester($command->cmd2(...));
+        $tester->execute([]);
+        $tester->assertCommandIsSuccessful();
+        $this->assertSame('cmd2', $tester->getDisplay());
+    }
+
     public function testInvokableDefinitionWithInputAttribute()
     {
         $application = new Application();
@@ -346,6 +374,30 @@ class CommandTesterTest extends TestCase
                   --admin %S
                   --active|--no-active %S
                   --status=STATUS                         [default: "unverified"]
+            %A
+            TXT;
+
+        self::assertSame(0, $statusCode);
+        self::assertStringMatchesFormat($expectedOutput, $bufferedOutput->fetch());
+    }
+
+    public function testMethodBasedCommandWithApplication()
+    {
+        $command = new MethodBasedTestCommand();
+
+        $application = new Application();
+        $application->addCommand($command->cmd1(...));
+        $application->setAutoExit(false);
+
+        $bufferedOutput = new BufferedOutput();
+        $statusCode = $application->run(new ArrayInput(['command' => 'help', 'command_name' => 'app:cmd1']), $bufferedOutput);
+
+        $expectedOutput = <<<TXT
+            Usage:
+              app:cmd1 [<name>]
+
+            Arguments:
+              name %S
             %A
             TXT;
 
@@ -509,5 +561,187 @@ class CommandTesterTest extends TestCase
 
         self::assertStringContainsString('Enter arg1', $tester->getDisplay());
         self::assertStringContainsString('Arg1: arg1-value', $tester->getDisplay());
+    }
+
+    public function testInvokableWithInteractiveChoiceAttribute()
+    {
+        $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
+        $tester->setInputs(['green', '', 'active', 'auth,cache']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Select a color', $tester->getDisplay());
+        self::assertStringContainsString('Color: green', $tester->getDisplay());
+        self::assertStringContainsString('Select a size', $tester->getDisplay());
+        self::assertStringContainsString('Size: medium', $tester->getDisplay());
+        self::assertStringContainsString('Select a status', $tester->getDisplay());
+        self::assertStringContainsString('Status: active', $tester->getDisplay());
+        self::assertStringContainsString('Select features', $tester->getDisplay());
+        self::assertStringContainsString('Features: auth,cache', $tester->getDisplay());
+    }
+
+    public function testInvokableWithInteractiveChoiceAttributeNonDefaultValues()
+    {
+        $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
+        $tester->setInputs(['blue', 'large', 'pending', 'api']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Color: blue', $tester->getDisplay());
+        self::assertStringContainsString('Size: large', $tester->getDisplay());
+        self::assertStringContainsString('Status: pending', $tester->getDisplay());
+        self::assertStringContainsString('Features: api', $tester->getDisplay());
+    }
+
+    public function testInvokableWithInteractiveChoiceAttributeInvalidThenValid()
+    {
+        $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
+        // First input 'yellow' is invalid, then 'red' is valid
+        $tester->setInputs(['yellow', 'red', 'medium', 'active', 'auth']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Value "yellow" is invalid', $tester->getDisplay());
+        self::assertStringContainsString('Color: red', $tester->getDisplay());
+    }
+
+    public function testInvokableWithInteractiveChoiceAttributeInvalidEnumValue()
+    {
+        $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
+        // 'unknown' is not a valid enum value, then 'inactive' is valid
+        $tester->setInputs(['red', 'medium', 'unknown', 'inactive', 'api']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Value "unknown" is invalid', $tester->getDisplay());
+        self::assertStringContainsString('Status: inactive', $tester->getDisplay());
+    }
+
+    public function testInvokableWithInteractiveChoiceAttributeInvalidChoiceNumber()
+    {
+        $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
+        // '5' is not a valid choice number, then '1' (inactive) is valid
+        $tester->setInputs(['red', 'medium', '5', '1', 'api']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Value "5" is invalid', $tester->getDisplay());
+        self::assertStringContainsString('Status: inactive', $tester->getDisplay());
+    }
+
+    public function testChoiceWithoutChoicesAndWithoutEnumThrowsException()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('requires either explicit choices or a BackedEnum type');
+
+        $command = new Command('foo');
+        $command->setCode(static fn (
+            #[Argument, AskChoice('Select a color')]
+            string $color,
+        ): int => 0);
+
+        $command->getDefinition();
+    }
+
+    public function testItExecutesTheTestedCommandWithTheSameConfigAsThePreviousApiByDefault()
+    {
+        $oldConfig = [];
+        $newConfig = [];
+
+        $oldTesterCommand = self::createDisplayConfigurationCommand($oldConfig);
+        $newTesterCommand = self::createDisplayConfigurationCommand($newConfig);
+
+        $oldTester = new CommandTester($oldTesterCommand);
+        $oldTester->execute([]);
+
+        $newTester = new CommandTester($newTesterCommand);
+        $newTester->run();
+
+        // Sanity check
+        $this->assertNotEquals([], $oldConfig);
+        $this->assertEquals($oldConfig, $newConfig);
+    }
+
+    public function testItCanConfigureTheExecutedCommand()
+    {
+        $config = [];
+
+        $test = new CommandTester(
+            self::createDisplayConfigurationCommand($config),
+        );
+        $test->run(
+            interactive: true,
+            decorated: false,
+            verbosity: OutputInterface::VERBOSITY_VERY_VERBOSE,
+        );
+
+        $expectedConfig = [
+            'interactive' => true,
+            'decorated' => false,
+            'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        ];
+
+        $this->assertEquals($expectedConfig, $config);
+    }
+
+    public function testItCanTestTheExecutionResult()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $output->writeln('bar');
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run();
+
+        $this->assertCommandIsSuccessful($result);
+        $this->assertSame(0, $result->statusCode);
+        $this->assertSame("bar\n", $result->getDisplay());
+    }
+
+    public function testItProvidesUserInputs()
+    {
+        $questions = [
+            'What\'s your name?',
+            'How are you?',
+            'Where do you come from?',
+        ];
+
+        $command = new Command('foo');
+        $command->setHelperSet(new HelperSet([new QuestionHelper()]));
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) use ($questions, $command): int {
+            $helper = $command->getHelper('question');
+            $helper->ask($input, $output, new Question($questions[0]));
+            $helper->ask($input, $output, new Question($questions[1]));
+            $helper->ask($input, $output, new Question($questions[2]));
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $result = $tester->run(interactiveInputs: ['Bobby', 'Fine', 'France']);
+
+        $this->assertCommandResultEquals(
+            $result,
+            0,
+            '',
+            implode('', $questions),
+            implode('', $questions),
+        );
+    }
+
+    private static function createDisplayConfigurationCommand(array &$config): Command
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) use (&$config) {
+            $config['interactive'] = $input->isInteractive();
+            $config['verbosity'] = $output->getVerbosity();
+            $config['decorated'] = $output->isDecorated();
+
+            return 0;
+        });
+
+        return $command;
     }
 }

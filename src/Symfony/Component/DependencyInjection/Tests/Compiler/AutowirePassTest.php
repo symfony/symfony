@@ -12,13 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -28,16 +26,17 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
+use Symfony\Component\DependencyInjection\Compiler\TagDecoratorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\includes\FooVariadic;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\OptionalParameter;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\WithoutTarget;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTarget;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WithTargetAnonymous;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -269,7 +268,9 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testGuessableUnionType()
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyGuessableUnionType()
     {
         $container = new ContainerBuilder();
 
@@ -278,6 +279,23 @@ class AutowirePassTest extends TestCase
         $container->setAlias(CollisionB::class.' $collision', 'b');
 
         $aDefinition = $container->register('a', UnionClasses::class);
+        $aDefinition->setAutowired(true);
+
+        $pass = new AutowirePass();
+        $pass->process($container);
+
+        $this->assertSame('b', (string) $aDefinition->getArgument(0));
+    }
+
+    public function testGuessableUnionType()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('b', \stdClass::class);
+        $container->setAlias('.'.CollisionA::class.' $collision', 'b');
+        $container->setAlias('.'.CollisionB::class.' $collision', 'b');
+
+        $aDefinition = $container->register('a', UnionClassesWithTarget::class);
         $aDefinition->setAutowired(true);
 
         $pass = new AutowirePass();
@@ -1005,22 +1023,6 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInlineServicesAreNotCandidates()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 7.4: XML configuration format is deprecated, use YAML or PHP instead.');
-
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/xml')));
-        $loader->load('services_inline_not_candidate.xml');
-
-        $pass = new AutowirePass();
-        $pass->process($container);
-
-        $this->assertSame([], $container->getDefinition('autowired')->getArguments());
-    }
-
     public function testAutowireDecorator()
     {
         $container = new ContainerBuilder();
@@ -1112,7 +1114,9 @@ class AutowirePassTest extends TestCase
         $this->assertSame(['Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'], $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
     }
 
-    public function testNamedArgumentAliasResolveCollisions()
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyNamedArgumentAliasResolveCollisions()
     {
         $container = new ContainerBuilder();
 
@@ -1120,6 +1124,31 @@ class AutowirePassTest extends TestCase
         $container->register('c2', CollisionB::class);
         $container->setAlias(CollisionInterface::class.' $collision', 'c2');
         $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollision::class);
+        $aDefinition->setAutowired(true);
+
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $pass = new AutowirePass();
+
+        $pass->process($container);
+
+        $expected = [
+            [
+                'setMultipleInstancesForOneArg',
+                [new TypedReference(CollisionInterface::class.' $collision', CollisionInterface::class)],
+            ],
+        ];
+        $this->assertEquals($expected, $container->getDefinition('setter_injection_collision')->getMethodCalls());
+    }
+
+    public function testNamedArgumentAliasResolveCollisions()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('c1', CollisionA::class);
+        $container->register('c2', CollisionB::class);
+        $container->setAlias(CollisionInterface::class.' $collision', 'c2');
+        $aDefinition = $container->register('setter_injection_collision', SetterInjectionCollisionWithTarget::class);
         $aDefinition->setAutowired(true);
 
         (new AutowireRequiredMethodsPass())->process($container);
@@ -1195,6 +1224,22 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testNamedAliasByParameterNameIsDeprecated()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('image.storage', BarInterface::class);
+        $container->registerAliasForArgument('image.storage', BarInterface::class, 'imageStorage');
+        $container->register('without_target', WithoutTarget::class)
+            ->setAutowired(true);
+
+        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 8.1: Relying solely on the name of parameter "$imageStorage" of "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\WithoutTarget::__construct()" to match a named autowiring alias is deprecated; use the "#[Target]" attribute.');
+
+        (new AutowirePass())->process($container);
+    }
+
     public function testArgumentWithIdTarget()
     {
         $container = new ContainerBuilder();
@@ -1243,7 +1288,9 @@ class AutowirePassTest extends TestCase
         $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
     }
 
-    public function testAutowireUnderscoreNamedArgument()
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyAutowireUnderscoreNamedArgument()
     {
         $container = new ContainerBuilder();
 
@@ -1253,6 +1300,18 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
 
         $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('foo')->now_datetime);
+    }
+
+    public function testAutowireUnderscoreNamedArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $container->autowire(\DateTimeImmutable::class.' $now_datetime', \DateTimeImmutable::class);
+        $container->autowire('foo', UnderscoreNamedArgumentWithTarget::class)->setPublic(true);
+
+        (new AutowirePass())->process($container);
+
+        $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('foo')->dt);
     }
 
     public function testAutowireDefaultValueParametersLike()
@@ -1388,6 +1447,32 @@ class AutowirePassTest extends TestCase
         $this->assertSame($barDecoratorName.'.inner', (string) $container->getDefinition($barDecoratorName)->getArgument(1));
     }
 
+    public function testAsTagDecoratorAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsTagDecoratorFoo::class)->addTag('test.tag');
+        $container->register(AsTagDecoratorBar::class)->addTag('test.tag');
+        $container->register(AsTagDecoratorService::class, AsTagDecoratorService::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+        (new AutowireAsDecoratorPass())->process($container);
+        (new TagDecoratorPass())->process($container);
+        (new DecoratorServicePass())->process($container);
+
+        $tagDecoratorTemplate = '.tag_decorator.test.tag.'.AsTagDecoratorService::class;
+        $this->assertFalse($container->has($tagDecoratorTemplate));
+
+        $fooDecorator = '.decorator.'.AsTagDecoratorFoo::class.'.'.$tagDecoratorTemplate;
+        $barDecorator = '.decorator.'.AsTagDecoratorBar::class.'.'.$tagDecoratorTemplate;
+
+        $this->assertTrue($container->has($fooDecorator));
+        $this->assertTrue($container->has($barDecorator));
+
+        $this->assertSame($fooDecorator, (string) $container->getAlias(AsTagDecoratorFoo::class));
+        $this->assertSame($barDecorator, (string) $container->getAlias(AsTagDecoratorBar::class));
+    }
+
     public function testTypeSymbolExcluded()
     {
         $container = new ContainerBuilder();
@@ -1437,7 +1522,7 @@ class AutowirePassTest extends TestCase
         $expected = [
             'decorated' => new Reference(AutowireNestedAttributes::class.'.inner'),
             'iterator' => new TaggedIteratorArgument('foo'),
-            'locator' => new ServiceLocatorArgument(new TaggedIteratorArgument('foo', null, null, true)),
+            'locator' => new ServiceLocatorArgument(new TaggedIteratorArgument('foo', null, true)),
             'service' => new Reference('bar'),
         ];
         $this->assertEquals($expected, $container->getDefinition(AutowireNestedAttributes::class)->getArgument(0));

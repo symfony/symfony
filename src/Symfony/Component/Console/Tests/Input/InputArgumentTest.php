@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Tests\Input;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -32,7 +34,7 @@ class InputArgumentTest extends TestCase
         $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
         $argument = new InputArgument('foo', null);
-        $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
+        $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
 
         $argument = new InputArgument('foo', InputArgument::OPTIONAL);
         $this->assertFalse($argument->isRequired(), '__construct() can take "InputArgument::OPTIONAL" as its mode');
@@ -46,7 +48,16 @@ class InputArgumentTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument mode "-1" is not valid.');
 
-        new InputArgument('foo', '-1');
+        new InputArgument('foo', -1);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testAmbiguousRequirementSpecifierMode()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/console 8.1: Argument "foo" mode should specify either required or optional.');
+
+        new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::REQUIRED);
     }
 
     public function testIsArray()
@@ -82,6 +93,17 @@ class InputArgumentTest extends TestCase
         $argument = new InputArgument('foo', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
         $argument->setDefault([1, 2]);
         $this->assertSame([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
+    }
+
+    public function testSetDefaultWithObject()
+    {
+        $default = new \DateTimeImmutable('2024-01-01');
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', $default);
+        $this->assertSame($default, $argument->getDefault(), '->getDefault() returns the object default value');
+
+        $newDefault = new \DateTimeImmutable('2024-06-01');
+        $argument->setDefault($newDefault);
+        $this->assertSame($newDefault, $argument->getDefault(), '->setDefault() changes the default value to an object');
     }
 
     public function testSetDefaultWithRequiredArgument()

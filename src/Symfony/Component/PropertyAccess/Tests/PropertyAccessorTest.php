@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
@@ -44,7 +43,6 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
-use Symfony\Component\VarExporter\ProxyHelper;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -1035,27 +1033,9 @@ class PropertyAccessorTest extends TestCase
 
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty
     {
-        if (\PHP_VERSION_ID < 80400) {
-            if (!class_exists(ProxyHelper::class)) {
-                $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
-            }
-
-            $class = 'UninitializedObjectPropertyGhost';
-
-            if (!class_exists($class)) {
-                eval('class '.$class.ProxyHelper::generateLazyGhost(new \ReflectionClass(UninitializedObjectProperty::class)));
-            }
-
-            $this->assertTrue(class_exists($class));
-
-            return $class::createLazyGhost(static function ($instance) {
-            });
-        }
-
-        return (new \ReflectionClass(UninitializedObjectProperty::class))->newLazyGhost(static fn () => null);
+        return new \ReflectionClass(UninitializedObjectProperty::class)->newLazyGhost(static fn () => null);
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testIsWritableWithAsymmetricVisibility()
     {
         $object = new AsymmetricVisibility();
@@ -1067,7 +1047,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'virtualNoSetHook'));
     }
 
-    #[RequiresPhp('>=8.4.0')]
     public function testIsReadableWithAsymmetricVisibility()
     {
         $object = new AsymmetricVisibility();
@@ -1079,7 +1058,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isReadable($object, 'virtualNoSetHook'));
     }
 
-    #[RequiresPhp('>=8.4.0')]
     #[DataProvider('setValueWithAsymmetricVisibilityDataProvider')]
     public function testSetValueWithAsymmetricVisibility(string $propertyPath, ?string $expectedException)
     {

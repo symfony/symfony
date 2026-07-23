@@ -71,11 +71,20 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 
         self::$registerForAutoconfiguration = static function (ContainerBuilder $container, \ReflectionClass $class, \ReflectionAttribute $attribute) use ($parseDefinitions, $yamlLoader) {
             $attribute = (array) $attribute->newInstance();
+            $closureTags = [];
 
             foreach (['tags', 'resourceTags'] as $type) {
                 foreach ($attribute[$type] ?? [] as $i => $tag) {
                     if (\is_array($tag) && [0] === array_keys($tag)) {
-                        $attribute[$type][$i] = [$class->name => $tag[0]];
+                        $tag = $attribute[$type][$i] = [$class->name => $tag[0]];
+                    }
+
+                    // A closure attribute-set cannot be expressed in YAML and must not go
+                    // through the loader below; it is resolved per concrete class later, in
+                    // ResolveInstanceofConditionalsPass.
+                    if ('tags' === $type && \is_array($tag) && 1 === \count($tag) && current($tag) instanceof \Closure) {
+                        $closureTags[] = [key($tag), current($tag)];
+                        unset($attribute[$type][$i]);
                     }
                 }
             }
@@ -96,6 +105,12 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
                 $class->getFileName(),
                 false
             );
+
+            // The closure is wrapped in an array so addTag() keeps an array attribute-set;
+            // ResolveInstanceofConditionalsPass unwraps and resolves it per concrete class.
+            foreach ($closureTags as [$name, $closure]) {
+                $container->registerForAutoconfiguration($class->name)->addTag($name, [$closure]);
+            }
         };
 
         (self::$registerForAutoconfiguration)($container, $class, $attribute);

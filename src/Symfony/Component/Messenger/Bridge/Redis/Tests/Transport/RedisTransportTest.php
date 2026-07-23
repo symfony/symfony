@@ -17,8 +17,10 @@ use Symfony\Component\Messenger\Bridge\Redis\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Serializer as SerializerComponent;
 
 class RedisTransportTest extends TestCase
 {
@@ -49,10 +51,39 @@ class RedisTransportTest extends TestCase
         ];
 
         $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
-        $connection->method('get')->willReturn($redisEnvelope);
+        $connection->method('get')->willReturn([$redisEnvelope]);
 
         $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+    }
+
+    public function testAll()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('findAll')->with(50)->willReturn([
+            $this->createRedisEnvelope(),
+            $this->createRedisEnvelope(),
+        ]);
+
+        $transport = $this->getTransport($serializer, $connection);
+
+        $envelopes = [...$transport->all(50)];
+        $this->assertCount(2, $envelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+    }
+
+    public function testFind()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('find')->with('5')->willReturn($this->createRedisEnvelope());
+
+        $transport = $this->getTransport($serializer, $connection);
+
+        $this->assertEquals(new DummyMessage('Hi'), $transport->find('5')->getMessage());
     }
 
     public function testKeepalive()
@@ -73,5 +104,27 @@ class RedisTransportTest extends TestCase
         $connection ??= $this->createStub(Connection::class);
 
         return new RedisTransport($connection, $serializer);
+    }
+
+    private function createRedisEnvelope(): array
+    {
+        return [
+            'id' => '1-0',
+            'data' => [
+                'message' => json_encode([
+                    'body' => '{"message": "Hi"}',
+                    'headers' => [
+                        'type' => DummyMessage::class,
+                    ],
+                ]),
+            ],
+        ];
+    }
+
+    private function createSerializer(): Serializer
+    {
+        return new Serializer(
+            new SerializerComponent\Serializer([new SerializerComponent\Normalizer\ObjectNormalizer()], ['json' => new SerializerComponent\Encoder\JsonEncoder()])
+        );
     }
 }

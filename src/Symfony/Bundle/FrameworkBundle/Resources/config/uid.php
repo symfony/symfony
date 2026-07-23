@@ -16,6 +16,7 @@ use Symfony\Component\Uid\Factory\RandomBasedUuidFactory;
 use Symfony\Component\Uid\Factory\TimeBasedUuidFactory;
 use Symfony\Component\Uid\Factory\UlidFactory;
 use Symfony\Component\Uid\Factory\UuidFactory;
+use Symfony\Component\Uid\Uuid47Transformer;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -37,5 +38,9 @@ return static function (ContainerConfigurator $container) {
         ->set('time_based_uuid.factory', TimeBasedUuidFactory::class)
             ->factory([service('uuid.factory'), 'timeBased'])
         ->alias(TimeBasedUuidFactory::class, 'time_based_uuid.factory')
+
+        ->set('uuid47_transformer', Uuid47Transformer::class)
+            ->args([param('kernel.secret')])
+        ->alias(Uuid47Transformer::class, 'uuid47_transformer')
     ;
 };

@@ -14,8 +14,8 @@ namespace Symfony\Component\Form\Tests\Fixtures\Flow;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Flow\Type\NavigatorFlowType;
 use Symfony\Component\Form\Flow\Type\NextFlowType;
-use Symfony\Component\Form\Flow\Type\ResetFlowType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserSignUpNavigatorType extends AbstractType
 {
@@ -25,8 +25,13 @@ class UserSignUpNavigatorType extends AbstractType
             'clear_submission' => true,
             'include_if' => ['professional'],
         ]);
+    }
 
-        $builder->add('reset', ResetFlowType::class);
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'with_reset' => true,
+        ]);
     }
 
     public function getParent(): string

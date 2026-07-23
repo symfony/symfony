@@ -1,27 +1,19 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        (\Symfony\Component\VarExporter\Internal\Registry::$factories['Symfony\\Component\\VarExporter\\Tests\\FinalError'] ?? \Symfony\Component\VarExporter\Internal\Registry::f('Symfony\\Component\\VarExporter\\Tests\\FinalError'))(),
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\FinalError',
+    'objectMeta' => [
+        [0, 1],
     ],
-    null,
-    [
-        'TypeError' => [
-            'file' => [
-                \dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php',
-            ],
-            'line' => [
-                123,
-            ],
-        ],
+    'prepared' => 0,
+    'properties' => [
         'Error' => [
+            'file' => [\dirname(__DIR__).\DIRECTORY_SEPARATOR.'VarExporterTest.php'],
+            'line' => [123],
             'trace' => [
                 [],
             ],
         ],
     ],
-    $o[0],
-    [
-        1 => 0,
-    ]
-);
+    'states' => [1 => 0],
+], null, true);

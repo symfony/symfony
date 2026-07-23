@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\RateLimiter\Policy\CalendarAlignedWindow;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Policy\Window;
 use Symfony\Component\RateLimiter\RateLimit;
@@ -301,6 +302,209 @@ class FixedWindowLimiterTest extends TestCase
             $this->assertEquals($i, $rateLimit->getRemainingTokens());
             $this->assertTrue($rateLimit->isAccepted());
         }
+    }
+
+    public function testCalendarAnchorMonthlyOnTheFifth()
+    {
+        $utc = new \DateTimeZone('UTC');
+        // Anchor on the 5th of the month
+        $anchor = new \DateTimeImmutable('2024-01-05 00:00:00', $utc);
+
+        // Pretend "now" is 2026-05-10 — past the anchor by ~28 months
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-05-10 12:00:00', $utc))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 3, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        // The retry-after must point to the next 5th (2026-06-05 00:00:00 UTC), not "now + 1 month"
+        $this->assertSame(
+            (new \DateTimeImmutable('2026-06-05 00:00:00', $utc))->getTimestamp(),
+            $rateLimit->getRetryAfter()->getTimestamp()
+        );
+    }
+
+    public function testCalendarAnchorResetsAtPeriodBoundary()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $anchor = new \DateTimeImmutable('2024-01-05 00:00:00', $utc);
+
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-05-10 12:00:00', $utc))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $limiter->consume(2);
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        // Jump past the next anchor (5th of June)
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-06-05 00:00:01', $utc))->getTimestamp());
+
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1, $rateLimit->getRemainingTokens());
+    }
+
+    public function testCalendarAnchorInTheFuture()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $anchor = new \DateTimeImmutable('2030-01-01 00:00:00', $utc);
+
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-05-10 12:00:00', $utc))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1Y'), $this->storage, null, $anchor);
+
+        $limiter->consume();
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        // The current period ends at 2027-01-01 (anchor stepped backward by years until containing now)
+        $this->assertSame(
+            (new \DateTimeImmutable('2027-01-01 00:00:00', $utc))->getTimestamp(),
+            $rateLimit->getRetryAfter()->getTimestamp()
+        );
+    }
+
+    public function testCalendarAnchorNegativeConsumeClampsAtZero()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $anchor = new \DateTimeImmutable('2024-01-05 00:00:00', $utc);
+
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-05-10 12:00:00', $utc))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 5, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        // Negative consume on a fresh window must not push remaining tokens above the limit
+        $rateLimit = $limiter->consume(-1);
+        $this->assertSame(5, $rateLimit->getRemainingTokens());
+
+        $limiter->consume(3);
+        for ($i = 3; $i <= 5; ++$i) {
+            $rateLimit = $limiter->consume(-1);
+            $this->assertLessThanOrEqual(5, $rateLimit->getRemainingTokens());
+            $this->assertTrue($rateLimit->isAccepted());
+        }
+
+        // Counter must stay clamped: further negative consumes do not exceed the limit
+        $rateLimit = $limiter->consume(-1);
+        $this->assertSame(5, $rateLimit->getRemainingTokens());
+    }
+
+    public function testCalendarAlignedWindowSerializationRoundTrip()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $window = new CalendarAlignedWindow(
+            'cal-key',
+            7,
+            new \DateTimeImmutable('2024-01-05 00:00:00', $utc),
+            new \DateTimeImmutable('2024-02-05 00:00:00', $utc),
+        );
+        $window->add(3);
+
+        $restored = unserialize(serialize($window));
+
+        $this->assertInstanceOf(CalendarAlignedWindow::class, $restored);
+        $this->assertSame('cal-key', $restored->getId());
+        $this->assertSame(3, $restored->getHitCount());
+        $this->assertSame(4, $restored->getAvailableTokens(microtime(true)));
+        $this->assertSame(
+            $window->getPeriodStart()->getTimestamp(),
+            $restored->getPeriodStart()->getTimestamp(),
+        );
+        $this->assertSame(
+            $window->getPeriodEnd()->getTimestamp(),
+            $restored->getPeriodEnd()->getTimestamp(),
+        );
+    }
+
+    public function testCalendarAnchorAcceptsMutableDateTime()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $anchor = \DateTimeImmutable::createFromMutable(new \DateTime('2024-01-05 00:00:00', $utc));
+
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-05-10 12:00:00', $utc))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+        $this->assertSame(
+            (new \DateTimeImmutable('2026-06-05 00:00:00', $utc))->getTimestamp(),
+            $rateLimit->getRetryAfter()->getTimestamp(),
+        );
+    }
+
+    public function testCalendarAnchorEqualToNow()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $anchor = new \DateTimeImmutable('2026-05-10 12:00:00', $utc);
+
+        // "now" matches the anchor exactly
+        ClockMock::withClockMock($anchor->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 2, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $limiter->consume(2);
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        // Next reset is one full interval after the anchor
+        $this->assertSame(
+            $anchor->add(new \DateInterval('P1M'))->getTimestamp(),
+            $rateLimit->getRetryAfter()->getTimestamp(),
+        );
+    }
+
+    public function testCalendarAnchorAcrossDstTransition()
+    {
+        $tz = new \DateTimeZone('America/New_York');
+        // Anchor at local midnight on a date before US "spring forward" (March 10, 2024)
+        $anchor = new \DateTimeImmutable('2024-03-05 00:00:00', $tz);
+
+        // "now" sits after the DST transition. Next reset must be 2026-04-05 00:00 New York,
+        // i.e. EDT (UTC-04:00), not a fixed offset based on the original EST anchor.
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-03-20 12:00:00', $tz))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $limiter->consume();
+        $rateLimit = $limiter->consume();
+        $this->assertFalse($rateLimit->isAccepted());
+
+        $expected = new \DateTimeImmutable('2026-04-05 00:00:00', $tz);
+        $this->assertSame($expected->getTimestamp(), $rateLimit->getRetryAfter()->getTimestamp());
+    }
+
+    public function testCalendarAnchorRejectsSubMonthInterval()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "anchorAt" option');
+
+        new FixedWindowLimiter('cal', 1, new \DateInterval('PT1M'), $this->storage, null, new \DateTimeImmutable('2024-01-01'));
+    }
+
+    public function testCalendarAnchorRespectsTimezone()
+    {
+        $tz = new \DateTimeZone('America/New_York');
+        $anchor = new \DateTimeImmutable('2024-01-01 00:00:00', $tz);
+
+        // 2026-01-01 00:00:00 New York = 2026-01-01 05:00:00 UTC
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-01-01 04:00:00', new \DateTimeZone('UTC')))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 1, new \DateInterval('P1Y'), $this->storage, null, $anchor);
+
+        $limiter->consume();
+        $rateLimit = $limiter->consume();
+
+        // Period is still 2025 (in NY time it's still 2025-12-31 23:00); next reset = 2026-01-01 00:00 NY = 2026-01-01 05:00 UTC
+        $this->assertSame(
+            (new \DateTimeImmutable('2026-01-01 05:00:00', new \DateTimeZone('UTC')))->getTimestamp(),
+            $rateLimit->getRetryAfter()->getTimestamp()
+        );
     }
 
     public static function provideConsumeOutsideInterval(): \Generator

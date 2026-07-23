@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -136,6 +135,12 @@ class UrlGeneratorTest extends TestCase
         $nestedStdClass = new \stdClass();
         $nestedStdClass->nested = $stdClass;
 
+        $sharedLeaf = new \stdClass();
+        $sharedLeaf->baz = 'bar';
+        $sharedObject = new \stdClass();
+        $sharedObject->left = $sharedLeaf;
+        $sharedObject->right = $sharedLeaf;
+
         return [
             'null' => ['', 'foo', null],
             'string' => ['?foo=bar', 'foo', 'bar'],
@@ -150,7 +155,24 @@ class UrlGeneratorTest extends TestCase
             'non stringable object' => ['', 'foo', new NonStringableObject()],
             'non stringable object but has public property' => ['?foo%5Bfoo%5D=property', 'foo', new NonStringableObjectWithPublicProperty()],
             'numeric key' => ['?123=foo', '123', 'foo'],
+            // a shared (acyclic) reference must not be mistaken for a circular one
+            'object with a shared acyclic reference' => ['?foo%5Bleft%5D%5Bbaz%5D=bar&foo%5Bright%5D%5Bbaz%5D=bar', 'foo', $sharedObject],
         ];
+    }
+
+    public function testGenerateWithCircularObjectReference()
+    {
+        $a = new \stdClass();
+        $b = new \stdClass();
+        $a->b = $b;
+        $b->a = $a;
+
+        $routes = $this->getRoutes('test', new Route('/testing'));
+
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Parameters for route "test" cannot contain a circular reference');
+
+        $this->getGenerator($routes)->generate('test', ['foo' => $a]);
     }
 
     public function testUrlWithExtraParametersFromGlobals()
@@ -1133,22 +1155,16 @@ class UrlGeneratorTest extends TestCase
         ]);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testQueryParametersWithScalarValue()
     {
         $routes = $this->getRoutes('user', new Route('/user/{id}'));
 
-        $this->expectUserDeprecationMessage(
-            'Since symfony/routing 7.4: Parameter "_query" is reserved for passing an array of query parameters. '.
-            'Passing a scalar value is deprecated and will throw an exception in Symfony 8.0.',
-        );
+        $this->expectException(InvalidParameterException::class);
 
-        $url = $this->getGenerator($routes)->generate('user', [
+        $this->getGenerator($routes)->generate('user', [
             'id' => '123',
             '_query' => 'foo',
         ]);
-        $this->assertSame('/app.php/user/123?_query=foo', $url);
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, ?string $defaultLocale = null)

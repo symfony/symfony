@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Console\Attribute\Reflection;
 
+use Symfony\Component\String\UnicodeString;
+
 /**
  * @internal
  */
@@ -33,10 +35,25 @@ class ReflectionMember
         return ($this->member->getAttributes($class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null)?->newInstance();
     }
 
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return list<T>
+     */
+    public function getAttributes(string $class): array
+    {
+        return array_map(
+            static fn (\ReflectionAttribute $attribute) => $attribute->newInstance(),
+            $this->member->getAttributes($class, \ReflectionAttribute::IS_INSTANCEOF)
+        );
+    }
+
     public function getSourceName(): string
     {
         if ($this->member instanceof \ReflectionProperty) {
-            return $this->member->getDeclaringClass()->name;
+            return $this->member->class;
         }
 
         $function = $this->member->getDeclaringFunction();
@@ -102,8 +119,23 @@ class ReflectionMember
         return $this->member instanceof \ReflectionParameter;
     }
 
+    public function isVariadic(): bool
+    {
+        return $this->member instanceof \ReflectionParameter && $this->member->isVariadic();
+    }
+
     public function isProperty(): bool
     {
         return $this->member instanceof \ReflectionProperty;
+    }
+
+    public function getMember(): \ReflectionParameter|\ReflectionProperty
+    {
+        return $this->member;
+    }
+
+    public function getInputName(): string
+    {
+        return (new UnicodeString($this->member->getName()))->kebab()->toString();
     }
 }

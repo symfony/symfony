@@ -14,6 +14,19 @@ namespace Symfony\Component\Messenger\Stamp;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Messenger\Exception\LogicException;
 
+/**
+ * Carries a deduplication key alongside an Envelope.
+ *
+ * Security note: the key carried by this stamp is not authenticated. It travels
+ * with the envelope through the transport, so any actor able to write into the
+ * queue can craft an envelope whose DeduplicateStamp references the
+ * deduplication key of another in-flight message and, by failing that crafted
+ * message terminally, release the legitimate message's lock (see
+ * {@see \Symfony\Component\Messenger\EventListener\ReleaseDeduplicationLockOnFailureListener}).
+ *
+ * Treat deduplication keys as a best-effort idempotency primitive. They are not
+ * a correctness primitive against a hostile queue producer.
+ */
 final class DeduplicateStamp implements StampInterface
 {
     private Key $key;

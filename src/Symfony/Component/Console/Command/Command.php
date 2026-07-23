@@ -55,64 +55,21 @@ class Command implements SignalableCommandInterface
     private ?HelperSet $helperSet = null;
 
     /**
-     * @deprecated since Symfony 7.3, use the #[AsCommand] attribute instead
-     */
-    public static function getDefaultName(): ?string
-    {
-        trigger_deprecation('symfony/console', '7.3', 'Method "%s()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.', __METHOD__);
-
-        if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            return $attribute[0]->newInstance()->name;
-        }
-
-        return null;
-    }
-
-    /**
-     * @deprecated since Symfony 7.3, use the #[AsCommand] attribute instead
-     */
-    public static function getDefaultDescription(): ?string
-    {
-        trigger_deprecation('symfony/console', '7.3', 'Method "%s()" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.', __METHOD__);
-
-        if ($attribute = (new \ReflectionClass(static::class))->getAttributes(AsCommand::class)) {
-            return $attribute[0]->newInstance()->description;
-        }
-
-        return null;
-    }
-
-    /**
      * @param string|null $name The name of the command; passing null means it must be set in configure()
      *
      * @throws LogicException When the command name is empty
      */
     public function __construct(?string $name = null, ?callable $code = null)
     {
-        if (null !== $code) {
-            if (!\is_object($code) || $code instanceof \Closure) {
-                throw new InvalidArgumentException(\sprintf('The command must be an instance of "%s" or an invokable object.', self::class));
-            }
-            /** @var AsCommand $attribute */
-            $attribute = ((new \ReflectionObject($code))->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()
-                ?? throw new LogicException(\sprintf('The command must use the "%s" attribute.', AsCommand::class));
-            $this->setCode($code);
-        } else {
-            $attribute = ((new \ReflectionClass(static::class))->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-        }
-
         $this->definition = new InputDefinition();
-        if (null === $name) {
-            if (self::class !== (new \ReflectionMethod($this, 'getDefaultName'))->class) {
-                trigger_deprecation('symfony/console', '7.3', 'Overriding "Command::getDefaultName()" in "%s" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.', static::class);
 
-                $name = static::getDefaultName();
-            } else {
-                $name = $attribute?->name;
-            }
+        $attribute = $this->getCommandAttribute($code);
+
+        if ($code) {
+            $this->setCode($code);
         }
 
-        if (null !== $name) {
+        if (null !== $name ??= $attribute?->name) {
             $aliases = explode('|', $name);
 
             if ('' === $name = array_shift($aliases)) {
@@ -134,15 +91,7 @@ class Command implements SignalableCommandInterface
         }
 
         if ('' === $this->description) {
-            if (self::class !== (new \ReflectionMethod($this, 'getDefaultDescription'))->class) {
-                trigger_deprecation('symfony/console', '7.3', 'Overriding "Command::getDefaultDescription()" in "%s" is deprecated and will be removed in Symfony 8.0, use the #[AsCommand] attribute instead.', static::class);
-
-                $defaultDescription = static::getDefaultDescription();
-            } else {
-                $defaultDescription = $attribute?->description;
-            }
-
-            $this->setDescription($defaultDescription ?? '');
+            $this->setDescription($attribute?->description ?? '');
         }
 
         if ('' === $this->help) {
@@ -153,7 +102,7 @@ class Command implements SignalableCommandInterface
             $this->addUsage($usage);
         }
 
-        if (!$code && \is_callable($this) && self::class === (new \ReflectionMethod($this, 'execute'))->getDeclaringClass()->name) {
+        if (!$code && \is_callable($this) && self::class === (new \ReflectionMethod($this, 'execute'))->class) {
             $this->code = new InvokableCommand($this, $this(...));
         }
 
@@ -216,10 +165,8 @@ class Command implements SignalableCommandInterface
 
     /**
      * Configures the current command.
-     *
-     * @return void
      */
-    protected function configure()
+    protected function configure(): void
     {
     }
 
@@ -248,10 +195,8 @@ class Command implements SignalableCommandInterface
      * This method is executed before the InputDefinition is validated.
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
-     *
-     * @return void
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
     }
 
@@ -264,10 +209,8 @@ class Command implements SignalableCommandInterface
      *
      * @see InputInterface::bind()
      * @see InputInterface::validate()
-     *
-     * @return void
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
     }
 
@@ -639,7 +582,7 @@ class Command implements SignalableCommandInterface
             $list[] = $alias;
         }
 
-        $this->aliases = \is_array($aliases) ? $aliases : $list;
+        $this->aliases = $list;
 
         return $this;
     }
@@ -729,5 +672,35 @@ class Command implements SignalableCommandInterface
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(\sprintf('Command name "%s" is invalid.', $name));
         }
+    }
+
+    private function getCommandAttribute(?callable $code): ?AsCommand
+    {
+        if (null === $code) {
+            /** @var AsCommand|null $attribute */
+            $attribute = (new \ReflectionClass(static::class)->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+
+            return $attribute;
+        }
+
+        $reflection = new \ReflectionFunction($code(...));
+
+        if ($reflection->isAnonymous() || !$class = $reflection->getClosureScopeClass()) {
+            throw new InvalidArgumentException(\sprintf('The command must be an instance of "%s", an invokable object or a method of an object.', self::class));
+        }
+
+        /** @var AsCommand|null $attribute */
+        $attribute = ($reflection->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+
+        if (!$attribute && '__invoke' === $reflection->getName()) {
+            /** @var AsCommand|null $attribute */
+            $attribute = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        }
+
+        if (!$attribute) {
+            throw new LogicException(\sprintf('The command must use the "%s" attribute.', AsCommand::class));
+        }
+
+        return $attribute;
     }
 }

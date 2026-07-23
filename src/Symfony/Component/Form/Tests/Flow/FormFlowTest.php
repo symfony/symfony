@@ -945,8 +945,9 @@ class FormFlowTest extends TestCase
         self::assertTrue($flow->has('navigator'));
 
         $navigatorForm = $flow->get('navigator');
-        self::assertCount(1, $navigatorForm->all());
+        self::assertCount(2, $navigatorForm->all());
         self::assertTrue($navigatorForm->has('next'));
+        self::assertTrue($navigatorForm->has('reset'));
 
         $flow->submit([
             'step1' => 'foo',

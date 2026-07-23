@@ -12,8 +12,7 @@
 namespace Symfony\Component\PasswordHasher\Tests\Hasher;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
-use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\Attributes\TestWithJson;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PasswordHasher\Exception\InvalidPasswordException;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
@@ -100,37 +99,6 @@ class NativePasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 
-    #[RequiresPhp('<8.4.0')]
-    public function testBcryptWithNulByteWithNativePasswordHash()
-    {
-        $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
-        $plainPassword = "a\0b";
-
-        try {
-            $hash = password_hash($plainPassword, \PASSWORD_BCRYPT, ['cost' => 4]);
-        } catch (\Throwable $throwable) {
-            // we skip the test in case the current PHP version does not support NUL bytes in passwords
-            // with bcrypt
-            //
-            // @see https://github.com/php/php-src/commit/11f2568767660ffe92fbc6799800e01203aad73a
-            if (str_contains($throwable->getMessage(), 'Bcrypt password must not contain null character')) {
-                $this->markTestSkipped('password_hash() does not accept passwords containing NUL bytes.');
-            }
-
-            throw $throwable;
-        }
-
-        if (null === $hash) {
-            // we also skip the test in case password_hash() returns null as
-            // implemented in security patches backports
-            //
-            // @see https://github.com/shivammathur/php-src-backports/commit/d22d9ebb29dce86edd622205dd1196a2796c08c7
-            $this->markTestSkipped('password_hash() does not accept passwords containing NUL bytes.');
-        }
-
-        $this->assertFalse($hasher->verify($hash, $plainPassword));
-    }
-
     public function testPasswordNulByteGracefullyHandled()
     {
         $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
@@ -168,8 +136,8 @@ class NativePasswordHasherTest extends TestCase
         new NativePasswordHasher(3, 9999);
     }
 
-    #[TestWith([1])]
-    #[TestWith([40])]
+    #[TestWithJson('[1]')]
+    #[TestWithJson('[40]')]
     public function testInvalidCostThrows(int $cost)
     {
         $this->expectException(\InvalidArgumentException::class);

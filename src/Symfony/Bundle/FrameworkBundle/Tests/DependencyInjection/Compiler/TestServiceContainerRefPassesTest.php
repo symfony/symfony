@@ -15,11 +15,13 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerWeakRefPass;
+use Symfony\Bundle\FrameworkBundle\Test\TestContainer;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\HttpKernel\Kernel;
 
 class TestServiceContainerRefPassesTest extends TestCase
 {
@@ -57,6 +59,14 @@ class TestServiceContainerRefPassesTest extends TestCase
         $container->register('test.private_used_non_shared_service', 'stdClass')->setShared(false);
         $container->register('test.private_unused_non_shared_service', 'stdClass')->setShared(false);
 
+        $container->register('kernel', Kernel::class);
+
+        $container->register('test.service_container', TestContainer::class)
+            ->setPublic(true)
+            ->addArgument(new Reference('kernel'))
+            ->addArgument('id')
+            ->addArgument([]);
+
         $container->compile();
 
         $expected = [
@@ -65,6 +75,7 @@ class TestServiceContainerRefPassesTest extends TestCase
             'test.soon_private_service' => new ServiceClosureArgument(new Reference('.container.private.test.soon_private_service')),
             'test.soon_private_service_decorator' => new ServiceClosureArgument(new Reference('.container.private.test.soon_private_service_decorated')),
             'test.soon_private_service_decorated' => new ServiceClosureArgument(new Reference('.container.private.test.soon_private_service_decorated')),
+            'kernel' => new ServiceClosureArgument(new Reference('kernel')),
         ];
 
         $privateServices = $container->getDefinition('test.private_services_locator')->getArgument(0);
@@ -72,5 +83,9 @@ class TestServiceContainerRefPassesTest extends TestCase
 
         $this->assertEquals($expected, $privateServices);
         $this->assertFalse($container->getDefinition('test.private_used_non_shared_service')->isShared());
+
+        $this->assertEquals([
+            'test.private_used_non_shared_service' => true,
+        ], $container->getDefinition('test.service_container')->getArgument(3));
     }
 }

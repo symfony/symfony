@@ -18,12 +18,16 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Read\Instantiator;
 use Symfony\Component\JsonStreamer\Read\LazyInstantiator;
 use Symfony\Component\JsonStreamer\Read\StreamReaderGenerator;
-use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\BcMathNumberValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeZoneValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\GmpNumberValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
@@ -32,7 +36,14 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @implements StreamReaderInterface<array<string, mixed>>
+ * @psalm-type Options = array{
+ *     date_time_format?: string,
+ *     date_time_timezone?: string|\DateTimeZone,
+ *     date_interval_format?: string,
+ *     ...<string, mixed>,
+ * }
+ *
+ * @implements StreamReaderInterface<Options>
  */
 final class JsonStreamReader implements StreamReaderInterface
 {
@@ -45,71 +56,72 @@ final class JsonStreamReader implements StreamReaderInterface
      */
     private array $streamReaders = [];
 
+    /**
+     * @param Options $defaultOptions
+     */
     public function __construct(
-        private ContainerInterface $valueTransformers,
+        private ContainerInterface $transformers,
         PropertyMetadataLoaderInterface $propertyMetadataLoader,
         string $streamReadersDir,
-        ConfigCacheFactoryInterface|string|null $configCacheFactory = null,
-        ?string $lazyGhostsDir = null,
+        ?ConfigCacheFactoryInterface $configCacheFactory = null,
+        private array $defaultOptions = [],
     ) {
-        if (\is_string($configCacheFactory)) {
-            $lazyGhostsDir = $configCacheFactory;
-            $configCacheFactory = null;
-        }
-        $this->streamReaderGenerator = new StreamReaderGenerator($propertyMetadataLoader, $streamReadersDir, $configCacheFactory);
+        $this->streamReaderGenerator = new StreamReaderGenerator($propertyMetadataLoader, $transformers, $streamReadersDir, $configCacheFactory);
         $this->instantiator = new Instantiator();
-        $this->lazyInstantiator = new LazyInstantiator($lazyGhostsDir);
+        $this->lazyInstantiator = new LazyInstantiator();
     }
 
     public function read($input, Type $type, array $options = []): mixed
     {
+        $options += $this->defaultOptions;
         $isStream = \is_resource($input);
         $path = $this->streamReaderGenerator->generate($type, $isStream, $options);
 
-        return ($this->streamReaders[$path] ??= require $path)($input, $this->valueTransformers, $isStream ? $this->lazyInstantiator : $this->instantiator, $options);
+        return ($this->streamReaders[$path] ??= require $path)($input, $this->transformers, $isStream ? $this->lazyInstantiator : $this->instantiator, $options);
     }
 
     /**
-     * @param array<string, ValueTransformerInterface> $valueTransformers
+     * @param array<string, PropertyValueTransformerInterface|ValueObjectTransformerInterface> $transformers
      */
-    public static function create(array $valueTransformers = [], ?string $streamReadersDir = null, ?string $lazyGhostsDir = null): self
+    public static function create(array $transformers = [], ?string $streamReadersDir = null): self
     {
         $streamReadersDir ??= sys_get_temp_dir().'/json_streamer/read';
-        $lazyGhostsDir ??= sys_get_temp_dir().'/json_streamer/lazy_ghost';
-        $valueTransformers += [
-            'json_streamer.value_transformer.string_to_date_time' => new StringToDateTimeValueTransformer(),
+        $transformers += [
+            \DateTimeInterface::class => new DateTimeValueObjectTransformer(),
+            \DateInterval::class => new DateIntervalValueObjectTransformer(),
+            \DateTimeZone::class => new DateTimeZoneValueObjectTransformer(),
+            \BcMath\Number::class => new BcMathNumberValueObjectTransformer(),
+            \GMP::class => new GmpNumberValueObjectTransformer(),
         ];
 
-        $valueTransformersContainer = new class($valueTransformers) implements ContainerInterface {
+        $transformersContainer = new class($transformers) implements ContainerInterface {
             public function __construct(
-                private array $valueTransformers,
+                private array $transformers,
             ) {
             }
 
             public function has(string $id): bool
             {
-                return isset($this->valueTransformers[$id]);
+                return isset($this->transformers[$id]);
             }
 
-            public function get(string $id): ValueTransformerInterface
+            public function get(string $id): PropertyValueTransformerInterface|ValueObjectTransformerInterface
             {
-                return $this->valueTransformers[$id];
+                return $this->transformers[$id];
             }
         };
 
         $typeContextFactory = new TypeContextFactory(class_exists(PhpDocParser::class) ? new StringTypeResolver() : null);
 
         $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
-            new DateTimeTypePropertyMetadataLoader(
-                new AttributePropertyMetadataLoader(
-                    new PropertyMetadataLoader(TypeResolver::create()),
-                    $valueTransformersContainer,
-                    TypeResolver::create(),
-                ),
+            new AttributePropertyMetadataLoader(
+                new PropertyMetadataLoader(TypeResolver::create()),
+                $transformersContainer,
+                TypeResolver::create(),
             ),
             $typeContextFactory,
         );
 
-        return new self($valueTransformersContainer, $propertyMetadataLoader, $streamReadersDir, $lazyGhostsDir);
+        return new self($transformersContainer, $propertyMetadataLoader, $streamReadersDir);
     }
 }

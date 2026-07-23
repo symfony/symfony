@@ -69,9 +69,7 @@ class RememberMeAuthenticatorTest extends TestCase
     {
         $rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
         $rememberMeDetails = new RememberMeDetails('wouter', 1, 'secret');
-        $cookieData = explode(RememberMeDetails::COOKIE_DELIMITER, $rememberMeDetails->toString());
-        $cookieData[0] = '';
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => implode(RememberMeDetails::COOKIE_DELIMITER, $cookieData)]);
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => $rememberMeDetails->toString()]);
         $passport = (new RememberMeAuthenticator($rememberMeHandler, $this->tokenStorage, '_remember_me_cookie'))->authenticate($request);
 
         $rememberMeHandler->expects($this->once())->method('consumeRememberMeCookie')->with($this->callback(static fn ($arg) => $rememberMeDetails == $arg));
@@ -81,8 +79,8 @@ class RememberMeAuthenticatorTest extends TestCase
     public function testAuthenticateLegacyCookieFormat()
     {
         $rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
-        $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 1, 'secret', false);
-        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => $rememberMeDetails->toString()]);
+        $rememberMeDetails = new RememberMeDetails('wouter', 1, 'secret');
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => strtr(InMemoryUser::class, '\\', '.').$rememberMeDetails->toString()]);
         $passport = (new RememberMeAuthenticator($rememberMeHandler, $this->tokenStorage, '_remember_me_cookie'))->authenticate($request);
 
         $rememberMeHandler->expects($this->once())->method('consumeRememberMeCookie')->with($this->callback(static fn ($arg) => $rememberMeDetails == $arg));

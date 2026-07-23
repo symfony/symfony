@@ -17,8 +17,10 @@ use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\FormFlowTypeInterface;
+use Symfony\Component\Form\Flow\Type\FormFlowType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -225,13 +227,8 @@ class ControllerHelper implements ServiceSubscriberInterface
      */
     public function denyAccessUnlessGranted(mixed $attribute, mixed $subject = null, string $message = 'Access Denied.'): void
     {
-        if (class_exists(AccessDecision::class)) {
-            $accessDecision = $this->getAccessDecision($attribute, $subject);
-            $isGranted = $accessDecision->isGranted;
-        } else {
-            $accessDecision = null;
-            $isGranted = $this->isGranted($attribute, $subject);
-        }
+        $accessDecision = $this->getAccessDecision($attribute, $subject);
+        $isGranted = $accessDecision->isGranted;
 
         if (!$isGranted) {
             $e = $this->createAccessDeniedException(3 > \func_num_args() && $accessDecision ? $accessDecision->getMessage() : $message);
@@ -358,6 +355,14 @@ class ControllerHelper implements ServiceSubscriberInterface
     public function createFormBuilder(mixed $data = null, array $options = []): FormBuilderInterface
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
+    }
+
+    /**
+     * Creates and returns a form flow builder instance.
+     */
+    public function createFormFlowBuilder(mixed $data = null, array $options = []): FormFlowBuilderInterface
+    {
+        return $this->container->get('form.factory')->createBuilder(FormFlowType::class, $data, $options);
     }
 
     /**

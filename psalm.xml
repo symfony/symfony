@@ -29,6 +29,8 @@
             <errorLevel type="suppress">
                 <!-- These classes have been added in PHP 8.4 -->
                 <referencedClass name="BcMath\Number"/>
+                <!-- These classes have been added in PHP 8.5 -->
+                <referencedClass name="CurlSharePersistentHandle"/>
             </errorLevel>
         </UndefinedClass>
         <UnusedClass>
@@ -49,6 +51,12 @@
                 <directory name="src/Symfony" />
             </errorLevel>
         </UnusedConstructor>
+        <UndefinedFunction>
+            <errorLevel type="suppress">
+                <!-- These functions have been added in PHP 8.5 -->
+                <referencedFunction name="curl_share_init_persistent"/>
+            </errorLevel>
+        </UndefinedFunction>
     </issueHandlers>
 
     <forbiddenFunctions>

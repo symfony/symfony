@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Dumper;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -253,6 +254,16 @@ class YamlDumper extends Dumper
 
             return new TaggedValue('service_closure', $this->dumpValue($value));
         }
+        if ($value instanceof EnvClosureArgument) {
+            $envExpr = $this->container->resolveEnvPlaceholders($value->getValue());
+            $default = $value->getDefault();
+
+            if (!$value->isStringable()) {
+                return new TaggedValue('env_closure', null === $default ? $envExpr : [$envExpr, $default, false]);
+            }
+
+            return new TaggedValue('env_closure', [$envExpr, $default]);
+        }
         if ($value instanceof ArgumentInterface) {
             $tag = $value;
 
@@ -265,11 +276,13 @@ class YamlDumper extends Dumper
                         'index_by' => $tag->getIndexAttribute(),
                     ];
 
-                    if (null !== $tag->getDefaultIndexMethod()) {
-                        $content['default_index_method'] = $tag->getDefaultIndexMethod();
+                    $defaultPrefix = 'getDefault'.str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $tag->getIndexAttribute())));
+
+                    if (!\in_array($tag->getDefaultIndexMethod(false), [null, $defaultPrefix.'Name'], true)) {
+                        $content['default_index_method'] = $tag->getDefaultIndexMethod(false);
                     }
-                    if (null !== $tag->getDefaultPriorityMethod()) {
-                        $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
+                    if (!\in_array($tag->getDefaultPriorityMethod(false), [null, $defaultPrefix.'Priority'], true)) {
+                        $content['default_priority_method'] = $tag->getDefaultPriorityMethod(false);
                     }
                 }
                 if ($excludes = $tag->getExclude()) {

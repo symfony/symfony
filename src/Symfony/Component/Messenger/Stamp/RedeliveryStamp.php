@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Stamp;
 
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Messenger\Envelope;
 
 /**
@@ -24,7 +25,7 @@ final class RedeliveryStamp implements StampInterface
         private int $retryCount,
         ?\DateTimeInterface $redeliveredAt = null,
     ) {
-        $this->redeliveredAt = $redeliveredAt ?? new \DateTimeImmutable();
+        $this->redeliveredAt = $redeliveredAt ?? Clock::get()->now();
     }
 
     public static function getRetryCountFromEnvelope(Envelope $envelope): int

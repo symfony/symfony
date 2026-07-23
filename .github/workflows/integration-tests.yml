@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.2']
+        php: ['8.4']
       fail-fast: false
 
     services:
@@ -139,7 +139,7 @@ jobs:
           KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
         options: --name=kafka
       frankenphp:
-        image: dunglas/frankenphp:1.1.0
+        image: dunglas/frankenphp:1.12.1-php8.4
         ports:
           - 80:80
           - 8681:81

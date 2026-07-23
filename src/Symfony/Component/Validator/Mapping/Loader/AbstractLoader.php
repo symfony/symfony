@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Mapping\Loader;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MappingException;
 
@@ -34,11 +33,6 @@ abstract class AbstractLoader implements LoaderInterface
     public const DEFAULT_NAMESPACE = '\\Symfony\\Component\\Validator\\Constraints\\';
 
     protected array $namespaces = [];
-
-    /**
-     * @var array<class-string, bool>
-     */
-    private array $namedArgumentsCache = [];
 
     /**
      * Adds a namespace alias.
@@ -84,48 +78,14 @@ abstract class AbstractLoader implements LoaderInterface
             $className = self::DEFAULT_NAMESPACE.$name;
         }
 
-        if ($this->namedArgumentsCache[$className] ??= (bool) (new \ReflectionMethod($className, '__construct'))->getAttributes(HasNamedArguments::class)) {
-            if (null === $options) {
-                return new $className();
-            }
-
-            if (!\is_array($options)) {
-                return new $className($options);
-            }
-
-            if (1 === \count($options) && isset($options['value'])) {
-                if (\func_num_args() < 3 || !func_get_arg(2)) {
-                    trigger_deprecation('symfony/validator', '7.4', 'Using the "value" option to configure the "%s" constraint is deprecated.', $className);
-                }
-
-                return new $className($options['value']);
-            }
-
-            if (array_is_list($options)) {
-                trigger_deprecation('symfony/validator', '7.4', 'Configuring the "%s" without passing its option names is deprecated.', $className);
-
-                return new $className($options);
-            }
-
-            try {
-                return new $className(...$options);
-            } catch (\Error $e) {
-                if (str_starts_with($e->getMessage(), 'Unknown named parameter ')) {
-                    trigger_deprecation('symfony/validator', '7.4', 'Using option names not matching the named arguments of the "%s" constraint is deprecated.', $className);
-
-                    return new $className($options);
-                }
-
-                throw $e;
-            }
+        if (null === $options) {
+            return new $className();
         }
 
-        if ($options) {
-            trigger_deprecation('symfony/validator', '7.3', 'Using constraints not supporting named arguments is deprecated. Try adding the HasNamedArguments attribute to %s.', $className);
-
+        if (!\is_array($options)) {
             return new $className($options);
         }
 
-        return new $className();
+        return new $className(...$options);
     }
 }

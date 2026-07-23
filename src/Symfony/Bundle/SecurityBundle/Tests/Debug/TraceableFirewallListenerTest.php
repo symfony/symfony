@@ -33,6 +33,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
+use Symfony\Component\VarDumper\Caster\ClassStub;
 
 #[Group('time-sensitive')]
 class TraceableFirewallListenerTest extends TestCase
@@ -73,7 +74,8 @@ class TraceableFirewallListenerTest extends TestCase
 
         $listeners = $firewall->getWrappedListeners();
         $this->assertCount(1, $listeners);
-        $this->assertSame($listener, $listeners[0]['stub']);
+        $this->assertInstanceOf(ClassStub::class, $listeners[0]['stub']);
+        $this->assertSame((string) new ClassStub($listener::class), (string) $listeners[0]['stub']);
     }
 
     public function testOnKernelRequestRecordsAuthenticatorsInfo()

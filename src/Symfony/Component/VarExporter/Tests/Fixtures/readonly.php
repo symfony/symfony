@@ -1,20 +1,13 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (\Symfony\Component\VarExporter\Internal\Registry::$prototypes['Symfony\\Component\\VarExporter\\Tests\\Fixtures\\FooReadonly'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('Symfony\\Component\\VarExporter\\Tests\\Fixtures\\FooReadonly')),
-    ],
-    null,
-    [
+return \deepclone_from_array([
+    'classes' => 'Symfony\\Component\\VarExporter\\Tests\\Fixtures\\FooReadonly',
+    'objectMeta' => 1,
+    'prepared' => 0,
+    'properties' => [
         'Symfony\\Component\\VarExporter\\Tests\\Fixtures\\FooReadonly' => [
-            'name' => [
-                'k',
-            ],
-            'value' => [
-                'v',
-            ],
+            'name' => ['k'],
+            'value' => ['v'],
         ],
     ],
-    $o[0],
-    []
-);
+], null, true);

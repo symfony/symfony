@@ -29,6 +29,8 @@ use Symfony\Component\Process\Pipes\WindowsPipes;
  * @author Romain Neutron <imprec@gmail.com>
  *
  * @implements \IteratorAggregate<string, string>
+ *
+ * @psalm-type EnvArray = array<string, string|\Stringable|false>
  */
 class Process implements \IteratorAggregate
 {
@@ -62,12 +64,12 @@ class Process implements \IteratorAggregate
      */
     private const WINDOWS_ENV_BLOCK_MAX_LENGTH = 32767;
 
-    /**
-     * @var \Closure('out'|'err', string):bool|null
-     */
+    /** @var \Closure('out'|'err', string):bool|null */
     private ?\Closure $callback = null;
+    /** @var string[]|string */
     private array|string $commandline;
     private ?string $cwd;
+    /** @var EnvArray */
     private array $env = [];
     /** @var resource|string|\Iterator|null */
     private $input;
@@ -149,9 +151,9 @@ class Process implements \IteratorAggregate
     ];
 
     /**
-     * @param array          $command The command to run and its arguments listed as separate entries
+     * @param string[]       $command The command to run and its arguments listed as separate entries
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param EnvArray|null  $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
@@ -197,7 +199,7 @@ class Process implements \IteratorAggregate
      *
      * @param string         $command The command line to pass to the shell of the OS
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null     $env     The environment variables or null to use the same environment as the current PHP process
+     * @param EnvArray|null  $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
      * @param int|float|null $timeout The timeout in seconds or null to disable
      *
@@ -247,6 +249,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param EnvArray                                  $env
      *
      * @return int The exit status code
      *
@@ -273,6 +276,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param EnvArray                                  $env
      *
      * @return $this
      *
@@ -308,6 +312,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param EnvArray                                  $env
      *
      * @throws ProcessStartFailedException When process can't be launched
      * @throws RuntimeException            When process is already running
@@ -427,6 +432,7 @@ class Process implements \IteratorAggregate
      *
      * @param (callable('out'|'err', string):void)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
+     * @param EnvArray                                  $env
      *
      * @throws ProcessStartFailedException When process can't be launched
      * @throws RuntimeException            When process is already running
@@ -501,6 +507,8 @@ class Process implements \IteratorAggregate
      * The callback receives the type of output (out or err) and some bytes
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
+     *
+     * @param-immediately-invoked-callable $callback
      *
      * @param (callable('out'|'err', string):bool)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
@@ -1143,6 +1151,8 @@ class Process implements \IteratorAggregate
 
     /**
      * Gets the environment variables.
+     *
+     * @psalm-return EnvArray
      */
     public function getEnv(): array
     {
@@ -1152,7 +1162,7 @@ class Process implements \IteratorAggregate
     /**
      * Sets the environment variables.
      *
-     * @param array<string|\Stringable> $env The new environment variables
+     * @param EnvArray $env The new environment variables
      *
      * @return $this
      */
@@ -1325,7 +1335,7 @@ class Process implements \IteratorAggregate
      * The callbacks adds all occurred output to the specific buffer and calls
      * the user callback (if present) with the received output.
      *
-     * @param callable('out'|'err', string)|null $callback
+     * @param (callable('out'|'err', string):void)|null $callback
      *
      * @return \Closure('out'|'err', string):bool
      */
@@ -1559,6 +1569,9 @@ class Process implements \IteratorAggregate
         return true;
     }
 
+    /**
+     * @param string|list<string> $commandline
+     */
     private function buildShellCommandline(string|array $commandline): string
     {
         if (\is_string($commandline)) {
@@ -1574,6 +1587,12 @@ class Process implements \IteratorAggregate
         return implode(' ', array_map($this->escapeArgument(...), $commandline));
     }
 
+    /**
+     * @param string|list<string> $cmd
+     * @param EnvArray            $env
+     *
+     * @param-out EnvArray $env
+     */
     private function prepareWindowsCommandLine(string|array $cmd, array &$env): string
     {
         $cmd = $this->buildShellCommandline($cmd);
@@ -1674,6 +1693,9 @@ class Process implements \IteratorAggregate
         return '"'.str_replace(['"', '^', '%', '!', "\n"], ['""', '"^^"', '"^%"', '"^!"', '!LF!'], $argument).'"';
     }
 
+    /**
+     * @param EnvArray $env
+     */
     private function replacePlaceholders(string $commandline, array $env): string
     {
         return preg_replace_callback('/"\$\{:([_a-zA-Z]++[_a-zA-Z0-9]*+)\}"/', function ($matches) use ($commandline, $env) {
@@ -1685,6 +1707,9 @@ class Process implements \IteratorAggregate
         }, $commandline);
     }
 
+    /**
+     * @return EnvArray
+     */
     private function getDefaultEnv(): array
     {
         $env = getenv();

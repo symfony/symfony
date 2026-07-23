@@ -110,7 +110,7 @@ class PdoStore implements PersistingStoreInterface
             $stmt = $conn->prepare($sql);
         }
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
 
         try {
@@ -145,7 +145,7 @@ class PdoStore implements PersistingStoreInterface
             ." WHERE $this->table.$this->tokenCol = EXCLUDED.$this->tokenCol OR $this->table.$this->expirationCol <= $now";
 
         $conn = $this->getConnection();
-        $id = $this->getHashedKey($key);
+        $id = $this->getKeyName($key);
         $token = $this->getUniqueToken($key);
 
         try {
@@ -193,7 +193,7 @@ class PdoStore implements PersistingStoreInterface
         $stmt = $this->getConnection()->prepare($sql);
 
         $uniqueToken = $this->getUniqueToken($key);
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token1', $uniqueToken);
         $stmt->bindValue(':token2', $uniqueToken);
         $result = $stmt->execute();
@@ -211,7 +211,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $stmt->execute();
     }
@@ -221,7 +221,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $stmt = $this->getConnection()->prepare($sql);
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $result = $stmt->execute();
 

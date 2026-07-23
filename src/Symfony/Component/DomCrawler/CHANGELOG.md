@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Make `ChoiceFormField::addChoice()` part of the supported public API
+ * Always set `LIBXML_NONET` in `Crawler::addXmlContent()` so external entities cannot trigger network requests
+
+8.0
+---
+
+ * Remove argument `$useHtml5Parser` of `Crawler`'s constructor; the native HTML5 parser is used unconditionally
+
 7.4
 ---
 

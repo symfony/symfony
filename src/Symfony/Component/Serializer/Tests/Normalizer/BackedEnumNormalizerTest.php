@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -59,34 +60,58 @@ class BackedEnumNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
-    public function testDenormalize()
+    #[TestWith([StringBackedEnumDummy::GET, 'GET', StringBackedEnumDummy::class], 'string backed enum')]
+    #[TestWith([IntegerBackedEnumDummy::SUCCESS, 200, IntegerBackedEnumDummy::class], 'int backed enum')]
+    #[TestWith([IntegerBackedEnumDummy::SUCCESS, '200', IntegerBackedEnumDummy::class], 'int backed enum with string value')]
+    public function testDenormalize(mixed $expected, mixed $data, string $type)
     {
-        $this->assertSame(StringBackedEnumDummy::GET, $this->normalizer->denormalize('GET', StringBackedEnumDummy::class));
-        $this->assertSame(IntegerBackedEnumDummy::SUCCESS, $this->normalizer->denormalize(200, IntegerBackedEnumDummy::class));
+        $this->assertSame($expected, $this->normalizer->denormalize($data, $type));
     }
 
     public function testDenormalizeNullValueThrowsException()
     {
         $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data is neither an integer nor a string, you should pass an integer or a string');
+
         $this->normalizer->denormalize(null, StringBackedEnumDummy::class);
     }
 
     public function testDenormalizeBooleanValueThrowsException()
     {
         $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data is neither an integer nor a string, you should pass an integer or a string');
+
         $this->normalizer->denormalize(true, StringBackedEnumDummy::class);
     }
 
     public function testDenormalizeObjectThrowsException()
     {
         $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data is neither an integer nor a string, you should pass an integer or a string');
+
         $this->normalizer->denormalize(new \stdClass(), StringBackedEnumDummy::class);
     }
 
-    public function testDenormalizeBadBackingValueThrowsException()
+    public function testDenormalizeInvalidBackedTypeThrowsException()
     {
         $this->expectException(NotNormalizableValueException::class);
-        $this->expectExceptionMessage('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class);
+        $this->expectExceptionMessage('The data must be of type string');
+
+        $this->normalizer->denormalize(8, StringBackedEnumDummy::class);
+    }
+
+    public function testDenormalizeInvalidIntegerBackedValueThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data must be one of the following values: 200, 404');
+
+        $this->normalizer->denormalize(300, IntegerBackedEnumDummy::class);
+    }
+
+    public function testDenormalizeInvalidStringBackedValueThrowsException()
+    {
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('The data must be one of the following values: "GET", "OPTIONS"');
 
         $this->normalizer->denormalize('POST', StringBackedEnumDummy::class);
     }
@@ -149,9 +174,9 @@ class BackedEnumNormalizerTest extends TestCase
         } catch (NotNormalizableValueException $e) {
             $this->assertSame('get', $e->getPath());
             $this->assertSame('string', $e->getCurrentType());
-            $this->assertSame(['int', 'string'], $e->getExpectedTypes());
+            $this->assertNull($e->getExpectedTypes());
             $this->assertTrue($e->canUseMessageForUser());
-            $this->assertSame('The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class, $e->getMessage());
+            $this->assertSame('The data must be one of the following values: "GET", "OPTIONS"', $e->getMessage());
         }
     }
 }

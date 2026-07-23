@@ -74,7 +74,7 @@ final class SecurityExtension extends AbstractExtension
         }
 
         if (!$this->securityChecker instanceof UserAuthorizationCheckerInterface) {
-            throw new \LogicException(\sprintf('You cannot use "%s()" if the authorization checker doesn\'t implement "%s".%s', __METHOD__, UserAuthorizationCheckerInterface::class, interface_exists(UserAuthorizationCheckerInterface::class) ? ' Try upgrading the "symfony/security-core" package to v7.3 minimum.' : ''));
+            throw new \LogicException(\sprintf('You cannot use "%s()" if the authorization checker doesn\'t implement "%s".', __METHOD__, UserAuthorizationCheckerInterface::class));
         }
 
         if (null !== $field) {

@@ -14,7 +14,6 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 use AsyncAws\Core\Configuration;
 use AsyncAws\Core\Credentials\NullProvider;
 use AsyncAws\Ses\SesClient;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -136,13 +135,13 @@ class SesApiAsyncAwsTransportTest extends TestCase
             }
 
             // ASCII header should be sent as-is
-            Assert::assertSame('foobar', $headers['X-Ascii-Header']);
+            self::assertSame('foobar', $headers['X-Ascii-Header']);
 
             // Non-ASCII header should be base64-encoded per RFC 2047
-            Assert::assertSame('=?UTF-8?B?'.base64_encode('éééééééé').'?=', $headers['X-NonAscii-Header']);
+            self::assertSame('=?UTF-8?B?'.base64_encode('éééééééé').'?=', $headers['X-NonAscii-Header']);
 
             // Ensure the encoded value only contains printable ASCII characters (char codes 32-126)
-            Assert::assertMatchesRegularExpression('/^[\x20-\x7E]+$/', $headers['X-NonAscii-Header']);
+            self::assertMatchesRegularExpression('/^[\x20-\x7E]+$/', $headers['X-NonAscii-Header']);
 
             return new MockResponse('{"MessageId": "foobar"}', ['http_code' => 200]);
         });

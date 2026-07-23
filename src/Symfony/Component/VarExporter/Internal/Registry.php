@@ -119,7 +119,7 @@ class Registry
         }
 
         if (null === $cloneable) {
-            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !method_exists($proto, '__wakeup') && !method_exists($class, '__unserialize'))) {
+            if (($proto instanceof \Reflector || $proto instanceof \ReflectionGenerator || $proto instanceof \ReflectionType || $proto instanceof \IteratorIterator || $proto instanceof \RecursiveIteratorIterator) && (!$proto instanceof \Serializable && !method_exists($class, '__wakeup') && !method_exists($class, '__unserialize'))) {
                 throw new NotInstantiableTypeException($class);
             }
 

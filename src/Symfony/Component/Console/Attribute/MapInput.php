@@ -35,6 +35,14 @@ final class MapInput
     private array $interactiveAttributes = [];
 
     /**
+     * @param string[]|null $validationGroups
+     */
+    public function __construct(
+        public readonly ?array $validationGroups = null,
+    ) {
+    }
+
+    /**
      * @internal
      */
     public static function tryFrom(\ReflectionParameter|\ReflectionProperty $member): ?self
@@ -87,25 +95,6 @@ final class MapInput
     /**
      * @internal
      */
-    public function resolveValue(InputInterface $input): object
-    {
-        $instance = $this->class->newInstanceWithoutConstructor();
-
-        foreach ($this->definition as $name => $spec) {
-            // ignore required arguments that are not set yet (may happen in interactive mode)
-            if ($spec instanceof Argument && $spec->isRequired() && \in_array($input->getArgument($spec->name), [null, []], true)) {
-                continue;
-            }
-
-            $instance->$name = $spec->resolveValue($input);
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @internal
-     */
     public function setValue(InputInterface $input, object $object): void
     {
         foreach ($this->definition as $name => $spec) {
@@ -150,6 +139,79 @@ final class MapInput
                 yield from $spec->getOptions();
             }
         }
+    }
+
+    /**
+     * @internal
+     *
+     * @return \ReflectionClass<object>
+     */
+    public function getClass(): \ReflectionClass
+    {
+        return $this->class;
+    }
+
+    /**
+     * @internal
+     *
+     * @return array<string, Argument|Option|self>
+     */
+    public function getDefinition(): array
+    {
+        return $this->definition;
+    }
+
+    /**
+     * Creates a populated instance of the DTO from command input.
+     *
+     * @internal
+     */
+    public function createInstance(InputInterface $input): object
+    {
+        $instance = $this->class->newInstanceWithoutConstructor();
+
+        foreach ($this->definition as $name => $spec) {
+            if ($spec instanceof Argument) {
+                $value = $input->getArgument($spec->name);
+                if ($spec->isRequired() && \in_array($value, [null, []], true)) {
+                    continue;
+                }
+                $instance->$name = $this->resolveValue($spec->typeName, $value, $spec->default);
+            } elseif ($spec instanceof Option) {
+                $value = $input->getOption($spec->name);
+                $instance->$name = $this->resolveValue($spec->typeName, $value, $spec->default);
+            } elseif ($spec instanceof self) {
+                $instance->$name = $spec->createInstance($input);
+            }
+        }
+
+        return $instance;
+    }
+
+    private function resolveValue(string $typeName, mixed $value, mixed $default): mixed
+    {
+        if (null === $value) {
+            return $default;
+        }
+
+        if ('' === $value) {
+            return $value;
+        }
+
+        if (is_subclass_of($typeName, \BackedEnum::class)) {
+            return $value instanceof $typeName ? $value : $typeName::tryFrom($value);
+        }
+
+        if (is_a($typeName, \DateTimeInterface::class, true)) {
+            if ($value instanceof \DateTimeInterface) {
+                return $value;
+            }
+            $class = \DateTimeInterface::class === $typeName ? \DateTimeImmutable::class : $typeName;
+
+            return new $class($value);
+        }
+
+        return $value;
     }
 
     /**

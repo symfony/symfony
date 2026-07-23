@@ -1,0 +1,19 @@
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+       version="2.2" srcLang="en" trgLang="fr">
+    <file id="f1">
+        <unit id="tu1" name="party_invite" pgs:switch="gender:host_gender">
+            <segment id="seg1" pgs:case="feminine">
+                <source>You are invited to her party</source>
+                <target>Vous êtes invité à sa fête</target>
+            </segment>
+            <segment id="seg2" pgs:case="masculine">
+                <source>You are invited to his party</source>
+                <target>Vous êtes invité à sa fête</target>
+            </segment>
+            <segment id="seg3" pgs:case="other">
+                <source>You are invited to their party</source>
+                <target>Vous êtes invité à leur fête</target>
+            </segment>
+        </unit>
+    </file>
+</xliff>

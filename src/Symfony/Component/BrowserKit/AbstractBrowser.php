@@ -46,8 +46,6 @@ abstract class AbstractBrowser
     /** @psalm-var TResponse */
     protected object $response;
     protected Crawler $crawler;
-    /** @deprecated since Symfony 7.4, to be removed in Symfony 8 */
-    protected bool $useHtml5Parser = true;
     protected string|false $wrapContentPattern = false;
     protected bool $insulated = false;
     protected ?string $redirect;
@@ -201,24 +199,6 @@ abstract class AbstractBrowser
     public function getCrawler(): Crawler
     {
         return $this->crawler ?? throw new BadMethodCallException(\sprintf('The "request()" method must be called before "%s()".', __METHOD__));
-    }
-
-    /**
-     * Sets whether parsing should be done using "masterminds/html5".
-     *
-     * @deprecated since Symfony 7.4, Symfony 8 will unconditionally use the native HTML5 parser
-     *
-     * @return $this
-     */
-    public function useHtml5Parser(bool $useHtml5Parser): static
-    {
-        if (\PHP_VERSION_ID >= 80400) {
-            trigger_deprecation('symfony/browser-kit', '7.4', 'Method "%s()" is deprecated. Symfony 8 will unconditionally use the native HTML5 parser.', __METHOD__);
-        }
-
-        $this->useHtml5Parser = $useHtml5Parser;
-
-        return $this;
     }
 
     /**
@@ -436,13 +416,11 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return object
-     *
      * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): object
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -475,11 +453,9 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return object
-     *
      * @psalm-return TResponse
      */
-    abstract protected function doRequest(object $request);
+    abstract protected function doRequest(object $request): object;
 
     /**
      * Returns the script to execute when the request must be insulated.
@@ -488,11 +464,9 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return string
-     *
      * @throws LogicException When this abstract class is not implemented
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         throw new LogicException('To insulate requests, you need to override the getScript() method.');
     }
@@ -500,11 +474,9 @@ abstract class AbstractBrowser
     /**
      * Filters the BrowserKit request to the origin one.
      *
-     * @return object
-     *
      * @psalm-return TRequest
      */
-    protected function filterRequest(Request $request)
+    protected function filterRequest(Request $request): object
     {
         return $request;
     }
@@ -513,10 +485,8 @@ abstract class AbstractBrowser
      * Filters the origin response to the BrowserKit one.
      *
      * @psalm-param TResponse $response
-     *
-     * @return Response
      */
-    protected function filterResponse(object $response)
+    protected function filterResponse(object $response): Response
     {
         return $response;
     }
@@ -532,7 +502,7 @@ abstract class AbstractBrowser
             return null;
         }
 
-        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
+        $crawler = new Crawler(null, $uri, null);
         $crawler->addContent($content, $type);
 
         return $crawler;

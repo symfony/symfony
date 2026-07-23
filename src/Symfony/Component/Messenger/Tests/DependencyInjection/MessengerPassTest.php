@@ -55,6 +55,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\UnionTypeArgumentHandler;
 use Symfony\Component\Messenger\Tests\Fixtures\UnionTypeOneMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\UnionTypeTwoMessage;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
 class MessengerPassTest extends TestCase
 {
@@ -1022,6 +1023,120 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertFalse($container->hasDefinition('messenger.signing_serializer'));
+    }
+
+    public function testItRegistersTypeMappingFromMessageTag()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'my.custom.type'])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            ['my.custom.type' => 'App\Message\MyMessage'],
+            $container->getDefinition('messenger.transport.symfony_serializer')->getArgument(3)
+        );
+    }
+
+    public function testItRegistersMultipleTypeMappingsFromMessageTags()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\AbstractMessage', 'App\Message\AbstractMessage')
+            ->setAbstract(true)
+            ->addTag('container.excluded')
+            ->addTag('messenger.message')
+        ;
+        $container
+            ->register('App\Message\MessageA', 'App\Message\MessageA')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'type.a'])
+        ;
+        $container
+            ->register('App\Message\MessageB', 'App\Message\MessageB')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'type.b'])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            ['type.a' => 'App\Message\MessageA', 'type.b' => 'App\Message\MessageB'],
+            $container->getDefinition('messenger.transport.symfony_serializer')->getArgument(3)
+        );
+    }
+
+    public function testItIgnoresMessageTagWithoutSerializedTypeName()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            [],
+            $container->getDefinition('messenger.transport.symfony_serializer')->getArgument(3)
+        );
+    }
+
+    public function testItThrowsExceptionOnDuplicateSerializedTypeName()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The serialized type name "my.duplicate.type" is already mapped to class "App\Message\MessageA", cannot map it to "App\Message\MessageB" as well.');
+
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MessageA', 'App\Message\MessageA')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'my.duplicate.type'])
+        ;
+        $container
+            ->register('App\Message\MessageB', 'App\Message\MessageB')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'my.duplicate.type'])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testItDoesNotFailWhenSerializerServiceIsNotRegistered()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'my.custom.type'])
+        ;
+
+        // Should not throw any exception
+        (new MessengerPass())->process($container);
+
+        $this->assertFalse($container->hasDefinition('messenger.transport.symfony_serializer'));
     }
 }
 

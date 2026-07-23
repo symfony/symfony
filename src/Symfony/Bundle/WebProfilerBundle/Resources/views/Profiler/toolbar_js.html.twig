@@ -1,5 +1,5 @@
 <!-- START of Symfony Web Debug Toolbar -->
-<div class="sf-toolbar sf-toolbar-opened" role="region" aria-label="Symfony Web Debug Toolbar" data-frankenphp-hot-reload-preserve>
+<div class="sf-toolbar sf-toolbar-opened" role="toolbar" aria-label="Symfony Web Debug Toolbar" data-frankenphp-hot-reload-preserve>
     <div id="sfwdt{{ token }}">
         {{ include('@WebProfiler/Profiler/toolbar.html.twig', {
             templates: {
@@ -41,14 +41,16 @@
 
                 var el = document.createElement('div');
                 if (!('addEventListener' in el)) {
-                    addEventListener = function (element, eventName, callback) {
+                    addEventListener = function (element, eventName, callback, options) {
                         element.attachEvent('on' + eventName, callback);
                     };
                 } else {
-                    addEventListener = function (element, eventName, callback) {
-                        element.addEventListener(eventName, callback, false);
+                    addEventListener = function (element, eventName, callback, options) {
+                        element.addEventListener(eventName, callback, options || false);
                     };
                 }
+
+                var toolbarLoadAborter = null;
 
                 var request = function(url, onSuccess, onError, payload, options, tries) {
                     url = new URL(url);
@@ -576,6 +578,13 @@
                                     return;
                                 }
 
+                                /* Drop listeners attached during the previous load so they don't stack on AJAX replacements */
+                                if (toolbarLoadAborter && typeof toolbarLoadAborter.abort === 'function') {
+                                    toolbarLoadAborter.abort();
+                                }
+                                toolbarLoadAborter = (typeof AbortController === 'function') ? new AbortController() : null;
+                                var toolbarLoadSignal = toolbarLoadAborter ? { signal: toolbarLoadAborter.signal } : false;
+
                                 /* Replace the ID, it has to match the new token */
                                 toolbarContent.parentElement.id = 'sfwdt' + newToken;
 
@@ -597,29 +606,165 @@
 
                                 /* Handle toolbar-info position */
                                 var toolbarBlocks = [].slice.call(el.querySelectorAll('.sf-toolbar-block'));
+                                var positionToolbarInfo = function () {
+                                    var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
+                                    var pageWidth = document.body.clientWidth;
+                                    var elementWidth = toolbarInfo.offsetWidth;
+                                    var leftValue = (elementWidth + this.offsetLeft) - pageWidth;
+                                    var rightValue = (elementWidth + (pageWidth - this.offsetLeft)) - pageWidth;
+
+                                    /* Reset right and left value, useful on window resize */
+                                    toolbarInfo.style.right = '';
+                                    toolbarInfo.style.left = '';
+
+                                    if (elementWidth > pageWidth) {
+                                        toolbarInfo.style.left = 0;
+                                    } else if (leftValue > 0 && rightValue > 0) {
+                                        toolbarInfo.style.right = (rightValue * -1) + 'px';
+                                    } else if (leftValue < 0) {
+                                        toolbarInfo.style.left = 0;
+                                    } else {
+                                        toolbarInfo.style.right = '0px';
+                                    }
+                                };
                                 for (i = 0; i < toolbarBlocks.length; ++i) {
+                                    addEventListener(toolbarBlocks[i], 'focusin', positionToolbarInfo, toolbarLoadSignal);
                                     toolbarBlocks[i].onmouseover = function () {
-                                        var toolbarInfo = this.querySelectorAll('.sf-toolbar-info')[0];
-                                        var pageWidth = document.body.clientWidth;
-                                        var elementWidth = toolbarInfo.offsetWidth;
-                                        var leftValue = (elementWidth + this.offsetLeft) - pageWidth;
-                                        var rightValue = (elementWidth + (pageWidth - this.offsetLeft)) - pageWidth;
-
-                                        /* Reset right and left value, useful on window resize */
-                                        toolbarInfo.style.right = '';
-                                        toolbarInfo.style.left = '';
-
-                                        if (elementWidth > pageWidth) {
-                                            toolbarInfo.style.left = 0;
+                                        /* Transfer focus away from any other toolbar block so that */
+                                        /* :focus-within and :hover are never active simultaneously */
+                                        var focused = document.activeElement;
+                                        if (focused && !this.contains(focused) && focused.closest) {
+                                            var focusedBlock = focused.closest('.sf-toolbar-block');
+                                            if (focusedBlock) {
+                                                focused.blur();
+                                            }
                                         }
-                                        else if (leftValue > 0 && rightValue > 0) {
-                                            toolbarInfo.style.right = (rightValue * -1) + 'px';
-                                        } else if (leftValue < 0) {
-                                            toolbarInfo.style.left = 0;
-                                        } else {
-                                            toolbarInfo.style.right = '0px';
-                                        }
+                                        positionToolbarInfo.call(this);
                                     };
+                                }
+
+                                /* Roving tabindex for WAI-ARIA toolbar pattern */
+                                var triggers = [];
+                                for (i = 0; i < toolbarBlocks.length; ++i) {
+                                    var icon = toolbarBlocks[i].querySelector('.sf-toolbar-icon');
+                                    var trigger = (icon && icon.parentElement.tagName === 'A') ? icon.parentElement : icon;
+                                    if (trigger) {
+                                        trigger.setAttribute('tabindex', triggers.length === 0 ? '0' : '-1');
+                                        triggers.push(trigger);
+                                    }
+
+                                    /* Inject accessible label when no visible SVG <title> provides one */
+                                    var label = toolbarBlocks[i].getAttribute('data-accessible-label');
+                                    if (label) {
+                                        var svg = toolbarBlocks[i].querySelector('.sf-toolbar-icon svg');
+                                        var hasVisibleTitle = svg && svg.querySelector('title') && window.getComputedStyle(svg).display !== 'none' && svg.getAttribute('aria-hidden') !== 'true';
+                                        if (!hasVisibleTitle) {
+                                            var span = document.createElement('span');
+                                            span.className = 'visually-hidden';
+                                            span.textContent = label;
+                                            var parent = trigger || toolbarBlocks[i];
+                                            parent.insertBefore(span, parent.firstChild);
+                                        }
+                                    }
+                                }
+                                var toggleButton = document.getElementById('sfToolbarToggleButton-' + newToken);
+                                if (toggleButton) {
+                                    toggleButton.setAttribute('tabindex', triggers.length === 0 ? '0' : '-1');
+                                    triggers.push(toggleButton);
+                                }
+
+                                var isTriggerVisible = function(trigger) {
+                                    var block = trigger.closest('.sf-toolbar-block');
+                                    return block && window.getComputedStyle(block).display !== 'none';
+                                };
+
+                                var findVisibleIndex = function(fromIndex, direction) {
+                                    var len = triggers.length;
+                                    for (var step = 1; step < len; step++) {
+                                        var candidate = (fromIndex + direction * step + len) % len;
+                                        if (isTriggerVisible(triggers[candidate])) {
+                                            return candidate;
+                                        }
+                                    }
+                                    return fromIndex;
+                                };
+
+                                var findFirstVisible = function() {
+                                    for (var t = 0; t < triggers.length; t++) {
+                                        if (isTriggerVisible(triggers[t])) return t;
+                                    }
+                                    return 0;
+                                };
+
+                                var findLastVisible = function() {
+                                    for (var t = triggers.length - 1; t >= 0; t--) {
+                                        if (isTriggerVisible(triggers[t])) return t;
+                                    }
+                                    return triggers.length - 1;
+                                };
+
+                                var setRovingFocus = function(newIndex) {
+                                    for (var t = 0; t < triggers.length; t++) {
+                                        triggers[t].setAttribute('tabindex', t === newIndex ? '0' : '-1');
+                                    }
+                                    triggers[newIndex].focus();
+                                };
+
+                                for (i = 0; i < triggers.length; ++i) {
+                                    (function(index) {
+                                        addEventListener(triggers[index], 'keydown', function(event) {
+                                            var handled = true;
+                                            switch (event.key) {
+                                                case 'ArrowRight':
+                                                    setRovingFocus(findVisibleIndex(index, 1));
+                                                    break;
+                                                case 'ArrowLeft':
+                                                    setRovingFocus(findVisibleIndex(index, -1));
+                                                    break;
+                                                case 'Home':
+                                                    setRovingFocus(findFirstVisible());
+                                                    break;
+                                                case 'End':
+                                                    setRovingFocus(findLastVisible());
+                                                    break;
+                                                case 'ArrowDown':
+                                                    var block = triggers[index].closest('.sf-toolbar-block');
+                                                    if (block) {
+                                                        var info = block.querySelector('.sf-toolbar-info');
+                                                        if (info) {
+                                                            info.focus();
+                                                        }
+                                                    }
+                                                    break;
+                                                default:
+                                                    handled = false;
+                                            }
+                                            if (handled) {
+                                                event.preventDefault();
+                                            }
+                                        }, toolbarLoadSignal);
+                                    })(i);
+                                }
+
+                                /* Escape from popover returns focus to trigger */
+                                var infoElements = el.querySelectorAll('.sf-toolbar-info[tabindex]');
+                                for (i = 0; i < infoElements.length; ++i) {
+                                    (function(infoEl) {
+                                        addEventListener(infoEl, 'keydown', function(event) {
+                                            if (event.key === 'Escape') {
+                                                var block = infoEl.closest('.sf-toolbar-block');
+                                                if (block) {
+                                                    removeClass(block, 'hover');
+                                                    var blockIcon = block.querySelector('.sf-toolbar-icon');
+                                                    var trigger = (blockIcon && blockIcon.parentElement.tagName === 'A') ? blockIcon.parentElement : blockIcon;
+                                                    if (trigger) {
+                                                        trigger.focus();
+                                                    }
+                                                }
+                                                event.preventDefault();
+                                            }
+                                        }, toolbarLoadSignal);
+                                    })(infoElements[i]);
                                 }
 
                                 renderAjaxRequests();

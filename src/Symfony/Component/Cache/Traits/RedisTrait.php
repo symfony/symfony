@@ -720,6 +720,9 @@ trait RedisTrait
         return $failed;
     }
 
+    /**
+     * @param-immediately-invoked-callable $generator
+     */
     private function pipeline(\Closure $generator, ?object $redis = null): \Generator
     {
         $ids = [];

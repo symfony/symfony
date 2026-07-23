@@ -1,0 +1,3 @@
+framework:
+    validation:
+        property_metadata_existence_check: true

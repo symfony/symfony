@@ -62,16 +62,9 @@ class NativeSessionStorage implements SessionStorageInterface
      * gc_probability, "1"
      * lazy_write, "1"
      * name, "PHPSESSID"
-     * referer_check, "" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      * serialize_handler, "php"
      * use_strict_mode, "1"
      * use_cookies, "1"
-     * use_only_cookies, "1" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
-     * use_trans_sid, "0" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
-     * sid_length, "32" (@deprecated since Symfony 7.2, to be removed in 8.0)
-     * sid_bits_per_character, "5" (@deprecated since Symfony 7.2, to be removed in 8.0)
-     * trans_sid_hosts, $_SERVER['HTTP_HOST'] (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
-     * trans_sid_tags, "a=href,area=href,frame=src,form=" (deprecated since Symfony 7.2, to be removed in Symfony 8.0)
      */
     public function __construct(array $options = [], AbstractProxy|\SessionHandlerInterface|null $handler = null, ?MetadataBag $metaBag = null)
     {
@@ -122,24 +115,18 @@ class NativeSessionStorage implements SessionStorageInterface
          *
          * ---------- Part 1
          *
-         * The part `[a-zA-Z0-9,-]` is related to the PHP ini directive `session.sid_bits_per_character` defined as 6.
+         * The part `[a-zA-Z0-9,-]` corresponds to the character range when PHP's `session.sid_bits_per_character` is set to 6.
          * See https://php.net/session.configuration#ini.session.sid-bits-per-character
-         * Allowed values are integers such as:
-         * - 4 for range `a-f0-9`
-         * - 5 for range `a-v0-9` (@deprecated since Symfony 7.2, it will default to 4 and the option will be ignored in Symfony 8.0)
-         * - 6 for range `a-zA-Z0-9,-` (@deprecated since Symfony 7.2, it will default to 4 and the option will be ignored in Symfony 8.0)
          *
          * ---------- Part 2
          *
-         * The part `{22,250}` is related to the PHP ini directive `session.sid_length`.
+         * The part `{22,250}` defines the acceptable length range for session IDs.
          * See https://php.net/session.configuration#ini.session.sid-length
          * Allowed values are integers between 22 and 256, but we use 250 for the max.
          *
          * Where does the 250 come from?
          * - The length of Windows and Linux filenames is limited to 255 bytes. Then the max must not exceed 255.
          * - The session filename prefix is `sess_`, a 5 bytes string. Then the max must not exceed 255 - 5 = 250.
-         *
-         * This is @deprecated since Symfony 7.2, the sid length will default to 32 and the option will be ignored in Symfony 8.0.
          *
          * ---------- Conclusion
          *
@@ -323,17 +310,11 @@ class NativeSessionStorage implements SessionStorageInterface
             'cache_expire', 'cache_limiter', 'cookie_domain', 'cookie_httponly',
             'cookie_lifetime', 'cookie_path', 'cookie_secure', 'cookie_samesite',
             'gc_divisor', 'gc_maxlifetime', 'gc_probability',
-            'lazy_write', 'name', 'referer_check',
+            'lazy_write', 'name',
             'serialize_handler', 'use_strict_mode', 'use_cookies',
-            'use_only_cookies', 'use_trans_sid',
-            'sid_length', 'sid_bits_per_character', 'trans_sid_hosts', 'trans_sid_tags',
         ]);
 
         foreach ($options as $key => $value) {
-            if (\in_array($key, ['referer_check', 'use_only_cookies', 'use_trans_sid', 'trans_sid_hosts', 'trans_sid_tags', 'sid_length', 'sid_bits_per_character'], true)) {
-                trigger_deprecation('symfony/http-foundation', '7.2', 'NativeSessionStorage\'s "%s" option is deprecated and will be ignored in Symfony 8.0.', $key);
-            }
-
             if (isset($validOptions[$key])) {
                 if ('cookie_secure' === $key && 'auto' === $value) {
                     continue;

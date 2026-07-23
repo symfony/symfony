@@ -1,6 +1,25 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add dump indicator to profiler list view for profiles with dumped content
+
+8.1
+---
+
+ * Forward the CSP nonce to `DumpDataCollector` instead of disabling CSP when `dump()` is used
+ * Add console command value resolvers durations to Performances panel
+ * Add error indicator to profiler list view for profiles with errors
+ * Add cURL copy paste button in the Request/Response tab
+ * Add support for streamed responses in the debug toolbar
+
+8.0
+---
+
+ * Remove `profiler.xml` and `wdt.xml` routing configuration files (use their PHP equivalent instead)
+
 7.4
 ---
 

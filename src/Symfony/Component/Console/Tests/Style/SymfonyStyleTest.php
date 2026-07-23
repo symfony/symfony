@@ -95,6 +95,41 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
+    public function testProgressIterateWithCustomFormat()
+    {
+        $code = static function (InputInterface $input, OutputInterface $output): int {
+            $io = new SymfonyStyle($input, $output);
+
+            foreach ($io->progressIterate(range(1, 3), null, ' %current%/%max% [%bar%] %memory:6s%') as $step) {
+                // noop
+            }
+
+            return Command::SUCCESS;
+        };
+
+        $this->command->setCode($code);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/\d+(\.\d+)? (GiB|MiB|KiB|B)/', $this->tester->getDisplay(true));
+    }
+
+    public function testProgressStartWithCustomFormat()
+    {
+        $code = static function (InputInterface $input, OutputInterface $output): int {
+            $io = new SymfonyStyle($input, $output);
+            $io->progressStart(3, ' %current%/%max% [%bar%] %memory:6s%');
+            $io->progressAdvance(3);
+            $io->progressFinish();
+
+            return Command::SUCCESS;
+        };
+
+        $this->command->setCode($code);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/\d+(\.\d+)? (GiB|MiB|KiB|B)/', $this->tester->getDisplay(true));
+    }
+
     public function testBlockWithWindowsLineEndings()
     {
         $code = static function (InputInterface $input, OutputInterface $output) {
@@ -111,6 +146,42 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringNotContainsString("\r", $display);
         $this->assertStringContainsString('First line.', $display);
         $this->assertStringContainsString('Second line.', $display);
+    }
+
+    public function testStyledBlockUsesEchPaddingWhenDecorated()
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w', false), decorated: true);
+        $io = new SymfonyStyle(new ArrayInput([]), $output);
+        $io->block('msg', null, 'fg=white;bg=blue', ' ', false);
+
+        rewind($output->getStream());
+        $display = stream_get_contents($output->getStream());
+
+        $this->assertMatchesRegularExpression("/\e\[\d+X\e\[\d+C/", $display);
+    }
+
+    public function testStyledBlockKeepsSpacePaddingWhenNotDecorated()
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w', false), decorated: false);
+        $io = new SymfonyStyle(new ArrayInput([]), $output);
+        $io->block('msg', null, 'fg=white;bg=blue', ' ', false);
+
+        rewind($output->getStream());
+        $display = stream_get_contents($output->getStream());
+
+        $this->assertStringNotContainsString("\e[", $display);
+    }
+
+    public function testUnstyledBlockKeepsSpacePaddingEvenWhenDecorated()
+    {
+        $output = new StreamOutput(fopen('php://memory', 'w', false), decorated: true);
+        $io = new SymfonyStyle(new ArrayInput([]), $output);
+        $io->block('msg', null, null, ' ', false);
+
+        rewind($output->getStream());
+        $display = stream_get_contents($output->getStream());
+
+        $this->assertStringNotContainsString("\e[", $display);
     }
 
     public function testGetErrorStyle()
@@ -328,12 +399,42 @@ class SymfonyStyleTest extends TestCase
             'start'.\PHP_EOL. // write start
             'foo'.\PHP_EOL. // write foo
             "\x1b[1A\x1b[0Jfoo and bar".\PHP_EOL. // complete line
-            \PHP_EOL." \033[32mDummy question?\033[39m:".\PHP_EOL.' > '.\PHP_EOL.\PHP_EOL. // question
+            \PHP_EOL." \033[32mDummy question?\033[39m:".\PHP_EOL.' > '.\PHP_EOL. // question
             'foo2'.\PHP_EOL. // write foo2
             'bar2'.\PHP_EOL. // write bar
-            "\033[9A\033[0J"), // clear 9 lines (8 output lines and one from the answer input return)
+            "\033[8A\033[0J"), // clear 8 lines (7 output lines and one from the answer input return)
             escapeshellcmd(stream_get_contents($output->getStream()))
         );
+    }
+
+    public function testAskQuestionInSectionMatchesNonSectionOutput()
+    {
+        // asking a question inside a ConsoleSectionOutput must not leave an extra
+        // blank line below the answer: the output must match a regular StreamOutput.
+        $render = function (StreamOutput $output): string {
+            $inputStream = fopen('php://memory', 'r+');
+            fwrite($inputStream, 'Answer'.\PHP_EOL);
+            rewind($inputStream);
+            $input = $this->createStub(Input::class);
+            $input->method('isInteractive')->willReturn(true);
+            $input->method('getStream')->willReturn($inputStream);
+
+            $style = new SymfonyStyle($input, $output);
+            $style->writeln('before');
+            $style->ask('Dummy question?');
+            $style->writeln('after');
+
+            rewind($output->getStream());
+
+            return stream_get_contents($output->getStream());
+        };
+
+        $sections = [];
+        $sectionOutput = $render(new ConsoleSectionOutput(fopen('php://memory', 'r+', false), $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter()));
+        $streamOutput = $render(new StreamOutput(fopen('php://memory', 'r+', false), StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter()));
+
+        $this->assertSame($streamOutput, $sectionOutput);
+        $this->assertStringNotContainsString(' > '.\PHP_EOL.\PHP_EOL, $sectionOutput);
     }
 
     private static function normalizeLineBreaks($text)

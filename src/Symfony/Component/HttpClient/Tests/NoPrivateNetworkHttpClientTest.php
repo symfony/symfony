@@ -138,6 +138,59 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         }
     }
 
+    public static function getAllowListData(): iterable
+    {
+        // private IPs that match the allow-list -> request is allowed
+        yield 'private IPv4 explicitly allowed (single IP)' => ['10.0.0.1', null,                  '10.0.0.1',         false];
+        yield 'private IPv4 explicitly allowed (CIDR)' => ['10.0.0.42', null,                 '10.0.0.0/24',      false];
+        yield 'private IPv4 explicitly allowed (array)' => ['10.0.0.1', null,                  ['10.0.0.1'],       false];
+        yield 'private IPv6 explicitly allowed (single IP)' => ['fc00::1',  null,                  'fc00::1',          false];
+        yield 'private IPv6 explicitly allowed (CIDR)' => ['fc00::1',  null,                  'fc00::/7',         false];
+
+        // private IPs that don't match the allow-list -> request is still blocked
+        yield 'private IPv4 not in allow-list still blocked' => ['10.0.0.1', null,                  '192.168.0.0/24',   true];
+        yield 'private IPv6 not in allow-list still blocked' => ['fc00::1',  null,                  'fd00::/8',         true];
+
+        // allow-list combined with a custom $subnets list
+        yield 'private IPv4 allowed via allow-list against custom subnets' => ['10.0.0.1', '10.0.0.0/8',          '10.0.0.1',         false];
+        yield 'public IPv4 keeps being allowed regardless of allow-list' => ['104.26.14.6', null,               '10.0.0.0/8',       false];
+    }
+
+    #[DataProvider('getAllowListData')]
+    #[Group('dns-sensitive')]
+    public function testAllowList(string $ipAddr, string|array|null $subnets, string|array $allowList, bool $mustThrow)
+    {
+        $host = strtr($ipAddr, '.:', '--');
+        DnsMock::withMockedHosts([
+            $host => [
+                str_contains($ipAddr, ':') ? [
+                    'type' => 'AAAA',
+                    'ipv6' => $ipAddr,
+                ] : [
+                    'type' => 'A',
+                    'ip' => $ipAddr,
+                ],
+            ],
+        ]);
+
+        $content = 'foo';
+        $url = \sprintf('http://%s/', $host);
+
+        if ($mustThrow) {
+            $this->expectException(TransportException::class);
+            $this->expectExceptionMessage(\sprintf('Host "%s" is blocked for "%s".', $host, $url));
+        }
+
+        $previousHttpClient = $this->getMockHttpClient($ipAddr, $content);
+        $client = new NoPrivateNetworkHttpClient($previousHttpClient, $subnets, $allowList);
+        $response = $client->request('GET', $url);
+
+        if (!$mustThrow) {
+            $this->assertEquals($content, $response->getContent());
+            $this->assertEquals(200, $response->getStatusCode());
+        }
+    }
+
     public function testCustomOnProgressCallback()
     {
         $ipAddr = '104.26.14.6';

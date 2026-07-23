@@ -1,6 +1,26 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for enums in `SignatureHasher::computeSignatureHash()`
+ * Add `getParentRoleNames()` method to `RoleHierarchyInterface`
+
+8.0
+---
+
+ * Add argument `$accessDecision` to `AccessDecisionStrategyInterface::decide()`
+ * Remove `PersistentTokenInterface::getClass()`
+ * Remove the user FQCN from the remember-me cookie
+ * Remove `RememberMeToken::getSecret()`
+ * Remove `UserInterface::eraseCredentials()` and `TokenInterface::eraseCredentials()`,
+   erase credentials e.g. using `__serialize()` instead
+ * Add argument `$accessDecision` to `AccessDecisionManagerInterface::decide()` and `AuthorizationCheckerInterface::isGranted()`
+ * Add argument `$vote` to `VoterInterface::vote()` and `Voter::voteOnAttribute()`
+ * Add argument `$token` to `UserCheckerInterface::checkPostAuth()`
+ * Make `UserChainProvider` implement `AttributesBasedUserProviderInterface`
+
 7.4
 ---
 

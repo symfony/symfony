@@ -19,6 +19,7 @@ use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\Util\XliffUtils;
 
 /**
@@ -80,7 +81,7 @@ class XliffFileLoader implements LoaderInterface
             $this->extractXliff1($dom, $catalogue, $domain);
         }
 
-        if ('2.0' === $xliffVersion) {
+        if (\in_array($xliffVersion, ['2.0', '2.1', '2.2'], true)) {
             $this->extractXliff2($dom, $catalogue, $domain);
         }
     }
@@ -167,6 +168,11 @@ class XliffFileLoader implements LoaderInterface
         $xml->registerXPathNamespace('xliff', 'urn:oasis:names:tc:xliff:document:2.0');
 
         foreach ($xml->xpath('//xliff:unit') as $unit) {
+            if (null !== $pgsSwitch = $unit->attributes('urn:oasis:names:tc:xliff:pgs:1.0')['switch'] ?? null) {
+                $this->extractXliff2PgsUnit($unit, $catalogue, $domain, (string) $pgsSwitch, $encoding);
+                continue;
+            }
+
             foreach ($unit->segment as $segment) {
                 $attributes = $unit->attributes();
                 $source = $attributes['name'] ?? $segment->source;
@@ -207,6 +213,164 @@ class XliffFileLoader implements LoaderInterface
                 $catalogue->setMetadata((string) $source, $metadata, $domain);
             }
         }
+    }
+
+    private function extractXliff2PgsUnit(\SimpleXMLElement $unit, MessageCatalogue $catalogue, string $domain, string $pgsSwitch, ?string $encoding): void
+    {
+        $switches = $this->parsePgsSwitch($pgsSwitch);
+        $attributes = $unit->attributes();
+        $source = (string) ($attributes['name'] ?? $attributes['id']);
+
+        $cases = [];
+        foreach ($unit->segment as $segment) {
+            if (null === $pgsCase = $segment->attributes('urn:oasis:names:tc:xliff:pgs:1.0')['case'] ?? null) {
+                continue;
+            }
+
+            $cases[(string) $pgsCase] = $this->extractPgsSegmentText($segment->target ?? $segment->source, $switches);
+        }
+
+        $intlDomain = $domain.MessageCatalogueInterface::INTL_DOMAIN_SUFFIX;
+        $catalogue->set($source, $this->utf8ToCharset($this->buildIcuMessage($switches, $cases), $encoding), $intlDomain);
+
+        $metadata = ['pgs-switch' => $pgsSwitch];
+        if (isset($unit->notes)) {
+            $metadata['notes'] = [];
+            foreach ($unit->notes->note as $noteNode) {
+                $note = array_map('strval', $noteNode->attributes() ?? []);
+
+                $note['content'] = (string) $noteNode;
+                $metadata['notes'][] = $note;
+            }
+        }
+
+        $catalogue->setMetadata($source, $metadata, $intlDomain);
+    }
+
+    private function parsePgsSwitch(string $pgsSwitch): array
+    {
+        $trimmed = trim($pgsSwitch);
+        if ('' === $trimmed) {
+            throw new InvalidResourceException('The pgs:switch attribute must not be empty.');
+        }
+
+        $switches = [];
+        foreach (preg_split('/\s+/', $trimmed) as $item) {
+            $parts = explode(':', $item, 2);
+            if (2 !== \count($parts) || '' === $parts[0] || '' === $parts[1]) {
+                throw new InvalidResourceException(\sprintf('The pgs:switch token "%s" must use the "type:variable" form.', $item));
+            }
+            $switches[] = ['type' => $parts[0], 'variable' => $parts[1]];
+        }
+
+        return $switches;
+    }
+
+    private function extractPgsSegmentText(\SimpleXMLElement $element, array $switches): string
+    {
+        $pluralVariables = [];
+        foreach ($switches as $switch) {
+            if ('plural' === $switch['type'] || 'ordinal' === $switch['type']) {
+                $pluralVariables[$switch['variable']] = true;
+            }
+        }
+
+        return $this->collectPgsText(dom_import_simplexml($element), $pluralVariables);
+    }
+
+    private function collectPgsText(\DOMNode $node, array $pluralVariables): string
+    {
+        $text = '';
+        foreach ($node->childNodes as $child) {
+            if (\XML_TEXT_NODE === $child->nodeType || \XML_CDATA_SECTION_NODE === $child->nodeType) {
+                $text .= $child->textContent;
+                continue;
+            }
+
+            if (\XML_ELEMENT_NODE !== $child->nodeType) {
+                continue;
+            }
+
+            if ('ph' === $child->localName) {
+                $disp = $child->getAttribute('disp');
+                if ('' !== $disp && isset($pluralVariables[$disp])) {
+                    $text .= '#';
+                } elseif ('' !== $disp) {
+                    $text .= '{'.$disp.'}';
+                }
+                continue;
+            }
+
+            if (\in_array($child->localName, ['pc', 'mrk'], true)) {
+                $text .= $this->collectPgsText($child, $pluralVariables);
+                continue;
+            }
+
+            if ('cp' === $child->localName) {
+                $hex = $child->getAttribute('hex');
+                if ('' !== $hex && ctype_xdigit($hex)) {
+                    $codepoint = hexdec($hex);
+                    if ($codepoint <= 0x10FFFF && ($codepoint < 0xD800 || $codepoint > 0xDFFF)) {
+                        $text .= mb_chr($codepoint, 'UTF-8');
+                    }
+                }
+                continue;
+            }
+
+            if (\in_array($child->localName, ['sc', 'ec', 'sm', 'em'], true)) {
+                continue;
+            }
+
+            $text .= $this->collectPgsText($child, $pluralVariables);
+        }
+
+        return $text;
+    }
+
+    private function buildIcuMessage(array $switches, array $cases): string
+    {
+        if (1 === \count($switches)) {
+            $switch = $switches[0];
+            $icuType = $this->getIcuType($switch['type']);
+
+            $icuCases = [];
+            foreach ($cases as $caseValue => $text) {
+                $icuCases[] = $this->formatIcuCase($caseValue, $switch['type']).' {'.$text.'}';
+            }
+
+            return '{'.$switch['variable'].', '.$icuType.', '.implode(' ', $icuCases).'}';
+        }
+
+        $outerSwitch = $switches[0];
+        $innerSwitches = \array_slice($switches, 1);
+        $icuType = $this->getIcuType($outerSwitch['type']);
+
+        $grouped = [];
+        foreach ($cases as $caseKey => $text) {
+            $caseParts = explode(' ', $caseKey, 2);
+            $grouped[$caseParts[0]][$caseParts[1] ?? 'other'] = $text;
+        }
+
+        $icuCases = [];
+        foreach ($grouped as $caseValue => $innerCases) {
+            $icuCases[] = $this->formatIcuCase($caseValue, $outerSwitch['type']).' {'.$this->buildIcuMessage($innerSwitches, $innerCases).'}';
+        }
+
+        return '{'.$outerSwitch['variable'].', '.$icuType.', '.implode(' ', $icuCases).'}';
+    }
+
+    private function getIcuType(string $pgsType): string
+    {
+        return match ($pgsType) {
+            'plural' => 'plural',
+            'ordinal' => 'selectordinal',
+            default => 'select',
+        };
+    }
+
+    private function formatIcuCase(int|string $caseValue, string $switchType): string
+    {
+        return (\in_array($switchType, ['plural', 'ordinal'], true) && is_numeric($caseValue) ? '=' : '').$caseValue;
     }
 
     /**

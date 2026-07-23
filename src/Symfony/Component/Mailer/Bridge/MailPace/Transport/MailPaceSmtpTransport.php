@@ -36,6 +36,7 @@ final class MailPaceSmtpTransport extends EsmtpTransport
     public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if ($message instanceof Message) {
+            $message = clone $message;
             $this->addMailPaceHeaders($message);
         }
 

@@ -25,7 +25,7 @@ class Parser
 {
     public const TAG_PATTERN = '(?P<tag>![\w!.\/:-]+)';
     public const BLOCK_SCALAR_HEADER_PATTERN = '(?P<separator>\||>)(?P<modifiers>\+|\-|\d+|\+\d+|\-\d+|\d+\+|\d+\-)?(?P<comments> +#.*)?';
-    public const REFERENCE_PATTERN = '#^&(?P<ref>[^ ]++) *+(?P<value>.*)#u';
+    public const REFERENCE_PATTERN = '#^&(?P<ref>[^ ]++) *+(?P<value>.*)#';
     public const DEFAULT_MAX_NESTING_LEVEL = 128;
     public const DEFAULT_MAX_ALIASES_FOR_COLLECTIONS = 128;
 
@@ -167,7 +167,7 @@ class Parser
             Inline::initialize($flags, $this->getRealCurrentLineNb(), $this->filename);
 
             $isRef = $mergeNode = false;
-            if ('-' === $this->currentLine[0] && self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#u', rtrim($this->currentLine), $values)) {
+            if ('-' === $this->currentLine[0] && self::preg_match('#^\-((?P<leadspaces>\s+)(?P<value>.+))?$#', rtrim($this->currentLine), $values)) {
                 if ($context && 'mapping' == $context) {
                     throw new ParseException('You cannot define a sequence item when in a mapping.', $this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
                 }
@@ -205,7 +205,7 @@ class Parser
                         isset($values['leadspaces'])
                         && (
                             '!' === $values['value'][0]
-                            || self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#u', $this->trimTag($values['value']), $matches)
+                            || self::preg_match('#^(?P<key>'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\{\[].*?) *\:(\s+(?P<value>.+?))?\s*$#', $this->trimTag($values['value']), $matches)
                         )
                     ) {
                         $block = $values['value'];
@@ -223,7 +223,7 @@ class Parser
                     array_pop($this->refsBeingParsed);
                 }
             } elseif (
-                self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{!].*?)) *\:(( |\t)++(?P<value>.+))?$#u', rtrim($this->currentLine), $values)
+                self::preg_match('#^(?P<key>(?:![^\s]++\s++)?(?:'.Inline::REGEX_QUOTED_STRING.'|[^ \'"\[\{!].*?)) *\:(( |\t)++(?P<value>.+))?$#', rtrim($this->currentLine), $values)
                 && (!str_contains($values['key'], ' #') || \in_array($values['key'][0], ['"', "'"], true))
             ) {
                 if ($context && 'sequence' == $context) {
@@ -249,7 +249,7 @@ class Parser
                     $key = (string) $key;
                 }
 
-                if ('<<' === $key && (!isset($values['value']) || '&' !== $values['value'][0] || !self::preg_match('#^&(?P<ref>[^ ]+)#u', $values['value'], $refMatches))) {
+                if ('<<' === $key && (!isset($values['value']) || '&' !== $values['value'][0] || !self::preg_match('#^&(?P<ref>[^ ]+)#', $values['value'], $refMatches))) {
                     $mergeNode = true;
                     $allowOverwrite = true;
                     if (isset($values['value'][0]) && '*' === $values['value'][0]) {
@@ -329,7 +329,7 @@ class Parser
                         // But overwriting is allowed when a merge node is used in current block.
                         if ($allowOverwrite || !isset($data[$key])) {
                             if (!$allowOverwrite && \array_key_exists($key, $data)) {
-                                trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
+                                throw new ParseException(\sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                             }
 
                             if (null !== $subTag) {
@@ -354,7 +354,7 @@ class Parser
                             $data += $value;
                         } elseif ($allowOverwrite || !isset($data[$key])) {
                             if (!$allowOverwrite && \array_key_exists($key, $data)) {
-                                trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
+                                throw new ParseException(\sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                             }
 
                             // Spec: Keys MUST be unique; first one wins.
@@ -374,7 +374,7 @@ class Parser
                     // But overwriting is allowed when a merge node is used in current block.
                     if ($allowOverwrite || !isset($data[$key])) {
                         if (!$allowOverwrite && \array_key_exists($key, $data)) {
-                            trigger_deprecation('symfony/yaml', '7.2', 'Duplicate key "%s" detected on line %d whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.', $key, $this->getRealCurrentLineNb() + 1);
+                            throw new ParseException(\sprintf('Duplicate key "%s" detected.', $key), $this->getRealCurrentLineNb() + 1, $this->currentLine);
                         }
 
                         $data[$key] = $value;
@@ -1028,11 +1028,11 @@ class Parser
 
         // strip YAML header
         $count = 0;
-        $value = preg_replace('#^%YAML[: ][\d.]++[^\n]*+\n#u', '', $value, -1, $count);
+        $value = preg_replace('#^%YAML[: ][\d.]++[^\n]*+\n#', '', $value, -1, $count);
         $this->offset += $count;
 
         // remove leading comments
-        $trimmedValue = preg_replace('#^(?:\#[^\n]*+\n)++#', '', $value, -1, $count);
+        $trimmedValue = preg_replace('#^(?>(\#.*?\n))+#s', '', $value, -1, $count);
         if (1 === $count) {
             // items have been removed, update the offset
             $this->offset += substr_count($value, "\n") - substr_count($trimmedValue, "\n");
@@ -1191,7 +1191,7 @@ class Parser
             if ($this->isCurrentLineBlank()) {
                 $previousLineWasNewline = true;
                 $previousLineWasTerminatedWithBackslash = false;
-            } elseif ('\\' === $this->currentLine[-1]) {
+            } elseif ('"' === $quotation && 1 === (\strlen($this->currentLine) - \strlen(rtrim($this->currentLine, '\\'))) % 2) {
                 $previousLineWasNewline = false;
                 $previousLineWasTerminatedWithBackslash = true;
             } else {
@@ -1204,7 +1204,7 @@ class Parser
             }
         } while ($this->moveToNextLine());
 
-        throw new ParseException('Malformed inline YAML string.');
+        throw new ParseException('Unterminated quoted string. If it spans multiple lines, its continuation lines must be indented at least as deeply as where it starts.');
     }
 
     private function lexUnquotedString(int &$cursor): string

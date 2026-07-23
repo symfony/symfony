@@ -1087,6 +1087,28 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
+    public function testUseUnixPaths()
+    {
+        $fixturesDirectory = str_replace('\\', '/', __DIR__.\DIRECTORY_SEPARATOR.'Fixtures');
+
+        $finder = $this->buildFinder();
+        $this->assertSame($finder, $finder->useUnixPaths());
+
+        $sawSubdirectoryEntry = false;
+        foreach ($finder->in($fixturesDirectory) as $file) {
+            $this->assertStringNotContainsString('\\', $file->getPathname(), 'getPathname() should use forward slashes.');
+            $this->assertStringNotContainsString('\\', $file->getPath(), 'getPath() should use forward slashes.');
+            $this->assertStringNotContainsString('\\', $file->getRelativePath(), 'getRelativePath() should use forward slashes.');
+            $this->assertStringNotContainsString('\\', $file->getRelativePathname(), 'getRelativePathname() should use forward slashes.');
+
+            if ('' !== $file->getRelativePath()) {
+                $sawSubdirectoryEntry = true;
+            }
+        }
+
+        $this->assertTrue($sawSubdirectoryEntry, 'The Fixtures directory should yield at least one entry inside a subdirectory.');
+    }
+
     public function testIn()
     {
         $finder = $this->buildFinder();

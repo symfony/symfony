@@ -22,4 +22,13 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
  */
 final class Mapping extends Map
 {
+    public function __construct(
+        ?string $target = null,
+        ?string $source = null,
+        mixed $if = null,
+        mixed $transform = null,
+        public readonly ?string $targetClass = null,
+    ) {
+        parent::__construct($target, $source, $if, $transform);
+    }
 }

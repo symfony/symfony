@@ -76,13 +76,13 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);
         $container->register('service_b', 'stdClass')->addTag('foo', ['key' => '2']);
-        $container->register('service_c', 'stdClass')->addTag('foo', ['key' => '3'])->setProperty('foos', new TaggedIteratorArgument('foo', 'key', null, false, null, [], false));
+        $container->register('service_c', 'stdClass')->addTag('foo', ['key' => '3'])->setProperty('foos', new TaggedIteratorArgument('foo', 'key', false, [], false));
 
         (new ResolveTaggedIteratorArgumentPass())->process($container);
 
         $properties = $container->getDefinition('service_c')->getProperties();
 
-        $expected = new TaggedIteratorArgument('foo', 'key', null, false, null, [], false);
+        $expected = new TaggedIteratorArgument('foo', 'key', false, [], false);
         $expected->setValues(['1' => new TypedReference('service_a', 'stdClass'), '2' => new TypedReference('service_b', 'stdClass'),  '3' => new TypedReference('service_c', 'stdClass')]);
         $this->assertEquals($expected, $properties['foos']);
     }

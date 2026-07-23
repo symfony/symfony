@@ -12,6 +12,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\Semaphore\SemaphoreFactory;
+use Symfony\Component\Semaphore\Serializer\SemaphoreKeyNormalizer;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -19,5 +20,8 @@ return static function (ContainerConfigurator $container) {
             ->args([abstract_arg('Store')])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'semaphore'])
+
+        ->set('serializer.normalizer.semaphore_key', SemaphoreKeyNormalizer::class)
+            ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
     ;
 };

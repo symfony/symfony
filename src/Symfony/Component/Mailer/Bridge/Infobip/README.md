@@ -25,8 +25,16 @@ This transport supports the following custom headers:
 | `X-Infobip-MessageId`          | string  | The ID that uniquely identifies the message sent to a recipient.                        |
 | `X-Infobip-Track`              | boolean | Enable or disable open and click tracking.                                              |
 | `X-Infobip-TrackingUrl`        | string  | The URL on your callback server on which the open and click notifications will be sent. |
-| `X-Infobip-TrackClicks`        | boolean | Enable or disable track click feature..                                                 |
+| `X-Infobip-TrackClicks`        | boolean | Enable or disable track click feature.                                                  |
 | `X-Infobip-TrackOpens`         | boolean | Enable or disable open click feature.                                                   |
+| `X-Infobip-IpPoolId`           | string  | The ID of the dedicated IP pool that will be used to deliver the message.               |
+
+Sponsor
+-------
+
+This package is looking for a [backer][1].
+
+Help Symfony by [sponsoring][3] its development!
 
 Resources
 ---------
@@ -36,3 +44,6 @@ Resources
  * [Report issues](https://github.com/symfony/symfony/issues) and
    [send Pull Requests](https://github.com/symfony/symfony/pulls)
    in the [main Symfony repository](https://github.com/symfony/symfony)
+
+[1]: https://symfony.com/backers
+[3]: https://symfony.com/sponsor

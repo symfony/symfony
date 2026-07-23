@@ -13,6 +13,7 @@ namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
@@ -93,10 +94,10 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
 
     abstract protected function createForm(array $options = []);
 
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
         return [
-            new ValidatorExtension((new ValidatorBuilder())->getValidator()),
+            new ValidatorExtension((new ValidatorBuilder())->getValidator(), $violationMapper),
         ];
     }
 }

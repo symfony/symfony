@@ -17,20 +17,17 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Form\AbstractRendererEngine;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Contracts\Service\ResetInterface;
 use Twig\Attribute\AsTwigFilter;
 use Twig\Attribute\AsTwigFunction;
 use Twig\Attribute\AsTwigTest;
-use Twig\Environment;
 use Twig\Extension\ExtensionInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Twig\Loader\LoaderInterface;
@@ -48,18 +45,8 @@ class TwigExtension extends Extension
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('twig.php');
 
-        if (method_exists(Environment::class, 'resetGlobals')) {
-            $container->getDefinition('twig')->addTag('kernel.reset', ['method' => 'resetGlobals']);
-        }
-
         if ($container::willBeAvailable('symfony/form', Form::class, ['symfony/twig-bundle'])) {
             $loader->load('form.php');
-
-            if (is_subclass_of(AbstractRendererEngine::class, ResetInterface::class)) {
-                $container->getDefinition('twig.form.engine')->addTag('kernel.reset', [
-                    'method' => 'reset',
-                ]);
-            }
         }
 
         if ($container::willBeAvailable('symfony/console', Application::class, ['symfony/twig-bundle'])) {
@@ -110,6 +97,8 @@ class TwigExtension extends Extension
         $container->setParameter('twig.form.resources', $config['form_themes']);
         $container->setParameter('twig.default_path', $config['default_path']);
         $defaultTwigPath = $container->getParameterBag()->resolveValue($config['default_path']);
+
+        $container->getDefinition('twig.runtime.escaper')->replaceArgument(0, $config['charset']);
 
         $envConfiguratorDefinition = $container->getDefinition('twig.configurator.environment');
         $envConfiguratorDefinition->replaceArgument(0, $config['date']['format']);
@@ -201,7 +190,6 @@ class TwigExtension extends Extension
         $container->getDefinition('twig')->replaceArgument(1, array_intersect_key($config, [
             'debug' => true,
             'charset' => true,
-            'base_template_class' => true,
             'strict_variables' => true,
             'autoescape' => true,
             'cache' => true,
@@ -245,21 +233,5 @@ class TwigExtension extends Extension
         }
 
         return $name;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
-     */
-    public function getXsdValidationBasePath(): string|false
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, to be removed in Symfony 8.0 together with XML support.
-     */
-    public function getNamespace(): string
-    {
-        return 'http://symfony.com/schema/dic/twig';
     }
 }

@@ -18,6 +18,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Doctrine\Persistence\Proxy;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\AttributesBasedUserProviderInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -33,9 +34,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @template TUser of UserInterface
  *
- * @template-implements UserProviderInterface<TUser>
+ * @template-implements AttributesBasedUserProviderInterface<TUser>
  */
-class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInterface
+class EntityUserProvider implements AttributesBasedUserProviderInterface, PasswordUpgraderInterface
 {
     private string $class;
 
@@ -47,10 +48,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
     ) {
     }
 
-    /**
-     * @param ?array $attributes
-     */
-    public function loadUserByIdentifier(string $identifier/* , ?array $attributes = null */): UserInterface
+    public function loadUserByIdentifier(string $identifier, ?array $attributes = null): UserInterface
     {
         $repository = $this->getRepository();
         if (null !== $this->property) {
@@ -60,7 +58,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
                 throw new \InvalidArgumentException(\sprintf('You must either make the "%s" entity Doctrine Repository ("%s") implement "Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface" or set the "property" option in the corresponding entity provider configuration.', $this->classOrAlias, get_debug_type($repository)));
             }
 
-            if (null === $attributes = \func_num_args() > 1 ? func_get_arg(1) : null) {
+            if (null === $attributes) {
                 $user = $repository->loadUserByIdentifier($identifier);
             } else {
                 $user = $repository->loadUserByIdentifier($identifier, $attributes);
@@ -107,7 +105,7 @@ class EntityUserProvider implements UserProviderInterface, PasswordUpgraderInter
 
         if ($refreshedUser instanceof Proxy && !$refreshedUser->__isInitialized()) {
             $refreshedUser->__load();
-        } elseif (\PHP_VERSION_ID >= 80400 && ($r = new \ReflectionClass($refreshedUser))->isUninitializedLazyObject($refreshedUser)) {
+        } elseif (($r = new \ReflectionClass($refreshedUser))->isUninitializedLazyObject($refreshedUser)) {
             $r->initializeLazyObject($refreshedUser);
         }
 

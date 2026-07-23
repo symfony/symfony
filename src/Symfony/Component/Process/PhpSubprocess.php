@@ -40,16 +40,18 @@ use Symfony\Component\Process\Exception\RuntimeException;
  *
  * @author Yanick Witschi <yanick.witschi@terminal42.ch>
  * @author Partially copied and heavily inspired from composer/xdebug-handler by John Stevenson <john-stevenson@blueyonder.co.uk>
+ *
+ * @psalm-import-type EnvArray from Process
  */
 class PhpSubprocess extends Process
 {
     /**
-     * @param array       $command The command to run and its arguments listed as separate entries. They will automatically
-     *                             get prefixed with the PHP binary
-     * @param string|null $cwd     The working directory or null to use the working dir of the current PHP process
-     * @param array|null  $env     The environment variables or null to use the same environment as the current PHP process
-     * @param int         $timeout The timeout in seconds
-     * @param array|null  $php     Path to the PHP binary to use with any additional arguments
+     * @param array         $command The command to run and its arguments listed as separate entries. They will automatically
+     *                               get prefixed with the PHP binary
+     * @param string|null   $cwd     The working directory or null to use the working dir of the current PHP process
+     * @param EnvArray|null $env     The environment variables or null to use the same environment as the current PHP process
+     * @param int           $timeout The timeout in seconds
+     * @param array|null    $php     Path to the PHP binary to use with any additional arguments
      */
     public function __construct(array $command, ?string $cwd = null, ?array $env = null, int $timeout = 60, ?array $php = null)
     {

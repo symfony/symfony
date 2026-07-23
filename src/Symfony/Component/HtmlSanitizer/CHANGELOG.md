@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `MastermindsParser`; use `NativeParser` instead
+ * Add argument `$context` to `ParserInterface::parse()`
+
 7.4
 ---
 

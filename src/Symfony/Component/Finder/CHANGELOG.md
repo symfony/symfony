@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `Finder::useUnixPaths()` to force forward slashes as the directory separator in returned paths
+
 6.4
 ---
 

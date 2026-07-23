@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
+use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
@@ -393,12 +394,10 @@ class AbstractControllerTest extends TestCase
             ->expects($this->once())
             ->method('isGranted')
             ->willReturnCallback(function ($attribute, $subject, ?AccessDecision $accessDecision = null) {
-                if (class_exists(AccessDecision::class)) {
-                    $this->assertInstanceOf(AccessDecision::class, $accessDecision);
-                    $accessDecision->votes[] = $vote = new Vote();
-                    $vote->result = VoterInterface::ACCESS_DENIED;
-                    $vote->reasons[] = 'Why should I.';
-                }
+                $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+                $accessDecision->votes[] = $vote = new Vote();
+                $vote->result = VoterInterface::ACCESS_DENIED;
+                $vote->reasons[] = 'Why should I.';
 
                 return false;
             });
@@ -410,14 +409,12 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->expectException(AccessDeniedException::class);
-        $this->expectExceptionMessage('Access Denied.'.(class_exists(AccessDecision::class) ? ' Why should I.' : ''));
+        $this->expectExceptionMessage('Access Denied. Why should I.');
 
         try {
             $controller->denyAccessUnlessGranted('foo');
         } catch (AccessDeniedException $e) {
-            if (class_exists(AccessDecision::class)) {
-                $this->assertFalse($e->getAccessDecision()->isGranted);
-            }
+            $this->assertFalse($e->getAccessDecision()->isGranted);
 
             throw $e;
         }
@@ -663,6 +660,22 @@ class AbstractControllerTest extends TestCase
         $controller->setContainer($container);
 
         $this->assertEquals($formBuilder, $controller->createFormBuilder('foo'));
+    }
+
+    public function testCreateFormFlowBuilder()
+    {
+        $formFlowBuilder = $this->createStub(FormFlowBuilderInterface::class);
+
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $formFactory->expects($this->once())->method('createBuilder')->willReturn($formFlowBuilder);
+
+        $container = new Container();
+        $container->set('form.factory', $formFactory);
+
+        $controller = $this->createController();
+        $controller->setContainer($container);
+
+        $this->assertEquals($formFlowBuilder, $controller->createFormFlowBuilder('foo'));
     }
 
     public function testAddLink()

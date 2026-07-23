@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\CardScheme;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -47,15 +45,6 @@ class CardSchemeTest extends TestCase
         $this->expectExceptionMessage(\sprintf('The options "schemes" must be set for constraint "%s".', CardScheme::class));
 
         new CardScheme(null);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testSchemesInOptionsArray()
-    {
-        $constraint = new CardScheme(null, options: ['schemes' => [CardScheme::MASTERCARD]]);
-
-        $this->assertSame([CardScheme::MASTERCARD], $constraint->schemes);
     }
 }
 

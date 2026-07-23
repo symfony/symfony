@@ -54,9 +54,6 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         }
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
-        if (!interface_exists(Middleware::class)) {
-            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
-        }
 
         $middleware = $this->createStub(Middleware::class);
         $middleware

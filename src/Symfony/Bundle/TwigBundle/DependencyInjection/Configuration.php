@@ -14,7 +14,6 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 
 /**
@@ -34,23 +33,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->docUrl('https://symfony.com/doc/{version:major}.{version:minor}/reference/configuration/twig.html', 'symfony/twig-bundle')
-            ->beforeNormalization()
-                ->ifArray()
-                ->then(static function ($v) {
-                    if (!\array_key_exists('exception_controller', $v)) {
-                        return $v;
-                    }
-
-                    if (isset($v['exception_controller'])) {
-                        throw new InvalidConfigurationException('Option "exception_controller" under "twig" must be null or unset, use "error_controller" under "framework" instead.');
-                    }
-
-                    unset($v['exception_controller']);
-                    trigger_deprecation('symfony/twig-bundle', '7.4', 'Setting the "exception_controller" option under "twig" to null is deprecated. Omit this legacy no-op option instead.');
-
-                    return $v;
-                })
-            ->end();
+        ;
 
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
@@ -133,11 +116,6 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
-                ->scalarNode('base_template_class')
-                    ->setDeprecated('symfony/twig-bundle', '7.1')
-                    ->example('Twig\Template')
-                    ->cannotBeEmpty()
-                ->end()
                 ->scalarNode('cache')->defaultTrue()->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()

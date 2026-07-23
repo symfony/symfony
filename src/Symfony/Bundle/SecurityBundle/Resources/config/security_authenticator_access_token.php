@@ -91,6 +91,7 @@ return static function (ContainerConfigurator $container) {
                 'sub',
                 service('logger')->nullOnInvalid(),
                 service('clock'),
+                0,
             ])
 
         ->set('security.access_token_handler.oidc_discovery.http_client', HttpClientInterface::class)

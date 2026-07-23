@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `subjectMaxLength` option to `MailerHandler` to truncate long email subjects (defaults to 200)
+
+8.0
+---
+
+ * Remove `NotFoundActivationStrategy`, use `HttpCodeActivationStrategy` instead
+
 7.4
 ---
 

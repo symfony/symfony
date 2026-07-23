@@ -12,7 +12,6 @@
 namespace Symfony\Component\Validator\Constraints;
 
 use Egulias\EmailValidator\EmailValidator as StrictEmailValidator;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\LogicException;
@@ -50,7 +49,6 @@ class Email extends Constraint
      * @param self::VALIDATION_MODE_*|null $mode   The pattern used to validate the email address; pass null to use the default mode configured for the EmailValidator
      * @param string[]|null                $groups
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -59,23 +57,19 @@ class Email extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
-        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
-            throw new InvalidArgumentException('The "mode" parameter value is not valid.');
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
         if (null !== $mode && !\in_array($mode, self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-        }
-
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->mode = $mode ?? $this->mode;
-        $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->mode = $mode;
+        $this->normalizer = $normalizer;
 
         if (self::VALIDATION_MODE_STRICT === $this->mode && !class_exists(StrictEmailValidator::class)) {
             throw new LogicException(\sprintf('The "egulias/email-validator" component is required to use the "%s" constraint in strict mode. Try running "composer require egulias/email-validator".', __CLASS__));

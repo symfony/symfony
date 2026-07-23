@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Tests\Fixtures\TestEnum;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\VarExporter\DeepCloner;
 
 #[Group('time-sensitive')]
 class ArrayAdapterTest extends AdapterTestCase
@@ -60,6 +61,64 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertSame(serialize('::4711'), $values['foo']);
         $this->assertArrayHasKey('bar', $values);
         $this->assertNull($values['bar']);
+    }
+
+    public function testGetValuesWithNamedClosure()
+    {
+        /** @var ArrayAdapter $cache */
+        $cache = $this->createCachePool();
+
+        $item = $cache->getItem('foo');
+        $item->set([strlen(...)]);
+        $cache->save($item);
+
+        // a Closure cannot be serialized: getValues() skips the entry instead of
+        // throwing, while raw mode keeps it as a DeepCloner that can be cloned back
+        $this->assertArrayNotHasKey('foo', $cache->getValues());
+
+        $raw = $cache->getValues(true);
+        $this->assertInstanceOf(DeepCloner::class, $raw['foo']);
+        $this->assertInstanceOf(\Closure::class, $raw['foo']->clone(null, true)[0]);
+    }
+
+    public function testGetValuesDistinguishesRecordedNullFromMiss()
+    {
+        /** @var ArrayAdapter $cache */
+        $cache = $this->createCachePool();
+
+        // a deliberately cached null is a hit...
+        $cache->save($cache->getItem('recorded')->set(null));
+        $this->assertTrue($cache->getItem('recorded')->isHit());
+        // ...while a looked-up but absent key is a tracked miss
+        $this->assertFalse($cache->getItem('miss')->isHit());
+
+        // getValues() keeps them apart: the recorded null is serialized, the miss stays a bare null
+        $values = $cache->getValues();
+        $this->assertSame(serialize(null), $values['recorded']);
+        $this->assertNull($values['miss']);
+
+        // same in raw mode: the recorded null is wrapped in a DeepCloner
+        $raw = $cache->getValues(true);
+        $this->assertInstanceOf(DeepCloner::class, $raw['recorded']);
+        $this->assertNull($raw['miss']);
+    }
+
+    public function testGetValuesKeepsPlainStaticValuesUnwrapped()
+    {
+        /** @var ArrayAdapter $cache */
+        $cache = $this->createCachePool();
+
+        $cache->save($cache->getItem('plain')->set('no-colon'));
+        $cache->save($cache->getItem('int')->set(42));
+        $cache->save($cache->getItem('colon')->set('a:b'));
+
+        $raw = $cache->getValues(true);
+        // plain static values stay unwrapped for performance
+        $this->assertSame('no-colon', $raw['plain']);
+        $this->assertSame(42, $raw['int']);
+        // a string holding a colon is wrapped so it can't be mistaken for a serialized value
+        $this->assertInstanceOf(DeepCloner::class, $raw['colon']);
+        $this->assertSame('a:b', $raw['colon']->clone());
     }
 
     public function testMaxLifetime()

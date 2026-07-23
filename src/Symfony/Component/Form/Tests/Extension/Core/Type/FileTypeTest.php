@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -25,9 +26,9 @@ class FileTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = FileType::class;
 
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
-        return array_merge(parent::getExtensions(), [new CoreExtension(null, null, new IdentityTranslator())]);
+        return array_merge(parent::getExtensions($violationMapper), [new CoreExtension(null, null, new IdentityTranslator())]);
     }
 
     // https://github.com/symfony/symfony/pull/5028

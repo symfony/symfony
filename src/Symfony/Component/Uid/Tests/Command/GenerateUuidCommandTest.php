@@ -231,12 +231,7 @@ final class GenerateUuidCommandTest extends TestCase
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $application = new Application();
-        $command = new GenerateUuidCommand();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand(new GenerateUuidCommand());
         $tester = new CommandCompletionTester($application->get('uuid:generate'));
         $suggestions = $tester->complete($input, 2);
         $this->assertSame($expectedSuggestions, $suggestions);

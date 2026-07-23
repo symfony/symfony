@@ -30,8 +30,24 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
+    private array $extensions = [];
+
+    /**
+     * @param string[] $extensions Extension aliases to implicitly load when no configuration is explicitly provided
+     */
+    public function __construct(
+        array $extensions = [],
+    ) {
+        $this->extensions = $extensions;
+    }
+
     public function process(ContainerBuilder $container): void
     {
+        foreach ($this->extensions as $extension) {
+            if (!\count($container->getExtensionConfig($extension))) {
+                $container->loadFromExtension($extension, []);
+            }
+        }
         $parameters = $container->getParameterBag()->all();
         $definitions = $container->getDefinitions();
         $aliases = $container->getAliases();

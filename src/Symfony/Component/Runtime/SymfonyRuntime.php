@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Dotenv\Dotenv;
@@ -43,11 +44,16 @@ class_exists(MissingDotenv::class, false) || class_exists(Dotenv::class) || clas
  *  - "use_putenv" to tell Dotenv to set env vars using putenv() (NOT RECOMMENDED.)
  *  - "dotenv_overload" to tell Dotenv to override existing vars
  *  - "dotenv_extra_paths" to define a list of additional dot-env files
- *  - "worker_loop_max" to define the number of requests after which the worker must restart to prevent memory leaks
+ *  - "worker_loop_max" to define the number of requests after which the worker must restart;
+ *    use 0 or a negative integer to never restart. Falls back to the "FRANKENPHP_LOOP_MAX" env var, defaults to 500.
  *
  * When the "debug" / "env" options are not defined, they will fallback to the
  * "APP_DEBUG" / "APP_ENV" environment variables, and to the "--env|-e" / "--no-debug"
  * command line arguments if "symfony/console" is installed.
+ *
+ * When the application is an HttpKernelInterface or Response and "FRANKENPHP_WORKER" is truthy,
+ * a FrankenPhpWorkerRunner is used. For HttpKernelInterface, "FRANKENPHP_RESET_KERNEL" additionally
+ * clones the kernel after each request.
  *
  * When the "symfony/dotenv" component is installed, .env files are loaded.
  * When "symfony/error-handler" is installed, it is registered in debug mode.
@@ -173,25 +179,29 @@ class SymfonyRuntime extends GenericRuntime
     public function getRunner(?object $application): RunnerInterface
     {
         if ($application instanceof HttpKernelInterface) {
-            if ($_SERVER['FRANKENPHP_WORKER'] ?? false) {
+            if (filter_var($_SERVER['FRANKENPHP_WORKER'] ?? false, \FILTER_VALIDATE_BOOL)) {
                 return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
             }
 
-            return new HttpKernelRunner($application, $this->request ??= Request::createFromGlobals(), $this->options['debug'] ?? false);
+            return new HttpKernelRunner($application, $this->resolveType(Request::class), $this->options['debug'] ?? false);
         }
 
         if ($application instanceof Response) {
+            if (filter_var($_SERVER['FRANKENPHP_WORKER'] ?? false, \FILTER_VALIDATE_BOOL)) {
+                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
+            }
+
             return new ResponseRunner($application);
         }
 
         if ($application instanceof Command) {
-            $console = $this->console ??= new Application();
+            $console = $this->resolveType(Application::class);
             $console->setName($application->getName() ?: $console->getName());
 
             if (!$application->getName() || !$console->has($application->getName())) {
                 $application->setName($_SERVER['argv'][0]);
 
-                if (!method_exists($console, 'addCommand') || method_exists($console, 'add') && (new \ReflectionMethod($console, 'add'))->getDeclaringClass()->getName() !== (new \ReflectionMethod($console, 'addCommand'))->getDeclaringClass()->getName()) {
+                if (!method_exists($console, 'addCommand') || method_exists($console, 'add') && (new \ReflectionMethod($console, 'add'))->class !== (new \ReflectionMethod($console, 'addCommand'))->class) {
                     $console->add($application);
                 } else {
                     $console->addCommand($application);
@@ -207,13 +217,13 @@ class SymfonyRuntime extends GenericRuntime
         if ($application instanceof Application) {
             set_time_limit(0);
             $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_name']] ?? 'dev') : null;
-            $output = $this->output ??= new ConsoleOutput();
+            $output = $this->resolveType(OutputInterface::class);
 
-            return new ConsoleApplicationRunner($application, $defaultEnv, $this->getInput(), $output);
+            return new ConsoleApplicationRunner($application, $defaultEnv, $this->resolveType(InputInterface::class), $output);
         }
 
         if (isset($this->command)) {
-            $this->getInput()->bind($this->command->getDefinition());
+            $this->resolveType(InputInterface::class)->bind($this->command->getDefinition());
         }
 
         return parent::getRunner($application);
@@ -221,13 +231,22 @@ class SymfonyRuntime extends GenericRuntime
 
     protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
+        return (null !== $type ? $this->resolveType($type) : null) ?? parent::getArgument($parameter, $type);
+    }
+
+    /**
+     * Returns an instance for the given $type, or null to delegate to the default resolver.
+     */
+    protected function resolveType(string $type): mixed
+    {
         return match ($type) {
             Request::class => $this->request ??= Request::createFromGlobals(),
             InputInterface::class => $this->getInput(),
+            RawInputInterface::class => $this->getInput(),
             OutputInterface::class => $this->output ??= new ConsoleOutput(),
             Application::class => $this->console ??= new Application(),
             Command::class => $this->command ??= new Command(),
-            default => parent::getArgument($parameter, $type),
+            default => null,
         };
     }
 
@@ -241,6 +260,7 @@ class SymfonyRuntime extends GenericRuntime
             Application::class => $self,
             Command::class => $self,
             InputInterface::class => $self,
+            RawInputInterface::class => $self,
             OutputInterface::class => $self,
         ];
         $runtime->options = $self->options;

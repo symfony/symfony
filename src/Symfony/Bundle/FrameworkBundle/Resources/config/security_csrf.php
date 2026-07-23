@@ -15,6 +15,7 @@ use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bridge\Twig\Extension\CsrfRuntime;
 use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\SameOriginCsrfListener;
 use Symfony\Component\Security\Csrf\SameOriginCsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
@@ -59,6 +60,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('framework.csrf_protection.cookie_name'),
             ])
             ->tag('monolog.logger', ['channel' => 'request'])
+
+        ->set('security.csrf.same_origin_listener', SameOriginCsrfListener::class)
+            ->args([
+                abstract_arg('framework.csrf_protection.cookie_name'),
+            ])
             ->tag('kernel.event_listener', ['event' => 'kernel.response', 'method' => 'onKernelResponse'])
     ;
 };

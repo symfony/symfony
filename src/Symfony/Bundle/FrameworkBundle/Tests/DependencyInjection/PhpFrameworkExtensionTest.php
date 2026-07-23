@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -42,10 +44,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'assets' => [
                     'base_urls' => 'http://cdn.example.com',
                     'base_path' => '/foo',
@@ -59,10 +57,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'assets' => [
                     'packages' => [
                         'impossible' => [
@@ -81,10 +75,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
         $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'workflows' => [
                     'article' => [
                         'type' => 'state_machine',
@@ -116,10 +106,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectExceptionMessage($message);
         $this->createContainerFromClosure(static function ($container) use ($class) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'workflows' => [
                     'article' => [
                         'type' => 'state_machine',
@@ -158,10 +144,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'workflows' => [
                     'workflow_a' => [
                         'type' => 'state_machine',
@@ -219,10 +201,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         try {
             $this->createContainerFromClosure(static function (ContainerBuilder $container) {
                 $container->loadFromExtension('framework', [
-                    'annotations' => false,
-                    'http_method_override' => false,
-                    'handle_all_throwables' => true,
-                    'php_errors' => ['log' => true],
                     'lock' => false,
                     'rate_limiter' => [
                         'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => 'lock.factory'],
@@ -240,10 +218,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'lock' => true,
                 'rate_limiter' => [
                     'with_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -259,11 +233,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
                 'lock' => false,
-                'php_errors' => ['log' => true],
                 'rate_limiter' => [
                     'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
                 ],
@@ -280,11 +250,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
                 'lock' => true,
-                'php_errors' => ['log' => true],
                 'rate_limiter' => [
                     'without_lock' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour', 'lock_factory' => null],
                 ],
@@ -301,10 +267,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'lock' => true,
                 'rate_limiter' => [
                     'first' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -325,10 +287,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'lock' => true,
                 'rate_limiter' => [
                     'first' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
@@ -342,12 +300,14 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             'policy' => 'fixed_window',
             'limit' => 10,
             'interval' => '1 hour',
+            'anchor_at' => null,
             'id' => 'first',
         ], $container->getDefinition('limiter.first')->getArgument(0));
         $this->assertSame([
             'policy' => 'sliding_window',
             'limit' => 10,
             'interval' => '1 hour',
+            'anchor_at' => null,
             'id' => 'second',
         ], $container->getDefinition('limiter.second')->getArgument(0));
 
@@ -372,10 +332,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'rate_limiter' => [
                     'compound' => ['policy' => 'compound'],
                 ],
@@ -392,12 +348,27 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->expectException(\LogicException::class);
         $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'rate_limiter' => [
                     'compound' => ['policy' => 'compound', 'limiters' => ['invalid1', 'invalid2']],
+                ],
+            ]);
+        });
+    }
+
+    public function testRateLimiterAnchorAtRequiresMonthlyOrYearlyInterval()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "anchor_at" option requires an "interval" of at least one month.');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'sub_month' => [
+                        'policy' => 'fixed_window',
+                        'limit' => 10,
+                        'interval' => '1 hour',
+                        'anchor_at' => '2024-01-01 00:00:00 UTC',
+                    ],
                 ],
             ]);
         });
@@ -410,10 +381,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($mode) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'validation' => [
                     'email_validation_mode' => $mode,
                 ],
@@ -426,7 +393,40 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         foreach (Email::VALIDATION_MODES as $mode) {
             yield [$mode];
         }
-        yield ['loose'];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyMessengerSigningSerializerWiring()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('signed_handler', 'stdClass')
+                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
+
+            $container->loadFromExtension('framework', [
+                'messenger' => [
+                    'transports' => [
+                        'async' => ['dsn' => 'in-memory://'],
+                    ],
+                    'routing' => [
+                        DummyMessage::class => ['senders' => ['async']],
+                    ],
+                    'buses' => [
+                        'message_bus' => ['default_middleware' => ['enabled' => true]],
+                    ],
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
+        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
+        $this->assertArrayHasKey(DummyMessage::class, $mapping);
+        $this->assertNotEmpty($mapping[DummyMessage::class]);
+
+        $this->assertTrue($container->hasDefinition('message_bus'));
+        $this->assertSame('message_bus', (string) $container->getAlias('messenger.default_bus'));
     }
 
     public function testMessengerSigningSerializerWiring()
@@ -436,16 +436,12 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
 
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'messenger' => [
                     'transports' => [
                         'async' => ['dsn' => 'in-memory://'],
                     ],
                     'routing' => [
-                        DummyMessage::class => ['senders' => ['async']],
+                        DummyMessage::class => ['async'],
                     ],
                     'buses' => [
                         'message_bus' => ['default_middleware' => ['enabled' => true]],
@@ -470,8 +466,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                 ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
 
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
                 'messenger' => [
@@ -500,8 +494,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $container = $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
                 'mailer' => ['dsn' => 'smtp://null'],
@@ -524,8 +516,6 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $container = $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
                 'mailer' => ['dsn' => 'smtp://null'],

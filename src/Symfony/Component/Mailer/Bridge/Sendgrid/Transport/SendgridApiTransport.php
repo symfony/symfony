@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\DateHeader;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -126,7 +127,12 @@ class SendgridApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if ($header instanceof TagHeader) {
+            if ('send-at' === $name) {
+                if (!$header instanceof DateHeader) {
+                    throw new TransportException(\sprintf('The "Send-At" header must be a "%s" instance.', DateHeader::class));
+                }
+                $payload['send_at'] = $header->getDateTime()->getTimestamp();
+            } elseif ($header instanceof TagHeader) {
                 if (10 === \count($categories)) {
                     throw new TransportException(\sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
                 }
@@ -145,11 +151,11 @@ class SendgridApiTransport extends AbstractApiTransport
             }
         }
 
-        if (\count($categories) > 0) {
+        if ($categories) {
             $payload['categories'] = $categories;
         }
 
-        if (\count($customArguments) > 0) {
+        if ($customArguments) {
             $personalization['custom_args'] = $customArguments;
         }
 

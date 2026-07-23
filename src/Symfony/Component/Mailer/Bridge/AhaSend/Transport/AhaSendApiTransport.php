@@ -142,7 +142,6 @@ final class AhaSendApiTransport extends AbstractApiTransport
 
             if ($header instanceof TagHeader) {
                 $tags[] = $header->getValue();
-                $headers->remove($header->getName());
                 continue;
             }
 

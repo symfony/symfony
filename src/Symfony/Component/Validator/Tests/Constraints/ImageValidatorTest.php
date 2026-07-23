@@ -12,11 +12,8 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\ImageValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -56,21 +53,21 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Image());
+        $this->validate(null, new Image());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Image());
+        $this->validate('', new Image());
 
         $this->assertNoViolation();
     }
 
     public function testValidImage()
     {
-        $this->validator->validate($this->image, new Image());
+        $this->validate($this->image, new Image());
 
         $this->assertNoViolation();
     }
@@ -80,24 +77,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
      */
     public function testFileNotFound()
     {
-        $this->validator->validate('foobar', new Image(notFoundMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ file }}', '"foobar"')
-            ->setCode(Image::NOT_FOUND_ERROR)
-            ->assertRaised();
-    }
-
-    /**
-     * Checks that the logic from FileValidator still works.
-     */
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testFileNotFoundDoctrineStyle()
-    {
-        $this->validator->validate('foobar', new Image([
-            'notFoundMessage' => 'myMessage',
-        ]));
+        $this->validate('foobar', new Image(notFoundMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ file }}', '"foobar"')
@@ -114,30 +94,14 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             maxHeight: 2,
         );
 
-        $this->validator->validate($this->image, $constraint);
+        $this->validate($this->image, $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testWidthTooSmall()
     {
-        $this->validator->validate($this->image, new Image(minWidth: 3, minWidthMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ width }}', '2')
-            ->setParameter('{{ min_width }}', '3')
-            ->setCode(Image::TOO_NARROW_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testWidthTooSmallDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'minWidth' => 3,
-            'minWidthMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(minWidth: 3, minWidthMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', '2')
@@ -148,23 +112,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testWidthTooBig()
     {
-        $this->validator->validate($this->image, new Image(maxWidth: 1, maxWidthMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ width }}', '2')
-            ->setParameter('{{ max_width }}', '1')
-            ->setCode(Image::TOO_WIDE_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testWidthTooBigDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'maxWidth' => 1,
-            'maxWidthMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(maxWidth: 1, maxWidthMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', '2')
@@ -175,23 +123,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testHeightTooSmall()
     {
-        $this->validator->validate($this->image, new Image(minHeight: 3, minHeightMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ height }}', '2')
-            ->setParameter('{{ min_height }}', '3')
-            ->setCode(Image::TOO_LOW_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testHeightTooSmallDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'minHeight' => 3,
-            'minHeightMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(minHeight: 3, minHeightMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ height }}', '2')
@@ -202,23 +134,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testHeightTooBig()
     {
-        $this->validator->validate($this->image, new Image(maxHeight: 1, maxHeightMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ height }}', '2')
-            ->setParameter('{{ max_height }}', '1')
-            ->setCode(Image::TOO_HIGH_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testHeightTooBigDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'maxHeight' => 1,
-            'maxHeightMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(maxHeight: 1, maxHeightMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ height }}', '2')
@@ -229,25 +145,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testPixelsTooFew()
     {
-        $this->validator->validate($this->image, new Image(minPixels: 5, minPixelsMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ pixels }}', '4')
-            ->setParameter('{{ min_pixels }}', '5')
-            ->setParameter('{{ height }}', '2')
-            ->setParameter('{{ width }}', '2')
-            ->setCode(Image::TOO_FEW_PIXEL_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testPixelsTooFewDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'minPixels' => 5,
-            'minPixelsMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(minPixels: 5, minPixelsMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ pixels }}', '4')
@@ -260,25 +158,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testPixelsTooMany()
     {
-        $this->validator->validate($this->image, new Image(maxPixels: 3, maxPixelsMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ pixels }}', '4')
-            ->setParameter('{{ max_pixels }}', '3')
-            ->setParameter('{{ height }}', '2')
-            ->setParameter('{{ width }}', '2')
-            ->setCode(Image::TOO_MANY_PIXEL_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testPixelsTooManyDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'maxPixels' => 3,
-            'maxPixelsMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(maxPixels: 3, maxPixelsMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ pixels }}', '4')
@@ -291,23 +171,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testRatioTooSmall()
     {
-        $this->validator->validate($this->image, new Image(minRatio: 2, minRatioMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ ratio }}', 1)
-            ->setParameter('{{ min_ratio }}', 2)
-            ->setCode(Image::RATIO_TOO_SMALL_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testRatioTooSmallDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'minRatio' => 2,
-            'minRatioMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(minRatio: 2, minRatioMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ ratio }}', 1)
@@ -318,23 +182,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testRatioTooBig()
     {
-        $this->validator->validate($this->image, new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ ratio }}', 1)
-            ->setParameter('{{ max_ratio }}', 0.5)
-            ->setCode(Image::RATIO_TOO_BIG_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testRatioTooBigDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'maxRatio' => 0.5,
-            'maxRatioMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ ratio }}', 1)
@@ -347,7 +195,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Image(maxRatio: 1.33);
 
-        $this->validator->validate($this->image4By3, $constraint);
+        $this->validate($this->image4By3, $constraint);
 
         $this->assertNoViolation();
     }
@@ -356,7 +204,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Image(minRatio: 4 / 3);
 
-        $this->validator->validate($this->image4By3, $constraint);
+        $this->validate($this->image4By3, $constraint);
 
         $this->assertNoViolation();
     }
@@ -365,30 +213,14 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Image(maxRatio: 16 / 9);
 
-        $this->validator->validate($this->image16By9, $constraint);
+        $this->validate($this->image16By9, $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testSquareNotAllowed()
     {
-        $this->validator->validate($this->image, new Image(allowSquare: false, allowSquareMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ width }}', 2)
-            ->setParameter('{{ height }}', 2)
-            ->setCode(Image::SQUARE_NOT_ALLOWED_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testSquareNotAllowedDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'allowSquare' => false,
-            'allowSquareMessage' => 'myMessage',
-        ]));
+        $this->validate($this->image, new Image(allowSquare: false, allowSquareMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', 2)
@@ -399,23 +231,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testLandscapeNotAllowed()
     {
-        $this->validator->validate($this->imageLandscape, new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ width }}', 2)
-            ->setParameter('{{ height }}', 1)
-            ->setCode(Image::LANDSCAPE_NOT_ALLOWED_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testLandscapeNotAllowedDoctrineStyle()
-    {
-        $this->validator->validate($this->imageLandscape, new Image([
-            'allowLandscape' => false,
-            'allowLandscapeMessage' => 'myMessage',
-        ]));
+        $this->validate($this->imageLandscape, new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', 2)
@@ -426,23 +242,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testPortraitNotAllowed()
     {
-        $this->validator->validate($this->imagePortrait, new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ width }}', 1)
-            ->setParameter('{{ height }}', 2)
-            ->setCode(Image::PORTRAIT_NOT_ALLOWED_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testPortraitNotAllowedDoctrineStyle()
-    {
-        $this->validator->validate($this->imagePortrait, new Image([
-            'allowPortrait' => false,
-            'allowPortraitMessage' => 'myMessage',
-        ]));
+        $this->validate($this->imagePortrait, new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', 1)
@@ -459,35 +259,11 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Image(detectCorrupted: true, corruptedMessage: 'myMessage');
 
-        $this->validator->validate($this->image, $constraint);
+        $this->validate($this->image, $constraint);
 
         $this->assertNoViolation();
 
-        $this->validator->validate($this->imageCorrupted, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setCode(Image::CORRUPTED_IMAGE_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testCorruptedDoctrineStyle()
-    {
-        if (!\function_exists('imagecreatefromstring')) {
-            $this->markTestSkipped('This test require GD extension');
-        }
-
-        $constraint = new Image([
-            'detectCorrupted' => true,
-            'corruptedMessage' => 'myMessage',
-        ]);
-
-        $this->validator->validate($this->image, $constraint);
-
-        $this->assertNoViolation();
-
-        $this->validator->validate($this->imageCorrupted, $constraint);
+        $this->validate($this->imageCorrupted, $constraint);
 
         $this->buildViolation('myMessage')
             ->setCode(Image::CORRUPTED_IMAGE_ERROR)
@@ -496,7 +272,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMimeType()
     {
-        $this->validator->validate($this->notAnImage, $constraint = new Image());
+        $this->validate($this->notAnImage, $constraint = new Image());
 
         $this->assertSame('image/*', $constraint->mimeTypes);
 
@@ -511,29 +287,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMimeTypeWithNarrowedSet()
     {
-        $this->validator->validate($this->image, new Image(mimeTypes: [
+        $this->validate($this->image, new Image(mimeTypes: [
             'image/jpeg',
             'image/png',
-        ]));
-
-        $this->buildViolation('The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.')
-            ->setParameter('{{ file }}', \sprintf('"%s"', $this->image))
-            ->setParameter('{{ type }}', '"image/gif"')
-            ->setParameter('{{ types }}', '"image/jpeg", "image/png"')
-            ->setParameter('{{ name }}', '"test.gif"')
-            ->setCode(Image::INVALID_MIME_TYPE_ERROR)
-            ->assertRaised();
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidMimeTypeWithNarrowedSetDoctrineStyle()
-    {
-        $this->validator->validate($this->image, new Image([
-            'mimeTypes' => [
-                'image/jpeg',
-                'image/png',
-            ],
         ]));
 
         $this->buildViolation('The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.')
@@ -548,7 +304,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('provideSvgWithViolation')]
     public function testSvgWithViolation(string $image, Image $constraint, string $violation, array $parameters = [])
     {
-        $this->validator->validate($image, $constraint);
+        $this->validate($image, $constraint);
 
         $this->buildViolation('myMessage')
             ->setCode($violation)
@@ -678,7 +434,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('provideSvgWithoutViolation')]
     public function testSvgWithoutViolation(string $image, Image $constraint)
     {
-        $this->validator->validate($image, $constraint);
+        $this->validate($image, $constraint);
 
         $this->assertNoViolation();
     }
@@ -714,13 +470,9 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('providerValidExtension')]
     public function testExtensionValid(string $name)
     {
-        if (!class_exists(MimeTypes::class)) {
-            $this->markTestSkipped('Guessing the mime type is not possible');
-        }
-
         $constraint = new Image(mimeTypes: [], extensions: ['gif'], extensionsMessage: 'myMessage');
 
-        $this->validator->validate(new File(__DIR__.'/Fixtures/'.$name), $constraint);
+        $this->validate(new File(__DIR__.'/Fixtures/'.$name), $constraint);
 
         $this->assertNoViolation();
     }
@@ -737,7 +489,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $path = __DIR__.'/Fixtures/'.$name;
         $constraint = new Image(extensions: ['png', 'svg'], extensionsMessage: 'myMessage');
 
-        $this->validator->validate(new File($path), $constraint);
+        $this->validate(new File($path), $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameters([
@@ -758,14 +510,10 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
 
     public function testExtensionAutodetectMimeTypesInvalid()
     {
-        if (!class_exists(MimeTypes::class)) {
-            $this->markTestSkipped('Guessing the mime type is not possible');
-        }
-
         $path = __DIR__.'/Fixtures/invalid-content.gif';
         $constraint = new Image(mimeTypesMessage: 'myMessage', extensions: ['gif']);
 
-        $this->validator->validate(new File($path), $constraint);
+        $this->validate(new File($path), $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameters([

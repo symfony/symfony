@@ -1,20 +1,22 @@
 <?php
 
-return \Symfony\Component\VarExporter\Internal\Hydrator::hydrate(
-    $o = [
-        clone (($p = &\Symfony\Component\VarExporter\Internal\Registry::$prototypes)['SplObjectStorage'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('SplObjectStorage')),
-        clone ($p['stdClass'] ?? \Symfony\Component\VarExporter\Internal\Registry::p('stdClass')),
+return \deepclone_from_array([
+    'classes' => ['SplObjectStorage', 'stdClass'],
+    'objectMeta' => [
+        [0, -2],
+        1,
     ],
-    null,
-    [],
-    $o[0],
-    [
-        [
+    'prepared' => 0,
+    'states' => [
+        2 => [
+            0,
             [
-                $o[1],
-                345,
+                [1, 345],
+                [],
             ],
-            [],
+            [
+                [true],
+            ],
         ],
-    ]
-);
+    ],
+], null, true);

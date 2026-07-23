@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `form_flow_*` Twig form helper functions to access values from `FormFlowCursor`
+ * Add daisyUI 5 form layout
+
+8.0
+---
+
+ * Remove support for passing a tag to the constructor of `FormThemeNode`
+
 7.4
 ---
 

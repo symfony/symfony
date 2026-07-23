@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `LockStore` to use the Lock component as a semaphore store backend
+ * Add `SemaphoreKeyNormalizer` for cross-process `Key` transfer
+
 7.4
 ---
 

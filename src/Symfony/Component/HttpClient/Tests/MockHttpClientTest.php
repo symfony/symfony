@@ -357,6 +357,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testTimeoutOnInitialize':
             case 'testTimeoutOnDestruct':
+            case 'testMaxConnectDuration':
                 $this->markTestSkipped('Real transport required');
                 break;
 
@@ -482,6 +483,10 @@ class MockHttpClientTest extends HttpClientTestCase
                     '',
                     ['error' => 'Max duration was reached.']
                 );
+                break;
+
+            case 'testMaxConnectDurationInfo':
+                $responses[] = new MockResponse('');
                 break;
         }
 

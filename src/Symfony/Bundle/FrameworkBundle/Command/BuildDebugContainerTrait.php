@@ -12,10 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -60,19 +57,13 @@ trait BuildDebugContainerTrait
             }, $kernel, $kernel::class);
             $container = $buildContainer();
 
-            if (str_ends_with($file, '.xml') && is_file(substr_replace($file, '.ser', -4))) {
-                $dumpedContainer = unserialize(file_get_contents(substr_replace($file, '.ser', -4)), ['allowed_classes' => true]);
-                $container->setDefinitions($dumpedContainer->getDefinitions());
-                $container->setAliases($dumpedContainer->getAliases());
+            $dumpedContainer = unserialize(file_get_contents(substr_replace($file, '.ser', -4)), ['allowed_classes' => true]);
+            $container->setDefinitions($dumpedContainer->getDefinitions());
+            $container->setAliases($dumpedContainer->getAliases());
 
-                $parameterBag = $container->getParameterBag();
-                $parameterBag->clear();
-                $parameterBag->add($dumpedContainer->getParameterBag()->all());
-            } else {
-                (new XmlFileLoader($container, new FileLocator()))->load($file);
-                $locatorPass = new ServiceLocatorTagPass();
-                $locatorPass->process($container);
-            }
+            $parameterBag = $container->getParameterBag();
+            $parameterBag->clear();
+            $parameterBag->add($dumpedContainer->getParameterBag()->all());
         }
 
         return $this->container = $container;

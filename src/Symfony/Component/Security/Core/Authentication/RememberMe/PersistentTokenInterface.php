@@ -20,13 +20,6 @@ namespace Symfony\Component\Security\Core\Authentication\RememberMe;
 interface PersistentTokenInterface
 {
     /**
-     * Returns the class of the user.
-     *
-     * @deprecated since Symfony 7.4, the user class will be removed from the remember-me cookie in 8.0
-     */
-    public function getClass(): string;
-
-    /**
      * Returns the series.
      */
     public function getSeries(): string;

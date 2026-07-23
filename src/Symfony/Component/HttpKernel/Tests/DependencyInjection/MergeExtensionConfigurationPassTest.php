@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -18,6 +20,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpKernel\DependencyInjection\MergeExtensionConfigurationPass;
 use Symfony\Component\HttpKernel\Tests\Fixtures\AcmeFooBundle\AcmeFooBundle;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class MergeExtensionConfigurationPassTest extends TestCase
 {
     public function testAutoloadMainExtension()

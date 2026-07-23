@@ -20,23 +20,14 @@ use Symfony\Component\TypeInfo\Type;
  */
 final class PropertyMetadata
 {
-    private ?array $streamToNativeValueTransformers;
-
     /**
-     * @param list<string|\Closure>      $valueTransformers
-     * @param list<string|\Closure>|null $streamToNativeValueTransformers
+     * @param list<string|\Closure> $valueTransformers
      */
     public function __construct(
         private ?string $name,
         private Type $type,
         private array $valueTransformers = [],
-        ?array $streamToNativeValueTransformers = null,
     ) {
-        if (null !== $streamToNativeValueTransformers) {
-            trigger_deprecation('symfony/json-streamer', '7.4', 'The "streamToNativeValueTransformers" parameter of the "%s()" method is deprecated. Use "valueTransformers" instead.', __METHOD__);
-        }
-
-        $this->streamToNativeValueTransformers = $streamToNativeValueTransformers;
     }
 
     /**
@@ -54,7 +45,7 @@ final class PropertyMetadata
 
     public function withName(?string $name): self
     {
-        return new self($name, $this->type, $this->valueTransformers, $this->streamToNativeValueTransformers);
+        return new self($name, $this->type, $this->valueTransformers);
     }
 
     public function getType(): Type
@@ -64,7 +55,7 @@ final class PropertyMetadata
 
     public function withType(Type $type): self
     {
-        return new self($this->name, $type, $this->valueTransformers, $this->streamToNativeValueTransformers);
+        return new self($this->name, $type, $this->valueTransformers);
     }
 
     /**
@@ -91,83 +82,5 @@ final class PropertyMetadata
         $valueTransformers = array_values(array_unique($valueTransformers));
 
         return $this->withValueTransformers($valueTransformers);
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, use "getValueTransformers" instead
-     *
-     * @return list<string|\Closure>
-     */
-    public function getNativeToStreamValueTransformer(): array
-    {
-        trigger_deprecation('symfony/json-streamer', '7.4', 'The "%s()" method is deprecated, use "%s::getValueTransformers()" instead.', __METHOD__, self::class);
-
-        return $this->valueTransformers;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, use "withValueTransformers" instead
-     *
-     * @param list<string|\Closure> $nativeToStreamValueTransformers
-     */
-    public function withNativeToStreamValueTransformers(array $nativeToStreamValueTransformers): self
-    {
-        trigger_deprecation('symfony/json-streamer', '7.4', 'The "%s()" method is deprecated, use "%s::withValueTransformers()" instead.', __METHOD__, self::class);
-
-        return new self($this->name, $this->type, $nativeToStreamValueTransformers, $this->streamToNativeValueTransformers);
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, use "withAdditionalValueTransformer" instead
-     */
-    public function withAdditionalNativeToStreamValueTransformer(string|\Closure $nativeToStreamValueTransformer): self
-    {
-        trigger_deprecation('symfony/json-streamer', '7.4', 'The "%s()" method is deprecated, use "%s::withAdditionalValueTransformer()" instead.', __METHOD__, self::class);
-
-        $nativeToStreamValueTransformers = $this->valueTransformers;
-
-        $nativeToStreamValueTransformers[] = $nativeToStreamValueTransformer;
-        $nativeToStreamValueTransformers = array_values(array_unique($nativeToStreamValueTransformers));
-
-        return $this->withNativeToStreamValueTransformers($nativeToStreamValueTransformers);
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, use "getValueTransformers" instead
-     *
-     * @return list<string|\Closure>
-     */
-    public function getStreamToNativeValueTransformers(): array
-    {
-        trigger_deprecation('symfony/json-streamer', '7.4', 'The "%s()" method is deprecated, use "%s::getValueTransformers()" instead.', __METHOD__, self::class);
-
-        return $this->streamToNativeValueTransformers ?? [];
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, use "withValueTransformers" instead
-     *
-     * @param list<string|\Closure> $streamToNativeValueTransformers
-     */
-    public function withStreamToNativeValueTransformers(array $streamToNativeValueTransformers): self
-    {
-        trigger_deprecation('symfony/json-streamer', '7.4', 'The "%s()" method is deprecated, use "%s::withValueTransformers()" instead.', __METHOD__, self::class);
-
-        return new self($this->name, $this->type, $this->valueTransformers, $streamToNativeValueTransformers);
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, use "withAdditionalValueTransformer" instead
-     */
-    public function withAdditionalStreamToNativeValueTransformer(string|\Closure $streamToNativeValueTransformer): self
-    {
-        trigger_deprecation('symfony/json-streamer', '7.4', 'The "%s()" method is deprecated, use "%s::withAdditionalValueTransformer()" instead.', __METHOD__, self::class);
-
-        $streamToNativeValueTransformers = $this->streamToNativeValueTransformers ?? [];
-
-        $streamToNativeValueTransformers[] = $streamToNativeValueTransformer;
-        $streamToNativeValueTransformers = array_values(array_unique($streamToNativeValueTransformers));
-
-        return $this->withStreamToNativeValueTransformers($streamToNativeValueTransformers);
     }
 }

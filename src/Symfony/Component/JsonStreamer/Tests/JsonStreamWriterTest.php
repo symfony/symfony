@@ -12,6 +12,7 @@
 namespace Symfony\Component\JsonStreamer\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
@@ -20,9 +21,13 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithBcMathNumber;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateIntervals;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimeZones;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGmpNumber;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
@@ -34,15 +39,20 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyWithOtherDummy;
-use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\BooleanToStringValueTransformer;
-use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DoubleIntAndCastToStringValueTransformer;
-use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\BooleanToStringValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DoubleIntAndCastToStringValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\HeightValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueObject\Height;
+use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
 
 class JsonStreamWriterTest extends TestCase
@@ -224,7 +234,7 @@ class JsonStreamWriterTest extends TestCase
             $dummy,
             Type::object(DummyWithValueTransformerAttributes::class),
             options: ['scale' => 1],
-            valueTransformers: [
+            transformers: [
                 BooleanToStringValueTransformer::class => new BooleanToStringValueTransformer(),
                 DoubleIntAndCastToStringValueTransformer::class => new DoubleIntAndCastToStringValueTransformer(),
             ],
@@ -242,8 +252,8 @@ class JsonStreamWriterTest extends TestCase
             $dummy,
             Type::object(DummyWithValueTransformerAttributes::class),
             options: ['scale' => 1],
-            valueTransformers: [
-                BooleanToStringValueTransformer::class => new class($this) implements ValueTransformerInterface {
+            transformers: [
+                BooleanToStringValueTransformer::class => new class($this) implements PropertyValueTransformerInterface {
                     public function __construct(
                         private JsonStreamWriterTest $test,
                     ) {
@@ -263,6 +273,35 @@ class JsonStreamWriterTest extends TestCase
                     }
                 },
                 DoubleIntAndCastToStringValueTransformer::class => new DoubleIntAndCastToStringValueTransformer(),
+            ],
+        );
+    }
+
+    public function testWriteObjectWithValueObject()
+    {
+        $dummy = new DummyWithValueObjects();
+        $dummy->height = new Height(10, 'm');
+        $dummy->nullableHeight = new Height(10, 'dm');
+        $dummy->unionHeight = new Height(10, 'cm');
+
+        $this->assertWritten(
+            '{"height":"10 m","nullableHeight":"10 dm","unionHeight":"10 cm"}',
+            $dummy,
+            Type::object(DummyWithValueObjects::class),
+            transformers: [
+                Height::class => new HeightValueObjectTransformer(),
+            ],
+        );
+
+        $dummy->nullableHeight = null;
+        $dummy->unionHeight = 10;
+
+        $this->assertWritten(
+            '{"height":"10 m","unionHeight":10}',
+            $dummy,
+            Type::object(DummyWithValueObjects::class),
+            transformers: [
+                Height::class => new HeightValueObjectTransformer(),
             ],
         );
     }
@@ -304,7 +343,7 @@ class JsonStreamWriterTest extends TestCase
             '{"interface":"2024-11-20","immutable":"2025-11-20","union":"2026-11-20"}',
             $dummy,
             Type::object(DummyWithDateTimes::class),
-            options: [DateTimeToStringValueTransformer::FORMAT_KEY => 'Y-m-d'],
+            options: [DateTimeValueObjectTransformer::FORMAT_KEY => 'Y-m-d'],
         );
 
         $dummy->union = 10;
@@ -313,8 +352,51 @@ class JsonStreamWriterTest extends TestCase
             '{"interface":"2024-11-20","immutable":"2025-11-20","union":10}',
             $dummy,
             Type::object(DummyWithDateTimes::class),
-            options: [DateTimeToStringValueTransformer::FORMAT_KEY => 'Y-m-d'],
+            options: [DateTimeValueObjectTransformer::FORMAT_KEY => 'Y-m-d'],
         );
+    }
+
+    public function testWriteObjectWithDateIntervals()
+    {
+        $dummy = new DummyWithDateIntervals();
+        $dummy->interval = new \DateInterval('P2Y6M1DT12H30M5S');
+
+        $this->assertWritten(
+            '{"interval":"P2Y6M1DT12H30M5S"}',
+            $dummy,
+            Type::object(DummyWithDateIntervals::class),
+            options: [DateIntervalValueObjectTransformer::FORMAT_KEY => 'P%yY%mM%dDT%hH%iM%sS'],
+        );
+    }
+
+    public function testWriteObjectWithDateTimeZones()
+    {
+        $dummy = new DummyWithDateTimeZones();
+        $dummy->timezone = new \DateTimeZone('Asia/Tokyo');
+
+        $this->assertWritten(
+            '{"timezone":"Asia\/Tokyo"}',
+            $dummy,
+            Type::object(DummyWithDateTimeZones::class),
+        );
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testWriteObjectWithBcMathNumber()
+    {
+        $dummy = new DummyWithBcMathNumber();
+        $dummy->number = new \BcMath\Number('3.14');
+
+        $this->assertWritten('{"number":"3.14"}', $dummy, Type::object(DummyWithBcMathNumber::class));
+    }
+
+    #[RequiresPhpExtension('gmp')]
+    public function testWriteObjectWithGmpNumber()
+    {
+        $dummy = new DummyWithGmpNumber();
+        $dummy->gmp = new \GMP('99999999999999999999');
+
+        $this->assertWritten('{"gmp":"99999999999999999999"}', $dummy, Type::object(DummyWithGmpNumber::class));
     }
 
     public function testWriteObjectWithDollarNamedProperties()
@@ -436,7 +518,7 @@ class JsonStreamWriterTest extends TestCase
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 
         $this->expectException(NotEncodableValueException::class);
-        $this->expectExceptionMessage('Inf and NaN cannot be JSON encoded');
+        $this->expectExceptionMessage('Cannot encode "int" to JSON: Inf and NaN cannot be JSON encoded.');
 
         (string) $writer->write(\INF, Type::int());
     }
@@ -468,12 +550,12 @@ class JsonStreamWriterTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed>                     $options
-     * @param array<string, ValueTransformerInterface> $valueTransformers
+     * @param array<string, mixed>                                                             $options
+     * @param array<string, PropertyValueTransformerInterface|ValueObjectTransformerInterface> $transformers
      */
-    private function assertWritten(string $json, mixed $data, Type $type, array $options = [], array $valueTransformers = []): void
+    private function assertWritten(string $json, mixed $data, Type $type, array $options = [], array $transformers = []): void
     {
-        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir, valueTransformers: $valueTransformers);
+        $writer = JsonStreamWriter::create($transformers, $this->streamWritersDir);
         $this->assertSame($json, (string) $writer->write($data, $type, $options));
     }
 }

@@ -1,6 +1,66 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
+ * Add `--dispatchers` option to `debug:event-dispatcher` command
+ * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+ * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
+ * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
+
+8.1
+---
+
+ * Add `framework.validation.property_metadata_existence_check` config option
+ * Deprecate `json_streamer.value_transformer.date_time_to_string` and `json_streamer.value_transformer.string_to_date_time` services, date times are handled as value objects
+ * Deprecate `json_streamer.value_transformer` tag, use `json_streamer.property_value_transformer` instead
+ * Add `marshaller` option to cache pool configuration to allow per-pool marshaller services
+ * Add support for `lock://` DSN in semaphore configuration to use the Lock component as a semaphore store
+ * Add support for configuring JsonStreamer's `default_options`
+ * Add project-scoped `flock` and `semaphore` lock store services
+ * Add `createFormFlowBuilder` method to `AbstractController` and `ControllerHelper`
+ * Deprecate setting the `framework.profiler.collect_serializer_data` config option
+ * Deprecate the `framework.http_cache.terminate_on_cache_hit` config option
+ * Add support for `framework.secrets.decryption_env_var` to contain dots
+ * Enable mocking non-shared services in tests
+ * Add support for setting `mock_response_factory` per scoped HTTP client
+ * Add `ConsoleCommandAssertionsTrait` to `KernelTestCase` for running a command and asserting the result
+ * Add `assertSessionHasFlashMessage()` to `BrowserKitAssertionsTrait`
+ * Add `framework.html_sanitizer.sanitizers.*.default_action` config option
+ * Deprecate parameters `router.request_context.scheme` and `router.request_context.host`;
+   use the `router.request_context.base_url` parameter or the `framework.router.default_uri` config option instead
+ * Add decoration stack to `debug:container` command output
+ * Add `MicroKernelTrait::getAllowedEnvs()` to list and enforce allowed values for `APP_ENV`
+ * Change `caching.max_ttl` option to default to `86400` (24h) instead of `null`
+ * Deprecate setting `caching.max_ttl` to `null`, use a positive integer instead
+ * Deprecate `senders` nesting level for messenger routing config; use string or a list of strings instead
+ * Allow configuring Webhook's header names and signing algo
+ * Deprecate registering console commands by overriding `Bundle::registerCommands()`, use the `#[AsCommand]` attribute or the `console.command` service tag instead
+ * Deprecate calling `FrameworkExtension::load()` directly without first loading `ServicesBundle`'s extension
+ * Add support for the `#[RateLimit]` attribute on controllers when `framework.rate_limiter` is configured
+ * Add `--sort` option to `debug:router` command to sort routes by a given column
+
+8.0
+---
+
+ * Remove the `WorkflowDumpCommand` class; the `workflow:dump` command works the same as before but its class is now defined in the Workflow component
+ * Remove `errors.xml` and `webhook.xml` routing configuration files (use their PHP equivalent instead)
+ * Enable the property info constructor extractor by default
+ * Remove deprecated `Symfony\Bundle\FrameworkBundle\Console\Application::add()` method in favor of `Symfony\Bundle\FrameworkBundle\Console\Application::addCommand()`
+ * Make `Router` class `final`
+ * Make `SerializerCacheWarmer` class `final`
+ * Make `Translator` class `final`
+ * Make `TranslationsCacheWarmer` class `final`
+ * Make `ValidatorCacheWarmer` class `final`
+ * Remove autowiring aliases for `RateLimiterFactory`; use `RateLimiterFactoryInterface` instead
+ * Remove `session.sid_length` and `session.sid_bits_per_character` config options
+ * Remove the `router.cache_dir` config option
+ * Remove the `validation.cache` option
+ * Remove `TranslationUpdateCommand` in favor of `TranslationExtractCommand`
+ * Remove `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
+
 7.4
 ---
 

@@ -13,7 +13,6 @@ namespace Symfony\Bundle\TwigBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\Before;
-use PHPUnit\Framework\Attributes\BeforeClass;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -32,14 +31,6 @@ use Twig\Extension\AttributeExtension;
 
 class AttributeExtensionTest extends TestCase
 {
-    #[BeforeClass]
-    public static function assertTwigVersion(): void
-    {
-        if (!class_exists(AttributeExtension::class)) {
-            self::markTestSkipped('Twig 3.21 is required.');
-        }
-    }
-
     public function testExtensionWithAttributes()
     {
         $kernel = new class extends AttributeExtensionKernel {

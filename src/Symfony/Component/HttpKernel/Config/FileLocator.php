@@ -11,30 +11,13 @@
 
 namespace Symfony\Component\HttpKernel\Config;
 
-use Symfony\Component\Config\FileLocator as BaseFileLocator;
-use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\Kernel\FileLocator as BaseFileLocator;
+
+trigger_deprecation('symfony/http-kernel', '8.1', 'The "%s" class is deprecated, use "%s" instead.', FileLocator::class, BaseFileLocator::class);
 
 /**
- * FileLocator uses the KernelInterface to locate resources in bundles.
- *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @deprecated since Symfony 8.1, use Symfony\Component\DependencyInjection\Kernel\FileLocator instead
  */
 class FileLocator extends BaseFileLocator
 {
-    public function __construct(
-        private KernelInterface $kernel,
-    ) {
-        parent::__construct();
-    }
-
-    public function locate(string $file, ?string $currentPath = null, bool $first = true): string|array
-    {
-        if (isset($file[0]) && '@' === $file[0]) {
-            $resource = $this->kernel->locateResource($file);
-
-            return $first ? $resource : [$resource];
-        }
-
-        return parent::locate($file, $currentPath, $first);
-    }
 }

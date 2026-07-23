@@ -13,7 +13,6 @@ namespace Symfony\Bridge\Doctrine\Tests;
 
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\DummyManager;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -52,7 +51,6 @@ class ManagerRegistryTest extends TestCase
     }
 
     #[DataProvider('provideResetServiceWithNativeLazyObjectsCases')]
-    #[RequiresPhp('>=8.4.0')]
     public function testResetServiceWithNativeLazyObjects(string $class)
     {
         $container = new $class();

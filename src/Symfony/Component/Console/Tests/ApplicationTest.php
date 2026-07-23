@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -164,6 +165,90 @@ class ApplicationTest extends TestCase
         $this->assertEquals('foo <info>bar</info>', $application->getLongVersion(), '->getLongVersion() returns the long version of the application');
     }
 
+    public function testGetLongVersionWithContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+        $container->setParameter('kernel.debug', false);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertStringContainsString('env:', $application->getLongVersion());
+        $this->assertStringContainsString('prod', $application->getLongVersion());
+    }
+
+    public function testContainerWiresEventDispatcher()
+    {
+        $container = new ContainerBuilder();
+        $container->register('event_dispatcher', EventDispatcher::class)->setPublic(true);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $application->all(); // triggers init
+
+        $this->assertInstanceOf(EventDispatcherInterface::class, $application->getDispatcher());
+    }
+
+    public function testContainerWiresCommandLoader()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.command_loader', FactoryCommandLoader::class)
+            ->setPublic(true)
+            ->setArguments([['test:cmd' => static fn () => new Command('test:cmd')]]);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertTrue($application->has('test:cmd'));
+    }
+
+    public function testContainerWiresEagerCommands()
+    {
+        $container = new ContainerBuilder();
+        $container->register('my.command', \FooCommand::class)->setPublic(true);
+        $container->setParameter('console.command.ids', ['my.command']);
+        $container->compile();
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertTrue($application->has('foo:bar'));
+    }
+
+    public function testPsrContainerWiresEagerCommands()
+    {
+        $fooCommand = new \FooCommand();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnCallback(static fn (string $id) => \in_array($id, ['console.command.ids', 'my.command']));
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
+            'console.command.ids' => ['my.command'],
+            'my.command' => $fooCommand,
+        });
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertTrue($application->has('foo:bar'));
+    }
+
+    public function testPsrContainerSkipsLazyCommands()
+    {
+        $fooCommand = new \FooCommand();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('has')->willReturnCallback(static fn (string $id) => \in_array($id, ['console.command.ids', 'console.lazy_command.ids', 'my.command']));
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
+            'console.command.ids' => ['my.command'],
+            'console.lazy_command.ids' => ['my.command' => true],
+            'my.command' => $fooCommand,
+        });
+
+        $application = new Application('foo', 'bar', $container);
+        $this->assertFalse($application->has('foo:bar'));
+    }
+
+    public function testApplicationWithoutContainer()
+    {
+        $application = new Application('foo', 'bar');
+        $this->assertStringNotContainsString('env:', $application->getLongVersion());
+    }
+
     public function testHelp()
     {
         $application = new Application();
@@ -293,9 +378,9 @@ class ApplicationTest extends TestCase
 
     public static function provideInvalidInvokableCommands(): iterable
     {
-        yield 'a function' => ['strlen', InvalidArgumentException::class, \sprintf('The command must be an instance of "%s" or an invokable object.', Command::class)];
+        yield 'a function' => ['strlen', InvalidArgumentException::class, \sprintf('The command must be an instance of "%s", an invokable object or a method of an object.', Command::class)];
         yield 'a closure' => [static function () {
-        }, InvalidArgumentException::class, \sprintf('The command must be an instance of "%s" or an invokable object.', Command::class)];
+        }, InvalidArgumentException::class, \sprintf('The command must be an instance of "%s", an invokable object or a method of an object.', Command::class)];
         yield 'without the #[AsCommand] attribute' => [new class {
             public function __invoke()
             {
@@ -407,6 +492,19 @@ class ApplicationTest extends TestCase
         $this->expectExceptionMessage($expectedMsg);
 
         $application->findNamespace('f');
+    }
+
+    public function testFindAmbiguousNamespaceSortedAlphabetically()
+    {
+        $application = new Application();
+        $application->addCommand(new Command('test-zzz:cmd'));
+        $application->addCommand(new Command('test-aaa:cmd'));
+        $application->addCommand(new Command('test-bbb:cmd'));
+
+        $this->expectException(NamespaceNotFoundException::class);
+        $this->expectExceptionMessage("The namespace \"test\" is ambiguous.\nDid you mean one of these?\n    test-aaa\n    test-bbb\n    test-zzz");
+
+        $application->findNamespace('test');
     }
 
     public function testFindNonAmbiguous()
@@ -539,11 +637,34 @@ class ApplicationTest extends TestCase
             [
                 'foo:b',
                 "Command \"foo:b\" is ambiguous.\nDid you mean one of these?\n".
+                "    foo1:bar The foo1:bar command\n".
                 "    foo:bar  The foo:bar command\n".
-                "    foo:bar1 The foo:bar1 command\n".
-                '    foo1:bar The foo1:bar command',
+                '    foo:bar1 The foo:bar1 command',
             ],
         ];
+    }
+
+    public function testFindAmbiguousCommandsSortedAlphabetically()
+    {
+        putenv('COLUMNS=120');
+
+        $application = new Application();
+        // Register commands in non-alphabetical order
+        $application->addCommand(new Command('test:zzz'));
+        $application->addCommand(new Command('test:aaa'));
+        $application->addCommand(new Command('test:bbb'));
+
+        try {
+            $application->find('test:');
+            $this->fail('Expected CommandNotFoundException');
+        } catch (CommandNotFoundException $e) {
+            $this->assertMatchesRegularExpression(
+                '/test:aaa.*test:bbb.*test:zzz/s',
+                $e->getMessage()
+            );
+        } finally {
+            putenv('COLUMNS');
+        }
     }
 
     public function testFindWithAmbiguousAbbreviationsFindsCommandIfAlternativesAreHidden()

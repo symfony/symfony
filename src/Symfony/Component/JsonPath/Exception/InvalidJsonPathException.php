@@ -16,8 +16,8 @@ namespace Symfony\Component\JsonPath\Exception;
  */
 class InvalidJsonPathException extends \LogicException implements ExceptionInterface
 {
-    public function __construct(string $message, ?int $position = null)
+    public function __construct(string $message, ?int $position = null, ?\Throwable $previous = null)
     {
-        parent::__construct(\sprintf('JSONPath syntax error%s: %s', $position ? ' at position '.$position : '', $message));
+        parent::__construct(\sprintf('JSONPath syntax error%s: %s', $position ? ' at position '.$position : '', $message), previous: $previous);
     }
 }

@@ -45,6 +45,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAs
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasMultiple;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasProdEnv;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasTargetOne;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasTargetTwo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithCustomAsAlias;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\NotAService;
 
@@ -427,6 +429,22 @@ class FileLoaderTest extends TestCase
             'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
             'PrototypeAsAlias/{WithAsAliasMultipleInterface,AliasBarInterface,AliasFooInterface}.php'
         );
+    }
+
+    public function testRegisterClassesWithAsAliasTarget()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
+            'PrototypeAsAlias/{WithAsAliasTargetOne,WithAsAliasTargetTwo,AliasFooInterface}.php'
+        );
+        // Verify target-specific aliases are created
+        $this->assertTrue($container->hasAlias(AliasFooInterface::class.' $one'));
+        $this->assertTrue($container->hasAlias(AliasFooInterface::class.' $two'));
+        $this->assertSame(WithAsAliasTargetOne::class, (string) $container->getAlias(AliasFooInterface::class.' $one'));
+        $this->assertSame(WithAsAliasTargetTwo::class, (string) $container->getAlias(AliasFooInterface::class.' $two'));
     }
 
     public function testRegisterClassesWithStaticConstructor()

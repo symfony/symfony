@@ -231,9 +231,16 @@ class TextDescriptor extends Descriptor
 
         $options['output']->title($title);
 
-        $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
-            : $this->sortServiceIds($container->getServiceIds());
+        if (isset($options['tag']) && $options['tag']) {
+            $services = [];
+            foreach ($container->findTaggedServiceIds($options['tag']) as $serviceId => $tags) {
+                $definition = $container->getDefinition($serviceId);
+                $services[$serviceId] = $this->resolvePriorityServiceTags($container, $definition, $options['tag']);
+            }
+            $serviceIds = $this->sortTaggedServicesByPriority($services);
+        } else {
+            $serviceIds = $this->sortServiceIds($container->getServiceIds());
+        }
         $maxTags = [];
 
         if (isset($options['filter'])) {
@@ -255,7 +262,7 @@ class TextDescriptor extends Descriptor
                     continue;
                 }
                 if ($showTag) {
-                    $tags = $definition->getTag($showTag);
+                    $tags = $services[$serviceId];
                     foreach ($tags as $tag) {
                         foreach ($tag as $key => $value) {
                             if (!isset($maxTags[$key])) {
@@ -286,7 +293,7 @@ class TextDescriptor extends Descriptor
             $styledServiceId = $rawOutput ? $serviceId : \sprintf('<fg=cyan>%s</fg=cyan>', OutputFormatter::escape($serviceId));
             if ($definition instanceof Definition) {
                 if ($showTag) {
-                    foreach ($this->sortByPriority($definition->getTag($showTag)) as $key => $tag) {
+                    foreach ($this->sortByPriority($services[$serviceId]) as $key => $tag) {
                         $tagValues = [];
                         foreach ($tagsNames as $tagName) {
                             if (\is_array($tagValue = $tag[$tagName] ?? '')) {
@@ -331,7 +338,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Class', $definition->getClass() ?: '-'];
 
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];
-        if (!$omitTags && ($tags = $definition->getTags())) {
+        if (!$omitTags && ($tags = $container ? $this->resolvePriorityServiceTags($container, $definition) : $definition->getTags())) {
             $tagInformation = [];
             foreach ($tags as $tagName => $tagData) {
                 foreach ($tagData as $tagParameters) {
@@ -425,6 +432,15 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Usages', $inEdges ? implode(\PHP_EOL, $inEdges) : 'none'];
 
         $options['output']->table($tableHeaders, $tableRows);
+
+        if (isset($options['id']) && $container) {
+            $stack = $this->getDecorationStack($container, $options['id']);
+
+            if (\count($stack) > 1) {
+                $options['output']->section('Decoration Stack');
+                $options['output']->table(['ID', 'Class', 'Priority'], array_map(static fn ($item) => array_values($item), $stack));
+            }
+        }
     }
 
     protected function describeContainerDeprecations(ContainerBuilder $container, array $options = []): void
@@ -628,6 +644,8 @@ class TextDescriptor extends Descriptor
     }
 
     /**
+     * @param-immediately-invoked-callable $getContainer
+     *
      * @param (callable():ContainerBuilder)|null $getContainer
      */
     private function formatControllerLink(mixed $controller, string $anchorText, ?callable $getContainer = null): string

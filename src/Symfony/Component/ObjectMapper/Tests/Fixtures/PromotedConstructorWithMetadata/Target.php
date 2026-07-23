@@ -19,7 +19,7 @@ class Target
          * happened earlier already.
          */
         public string $notOnSourceButRequired,
-        public int    $number,
+        public int $number,
         public string $name,
     ) {
     }

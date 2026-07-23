@@ -283,11 +283,7 @@ class DebugCommandTest extends TestCase
 
         $command = new DebugCommand($env, $projectDirectory);
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandCompletionTester($application->get('debug:dotenv'));
         $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
     }

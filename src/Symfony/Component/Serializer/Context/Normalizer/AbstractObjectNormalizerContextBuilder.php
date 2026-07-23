@@ -62,6 +62,14 @@ abstract class AbstractObjectNormalizerContextBuilder extends AbstractNormalizer
     }
 
     /**
+     * Configures whether to convert scalar types to the expected type, if their value is compatible.
+     */
+    public function withEnableTypeConversion(?bool $enableTypeConversion): static
+    {
+        return $this->with(AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION, $enableTypeConversion);
+    }
+
+    /**
      * Configures whether fields with the value `null` should be output during normalization.
      */
     public function withSkipNullValues(?bool $skipNullValues): static

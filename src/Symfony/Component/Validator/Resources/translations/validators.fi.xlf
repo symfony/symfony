@@ -168,7 +168,7 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Kuva on liian korkea ({{ width }} px). Korkeuden tulee olla enintään {{ max_width }} px.</target>
+                <target>Kuva on liian korkea ({{ height }} px). Korkeuden tulee olla enintään {{ max_height }} px.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
@@ -328,7 +328,7 @@
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
-                <target>Tätä yritystunnusta (BIC) ei ole liitetty IBAN-tilinumeroon {{ iban }}.</target>
+                <target>Tätä pankkitunnusta (BIC) ei ole liitetty IBAN-tilinumeroon {{ iban }}.</target>
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>

@@ -27,14 +27,14 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Iban());
+        $this->validate(null, new Iban());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Iban());
+        $this->validate('', new Iban());
 
         $this->assertNoViolation();
     }
@@ -42,7 +42,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIbans')]
     public function testValidIbans($iban)
     {
-        $this->validator->validate($iban, new Iban());
+        $this->validate($iban, new Iban());
 
         $this->assertNoViolation();
     }
@@ -50,7 +50,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidIbans')]
     public function testValidIbansWithNewLine(string $iban)
     {
-        $this->validator->validate($iban."\n", new Iban());
+        $this->validate($iban."\n", new Iban());
 
         $this->buildViolation('This is not a valid International Bank Account Number (IBAN).')
             ->setParameter('{{ value }}', '"'.$iban."\n\"")
@@ -458,7 +458,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
 
         [$constraint] = $classMetadata->getPropertyMetadata('iban')[0]->getConstraints();
 
-        $this->validator->validate('DE89 3704 0044 0532 0130 01', $constraint);
+        $this->validate('DE89 3704 0044 0532 0130 01', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"DE89 3704 0044 0532 0130 01"')
@@ -479,7 +479,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Iban(message: 'myMessage');
 
-        $this->validator->validate($iban, $constraint);
+        $this->validate($iban, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$iban.'"')

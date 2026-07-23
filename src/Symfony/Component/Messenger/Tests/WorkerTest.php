@@ -669,7 +669,7 @@ class WorkerTest extends TestCase
         $clock = new MockClock();
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($clock) {
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($clock) {
             static $i = 0;
             if (1 === ++$i) {
                 $clock->sleep(30);

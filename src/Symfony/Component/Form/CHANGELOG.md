@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `0` as a default `false_values` value for `CheckboxType` and `RadioType` when `value` is an empty string
  * Add `inputmode="numeric"` to `IntegerType` when the `grouping` option is enabled
 
 8.1

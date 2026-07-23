@@ -14,11 +14,15 @@ namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class CheckboxTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = CheckboxType::class;
+    private const DEFAULT_FALSE_VALUES = [null];
+    private const EMPTY_VALUE = '';
+    private const ZERO_VALUE = '0';
 
     public function testDataIsFalseByDefault()
     {
@@ -139,6 +143,40 @@ class CheckboxTypeTest extends BaseTypeTestCase
 
         $this->assertTrue($form->getData());
         $this->assertSame('', $form->getViewData());
+    }
+
+    public function testSubmitZeroWithEmptyValueUnchecked()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'value' => self::EMPTY_VALUE,
+        ]);
+        $form->submit(self::ZERO_VALUE);
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getViewData());
+    }
+
+    public function testExplicitFalseValuesOverrideEmptyValueDefault()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'value' => self::EMPTY_VALUE,
+            'false_values' => self::DEFAULT_FALSE_VALUES,
+        ]);
+        $form->submit(self::ZERO_VALUE);
+
+        $this->assertTrue($form->getData());
+        $this->assertSame(self::EMPTY_VALUE, $form->getViewData());
+    }
+
+    public function testRadioTypeSubmitZeroWithEmptyValueUnchecked()
+    {
+        $form = $this->factory->create(RadioType::class, null, [
+            'value' => self::EMPTY_VALUE,
+        ]);
+        $form->submit(self::ZERO_VALUE);
+
+        $this->assertFalse($form->getData());
+        $this->assertNull($form->getViewData());
     }
 
     #[DataProvider('provideCustomModelTransformerData')]

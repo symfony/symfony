@@ -16,10 +16,15 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BooleanToStringTransfo
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CheckboxType extends AbstractType
 {
+    private const DEFAULT_FALSE_VALUES = [null];
+    private const EMPTY_VALUE = '';
+    private const EMPTY_VALUE_FALSE_VALUES = [null, '0'];
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Unlike in other types, where the data is NULL by default, it
@@ -48,7 +53,13 @@ class CheckboxType extends AbstractType
             'value' => '1',
             'empty_data' => $emptyData,
             'compound' => false,
-            'false_values' => [null],
+            'false_values' => static function (Options $options): array {
+                if (self::EMPTY_VALUE === $options['value']) {
+                    return self::EMPTY_VALUE_FALSE_VALUES;
+                }
+
+                return self::DEFAULT_FALSE_VALUES;
+            },
             'invalid_message' => 'The checkbox has an invalid value.',
             'is_empty_callback' => static fn ($modelData): bool => false === $modelData,
         ]);

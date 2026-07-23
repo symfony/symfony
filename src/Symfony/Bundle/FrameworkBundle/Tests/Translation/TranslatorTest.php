@@ -31,7 +31,7 @@ class TranslatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tmpDir = sys_get_temp_dir().'/sf_translation';
+        $this->tmpDir = sys_get_temp_dir().'/sf_translation_'.uniqid();
         $this->deleteTmpDir();
     }
 

@@ -304,20 +304,28 @@ class Worker
 
         foreach ($unacks as $handler) {
             $deferredMessage = $unacks[$handler];
+
+            if ($deferredMessage->acked) {
+                continue;
+            }
             $transportName = $deferredMessage->transportName;
             $envelope = $deferredMessage->envelope;
             try {
                 $e = null;
                 $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp(true === $force || !\is_bool($force))));
             } catch (\Throwable $e) {
-                $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
-                $this->acks[] = [$transportName, $envelope, $e];
+                if (!$deferredMessage->acked) {
+                    $this->acks[] = [$transportName, $envelope->withoutAll(NoAutoAckStamp::class), $e];
+                }
                 continue;
             }
 
+            if ($deferredMessage->acked) {
+                continue;
+            }
             $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
 
-            if (!$deferredMessage->acked && !$noAutoAckStamp) {
+            if (!$noAutoAckStamp) {
                 $this->acks[] = [$transportName, $envelope, $e];
             } elseif ($noAutoAckStamp) {
                 $this->unacks ??= new DeferredBatchMessageQueue();

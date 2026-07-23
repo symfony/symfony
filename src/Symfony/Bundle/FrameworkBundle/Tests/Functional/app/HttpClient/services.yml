@@ -10,3 +10,13 @@ services:
 
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\MockClientCallback:
         class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\MockClientCallback
+
+    # decorates the transport with the default priority; must keep running when the mock factory is active
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\TransportDecorator:
+        decorates: http_client.transport
+        arguments: ['@.inner']
+
+    # keeps the otherwise unreferenced opted-out client alive for the tests
+    test.not_mocked.http_client:
+        alias: not_mocked.http_client
+        public: true

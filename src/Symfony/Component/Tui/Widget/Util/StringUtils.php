@@ -63,6 +63,12 @@ final class StringUtils
      * of C1 controls (`\xc2[\x80-\x9f]`). Prevents terminal-escape injection
      * by removing the introducer bytes (ESC, BEL, 8-bit CSI); any payload
      * bytes that followed survive as visible literal text.
+     *
+     * Pass well-formed UTF-8 (run it through {@see self::sanitizeUtf8()} first).
+     * The replacement is single-pass, so on malformed input removing a control
+     * byte between a lone 0xC2 and a following 0x80-0x9F byte would splice them
+     * into a C1 introducer that then survives; sanitizeUtf8() drops such stray
+     * bytes, which is why every caller here sanitizes first.
      */
     public static function stripControlBytes(string $value): string
     {

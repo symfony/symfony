@@ -17,6 +17,7 @@ CHANGELOG
  * Add default `min`/`max` attributes to `BirthdayType` when `widget` is `single_text`
  * Add `labels` option to `DateType` to customize the year, month and day sub-field labels
  * Use `translation_domain` instead of `choice_translation_domain` for the expanded `ChoiceType` placeholder
+ * Render the placeholder option of required collapsed `ChoiceType` fields with the `hidden` attribute by default; set the `placeholder_attr` option to `[]` to restore the previous rendering
 
 8.0
 ---

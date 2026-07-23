@@ -250,9 +250,15 @@ class IpUtils
 
     /**
      * Checks if an IPv4 or IPv6 address is contained in the list of private IP subnets.
+     *
+     * @throws \ValueError When $requestIp is not a valid IP address
      */
     public static function isPrivateIp(string $requestIp): bool
     {
+        if (!filter_var($requestIp, \FILTER_VALIDATE_IP)) {
+            throw new \ValueError(\sprintf('"%s" is not a valid IP address.', $requestIp));
+        }
+
         return self::checkIp($requestIp, self::PRIVATE_SUBNETS);
     }
 

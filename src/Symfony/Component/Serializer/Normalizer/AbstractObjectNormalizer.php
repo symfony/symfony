@@ -516,6 +516,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                                 $data = false;
                             } elseif ('true' === $data || '1' === $data) {
                                 $data = true;
+                            } elseif ($context[self::FILTER_BOOL] ?? false) {
+                                // defer to the FILTER_BOOL handling below, which accepts more representations (e.g. "on"/"off")
+                                break;
                             } else {
                                 throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be bool ("%s" given).', $attribute, $currentClass, $data), $data, [Type::bool()], $context['deserialization_path'] ?? null);
                             }

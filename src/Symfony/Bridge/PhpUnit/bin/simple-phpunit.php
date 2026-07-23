@@ -44,6 +44,12 @@ $getEnvVar = static function ($name, $default = false) use ($argv) {
                 }
             }
 
+            // probe the verbatim name last so that the default "phpunit" lookup keeps
+            // resolving to phpunit.xml(.dist) when an extensionless "phpunit" file exists
+            if (file_exists($probableConfig)) {
+                return $probableConfig;
+            }
+
             return null;
         };
 

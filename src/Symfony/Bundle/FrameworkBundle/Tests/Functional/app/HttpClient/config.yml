@@ -9,3 +9,6 @@ framework:
         scoped_clients:
             symfony.http_client:
                 base_uri: 'https://symfony.com'
+            not_mocked.http_client:
+                base_uri: 'https://symfony.com'
+                mock_response_factory: false

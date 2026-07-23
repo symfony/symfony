@@ -30,21 +30,28 @@ use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Amount;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedFlatTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedInnerSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedOtherTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\AutoNestedOuterSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\BasePaymentView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceAndAutoMappedView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetChild;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\ExtensibleTargetParent;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Invoice;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\InvoiceView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Payment;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PaymentView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PreMappedSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PreMappedTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\PrivateMappedChildView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteRequestView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RefundPayment;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RichDomainUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\RichDomainUserView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\SharedSource;
@@ -130,6 +137,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransfor
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRecursion\Source as NestedMergeRecursionSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMergeRecursion\Target as NestedMergeRecursionTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\InnerTargetA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSource as MultiTargetOuterSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSourceWithRenamedProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTarget as MultiTargetOuterTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithInterfaceProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithRenamedProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithUntypedProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\FinalInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\PartialInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PrivateParentProperty\ChildEntity;
@@ -1037,6 +1051,55 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame(21, $withoutTransform->value);
     }
 
+    public function testClassMapKeepsClassLevelTransformDeclaredOnTarget()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [Payment::class => PaymentView::class],
+        ));
+
+        $view = $mapper->map(new Payment(new Amount(4200)));
+
+        $this->assertInstanceOf(PaymentView::class, $view);
+        $this->assertSame(4200, $view->amountCents);
+
+        $view = $mapper->map(new Payment(new Amount(100)), PaymentView::class);
+
+        $this->assertInstanceOf(PaymentView::class, $view);
+        $this->assertSame(100, $view->amountCents);
+    }
+
+    public function testClassMapKeepsClassLevelTransformDeclaredForAParentSourceClass()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [RefundPayment::class => BasePaymentView::class],
+        ));
+
+        $view = $mapper->map(new RefundPayment(new Amount(500)));
+
+        $this->assertInstanceOf(BasePaymentView::class, $view);
+        $this->assertSame(500, $view->amountCents);
+    }
+
+    public function testClassMapKeepsEveryConditionalClassLevelMapDeclaredOnTarget()
+    {
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [Invoice::class => InvoiceView::class],
+        ));
+
+        $view = $mapper->map(new Invoice(100, 'EUR'));
+
+        $this->assertInstanceOf(InvoiceView::class, $view);
+        $this->assertSame('100 EUR', $view->label);
+
+        $view = $mapper->map(new Invoice(50, 'USD'));
+
+        $this->assertInstanceOf(InvoiceView::class, $view);
+        $this->assertSame('50 USD', $view->label);
+    }
+
     public function testClassMapWithMultipleTargetsSharingOneSourceRequiresAnExplicitTarget()
     {
         $classMap = [
@@ -1124,6 +1187,47 @@ final class ObjectMapperTest extends TestCase
         $source = new MultipleTargetPropertyA();
         $mapper = new ObjectMapper();
         $mapper->map($source);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsIsResolvedByItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new MultiTargetOuterSource(), MultiTargetOuterTarget::class);
+
+        $this->assertInstanceOf(InnerTargetA::class, $target->inner);
+        $this->assertSame('inner-value', $target->inner->value);
+    }
+
+    public function testNestedRenamedPropertyWithSeveralMapTargetsIsResolvedByItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new OuterSourceWithRenamedProperty());
+
+        $this->assertInstanceOf(OuterTargetWithRenamedProperty::class, $target);
+        $this->assertInstanceOf(InnerTargetA::class, $target->nested);
+        $this->assertSame('inner-value', $target->nested->value);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsThrowsWhenUntyped()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping');
+
+        $mapper->map(new MultiTargetOuterSource(), OuterTargetWithUntypedProperty::class);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsThrowsWhenTypedWithAnInterfaceBothTargetsImplement()
+    {
+        $mapper = new ObjectMapper();
+
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping');
+
+        $mapper->map(new MultiTargetOuterSource(), OuterTargetWithInterfaceProperty::class);
     }
 
     public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()

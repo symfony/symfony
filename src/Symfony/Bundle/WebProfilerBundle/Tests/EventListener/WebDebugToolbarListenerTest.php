@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\EventListener\WebDebugToolbarListener;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\EventStreamResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -113,6 +114,26 @@ class WebDebugToolbarListenerTest extends TestCase
         $listener->onKernelResponse($event);
 
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
+    }
+
+    #[Depends('testToolbarIsInjected')]
+    public function testToolbarIsNotInjectedOnBinaryFileResponse()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_toolbar');
+        file_put_contents($file, '<html><head></head><body></body></html>');
+
+        try {
+            $response = new BinaryFileResponse($file, 200, ['Content-Type' => 'text/html']);
+            $response->headers->set('X-Debug-Token', 'xxxxxxxx');
+            $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
+
+            $listener = new WebDebugToolbarListener($this->getTwigMock());
+            $listener->onKernelResponse($event);
+
+            $this->assertFalse($response->getContent());
+        } finally {
+            @unlink($file);
+        }
     }
 
     #[Depends('testToolbarIsInjected')]

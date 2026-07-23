@@ -56,6 +56,10 @@ Form
 
  * Deprecate passing boolean as the second argument of `ValidatorExtension` and `FormTypeValidatorExtension`'s constructors; pass a `ViolationMapperInterface` instead
  * Add argument `$violationMapper` to `ValidatorExtensionTrait` and `TypeTestCase`'s `getExtensions()` methods
+ * The placeholder option of a required collapsed `ChoiceType` field is now rendered with the `hidden` attribute,
+   so browsers no longer offer it in the dropdown once a value is selected. Set the `placeholder_attr` option to
+   `[]` to restore the previous rendering, or declare the field with `'required' => false` if re-selecting the
+   placeholder to reset the field should be possible
 
 Filesystem
 ----------

@@ -272,11 +272,11 @@
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>Denne værdi bør ikke være lig med {{ compared_value }}.</target>
+                <target>Denne værdi må ikke være lig med {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>Denne værdi bør ikke være identisk med {{ compared_value_type }} {{ compared_value }}.</target>
+                <target>Denne værdi må ikke være identisk med {{ compared_value_type }} {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -320,11 +320,11 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target>Denne værdi er ikke en gyldig UUID.</target>
+                <target>Denne værdi er ikke et gyldigt UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>Denne værdi skal være et multiplikation af {{ compared_value }}.</target>
+                <target>Denne værdi skal være et multiplum af {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -336,7 +336,7 @@
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
-                <target>Denne samling bør kun indeholde unikke elementer.</target>
+                <target>Denne samling må kun indeholde unikke elementer.</target>
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
@@ -372,15 +372,15 @@
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>Antallet af elementer i denne samling skal være en multiplikation af {{ compared_value }}.</target>
+                <target>Antallet af elementer i denne samling skal være et multiplum af {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>Værdien skal overholde mindst én af følgende krav:</target>
+                <target>Værdien skal overholde mindst ét af følgende krav:</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>Hvert element i denne samling skal overholde dens egne krav.</target>
+                <target>Hvert element i denne samling skal overholde sine egne krav.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
@@ -460,11 +460,11 @@
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target>Denne værdi bør ikke være før uge "{{ min }}".</target>
+                <target>Denne værdi må ikke være før uge "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target>Denne værdi bør ikke være efter uge "{{ max }}".</target>
+                <target>Denne værdi må ikke være efter uge "{{ max }}".</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Denne værdi er ikke gyldig XML.</target>
+                <target>Denne værdi er ikke gyldig XML.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Denne værdi overholder ikke det forventede XSD-skema.</target>
+                <target>Denne værdi overholder ikke det forventede XSD-skema.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Denne XML-nyttelast er for stor ({{ size }} byte): den overskrider grænsen på {{ limit }} byte.</target>
+                <target>Denne XML-payload er for stor ({{ size }} bytes): den overskrider grænsen på {{ limit }} bytes.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Denne værdi er ikke et gyldigt cron-udtryk.</target>
+                <target>Denne værdi er ikke et gyldigt cron-udtryk.</target>
             </trans-unit>
         </body>
     </file>

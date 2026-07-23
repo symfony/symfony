@@ -1215,6 +1215,54 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
+    public function testMapRequestPayloadWithUploadedFileConvertsScalars()
+    {
+        $image = new UploadedFile(self::FIXTURES_BASE_PATH.'/file-small.txt', 'file-small.txt');
+
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new ReflectionExtractor())]);
+        $validator = $this->createStub(ValidatorInterface::class);
+        $validator->method('validate')->willReturn(new ConstraintViolationList());
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('data', RequestPayloadWithFileAndScalars::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', ['skuNumber' => '42', 'published' => 'true'], [], ['image' => $image]);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $payload = $event->getArguments()[0];
+        $this->assertSame(42, $payload->skuNumber);
+        $this->assertTrue($payload->published);
+    }
+
+    public function testMapRequestPayloadWithoutUploadedFileConvertsScalars()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new ReflectionExtractor())]);
+        $validator = $this->createStub(ValidatorInterface::class);
+        $validator->method('validate')->willReturn(new ConstraintViolationList());
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('data', RequestPayloadWithFileAndScalars::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+        $request = Request::create('/', 'POST', ['skuNumber' => '42', 'published' => 'true']);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $payload = $event->getArguments()[0];
+        $this->assertSame(42, $payload->skuNumber);
+        $this->assertTrue($payload->published);
+    }
+
     public function testExpressionAsValidationGroup()
     {
         $content = '{"price": 24}';
@@ -1462,6 +1510,13 @@ class RequestPayload
 class RequestPayloadWithFile extends RequestPayload
 {
     public ?UploadedFile $image = null;
+}
+
+class RequestPayloadWithFileAndScalars
+{
+    public ?UploadedFile $image = null;
+    public int $skuNumber = 0;
+    public bool $published = false;
 }
 
 interface SerializerDenormalizer extends SerializerInterface, DenormalizerInterface

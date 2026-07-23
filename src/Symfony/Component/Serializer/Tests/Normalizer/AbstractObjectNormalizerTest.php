@@ -27,6 +27,8 @@ use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
+use Symfony\Component\Serializer\Encoder\CsvEncoder;
+use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -1558,6 +1560,34 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame($expectedFoo, $dummy->foo);
     }
 
+    #[DataProvider('provideDenormalizeWithFilterBoolData')]
+    public function testDenormalizeBooleanTypeWithFilterBoolForTypeConvertingFormats(array $data, ?bool $expectedFoo)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        // FILTER_BOOL must keep working for the formats that convert scalar types (xml and csv):
+        // the result is expected to be identical to using FILTER_BOOL alone.
+        foreach ([XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize($data, BoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+
+            $this->assertSame($expectedFoo, $dummy->foo);
+        }
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideDenormalizeWithFilterBoolData')]
+    public function testDenormalizeBooleanTypeWithFilterBoolForTypeConvertingFormatsLegacy(array $data, ?bool $expectedFoo)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyPropertyTypeExtractor();
+
+        foreach ([XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize($data, BoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+
+            $this->assertSame($expectedFoo, $dummy->foo);
+        }
+    }
+
     public static function provideDenormalizeWithFilterBoolData(): array
     {
         return [
@@ -2156,6 +2186,43 @@ class AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors extends Abst
     public function __construct()
     {
         parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]));
+    }
+
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
+    {
+        return [];
+    }
+
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
+    {
+        return null;
+    }
+
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
+    {
+        if (property_exists($object, $attribute)) {
+            $object->$attribute = $value;
+        }
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false,
+        ];
+    }
+}
+
+class AbstractObjectNormalizerWithMetadataAndLegacyPropertyTypeExtractor extends AbstractObjectNormalizer
+{
+    public function __construct()
+    {
+        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new class implements PropertyTypeExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL, true)];
+            }
+        });
     }
 
     protected function extractAttributes(object $object, ?string $format = null, array $context = []): array

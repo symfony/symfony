@@ -261,6 +261,28 @@ class IpUtilsTest extends TestCase
         ];
     }
 
+    #[DataProvider('getIsPrivateIpInvalidData')]
+    public function testIsPrivateIpThrowsOnNonCanonicalIp(string $ip)
+    {
+        $this->expectException(\ValueError::class);
+        $this->expectExceptionMessage(\sprintf('"%s" is not a valid IP address.', $ip));
+
+        IpUtils::isPrivateIp($ip);
+    }
+
+    public static function getIsPrivateIpInvalidData(): array
+    {
+        return [
+            'decimal' => ['2130706433'],
+            'hexadecimal' => ['0x7f000001'],
+            'leading zero' => ['010.0.0.1'],
+            'short form' => ['127.1'],
+            'zone id' => ['fe80::1%eth0'],
+            'not an IP' => ['not-an-ip'],
+            'empty string' => [''],
+        ];
+    }
+
     public function testCacheSizeLimit()
     {
         $ref = new \ReflectionClass(IpUtils::class);

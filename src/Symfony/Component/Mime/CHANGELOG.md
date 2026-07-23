@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+* Add `Message::toStringForArchive()` and `Message::toIterableForArchive()` to serialize messages with the `Bcc` header preserved
+
 7.4
 ---
 

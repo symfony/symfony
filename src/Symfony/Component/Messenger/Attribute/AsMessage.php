@@ -28,6 +28,12 @@ class AsMessage
          * The serialized type to use when sending or receiving the message.
          */
         public ?string $serializedTypeName = null,
+        /**
+         * Alternate serialized type names that also decode to this message.
+         *
+         * @var string[]
+         */
+        public array $serializedTypeNameAliases = [],
     ) {
     }
 }

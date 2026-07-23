@@ -45,7 +45,10 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
     private array $classToTypeMap = [];
 
     /**
-     * @param array<string, class-string> $typeToClassMap
+     * @param array<string, class-string> $typeToClassMap Several type names may point to the same class, so that
+     *                                                    messages already sent under an old name keep decoding. The
+     *                                                    map is flipped to pick the type name to encode with, so the
+     *                                                    last name listed for a class is the one that gets sent
      */
     public function __construct(
         ?SymfonySerializerInterface $serializer = null,

@@ -771,7 +771,10 @@ class FrameworkExtension extends Extension
             ->addTag('container.excluded', ['source' => 'because it\'s a validation constraint']);
         $container->registerAttributeForAutoconfiguration(AsMessage::class, static function (ChildDefinition $definition, AsMessage $attribute): void {
             $definition->addTag('container.excluded', ['source' => 'because it\'s a messenger message']);
-            $definition->addTag('messenger.message', ['serializedTypeName' => $attribute->serializedTypeName]);
+            $definition->addTag('messenger.message', [
+                'serializedTypeName' => $attribute->serializedTypeName,
+                'serializedTypeNameAliases' => $attribute->serializedTypeNameAliases ?? [],
+            ]);
         });
         $container->registerAttributeForAutoconfiguration(Entity::class, static function (ChildDefinition $definition) {
             $definition->addTag('container.excluded', ['source' => 'because it\'s a Doctrine entity']);

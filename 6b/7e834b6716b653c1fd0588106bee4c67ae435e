@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-09T16:00:56Z
+
+The condition on `BinaryFileResponse` probably should be added to this one instead: https://github.com/symfony/symfony/blob/54a7ac57546426ca4a3757130e5417ec16a7f1f9/src/Symfony/Bundle/WebProfilerBundle/EventListener/WebDebugToolbarListener.php#L153-L161
+
+---------------------------------------------------------------------------
+
+by Fuck4ik at 2026-07-09T17:23:58Z
+
+Moved the check to the early-return guard in `onKernelResponse()` as suggested, and reverted `injectToolbar()` to its original form. The test still covers the scenario from #64833.

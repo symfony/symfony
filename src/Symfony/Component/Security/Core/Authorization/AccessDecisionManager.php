@@ -59,7 +59,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
             $accessDecision = null;
         }
 
-        // Special case for AccessListener, do not remove the right side of the condition before 6.0
+        // Special case for AccessListener, which passes all attributes of the matched access_control rule at once
         if (\count($attributes) > 1 && !$allowMultipleAttributes) {
             throw new InvalidArgumentException(\sprintf('Passing more than one Security attribute to "%s()" is not supported.', __METHOD__));
         }

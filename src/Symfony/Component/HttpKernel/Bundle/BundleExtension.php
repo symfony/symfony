@@ -64,4 +64,10 @@ class BundleExtension extends Extension implements PrependExtensionInterface
 
         $this->executeConfiguratorCallback($container, $callback, $this->subject);
     }
+
+    public function getNamespace(): string
+    {
+        return ($this->subject instanceof AbstractBundle ? $this->subject->getXMLNamespace() : null)
+            ?? parent::getNamespace();
+    }
 }

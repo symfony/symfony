@@ -58,4 +58,9 @@ abstract class AbstractBundle extends Bundle implements ConfigurableExtensionInt
 
         return $this->path;
     }
+
+    public function getXMLNamespace(): ?string
+    {
+        return null;
+    }
 }

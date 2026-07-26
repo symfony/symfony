@@ -59,6 +59,13 @@ class CachedMappedAssetFactory implements MappedAssetFactoryInterface
         return $mappedAsset;
     }
 
+    public function reset(): void
+    {
+        if (\is_callable([$this->innerFactory, 'reset'])) {
+            $this->innerFactory->reset();
+        }
+    }
+
     private function getCacheFilePath(string $logicalPath, string $sourcePath): string
     {
         return $this->cacheDir.'/'.hash('xxh128', $logicalPath.':'.$sourcePath).'.php';

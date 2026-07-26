@@ -52,7 +52,8 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
      */
     public function reset()
     {
-        unset($this->commandData);
+        // the command data is set once, on ConsoleEvents::COMMAND, and must outlive any reset
+        // happening while the command is still running
     }
 
     /**

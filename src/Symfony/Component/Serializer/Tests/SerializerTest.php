@@ -18,6 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
@@ -905,6 +906,19 @@ class SerializerTest extends TestCase
         $actual = $serializer->deserialize('value'.\PHP_EOL.',', DummyWithObjectOrNull::class, 'csv', [CsvEncoder::AS_COLLECTION_KEY => false]);
 
         $this->assertEquals(new DummyWithObjectOrNull(null), $actual);
+    }
+
+    public function testSerializeAndDeserializeObjectsWhoseClassIsMappedToSeveralDiscriminatorTypes()
+    {
+        $serializer = $this->serializerWithClassDiscriminator();
+
+        $documents = [new DummyPassportDocument('current'), new DummyPassportDocument('previous')];
+
+        $this->assertSame('[{"type":"current"},{"type":"previous"}]', $serializer->serialize($documents, 'json'));
+
+        foreach ($documents as $document) {
+            $this->assertEquals($document, $serializer->deserialize($serializer->serialize($document, 'json'), DummyIdentityDocument::class, 'json'));
+        }
     }
 
     private function serializerWithClassDiscriminator()
@@ -2258,4 +2272,16 @@ class SerializerTestRequestDto
         public SerializerTestBackedEnum $status,
     ) {
     }
+}
+
+#[DiscriminatorMap('type', ['current' => DummyPassportDocument::class, 'previous' => DummyPassportDocument::class])]
+abstract class DummyIdentityDocument
+{
+    public function __construct(public string $type)
+    {
+    }
+}
+
+class DummyPassportDocument extends DummyIdentityDocument
+{
 }

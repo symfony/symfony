@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T09:01:21Z
+
+I retargeted this to 6.4 and reworked it as a bugfix.
+
+The reasoning: once the memoization was dropped, this PR no longer introduces anything that needs resetting, so it could not stand as the 8.2 half of the split. What it does fix is older than both PRs: `MappedAssetFactory::$assetsCache` has never been cleared, so in a worker an edited asset keeps its old digest until the process is recycled. That is a bug, and it belongs in the oldest maintained branch.
+
+Changes on top of your commits: the CHANGELOG entry is gone, since bugfixes do not carry one, and the tests now cover the defect itself rather than the accessor. `testResetForgetsTheContentOfAlreadyBuiltAssets` builds an asset, rewrites the source file, asserts the digest is still stale, then resets and asserts it changes. It fails without the fix on the second part while passing on the first, so it distinguishes the two states.
+
+The decorator tests were kept in spirit: one checks the forwarding, one checks that an inner factory without `reset()` is accepted.

@@ -309,87 +309,41 @@ class ConnectionTest extends TestCase
 
         $connection = new Connection(['redeliver_timeout' => 30, 'table_name' => 'messenger_messages'], $driverConnection);
 
-        $queryBuilder->expects($this->once())
-            ->method('update')
-            ->with('messenger_messages')
-            ->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('update')->with('messenger_messages')->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('set')->with('delivered_at', '?')->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('where')->with('id = ?')->willReturnSelf();
+        $queryBuilder->expects($this->once())->method('getSQL')->willReturn('UPDATE');
 
-        $queryBuilder->expects($this->once())
-            ->method('set')
-            ->with('delivered_at', '?')
-            ->willReturnSelf();
+        $driverConnection->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $driverConnection->expects($this->once())->method('executeStatement')->with('UPDATE');
 
-        $queryBuilder->expects($this->once())
-            ->method('where')
-            ->with('id = ?')
-            ->willReturnSelf();
-
-        $driverConnection->expects($this->once())
-            ->method('beginTransaction');
-
-        $driverConnection->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $queryBuilder->expects($this->once())
-            ->method('getSQL')
-            ->willReturn('UPDATE');
-
-        $driverConnection->expects($this->once())
-            ->method('executeStatement')
-            ->with('UPDATE')
-            ->willReturn(1);
-
-        $driverConnection->expects($this->once())
-            ->method('commit');
+        // the keepalive runs from a signal handler that can interrupt the connection between a
+        // driver call and its nesting-level update, where a transaction corrupts that state
+        $driverConnection->expects($this->never())->method('beginTransaction');
+        $driverConnection->expects($this->never())->method('commit');
+        $driverConnection->expects($this->never())->method('rollBack');
 
         $connection->keepalive('1');
     }
 
-    public function testKeepaliveRollback()
+    public function testKeepaliveWrapsFailuresInTransportException()
     {
-        $queryBuilder = $this->getQueryBuilderMock();
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $queryBuilder->method('update')->willReturnSelf();
+        $queryBuilder->method('set')->willReturnSelf();
+        $queryBuilder->method('where')->willReturnSelf();
+        $queryBuilder->method('getSQL')->willReturn('UPDATE');
+
         $driverConnection = $this->getDBALConnection(true);
+        $driverConnection->method('createQueryBuilder')->willReturn($queryBuilder);
+        $driverConnection->method('executeStatement')->willThrowException(new \RuntimeException('No connection.'));
+
+        $driverConnection->expects($this->never())->method('rollBack');
 
         $connection = new Connection(['redeliver_timeout' => 30, 'table_name' => 'messenger_messages'], $driverConnection);
 
-        $queryBuilder->expects($this->once())
-            ->method('update')
-            ->with('messenger_messages')
-            ->willReturnSelf();
-
-        $queryBuilder->expects($this->once())
-            ->method('set')
-            ->with('delivered_at', '?')
-            ->willReturnSelf();
-
-        $queryBuilder->expects($this->once())
-            ->method('where')
-            ->with('id = ?')
-            ->willReturnSelf();
-
-        $driverConnection->expects($this->once())
-            ->method('beginTransaction');
-
-        $driverConnection->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $queryBuilder->expects($this->once())
-            ->method('getSQL')
-            ->willReturn('UPDATE');
-
-        $driverConnection->expects($this->once())
-            ->method('executeStatement')
-            ->willThrowException($this->createStub(DBALException::class));
-
-        $driverConnection->expects($this->never())
-            ->method('commit');
-
-        $driverConnection->expects($this->once())
-            ->method('rollBack');
-
         $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('No connection.');
 
         $connection->keepalive('1');
     }

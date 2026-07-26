@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add IterableToArrayCollectionTransformer for ObjectMapper
+ * Throw a `ConstraintDefinitionException` from `UniqueEntity` when a checked field holds an array or is a to-many association, instead of building a query that cannot match
 
 8.1
 ---

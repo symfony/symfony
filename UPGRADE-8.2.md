@@ -13,6 +13,13 @@ Crowdin Translation Provider
 
  * Add `$projectId` constructor parameter to `CrowdinProvider`
 
+DoctrineBridge
+--------------
+
+ * `UniqueEntity` now throws a `ConstraintDefinitionException` when a checked field holds an array or is a to-many
+   association and the default `findBy` repository method is used. Such fields were silently validated against a
+   query that could not match. Use the `repositoryMethod` option to provide a method that can query them
+
 FrameworkBundle
 ---------------
 

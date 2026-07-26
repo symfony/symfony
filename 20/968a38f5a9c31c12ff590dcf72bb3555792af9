@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:12:16Z
+
+Reviewed, rebased onto the current 6.4, and extended. Thanks @voodooism, the diagnosis was right.
+
+Two gaps in the original diff:
+
+* `AmazonSqsSender::send()` was still on the bare `catch (HttpException $e)`. The PR body listed six affected call sites and there are seven. I reproduced it with a real `Connection` and a `MockHttpClient` returning a connection timeout, not a mocked `Connection`: `AmazonSqsReceiver::get()` came back as a `TransportException` while `AmazonSqsSender::send()` still threw a raw `NetworkException`.
+* `HttpException|NetworkException` is an enumeration of leaves, so `UnparsableResponse` still escaped. A proxy answering 200 with an HTML body produces `UnparsableResponse: Could not parse response as array` straight out of the receiver.
+
+Both are covered by catching the AsyncAws root exception interface instead, which is also what Amqp, Doctrine, Beanstalkd and Redis do with their own driver exceptions. The catch bodies are all the same one-liner and use no `HttpException`-specific method, so nothing else had to change.
+
+I also folded in the same fix for `SesHttpAsyncAwsTransport`, the only other AsyncAws integration in the monorepo, as a second commit. That replaces #64974.
+
+Tests added for `reject()` and `getMessageCount()`, which the original diff fixed but did not cover, plus the sender, the `UnparsableResponse` case and SES. All eight fail on a clean 6.4 tip and pass after. Local runs: AmazonSqs 69, Messenger 408, Amazon mailer 50, Mailer 164, all green; php-cs-fixer clean.
+
+Note that CI had never run on the previous head, so this is its first real signal.

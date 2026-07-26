@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-04T13:20:38Z
+
+Same here: as hinted by @stof in the linked issue, we would consider this as a new feature. For 8.1.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-20T17:08:47Z
+
+Thanks @nicolas-grekas — agreed, this is a new feature. The Q/A table already targets 8.1 with `New feature? yes`; I just rebased onto the latest 8.1 and added the missing `Serializer/CHANGELOG.md` entry in `afe717e`. The new property-aware path is opt-in by data: when no readable property maps to a compatible class, the existing first-match loop runs unchanged, so existing DiscriminatorMap users keep their current behavior.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-09T12:50:16Z
+
+Rebased this PR onto current `8.2` and pushed `be621905ed2d`.
+
+It is up to date with the target branch again and waiting for review.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-23T10:56:47Z
+
+Addressed the review feedback in `c627c98532d3b9ae0ff409a042dbbcfeceb0bad4`.
+
+Changes:
+- moved the Serializer changelog entry under `8.2`
+- shortened the changelog wording to the suggested scope
+- restricted discriminator-property lookup to mappings that are actually ambiguous for the object class, so a stale/parent-compatible discriminator value no longer changes the existing first-match behavior
+- added a BC regression test for the parent/child compatible-type case
+
+Local validation:
+- RED via Docker/PHP 8.4: the new regression test failed before the fix with `Expected child`, `Actual base`
+- GREEN via Docker/PHP 8.4: `php ./phpunit src/Symfony/Component/Serializer/Tests/Mapping/ClassDiscriminatorMappingTest.php` => `OK (6 tests, 11 assertions)`
+- PHP syntax checks on the touched mapping and test files passed
+
+CI notes on the pushed SHA:
+- Serializer passed in the relevant CI jobs
+- PHPStan, Psalm, Fabbot, Verify Packages, Integration, Unit Tests 8.4, Unit Tests 8.4 high-deps, Unit Tests 8.5/8.6, and Windows all-extensions passed
+- two CI jobs are red outside this PR's touched area: `Unit Tests (8.4, low-deps)` fails in `HttpKernel` (`RequestPayloadValueResolverTest::testMapRequestPayloadWithUploadedFileConvertsScalars`), and `x86 / minimal-exts / lowest-php` fails in `HttpClient` (`AmpHttpClientTest::testTimeoutIsNotAFatalError`). I attempted `gh run rerun --failed`, but GitHub rejected the rerun with `workflow file may be broken`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:54:13Z
+
+Reviewed, rebased onto 8.2 and reworked. Thanks @ousamabenyounes, the round-trip problem is real and the fix direction is right.
+
+@mtarld asked whether the lookup should only consult the property when the mapping is genuinely ambiguous for the object. The `count > 1` guard added in response does not quite answer it: it tests whether the class named by the property *value* is duplicated, not whether the entry the lookup picked is. Those come apart as soon as a subclass sits alongside a doubly-mapped parent:
+
+```php
+#[DiscriminatorMap("type", [
+    "invoice" => Bill::class,
+    "bill" => Bill::class,
+    "credit_note" => CreditNote::class,   // CreditNote extends Bill
+])]
+```
+
+A `CreditNote` whose `$type` still held `"bill"` normalized to `{"type":"bill",...}` and denormalized back into `Bill`, silently dropping the subclass fields. On the base branch it correctly gives `credit_note`. The BC test added for this passes on base as well, so it could not catch it, and its two-entry map cannot reach the shape.
+
+The logic now resolves the class first and lets the property choose only between entries mapping to that same class, so a subclass can never be reported as its parent. Int-backed enums fall out of that too: the `is_string()` check was rejecting them, so `[1 => Doc::class, 2 => Doc::class]` always returned the first entry regardless of the enum value.
+
+Added a unit test for each of those, both red against the previous guard, plus a functional test through `Serializer` and `ObjectNormalizer`. The four existing tests were all at the `ClassDiscriminatorMapping` level, and the defect users hit runs through the normalizer, including the attribute override in `AbstractObjectNormalizer::normalize()`.
+
+Housekeeping while amending: squashed to one commit under your name. One of the three was authored by `v <v@v.com>` rather than you, and one commit message ended with tool-generated credit lines, which we do not carry in the repository. The code comment lost its issue reference and its em-dash, and the CHANGELOG entry now also states the tie-break used when the property is unset or unknown.
+
+Label switched to Feature to match the classification you and the mergers agreed on the issue, and the title no longer says "Fix".
+
+Local runs: Serializer 1379 green, php-cs-fixer clean.

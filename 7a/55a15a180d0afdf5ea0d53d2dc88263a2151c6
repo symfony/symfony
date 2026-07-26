@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by wkania at 2025-09-16T18:23:25Z
+
+This should be more DX then a bug.
+
+---------------------------------------------------------------------------
+
+by wkania at 2026-03-22T23:07:51Z
+
+I have removed legacy code and rebased against branch 8.1.
+Failing test not related
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T15:04:23Z
+
+Reviewed and rebased onto the current 8.2. Thanks @wkania, the diagnosis holds up. I captured the SQL with a DBAL logging middleware against a real SQLite database rather than mocks, and `simple_array` really does produce `WHERE simpleArray IN (?, ?)` with both parameters NULL, while a nested `json` array gets flattened into the wrong arity. Silent false negatives in a uniqueness rule are worth fixing.
+
+Two changes of approach on top of your diff.
+
+**The check is on the runtime value rather than the declared column type.** `[Types::SIMPLE_ARRAY, Types::JSON]` is an allow-list of two out of the array-valued types. DBAL alone also ships `JSON_OBJECT`, `JSONB` and `JSONB_OBJECT`, and any user-defined type whose PHP representation is an array hits the same mistranslation. I wrote a 15-line `csv_list` type to check: it still produced `WHERE tags IN ("red","blue")` against a row holding `red,blue` and reported no violation. The type-based check also rejected `json` columns holding a scalar, which work correctly today, so it traded a silent bug for a hard exception on a working case. `is_array($fieldValue)` covers all of it.
+
+**No DBAL dependency.** This is the one that worried me most. `doctrine/dbal` is only in `require-dev` for this bridge; the runtime requirement is `doctrine/persistence`, and `UniqueEntityValidator` is deliberately persistence-agnostic, down to the `MongoCursor` branch it still carries. A class-constant fetch autoloads, so `Types::SIMPLE_ARRAY` made every `UniqueEntity` validation fatal on a MongoDB or PHPCR ODM install. I reproduced it with an isolated autoloader that refuses `Doctrine\DBAL\*`: base validates fine, the patched version dies with `Class "Doctrine\DBAL\Types\Types" not found`.
+
+For the same reason the association check now uses `ClassMetadata::isCollectionValuedAssociation()`, which `doctrine/persistence` declares for every driver, instead of the ORM `ClassMetadata` constants behind an `instanceof` guard. That guard silently disabled the whole check for ODM anyway.
+
+Net result is 14 added lines and no new imports.
+
+On the tests and fixtures: I kept three, one per behaviour, and dropped the 25-case `provideFieldTypes` matrix. Those all passed unchanged on the base branch, so they were characterization tests rather than proof, and they were the only reason `AllTypesEntity` needed 25 columns and an enum fixture. The to-many case does need new mapping, since the bridge had no `OneToMany` entity, so there are two small fixtures for it, both passing `SchemaValidator`. The previous `AllTypesEntity` did not: `mappedBy: "allEntity"` pointed at a property `RelatedEntity` does not declare, and it was the fixture used to demonstrate the `ONE_TO_MANY` claim.
+
+Added the CHANGELOG and UPGRADE entries, since silent-to-throwing is a behaviour change. Dropped the `Bug` label to match.
+
+Local runs: Doctrine bridge 438 tests green, php-cs-fixer clean.

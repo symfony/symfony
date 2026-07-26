@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Http\NetworkException;
 use AsyncAws\Core\Exception\Http\ServerException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
@@ -148,6 +149,34 @@ class AmazonSqsTransportTest extends TestCase
             ->expects($this->once())
             ->method('reset')
             ->willThrowException($this->createHttpException());
+
+        $this->expectException(TransportException::class);
+
+        $transport->reset();
+    }
+
+    public function testItConvertsNetworkExceptionDuringSetupIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $transport = $this->getTransport(null, $connection);
+        $connection
+            ->expects($this->once())
+            ->method('setup')
+            ->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $this->expectException(TransportException::class);
+
+        $transport->setup();
+    }
+
+    public function testItConvertsNetworkExceptionDuringResetIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $transport = $this->getTransport(null, $connection);
+        $connection
+            ->expects($this->once())
+            ->method('reset')
+            ->willThrowException(new NetworkException('Could not contact remote server.'));
 
         $this->expectException(TransportException::class);
 

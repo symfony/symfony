@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
-use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -39,7 +39,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $sqsEnvelope = $this->connection->get();
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
         if (null === $sqsEnvelope) {
@@ -64,7 +64,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -73,7 +73,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             $this->connection->delete($this->findSqsReceivedStamp($envelope)->getId());
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -82,7 +82,7 @@ class AmazonSqsReceiver implements ReceiverInterface, MessageCountAwareInterface
     {
         try {
             return $this->connection->getMessageCount();
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }

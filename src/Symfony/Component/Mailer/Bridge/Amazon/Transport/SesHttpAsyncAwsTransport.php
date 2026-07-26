@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Http\NetworkException;
 use AsyncAws\Ses\Input\SendEmailRequest;
 use AsyncAws\Ses\SesClient;
 use AsyncAws\Ses\ValueObject\Destination;
@@ -64,6 +65,8 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
             $exception->appendDebug($e->getResponse()->getInfo('debug') ?? '');
 
             throw $exception;
+        } catch (NetworkException $e) {
+            throw new HttpTransportException('Could not reach the remote Amazon server.', $response, 0, $e);
         }
     }
 

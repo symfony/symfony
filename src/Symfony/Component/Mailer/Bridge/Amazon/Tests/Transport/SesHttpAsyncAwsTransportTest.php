@@ -142,4 +142,21 @@ class SesHttpAsyncAwsTransportTest extends TestCase
         $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
     }
+
+    public function testSendThrowsTransportExceptionOnNetworkFailure()
+    {
+        $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse('', ['error' => 'Connection timed out']));
+
+        $transport = new SesHttpAsyncAwsTransport(new SesClient(Configuration::create([]), new NullProvider(), $client));
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $this->expectException(HttpTransportException::class);
+        $this->expectExceptionMessage('Could not reach the remote Amazon server.');
+        $transport->send($mail);
+    }
 }

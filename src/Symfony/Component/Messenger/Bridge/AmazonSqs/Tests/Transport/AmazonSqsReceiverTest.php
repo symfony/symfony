@@ -11,11 +11,16 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
+use AsyncAws\Core\Exception\Http\NetworkException;
+use AsyncAws\Core\Exception\UnparsableResponse;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -54,6 +59,32 @@ class AmazonSqsReceiverTest extends TestCase
         iterator_to_array($receiver->get());
     }
 
+    public function testItConvertsNetworkExceptionDuringGetIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $receiver = new AmazonSqsReceiver($connection, $this->createSerializer());
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
+        iterator_to_array($receiver->get());
+    }
+
+    public function testItConvertsNetworkExceptionDuringAckIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('delete')->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $receiver = new AmazonSqsReceiver($connection, $this->createSerializer());
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
+        $receiver->ack(new Envelope(new DummyMessage('Hi'), [new AmazonSqsReceivedStamp('1')]));
+    }
+
     private function createSqsEnvelope()
     {
         return [
@@ -63,6 +94,45 @@ class AmazonSqsReceiverTest extends TestCase
                 'type' => DummyMessage::class,
             ],
         ];
+    }
+
+    public function testItConvertsNetworkExceptionDuringRejectIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('delete')->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $receiver = new AmazonSqsReceiver($connection, $this->createSerializer());
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
+        $receiver->reject(new Envelope(new DummyMessage('Oops'), [new AmazonSqsReceivedStamp('id')]));
+    }
+
+    public function testItConvertsNetworkExceptionDuringGetMessageCountIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getMessageCount')->willThrowException(new NetworkException('Could not contact remote server.'));
+
+        $receiver = new AmazonSqsReceiver($connection, $this->createSerializer());
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not contact remote server.');
+
+        $receiver->getMessageCount();
+    }
+
+    public function testItConvertsUnparsableResponseIntoTransportException()
+    {
+        $connection = $this->createMock(Connection::class);
+        $connection->method('get')->willThrowException(new UnparsableResponse('Could not parse response as array.'));
+
+        $receiver = new AmazonSqsReceiver($connection, $this->createSerializer());
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Could not parse response as array.');
+
+        iterator_to_array($receiver->get());
     }
 
     private function createSerializer(): Serializer

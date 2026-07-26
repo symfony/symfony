@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:45:13Z
+
+Reviewed and retargeted to 6.4. Thanks @jprivet-dev, the diagnosis is right and the flowchart in your description matches what I measured.
+
+Retargeted because the defect is present unchanged on 6.4, 7.4, 8.1 and 8.2. I ran the extracted Console component of each branch under a real pty with an injected formatter and got `isDecorated() === false` on all three older branches, against `true` for the no-formatter control in the same process.
+
+We do not guarantee that `getErrorOutput()->getFormatter()` is the injected instance, so the identity change is not a BC break and this can land as a bugfix. Dropped the UPGRADE and CHANGELOG entries I had drafted on that basis.
+
+Three changes on top of your commit:
+
+* the two constructor branches are collapsed into one line. Once stderr always gets its own formatter, the only difference between the branches is whether that formatter is a fresh default or a copy, and `$formatter ? clone $formatter : null` says it directly. The comment about keeping a shared formatter for BC was left in place by the diff and is no longer true, so it is gone;
+* the test now covers what the patch changes. The previous version asserted only formatter identity, so reverting the levelling removal while keeping the clone would still have passed. `testStdoutAndStderrAreDecoratedIndependently` sets `setDecorated(false)` on the error output and asserts the two differ. It needs no tty and it fails on a clean 6.4 with `Failed asserting that false is true`;
+* the `InputFileTest` root-skip is dropped from this PR. It is unrelated to coloration, and that file does not exist before 8.1. The reasoning is sound and it copies the existing house idiom, so it is worth its own PR on 8.1 if you want to open one.
+
+Local runs on 6.4: Console 1336 tests green, php-cs-fixer clean.
+
+One thing to know rather than act on: `ProgressBar` redirects to `getErrorOutput()` whenever the output is a `ConsoleOutputInterface`, so under `setPty(true)` progress bars stay undecorated because stderr really is a pipe. That is already the behaviour of the default no-formatter path, so it is not a regression, but it will not change with this fix either.

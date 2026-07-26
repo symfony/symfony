@@ -358,6 +358,6 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester->run(['command' => 'debug:container', 'name' => 'router', '--show-arguments' => true]);
 
         $tester->assertCommandIsSuccessful();
-        $this->assertStringContainsString('[WARNING] The "--show-arguments" option is deprecated, as arguments are now always shown.', $tester->getDisplay());
+        $this->assertStringContainsString('[WARNING] The "--show-arguments" option is deprecated, as arguments are now always shown.', preg_replace('/\s+/', ' ', $tester->getDisplay()));
     }
 }

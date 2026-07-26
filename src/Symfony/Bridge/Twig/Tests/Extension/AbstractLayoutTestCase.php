@@ -2381,6 +2381,64 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
+    public function testStartTagRendersNoIdWhenNothingReferencesIt()
+    {
+        $this->requireFormIdViewVariable();
+
+        $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+            'method' => 'get',
+            'action' => 'http://example.com/directory',
+        ])->add('username', 'Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType');
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertStringNotContainsString('id=', $html);
+    }
+
+    public function testStartTagIdIsWhatFormAttrChildrenReference()
+    {
+        $this->requireFormIdViewVariable();
+
+        $form = $this->factory->createNamedBuilder('registration', 'Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType', null, [
+            'method' => 'get',
+            'form_attr' => true,
+        ])->add('username', 'Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType')->getForm();
+
+        $view = $form->createView();
+        $html = $this->renderStart($view);
+
+        $this->assertStringContainsString('id="form_registration"', $html);
+        $this->assertSame('form_registration', $view['username']->vars['attr']['form']);
+    }
+
+    public function testStartTagIdIsTheFormAttrStringIdentifier()
+    {
+        $this->requireFormIdViewVariable();
+
+        $form = $this->factory->createNamedBuilder('registration', 'Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType', null, [
+            'method' => 'get',
+        ])->add('username', 'Symfony\\Component\\Form\\Extension\\Core\\Type\\TextType', ['form_attr' => 'custom-identifier'])->getForm();
+
+        $view = $form->createView();
+        $html = $this->renderStart($view);
+
+        $this->assertStringContainsString('id="custom-identifier"', $html);
+        $this->assertSame('custom-identifier', $view['username']->vars['attr']['form']);
+    }
+
+    public function testStartTagKeepsAnExplicitIdFromAttr()
+    {
+        $form = $this->factory->create('Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType', null, [
+            'method' => 'get',
+            'attr' => ['id' => 'chosen-by-the-app'],
+        ]);
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertStringContainsString('id="chosen-by-the-app"', $html);
+        $this->assertStringNotContainsString('id="form_form"', $html);
+    }
+
     public function testStartTagForPutRequest()
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
@@ -2843,5 +2901,17 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     ]
     [count(./input)=2]'
         );
+    }
+
+    /**
+     * The "form_id" view variable ships with symfony/form 8.2; the themes degrade without it.
+     */
+    protected function requireFormIdViewVariable(): void
+    {
+        $vars = $this->factory->create('Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType')->createView()->vars;
+
+        if (!\array_key_exists('form_id', $vars)) {
+            $this->markTestSkipped('symfony/form 8.2 is required for the "form_id" view variable.');
+        }
     }
 }

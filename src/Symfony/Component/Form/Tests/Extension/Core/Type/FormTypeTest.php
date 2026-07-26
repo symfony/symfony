@@ -785,8 +785,93 @@ $ref2
             ->getForm()
             ->createView();
         $this->assertArrayNotHasKey('form', $view->vars['attr']);
-        $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
-        $this->assertSame($view->vars['id'], $view['child2']->vars['attr']['form']);
+        $this->assertSame($view->vars['form_id'], $view['child1']->vars['attr']['form']);
+        $this->assertSame($view->vars['form_id'], $view['child2']->vars['attr']['form']);
+    }
+
+    public function testFormAttrAsStringIsUsedAsIs()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'form_attr' => 'custom-identifier',
+            ])
+            ->add('child1', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertSame('custom-identifier', $view->vars['id']);
+        $this->assertSame('custom-identifier_child1', $view['child1']->vars['id']);
+        $this->assertSame('custom-identifier', $view->vars['form_id']);
+        $this->assertSame('custom-identifier', $view['child1']->vars['attr']['form']);
+    }
+
+    public function testFormAttrAsStringOnADescendantIsUsedAsIs()
+    {
+        $builder = $this->factory->createNamedBuilder('parent', self::TESTED_TYPE);
+        $builder->add(
+            $this->factory->createNamedBuilder('child1', self::TESTED_TYPE)
+                ->add('grandchild', $this->getTestedType(), ['form_attr' => 'custom-identifier'])
+        );
+        $view = $builder->getForm()->createView();
+
+        $this->assertSame('parent', $view->vars['id']);
+        $this->assertSame('custom-identifier', $view->vars['form_id']);
+        $this->assertSame('custom-identifier', $view['child1']['grandchild']->vars['attr']['form']);
+    }
+
+    public function testFormAttrAsStringOnTheRootWinsOverTheOneOfADescendant()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'form_attr' => 'chosen-by-the-root',
+            ])
+            ->add('child1', $this->getTestedType(), ['form_attr' => 'chosen-by-the-child'])
+            ->getForm()
+            ->createView();
+
+        $this->assertSame('chosen-by-the-root', $view->vars['form_id']);
+        $this->assertSame('chosen-by-the-root', $view['child1']->vars['attr']['form']);
+    }
+
+    public function testFormIdMatchesTheReferenceWhenTheNameStartsWithAnUnderscore()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('_parent', self::TESTED_TYPE, null, [
+                'form_attr' => true,
+            ])
+            ->add('child1', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertSame($view->vars['form_id'], $view['child1']->vars['attr']['form']);
+    }
+
+    public function testFormIdMatchesTheReferenceWhenTheNameStartsWithADigit()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('2parent', self::TESTED_TYPE, null, [
+                'form_attr' => true,
+            ])
+            ->add('child1', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertSame($view->vars['form_id'], $view['child1']->vars['attr']['form']);
+    }
+
+    public function testFormIdIsTheExplicitIdFromAttr()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'form_attr' => true,
+                'attr' => ['id' => 'chosen-by-the-app'],
+            ])
+            ->add('child1', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertSame('chosen-by-the-app', $view->vars['form_id']);
+        $this->assertSame('chosen-by-the-app', $view['child1']->vars['attr']['form']);
     }
 
     public function testFormAttrOnChild()
@@ -800,8 +885,45 @@ $ref2
             ->getForm()
             ->createView();
         $this->assertArrayNotHasKey('form', $view->vars['attr']);
-        $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
+        $this->assertSame($view->vars['form_id'], $view['child1']->vars['attr']['form']);
         $this->assertArrayNotHasKey('form', $view['child2']->vars['attr']);
+    }
+
+    public function testFormIdIsNotSetWhenNothingReferencesIt()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE)
+            ->add('child1', $this->getTestedType())
+            ->getForm()
+            ->createView();
+
+        $this->assertNull($view->vars['form_id']);
+    }
+
+    public function testFormIdIsNotSetWhenAChildPointsAtAnotherForm()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE)
+            ->add('child1', $this->getTestedType(), [
+                'attr' => ['form' => 'another-form'],
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertNull($view->vars['form_id']);
+    }
+
+    public function testFormIdIsSetWhenADescendantReferencesIt()
+    {
+        $builder = $this->factory->createNamedBuilder('parent', self::TESTED_TYPE);
+        $builder->add(
+            $this->factory->createNamedBuilder('child1', self::TESTED_TYPE)
+                ->add('grandchild', $this->getTestedType(), ['form_attr' => true])
+        );
+        $view = $builder->getForm()->createView();
+
+        $this->assertSame('form_parent', $view->vars['form_id']);
+        $this->assertSame('form_parent', $view['child1']['grandchild']->vars['attr']['form']);
     }
 
     public function testFormAttrAsBoolWithNoId()
@@ -831,8 +953,8 @@ $ref2
             ->createView();
         $this->assertArrayNotHasKey('form', $view->vars['attr']);
         $this->assertSame($stringId, $view->vars['id']);
-        $this->assertSame($view->vars['id'], $view['child1']->vars['attr']['form']);
-        $this->assertSame($view->vars['id'], $view['child2']->vars['attr']['form']);
+        $this->assertSame($view->vars['form_id'], $view['child1']->vars['attr']['form']);
+        $this->assertSame($view->vars['form_id'], $view['child2']->vars['attr']['form']);
     }
 
     public function testSortingViewChildrenBasedOnPriorityOption()

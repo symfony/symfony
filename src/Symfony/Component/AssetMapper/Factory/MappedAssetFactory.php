@@ -73,6 +73,12 @@ class MappedAssetFactory implements MappedAssetFactoryInterface
         return $this->assetsCache[$logicalPath];
     }
 
+    public function reset(): void
+    {
+        $this->assetsCache = [];
+        $this->assetsBeingCreated = [];
+    }
+
     /**
      * Returns an array of "string digest" and "bool predigested".
      *

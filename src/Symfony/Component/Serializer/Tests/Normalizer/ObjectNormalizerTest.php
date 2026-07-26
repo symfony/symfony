@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
@@ -26,6 +27,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type as LegacyType;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -1650,6 +1652,46 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame($nested, $obj->nested);
         $this->assertSame('foo', $obj->nested->getValue());
     }
+
+    #[DataProvider('provideDiscriminatorMapGroups')]
+    public function testNormalizeConcreteDiscriminatorMapClassKeepsOwnAttributesOnly(array $groups)
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+        $context = [AbstractNormalizer::GROUPS => $groups];
+
+        $this->assertSame([
+            'foo' => ObjectNormalizerDiscriminatorBase::FOO,
+            'type' => ObjectNormalizerDiscriminatorBase::TYPE,
+        ], $normalizer->normalize(new ObjectNormalizerDiscriminatorBase(), null, $context));
+
+        $this->assertSame([
+            'bar' => ObjectNormalizerDiscriminatorSub::BAR,
+            'foo' => ObjectNormalizerDiscriminatorBase::FOO,
+            'type' => ObjectNormalizerDiscriminatorSub::TYPE,
+        ], $normalizer->normalize(new ObjectNormalizerDiscriminatorSub(), null, $context));
+    }
+
+    public static function provideDiscriminatorMapGroups(): iterable
+    {
+        yield 'wildcard group' => [['*']];
+        yield 'no group' => [[]];
+    }
+
+    public function testDenormalizeConcreteDiscriminatorMapBaseClassAllowsMappedAttributes()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(
+            ['type' => ObjectNormalizerDiscriminatorSub::TYPE, 'foo' => 'FOO', 'bar' => 'BAR'],
+            ObjectNormalizerDiscriminatorBase::class,
+            null,
+            [AbstractNormalizer::GROUPS => ['*']]
+        );
+
+        $this->assertInstanceOf(ObjectNormalizerDiscriminatorSub::class, $denormalized);
+        $this->assertSame('FOO', $denormalized->foo);
+        $this->assertSame('BAR', $denormalized->bar);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -2013,7 +2055,7 @@ class ObjectWithAccessorishMethods
     }
 }
 
-#[\Symfony\Component\Serializer\Attribute\DiscriminatorMap(
+#[DiscriminatorMap(
     typeProperty: 'type',
     mapping: [
         'type_a' => DiscriminatorDummyTypeA::class,
@@ -2391,4 +2433,31 @@ class NullableArrayItemDummy
 class ObjectTypedDummy
 {
     public string $name;
+}
+
+#[DiscriminatorMap(
+    typeProperty: 'type',
+    mapping: [
+        ObjectNormalizerDiscriminatorBase::TYPE => ObjectNormalizerDiscriminatorBase::class,
+        ObjectNormalizerDiscriminatorSub::TYPE => ObjectNormalizerDiscriminatorSub::class,
+    ],
+)]
+class ObjectNormalizerDiscriminatorBase
+{
+    public const TYPE = 'base';
+    public const FOO = 'foo';
+    public const BAZ = 'baz';
+
+    public string $foo = self::FOO;
+
+    #[Ignore]
+    public string $baz = self::BAZ;
+}
+
+class ObjectNormalizerDiscriminatorSub extends ObjectNormalizerDiscriminatorBase
+{
+    public const TYPE = 'sub';
+    public const BAR = 'bar';
+
+    public string $bar = self::BAR;
 }

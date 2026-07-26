@@ -92,14 +92,15 @@ class ImportMapGenerator
         }
 
         $allEntries = [];
+        $resolvedAssets = [];
         foreach ($this->importMapConfigReader->getEntries() as $rootEntry) {
             $allEntries[$rootEntry->importName] = $rootEntry;
-            $allEntries = $this->addImplicitEntries($rootEntry, $allEntries);
+            $allEntries = $this->addImplicitEntries($rootEntry, $allEntries, $resolvedAssets);
         }
 
         $rawImportMapData = [];
         foreach ($allEntries as $entry) {
-            $asset = $this->findAsset($entry->path);
+            $asset = $resolvedAssets[$entry->importName] ?? $this->findAsset($entry->path);
             if (!$asset) {
                 throw $this->createMissingImportMapAssetException($entry);
             }
@@ -154,10 +155,11 @@ class ImportMapGenerator
      * and adds them to the importmap.
      *
      * @param array<string, ImportMapEntry> $currentImportEntries
+     * @param array<string, MappedAsset>    $resolvedAssets       Filled with the asset of each expanded entry
      *
      * @return array<string, ImportMapEntry>
      */
-    private function addImplicitEntries(ImportMapEntry $entry, array $currentImportEntries): array
+    private function addImplicitEntries(ImportMapEntry $entry, array $currentImportEntries, array &$resolvedAssets): array
     {
         // only process import dependencies for JS files
         if (ImportMapType::JS !== $entry->type) {
@@ -168,6 +170,7 @@ class ImportMapGenerator
             // should only be possible at this point for root importmap.php entries
             throw $this->createMissingImportMapAssetException($entry);
         }
+        $resolvedAssets[$entry->importName] = $asset;
 
         foreach ($asset->getJavaScriptImports() as $javaScriptImport) {
             $importName = $javaScriptImport->importName;
@@ -198,7 +201,7 @@ class ImportMapGenerator
 
             // unless there was some missing importmap entry, recurse
             if ($nextEntry) {
-                $currentImportEntries = $this->addImplicitEntries($nextEntry, $currentImportEntries);
+                $currentImportEntries = $this->addImplicitEntries($nextEntry, $currentImportEntries, $resolvedAssets);
             }
         }
 

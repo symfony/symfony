@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-07-06T15:26:13Z
+
+Rebased 👍🏼
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T13:40:25Z
+
+**Superseded by the retarget below. The behaviour note still holds; the rest described the earlier 8.2 shape.**
+
+There is one, and it is narrow enough to be worth writing down rather than blocking on.
+
+In a long-running console runner, `Application::reset()` between two commands used to clear the command data. It no longer does, so a record logged after a reset and before the next `ConsoleEvents::COMMAND` now carries the previous command's name instead of none. I probed it with two successive commands on one process:
+
+```
+before: cmd:a / <none>  / cmd:b / cmd:b
+after:  cmd:a / cmd:a   / cmd:b / cmd:b
+```
+
+Records inside a later command stay correct, because `addCommandData` overwrites at `ConsoleEvents::COMMAND` with priority 1, before the command body runs. So there is no cross-contamination between two commands' own logs.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T13:46:55Z
+
+Retargeted from 8.2 to 6.4 and rewritten as an empty `reset()` body instead of removing the interfaces.
+
+The bug is on every maintained branch, and the removal could not be backported, so the fix was landing on the dev branch only. Emptying the body fixes the same thing and is BC safe: nothing public disappears, so an application that hand-tagged the service `kernel.reset` with `method: reset` keeps working. Untagging the service instead is not an option, since the tag is autoconfigured from `ResetInterface`.
+
+The part that decides it is the merge-up. On 7.3 and later the class also implements `Monolog\ResettableInterface`, and `Logger::reset()` cascades into the same `reset()` method, so an empty body neutralizes both paths at once. Checked on 8.2 with the interfaces kept and a test driving the real Monolog cascade: 91 tests green. `git merge-tree` against 7.4, 8.1 and 8.2 is conflict free.
+
+Local runs: 6.4 Monolog bridge 90 tests green, and the new test fails on a clean 6.4 with `Failed asserting that an array has the key 'command'`.
+
+Removing `ResetInterface`, `Monolog\ResettableInterface` and the empty method is still worth doing on 8.2, but as a cleanup on top of this, not as the fix.

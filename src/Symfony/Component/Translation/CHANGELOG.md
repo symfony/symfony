@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
+
 8.1
 ---
 

@@ -106,6 +106,14 @@ class UniqueEntityValidator extends ConstraintValidator
             $criteria[$fieldName] = $fieldValue;
 
             if (\is_object($criteria[$fieldName]) && $class->hasAssociation($fieldName)) {
+                if ($class->isCollectionValuedAssociation($fieldName)) {
+                    if ('findBy' === $constraint->repositoryMethod) {
+                        throw new ConstraintDefinitionException(\sprintf('The field "%s" is a to-many association, which the default "findBy" repository method cannot query. Use the "repositoryMethod" option to provide a method that can.', $fieldName));
+                    }
+
+                    continue;
+                }
+
                 /* Ensure the Proxy is initialized before using reflection to
                  * read its identifiers. This is necessary because the wrapped
                  * getter methods in the Proxy are being bypassed.
@@ -149,6 +157,12 @@ class UniqueEntityValidator extends ConstraintValidator
          * - One entity returned the uniqueness depends on the current entity.
          */
         if ('findBy' === $constraint->repositoryMethod) {
+            foreach ($criteria as $fieldName => $fieldValue) {
+                if (\is_array($fieldValue)) {
+                    throw new ConstraintDefinitionException(\sprintf('The field "%s" holds an array, which the default "findBy" repository method turns into an "IN" clause instead of an equality check. Use the "repositoryMethod" option to provide a method that can query it.', $fieldName));
+                }
+            }
+
             $arguments = [$criteria, null, 2];
         }
 

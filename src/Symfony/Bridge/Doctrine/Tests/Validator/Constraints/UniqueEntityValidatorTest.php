@@ -39,6 +39,8 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdStringWrapperNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdWithPrivateNameEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\ToManyEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\ToOneEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\Type\StringWrapperType;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\UpdateCompositeIntIdEntity;
@@ -112,6 +114,8 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema([
             $em->getClassMetadata(SingleIntIdEntity::class),
+            $em->getClassMetadata(ToManyEntity::class),
+            $em->getClassMetadata(ToOneEntity::class),
             $em->getClassMetadata(SingleIntIdWithPrivateNameEntity::class),
             $em->getClassMetadata(SingleIntIdNoToStringEntity::class),
             $em->getClassMetadata(DoubleNameEntity::class),
@@ -1117,6 +1121,47 @@ class UniqueEntityValidatorTest extends ConstraintValidatorTestCase
     }
 
     // TODO remove this in Symfony 9.0 (or earlier, when dropping support for symfony/validator < 8.1)
+    public function testArrayValuedFieldIsRejectedByTheDefaultRepositoryMethod()
+    {
+        $constraint = new UniqueEntity(message: 'myMessage', fields: ['phoneNumbers'], em: self::EM_NAME);
+
+        $entity = new SingleIntIdEntity(1, 'foo');
+        $entity->phoneNumbers = [123, 456];
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The field "phoneNumbers" holds an array, which the default "findBy" repository method turns into an "IN" clause instead of an equality check.');
+
+        $this->validate($entity, $constraint);
+    }
+
+    public function testScalarValueInAnArrayCapableFieldIsAccepted()
+    {
+        $constraint = new UniqueEntity(message: 'myMessage', fields: ['phoneNumbers'], em: self::EM_NAME);
+
+        $entity = new SingleIntIdEntity(1, 'foo');
+        $entity->phoneNumbers = 'dark-mode';
+
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->validate($entity, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testToManyAssociationIsRejectedByTheDefaultRepositoryMethod()
+    {
+        $constraint = new UniqueEntity(message: 'myMessage', fields: ['children'], em: self::EM_NAME);
+
+        $entity = new ToManyEntity(1);
+        $entity->children->add(new ToOneEntity(1));
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('The field "children" is a to-many association, which the default "findBy" repository method cannot query.');
+
+        $this->validate($entity, $constraint);
+    }
+
     protected function validate(mixed $value, Constraint $constraint): void
     {
         if (method_exists(parent::class, 'validate')) {

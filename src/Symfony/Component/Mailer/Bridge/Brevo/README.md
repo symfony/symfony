@@ -10,12 +10,19 @@ Configuration example:
 # SMTP
 MAILER_DSN=brevo+smtp://USERNAME:PASSWORD@default
 
+# SMTP on a specific port
+MAILER_DSN=brevo+smtp://USERNAME:PASSWORD@default:587
+
 # API
 MAILER_DSN=brevo+api://KEY@default
 ```
 
 where:
  - `KEY` is your Brevo API Key
+
+The SMTP port defaults to 465, which uses implicit TLS. On any other port the
+connection starts in clear text and is upgraded with STARTTLS when the server
+offers it.
 
 With API, you can use custom headers.
 

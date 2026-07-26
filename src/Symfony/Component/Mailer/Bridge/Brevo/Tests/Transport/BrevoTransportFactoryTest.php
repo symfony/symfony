@@ -71,6 +71,11 @@ class BrevoTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('brevo+smtp', 'default', self::USER, self::PASSWORD, 587),
+            new BrevoSmtpTransport(self::USER, self::PASSWORD, null, new NullLogger(), 587),
+        ];
+
+        yield [
             new Dsn('brevo+api', 'default', self::USER),
             new BrevoApiTransport(self::USER, new MockHttpClient(), null, new NullLogger()),
         ];

@@ -571,6 +571,87 @@ class ImportMapGeneratorTest extends TestCase
         ];
     }
 
+    public function testGetRawImportMapDataExpandsBareImportedEntriesOnce()
+    {
+        $manager = $this->createImportMapGenerator();
+        $this->mockImportMap([
+            self::createLocalEntry('app', path: 'app.js'),
+            self::createLocalEntry('module-a', path: 'module-a.js'),
+            self::createLocalEntry('module-b', path: 'module-b.js'),
+            self::createLocalEntry('shared', path: 'shared.js'),
+        ]);
+
+        $mappedAssets = [
+            new MappedAsset(
+                'app.js',
+                publicPath: '/assets/app-d1g3st.js',
+                javaScriptImports: [
+                    new JavaScriptImport('module-a', assetLogicalPath: 'module-a.js', assetSourcePath: '/path/to/module-a.js', isLazy: false),
+                    new JavaScriptImport('module-b', assetLogicalPath: 'module-b.js', assetSourcePath: '/path/to/module-b.js', isLazy: false),
+                ],
+            ),
+            new MappedAsset(
+                'module-a.js',
+                publicPath: '/assets/module-a-d1g3st.js',
+                javaScriptImports: [
+                    new JavaScriptImport('shared', assetLogicalPath: 'shared.js', assetSourcePath: '/path/to/shared.js', isLazy: false),
+                ],
+            ),
+            new MappedAsset(
+                'module-b.js',
+                publicPath: '/assets/module-b-d1g3st.js',
+                javaScriptImports: [
+                    new JavaScriptImport('shared', assetLogicalPath: 'shared.js', assetSourcePath: '/path/to/shared.js', isLazy: false),
+                ],
+            ),
+            new MappedAsset(
+                'shared.js',
+                publicPath: '/assets/shared-d1g3st.js',
+            ),
+        ];
+        $resolvedAssets = [];
+        $this->mockAssetMapper($mappedAssets, $resolvedAssets);
+
+        $this->assertSame([
+            'app' => ['path' => '/assets/app-d1g3st.js', 'type' => 'js'],
+            'module-a' => ['path' => '/assets/module-a-d1g3st.js', 'type' => 'js'],
+            'module-b' => ['path' => '/assets/module-b-d1g3st.js', 'type' => 'js'],
+            'shared' => ['path' => '/assets/shared-d1g3st.js', 'type' => 'js'],
+        ], $manager->getRawImportMapData());
+        $this->assertSame(2, $resolvedAssets['shared.js']);
+    }
+
+    public function testGetRawImportMapDataDoesNotExpandInterRootBareImportsTwice()
+    {
+        $manager = $this->createImportMapGenerator();
+        $this->mockImportMap([
+            self::createLocalEntry('app', path: 'app.js'),
+            self::createLocalEntry('admin', path: 'admin.js'),
+        ]);
+
+        $mappedAssets = [
+            new MappedAsset(
+                'app.js',
+                publicPath: '/assets/app-d1g3st.js',
+                javaScriptImports: [
+                    new JavaScriptImport('admin', assetLogicalPath: 'admin.js', assetSourcePath: '/path/to/admin.js', isLazy: false),
+                ],
+            ),
+            new MappedAsset(
+                'admin.js',
+                publicPath: '/assets/admin-d1g3st.js',
+            ),
+        ];
+        $resolvedAssets = [];
+        $this->mockAssetMapper($mappedAssets, $resolvedAssets);
+
+        $this->assertSame([
+            'app' => ['path' => '/assets/app-d1g3st.js', 'type' => 'js'],
+            'admin' => ['path' => '/assets/admin-d1g3st.js', 'type' => 'js'],
+        ], $manager->getRawImportMapData());
+        $this->assertSame(2, $resolvedAssets['admin.js']);
+    }
+
     public function testGetRawImportDataUsesCacheFile()
     {
         $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
@@ -734,9 +815,15 @@ class ImportMapGeneratorTest extends TestCase
 
     private function mockImportMap(array $importMapEntries): void
     {
+        $importMapEntries = new ImportMapEntries($importMapEntries);
+
         $this->configReader
             ->method('getEntries')
-            ->willReturn(new ImportMapEntries($importMapEntries))
+            ->willReturn($importMapEntries)
+        ;
+        $this->configReader
+            ->method('findRootImportMapEntry')
+            ->willReturnCallback(static fn (string $moduleName): ?ImportMapEntry => $importMapEntries->has($moduleName) ? $importMapEntries->get($moduleName) : null)
         ;
     }
 
@@ -754,13 +841,16 @@ class ImportMapGeneratorTest extends TestCase
     }
 
     /**
-     * @param MappedAsset[] $mappedAssets
+     * @param MappedAsset[]      $mappedAssets
+     * @param array<string, int> $resolvedAssets Filled with the number of times each logical path was resolved
      */
-    private function mockAssetMapper(array $mappedAssets): void
+    private function mockAssetMapper(array $mappedAssets, array &$resolvedAssets = []): void
     {
         $this->assetMapper
             ->method('getAsset')
-            ->willReturnCallback(static function (string $logicalPath) use ($mappedAssets) {
+            ->willReturnCallback(static function (string $logicalPath) use ($mappedAssets, &$resolvedAssets) {
+                $resolvedAssets[$logicalPath] = ($resolvedAssets[$logicalPath] ?? 0) + 1;
+
                 foreach ($mappedAssets as $asset) {
                     if ($asset->logicalPath === $logicalPath) {
                         return $asset;

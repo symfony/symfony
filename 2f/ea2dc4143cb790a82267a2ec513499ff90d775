@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-07-16T18:24:07Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T13:42:27Z
+
+Reviewed and rebased onto the current 8.1.
+
+I found one behaviour difference against 8.1 and fixed it in the same commit. Reading 8192 bytes at a time leaves whatever followed `PASTE_END` in the buffer, so after an empty or whitespace-only paste the bytes typed next ended up in the path:
+
+```
+8.1:        File "<ESC>[201~" does not exist.
+before fix: File "<ESC>[201~/tmp/f.txt" does not exist.
+```
+
+Both end in `InvalidFileException` and neither can resolve to a real file, since the path keeps the ESC byte, so it is not exploitable. It is still a change in a patch advertised as behaviour-preserving, and it put what the user typed after the paste into an error message. Truncating the buffer at the end marker restores parity. I checked it with a differential fuzz against the 8.1 implementation, chunk sizes 1 to 8192: 91 divergences before the fix, 0 after, and 6,382 when I deliberately removed the look-back offsets, so the harness does discriminate.
+
+Two things for whoever merges this.
+
+The chunked reads consume input past the terminator and drop it, so a second `FileQuestion` on the same stream, or a retry after failed validation, loses its answer. That comes from #64709 and is already on 8.2; this PR does not make it worse. It only matters when `Terminal::supportsImageProtocol()` and `hasSttyAvailable()` are both true, so not for piped input, but it is type-ahead that used to survive.
+
+The merge-up to 8.2 will conflict in `FileInputHelper.php`, because 8.2 reached the same content through #64709. Take the 8.1 side wholesale.
+
+Local run on the rebased branch: Console 1801 tests, 2 failures, and the same 2 fail on a clean 8.1 tip here (`QuestionHelperTest::testAskTimeout` and `::testAskThrowsExceptionOnMissingInputForChoiceQuestion`, both stdin-related in a non-interactive environment). CI had never run on the previous head.

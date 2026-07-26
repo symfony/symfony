@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-26T08:11:55Z
+
+Thanks for the review. Addressed the requested split in 564a38b9932: this PR is now rebased on 6.4 and only contains the import-map traversal bugfix and its two regression tests. The memoization/reset work was dropped from this branch.
+
+Validation: reproduced the traversal regressions RED (`6 is not 2` and `3 is not 2`), then reran the focused tests GREEN. Local AssetMapper replay is iso-baseline with the same existing `RemotePackageStorageTest::testSaveThrowsWhenFailing` failure on `upstream/6.4` and on this branch.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-26T08:17:48Z
+
+Follow-up after rebasing onto the current 6.4 head: the PR now points to 3b64ec96c0b with the same narrowed two-file traversal fix.
+
+Validation after rebase: reproduced the two traversal regressions RED (`6 is not 2` and `3 is not 2`), then reran the focused tests GREEN. Local AssetMapper replay remains iso-baseline with the same existing `RemotePackageStorageTest::testSaveThrowsWhenFailing` failure on current `upstream/6.4` and on this branch.

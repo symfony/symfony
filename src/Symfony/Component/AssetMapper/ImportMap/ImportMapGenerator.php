@@ -92,9 +92,10 @@ class ImportMapGenerator
         }
 
         $allEntries = [];
+        $expandedEntries = [];
         foreach ($this->importMapConfigReader->getEntries() as $rootEntry) {
             $allEntries[$rootEntry->importName] = $rootEntry;
-            $allEntries = $this->addImplicitEntries($rootEntry, $allEntries);
+            $allEntries = $this->addImplicitEntries($rootEntry, $allEntries, $expandedEntries);
         }
 
         $rawImportMapData = [];
@@ -157,12 +158,17 @@ class ImportMapGenerator
      *
      * @return array<string, ImportMapEntry>
      */
-    private function addImplicitEntries(ImportMapEntry $entry, array $currentImportEntries): array
+    private function addImplicitEntries(ImportMapEntry $entry, array $currentImportEntries, array &$expandedEntries): array
     {
         // only process import dependencies for JS files
         if (ImportMapType::JS !== $entry->type) {
             return $currentImportEntries;
         }
+
+        if (isset($expandedEntries[$entry->importName])) {
+            return $currentImportEntries;
+        }
+        $expandedEntries[$entry->importName] = true;
 
         if (!$asset = $this->findAsset($entry->path)) {
             // should only be possible at this point for root importmap.php entries
@@ -198,7 +204,7 @@ class ImportMapGenerator
 
             // unless there was some missing importmap entry, recurse
             if ($nextEntry) {
-                $currentImportEntries = $this->addImplicitEntries($nextEntry, $currentImportEntries);
+                $currentImportEntries = $this->addImplicitEntries($nextEntry, $currentImportEntries, $expandedEntries);
             }
         }
 

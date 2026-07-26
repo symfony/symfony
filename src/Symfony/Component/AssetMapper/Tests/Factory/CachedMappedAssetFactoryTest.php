@@ -171,6 +171,41 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertInstanceOf(FileExistenceResource::class, $configCacheMetadata[5]);
     }
 
+    public function testResetIsForwardedToTheInnerFactory()
+    {
+        $innerFactory = new class implements MappedAssetFactoryInterface {
+            public int $resetCount = 0;
+
+            public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
+            {
+                return null;
+            }
+
+            public function reset(): void
+            {
+                ++$this->resetCount;
+            }
+        };
+
+        (new CachedMappedAssetFactory($innerFactory, $this->cacheDir, true))->reset();
+
+        $this->assertSame(1, $innerFactory->resetCount);
+    }
+
+    public function testResetAcceptsAnInnerFactoryWithoutResetMethod()
+    {
+        $innerFactory = new class implements MappedAssetFactoryInterface {
+            public function createMappedAsset(string $logicalPath, string $sourcePath): ?MappedAsset
+            {
+                return null;
+            }
+        };
+
+        $this->expectNotToPerformAssertions();
+
+        (new CachedMappedAssetFactory($innerFactory, $this->cacheDir, true))->reset();
+    }
+
     private function loadConfigCacheMetadataFor(MappedAsset $mappedAsset): array
     {
         $cachedPath = $this->getConfigCachePath($mappedAsset).'.meta';

@@ -2960,6 +2960,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('asset_mapper_without_assets');
 
         $this->assertTrue($container->has('asset_mapper'));
+        $this->assertSame([['method' => 'reset', 'on_invalid' => 'ignore']], $container->getDefinition('asset_mapper.cached_mapped_asset_factory')->getTag('kernel.reset'));
         $this->assertFalse($container->has('asset_mapper.asset_package'));
         $this->assertFalse($container->has('assets.packages'));
         $this->assertFalse($container->has('assets._default_package'));

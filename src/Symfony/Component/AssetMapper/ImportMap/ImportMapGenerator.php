@@ -166,6 +166,10 @@ class ImportMapGenerator
             return $currentImportEntries;
         }
 
+        if (isset($resolvedAssets[$entry->importName])) {
+            return $currentImportEntries;
+        }
+
         if (!$asset = $this->findAsset($entry->path)) {
             // should only be possible at this point for root importmap.php entries
             throw $this->createMissingImportMapAssetException($entry);

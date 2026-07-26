@@ -22,6 +22,7 @@ use Symfony\Component\AssetMapper\Factory\MappedAssetFactory;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\MappedAsset;
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 class MappedAssetFactoryTest extends TestCase
 {
@@ -145,6 +146,25 @@ class MappedAssetFactoryTest extends TestCase
         $asset = $assetMapper->createMappedAsset('lodash.js', self::VENDOR_FIXTURES_DIR.'/lodash/lodash.index.js');
         $this->assertSame('lodash.js', $asset->logicalPath);
         $this->assertFalse($asset->isVendor);
+    }
+
+    public function testResetForgetsTheContentOfAlreadyBuiltAssets()
+    {
+        $sourcePath = sys_get_temp_dir().'/asset_mapper_reset_'.uniqid('', true).'/file.css';
+        (new Filesystem())->dumpFile($sourcePath, 'body { color: red; }');
+
+        try {
+            $factory = $this->createFactory();
+            $digest = $factory->createMappedAsset('file.css', $sourcePath)->digest;
+
+            (new Filesystem())->dumpFile($sourcePath, 'body { color: blue; }');
+            $this->assertSame($digest, $factory->createMappedAsset('file.css', $sourcePath)->digest);
+
+            $factory->reset();
+            $this->assertNotSame($digest, $factory->createMappedAsset('file.css', $sourcePath)->digest);
+        } finally {
+            (new Filesystem())->remove(\dirname($sourcePath));
+        }
     }
 
     private function createFactory(?AssetCompilerInterface $extraCompiler = null, ?string $vendorDir = self::VENDOR_FIXTURES_DIR): MappedAssetFactory

@@ -70,6 +70,7 @@ return static function (ContainerConfigurator $container) {
                 param('kernel.debug'),
             ])
             ->decorate('asset_mapper.mapped_asset_factory')
+            ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
 
         ->set('asset_mapper.repository', AssetMapperRepository::class)
             ->args([

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:38:05Z
+
+Reviewed, retargeted to 7.4 and rebased. Thanks @misaert, the diagnosis is right and the scope is wider than the title suggests, in a good way.
+
+Retargeted because the flawed guard came in with #63401, released in 7.4.6, and `origin/7.4` reproduces the defect identically. 6.4 has no type-override block at all, so it stops there.
+
+I probed eight docblock shapes on 7.4. Six are broken on base and all six are fixed: `ArrayObject`, `Traversable`, `ArrayIterator`, `Generator`, an `array` parameter with an `ArrayObject` docblock, and the nullable form. `array<Item>` was already fine. So this closes far more than the `ArrayObject` case in the title.
+
+One change to the guard. `!$type->isIdentifiedBy(TypeIdentifier::OBJECT)` matches every object-shaped extractor type, not only collections, and that turns a working case into a fatal one. `PhpDocExtractor` cannot parse `@var iterable<T>`: it falls back to `Type::object("iterable<\Item>")`, a class name that does not exist. On base that bogus type is silently replaced by the reflection type and denormalization returns raw arrays, which is wrong but harmless. With the object-wide guard it survives and throws:
+
+```
+The type of the "items" attribute for class "..." must be one of "iterable<\Item>" ("array" given).
+```
+
+Testing for `CollectionType` instead fixes exactly the same six shapes and leaves that one on its current behaviour. `CollectionType` is already imported in the file, so it is a one-line change.
+
+That does mean `@var iterable<T>` still denormalizes to raw arrays. It is a PropertyInfo limitation rather than something this guard can address, and I left it alone rather than widen the scope.
+
+Small fixture change: `$this->items->exchangeArray($items)` on a parameter declared `iterable` would not survive a real iterator, since `exchangeArray()` needs `array|object`. Switched to `new \ArrayObject(iterator_to_array($items))`.
+
+The test fails on a clean 7.4 with `Failed asserting that ArrayObject ... contains only values of type "DummyDtoItem"`, so it is a genuine regression test. Local runs: Serializer 1396 green, HttpKernel 1545 green, php-cs-fixer clean.

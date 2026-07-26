@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:59:26Z
+
+Reviewed and rebased onto the current 8.2. Thanks @mauricedefelicec24, the round-trip loss is real and this had been sitting far too long.
+
+@welcoMattic, your BC point is right and it is wider than the loader change you commented on. The 1.2 loader already fills `metadata["source"]`, so `translation:pull` and `translation:extract --force` will start rewriting `<source>` in committed 1.2 files whose source differs from their resname, without any loader change at all. We are taking that deliberately, which is why the PR is now labelled Feature with a CHANGELOG entry rather than treated as a bugfix.
+
+Three things fixed while rebasing:
+
+* **XLIFF 2.0 keys longer than 80 characters lost their key.** The dumper only writes a `name` attribute up to 80 characters, and the loader falls back to `<source>` for the key when there is none. Harmless while `<source>` holds the key; once it holds the source text, the key is gone on the next load. Reproduced with a 101-character key: `keys after reload: ["Home"]`. The substitution now applies only to units that carry a `name`.
+* **Non-string metadata threw.** `$metadata["source"]` went straight into `createTextNode`, so a `TypeError` where the base branch emits valid XML.
+* `testLoadVersion21` and `testLoadVersion22` were failing after rebase. They arrived in `0120aceac1d` in February, months after this branch was opened, and the loader change applies to 2.1 and 2.2 too. Note that all CI on the previous head ran in October 2025, so the green rollup was meaningless.
+
+On the tests: `testLoadVersion2StoresSourceInMetadata` used `resources-2.0.xlf`, where source and key are equal, so it passed for the wrong reason. I dropped it in favour of a load-then-dump round trip on a 1.2 file whose `<source>` differs from its `resname`, which is the scenario from #33041 and fails on a clean 8.2, plus tests for the two cases above.
+
+One scope note for the merger. This makes the round trip lossless for files that already carry a meaningful `<source>`, so hand-written files and files from external tools. It does not populate `metadata["source"]` for files Symfony generated itself, so those see no change at all. Filling the source from the default-locale catalogue during extraction, as @squrious sketched on the issue, is the other half and is not here.
+
+Local runs: Translation 623 tests, one pre-existing failure (`TranslationLintCommandTest::testLintMalformedIcuTranslations`, which also fails on a clean 8.2 on this machine). php-cs-fixer clean.

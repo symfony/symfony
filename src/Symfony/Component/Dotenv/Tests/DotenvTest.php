@@ -333,6 +333,125 @@ class DotenvTest extends TestCase
         }
     }
 
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testLoadDoesNotTruncateExternalEnvVarOnlyPresentInGetenvOnSelfReference(bool $usePutenv)
+    {
+        unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('SYMFONY_DOTENV_VARS');
+
+        // Mimics `variables_order` lacking both "E" and "S": the OS-provided
+        // env var is only reachable through getenv().
+        putenv('EXT_VAR=secret$word');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+        file_put_contents($path, "EXT_VAR=\${EXT_VAR}\n");
+
+        $dotenv = new Dotenv();
+
+        try {
+            $dotenv->usePutenv($usePutenv)->load($path);
+            $this->assertSame('secret$word', $_ENV['EXT_VAR']);
+            $this->assertSame('secret$word', $_SERVER['EXT_VAR']);
+            if ($usePutenv) {
+                $this->assertSame('secret$word', getenv('EXT_VAR'));
+            }
+        } finally {
+            unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+            putenv('EXT_VAR');
+            putenv('SYMFONY_DOTENV_VARS');
+            unlink($path);
+            @rmdir($tmpdir);
+        }
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testLoadResolvesSelfReferencingDefaultWhenNoExternalEnvVarExists(bool $usePutenv)
+    {
+        unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('EXT_VAR');
+        putenv('SYMFONY_DOTENV_VARS');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+        file_put_contents($path, "EXT_VAR=\${EXT_VAR:-default}\n");
+
+        try {
+            (new Dotenv())->usePutenv($usePutenv)->load($path);
+            $this->assertSame('default', $_ENV['EXT_VAR']);
+            $this->assertSame('default', $_SERVER['EXT_VAR']);
+            if ($usePutenv) {
+                $this->assertSame('default', getenv('EXT_VAR'));
+            }
+        } finally {
+            unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+            putenv('EXT_VAR');
+            putenv('SYMFONY_DOTENV_VARS');
+            unlink($path);
+            @rmdir($tmpdir);
+        }
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testLoadPrefersExternalEnvVarOnlyPresentInGetenvOverSelfReferencingDefault(bool $usePutenv)
+    {
+        unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('SYMFONY_DOTENV_VARS');
+        putenv('EXT_VAR=external');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+        file_put_contents($path, "EXT_VAR=\${EXT_VAR:-default}\n");
+
+        try {
+            (new Dotenv())->usePutenv($usePutenv)->load($path);
+            $this->assertSame('external', $_ENV['EXT_VAR']);
+            $this->assertSame('external', $_SERVER['EXT_VAR']);
+        } finally {
+            unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+            putenv('EXT_VAR');
+            putenv('SYMFONY_DOTENV_VARS');
+            unlink($path);
+            @rmdir($tmpdir);
+        }
+    }
+
+    /**
+     * @testWith [false]
+     *           [true]
+     */
+    public function testLoadDoesNotExecuteShellSyntaxFromExternalEnvVarOnlyPresentInGetenv(bool $usePutenv)
+    {
+        unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('SYMFONY_DOTENV_VARS');
+        putenv('EXT_VAR=value$(id)');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+        file_put_contents($path, "EXT_VAR=\${EXT_VAR}\n");
+
+        try {
+            (new Dotenv())->usePutenv($usePutenv)->load($path);
+            $this->assertSame('value$(id)', $_ENV['EXT_VAR']);
+            $this->assertSame('value$(id)', $_SERVER['EXT_VAR']);
+        } finally {
+            unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+            putenv('EXT_VAR');
+            putenv('SYMFONY_DOTENV_VARS');
+            unlink($path);
+            @rmdir($tmpdir);
+        }
+    }
+
     public function testOverloadDoesNotExecuteShellSyntaxFromExternalEnvOnSelfReference()
     {
         unset($_ENV['FOO'], $_SERVER['FOO'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);

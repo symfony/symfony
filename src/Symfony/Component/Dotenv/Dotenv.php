@@ -604,19 +604,27 @@ final class Dotenv
             }
 
             $name = $matches['name'];
+            $isExternal = false;
             if (isset($loadedVars[$name]) && isset($this->values[$name])) {
                 $value = $this->values[$name];
             } elseif (isset($_ENV[$name])) {
                 $value = $_ENV[$name];
+                $isExternal = true;
             } elseif (isset($_SERVER[$name]) && !str_starts_with($name, 'HTTP_')) {
                 $value = $_SERVER[$name];
+                $isExternal = true;
             } elseif (isset($this->values[$name])) {
                 $value = $this->values[$name];
             } else {
                 $value = (string) getenv($name);
+                $isExternal = true;
             }
 
             if ('' !== $value && !isset($loadedVars[$name])) {
+                if ($isExternal) {
+                    // unlike values parsed from a .env file, external ones are not escaped yet
+                    $value = str_replace('\\', '\\\\', $value);
+                }
                 $value = str_replace('$', "\x00", $value);
             }
 
@@ -787,7 +795,7 @@ final class Dotenv
                         $envBackup = $_ENV[$name] ?? null;
                         $serverBackup = $_SERVER[$name] ?? null;
                         if (isset($this->overriddenValues[$name])) {
-                            $_ENV[$name] = str_replace('$', "\x00", $this->overriddenValues[$name]);
+                            $_ENV[$name] = str_replace(['\\\\', '$'], ['\\\\\\\\', "\x00"], $this->overriddenValues[$name]);
                             $_SERVER[$name] = $_ENV[$name];
                         } else {
                             unset($_ENV[$name], $_SERVER[$name]);

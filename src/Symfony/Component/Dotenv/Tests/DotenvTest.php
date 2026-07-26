@@ -452,6 +452,49 @@ class DotenvTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider provideBackslashedExternalEnvVars
+     */
+    public function testPreservesBackslashesOfExternalEnvVar(string $external, bool $onlyInGetenv, bool $selfReference)
+    {
+        unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['REF_VAR'], $_SERVER['REF_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('SYMFONY_DOTENV_VARS');
+
+        if ($onlyInGetenv) {
+            putenv("EXT_VAR=$external");
+        } else {
+            $_ENV['EXT_VAR'] = $_SERVER['EXT_VAR'] = $external;
+        }
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+        $name = $selfReference ? 'EXT_VAR' : 'REF_VAR';
+        file_put_contents($path, "$name=pre\${EXT_VAR}post\n");
+
+        try {
+            $dotenv = new Dotenv();
+            $onlyInGetenv ? $dotenv->load($path) : $dotenv->overload($path);
+            $this->assertSame("pre{$external}post", $_ENV[$name]);
+            $this->assertSame("pre{$external}post", $_SERVER[$name]);
+        } finally {
+            unset($_ENV['EXT_VAR'], $_SERVER['EXT_VAR'], $_ENV['REF_VAR'], $_SERVER['REF_VAR'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);
+            putenv('EXT_VAR');
+            putenv('SYMFONY_DOTENV_VARS');
+            unlink($path);
+            @rmdir($tmpdir);
+        }
+    }
+
+    public static function provideBackslashedExternalEnvVars(): iterable
+    {
+        foreach (['a\\b', 'a\\\\b', 'a\\\\\\b', 'a\\\\\\\\b', 'a\\\\', '\\\\a', 'a\\\\$b'] as $external) {
+            foreach ([true, false] as $onlyInGetenv) {
+                yield [$external, $onlyInGetenv, true];
+                yield [$external, $onlyInGetenv, false];
+            }
+        }
+    }
+
     public function testOverloadDoesNotExecuteShellSyntaxFromExternalEnvOnSelfReference()
     {
         unset($_ENV['FOO'], $_SERVER['FOO'], $_ENV['SYMFONY_DOTENV_VARS'], $_SERVER['SYMFONY_DOTENV_VARS']);

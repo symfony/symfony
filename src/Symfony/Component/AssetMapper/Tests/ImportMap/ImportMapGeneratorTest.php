@@ -743,6 +743,27 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($entrypointData, $manager->findEagerEntrypointImports('foo'));
     }
 
+    public function testGetRawImportMapDataResolvesEachEntryOnce()
+    {
+        $manager = $this->createImportMapGenerator();
+        $this->mockImportMap([
+            self::createLocalEntry('app', path: 'app.js'),
+            self::createLocalEntry('admin', path: 'admin.js'),
+        ]);
+
+        $resolvedAssets = [];
+        $this->mockAssetMapper([
+            new MappedAsset('app.js', publicPath: '/assets/app-d1g3st.js'),
+            new MappedAsset('admin.js', publicPath: '/assets/admin-d1g3st.js'),
+        ], $resolvedAssets);
+
+        $this->assertSame([
+            'app' => ['path' => '/assets/app-d1g3st.js', 'type' => 'js'],
+            'admin' => ['path' => '/assets/admin-d1g3st.js', 'type' => 'js'],
+        ], $manager->getRawImportMapData());
+        $this->assertSame(['app.js' => 1, 'admin.js' => 1], $resolvedAssets);
+    }
+
     private function createImportMapGenerator(): ImportMapGenerator
     {
         $this->compiledConfigReader ??= $this->createStub(CompiledAssetMapperConfigReader::class);
@@ -789,11 +810,13 @@ class ImportMapGeneratorTest extends TestCase
     /**
      * @param MappedAsset[] $mappedAssets
      */
-    private function mockAssetMapper(array $mappedAssets): void
+    private function mockAssetMapper(array $mappedAssets, array &$resolvedAssets = []): void
     {
         $this->assetMapper
             ->method('getAsset')
-            ->willReturnCallback(static function (string $logicalPath) use ($mappedAssets) {
+            ->willReturnCallback(static function (string $logicalPath) use ($mappedAssets, &$resolvedAssets) {
+                $resolvedAssets[$logicalPath] = ($resolvedAssets[$logicalPath] ?? 0) + 1;
+
                 foreach ($mappedAssets as $asset) {
                     if ($asset->logicalPath === $logicalPath) {
                         return $asset;

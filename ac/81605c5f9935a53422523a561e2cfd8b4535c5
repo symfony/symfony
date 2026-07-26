@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by thomas2411 at 2026-07-10T08:43:59Z
+
+OK, sure
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:32:26Z
+
+Reviewed and rebased onto 8.2. Thanks @thomas2411.
+
+Retargeted as @alexandre-daubois asked. To confirm the classification from the code: the factory has never read `Dsn::getPort()` for the SMTP schemes on any maintained branch, and the port was never documented, so nothing regressed. I checked all 17 `*SmtpTransport` bridges and 16 hardcode the provider port; only Sweego takes one, and only because its DSN documents it. So this is a new capability. Label swapped to Feature.
+
+Two changes on top of your commit:
+
+* `465 === $port ? true : null` is dead. `EsmtpTransport::__construct()` already maps a null TLS flag to implicit TLS on 465 and opportunistic STARTTLS on anything else. I swept 8 ports through the factory and the resulting host, port and TLS state are identical with a plain `null`. Passing `?int $port = null` and `$dsn->getPort()` also keeps the default in one place and matches the `?int` that `Dsn::getPort()` returns.
+* Added the bridge CHANGELOG entry and a README example, with a line noting that ports other than 465 use STARTTLS rather than implicit TLS. Worth stating, because the bridge cannot express `require_tls`, so a non-465 port is a weaker guarantee than the generic `smtp://` DSN with `require_tls=1`.
+
+One thing worth knowing rather than acting on: Symfony has twice solved this same problem by changing a bridge default instead of exposing a knob, mailgun 465 to 587 in 6.3 and mailjet in 6.4, and the Brevo support statement you quoted recommends 587. If a maintainer prefers that, it would be a different PR; this one keeps 465 as the default and adds the choice.
+
+Local runs: Brevo 40 tests, full Mailer 866, php-cs-fixer clean.

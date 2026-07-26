@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T14:27:28Z
+
+Reviewed, rebased onto the current 7.4, and reworked. Thanks @bendavies, the diagnosis is exactly right and the PostgreSQL reproduction is excellent.
+
+I changed the approach: instead of a dedicated connection, the transaction wrapper is simply removed. A single `UPDATE` never needed one, and the dedicated connection turned out to carry two regressions I could measure locally:
+
+* **in-memory SQLite loses keepalive entirely.** `DriverManager::getConnection(["driver" => "pdo_sqlite", "memory" => true])` opens a new, empty database, so every tick throws `no such table: messenger_messages`. That is the default DSN of this bridge's own `DoctrineIntegrationTest`. The PR's `testKeepaliveWrapsFailuresInTransportException` used in-memory SQLite precisely because the second connection gets an empty database, which encoded the regression as the expected behaviour.
+* **a stall inside the signal handler.** File-backed SQLite, transport connection holding an open write transaction: the second connection blocks on the database-level write lock for the whole busy timeout. I measured 59.1 s against 0.0 s on base, and it happens inside an async signal handler, so the worker freezes and the exception then fails whatever the alarm interrupted. The `doctrine_transaction` middleware setup the linked issue mentions keeps a transaction open for the entire duration of handling a message, which is exactly when keepalive fires.
+
+Dropping the transaction also keeps the existing `executeStatement()` helper with its auto-setup retry, and avoids depending on `Connection::getParams()`, which DBAL marks `@internal`.
+
+On the tests, I replaced the two unit tests: the previous ones asserted the implementation choice (`never beginTransaction` on a connection whose params point at a fixture file), so they failed against any fix that kept the shared connection. They now assert the lease is renewed and no transaction method is touched, and both fail on a clean 7.4. I added two behaviour tests to `DoctrineIntegrationTest` that run against a real connection, including one with an open transaction; note those pass on base too, so they protect the behaviour rather than prove the fix.
+
+Your `DoctrinePostgreSqlKeepaliveIntegrationTest` is kept as is. It is design-agnostic and it is the only thing that actually reproduces the race. I could not run it here, no PostgreSQL and no Docker, and CI had never run on the previous head either, so the integration job will be its first real signal.
+
+Milestone moved from 8.2 to 7.4 to match the base.
+
+Local runs: Doctrine bridge 86 tests green, Messenger 513 green, php-cs-fixer clean.

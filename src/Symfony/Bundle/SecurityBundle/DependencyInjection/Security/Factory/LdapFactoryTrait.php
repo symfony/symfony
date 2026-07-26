@@ -35,7 +35,21 @@ trait LdapFactoryTrait
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $key = str_replace('-', '_', $this->getKey());
+        $definitions = $container->getDefinitions();
         $authenticatorId = parent::createAuthenticator($container, $firewallName, $config, $userProviderId);
+
+        // the parent factory registers its authenticator under the id its non-LDAP variant uses as
+        // well, so move the decorated one aside and hand the id back, to let both variants be
+        // configured on the same firewall
+        $decoratedId = 'security.authenticator.'.$key.'.'.$firewallName.'.inner';
+        $container->setDefinition($decoratedId, $container->getDefinition($authenticatorId));
+        $container->removeDefinition($authenticatorId);
+
+        if (isset($definitions[$authenticatorId])) {
+            $container->setDefinition($authenticatorId, $definitions[$authenticatorId]);
+        }
+
+        $authenticatorId = $decoratedId;
 
         $container->setDefinition('security.listener.'.$key.'.'.$firewallName, new Definition(CheckLdapCredentialsListener::class))
             ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])

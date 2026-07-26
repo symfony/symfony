@@ -29,6 +29,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
@@ -43,6 +44,30 @@ use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 class SecurityExtensionTest extends TestCase
 {
     use ExpectDeprecationTrait;
+
+    public function testLdapAndNonLdapVariantsOfTheSameAuthenticatorCanShareAFirewall()
+    {
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['id' => 'foo']],
+            'firewalls' => [
+                'main' => [
+                    'entry_point' => 'form_login',
+                    'form_login' => ['check_path' => '/login_check'],
+                    'form_login_ldap' => ['service' => 'Symfony\\Component\\Ldap\\Ldap', 'check_path' => '/login_check_ldap'],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $plain = $container->getDefinition('security.authenticator.form_login.main');
+        $this->assertSame('/login_check', $plain->getArgument(4)['check_path']);
+
+        $decorated = $container->getDefinition('security.authenticator.form_login_ldap.main')->getArgument(0);
+        $this->assertSame('security.authenticator.form_login_ldap.main.inner', (string) $decorated);
+        $this->assertSame('/login_check_ldap', $container->getDefinition((string) $decorated)->getArgument(4)['check_path']);
+    }
 
     public function testInvalidCheckPath()
     {
@@ -934,6 +959,7 @@ class SecurityExtensionTest extends TestCase
         $container->loadFromExtension('security', [
             'firewalls' => [
                 'main' => [
+                    'entry_point' => 'form_login',
                     'custom_listener' => true,
                 ],
             ],
@@ -1017,7 +1043,8 @@ class SecurityExtensionTest extends TestCase
                     'migrate_from' => 'legacy',
                 ],
             ],
-            'firewalls' => ['main' => ['http_basic' => true]],
+            'firewalls' => ['main' => [
+                'entry_point' => 'form_login', 'http_basic' => true]],
         ]);
 
         $container->compile();

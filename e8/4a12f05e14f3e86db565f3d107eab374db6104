@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-27T19:43:43Z
+
+@derrabus fair point, and it was true of the state you reviewed. I have pushed two things since.
+
+`ses+api://` now actually sends the raw message instead of refusing it. That transport is not an `AbstractApiTransport`, so the guard never applied to it and it still died with the same `TypeError`:
+
+```
+TypeError: MessageConverter::toEmail(): Argument #1 ($message) must be of type Message,
+RawMessage given, called in SesApiAsyncAwsTransport.php on line 47
+```
+
+Its `getRequest()` already falls back to the SES `Content.Raw.Data` endpoint when an email carries attachments, and that endpoint takes the message as-is, so a `RawMessage` can take the same path. Covered by `SesApiAsyncAwsTransportTest::testSendRawMessage`.
+
+For the other twelve transports I do not think there is anything better to do than fail clearly. An API transport builds a structured payload out of the message fields, and a `RawMessage` is an opaque blob with nothing to read those fields from. Where a provider does expose a raw endpoint, Symfony already surfaces it as its own transport: `mailgun+https://` and `mandrill+https://` build from `$message->toString()` and accept a `RawMessage` today, which is why the guard sits in `AbstractApiTransport` rather than in `AbstractHttpTransport`.
+
+So the exception now points at the way out rather than just naming the type:
+
+```
+Unable to send message with the "Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridApiTransport"
+transport: the message must be an instance of "Symfony\Component\Mime\Message" (got
+"Symfony\Component\Mime\RawMessage"). An API transport builds its payload from the message fields;
+use an SMTP transport to send a raw message.
+```
+
+It also names the configured transport now, rather than `AbstractApiTransport`, which is what `__CLASS__` printed.
+
+If you would rather have `+api://` accept raw messages generally, that is a different and much larger change: every bridge would need a raw path, and most provider APIs have no endpoint for it. Happy to go that way if you prefer, but it did not look like this PR's job.

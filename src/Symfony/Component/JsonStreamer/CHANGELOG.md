@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add `BcMath\Number` value object support with `BcMathNumberValueObjectTransformer`
  * Add `GMP` value object support with `GmpNumberValueObjectTransformer`
+ * Add a `cache_variant` option that partitions the generated code cache, so a custom property metadata loader can produce several payload shapes for the same PHP type
 
 8.1
 ---

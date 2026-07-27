@@ -19,6 +19,7 @@ use Symfony\Component\JsonStreamer\DataModel\Read\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\DataModelNodeInterface;
 use Symfony\Component\JsonStreamer\DataModel\Read\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\ScalarNode;
+use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -61,7 +62,7 @@ final class StreamReaderGenerator
      */
     public function generate(Type $type, bool $decodeFromStream, array $options = []): string
     {
-        $path = \sprintf('%s%s%s.json%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), $decodeFromStream ? '.stream' : '');
+        $path = \sprintf('%s%s%s.%s%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), self::cacheVariant($options), $decodeFromStream ? '.stream' : '');
         $generateContent = function () use ($type, $decodeFromStream, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
@@ -71,6 +72,22 @@ final class StreamReaderGenerator
         $this->dumper->dump($type, $path, $generateContent);
 
         return $path;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    private static function cacheVariant(array $options): string
+    {
+        $variant = $options['cache_variant'] ?? 'json';
+
+        // the value ends up in the cache file name, before the ".stream" marker,
+        // so it must neither reach the filesystem unchecked nor shadow that marker
+        if (!\is_string($variant) || !preg_match('/^[a-zA-Z0-9_-]++$/', $variant)) {
+            throw new InvalidArgumentException(\sprintf('The "cache_variant" option must match "[a-zA-Z0-9_-]+", "%s" given.', \is_string($variant) ? $variant : get_debug_type($variant)));
+        }
+
+        return $variant;
     }
 
     /**

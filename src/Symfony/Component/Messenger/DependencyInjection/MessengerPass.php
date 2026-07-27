@@ -413,12 +413,24 @@ class MessengerPass implements CompilerPassInterface
             return;
         }
 
+        $taggedIds = $container->findTaggedResourceIds('messenger.message', false);
+
+        // a message with no serialized type name is sent under its own class name, so that name is
+        // taken even though it never enters the map
+        $messageClasses = [];
+        foreach ($taggedIds as $id => $tags) {
+            $messageClasses[$container->getDefinition($id)->getClass()] = true;
+        }
+
         $typeToClassMap = [];
-        foreach ($container->findTaggedResourceIds('messenger.message', false) as $id => $tags) {
+        foreach ($taggedIds as $id => $tags) {
             $class = $container->getDefinition($id)->getClass();
             foreach ($tags as $tag) {
                 if (!isset($tag['serializedTypeName'])) {
                     continue;
+                }
+                if ($tag['serializedTypeName'] !== $class && isset($messageClasses[$tag['serializedTypeName']])) {
+                    throw new RuntimeException(\sprintf('The serialized type name "%s" set on class "%s" is the name of another message class, which uses it as its own serialized type.', $tag['serializedTypeName'], $class));
                 }
                 if (isset($typeToClassMap[$tag['serializedTypeName']])) {
                     throw new RuntimeException(\sprintf('The serialized type name "%s" is already mapped to class "%s", cannot map it to "%s" as well. Each serialized type must be unique.', $tag['serializedTypeName'], $typeToClassMap[$tag['serializedTypeName']], $class));

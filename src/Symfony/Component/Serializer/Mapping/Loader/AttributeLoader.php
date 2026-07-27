@@ -133,8 +133,8 @@ class AttributeLoader implements LoaderInterface
 
                     match (true) {
                         $attribute instanceof MaxDepth => $attributeMetadata->setMaxDepth($attribute->maxDepth),
-                        $attribute instanceof SerializedName => $attributeMetadata->setSerializedName($attribute->serializedName),
-                        $attribute instanceof SerializedPath => $attributeMetadata->setSerializedPath($attribute->serializedPath),
+                        $attribute instanceof SerializedName => $attributeMetadata->setSerializedName($attribute->serializedName, $attribute->groups),
+                        $attribute instanceof SerializedPath => $attributeMetadata->setSerializedPath($attribute->serializedPath, $attribute->groups),
                         $attribute instanceof Ignore => $attributeMetadata->setIgnore(true),
                         $attribute instanceof Context => $this->setAttributeContextsForGroups($attribute, $attributeMetadata),
                         default => null,
@@ -191,13 +191,13 @@ class AttributeLoader implements LoaderInterface
                         throw new MappingException(\sprintf('SerializedName on "%s::%s()" cannot be added. SerializedName can only be added on methods beginning with "get", "is", "has", "can" or "set".', $className, $method->name));
                     }
 
-                    $attributeMetadata->setSerializedName($attribute->serializedName);
+                    $attributeMetadata->setSerializedName($attribute->serializedName, $attribute->groups);
                 } elseif ($attribute instanceof SerializedPath) {
                     if (!$attributeMetadata) {
                         throw new MappingException(\sprintf('SerializedPath on "%s::%s()" cannot be added. SerializedPath can only be added on methods beginning with "get", "is", "has", "can" or "set".', $className, $method->name));
                     }
 
-                    $attributeMetadata->setSerializedPath($attribute->serializedPath);
+                    $attributeMetadata->setSerializedPath($attribute->serializedPath, $attribute->groups);
                 } elseif ($attribute instanceof Ignore) {
                     if ($attributeMetadata && !$this->hasPublicPropertyForAccessor($reflectionClass, $attributeName)) {
                         $attributeMetadata->setIgnore(true);

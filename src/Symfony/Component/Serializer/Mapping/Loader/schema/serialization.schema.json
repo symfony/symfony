@@ -45,6 +45,41 @@
                     "type": "boolean",
                     "description": "Whether to ignore this attribute during serialization"
                   },
+                  "serialized": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "description": "Serialized name or path with optional groups",
+                      "additionalProperties": false,
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "Custom name for serialization"
+                        },
+                        "path": {
+                          "type": "string",
+                          "description": "Property path for serialization (e.g., '[one][two]')"
+                        },
+                        "groups": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "Groups this entry applies to"
+                        }
+                      },
+                      "anyOf": [
+                        {
+                          "required": ["name"]
+                        },
+                        {
+                          "required": ["path"]
+                        }
+                      ]
+                    },
+                    "description": "Mapping configurations for this attribute"
+                  },
                   "contexts": {
                     "type": "array",
                     "items": {

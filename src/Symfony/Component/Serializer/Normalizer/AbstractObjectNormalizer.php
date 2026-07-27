@@ -225,7 +225,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             if (!$this->serializer instanceof NormalizerInterface) {
                 if (null === $attributeValue || \is_scalar($attributeValue)) {
-                    $normalizedData = $this->updateData($normalizedData, $attribute, $attributeValue, $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
+                    $normalizedData = $this->updateData($normalizedData, $attribute, $attributeValue, $class, $format, $context, $attributeContext, $attributesMetadata, $classMetadata);
                     continue;
                 }
                 throw new LogicException(\sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
@@ -233,7 +233,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $childContext = $this->createChildContext($attributeContext, $attribute, $format);
 
-            $normalizedData = $this->updateData($normalizedData, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
+            $normalizedData = $this->updateData($normalizedData, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $context, $attributeContext, $attributesMetadata, $classMetadata);
         }
 
         $preserveEmptyObjects = $context[self::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[self::PRESERVE_EMPTY_OBJECTS] ?? false;
@@ -339,7 +339,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $mappedClass = $this->getMappedClass($normalizedData, $type, $context);
 
-        $nestedAttributes = $this->getNestedAttributes($mappedClass);
+        $nestedAttributes = $this->getNestedAttributes($mappedClass, $context);
         $nestedData = $originalNestedData = [];
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()->enableExceptionOnInvalidIndex()->getPropertyAccessor();
         foreach ($nestedAttributes as $property => $serializedPath) {
@@ -890,13 +890,17 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      */
-    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
+    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, array $attributeContext, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
     {
-        if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
+        if (null === $attributeValue && ($attributeContext[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
             return $data;
         }
 
-        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath()) {
+        // resolve the serialized names and paths with the groups of the top-level context, not the
+        // ones a per-attribute #[Context] may override: when denormalizing, the name has to be
+        // resolved before the attribute is known, so only the top-level groups can apply there,
+        // and the name would not round trip otherwise
+        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath($this->getGroups($context))) {
             $propertyAccessor = PropertyAccess::createPropertyAccessor();
             if ($propertyAccessor->isReadable($data, $serializedPath) && null !== $propertyAccessor->getValue($data, $serializedPath)) {
                 throw new LogicException(\sprintf('The element you are trying to set is already populated: "%s".', (string) $serializedPath));
@@ -907,7 +911,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         }
 
         if ($this->nameConverter) {
-            $attribute = $this->nameConverter->normalize($attribute, $class, $format, $context);
+            $nameContext = $attributeContext;
+            if (\array_key_exists(self::GROUPS, $context)) {
+                $nameContext[self::GROUPS] = $context[self::GROUPS];
+            } else {
+                unset($nameContext[self::GROUPS]);
+            }
+            $attribute = $this->nameConverter->normalize($attribute, $class, $format, $nameContext);
         }
 
         $data[$attribute] = $attributeValue;
@@ -1016,7 +1026,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Returns all attributes with a SerializedPath attribute and the respective path.
      */
-    private function getNestedAttributes(string $class): array
+    private function getNestedAttributes(string $class, array $context): array
     {
         if (!$this->classMetadataFactory?->hasMetadataFor($class)) {
             return [];
@@ -1026,7 +1036,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $serializedPaths = [];
         $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
         foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (!$serializedPath = $metadata->getSerializedPath()) {
+            if (!$serializedPath = $metadata->getSerializedPath($this->getGroups($context))) {
                 continue;
             }
             $pathIdentifier = implode(',', $serializedPath->getElements());

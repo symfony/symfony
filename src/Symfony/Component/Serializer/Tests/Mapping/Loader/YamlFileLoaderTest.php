@@ -97,6 +97,8 @@ class YamlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals('baz', $attributesMetadata['foo']->getSerializedName());
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
+        $this->assertEquals('duxi', $attributesMetadata['duux']->getSerializedName());
+        $this->assertEquals('duxa', $attributesMetadata['duux']->getSerializedName(['a']));
     }
 
     public function testSerializedPath()
@@ -107,6 +109,8 @@ class YamlFileLoaderTest extends TestCase
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals(new PropertyPath('[one][two]'), $attributesMetadata['three']->getSerializedPath());
         $this->assertEquals(new PropertyPath('[three][four]'), $attributesMetadata['seven']->getSerializedPath());
+        $this->assertEquals(new PropertyPath('[five][six]'), $attributesMetadata['eleven']->getSerializedPath());
+        $this->assertEquals(new PropertyPath('[six][five]'), $attributesMetadata['eleven']->getSerializedPath(['a']));
     }
 
     public function testSerializedPathInConstructor()
@@ -116,6 +120,8 @@ class YamlFileLoaderTest extends TestCase
 
         $attributesMetadata = $classMetadata->getAttributesMetadata();
         $this->assertEquals(new PropertyPath('[one][two]'), $attributesMetadata['three']->getSerializedPath());
+        $this->assertEquals(new PropertyPath('[five][six]'), $attributesMetadata['eleven']->getSerializedPath());
+        $this->assertEquals(new PropertyPath('[six][five]'), $attributesMetadata['eleven']->getSerializedPath(['a']));
     }
 
     public function testLoadDiscriminatorMap()
@@ -149,6 +155,30 @@ class YamlFileLoaderTest extends TestCase
         $this->expectExceptionMessage('The "ignore" value must be a boolean');
 
         (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-ignore.yml'))->loadClassMetadata(new ClassMetadata(IgnoreDummy::class));
+    }
+
+    public function testLoadInvalidSerializedShape()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('The "serialized" value must be a list');
+
+        (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-serialized-shape.yml'))->loadClassMetadata(new ClassMetadata(SerializedNameDummy::class));
+    }
+
+    public function testLoadInvalidSerializedGroups()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('The "groups" value must be a list');
+
+        (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-serialized-groups.yml'))->loadClassMetadata(new ClassMetadata(SerializedNameDummy::class));
+    }
+
+    public function testLoadInvalidSerializedGroupName()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Group names must be non-empty strings');
+
+        (new YamlFileLoader(__DIR__.'/../../Fixtures/invalid-serialized-group-name.yml'))->loadClassMetadata(new ClassMetadata(SerializedNameDummy::class));
     }
 
     protected function getLoaderForContextMapping(): LoaderInterface

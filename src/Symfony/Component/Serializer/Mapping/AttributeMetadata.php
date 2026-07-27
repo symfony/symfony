@@ -23,8 +23,8 @@ class AttributeMetadata implements AttributeMetadataInterface
     private string $name;
     private array $groups = [];
     private ?int $maxDepth = null;
-    private ?string $serializedName = null;
-    private ?PropertyPath $serializedPath = null;
+    private array $serializedNames = [];
+    private array $serializedPaths = [];
     private bool $ignore = false;
 
     /**
@@ -69,24 +69,76 @@ class AttributeMetadata implements AttributeMetadataInterface
         return $this->maxDepth;
     }
 
-    public function setSerializedName(?string $serializedName): void
+    /**
+     * @param list<string> $groups
+     */
+    public function setSerializedName(?string $serializedName, array $groups = ['*']): void
     {
-        $this->serializedName = $serializedName;
+        if (isset($serializedName)) {
+            foreach ($groups as $group) {
+                $this->serializedNames[$group] = $serializedName;
+            }
+        } else {
+            foreach ($groups as $group) {
+                unset($this->serializedNames[$group]);
+            }
+        }
     }
 
-    public function getSerializedName(): ?string
+    /**
+     * @param list<string> $groups
+     */
+    public function getSerializedName(array $groups = ['*']): ?string
     {
-        return $this->serializedName;
+        // first match in declaration order, so that the order of the groups in the context has no effect
+        foreach ($this->serializedNames as $group => $serializedName) {
+            if ('*' !== $group && \in_array($group, $groups, true)) {
+                return $serializedName;
+            }
+        }
+
+        return $this->serializedNames['*'] ?? null;
     }
 
-    public function setSerializedPath(?PropertyPath $serializedPath = null): void
+    public function getSerializedNames(): array
     {
-        $this->serializedPath = $serializedPath;
+        return $this->serializedNames;
     }
 
-    public function getSerializedPath(): ?PropertyPath
+    /**
+     * @param list<string> $groups
+     */
+    public function setSerializedPath(?PropertyPath $serializedPath = null, array $groups = ['*']): void
     {
-        return $this->serializedPath;
+        if (isset($serializedPath)) {
+            foreach ($groups as $group) {
+                $this->serializedPaths[$group] = $serializedPath;
+            }
+        } else {
+            foreach ($groups as $group) {
+                unset($this->serializedPaths[$group]);
+            }
+        }
+    }
+
+    /**
+     * @param list<string> $groups
+     */
+    public function getSerializedPath(array $groups = ['*']): ?PropertyPath
+    {
+        // first match in declaration order, so that the order of the groups in the context has no effect
+        foreach ($this->serializedPaths as $group => $serializedPath) {
+            if ('*' !== $group && \in_array($group, $groups, true)) {
+                return $serializedPath;
+            }
+        }
+
+        return $this->serializedPaths['*'] ?? null;
+    }
+
+    public function getSerializedPaths(): array
+    {
+        return $this->serializedPaths;
     }
 
     public function setIgnore(bool $ignore): void
@@ -159,8 +211,16 @@ class AttributeMetadata implements AttributeMetadataInterface
 
         // Overwrite only if not defined
         $this->maxDepth ??= $attributeMetadata->getMaxDepth();
-        $this->serializedName ??= $attributeMetadata->getSerializedName();
-        $this->serializedPath ??= $attributeMetadata->getSerializedPath();
+
+        // Overwrite only if serialized names are empty
+        if (!$this->serializedNames) {
+            $this->serializedNames = self::getSerializedNamesFromAttributeMetadata($attributeMetadata);
+        }
+
+        // Overwrite only if serialized paths are empty
+        if (!$this->serializedPaths) {
+            $this->serializedPaths = self::getSerializedPathsFromAttributeMetadata($attributeMetadata);
+        }
 
         // Overwrite only if both contexts are empty
         if (!$this->normalizationContexts && !$this->denormalizationContexts) {
@@ -173,17 +233,73 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
+    /**
+     * BC layer for extraction of serialized names from attribute metadata.
+     * Can be removed as soon as AttributeMetadataInterface::getSerializedNames() become part of the interface.
+     *
+     * @internal
+     *
+     * @return array<string, string>
+     */
+    public static function getSerializedNamesFromAttributeMetadata(AttributeMetadataInterface $attributeMetadata): array
+    {
+        if (method_exists($attributeMetadata, 'getSerializedNames')) {
+            return $attributeMetadata->getSerializedNames();
+        }
+
+        if (null !== $serializedName = $attributeMetadata->getSerializedName()) {
+            return ['*' => $serializedName];
+        }
+
+        return [];
+    }
+
+    /**
+     * BC layer for extraction of serialized paths from attribute metadata.
+     * Can be removed as soon as AttributeMetadataInterface::getSerializedPaths() become part of the interface.
+     *
+     * @internal
+     *
+     * @return array<string, PropertyPath>
+     */
+    public static function getSerializedPathsFromAttributeMetadata(AttributeMetadataInterface $attributeMetadata): array
+    {
+        if (method_exists($attributeMetadata, 'getSerializedPaths')) {
+            return $attributeMetadata->getSerializedPaths();
+        }
+
+        if (null !== $serializedPath = $attributeMetadata->getSerializedPath()) {
+            return ['*' => $serializedPath];
+        }
+
+        return [];
+    }
+
     public function __serialize(): array
     {
         return [
             'name' => $this->name,
             'groups' => $this->groups,
             'maxDepth' => $this->maxDepth,
-            'serializedName' => $this->serializedName,
-            'serializedPath' => $this->serializedPath,
+            'serializedNames' => $this->serializedNames,
+            'serializedPaths' => $this->serializedPaths,
             'ignore' => $this->ignore,
             'normalizationContexts' => $this->normalizationContexts,
             'denormalizationContexts' => $this->denormalizationContexts,
         ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        // a cache warmed before the names and paths became per-group holds the single-value keys
+        if (\array_key_exists('serializedName', $data)) {
+            $data['serializedNames'] = null !== $data['serializedName'] ? ['*' => $data['serializedName']] : [];
+            $data['serializedPaths'] = null !== ($data['serializedPath'] ?? null) ? ['*' => $data['serializedPath']] : [];
+            unset($data['serializedName'], $data['serializedPath']);
+        }
+
+        foreach ($data as $property => $value) {
+            $this->$property = $value;
+        }
     }
 }

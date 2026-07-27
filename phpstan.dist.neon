@@ -37,3 +37,8 @@ parameters:
         -
             message: '#^Method Symfony\\Component\\ErrorHandler\\ErrorRenderer\\HtmlErrorRenderer\:\:\w+\(\) is unused\.$#'
             path: src/Symfony/Component/ErrorHandler/ErrorRenderer/HtmlErrorRenderer.php
+        # the $groups argument is declared on the final AttributeMetadata, and left commented
+        # out on the interface so implementers are not forced to add it
+        -
+            message: '#^Method Symfony\\Component\\Serializer\\Mapping\\AttributeMetadataInterface\:\:(get|set)Serialized(Name|Path)\(\) invoked with [12] parameters?, [01] required\.$#'
+            path: src/Symfony/Component/Serializer/*.php

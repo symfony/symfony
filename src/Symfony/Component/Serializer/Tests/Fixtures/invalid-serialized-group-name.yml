@@ -1,0 +1,6 @@
+'Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameDummy':
+  attributes:
+    foo:
+      serialized:
+        - name: bar
+          groups: ['']

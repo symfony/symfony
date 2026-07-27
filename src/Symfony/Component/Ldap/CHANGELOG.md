@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `$ldapUsersOnly` argument to `CheckLdapCredentialsListener`, to bind only `LdapUser` instances against the LDAP server
+
 8.0
 ---
 

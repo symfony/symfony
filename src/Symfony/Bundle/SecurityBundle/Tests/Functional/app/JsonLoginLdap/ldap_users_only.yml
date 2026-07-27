@@ -1,0 +1,22 @@
+imports:
+    - { resource: ./config.yml }
+
+security:
+    providers:
+        local:
+            memory:
+                users:
+                    bob: { password: 'db-pass', roles: [ROLE_USER] }
+        chain:
+            chain:
+                providers: [ldap, local]
+
+    firewalls:
+        main:
+            provider: chain
+            json_login_ldap:
+                dn_string: 'uid={user_identifier},dc=onfroy,dc=net'
+                ldap_users_only: true
+
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext

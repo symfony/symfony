@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `MysqlStore` based on MySQL `GET_LOCK()` functionality, usable with the `mysql+advisory:` DSN
+
 8.1
 ---
 

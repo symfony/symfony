@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Render dump toggles as `<button>` elements with `aria-expanded`, so they can be reached and operated with the keyboard
+ * Add a `Ctrl/Cmd+Shift+ArrowDown`/`ArrowUp` shortcut to expand or collapse all children of the focused toggle
+
 8.1
 ---
 

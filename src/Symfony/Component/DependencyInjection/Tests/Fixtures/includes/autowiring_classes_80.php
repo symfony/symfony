@@ -31,6 +31,41 @@ class AutowireWither
     }
 }
 
+class AutowirePrioritizedSetters
+{
+    #[Required(priority: -10)]
+    public function setLow(Foo $foo): void
+    {
+    }
+
+    #[Required]
+    public function setFoo(Foo $foo): void
+    {
+    }
+
+    #[Required]
+    public function setBar(Foo $foo): void
+    {
+    }
+
+    #[Required(priority: 10)]
+    public function setHigh(Foo $foo): void
+    {
+    }
+
+    #[Required]
+    public function withFoo(Foo $foo): static
+    {
+        return $this;
+    }
+
+    #[Required(priority: 10)]
+    public function withBar(Foo $foo): static
+    {
+        return $this;
+    }
+}
+
 class AutowireProperty
 {
     #[Required]

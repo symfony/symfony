@@ -457,6 +457,7 @@ class FrameworkExtension extends Extension
                 ->clearTag('kernel.event_subscriber');
 
             $container->removeDefinition('console.command.serializer_debug');
+            $container->removeDefinition('console.command.debug.section.serializer');
         }
 
         if ($typeInfoEnabled = $this->readConfigEnabled('type_info', $container, $config['type_info'])) {
@@ -552,6 +553,7 @@ class FrameworkExtension extends Extension
             }
         } else {
             $container->removeDefinition('console.command.form_debug');
+            $container->removeDefinition('console.command.debug.section.form');
         }
 
         // validation depends on form, annotations being registered
@@ -567,6 +569,7 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('cache.scheduler');
             $container->removeDefinition('console.command.scheduler_debug');
+            $container->removeDefinition('console.command.debug.section.scheduler');
         }
 
         // messenger depends on validation, and lock being registered
@@ -576,6 +579,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.messenger_consume_messages');
             $container->removeDefinition('console.command.messenger_stats');
             $container->removeDefinition('console.command.messenger_debug');
+            $container->removeDefinition('console.command.debug.section.messenger');
             $container->removeDefinition('console.command.messenger_stop_workers');
             $container->removeDefinition('console.command.messenger_setup_transports');
             $container->removeDefinition('console.command.messenger_failed_messages_retry');
@@ -1242,6 +1246,7 @@ class FrameworkExtension extends Extension
         if (!$this->readConfigEnabled('router', $container, $config)) {
             $container->removeDefinition('console.command.router_debug');
             $container->removeDefinition('console.command.router_match');
+            $container->removeDefinition('console.command.debug.section.router');
             $container->removeDefinition('messenger.middleware.router_context');
 
             return;
@@ -1546,6 +1551,7 @@ class FrameworkExtension extends Extension
     {
         if (!$this->readConfigEnabled('translator', $container, $config)) {
             $container->removeDefinition('console.command.translation_debug');
+            $container->removeDefinition('console.command.debug.section.i18n');
             $container->removeDefinition('console.command.translation_extract');
             $container->removeDefinition('console.command.translation_pull');
             $container->removeDefinition('console.command.translation_push');
@@ -1621,6 +1627,10 @@ class FrameworkExtension extends Extension
 
         if ($container->hasDefinition('console.command.translation_debug')) {
             $container->getDefinition('console.command.translation_debug')->replaceArgument(5, $transPaths);
+        }
+
+        if ($container->hasDefinition('console.command.debug.section.i18n')) {
+            $container->getDefinition('console.command.debug.section.i18n')->replaceArgument(5, $transPaths);
         }
 
         if ($container->hasDefinition('console.command.translation_extract')) {
@@ -1745,6 +1755,7 @@ class FrameworkExtension extends Extension
     {
         if (!$this->readConfigEnabled('validation', $container, $config)) {
             $container->removeDefinition('console.command.validator_debug');
+            $container->removeDefinition('console.command.debug.section.validator');
             $container->removeDefinition('.console.validate_question_input_listener');
 
             return;
@@ -2105,6 +2116,9 @@ class FrameworkExtension extends Extension
 
         $chainLoader->replaceArgument(0, $serializerLoaders);
         $container->getDefinition('serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
+        if ($container->hasDefinition('console.command.debug.section.serializer')) {
+            $container->getDefinition('console.command.debug.section.serializer')->replaceArgument(1, $serializerLoaders);
+        }
 
         if ($config['name_converter'] ?? false) {
             $container->setParameter('.serializer.name_converter', $config['name_converter']);
@@ -2371,6 +2385,7 @@ class FrameworkExtension extends Extension
 
         if (!$this->hasConsole()) {
             $container->removeDefinition('console.command.scheduler_debug');
+            $container->removeDefinition('console.command.debug.section.scheduler');
         }
     }
 

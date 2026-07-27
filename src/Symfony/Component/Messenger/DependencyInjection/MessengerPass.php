@@ -197,7 +197,11 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
-        if ($container->hasDefinition('console.command.messenger_debug')) {
+        $debugConsumers = array_filter(
+            ['console.command.messenger_debug', 'console.command.debug.section.messenger'],
+            $container->hasDefinition(...),
+        );
+        if ($debugConsumers) {
             $debugCommandMapping = $handlersByBusAndMessage;
             foreach ($busIds as $bus) {
                 if (!isset($debugCommandMapping[$bus])) {
@@ -210,7 +214,10 @@ class MessengerPass implements CompilerPassInterface
                     }
                 }
             }
-            $container->getDefinition('console.command.messenger_debug')->replaceArgument(0, $debugCommandMapping);
+
+            foreach ($debugConsumers as $debugConsumer) {
+                $container->getDefinition($debugConsumer)->replaceArgument(0, $debugCommandMapping);
+            }
         }
     }
 

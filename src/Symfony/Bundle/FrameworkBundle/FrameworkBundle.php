@@ -15,6 +15,8 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DebugSectionNamesPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DebugValidatorClassCandidatesPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
@@ -177,6 +179,8 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $this->addCompilerPassIfExists($container, AttributeMetadataPass::class);
+        $container->addCompilerPass(new DebugValidatorClassCandidatesPass());
+        $container->addCompilerPass(new DebugSectionNamesPass());
         $container->addCompilerPass(new TranslationLintCommandPass(), PassConfig::TYPE_BEFORE_REMOVING, 10);
         // must be registered as late as possible to get access to all Twig paths registered in
         // twig.template_iterator definition

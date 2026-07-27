@@ -11,12 +11,31 @@
 
 namespace Symfony\Component\Translation\Loader;
 
+use Symfony\Component\Translation\Exception\InvalidResourceException;
+use Symfony\Component\Translation\MessageCatalogue;
+
 /**
  * @copyright Copyright (c) 2010, Union of RAD https://github.com/UnionOfRAD/lithium
  * @copyright Copyright (c) 2012, Clemens Tolboom
  */
 class PoFileLoader extends FileLoader
 {
+    private array $metadata = [];
+    private array $contexts = [];
+
+    public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
+    {
+        $this->metadata = [];
+        $this->contexts = [];
+        $catalogue = parent::load($resource, $locale, $domain);
+
+        foreach ($this->metadata as $id => $metadata) {
+            $catalogue->setMetadata($id, $metadata, $domain);
+        }
+
+        return $catalogue;
+    }
+
     /**
      * Parses portable object (PO) format.
      *
@@ -55,7 +74,8 @@ class PoFileLoader extends FileLoader
      * - No support for comments spanning multiple lines.
      * - Translator and extracted comments are treated as being the same type.
      * - Message IDs are allowed to have other encodings as just US-ASCII.
-     * - Contexts (msgctxt) are parsed but discarded.
+     * - Contexts (msgctxt) are stored in the message metadata but ignored in the
+     *   message key, so reusing a msgid with a different context is not supported.
      *
      * Items with an empty id are ignored.
      */
@@ -86,6 +106,7 @@ class PoFileLoader extends FileLoader
                 }
                 $flags = array_map('trim', explode(',', substr($line, 2)));
             } elseif (str_starts_with($line, 'msgctxt "')) {
+                // msgctxt always precedes its msgid, so the context belongs to the next entry
                 if (null !== $item['translated']) {
                     $this->saveItem($messages, $item, $flags, $defaults);
                 }
@@ -155,7 +176,19 @@ class PoFileLoader extends FileLoader
             $translated += $empties;
             ksort($translated);
 
+            $context = null !== $item['context'] ? stripcslashes($item['context']) : null;
+            if (\array_key_exists($id, $this->contexts) && $context !== $this->contexts[$id]) {
+                throw new InvalidResourceException(null === $context || null === $this->contexts[$id]
+                    ? \sprintf('The "%s" message is defined both with and without a context, which is not supported because contexts are ignored in message keys.', $id)
+                    : \sprintf('The "%s" message is defined twice with different contexts ("%s" and "%s"), which is not supported because contexts are ignored in message keys.', $id, $this->contexts[$id], $context));
+            }
+            $this->contexts[$id] = $context;
+
             $messages[$id] = stripcslashes(implode('|', $translated));
+
+            if (null !== $context) {
+                $this->metadata[$id] = ['context' => $context];
+            }
         }
     }
 }

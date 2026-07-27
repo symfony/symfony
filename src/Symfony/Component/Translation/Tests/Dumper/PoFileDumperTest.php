@@ -60,6 +60,31 @@ class PoFileDumperTest extends TestCase
         $this->assertStringNotContainsString('msgid_plural', $dump);
     }
 
+    public function testDumpContext()
+    {
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->add(['foo' => 'bar']);
+        $catalogue->setMetadata('foo', ['context' => 'menu']);
+
+        $dumper = new PoFileDumper();
+
+        $expected = <<<'EOF'
+            msgid ""
+            msgstr ""
+            "Content-Type: text/plain; charset=UTF-8\n"
+            "Content-Transfer-Encoding: 8bit\n"
+            "Language: en\n"
+            "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+            msgctxt "menu"
+            msgid "foo"
+            msgstr "bar"
+
+            EOF;
+
+        $this->assertSame($expected, $dumper->formatCatalogue($catalogue, 'messages'));
+    }
+
     public function testDumpPlurals()
     {
         $catalogue = new MessageCatalogue('en');

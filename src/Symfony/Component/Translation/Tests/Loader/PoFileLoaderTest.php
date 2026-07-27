@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Tests\Loader;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\PoFileLoader;
 
@@ -118,7 +119,7 @@ class PoFileLoaderTest extends TestCase
         ], $catalogue->all('domain1'));
     }
 
-    public function testContextsAreDiscarded()
+    public function testLoadContextsIntoMetadata()
     {
         $loader = new PoFileLoader();
         $resource = __DIR__.'/../Fixtures/contexts.po';
@@ -129,6 +130,32 @@ class PoFileLoaderTest extends TestCase
             'foo2' => 'bar2',
             'foo3' => 'bar3',
         ], $catalogue->all('domain1'));
+
+        $this->assertEquals(['context' => 'menu'], $catalogue->getMetadata('foo1', 'domain1'));
+        $this->assertNull($catalogue->getMetadata('foo2', 'domain1'));
+        $this->assertEquals(['context' => 'multi-line context'], $catalogue->getMetadata('foo3', 'domain1'));
+    }
+
+    public function testLoadThrowsWhenTheSameMessageHasDifferentContexts()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../Fixtures/contexts-ambiguous.po';
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('The "foo" message is defined twice with different contexts ("menu" and "sidebar"), which is not supported because contexts are ignored in message keys.');
+
+        $loader->load($resource, 'en', 'domain1');
+    }
+
+    public function testLoadThrowsWhenTheSameMessageIsDefinedWithAndWithoutContext()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../Fixtures/contexts-with-and-without.po';
+
+        $this->expectException(InvalidResourceException::class);
+        $this->expectExceptionMessage('The "foo" message is defined both with and without a context, which is not supported because contexts are ignored in message keys.');
+
+        $loader->load($resource, 'en', 'domain1');
     }
 
     public function testMissingPlurals()

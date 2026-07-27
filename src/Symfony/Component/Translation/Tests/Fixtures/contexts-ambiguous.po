@@ -1,0 +1,7 @@
+msgctxt "menu"
+msgid "foo"
+msgstr "bar1"
+
+msgctxt "sidebar"
+msgid "foo"
+msgstr "bar2"

@@ -208,7 +208,9 @@ class HtmlDumper extends CliDumper
 
             var rxEsc = /([.*+?^${}()|\[\]\/\\])/g,
                 idRx = /\bsf-dump-\d+-ref[012]\w+\b/,
+                toggleTagRx = /^(A|BUTTON)$/,
                 keyHint = 0 <= navigator.platform.toUpperCase().indexOf('MAC') ? 'Cmd' : 'Ctrl',
+                ariaKeyHint = 'Cmd' === keyHint ? 'Meta' : 'Control',
                 addEventListener = function (e, n, cb) {
                     e.addEventListener(n, cb, false);
                 };
@@ -244,6 +246,8 @@ class HtmlDumper extends CliDumper
                 }
 
                 a.lastChild.innerHTML = arrow;
+                a.setAttribute('aria-expanded', 'sf-dump-expanded' === newClass ? 'true' : 'false');
+                setToggleKeyshortcuts(a, s, 'sf-dump-expanded' === newClass);
                 s.className = s.className.replace(/\bsf-dump-(compact|expanded)\b/, newClass);
 
                 if (recursive) {
@@ -253,6 +257,8 @@ class HtmlDumper extends CliDumper
                             if (-1 == a[s].className.indexOf(newClass)) {
                                 a[s].className = newClass;
                                 a[s].previousSibling.lastChild.innerHTML = arrow;
+                                a[s].previousSibling.setAttribute('aria-expanded', 'sf-dump-expanded' === newClass ? 'true' : 'false');
+                                setToggleKeyshortcuts(a[s].previousSibling, a[s], 'sf-dump-expanded' === newClass);
                             }
                         }
                     } catch (e) {
@@ -261,6 +267,15 @@ class HtmlDumper extends CliDumper
 
                 return true;
             };
+
+            function setToggleKeyshortcuts(a, content, expanded) {
+                /* a shared reference has a text node for content, there is nothing to expand there */
+                if (content && content.querySelector && content.querySelector('samp')) {
+                    a.setAttribute('aria-keyshortcuts', ariaKeyHint + (expanded ? '+Shift+ArrowUp' : '+Shift+ArrowDown'));
+                } else {
+                    a.removeAttribute('aria-keyshortcuts');
+                }
+            }
 
             function collapse(a, recursive) {
                 var s = a.nextSibling || {}, oldClass = s.className;
@@ -287,7 +302,7 @@ class HtmlDumper extends CliDumper
             };
 
             function collapseAll(root) {
-                var a = root.querySelector('a.sf-dump-toggle');
+                var a = root.querySelector('.sf-dump-toggle');
                 if (a) {
                     collapse(a, true);
                     expand(a);
@@ -301,7 +316,7 @@ class HtmlDumper extends CliDumper
             function reveal(node) {
                 var previous, parents = [];
 
-                while ((node = node.parentNode || {}) && (previous = node.previousSibling) && 'A' === previous.tagName) {
+                while ((node = node.parentNode || {}) && (previous = node.previousSibling) && toggleTagRx.test(previous.tagName)) {
                     parents.push(previous);
                 }
 
@@ -355,14 +370,16 @@ class HtmlDumper extends CliDumper
 
                 function a(e, f) {
                     addEventListener(root, e, function (e, n) {
-                        if ('A' == e.target.tagName) {
+                        if (e.target.closest && e.target.closest('.sf-dump-search-wrapper')) {
+                            /* the search bar has buttons of its own, they are not dump toggles */
+                        } else if (toggleTagRx.test(e.target.tagName)) {
                             f(e.target, e);
-                        } else if ('A' == e.target.parentNode.tagName) {
+                        } else if (toggleTagRx.test(e.target.parentNode.tagName)) {
                             f(e.target.parentNode, e);
                         } else {
                             n = /\bsf-dump-ellipsis\b/.test(e.target.className) ? e.target.parentNode : e.target;
 
-                            if ((n = n.nextElementSibling) && 'A' == n.tagName) {
+                            if ((n = n.nextElementSibling) && toggleTagRx.test(n.tagName)) {
                                 if (!/\bsf-dump-toggle\b/.test(n.className)) {
                                     n = n.nextElementSibling || n;
                                 }
@@ -435,6 +452,30 @@ class HtmlDumper extends CliDumper
                     }
                 });
 
+                addEventListener(root, 'keydown', function (e) {
+                    /* Ctrl+Shift+down/up: expand/collapse all children. A dedicated shortcut
+                     * instead of Ctrl+click's keyboard equivalent, since screen readers can
+                     * activate a control themselves without relaying the Ctrl state. */
+                    if (isCtrlKey(e) && e.shiftKey && /\bsf-dump-toggle\b/.test(e.target.className)) {
+                        if (40 === e.keyCode) {
+                            e.preventDefault();
+                            /* expand() returns early when the node is already expanded, so
+                             * collapse first to reach the children of an expanded node too */
+                            collapse(e.target);
+                            expand(e.target, true);
+                        } else if (38 === e.keyCode) {
+                            e.preventDefault();
+                            expand(e.target);
+                            collapse(e.target, true);
+                        }
+                    } else if (32 === e.keyCode && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey && 'A' === e.target.tagName && /\bsf-dump-toggle\b/.test(e.target.className)) {
+                        /* Space activates buttons natively but scrolls the page on links;
+                         * make the shared-reference link toggle behave like the buttons. */
+                        e.preventDefault();
+                        e.target.click();
+                    }
+                });
+
                 elt = root.getElementsByTagName('SAMP');
                 len = elt.length;
                 i = 0;
@@ -446,16 +487,29 @@ class HtmlDumper extends CliDumper
                     elt = t[i];
                     if ('SAMP' == elt.tagName) {
                         a = elt.previousSibling || {};
-                        if ('A' != a.tagName) {
-                            a = doc.createElement('A');
-                            a.className = 'sf-dump-ref';
-                            elt.parentNode.insertBefore(a, elt);
-                        } else {
+                        if ('A' === a.tagName && a.hasAttribute('href')) {
                             a.innerHTML += ' ';
+                        } else {
+                            h = doc.createElement('BUTTON');
+                            h.type = 'button';
+                            h.className = 'sf-dump-ref';
+                            if ('A' === a.tagName) {
+                                h.innerHTML = a.innerHTML + ' ';
+                                a.parentNode.replaceChild(h, a);
+                            } else {
+                                elt.parentNode.insertBefore(h, elt);
+                            }
+                            a = h;
                         }
                         a.title = (a.title ? a.title+'\n[' : '[')+keyHint+'+click] Expand all children';
-                        a.innerHTML += elt.className == 'sf-dump-compact' ? '<span>▶</span>' : '<span>▼</span>';
+                        if (!a.textContent.trim()) {
+                            /* the arrow that follows is decorative, so the button needs a name of its own */
+                            a.setAttribute('aria-label', 'Toggle children');
+                        }
+                        a.innerHTML += elt.className == 'sf-dump-compact' ? '<span aria-hidden=true>▶</span>' : '<span aria-hidden=true>▼</span>';
                         a.className += ' sf-dump-toggle';
+                        a.setAttribute('aria-expanded', elt.className == 'sf-dump-compact' ? 'false' : 'true');
+                        setToggleKeyshortcuts(a, elt, elt.className != 'sf-dump-compact');
 
                         x = 1;
                         if ('sf-dump' != elt.parentNode.className) {
@@ -473,12 +527,15 @@ class HtmlDumper extends CliDumper
                                 elt.appendChild(a);
                                 s.parentNode.insertBefore(a, s);
                                 if (/^[@#]/.test(elt.innerHTML)) {
-                                    elt.innerHTML += ' <span>▶</span>';
+                                    elt.innerHTML += ' <span aria-hidden=true>▶</span>';
                                 } else {
-                                    elt.innerHTML = '<span>▶</span>';
+                                    elt.innerHTML = '<span aria-hidden=true>▶</span>';
+                                    elt.setAttribute('aria-label', 'Toggle children');
                                     elt.className = 'sf-dump-ref';
                                 }
                                 elt.className += ' sf-dump-toggle';
+                                elt.setAttribute('aria-expanded', 'false');
+                                setToggleKeyshortcuts(elt, elt.nextSibling, false);
                             } catch (e) {
                                 if ('&' == elt.innerHTML.charAt(0)) {
                                     elt.innerHTML = '…';
@@ -638,7 +695,8 @@ class HtmlDumper extends CliDumper
                                 searchInput.value = '';
                             } else if (
                                 (isCtrlKey(e) && 71 === e.keyCode) /* CMD/CTRL + G */
-                                || 13 === e.keyCode /* Enter */
+                                /* Enter, unless it is activating a focused toggle */
+                                || (13 === e.keyCode && !/\bsf-dump-toggle\b/.test(e.target.className))
                                 || 114 === e.keyCode /* F3 */
                             ) {
                                 e.preventDefault();
@@ -670,8 +728,8 @@ class HtmlDumper extends CliDumper
                             h = elt.innerHTML;
                             elt[elt.innerText ? 'innerText' : 'textContent'] = s.substring(0, options.maxStringLength);
                             elt.className += ' sf-dump-str-collapse';
-                            elt.innerHTML = '<span class=sf-dump-str-collapse>'+h+'<a class="sf-dump-ref sf-dump-str-toggle" title="Collapse"> ◀</a></span>'+
-                                '<span class=sf-dump-str-expand>'+elt.innerHTML+'<a class="sf-dump-ref sf-dump-str-toggle" title="'+x+' remaining characters"> ▶</a></span>';
+                            elt.innerHTML = '<span class=sf-dump-str-collapse>'+h+'<button type=button class="sf-dump-ref sf-dump-str-toggle" title="Collapse" aria-label="Collapse" aria-expanded=true> ◀</button></span>'+
+                                '<span class=sf-dump-str-expand>'+elt.innerHTML+'<button type=button class="sf-dump-ref sf-dump-str-toggle" title="'+x+' remaining characters" aria-label="Show '+x+' remaining characters" aria-expanded=false> ▶</button></span>';
                         }
                     }
                 } catch (e) {
@@ -706,12 +764,25 @@ class HtmlDumper extends CliDumper
             pre.sf-dump .sf-dump-ellipsization {
                 display: inline-flex;
             }
-            pre.sf-dump a {
+            pre.sf-dump a,
+            pre.sf-dump .sf-dump-toggle,
+            pre.sf-dump .sf-dump-str-toggle {
                 text-decoration: none;
                 cursor: pointer;
                 border: 0;
                 outline: none;
                 color: inherit;
+                background: none;
+                padding: 0;
+                margin: 0;
+                font: inherit;
+                display: inline;
+            }
+            pre.sf-dump a:focus-visible,
+            pre.sf-dump .sf-dump-toggle:focus-visible,
+            pre.sf-dump .sf-dump-str-toggle:focus-visible {
+                outline: 1px solid;
+                outline-offset: 1px;
             }
             pre.sf-dump img {
                 max-width: 50em;

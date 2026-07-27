@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-06-29T23:06:39Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by ryanpon-payjoy at 2026-07-02T17:11:53Z
+
+Pushed in a lint fix, but the rest of the test failures seemed unrelated. Rebased the branch to see if that fixes it on the next run.
+
+---------------------------------------------------------------------------
+
+by ryanpon-payjoy at 2026-07-02T17:25:57Z
+
+Doc PR https://github.com/symfony/symfony-docs/pull/22440
+
+---------------------------------------------------------------------------
+
+by ryanpon-payjoy at 2026-07-02T19:48:00Z
+
+Failing tests seem to be the same as upstream 8.2.
+There's one outstanding lint error from an exception message that doesn't seem to be valid.
+
+---------------------------------------------------------------------------
+
+by ryanpon-payjoy at 2026-07-13T19:31:43Z
+
+@GromNaN thanks for reviewing. Anything else that needs to be done for this to be mergeable? The fabbot check is for the lint you mentioned shouldn't be fixed.

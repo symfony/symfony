@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
+use Symfony\Contracts\Service\Attribute\Required;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
@@ -60,6 +61,32 @@ class AutowireRequiredMethodsPassTest extends TestCase
             array_column($methodCalls, 0)
         );
         $this->assertEquals([], $methodCalls[0][1]);
+    }
+
+    public function testSetterInjectionWithPriority()
+    {
+        if (!property_exists(Required::class, 'priority')) {
+            $this->markTestSkipped('symfony/service-contracts 3.7+ is required.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(Foo::class);
+
+        $container
+            ->register('prioritized_setters', AutowirePrioritizedSetters::class)
+            ->setAutowired(true);
+
+        (new ResolveClassPass())->process($container);
+        (new AutowireRequiredMethodsPass())->process($container);
+
+        $this->assertSame([
+            ['withBar', [], true],
+            ['withFoo', [], true],
+            ['setHigh', []],
+            ['setFoo', []],
+            ['setBar', []],
+            ['setLow', []],
+        ], $container->getDefinition('prioritized_setters')->getMethodCalls());
     }
 
     public function testWitherWithStaticReturnTypeInjection()

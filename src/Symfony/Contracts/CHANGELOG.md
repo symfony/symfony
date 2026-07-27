@@ -4,6 +4,7 @@ CHANGELOG
 3.7
 ---
 
+ * Add a `$priority` argument to the `Required` attribute to control the order in which required methods are called
  * Add support for the `max_connect_duration` option in `HttpClientInterface`
  * Add support for hooked properties in `ServiceMethodsSubscriberTrait`
  * Add `ContainerProviderInterface`

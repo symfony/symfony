@@ -30,7 +30,17 @@ class ConsoleOutputTest extends TestCase
         $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true, $formatter = new OutputFormatter());
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertSame($formatter, $output->getFormatter());
-        $this->assertSame($formatter, $output->getErrorOutput()->getFormatter(), 'Output and ErrorOutput should use the same provided formatter');
+        $this->assertEquals($formatter, $output->getErrorOutput()->getFormatter(), 'ErrorOutput should use an equivalent formatter');
+    }
+
+    public function testStdoutAndStderrAreDecoratedIndependently()
+    {
+        $output = new ConsoleOutput(Output::VERBOSITY_QUIET, true, new OutputFormatter());
+
+        $output->getErrorOutput()->setDecorated(false);
+
+        $this->assertTrue($output->isDecorated());
+        $this->assertFalse($output->getErrorOutput()->isDecorated());
     }
 
     public function testSetFormatter()

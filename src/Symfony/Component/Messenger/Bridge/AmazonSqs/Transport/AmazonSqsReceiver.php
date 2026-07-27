@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
-use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
@@ -47,7 +47,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
             if (!$sqsEnvelopes = $this->connection->get($fetchSize)) {
                 return;
             }
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
 
@@ -72,7 +72,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
     {
         try {
             $this->connection->delete($this->findSqsReceivedStampId($envelope));
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -81,7 +81,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
     {
         try {
             $this->connection->reject($this->findSqsReceivedStampId($envelope));
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -90,7 +90,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
     {
         try {
             $this->connection->keepalive($this->findSqsReceivedStampId($envelope), $seconds);
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -99,7 +99,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
     {
         try {
             return $this->connection->getMessageCount();
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }

@@ -61,6 +61,19 @@ class ConsoleCommandProcessorTest extends TestCase
         $this->assertEquals([], $record['extra']);
     }
 
+    public function testCommandDataSurvivesReset()
+    {
+        $processor = new ConsoleCommandProcessor();
+        $processor->addCommandData($this->getConsoleEvent());
+
+        $processor->reset();
+
+        $record = $processor(RecordFactory::create());
+
+        $this->assertArrayHasKey('command', $record['extra']);
+        $this->assertSame(self::TEST_NAME, $record['extra']['command']['name']);
+    }
+
     private function getConsoleEvent(): ConsoleEvent
     {
         $input = $this->createStub(InputInterface::class);

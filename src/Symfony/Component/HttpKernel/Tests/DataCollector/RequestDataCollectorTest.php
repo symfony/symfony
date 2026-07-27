@@ -518,7 +518,7 @@ class RequestDataCollectorTest extends TestCase
 
     public function testCurlCommandWithCookies()
     {
-        $request = Request::create('http://test.com/foo', 'GET', [], ['session' => 'abc123', 'lang' => 'en']);
+        $request = Request::create('http://test.com/foo', 'GET', [], ['session' => 'abc123', 'lang' => 'en', 'note' => 'hello world', 'prefs' => ['setting1' => 'value1', 'setting2' => 'value2', 'setting3' => ['listItem1', 'listItem2']]]);
 
         $c = new RequestDataCollector();
         $c->collect($request, $this->createResponse());
@@ -527,6 +527,22 @@ class RequestDataCollectorTest extends TestCase
         $this->assertStringContainsString('--cookie', $curlCommand);
         $this->assertStringContainsString('session=abc123', $curlCommand);
         $this->assertStringContainsString('lang=en', $curlCommand);
+        $this->assertStringContainsString('prefs[setting1]=value1', $curlCommand);
+        $this->assertStringContainsString('prefs[setting2]=value2', $curlCommand);
+        $this->assertStringContainsString('prefs[setting3][0]=listItem1', $curlCommand);
+        $this->assertStringContainsString('prefs[setting3][1]=listItem2', $curlCommand);
+        // a cookie is not form data, so a space is "%20" and "+" stays a literal plus
+        $this->assertStringContainsString('note=hello%20world', $curlCommand);
+    }
+
+    public function testCurlCommandWithCookieHoldingAnEmptyArray()
+    {
+        $request = Request::create('http://test.com/foo', 'GET', [], ['prefs' => []]);
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $this->assertStringNotContainsString('--cookie', $c->getCurlCommand());
     }
 
     public function testCurlCommandPutWithBody()

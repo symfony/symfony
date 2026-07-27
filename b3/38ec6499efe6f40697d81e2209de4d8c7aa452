@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-07-24T14:38:11Z
+
+IIRC, `$allowMultipleAttributes` was meant to be a temporary solution until we could deprecate the usage of multiple attributes in other layers of the stack. The proper change is probably to do the next step of the change.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-24T14:38:49Z
+
+Related issue: #54060
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-24T15:52:31Z
+
+So, should we close here ... or should we merge this and also fix #54060 in a future PR?

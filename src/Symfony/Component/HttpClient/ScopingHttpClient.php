@@ -45,6 +45,30 @@ class ScopingHttpClient implements HttpClientInterface, ResetInterface
         return new self($client, [$regexp => $defaultOptions], $regexp);
     }
 
+    /**
+     * Builds a client scoped to several base URIs, the first one being the default.
+     *
+     * The scope matches all of them, so the options keep applying whichever one a request
+     * is resolved against, for instance when RetryableHttpClient rotates them.
+     *
+     * @param non-empty-list<string> $baseUris
+     */
+    public static function forBaseUris(HttpClientInterface $client, array $baseUris, array $defaultOptions = [], ?string $regexp = null): self
+    {
+        if (!$baseUris) {
+            throw new InvalidArgumentException('At least one base URI must be provided.');
+        }
+
+        $regexp ??= implode('|', array_map(
+            static fn (string $baseUri) => preg_quote(implode('', self::resolveUrl(self::parseUrl('.'), self::parseUrl($baseUri)))),
+            $baseUris,
+        ));
+
+        $defaultOptions['base_uri'] = $baseUris[0];
+
+        return new self($client, [$regexp => $defaultOptions], $regexp);
+    }
+
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $e = null;

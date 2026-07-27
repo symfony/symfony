@@ -7,6 +7,7 @@ CHANGELOG
  * Add the `extra.cache_policy` option to `CachingHttpClient` to tag cached responses and force their lifetime
  * Allow passing a stream or a closure to `HttpOptions::buffer()`
  * Add `QUERY` to the list of cacheable HTTP methods in `CachingHttpClient`
+ * Add `ScopingHttpClient::forBaseUris()` to scope a client to several base URIs at once
 
 8.1
 ---

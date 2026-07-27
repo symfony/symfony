@@ -2924,6 +2924,12 @@ class FrameworkExtension extends Extension
             $retryOptions = $scopeConfig['retry_failed'] ?? ['enabled' => false];
             unset($scopeConfig['retry_failed']);
 
+            // the base URI is the first one tried and the configured list holds the fallbacks; the
+            // scoping and the retryable clients must agree on the whole set
+            if ($retryOptions['base_uris'] ?? []) {
+                $retryOptions['base_uris'] = array_merge([$scopeConfig['base_uri']], $retryOptions['base_uris']);
+            }
+
             if (false === $mockResponseFactory = $scopeConfig['mock_response_factory'] ?? $defaultMockResponseFactory) {
                 $transportId = $realTransportId;
             } elseif ($mockResponseFactory === $defaultMockResponseFactory) {
@@ -2945,6 +2951,9 @@ class FrameworkExtension extends Extension
             // 4. CachingHttpClient (20) -> caches responses
             // 5. RetryableHttpClient (25) -> retries requests
             // 6. TraceableHttpClient (100) -> traces requests
+            //
+            // when "retry_failed.base_uris" is set, RetryableHttpClient moves to 12 so that it
+            // wraps ScopingHttpClient instead of being wrapped by it, see below
             $container->register($name, HttpClientInterface::class)
                 ->setFactory('current')
                 ->setArguments([[new Reference($transportId)]])
@@ -2959,9 +2968,17 @@ class FrameworkExtension extends Extension
                 $baseUri = $scopeConfig['base_uri'];
                 unset($scopeConfig['base_uri']);
 
-                $scopingDefinition
-                    ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
-                    ->setArguments([new Reference('.inner'), $baseUri, $scopeConfig]);
+                if ($retryOptions['base_uris'] ?? []) {
+                    // the scope must match every URI the retryable client may rotate to, otherwise
+                    // the scoped options stop applying as soon as it leaves the first one
+                    $scopingDefinition
+                        ->setFactory([ScopingHttpClient::class, 'forBaseUris'])
+                        ->setArguments([new Reference('.inner'), $retryOptions['base_uris'], $scopeConfig]);
+                } else {
+                    $scopingDefinition
+                        ->setFactory([ScopingHttpClient::class, 'forBaseUri'])
+                        ->setArguments([new Reference('.inner'), $baseUri, $scopeConfig]);
+                }
             } else {
                 $scopingDefinition
                     ->setArguments([new Reference('.inner'), [$scope => $scopeConfig], $scope]);
@@ -3071,11 +3088,18 @@ class FrameworkExtension extends Extension
             $retryStrategy = new Reference($name.'.retry_strategy');
         }
 
-        $container
+        // when retrying against several URIs, the retryable client must sit outside the scoping one:
+        // scoping resolves the URL and consumes the "base_uri" option, so a base URI injected below
+        // it would never be applied
+        $definition = $container
             ->register($name.'.retryable', RetryableHttpClient::class)
-            ->setDecoratedService($name, null, 25)
+            ->setDecoratedService($name, null, $options['base_uris'] ? 12 : 25)
             ->setArguments([new Reference('.inner'), $retryStrategy, $options['max_retries'], new Reference('logger')])
             ->addTag('monolog.logger', ['channel' => 'http_client']);
+
+        if ($options['base_uris']) {
+            $definition->addMethodCall('withOptions', [['base_uri' => $options['base_uris']]], true);
+        }
     }
 
     private function registerMailerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $webhookEnabled): void

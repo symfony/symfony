@@ -1,0 +1,17 @@
+imports:
+    - { resource: ../config/default.yml }
+    - { resource: services.yml }
+
+framework:
+    http_client:
+        mock_response_factory: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\RetryMockClientCallback
+        scoped_clients:
+            rotating.http_client:
+                base_uri: 'https://a.example.com'
+                headers:
+                    X-Scoped: 'yes'
+                retry_failed:
+                    max_retries: 1
+                    delay: 0
+                    base_uris:
+                        - 'https://b.example.com'

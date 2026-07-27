@@ -46,4 +46,15 @@ class RunCommandTest extends AbstractWebTestCase
         $this->assertCommandIsSuccessful($result);
         $this->assertStringContainsString('debug', $result->getOutput());
     }
+
+    public function testRunCommandResolvesArgumentsFromTheContainer()
+    {
+        $result = static::runCommand('app:advanced', ['name' => 'test-advanced']);
+
+        $this->assertCommandIsSuccessful($result);
+        $this->assertStringContainsString('Autowired: Service injected!', $result->getOutput());
+        $this->assertStringContainsString('Targeted: Service injected!', $result->getOutput());
+        $this->assertStringContainsString('Regular: Service injected!', $result->getOutput());
+        $this->assertStringContainsString('Name: test-advanced', $result->getOutput());
+    }
 }

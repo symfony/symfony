@@ -1,2 +1,12 @@
 imports:
     - { resource: ../config/default.yml }
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TestService: ~
+
+    test_service:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TestService
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\AdvancedCommand:
+        autowire: true
+        autoconfigure: true

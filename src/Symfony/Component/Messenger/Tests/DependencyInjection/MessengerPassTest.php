@@ -1123,6 +1123,51 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
     }
 
+    public function testItThrowsExceptionOnSerializedTypeNameShadowingAnotherMessageClass()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The serialized type name "App\Message\MessageA" set on class "App\Message\MessageB" is the name of another message class, which uses it as its own serialized type.');
+
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MessageA', 'App\Message\MessageA')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [])
+        ;
+        $container
+            ->register('App\Message\MessageB', 'App\Message\MessageB')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'App\Message\MessageA'])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testItAllowsAMessageToUseItsOwnClassNameAsSerializedTypeName()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'App\Message\MyMessage'])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            ['App\Message\MyMessage' => 'App\Message\MyMessage'],
+            $container->getDefinition('messenger.transport.symfony_serializer')->getArgument(3)
+        );
+    }
+
     public function testItDoesNotFailWhenSerializerServiceIsNotRegistered()
     {
         $container = $this->getContainerBuilder('message_bus');

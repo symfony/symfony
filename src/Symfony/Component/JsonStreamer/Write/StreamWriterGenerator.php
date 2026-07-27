@@ -19,6 +19,7 @@ use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\DataModelNodeInterface;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ScalarNode;
+use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -61,7 +62,7 @@ final class StreamWriterGenerator
      */
     public function generate(Type $type, array $options = []): string
     {
-        $path = \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type));
+        $path = \sprintf('%s%s%s.%s.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), self::cacheVariant($options));
         $generateContent = function () use ($type, $options): string {
             $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
@@ -71,6 +72,21 @@ final class StreamWriterGenerator
         $this->dumper->dump($type, $path, $generateContent);
 
         return $path;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    private static function cacheVariant(array $options): string
+    {
+        $variant = $options['cache_variant'] ?? 'json';
+
+        // the value ends up in the cache file name, so it must not reach the filesystem unchecked
+        if (!\is_string($variant) || !preg_match('/^[a-zA-Z0-9_-]++$/', $variant)) {
+            throw new InvalidArgumentException(\sprintf('The "cache_variant" option must match "[a-zA-Z0-9_-]+", "%s" given.', \is_string($variant) ? $variant : get_debug_type($variant)));
+        }
+
+        return $variant;
     }
 
     /**

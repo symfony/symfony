@@ -40,8 +40,14 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
  *     date_time_format?: string,
  *     date_time_timezone?: string|\DateTimeZone,
  *     date_interval_format?: string,
+ *     cache_variant?: string,
  *     ...<string, mixed>,
  * }
+ *
+ * The "cache_variant" option does not change the output on its own. It is appended to the
+ * name of the generated code cache file, so that a custom property metadata loader can
+ * produce several payload shapes for one PHP type without them overwriting each other.
+ * It must match "[a-zA-Z0-9_-]+".
  *
  * @implements StreamReaderInterface<Options>
  */

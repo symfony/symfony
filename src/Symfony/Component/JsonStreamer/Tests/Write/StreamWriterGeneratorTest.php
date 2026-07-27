@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonStreamer\Tests\Write;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
@@ -216,5 +217,67 @@ class StreamWriterGeneratorTest extends TestCase
         $this->expectExceptionMessageMatches('/Cannot generate accessor for anonymous function ".*\{closure[^"]*"\./');
 
         $generator->generate($type);
+    }
+
+    public function testCacheVariantOptionProducesDistinctFiles()
+    {
+        $type = Type::object(ClassicDummy::class);
+
+        $loader = new class implements PropertyMetadataLoaderInterface {
+            public function load(string $className, array $options = [], array $context = []): array
+            {
+                $properties = ['id' => new PropertyMetadata('id', Type::int())];
+
+                if ($options['extra'] ?? false) {
+                    $properties['name'] = new PropertyMetadata('name', Type::string());
+                }
+
+                return $properties;
+            }
+        };
+
+        $generator = new StreamWriterGenerator($loader, new ServiceContainer(), $this->streamWritersDir);
+
+        $pathDefault = $generator->generate($type);
+        $pathVariant = $generator->generate($type, ['extra' => true, 'cache_variant' => 'jsonld']);
+
+        $this->assertNotSame($pathDefault, $pathVariant);
+        $this->assertStringEndsWith('.json.php', $pathDefault);
+        $this->assertStringEndsWith('.jsonld.php', $pathVariant);
+        $this->assertFileNotEquals($pathDefault, $pathVariant);
+    }
+
+    public function testFilenameIsStableWithoutCacheVariantOption()
+    {
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+        $type = Type::object(ClassicDummy::class);
+
+        $this->assertSame($generator->generate($type), $generator->generate($type, ['include_null_properties' => true]));
+        $this->assertStringEndsWith('.json.php', $generator->generate($type));
+    }
+
+    #[DataProvider('invalidCacheVariants')]
+    public function testCacheVariantOptionRejectsInvalidValues(mixed $variant)
+    {
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "cache_variant" option must match "[a-zA-Z0-9_-]+"');
+
+        $generator->generate(Type::object(ClassicDummy::class), ['cache_variant' => $variant]);
+    }
+
+    public static function invalidCacheVariants(): iterable
+    {
+        yield 'empty' => [''];
+        yield 'directory separator' => ['a/b'];
+        yield 'parent directory' => ['../../escaped'];
+        yield 'dot' => ['json.stream'];
+        yield 'null byte' => ["json\0evil"];
+        yield 'newline' => ["json\nld"];
+        yield 'non-ascii' => ['jsonld✓'];
+        yield 'array' => [['a']];
+        yield 'true' => [true];
+        yield 'integer' => [1];
     }
 }

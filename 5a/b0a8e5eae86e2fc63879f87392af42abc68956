@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-17T14:04:21Z
+
+Should a new test be added? In the current state, nothing would prevent reverting this change and it would go unnoticed
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-17T14:16:20Z
+
+Not against adding a test but I don’t know how to implement it.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-17T14:20:18Z
+
+Can't we instantiate the Logger in debug mode and assert the records?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-17T14:22:36Z
+
+How would you assert a date includes milliseconds? Either the test would be flaky, or we need symfony/clock after all?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-17T14:41:21Z
+
+Could a regex do the trick?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-17T14:45:08Z
+
+How? Zero milliseconds is still a legit value :thinking:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-17T14:51:58Z
+
+Hmmm... I don't have a solution then. I guess it'll do fine like this 🙂
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-07-17T15:14:05Z
+
+`ClockMock::register` should still work right ?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-17T16:00:54Z
+
+@Spomky wouldn’t that require to write `DateTimeImmutable::createFromFormat('U.u', \sprintf("%.3F", microtime(true)))` in the logger instead of `new DateTimeImmutable()`? Would we want to do that?

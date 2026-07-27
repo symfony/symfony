@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
-use AsyncAws\Core\Exception\Http\HttpException;
+use AsyncAws\Core\Exception\Exception as AsyncAwsException;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -84,7 +84,7 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
     {
         try {
             $this->connection->setup();
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }
@@ -93,7 +93,7 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
     {
         try {
             $this->connection->reset();
-        } catch (HttpException $e) {
+        } catch (AsyncAwsException $e) {
             throw new TransportException($e->getMessage(), 0, $e);
         }
     }

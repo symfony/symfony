@@ -50,6 +50,30 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
     }
 
+    public function testKeepaliveRenewsTheLease()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $encoded = $this->connection->get();
+        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $encoded['id']]);
+
+        $this->connection->keepalive($encoded['id']);
+
+        $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded['id']]));
+    }
+
+    public function testKeepaliveWhileTheConnectionIsInATransaction()
+    {
+        $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
+        $encoded = $this->connection->get();
+        $this->driverConnection->executeStatement('UPDATE messenger_messages SET delivered_at = ? WHERE id = ?', ['2000-01-01 00:00:00', $encoded['id']]);
+
+        $this->driverConnection->beginTransaction();
+        $this->connection->keepalive($encoded['id']);
+        $this->driverConnection->commit();
+
+        $this->assertNotSame('2000-01-01 00:00:00', $this->driverConnection->fetchOne('SELECT delivered_at FROM messenger_messages WHERE id = ?', [$encoded['id']]));
+    }
+
     public function testSendWithDelay()
     {
         $this->connection->send('{"message": "Hi i am delayed"}', ['type' => DummyMessage::class], 600000);

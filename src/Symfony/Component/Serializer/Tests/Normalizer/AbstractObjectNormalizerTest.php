@@ -1007,6 +1007,27 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items));
     }
 
+    public function testDenormalizeArrayObjectConstructorParameterDenormalizesItems()
+    {
+        if (!method_exists(PropertyInfoExtractor::class, 'getType')) {
+            $this->markTestSkipped('The PropertyInfo component before Symfony 7.1 does not keep the collection value type for iterable constructor parameters.');
+        }
+
+        $serializer = new Serializer([
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(null, null, null, new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()])),
+        ]);
+
+        $result = $serializer->denormalize(
+            ['items' => [['value' => 'foo'], ['value' => 'bar']]],
+            DummyWithArrayObjectOfDtos::class,
+        );
+
+        $this->assertInstanceOf(DummyWithArrayObjectOfDtos::class, $result);
+        $this->assertContainsOnlyInstancesOf(DummyDtoItem::class, $result->items);
+        $this->assertSame(['foo', 'bar'], array_map(static fn (DummyDtoItem $i) => $i->value, $result->items->getArrayCopy()));
+    }
+
     public function testDenormalizeWithNumberAsSerializedNameAndNoArrayReindex()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadata();
@@ -2133,5 +2154,16 @@ class DummyWithIterableOfDtos
         $this->items = iterator_to_array((static function () use ($items) {
             yield from $items;
         })());
+    }
+}
+
+class DummyWithArrayObjectOfDtos
+{
+    /** @var \ArrayObject<DummyDtoItem> */
+    public \ArrayObject $items;
+
+    public function __construct(iterable $items)
+    {
+        $this->items = new \ArrayObject(iterator_to_array($items));
     }
 }

@@ -75,6 +75,7 @@ use Symfony\Component\JsonPath\FunctionReturnType;
 use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
@@ -1094,6 +1095,27 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expectedFactories, $container->getDefinition('messenger.transport_factory')->getArgument(0)->getValues());
         $this->assertTrue($container->hasDefinition('messenger.listener.reset_services'));
         $this->assertSame('messenger.listener.reset_services', (string) $container->getDefinition('console.command.messenger_consume_messages')->getArgument(5));
+    }
+
+    public function testMessengerAsMessageAttributeIsForwardedToTheTag()
+    {
+        if (!property_exists(AsMessage::class, 'serializedTypeNameAliases')) {
+            $this->markTestSkipped('symfony/messenger 8.2 is required.');
+        }
+
+        $container = $this->createContainerFromFile('messenger', [], true, false);
+        $container->compile();
+
+        $configurators = $container->getAttributeAutoconfigurators()[AsMessage::class] ?? [];
+        $this->assertCount(1, $configurators);
+
+        $definition = new ChildDefinition('');
+        $configurators[0]($definition, new AsMessage(serializedTypeName: 'my.type', serializedTypeNameAliases: ['my.legacy.type']));
+
+        $this->assertSame(
+            [['serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
+            $definition->getTag('messenger.message')
+        );
     }
 
     public function testMessengerWithoutConsole()

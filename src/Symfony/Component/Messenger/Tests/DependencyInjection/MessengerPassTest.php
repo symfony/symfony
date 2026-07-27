@@ -1078,6 +1078,156 @@ class MessengerPassTest extends TestCase
         );
     }
 
+    public function testItRegistersTypeMappingWithSerializedTypeNameAliases()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [
+                'serializedTypeName' => 'my.custom.type',
+                'serializedTypeNameAliases' => ['my.legacy.type', 'MyMessage'],
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            [
+                'my.legacy.type' => 'App\Message\MyMessage',
+                'MyMessage' => 'App\Message\MyMessage',
+                'my.custom.type' => 'App\Message\MyMessage',
+            ],
+            $container->getDefinition('messenger.transport.symfony_serializer')->getArgument(3)
+        );
+    }
+
+    public function testItThrowsExceptionOnDuplicateSerializedTypeNameAlias()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The serialized type name "my.duplicate.type" is already mapped to class "App\Message\MessageA", cannot map it to "App\Message\MessageB" as well.');
+
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MessageA', 'App\Message\MessageA')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeName' => 'my.duplicate.type'])
+        ;
+        $container
+            ->register('App\Message\MessageB', 'App\Message\MessageB')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [
+                'serializedTypeName' => 'type.b',
+                'serializedTypeNameAliases' => ['my.duplicate.type'],
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testItThrowsExceptionOnAliasShadowingAnotherMessageClass()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The serialized type name "App\Message\MessageA" set on class "App\Message\MessageB" is the name of another message class, which uses it as its own serialized type.');
+
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MessageA', 'App\Message\MessageA')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [])
+        ;
+        $container
+            ->register('App\Message\MessageB', 'App\Message\MessageB')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [
+                'serializedTypeName' => 'type.b',
+                'serializedTypeNameAliases' => ['App\Message\MessageA'],
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testItAllowsAMessageToAliasItsOwnClassName()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [
+                'serializedTypeName' => 'my.custom.type',
+                'serializedTypeNameAliases' => ['App\Message\MyMessage'],
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(
+            [
+                'App\Message\MyMessage' => 'App\Message\MyMessage',
+                'my.custom.type' => 'App\Message\MyMessage',
+            ],
+            $container->getDefinition('messenger.transport.symfony_serializer')->getArgument(3)
+        );
+    }
+
+    public function testItThrowsExceptionOnNonArraySerializedTypeNameAliases()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "serializedTypeNameAliases" attribute of the "messenger.message" tag of class "App\Message\MyMessage" must be an array of strings, "string" given.');
+
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', [
+                'serializedTypeName' => 'my.custom.type',
+                'serializedTypeNameAliases' => 'my.legacy.type',
+            ])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
+    public function testItThrowsExceptionOnSerializedTypeNameAliasesWithoutSerializedTypeName()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('A serialized type name must be set on class "App\Message\MyMessage" to use serialized type name aliases.');
+
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.transport.symfony_serializer', Serializer::class)
+            ->setArguments([null, 'json', [], []]);
+
+        $container
+            ->register('App\Message\MyMessage', 'App\Message\MyMessage')
+            ->addTag('container.excluded')
+            ->addTag('messenger.message', ['serializedTypeNameAliases' => ['my.legacy.type']])
+        ;
+
+        (new MessengerPass())->process($container);
+    }
+
     public function testItIgnoresMessageTagWithoutSerializedTypeName()
     {
         $container = $this->getContainerBuilder('message_bus');

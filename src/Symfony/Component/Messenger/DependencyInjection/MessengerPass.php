@@ -426,16 +426,36 @@ class MessengerPass implements CompilerPassInterface
         foreach ($taggedIds as $id => $tags) {
             $class = $container->getDefinition($id)->getClass();
             foreach ($tags as $tag) {
+                $aliases = $tag['serializedTypeNameAliases'] ?? [];
+
+                if (!\is_array($aliases)) {
+                    throw new RuntimeException(\sprintf('The "serializedTypeNameAliases" attribute of the "messenger.message" tag of class "%s" must be an array of strings, "%s" given.', $class, get_debug_type($aliases)));
+                }
+
                 if (!isset($tag['serializedTypeName'])) {
+                    if ($aliases) {
+                        throw new RuntimeException(\sprintf('A serialized type name must be set on class "%s" to use serialized type name aliases.', $class));
+                    }
+
                     continue;
                 }
-                if ($tag['serializedTypeName'] !== $class && isset($messageClasses[$tag['serializedTypeName']])) {
-                    throw new RuntimeException(\sprintf('The serialized type name "%s" set on class "%s" is the name of another message class, which uses it as its own serialized type.', $tag['serializedTypeName'], $class));
+
+                // the aliases come first so that the canonical name wins once the map is flipped for encoding
+                foreach ([...$aliases, $tag['serializedTypeName']] as $typeName) {
+                    if ($typeName !== $class && isset($messageClasses[$typeName])) {
+                        throw new RuntimeException(\sprintf('The serialized type name "%s" set on class "%s" is the name of another message class, which uses it as its own serialized type.', $typeName, $class));
+                    }
+
+                    if (isset($typeToClassMap[$typeName])) {
+                        if ($typeToClassMap[$typeName] === $class) {
+                            throw new RuntimeException(\sprintf('The serialized type name "%s" is listed more than once on class "%s".', $typeName, $class));
+                        }
+
+                        throw new RuntimeException(\sprintf('The serialized type name "%s" is already mapped to class "%s", cannot map it to "%s" as well. Each serialized type must be unique.', $typeName, $typeToClassMap[$typeName], $class));
+                    }
+
+                    $typeToClassMap[$typeName] = $class;
                 }
-                if (isset($typeToClassMap[$tag['serializedTypeName']])) {
-                    throw new RuntimeException(\sprintf('The serialized type name "%s" is already mapped to class "%s", cannot map it to "%s" as well. Each serialized type must be unique.', $tag['serializedTypeName'], $typeToClassMap[$tag['serializedTypeName']], $class));
-                }
-                $typeToClassMap[$tag['serializedTypeName']] = $class;
             }
         }
 

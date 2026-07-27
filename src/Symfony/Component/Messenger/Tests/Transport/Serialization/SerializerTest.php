@@ -297,6 +297,22 @@ class SerializerTest extends TestCase
         $this->assertSame('Hello', $decodedEnvelope->getMessage()->getMessage());
     }
 
+    public function testTypeToClassMapAliasesDecodeToSameClassWhileEncodeUsesCanonicalName()
+    {
+        $serializer = new Serializer(typeToClassMap: [
+            'legacy.type' => DummyMessage::class,
+            'current.type' => DummyMessage::class,
+        ]);
+
+        foreach (['legacy.type', 'current.type'] as $type) {
+            $decoded = $serializer->decode(['body' => '{"message":"Hello"}', 'headers' => ['type' => $type]]);
+            $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
+        }
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('Hello')));
+        $this->assertSame('current.type', $encoded['headers']['type']);
+    }
+
     public function testEncodeDecodeWithTypeToClassMap()
     {
         $serializer = new Serializer(typeToClassMap: ['custom.type' => DummyMessage::class]);

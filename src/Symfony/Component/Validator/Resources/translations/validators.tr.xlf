@@ -36,23 +36,23 @@
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
-                <target>Bu alan beklenen olmadı.</target>
+                <target>Bu alan beklenmiyor.</target>
             </trans-unit>
             <trans-unit id="10">
                 <source>This field is missing.</source>
-                <target>Bu alan, eksiktir</target>
+                <target>Bu alan eksik.</target>
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>Bu değer doğru bir tarih biçimi değildir.</target>
+                <target>Bu değer geçerli bir tarih biçimi değildir.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>Bu değer doğru bir tarihsaat biçimi değildir.</target>
+                <target>Bu değer geçerli bir tarih/saat biçimi değildir.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Bu değer doğru bir e-mail adresi değildir.</target>
+                <target>Bu değer geçerli bir e-mail adresi değildir.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -72,7 +72,7 @@
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
-                <target>Bu değer {{ limit }} ve altında olmalıdır.</target>
+                <target>Bu değer {{ limit }} veya daha az olmalıdır.</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
@@ -104,11 +104,11 @@
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>Bu değer doğru bir saat değildir.</target>
+                <target>Bu değer geçerli bir saat değildir.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>Bu değer doğru bir URL değildir.</target>
+                <target>Bu değer geçerli bir URL değildir.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Bu değer geçerli bir lisan değildir.</target>
+                <target>Bu değer geçerli bir dil değildir.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -152,7 +152,7 @@
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
-                <target>Bu değer şu anda kullanımda.</target>
+                <target>Bu değer zaten kullanılıyor.</target>
             </trans-unit>
             <trans-unit id="42">
                 <source>The size of the image could not be detected.</source>
@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Bu değer geçerli bir XML değil.</target>
+                <target>Bu değer geçerli bir XML değildir.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Bu değer beklenen XSD şemasına uymuyor.</target>
+                <target>Bu değer beklenen XSD şemasına uymuyor.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Bu XML yükü çok büyük ({{ size }} bayt): {{ limit }} baytlık sınırı aşıyor.</target>
+                <target>Bu XML yükü çok büyük ({{ size }} bayt): {{ limit }} baytlık sınırı aşıyor.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Bu değer geçerli bir cron ifadesi değil.</target>
+                <target>Bu değer geçerli bir cron ifadesi değildir.</target>
             </trans-unit>
         </body>
     </file>

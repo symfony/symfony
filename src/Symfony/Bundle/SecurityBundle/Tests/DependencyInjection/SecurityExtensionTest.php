@@ -32,6 +32,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Ldap\Ldap;
+use Symfony\Component\Ldap\Security\CheckLdapCredentialsListener;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -67,6 +68,101 @@ class SecurityExtensionTest extends TestCase
         $decorated = $container->getDefinition('security.authenticator.form_login_ldap.main')->getArgument(0);
         $this->assertSame('security.authenticator.form_login_ldap.main.inner', (string) $decorated);
         $this->assertSame('/login_check_ldap', $container->getDefinition((string) $decorated)->getArgument(4)['check_path']);
+    }
+
+    public function testLdapUsersOnlyReachesTheCredentialsListener()
+    {
+        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['id' => 'foo']],
+            'firewalls' => [
+                'main' => [
+                    'form_login_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                        'ldap_users_only' => true,
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $listener = $container->getDefinition('security.listener.form_login_ldap.main');
+        $this->assertTrue($listener->getArgument(1));
+    }
+
+    public function testLdapUsersOnlyIsRejectedWithoutAnLdapUserProvider()
+    {
+        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]]],
+            'firewalls' => [
+                'main' => [
+                    'form_login_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                        'ldap_users_only' => true,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Using "ldap_users_only" on the "main" firewall requires a user provider that returns "Symfony\Component\Ldap\Security\LdapUser" instances, but none of the providers it uses does.');
+
+        $container->compile();
+    }
+
+    public function testLdapUsersOnlyIsAcceptedWithAnLdapLegInAChainProvider()
+    {
+        if (!property_exists(CheckLdapCredentialsListener::class, 'ldapUsersOnly')) {
+            $this->markTestSkipped('symfony/ldap 8.2 is required.');
+        }
+
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'local' => ['memory' => ['users' => ['bob' => ['password' => 'x']]]],
+                'directory' => ['ldap' => ['service' => 'Symfony\\Component\\Ldap\\Ldap', 'base_dn' => 'dc=example,dc=com']],
+                'chain' => ['chain' => ['providers' => ['local', 'directory']]],
+            ],
+            'firewalls' => [
+                'main' => [
+                    'provider' => 'chain',
+                    'form_login_ldap' => [
+                        'service' => 'Symfony\\Component\\Ldap\\Ldap',
+                        'ldap_users_only' => true,
+                    ],
+                ],
+            ],
+        ]);
+        $container->compile();
+
+        $this->assertTrue($container->getDefinition('security.listener.form_login_ldap.main')->getArgument(1));
+    }
+
+    public function testLdapUsersOnlyDefaultsToCheckingEveryUser()
+    {
+        $container = $this->getRawContainer();
+        $container->register('Symfony\\Component\\Ldap\\Ldap', Ldap::class)->addTag('ldap');
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['id' => 'foo']],
+            'firewalls' => [
+                'main' => ['form_login_ldap' => ['service' => 'Symfony\\Component\\Ldap\\Ldap']],
+            ],
+        ]);
+        $container->compile();
+
+        $this->assertFalse($container->getDefinition('security.listener.form_login_ldap.main')->getArgument(1));
     }
 
     public function testInvalidCheckPath()

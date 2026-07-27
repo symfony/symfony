@@ -81,6 +81,7 @@ class HttpBasicLdapFactory extends HttpBasicFactory
                 ->scalarNode('query_string')->end()
                 ->scalarNode('search_dn')->defaultValue('')->end()
                 ->scalarNode('search_password')->defaultValue('')->end()
+                ->booleanNode('ldap_users_only')->defaultFalse()->info('Only bind users of class "Symfony\\Component\\Ldap\\Security\\LdapUser" against the LDAP server, and leave any other user to the regular password checker.')->end()
             ->end()
         ;
     }

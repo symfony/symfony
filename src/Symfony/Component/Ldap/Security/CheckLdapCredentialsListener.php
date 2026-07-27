@@ -31,6 +31,7 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
 {
     public function __construct(
         private ContainerInterface $ldapLocator,
+        private bool $ldapUsersOnly = false,
     ) {
     }
 
@@ -55,6 +56,14 @@ class CheckLdapCredentialsListener implements EventSubscriberInterface
         $passwordCredentials = $passport->getBadge(PasswordCredentials::class);
         if ($passwordCredentials->isResolved()) {
             throw new \LogicException('LDAP authentication password verification cannot be completed because something else has already resolved the PasswordCredentials.');
+        }
+
+        if ($this->ldapUsersOnly && !$passport->getUser() instanceof LdapUser) {
+            // the user comes from another provider of the chain, leave the password credentials
+            // for CheckCredentialsListener while still reporting that this listener has run
+            $ldapBadge->markResolved();
+
+            return;
         }
 
         if (!$this->ldapLocator->has($ldapBadge->getLdapServiceId())) {

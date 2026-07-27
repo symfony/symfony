@@ -14,6 +14,7 @@ namespace Symfony\Component\Console\Tests\Style;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\TreeHelper;
@@ -184,6 +185,15 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringNotContainsString("\e[", $display);
     }
 
+    public function testSetBlockStyleRejectsInvalidStyle()
+    {
+        $io = new SymfonyStyle(new ArrayInput([]), new NullOutput());
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $io->setBlockStyle('not-a-style');
+    }
+
     public function testGetErrorStyle()
     {
         $input = $this->createStub(InputInterface::class);
@@ -207,6 +217,17 @@ class SymfonyStyleTest extends TestCase
 
         $io = new SymfonyStyle($input, $output);
         $io->getErrorStyle()->write('');
+    }
+
+    public function testGetErrorStyleKeepsBlockStyle()
+    {
+        $output = new BufferedOutput();
+        $io = new SymfonyStyle(new ArrayInput([]), $output);
+        $io->setBlockStyle(SymfonyStyle::BLOCK_STYLE_OUTLINE);
+
+        $io->getErrorStyle()->error('Error message.');
+
+        $this->assertStringContainsString('❌ Error', $output->fetch());
     }
 
     public function testCreateTableWithConsoleOutput()

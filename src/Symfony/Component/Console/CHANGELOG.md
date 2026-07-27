@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `SymfonyStyle::setBlockStyle()` and a `$blockStyle` constructor parameter to switch `success()`, `error()`, `warning()`, `note()`, `info()` and `caution()` between the default and outline block rendering
+
+
 8.1
 ---
 

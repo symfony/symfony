@@ -45,23 +45,48 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class SymfonyStyle extends OutputStyle
 {
     public const MAX_LINE_LENGTH = 120;
+    public const BLOCK_STYLE_DEFAULT = 'block';
+    public const BLOCK_STYLE_OUTLINE = 'outline';
 
     private SymfonyQuestionHelper $questionHelper;
     private ProgressBar $progressBar;
     private int $lineLength;
     private TrimmedBufferOutput $bufferedOutput;
+    private string $blockStyle;
 
+    /**
+     * @param self::BLOCK_STYLE_* $blockStyle
+     */
     public function __construct(
         private InputInterface $input,
         private OutputInterface $output,
         private ?EventDispatcherInterface $dispatcher = null,
+        string $blockStyle = self::BLOCK_STYLE_DEFAULT,
     ) {
+        $this->setBlockStyle($blockStyle);
+
         $this->bufferedOutput = new TrimmedBufferOutput(\DIRECTORY_SEPARATOR === '\\' ? 4 : 2, $output->getVerbosity(), false, clone $output->getFormatter());
         // Windows cmd wraps lines as soon as the terminal width is reached, whether there are following chars or not.
         $width = (new Terminal())->getWidth() ?: self::MAX_LINE_LENGTH;
         $this->lineLength = min($width - (int) (\DIRECTORY_SEPARATOR === '\\'), self::MAX_LINE_LENGTH);
 
         parent::__construct($output);
+    }
+
+    /**
+     * Sets the style used by success(), error(), warning(), note(), info() and caution().
+     *
+     * @param self::BLOCK_STYLE_* $blockStyle
+     */
+    public function setBlockStyle(string $blockStyle): static
+    {
+        if (!\in_array($blockStyle, [self::BLOCK_STYLE_DEFAULT, self::BLOCK_STYLE_OUTLINE], true)) {
+            throw new InvalidArgumentException(\sprintf('The block style must be one of "%s", "%s" given.', implode('", "', [self::BLOCK_STYLE_DEFAULT, self::BLOCK_STYLE_OUTLINE]), $blockStyle));
+        }
+
+        $this->blockStyle = $blockStyle;
+
+        return $this;
     }
 
     /**
@@ -125,21 +150,45 @@ class SymfonyStyle extends OutputStyle
 
     public function success(string|array $message): void
     {
+        if (self::BLOCK_STYLE_OUTLINE === $this->blockStyle) {
+            $this->outlineSuccess($message);
+
+            return;
+        }
+
         $this->block($message, 'OK', 'fg=black;bg=green', ' ', true);
     }
 
     public function error(string|array $message): void
     {
+        if (self::BLOCK_STYLE_OUTLINE === $this->blockStyle) {
+            $this->outlineError($message);
+
+            return;
+        }
+
         $this->block($message, 'ERROR', 'fg=white;bg=red', ' ', true);
     }
 
     public function warning(string|array $message): void
     {
+        if (self::BLOCK_STYLE_OUTLINE === $this->blockStyle) {
+            $this->outlineWarning($message);
+
+            return;
+        }
+
         $this->block($message, 'WARNING', 'fg=black;bg=yellow', ' ', true);
     }
 
     public function note(string|array $message): void
     {
+        if (self::BLOCK_STYLE_OUTLINE === $this->blockStyle) {
+            $this->outlineNote($message);
+
+            return;
+        }
+
         $this->block($message, 'NOTE', 'fg=yellow', ' ! ');
     }
 
@@ -148,11 +197,23 @@ class SymfonyStyle extends OutputStyle
      */
     public function info(string|array $message): void
     {
+        if (self::BLOCK_STYLE_OUTLINE === $this->blockStyle) {
+            $this->outlineInfo($message);
+
+            return;
+        }
+
         $this->block($message, 'INFO', 'fg=green', ' ', true);
     }
 
     public function caution(string|array $message): void
     {
+        if (self::BLOCK_STYLE_OUTLINE === $this->blockStyle) {
+            $this->outlineCaution($message);
+
+            return;
+        }
+
         $this->block($message, 'CAUTION', 'fg=white;bg=red', ' ! ', true);
     }
 
@@ -427,7 +488,7 @@ class SymfonyStyle extends OutputStyle
      */
     public function getErrorStyle(): self
     {
-        return new self($this->input, $this->getErrorOutput());
+        return new self($this->input, $this->getErrorOutput(), blockStyle: $this->blockStyle);
     }
 
     public function createTable(): Table

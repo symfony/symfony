@@ -362,6 +362,63 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
+    #[DataProvider('provideNestedParenthesesFilters')]
+    public function testFilterWithNestedParentheses(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('[{"a": 1, "b": 2}, {"a": 2, "b": 2}, {"a": 3, "b": 4}]');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideNestedParenthesesFilters(): iterable
+    {
+        $first = ['a' => 1, 'b' => 2];
+        $second = ['a' => 2, 'b' => 2];
+        $third = ['a' => 3, 'b' => 4];
+
+        yield 'no parentheses' => ['$[?@.a == 1]', [$first]];
+        yield 'one pair' => ['$[?(@.a == 1)]', [$first]];
+        yield 'two pairs' => ['$[?((@.a == 1))]', [$first]];
+        yield 'three pairs' => ['$[?(((@.a == 1)))]', [$first]];
+        yield 'four pairs' => ['$[?((((@.a == 1))))]', [$first]];
+        yield 'five pairs' => ['$[?(((((@.a == 1)))))]', [$first]];
+
+        yield 'sibling groups' => ['$[?((@.a == 1) && (@.b == 2))]', [$first]];
+        yield 'sibling groups with or' => ['$[?((@.a == 1) || (@.a == 3))]', [$first, $third]];
+        yield 'wrapped sibling groups' => ['$[?(((@.a == 1) && (@.b == 2)))]', [$first]];
+        yield 'nested sibling groups' => ['$[?(((@.a == 1)) && ((@.b == 2)))]', [$first]];
+        yield 'sibling groups with nested or' => ['$[?(((@.a == 1) || (@.a == 2)) && (@.b == 2))]', [$first, $second]];
+
+        yield 'negated group' => ['$[?(!(@.a == 1))]', [$second, $third]];
+        yield 'negated nested group' => ['$[?(!((@.a == 1)))]', [$second, $third]];
+        yield 'negated deeply nested group' => ['$[?(!(((@.a == 1))))]', [$second, $third]];
+        yield 'wrapped negated group' => ['$[?((!(@.a == 1)))]', [$second, $third]];
+        yield 'negated group with and' => ['$[?(!((@.a == 1)) && (@.b == 2))]', [$second]];
+        yield 'negation binds tighter than and' => ['$[?(!(@.a == 1) && (@.b == 2))]', [$second]];
+        yield 'negation binds tighter than or' => ['$[?(!(@.b == 2) || (@.a == 1))]', [$first, $third]];
+        yield 'negation of a whole group' => ['$[?(!((@.a == 1) && (@.b == 2)))]', [$second, $third]];
+
+        yield 'nested function call' => ['$[?((length(@) == 2))]', [$first, $second, $third]];
+    }
+
+    #[DataProvider('provideNestedParenthesesNonSingularFilters')]
+    public function testNonSingularQueryIsRejectedWhateverTheNesting(string $path)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessageMatches('/non-singular query/i');
+
+        (new JsonCrawler('[{"a": 1}]'))->find($path);
+    }
+
+    public static function provideNestedParenthesesNonSingularFilters(): iterable
+    {
+        yield ['$[?(@.* == 1)]'];
+        yield ['$[?((@.* == 1))]'];
+        yield ['$[?(((@.* == 1)))]'];
+        yield ['$[?(!(@.* == 1))]'];
+        yield ['$[?((@.* == 1) && (@.a == 1))]'];
+    }
+
     public function testEmptyResult()
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.price > 1000)]');

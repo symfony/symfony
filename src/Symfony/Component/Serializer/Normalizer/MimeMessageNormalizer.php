@@ -19,6 +19,7 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -103,7 +104,13 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         if (AbstractPart::class === $type) {
-            $type = $data['class'];
+            $class = $data['class'] ?? null;
+
+            if (!\is_string($class) || !is_a($class, AbstractPart::class, true)) {
+                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Expected a subclass of "%s", got "%s".', AbstractPart::class, \is_string($class) ? $class : get_debug_type($class)), $data, [AbstractPart::class], $context['deserialization_path'] ?? null);
+            }
+
+            $type = $class;
             unset($data['class']);
             $data['headers'] = $this->serializer->denormalize($data['headers'], Headers::class, $format, $context);
         }

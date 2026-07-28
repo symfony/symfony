@@ -9,23 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Messenger\Execution\Message;
+namespace Symfony\Component\Messenger\Execution;
 
 use Symfony\Component\Messenger\Envelope;
 
 /**
  * @internal
  */
-final class DeferredBatchMessage
+final class PendingParallelExecutionRequest
 {
-    public bool $acked;
+    public bool $deferred = false;
 
     public function __construct(
-        public readonly mixed $context,
+        public readonly string $transportName,
         public readonly Envelope $envelope,
-        bool &$acked,
-        public readonly float $queuedAt,
+        public readonly int $channelId,
+        public readonly string $affinityKey,
+        public readonly bool $isProbe,
     ) {
-        $this->acked = &$acked;
     }
 }

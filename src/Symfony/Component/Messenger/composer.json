@@ -22,6 +22,7 @@
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
+        "amphp/parallel": "^2.0",
         "psr/cache": "^1.0|^2.0|^3.0",
         "symfony/console": "^7.4|^8.0",
         "symfony/dependency-injection": "^8.1",
@@ -33,7 +34,7 @@
         "symfony/rate-limiter": "^7.4|^8.0",
         "symfony/routing": "^8.2",
         "symfony/serializer": "^7.4.4|^8.0.4",
-        "symfony/service-contracts": "^2.5|^3",
+        "symfony/service-contracts": "^3.7.1",
         "symfony/stopwatch": "^7.4|^8.0",
         "symfony/validator": "^7.4|^8.0",
         "symfony/var-dumper": "^7.4|^8.0"
@@ -44,7 +45,8 @@
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/lock": "<7.4",
         "symfony/routing": "<8.2",
-        "symfony/serializer": "<7.4.4|>=8.0,<8.0.4"
+        "symfony/serializer": "<7.4.4|>=8.0,<8.0.4",
+        "symfony/service-contracts": "<3.7.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Messenger\\": "" },

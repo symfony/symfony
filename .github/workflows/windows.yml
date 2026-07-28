@@ -154,6 +154,10 @@ jobs:
           7z x php_igbinary.zip -y >nul
           iwr -outf php_redis.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.2.0-8.4-ts-vs17-x86.zip
           7z x php_redis.zip -y >nul
+          iwr -outf php_parallel.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_parallel-1.2.15-8.4-ts-vs17-x86.zip
+          7z x php_parallel.zip -y >nul
+          # dependencies of extensions are resolved next to php.exe, not in ext\
+          Move-Item -Force pthreadVC3.dll ..\pthreadVC3.dll
           cd ..
           Copy php.ini-development php.ini
           "memory_limit=-1" >> php.ini
@@ -171,6 +175,7 @@ jobs:
           "extension=php_apcu.dll" >> php.ini
           "extension=php_igbinary.dll" >> php.ini
           "extension=php_redis.dll" >> php.ini
+          "extension=php_parallel.dll" >> php.ini
           "apc.enable_cli=1" >> php.ini
           "extension=php_intl.dll" >> php.ini
           "extension=php_fileinfo.dll" >> php.ini
@@ -208,4 +213,4 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
 
-          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group transient-on-windows --requires-php-extension apcu --requires-php-extension curl --requires-php-extension fileinfo --requires-php-extension igbinary --requires-php-extension intl --requires-php-extension openssl --requires-php-extension pdo_sqlite --requires-php-extension redis --requires-php-extension sodium
+          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group transient-on-windows --requires-php-extension apcu --requires-php-extension curl --requires-php-extension fileinfo --requires-php-extension igbinary --requires-php-extension intl --requires-php-extension openssl --requires-php-extension pdo_sqlite --requires-php-extension redis --requires-php-extension sodium --requires-php-extension parallel

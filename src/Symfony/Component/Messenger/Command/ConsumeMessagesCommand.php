@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Messenger\Command;
 
+use Amp\Parallel\Worker\ContextWorkerFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Clock\Clock;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
@@ -32,6 +34,7 @@ use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Worker;
@@ -56,6 +59,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         private array $busIds = [],
         private ?ContainerInterface $rateLimiterLocator = null,
         private ?array $signals = null,
+        private string $console = '',
     ) {
         parent::__construct();
     }
@@ -78,7 +82,8 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Consume messages from all receivers'),
                 new InputOption('exclude-receivers', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Exclude specific receivers/transports from consumption (can only be used with --all)'),
                 new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
-                new InputOption('fetch-size', null, InputOption::VALUE_REQUIRED, 'The number of messages to fetch per call to the transport', 1),
+                new InputOption('concurrency', null, InputOption::VALUE_REQUIRED, 'The number of concurrent messages to process', 1),
+                new InputOption('fetch-size', null, InputOption::VALUE_REQUIRED, 'The number of messages to fetch per call to the transport (defaults to --concurrency)'),
             ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -134,9 +139,13 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
                     <info>php %command.full_name% --all --exclude-receivers=<receiver-name></info>
 
-                Use the <info>--fetch-size</info> option to control how many messages are fetched per call to the transport:
+                Use the <info>--concurrency</info> option to process several messages at the same time:
 
-                    <info>php %command.full_name% <receiver-name> --fetch-size=8</info>
+                    <info>php %command.full_name% <receiver-name> --concurrency=4</info>
+
+                Use the <info>--fetch-size</info> option to control how many messages are fetched per call to the transport (defaults to the value of <info>--concurrency</info>):
+
+                    <info>php %command.full_name% <receiver-name> --concurrency=4 --fetch-size=8</info>
                 EOF
             )
         ;
@@ -150,6 +159,16 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         if ($input->getOption('exclude-receivers') && !$input->getOption('all')) {
             throw new InvalidOptionException('The "--exclude-receivers" option can only be used with the "--all" option.');
+        }
+
+        $concurrency = $input->getOption('concurrency');
+        if (!is_numeric($concurrency) || 0 >= (int) $concurrency) {
+            throw new InvalidOptionException(\sprintf('Option "concurrency" must be a positive integer, "%s" passed.', $concurrency));
+        }
+
+        $fetchSize = $input->getOption('fetch-size');
+        if (null !== $fetchSize && (!is_numeric($fetchSize) || 0 >= (int) $fetchSize)) {
+            throw new InvalidOptionException(\sprintf('Option "fetch-size" must be a positive integer, "%s" passed.', $fetchSize));
         }
     }
 
@@ -300,7 +319,26 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;
 
-        $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
+        $messageExecutionStrategy = null;
+
+        if (1 < $concurrency = (int) $input->getOption('concurrency')) {
+            if (!class_exists(ContextWorkerFactory::class)) {
+                throw new RuntimeException('Parallel message execution requires the "amphp/parallel" package. Try running "composer require amphp/parallel".');
+            }
+
+            if (!$this->console) {
+                throw new RuntimeException('Parallel message execution requires the console entry point to be configured.');
+            }
+
+            $messageExecutionStrategy = new ParallelExecutionStrategy(
+                $this->console,
+                $concurrency,
+                $resetInterval,
+                $memoryLimit ? $this->convertToBytes($memoryLimit) : null,
+            );
+        }
+
+        $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters, new Clock(), $messageExecutionStrategy);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
             'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,
@@ -309,16 +347,16 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $options['queues'] = $queues;
         }
 
-        if (1 > $fetchSize = (int) $input->getOption('fetch-size')) {
-            throw new \InvalidArgumentException(\sprintf('The "--fetch-size" option must be a positive integer, "%s" given.', $input->getOption('fetch-size')));
+        $options['fetch_size'] = (int) ($input->getOption('fetch-size') ?? $concurrency);
+        if ($busName = $input->getOption('bus')) {
+            $options['bus_name'] = $busName;
         }
-
-        $options['fetch_size'] = $fetchSize;
 
         try {
             $this->worker->run($options);
         } finally {
             $this->worker = null;
+            $messageExecutionStrategy?->shutdown();
         }
 
         return 0;

@@ -66,7 +66,7 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
         try {
             // Execute the whole middleware stack & message handling for main dispatch:
             $returnedEnvelope = $stack->next()->handle($envelope, $stack);
-        } catch (\Throwable $exception) {
+        } catch (\Throwable $e) {
             /*
              * Whenever an exception occurs while handling a message that has
              * queued other messages, we drop the queued ones.
@@ -76,7 +76,7 @@ class DispatchAfterCurrentBusMiddleware implements MiddlewareInterface
             $this->queue = [];
             $this->isRootDispatchCallRunning = false;
 
-            throw $exception;
+            throw $e;
         }
 
         // "Root dispatch" call is finished, dispatch stored messages.

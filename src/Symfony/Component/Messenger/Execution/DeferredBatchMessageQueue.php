@@ -27,10 +27,11 @@ final class DeferredBatchMessageQueue
         return null !== $this->messages;
     }
 
-    public function add(object $batchHandler, string $transportName, Envelope $envelope, bool &$acked, float $queuedAt): void
+    public function add(object $batchHandler, mixed $context, Envelope $envelope, bool &$acked, float $queuedAt): void
     {
-        $this->messages ??= new \SplObjectStorage();
-        $this->messages[$batchHandler] = new DeferredBatchMessage($transportName, $envelope, $acked, $queuedAt);
+        /** @var \SplObjectStorage<object, DeferredBatchMessage> $messages */
+        $messages = $this->messages ??= new \SplObjectStorage();
+        $messages[$batchHandler] = new DeferredBatchMessage($context, $envelope, $acked, $queuedAt);
     }
 
     /**
@@ -49,7 +50,9 @@ final class DeferredBatchMessageQueue
             return $messages;
         }
 
+        /** @var \SplObjectStorage<object, DeferredBatchMessage> $remaining */
         $remaining = new \SplObjectStorage();
+        /** @var \SplObjectStorage<object, DeferredBatchMessage> $flushable */
         $flushable = new \SplObjectStorage();
 
         foreach ($this->messages as $handler) {

@@ -124,6 +124,7 @@ class PhpDumper extends Dumper
      *  * base_class: The base class name
      *  * namespace:  The class namespace
      *  * as_files:   To split the container in several files
+     *  * container_stub: To dump a ContainerInterface static analysis stub
      *
      * @return string|array A PHP class representing the service container or an array of PHP files if the "as_files" option is set
      *
@@ -141,6 +142,7 @@ class PhpDumper extends Dumper
             'base_class' => 'Container',
             'namespace' => '',
             'as_files' => false,
+            'container_stub' => false,
             'debug' => true,
             'hot_path_tag' => 'container.hot_path',
             'preload_tags' => ['container.preload', 'container.no_preload'],
@@ -354,6 +356,10 @@ class PhpDumper extends Dumper
                     EOF;
             }
 
+            if ($options['container_stub']) {
+                $code['stub/ContainerInterface.php'] = $this->generateContainerInterfaceStub();
+            }
+
             $code[$options['class'].'.php'] = <<<EOF
                 <?php
                 {$namespaceLine}
@@ -405,6 +411,106 @@ class PhpDumper extends Dumper
         }
 
         return $code;
+    }
+
+    private function generateContainerInterfaceStub(): string
+    {
+        $types = [];
+
+        foreach ($this->container->getDefinitions() as $id => $definition) {
+            if (!$definition->isPublic() || $definition->isSynthetic() || $definition->isAbstract()) {
+                continue;
+            }
+
+            if (null !== $type = $this->getContainerStubServiceType($definition)) {
+                $types[$id] = $type;
+            }
+        }
+
+        foreach ($this->container->getAliases() as $alias => $target) {
+            if (!$target->isPublic() || $target->isDeprecated()) {
+                continue;
+            }
+
+            if (null !== $type = $this->getContainerStubServiceType($this->container->findDefinition($alias))) {
+                $types[$alias] = $type;
+            }
+        }
+
+        ksort($types);
+
+        $shape = 'array{}';
+        if ($types) {
+            $shape = "array{\n";
+            foreach ($types as $id => $type) {
+                $shape .= \sprintf(" *     '%s': %s,\n", str_replace(['\\', "'"], ['\\\\', "\\'"], $id), $type);
+            }
+            $shape .= ' * }';
+        }
+
+        return <<<EOF
+            <?php
+
+            namespace Symfony\Component\DependencyInjection;
+
+            use Psr\Container\ContainerInterface as PsrContainerInterface;
+            use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+            use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+            use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+
+            /**
+             * @phpstan-type Services {$shape}
+             * @psalm-type Services = {$shape}
+             * @type Services = {$shape}
+             */
+            interface ContainerInterface extends PsrContainerInterface
+            {
+                public const RUNTIME_EXCEPTION_ON_INVALID_REFERENCE = 0;
+                public const EXCEPTION_ON_INVALID_REFERENCE = 1;
+                public const NULL_ON_INVALID_REFERENCE = 2;
+                public const IGNORE_ON_INVALID_REFERENCE = 3;
+                public const IGNORE_ON_UNINITIALIZED_REFERENCE = 4;
+
+                public function set(string \$id, ?object \$service): void;
+
+                /**
+                 * @template T of string
+                 *
+                 * @param T \$id
+                 *
+                 * @return (T is key-of<Services> ? Services[T] : object|null)
+                 *
+                 * @throws ServiceCircularReferenceException
+                 * @throws ServiceNotFoundException
+                 */
+                public function get(string \$id, int \$invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE): ?object;
+
+                public function has(string \$id): bool;
+
+                public function initialized(string \$id): bool;
+
+                /**
+                 * @throws ParameterNotFoundException
+                 */
+                public function getParameter(string \$name): array|bool|string|int|float|\UnitEnum|null;
+
+                public function hasParameter(string \$name): bool;
+
+                public function setParameter(string \$name, array|bool|string|int|float|\UnitEnum|null \$value): void;
+            }
+
+            EOF;
+    }
+
+    private function getContainerStubServiceType(Definition $definition): ?string
+    {
+        $class = $this->container->getParameterBag()->resolveValue($definition->getClass());
+
+        if (!\is_string($class) || '' === $class || str_contains($class, '%')) {
+            return null;
+        }
+
+        return '\\'.ltrim($class, '\\');
     }
 
     /**

@@ -373,6 +373,7 @@ trait KernelTrait
             'base_class' => $baseClass,
             'file' => $cache->getPath(),
             'as_files' => true,
+            'container_stub' => true,
             'debug' => $this->debug,
             'inline_factories' => $buildParameters['.container.dumper.inline_factories'] ?? false,
             'inline_class_loader' => $buildParameters['.container.dumper.inline_class_loader'] ?? $this->debug,

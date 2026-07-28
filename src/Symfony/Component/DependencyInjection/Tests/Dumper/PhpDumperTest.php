@@ -2530,6 +2530,24 @@ class PhpDumperTest extends TestCase
         $this->assertStringNotContainsString("'container.build_time' => 0", $dump);
     }
 
+    public function testDumpAsFilesGeneratesContainerInterfaceStub()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \stdClass::class)->setPublic(true);
+        $container->register('private_foo', FooClass::class);
+        $container->setAlias('bar', 'foo')->setPublic(true);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['as_files' => true, 'container_stub' => true, 'file' => __DIR__]);
+
+        $this->assertArrayHasKey('stub/ContainerInterface.php', $dump);
+        $this->assertStringContainsString("'bar': \\stdClass,", $dump['stub/ContainerInterface.php']);
+        $this->assertStringContainsString("'foo': \\stdClass,", $dump['stub/ContainerInterface.php']);
+        $this->assertStringNotContainsString('private_foo', $dump['stub/ContainerInterface.php']);
+        $this->assertStringContainsString('@return (T is key-of<Services> ? Services[T] : object|null)', $dump['stub/ContainerInterface.php']);
+    }
+
     private static function assertStringEqualsGeneratedFile(string $expectedFile, string $dumpedCode): void
     {
         $expectedFile = self::$fixturesPath.'/php/'.$expectedFile;

@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
+use Symfony\Component\PropertyInfo\Type as LegacyType;
 use Symfony\Component\TypeInfo\Type;
 
 /**
@@ -83,5 +84,38 @@ class PropertyInfoExtractorTest extends AbstractPropertyInfoExtractorTest
         yield ['noDocBlock', null];
         yield ['listOfStrings', Type::array(Type::string(), Type::int())];
         yield ['parentAnnotation', Type::object(ParentDummy::class)];
+    }
+
+    public function testGetTypeConvertsTypesFromGetTypesOnlyExtractor()
+    {
+        $propertyInfoExtractor = new PropertyInfoExtractor([], [new class implements PropertyTypeExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return [new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
+            }
+        }]);
+
+        $deprecations = [];
+        set_error_handler(static function (int $type, string $message) use (&$deprecations): bool {
+            if (\E_USER_DEPRECATED === $type) {
+                $deprecations[] = $message;
+            }
+
+            return true;
+        });
+
+        try {
+            $type = $propertyInfoExtractor->getType(Dummy::class, 'bar');
+            $deprecationsAfterExtraction = $deprecations;
+
+            // a direct use must still be reported
+            new LegacyType(LegacyType::BUILTIN_TYPE_INT);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertEquals(Type::string(), $type);
+        $this->assertSame([], $deprecationsAfterExtraction);
+        $this->assertCount(1, $deprecations);
     }
 }

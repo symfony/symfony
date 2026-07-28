@@ -58,10 +58,10 @@ class PropertyInfoExtractor implements PropertyInfoExtractorInterface, PropertyI
     {
         foreach ($this->typeExtractors as $extractor) {
             if (!method_exists($extractor, 'getType')) {
-                $legacyTypes = $extractor->getTypes($class, $property, $context);
-
-                if (null !== $legacyTypes) {
-                    return LegacyTypeConverter::toTypeInfoType($legacyTypes);
+                // BC layer for PropertyTypeExtractorInterface::getTypes().
+                // Can be removed as soon as PropertyTypeExtractorInterface::getTypes() is removed (8.0).
+                if (null !== $value = LegacyTypeConverter::fromLegacy(static fn () => $extractor->getTypes($class, $property, $context))) {
+                    return $value;
                 }
 
                 continue;

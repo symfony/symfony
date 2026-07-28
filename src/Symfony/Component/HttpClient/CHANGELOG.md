@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add options `extra.cache_tags`, `extra.cache_tags_from_headers` and `extra.cache_tags_from_response` to `CachingHttpClient` to attach custom cache tags to cached responses
+
 8.1
 ---
 

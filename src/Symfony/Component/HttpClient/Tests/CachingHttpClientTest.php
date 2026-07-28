@@ -2485,6 +2485,471 @@ class CachingHttpClientTest extends TestCase
         new CachingHttpClient(new MockHttpClient([]), $this->cacheAdapter, [], true, null);
     }
 
+    public function testCacheTagsAllowTargetedInvalidation()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300'],
+            ]),
+            new MockResponse('bar'),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/products', [
+            'extra' => ['cache_tags' => ['product-1', 'product-2']],
+        ]);
+        $this->assertSame('foo', $response->getContent());
+
+        // Sanity check: the response is cached on a second request.
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame('foo', $response->getContent());
+
+        // Invalidating a custom tag must evict the cached response.
+        $this->cacheAdapter->invalidateTags(['product-1']);
+
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testCacheTagsRejectsScalar()
+    {
+        $client = $this->buildClient([new MockResponse('foo')]);
+
+        $this->expectException(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extra.cache_tags" option must be an array of non-empty strings, "int" given.');
+
+        $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags' => 42],
+        ]);
+    }
+
+    public function testCacheTagsRejectsNonStringEntry()
+    {
+        $client = $this->buildClient([new MockResponse('foo')]);
+
+        $this->expectException(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extra.cache_tags" option must be an array of non-empty strings, found "int".');
+
+        $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags' => ['product-1', 42]],
+        ]);
+    }
+
+    public function testCacheTagsFromHeadersResolver()
+    {
+        $client = $this->buildClient([
+            new MockResponse('large body that should not be buffered', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/json'],
+            ]),
+            new MockResponse('miss'),
+        ]);
+
+        $invocations = 0;
+        $tagsFromHeaders = static function (int $statusCode, array $headers) use (&$invocations): array {
+            ++$invocations;
+
+            return ['mime-'.strtr($headers['content-type'][0], ['/' => '-']), 'status-'.$statusCode];
+        };
+
+        $response = $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_headers' => $tagsFromHeaders],
+        ]);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('large body that should not be buffered', $response->getContent());
+        $this->assertSame(1, $invocations);
+
+        // Sanity check: cached on second request.
+        $response = $client->request('GET', 'http://example.com/foo');
+        $this->assertSame('large body that should not be buffered', $response->getContent());
+
+        // Invalidating either resolved tag must evict the cached response.
+        $this->cacheAdapter->invalidateTags(['mime-application-json']);
+
+        $response = $client->request('GET', 'http://example.com/foo');
+        $this->assertSame('miss', $response->getContent());
+    }
+
+    public function testCacheTagsFromResponseResolver()
+    {
+        $client = $this->buildClient([
+            new MockResponse(json_encode(['items' => [['id' => 1], ['id' => 2]]]), [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/json'],
+            ]),
+            new MockResponse('miss'),
+        ]);
+
+        $invocations = 0;
+        $tagsFromBody = static function (string $body, int $statusCode, array $headers) use (&$invocations): array {
+            ++$invocations;
+            $data = json_decode($body, true);
+
+            return array_map(static fn (array $item): string => 'product-'.$item['id'], $data['items']);
+        };
+
+        $response = $client->request('GET', 'http://example.com/products', [
+            'extra' => ['cache_tags_from_response' => $tagsFromBody],
+        ]);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame(['items' => [['id' => 1], ['id' => 2]]], $response->toArray());
+        $this->assertSame(1, $invocations);
+
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame(['items' => [['id' => 1], ['id' => 2]]], $response->toArray());
+
+        $this->cacheAdapter->invalidateTags(['product-2']);
+
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame('miss', $response->getContent());
+    }
+
+    public function testCacheTagsCanBeCombined()
+    {
+        $client = $this->buildClient([
+            new MockResponse(json_encode(['items' => [['id' => 1]]]), [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/json'],
+            ]),
+            new MockResponse('miss'),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/products', [
+            'extra' => [
+                'cache_tags' => ['fixed-tag'],
+                'cache_tags_from_headers' => static fn (int $statusCode, array $headers): array => ['mime-'.strtr($headers['content-type'][0], ['/' => '-'])],
+                'cache_tags_from_response' => static fn (string $body): array => array_map(
+                    static fn (array $item): string => 'product-'.$item['id'],
+                    json_decode($body, true)['items'],
+                ),
+            ],
+        ]);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('{"items":[{"id":1}]}', $response->getContent());
+
+        // The cached response can be invalidated by ANY of the three tag sources.
+        $this->cacheAdapter->invalidateTags(['product-1']);
+
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame('miss', $response->getContent());
+    }
+
+    public function testCacheTagsFromHeadersResolverRejectsNonCallable()
+    {
+        $client = $this->buildClient([new MockResponse('foo')]);
+
+        $this->expectException(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extra.cache_tags_from_headers" option must be a callable returning an iterable of non-empty strings, "string" given.');
+
+        $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_headers' => 'not a callable'],
+        ]);
+    }
+
+    public function testCacheTagsFromResponseResolverRejectsNonCallable()
+    {
+        $client = $this->buildClient([new MockResponse('foo')]);
+
+        $this->expectException(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extra.cache_tags_from_response" option must be a callable returning an iterable of non-empty strings, "int" given.');
+
+        $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_response' => 42],
+        ]);
+    }
+
+    public function testCacheTagsFromHeadersResolverMustReturnStrings()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300'],
+            ]),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_headers' => static fn (): array => ['ok', 42]],
+        ]);
+
+        try {
+            $response->getContent();
+            $this->fail('Expected exception was not thrown.');
+        } catch (\Symfony\Component\HttpClient\Exception\TransportException $e) {
+            $this->assertInstanceOf(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class, $e->getPrevious());
+            $this->assertSame('The callable passed to "extra.cache_tags_from_headers" must return an iterable of non-empty strings, found "int".', $e->getPrevious()->getMessage());
+        }
+    }
+
+    public function testCacheTagsFromResponseResolverMustReturnIterable()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300'],
+            ]),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_response' => static fn (): string => 'oops'],
+        ]);
+
+        try {
+            $response->getContent();
+            $this->fail('Expected exception was not thrown.');
+        } catch (\Symfony\Component\HttpClient\Exception\TransportException $e) {
+            $this->assertInstanceOf(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class, $e->getPrevious());
+            $this->assertSame('The callable passed to "extra.cache_tags_from_response" must return an iterable of non-empty strings, "string" returned.', $e->getPrevious()->getMessage());
+        }
+    }
+
+    public function testCacheTagsFromResponseResolverMustReturnStrings()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300'],
+            ]),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_response' => static fn (): array => ['ok', 42]],
+        ]);
+
+        try {
+            $response->getContent();
+            $this->fail('Expected exception was not thrown.');
+        } catch (\Symfony\Component\HttpClient\Exception\TransportException $e) {
+            $this->assertInstanceOf(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class, $e->getPrevious());
+            $this->assertSame('The callable passed to "extra.cache_tags_from_response" must return an iterable of non-empty strings, found "int".', $e->getPrevious()->getMessage());
+        }
+    }
+
+    public function testCacheTagsFromResponseIsSkippedWhenBufferingIsDisabled()
+    {
+        $client = $this->buildClient([
+            new MockResponse('large body that should not be buffered', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/octet-stream'],
+            ]),
+            new MockResponse('miss'),
+        ]);
+
+        $resolverInvocations = 0;
+
+        $response = $client->request('GET', 'http://example.com/file', [
+            'buffer' => false,
+            'extra' => [
+                'cache_tags' => ['static-tag'],
+                'cache_tags_from_response' => static function () use (&$resolverInvocations): array {
+                    ++$resolverInvocations;
+
+                    return ['should-not-be-applied'];
+                },
+            ],
+        ]);
+
+        $body = '';
+        foreach ($client->stream($response) as $chunk) {
+            $body .= $chunk->getContent();
+        }
+        $this->assertSame('large body that should not be buffered', $body);
+        $this->assertSame(0, $resolverInvocations, 'cache_tags_from_response must be skipped when the "buffer" option disables buffering');
+
+        // Static tags are still applied: invalidating one must evict the cached response.
+        $this->cacheAdapter->invalidateTags(['static-tag']);
+
+        $response = $client->request('GET', 'http://example.com/file');
+        $this->assertSame('miss', $response->getContent());
+    }
+
+    public function testCacheTagsFromResponseIsSkippedWhenBufferingIsNotPlainlyEnabled()
+    {
+        $resolver = static fn (string $body): array => ['from-body-'.strtolower(trim($body, '"'))];
+
+        foreach ([false, static fn (array $headers): bool => true] as $buffer) {
+            $client = $this->buildClient([
+                new MockResponse('"decoded"', [
+                    'http_code' => 200,
+                    'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/json'],
+                ]),
+                new MockResponse('miss'),
+            ]);
+
+            $response = $client->request('GET', 'http://example.com/products', [
+                'buffer' => $buffer,
+                'extra' => ['cache_tags_from_response' => $resolver],
+            ]);
+            $this->assertSame('"decoded"', $response->getContent());
+
+            $this->cacheAdapter->invalidateTags(['from-body-decoded']);
+
+            $response = $client->request('GET', 'http://example.com/products');
+            $this->assertSame('"decoded"', $response->getContent(), 'no body-derived tag was attached, so the entry survives the invalidation');
+        }
+    }
+
+    public function testCacheTagsFromResponseWithChunkedBody()
+    {
+        $client = $this->buildClient([
+            new MockResponse(['{"items":', '[{"id":9}]}'], [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/json'],
+            ]),
+            new MockResponse('miss'),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/products', [
+            'extra' => [
+                'cache_tags_from_response' => static fn (string $body): array => array_map(
+                    static fn (array $item): string => 'product-'.$item['id'],
+                    json_decode($body, true)['items'],
+                ),
+            ],
+        ]);
+        $this->assertSame(['items' => [['id' => 9]]], $response->toArray());
+
+        // The body served from cache is reassembled from the flushed chunk chain.
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame(['items' => [['id' => 9]]], $response->toArray());
+
+        $this->cacheAdapter->invalidateTags(['product-9']);
+
+        $response = $client->request('GET', 'http://example.com/products');
+        $this->assertSame('miss', $response->getContent());
+    }
+
+    public function testAnUntaggedRevalidationKeepsTheTagsOfTheEntry()
+    {
+        $inner = new ArrayAdapter();
+        $this->cacheAdapter = new TagAwareAdapter($inner);
+
+        $client = $this->buildClient([
+            new MockResponse('body-v1', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=0', 'ETag' => '"v1"'],
+            ]),
+            new MockResponse('', [
+                'http_code' => 304,
+                'response_headers' => ['ETag' => '"v1"'],
+            ]),
+        ]);
+
+        $this->assertSame('body-v1', $client->request('GET', 'http://example.com/products', [
+            'extra' => ['cache_tags' => ['product-1']],
+        ])->getContent());
+
+        // the entry is shared, so a request declaring no tag must not strip the stored ones
+        $this->assertSame('body-v1', $client->request('GET', 'http://example.com/products')->getContent());
+
+        $this->cacheAdapter->invalidateTags(['product-1']);
+
+        foreach (array_keys($inner->getValues()) as $key) {
+            if (str_starts_with($key, 'vary_')) {
+                continue;
+            }
+
+            $this->assertFalse($this->cacheAdapter->getItem($key)->isHit(), \sprintf('"%s" must still be invalidatable by the tags stored before the revalidation.', $key));
+        }
+    }
+
+    public function testCacheTagsSurviveRevalidation()
+    {
+        $inner = new ArrayAdapter();
+        $this->cacheAdapter = new TagAwareAdapter($inner);
+
+        $client = $this->buildClient([
+            new MockResponse('body-v1', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=0', 'ETag' => '"v1"'],
+            ]),
+            new MockResponse('', [
+                'http_code' => 304,
+                'response_headers' => ['ETag' => '"v1"'],
+            ]),
+        ]);
+        $options = ['extra' => ['cache_tags' => ['product-1']]];
+
+        $this->assertSame('body-v1', $client->request('GET', 'http://example.com/products', $options)->getContent());
+
+        // The 304 revalidation refreshes the metadata and rewrites the chunk items with a new expiry.
+        $this->assertSame('body-v1', $client->request('GET', 'http://example.com/products', $options)->getContent());
+
+        $chunkKeys = [];
+        foreach ($inner->getValues() as $key => $value) {
+            if (\is_string($value) && str_contains($value, 'next_chunk') && !str_contains($value, 'status_code')) {
+                $chunkKeys[] = $key;
+                $this->assertTrue($this->cacheAdapter->getItem($key)->isHit());
+            }
+        }
+        $this->assertNotEmpty($chunkKeys);
+
+        $this->cacheAdapter->invalidateTags(['product-1']);
+
+        foreach ($chunkKeys as $key) {
+            $this->assertFalse($this->cacheAdapter->getItem($key)->isHit(), 'chunk items rewritten during a 304 revalidation must remain invalidatable by the custom tags');
+        }
+    }
+
+    public function testCacheTagsFromResponseDoesNotReplayOnProgress()
+    {
+        $mockResponse = static fn (): MockResponse => new MockResponse('{"id":1}', [
+            'http_code' => 200,
+            'response_headers' => ['Cache-Control' => 'max-age=300', 'Content-Type' => 'application/json'],
+        ]);
+        $client = $this->buildClient([$mockResponse(), $mockResponse()]);
+
+        $baselineCalls = 0;
+        $client->request('GET', 'http://example.com/without-resolver', [
+            'on_progress' => static function () use (&$baselineCalls): void {
+                ++$baselineCalls;
+            },
+        ])->getContent();
+
+        $resolverCalls = 0;
+        $client->request('GET', 'http://example.com/with-resolver', [
+            'on_progress' => static function () use (&$resolverCalls): void {
+                ++$resolverCalls;
+            },
+            'extra' => ['cache_tags_from_response' => static fn (): array => ['some-tag']],
+        ])->getContent();
+
+        $this->assertSame($baselineCalls, $resolverCalls, 'resolving tags from the response must not replay the caller\'s "on_progress" callback');
+    }
+
+    public function testCacheTagsRejectsReservedCharacters()
+    {
+        $client = $this->buildClient([new MockResponse('foo')]);
+
+        $this->expectException(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extra.cache_tags" option contains the tag "product/1" with one of the reserved characters "{}()/\@:".');
+
+        $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags' => ['product/1']],
+        ]);
+    }
+
+    public function testCacheTagsFromHeadersResolverRejectsReservedCharacters()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => ['Cache-Control' => 'max-age=300'],
+            ]),
+        ]);
+
+        $response = $client->request('GET', 'http://example.com/foo', [
+            'extra' => ['cache_tags_from_headers' => static fn (): array => ['status:200']],
+        ]);
+
+        try {
+            $response->getContent();
+            $this->fail('Expected exception was not thrown.');
+        } catch (\Symfony\Component\HttpClient\Exception\TransportException $e) {
+            $this->assertInstanceOf(\Symfony\Component\HttpClient\Exception\InvalidArgumentException::class, $e->getPrevious());
+            $this->assertSame('The callable passed to "extra.cache_tags_from_headers" returned the tag "status:200" with one of the reserved characters "{}()/\@:".', $e->getPrevious()->getMessage());
+        }
+    }
+
     /**
      * @param iterable<MockResponse> $responses
      */

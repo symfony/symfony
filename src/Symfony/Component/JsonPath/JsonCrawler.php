@@ -543,30 +543,9 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateFilterExpression(string $expr, mixed $context): bool
     {
-        $expr = JsonPathUtils::normalizeWhitespace($expr);
+        $expr = $this->stripWrappingParentheses(JsonPathUtils::normalizeWhitespace($expr));
 
-        // remove outer parentheses if they wrap the entire expression
-        if (str_starts_with($expr, '(') && str_ends_with($expr, ')')) {
-            $depth = 0;
-            $isWrapped = true;
-            $i = -1;
-            while (null !== $char = $expr[++$i] ?? null) {
-                if ('(' === $char) {
-                    ++$depth;
-                } elseif (')' === $char && 0 === --$depth && isset($expr[$i + 1])) {
-                    $isWrapped = false;
-                    break;
-                }
-            }
-            if ($isWrapped) {
-                $expr = trim(substr($expr, 1, -1));
-            }
-        }
-
-        if (str_starts_with($expr, '!')) {
-            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context);
-        }
-
+        // logical operators bind less tightly than the negation
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
             $left = trim(substr($expr, 0, $logicalOp['position']));
             $right = trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])));
@@ -576,6 +555,10 @@ final class JsonCrawler implements JsonCrawlerInterface
             }
 
             return $this->evaluateFilterExpression($left, $context) && $this->evaluateFilterExpression($right, $context);
+        }
+
+        if (str_starts_with($expr, '!')) {
+            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context);
         }
 
         foreach (self::COMPARISON_OPERATORS as $op => $len) {
@@ -624,6 +607,29 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         return false;
+    }
+
+    /**
+     * Removes the outer parentheses as long as they wrap the whole expression,
+     * e.g. `((@.a == 1))` becomes `@.a == 1` while `(@.a == 1) && (@.b == 2)` is left untouched.
+     */
+    private function stripWrappingParentheses(string $expr): string
+    {
+        while (str_starts_with($expr, '(') && str_ends_with($expr, ')')) {
+            $depth = 0;
+            $i = -1;
+            while (null !== $char = $expr[++$i] ?? null) {
+                if ('(' === $char) {
+                    ++$depth;
+                } elseif (')' === $char && 0 === --$depth && isset($expr[$i + 1])) {
+                    return $expr;
+                }
+            }
+
+            $expr = trim(substr($expr, 1, -1));
+        }
+
+        return $expr;
     }
 
     private function findRightmostLogicalOperator(string $expr): ?array
@@ -1007,9 +1013,17 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function validateFilterExpression(string $expr): void
     {
+        $expr = $this->stripWrappingParentheses($expr);
+
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
             $this->validateFilterExpression(trim(substr($expr, 0, $logicalOp['position']))); // left
             $this->validateFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])))); // right
+
+            return;
+        }
+
+        if (str_starts_with($expr, '!')) {
+            $this->validateFilterExpression(trim(substr($expr, 1)));
 
             return;
         }

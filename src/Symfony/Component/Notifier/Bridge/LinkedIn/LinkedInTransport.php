@@ -37,13 +37,19 @@ final class LinkedInTransport extends AbstractTransport
         private string $accountId,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
+        private LinkedInAuthorType $authorType = LinkedInAuthorType::Person,
     ) {
         parent::__construct($client, $dispatcher);
     }
 
     public function __toString(): string
     {
-        return \sprintf('linkedin://%s', $this->getEndpoint());
+        $query = [];
+        if (LinkedInAuthorType::Person !== $this->authorType) {
+            $query['author'] = $this->authorType->value;
+        }
+
+        return \sprintf('linkedin://%s%s', $this->getEndpoint(), $query ? '?'.http_build_query($query) : '');
     }
 
     public function supports(MessageInterface $message): bool
@@ -66,7 +72,7 @@ final class LinkedInTransport extends AbstractTransport
 
         if (!$options && $notification = $message->getNotification()) {
             $options = LinkedInOptions::fromNotification($notification);
-            $options->author(new AuthorShare($this->accountId));
+            $options->author(new AuthorShare($this->accountId, $this->authorType->value));
         }
 
         $endpoint = \sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
@@ -89,8 +95,8 @@ final class LinkedInTransport extends AbstractTransport
 
         $result = $response->toArray(false);
 
-        if (!$result['id']) {
-            throw new TransportException(\sprintf('Unable to post the Linkedin message: "%s".', $result['error']), $response);
+        if (!isset($result['id']) || '' === $result['id']) {
+            throw new TransportException(\sprintf('Unable to post the Linkedin message: "%s".', $result['error'] ?? 'missing post id'), $response);
         }
 
         $sentMessage = new SentMessage($message, (string) $this);
@@ -115,7 +121,7 @@ final class LinkedInTransport extends AbstractTransport
                 'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
             ],
             'lifecycleState' => 'PUBLISHED',
-            'author' => \sprintf('urn:li:person:%s', $this->accountId),
+            'author' => \sprintf('urn:li:%s:%s', $this->authorType->value, $this->accountId),
         ];
     }
 }

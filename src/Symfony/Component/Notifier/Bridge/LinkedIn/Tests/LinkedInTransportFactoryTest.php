@@ -12,8 +12,10 @@
 namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransportFactory;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
+use Symfony\Component\Notifier\Transport\Dsn;
 
 final class LinkedInTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
@@ -29,6 +31,16 @@ final class LinkedInTransportFactoryTest extends AbstractTransportFactoryTestCas
         yield [
             'linkedin://host.test',
             'linkedin://accessToken:UserId@host.test',
+        ];
+
+        yield 'with organization author' => [
+            'linkedin://host.test?author=organization',
+            'linkedin://accessToken:OrganizationId@host.test?author=organization',
+        ];
+
+        yield 'with person author' => [
+            'linkedin://host.test',
+            'linkedin://accessToken:UserId@host.test?author=person',
         ];
     }
 
@@ -46,5 +58,13 @@ final class LinkedInTransportFactoryTest extends AbstractTransportFactoryTestCas
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://accessToken:UserId@default'];
+    }
+
+    public function testInvalidAuthorOptionThrows()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid LinkedIn DSN author option "company". Supported values: "person", "organization".');
+
+        $this->createFactory()->create(new Dsn('linkedin://accessToken:UserId@default?author=company'));
     }
 }

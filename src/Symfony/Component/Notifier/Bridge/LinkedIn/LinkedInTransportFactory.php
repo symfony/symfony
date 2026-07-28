@@ -30,10 +30,12 @@ final class LinkedInTransportFactory extends AbstractTransportFactory
 
         $authToken = $this->getUser($dsn);
         $accountId = $this->getPassword($dsn);
+        $author = $dsn->getOption('author');
+        $authorType = LinkedInAuthorType::fromDsnOption(\is_string($author) ? $author : null);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new LinkedInTransport($authToken, $accountId, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new LinkedInTransport($authToken, $accountId, $this->client, $this->dispatcher, $authorType))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

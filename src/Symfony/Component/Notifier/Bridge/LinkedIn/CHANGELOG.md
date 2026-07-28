@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for posting as a LinkedIn organization via the DSN `author` option
+
 5.3
 ---
 

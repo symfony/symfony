@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target>CSRF fişi geçersiz. Formu tekrar göndermeyi deneyin.</target>
+                <target>CSRF token geçersiz. Lütfen formu tekrar göndermeyi deneyin.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
@@ -52,7 +52,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Please enter a valid date.</source>
-                <target>Lütfen geçerli bir tarih giriniz.</target>
+                <target>Lütfen geçerli bir tarih girin.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Please select a valid file.</source>
@@ -80,7 +80,7 @@
             </trans-unit>
             <trans-unit id="115">
                 <source>Please enter a number.</source>
-                <target>Lütfen bir numara giriniz.</target>
+                <target>Lütfen bir sayı girin.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>The password is invalid.</source>
@@ -104,7 +104,7 @@
             </trans-unit>
             <trans-unit id="121">
                 <source>Please enter a valid URL.</source>
-                <target>Lütfen geçerli bir giriniz URL.</target>
+                <target>Lütfen geçerli bir URL girin.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>Please enter a valid search term.</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="123">
                 <source>Please provide a valid phone number.</source>
-                <target>lütfen geçerli bir telefon numarası sağlayın.</target>
+                <target>Lütfen geçerli bir telefon numarası girin.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The checkbox has an invalid value.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">Lütfen geçerli bir UUID girin.</target>
+                <target>Lütfen geçerli bir UUID girin.</target>
             </trans-unit>
         </body>
     </file>

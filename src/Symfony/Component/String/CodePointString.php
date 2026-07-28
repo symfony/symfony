@@ -126,7 +126,11 @@ class CodePointString extends AbstractUnicodeString
             return null;
         }
 
-        $i = $this->ignoreCase ? mb_stripos($this->string, $needle, $offset, 'UTF-8') : mb_strpos($this->string, $needle, $offset, 'UTF-8');
+        try {
+            $i = $this->ignoreCase ? mb_stripos($this->string, $needle, $offset, 'UTF-8') : mb_strpos($this->string, $needle, $offset, 'UTF-8');
+        } catch (\ValueError) {
+            return null;
+        }
 
         return false === $i ? null : $i;
     }
@@ -143,7 +147,11 @@ class CodePointString extends AbstractUnicodeString
             return null;
         }
 
-        $i = $this->ignoreCase ? mb_strripos($this->string, $needle, $offset, 'UTF-8') : mb_strrpos($this->string, $needle, $offset, 'UTF-8');
+        try {
+            $i = $this->ignoreCase ? mb_strripos($this->string, $needle, $offset, 'UTF-8') : mb_strrpos($this->string, $needle, $offset, 'UTF-8');
+        } catch (\ValueError) {
+            return null;
+        }
 
         return false === $i ? null : $i;
     }

@@ -186,7 +186,11 @@ class UnicodeString extends AbstractUnicodeString
             $offset = 0;
         }
 
-        $i = $this->ignoreCase ? grapheme_strripos($string, $needle, $offset) : grapheme_strrpos($string, $needle, $offset);
+        try {
+            $i = $this->ignoreCase ? grapheme_strripos($string, $needle, $offset) : grapheme_strrpos($string, $needle, $offset);
+        } catch (\ValueError) {
+            return null;
+        }
 
         return false === $i ? null : $i;
     }

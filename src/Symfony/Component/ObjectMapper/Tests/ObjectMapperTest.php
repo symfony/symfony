@@ -108,6 +108,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MagicGet\MagicGetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MagicGet\MagicGetUserView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\ExistingObjectWithPublicProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\ExistingObjectWithSetter;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\NestedExistingTagTransformer;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\Post as MapExistingObjectPost;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\PostDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\Tag;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
@@ -128,6 +132,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\LineIt
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\LineItemTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\OrderSource as NestedCollectionOrderSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\OrderTarget as NestedCollectionOrderTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\Inner;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\InnerMapped;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\Outer;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDto;
@@ -281,6 +288,25 @@ final class ObjectMapperTest extends TestCase
         $mapped = $mapper->map($ab);
         $this->assertInstanceOf(Dto::class, $mapped);
         $this->assertSame($mapped, $mapped->dto);
+    }
+
+    public function testNestedMapCallDoesNotReconstructExistingTarget()
+    {
+        $existingTag = new Tag('original name');
+        $this->assertSame(1, $existingTag->constructorCalls);
+
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([
+                NestedExistingTagTransformer::class => new NestedExistingTagTransformer($existingTag),
+            ]),
+        );
+
+        $post = $mapper->map(new PostDto(), MapExistingObjectPost::class);
+
+        $this->assertInstanceOf(MapExistingObjectPost::class, $post);
+        $this->assertSame($existingTag, $post->tag);
+        $this->assertSame('updated name', $existingTag->name);
+        $this->assertSame(1, $existingTag->constructorCalls);
     }
 
     public function testDeeperRecursion()
@@ -1565,5 +1591,16 @@ final class ObjectMapperTest extends TestCase
         // source, otherwise the #[Map(source: ...)] property is read as null and the transform receives null
         $this->assertInstanceOf(TransformSourcePropertyTarget::class, $target);
         $this->assertSame('ABC', $target->targetProperty);
+    }
+
+    public function testNestedTargetIsConstructed()
+    {
+        $mapper = new ObjectMapper();
+        $mapped = $mapper->map(new Outer(new Inner('bar')));
+
+        $this->assertInstanceOf(InnerMapped::class, $mapped->inner);
+        $this->assertSame('bar', $mapped->inner->name);
+        // computed by the constructor, so it can only be set if the constructor ran
+        $this->assertSame('slug-of-bar', $mapped->inner->slug);
     }
 }

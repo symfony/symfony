@@ -50,18 +50,18 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     public function map(object $source, object|string|null $target = null): object
     {
         if ($this->objectMap) {
-            return $this->doMap($source, $target, $this->objectMap, false);
+            return $this->doMap($source, $target, $this->objectMap);
         }
 
         $this->objectMap = new \WeakMap();
         try {
-            return $this->doMap($source, $target, $this->objectMap, true);
+            return $this->doMap($source, $target, $this->objectMap);
         } finally {
             $this->objectMap = null;
         }
     }
 
-    private function doMap(object $source, object|string|null $target, \WeakMap $objectMap, bool $rootCall): object
+    private function doMap(object $source, object|string|null $target, \WeakMap $objectMap, bool $constructTarget = false): object
     {
         $metadata = $this->metadataFactory->create($source);
         $map = $this->getMapTarget($metadata, null, $source, null, null === $target);
@@ -104,7 +104,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         $objectMap[$source] = $mappedTarget;
         $ctorArguments = [];
         $targetConstructor = $targetRefl->getConstructor();
-        if (!$mappingToObject || !$rootCall) {
+        if (!$mappingToObject || $constructTarget) {
             foreach ($targetConstructor?->getParameters() ?? [] as $parameter) {
                 $parameterName = $parameter->getName();
 
@@ -229,7 +229,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             }
         }
 
-        if ((!$mappingToObject || !$rootCall) && !$map?->transform && $targetConstructor
+        if ((!$mappingToObject || $constructTarget) && !$map?->transform && $targetConstructor
             && ($ctorArguments || !$targetConstructor->getNumberOfRequiredParameters())
         ) {
             try {
@@ -342,7 +342,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     $previousMap = $this->objectMap;
                     $this->objectMap = $objectMap;
                     try {
-                        $objectMap[$value] = $mapper->map($value, $target);
+                        // the ghost has not run a constructor yet, unlike a caller-supplied target
+                        $objectMap[$value] = $mapper === $this
+                            ? $this->doMap($value, $target, $objectMap, true)
+                            : $mapper->map($value, $target);
                     } finally {
                         $this->objectMap = $previousMap;
                     }

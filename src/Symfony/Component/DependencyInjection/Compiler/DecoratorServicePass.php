@@ -27,7 +27,25 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class DecoratorServicePass extends AbstractRecursivePass
 {
+    private const TAGS_TO_KEEP = [
+        'proxy',
+        'container.do_not_inline',
+        'container.service_locator',
+        'container.service_subscriber',
+        'container.service_subscriber.locator',
+    ];
+
     protected bool $skipScalars = true;
+
+    private array $tagsToKeep;
+
+    /**
+     * @param list<string> $tagsToKeep Tags that describe the service instance and must stay on the decorated service
+     */
+    public function __construct(array $tagsToKeep = [])
+    {
+        $this->tagsToKeep = [...self::TAGS_TO_KEEP, ...$tagsToKeep];
+    }
 
     public function process(ContainerBuilder $container): void
     {
@@ -45,7 +63,7 @@ class DecoratorServicePass extends AbstractRecursivePass
 
         // These tags describe how the container wires a concrete service and must stay on the
         // decorated service; role-describing tags (e.g. "kernel.event_listener") move to its decorators.
-        $tagsToKeep = ['proxy', 'container.do_not_inline', 'container.service_locator', 'container.service_subscriber', 'container.service_subscriber.locator'];
+        $tagsToKeep = $this->tagsToKeep;
 
         foreach ($definitions as [$id, $definition]) {
             $decoratedService = $definition->getDecoratedService();

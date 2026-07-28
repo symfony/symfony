@@ -281,6 +281,29 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
+    public function testProcessLeavesCustomTagsOnOriginalDefinition()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register('foo')
+            ->setTags(['logger_aware' => [['method' => 'setLogger']], 'bar' => ['attr' => 'baz']])
+        ;
+        $container
+            ->register('baz')
+            ->setTags(['foobar' => ['attr' => 'bar']])
+            ->setDecoratedService('foo')
+        ;
+
+        (new DecoratorServicePass(['logger_aware']))->process($container);
+
+        $this->assertEquals(['logger_aware' => [['method' => 'setLogger']]], $container->getDefinition('baz.inner')->getTags());
+        $this->assertEquals([
+            'bar' => ['attr' => 'baz'],
+            'foobar' => ['attr' => 'bar'],
+            'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']],
+        ], $container->getDefinition('baz')->getTags());
+    }
+
     public function testProcessIgnoresBehaviorDescribingTagsParameter()
     {
         $container = new ContainerBuilder();

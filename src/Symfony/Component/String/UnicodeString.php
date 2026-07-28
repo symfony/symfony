@@ -177,7 +177,9 @@ class UnicodeString extends AbstractUnicodeString
         $string = $this->string;
 
         if (0 > $offset) {
-            // workaround https://bugs.php.net/74264
+            // ICU's grapheme_strrpos() disagrees with mb_strrpos() for multi-grapheme needles at
+            // negative offsets: it truncates the haystack instead of bounding the match start, so
+            // overlapping matches resolve too far left. bugs.php.net/74264 only fixed the single-grapheme case
             if (0 > $offset += grapheme_strlen($needle)) {
                 $string = grapheme_substr($string, 0, $offset);
             }

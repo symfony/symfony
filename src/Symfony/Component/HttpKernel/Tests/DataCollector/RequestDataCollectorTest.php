@@ -472,7 +472,7 @@ class RequestDataCollectorTest extends TestCase
 
         $curlCommand = $c->getCurlCommand();
         $this->assertStringStartsWith("curl \\\n  --compressed", $curlCommand);
-        $this->assertStringContainsString('--url '.('\\' === \DIRECTORY_SEPARATOR ? '"http://test.com/foo?bar=baz"' : "'http://test.com/foo?bar=baz'"), $curlCommand);
+        $this->assertStringContainsString("--url 'http://test.com/foo?bar=baz'", $curlCommand);
         $this->assertStringNotContainsString('--request', $curlCommand);
     }
 
@@ -486,7 +486,7 @@ class RequestDataCollectorTest extends TestCase
         $curlCommand = $c->getCurlCommand();
         $this->assertStringContainsString('--request POST', $curlCommand);
         $this->assertStringContainsString('--data-raw', $curlCommand);
-        $this->assertStringContainsString('\\' === \DIRECTORY_SEPARATOR ? '"{""key"":""value""}"' : '\'{"key":"value"}\'', $curlCommand);
+        $this->assertStringContainsString('\'{"key":"value"}\'', $curlCommand);
     }
 
     public function testCurlCommandHead()
@@ -511,8 +511,8 @@ class RequestDataCollectorTest extends TestCase
         $c->collect($request, $this->createResponse());
 
         $curlCommand = $c->getCurlCommand();
-        $this->assertStringContainsString('--header '.('\\' === \DIRECTORY_SEPARATOR ? '"Accept: application/json"' : "'Accept: application/json'"), $curlCommand);
-        $this->assertStringContainsString('--header '.('\\' === \DIRECTORY_SEPARATOR ? '"X-Custom-Header: custom-value"' : "'X-Custom-Header: custom-value'"), $curlCommand);
+        $this->assertStringContainsString("--header 'Accept: application/json'", $curlCommand);
+        $this->assertStringContainsString("--header 'X-Custom-Header: custom-value'", $curlCommand);
         $this->assertStringNotContainsString('Host:', $curlCommand);
     }
 
@@ -533,6 +533,21 @@ class RequestDataCollectorTest extends TestCase
         $this->assertStringContainsString('prefs[setting3][1]=listItem2', $curlCommand);
         // a cookie is not form data, so a space is "%20" and "+" stays a literal plus
         $this->assertStringContainsString('note=hello%20world', $curlCommand);
+    }
+
+    public function testCurlCommandEscapesArgumentsForAPosixShell()
+    {
+        $request = Request::create('http://test.com/foo', 'POST', [], [], [], [], "it's `id` \$(id) & echo");
+        $request->headers->set('X-Shell', 'a`id`b $(id) & echo');
+        $request->headers->set('X-Binary', "a\xffb");
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString("--header 'X-Shell: a`id`b \$(id) & echo'", $curlCommand);
+        $this->assertStringContainsString("--header 'X-Binary: a\xffb'", $curlCommand);
+        $this->assertStringContainsString("--data-raw 'it'\\''s `id` \$(id) & echo'", $curlCommand);
     }
 
     public function testCurlCommandWithCookieHoldingAnEmptyArray()

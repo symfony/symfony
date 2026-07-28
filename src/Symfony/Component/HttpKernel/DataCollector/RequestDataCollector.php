@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Cloner\Data;
 
 /**
@@ -511,18 +510,18 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $command[] = \sprintf('--request %s', $method);
         }
 
-        $command[] = \sprintf('--url %s', escapeshellarg($request->getUri()));
+        $command[] = \sprintf('--url %s', $this->escapeArgument($request->getUri()));
 
         foreach ($request->headers->all() as $name => $values) {
             if (\in_array(strtolower($name), ['host', 'cookie'], true)) {
                 continue;
             }
 
-            $command[] = '--header '.escapeshellarg(ucwords($name, '-').': '.implode(', ', $values));
+            $command[] = '--header '.$this->escapeArgument(ucwords($name, '-').': '.implode(', ', $values));
         }
 
         if ($cookies = $this->flattenCookieArrayForCurl($request->cookies->all())) {
-            $command[] = '--cookie '.escapeshellarg(implode('; ', array_map(
+            $command[] = '--cookie '.$this->escapeArgument(implode('; ', array_map(
                 static fn ($name, $value) => $name.'='.$value,
                 array_keys($cookies),
                 $cookies
@@ -530,7 +529,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         if ($content && \in_array($method, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH, Request::METHOD_DELETE], true)) {
-            $command[] = '--data-raw '.$this->escapePayload($content);
+            $command[] = '--data-raw '.$this->escapeArgument($content);
         }
 
         return implode(" \\\n  ", $command);
@@ -541,19 +540,22 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return $this->data['curlCommand'] ?? '';
     }
 
-    private function escapePayload(string $payload): string
+    /**
+     * Quotes a value as a single argument for the displayed curl command.
+     *
+     * escapeshellarg() cannot be used here: on Windows it replaces "%" with a
+     * space to neutralize environment variable expansion, which corrupts
+     * percent-encoded values such as cookies (e.g. "hello%20world"). A simple
+     * manual quoting is used instead so the command stays readable and
+     * copy-pasteable while leaving "%" untouched.
+     */
+    private function escapeArgument(string $value): string
     {
-        static $useProcess;
-
-        if ($useProcess ??= \function_exists('proc_open') && class_exists(Process::class)) {
-            return substr((new Process(['', $payload]))->getCommandLine(), 3);
-        }
-
         if ('\\' === \DIRECTORY_SEPARATOR) {
-            return '"'.str_replace('"', '""', $payload).'"';
+            return '"'.str_replace('"', '""', $value).'"';
         }
 
-        return "'".str_replace("'", "'\\''", $payload)."'";
+        return "'".str_replace("'", "'\\''", $value)."'";
     }
 
     /**

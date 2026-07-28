@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-07-21T19:25:17Z
+
+Hi @mtarld
+
+`Uuid::fromString(`) returns the vesioned subclass (here a UuidV4), but the UUID tests only exercise a v4.
+Having another version like UuidV7 ( from  a data provider [string, expected class]) to confirm `reverseTransform` preserves the concrete type across another branch of `fromString()` would be great.
+
+Adding a `UuidVx`-typed property to `DummyWithUids` would also confirm subclass resolution end-to-end in the reader/writer tests.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-07-22T13:42:11Z
+
+Good idea @Spomky! I updated the tests accordingly :slightly_smiling_face:

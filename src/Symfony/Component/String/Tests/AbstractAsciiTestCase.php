@@ -1084,6 +1084,32 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    #[DataProvider('provideScreamingSnake')]
+    public function testScreamingSnake(string $expectedString, string $origin)
+    {
+        $instance = static::createFromString($origin)->screamingSnake();
+
+        $this->assertEquals(static::createFromString($expectedString), $instance);
+        $this->assertNotSame($origin, $instance, 'Strings should be immutable');
+    }
+
+    public static function provideScreamingSnake(): array
+    {
+        return [
+            ['', ''],
+            ['X_Y', 'x_y'],
+            ['X_Y', 'X_Y'],
+            ['XU_YO', 'xu_yo'],
+            ['SYMFONY_IS_GREAT', 'symfonyIsGreat'],
+            ['SYMFONY123_IS_GREAT', 'symfony123IsGreat'],
+            ['SYMFONY_IS_GREAT', 'Symfony is great'],
+            ['SYMFONY_IS_A_GREAT_FRAMEWORK', 'symfonyIsAGreatFramework'],
+            ['SYMFONY_IS_GREAT', 'symfonyIsGREAT'],
+            ['SYMFONY_IS_REALLY_GREAT', 'symfonyIsREALLYGreat'],
+            ['SYMFONY', 'SYMFONY'],
+        ];
+    }
+
     #[DataProvider('provideStartsWith')]
     public function testStartsWith(bool $expected, string $origin, $prefix, ?int $form = null)
     {

@@ -684,6 +684,17 @@ END'],
         );
     }
 
+    public static function provideScreamingSnake(): array
+    {
+        return array_merge(
+            parent::provideScreamingSnake(),
+            [
+                ['SYMFONY_IST_ÄUSSERST_COOL', 'symfonyIstÄußerstCool'],
+                ['SYMFONY_WITH_EMOJIS', 'Symfony with 😃 emojis'],
+            ]
+        );
+    }
+
     public static function provideKebab(): array
     {
         return [

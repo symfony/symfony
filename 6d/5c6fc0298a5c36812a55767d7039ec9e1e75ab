@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T07:14:14Z
+
+I think the ValueError doesn't match the intended API and may have happened inadvertently when PHP started throwing those.
+Can you please confirm this and change accordingly? I'd target 6.4 as a bugfix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T07:26:06Z
+
+Retargeted from 8.2 to 6.4 and rebased there. The inconsistency reproduces identically on 6.4, so that is the oldest affected maintained branch:
+
+```
+                               ByteString     CodePointString    UnicodeString
+indexOf, offset past end       ValueError     ValueError         null
+indexOf, offset before start   ValueError     ValueError         null
+indexOfLast, past end          ValueError     ValueError         ValueError
+indexOfLast, before start      ValueError     ValueError         null
+```
+
+Treating it as a bugfix rather than a behaviour change seems right: the return type is already `?int`, only some of the implementations honour it, and the ones that throw do so because a PHP 8 migration was left half done. The change is also permissive, so code that catches the `ValueError` today keeps working.
+
+Restoring the three sources and keeping the new provider rows fails with the underlying errors, so the added cases prove the fix:
+
+```
+ValueError: strpos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+ValueError: stripos(): Argument #3 ($offset) must be contained in argument #1 ($haystack)
+```
+
+`git merge-tree` against 7.4, 8.1 and 8.2 is conflict free, so the merge up should be uneventful.
+
+Also dropped the four repeated `// out-of-range offsets make the underlying PHP functions throw a ValueError` comments in the providers: the expected `null` next to an offset of 10 on a three-character string says it already.
+
+Suite: String 2380 tests, green.

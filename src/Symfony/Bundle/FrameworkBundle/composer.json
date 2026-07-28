@@ -28,7 +28,7 @@
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/finder": "^7.4|^8.0",
         "symfony/http-foundation": "^7.4|^8.0",
-        "symfony/http-kernel": "^8.1",
+        "symfony/http-kernel": "^8.2",
         "symfony/polyfill-mbstring": "^1.0",
         "symfony/polyfill-php85": "^1.33",
         "symfony/routing": "^7.4|^8.0",

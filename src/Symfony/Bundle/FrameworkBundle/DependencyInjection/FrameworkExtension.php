@@ -919,6 +919,8 @@ class FrameworkExtension extends Extension
             // this is needed for the WebProfiler to work even if the profiler is disabled
             $container->setParameter('data_collector.templates', []);
 
+            $container->removeDefinition('console.command.profiler_dump');
+
             return;
         }
 

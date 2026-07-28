@@ -105,6 +105,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         $authority = $url['authority'];
         $host = parse_url($authority, \PHP_URL_HOST);
         $proxy = self::getProxyUrl($options['proxy'], $url);
+        $noProxy = $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '';
+        self::checkHttpsProxySupport($proxy, $url, $noProxy);
         $url = implode('', $url);
 
         if (!isset($options['normalized_headers']['user-agent'])) {
@@ -120,8 +122,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_MAXREDIRS => 0 < $options['max_redirects'] ? $options['max_redirects'] : 0,
             \CURLOPT_COOKIEFILE => '', // Keep track of cookies during redirects
             \CURLOPT_TIMEOUT => 0,
-            \CURLOPT_PROXY => $proxy,
-            \CURLOPT_NOPROXY => $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '',
+            // Always set, so that curl doesn't resolve the proxy from its own environment
+            \CURLOPT_PROXY => $proxy ?? '',
+            \CURLOPT_NOPROXY => $noProxy,
             \CURLOPT_SSL_VERIFYPEER => $options['verify_peer'],
             \CURLOPT_SSL_VERIFYHOST => $options['verify_host'] ? 2 : 0,
             \CURLOPT_CAINFO => $options['cafile'],
@@ -319,7 +322,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $scheme, $host), CurlClientState::$curlVersion['version_number']);
+        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $scheme, $host, $noProxy), CurlClientState::$curlVersion['version_number']);
     }
 
     /**
@@ -407,7 +410,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      *
      * Work around CVE-2018-1000007: Authorization and Cookie headers should not follow redirects - fixed in Curl 7.64
      */
-    private static function createRedirectResolver(array $options, string $scheme, string $host): \Closure
+    private static function createRedirectResolver(array $options, string $scheme, string $host, string $noProxy): \Closure
     {
         $redirectHeaders = [];
         if (0 < $options['max_redirects']) {
@@ -424,7 +427,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders, $options) {
+        return static function ($ch, string $location, bool $noContent) use (&$redirectHeaders, $options, $noProxy) {
             try {
                 $location = self::parseUrl($location);
                 $url = self::parseUrl(curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL));
@@ -449,10 +452,40 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders['with_auth']);
             }
 
-            curl_setopt($ch, \CURLOPT_PROXY, self::getProxyUrl($options['proxy'], $url));
+            $proxy = self::getProxyUrl($options['proxy'], $url);
+            self::checkHttpsProxySupport($proxy, $url, $noProxy);
+            curl_setopt($ch, \CURLOPT_PROXY, $proxy ?? '');
 
             return implode('', $url);
         };
+    }
+
+    /**
+     * Rejects "https://" proxies that curl cannot connect to over TLS.
+     *
+     * Curl older than 7.50.2 connects to them in cleartext instead, leaking the proxy
+     * credentials and the CONNECT metadata on the wire.
+     */
+    private static function checkHttpsProxySupport(?string $proxy, array $url, string $noProxy): void
+    {
+        if (null === $proxy || 0 !== stripos($proxy, 'https://')) {
+            return;
+        }
+
+        if (CurlClientState::$curlVersion['features'] & (\defined('CURL_VERSION_HTTPS_PROXY') ? \CURL_VERSION_HTTPS_PROXY : 1 << 21)) {
+            return;
+        }
+
+        $host = parse_url($url['authority'], \PHP_URL_HOST);
+
+        // Matching "no_proxy" should follow the behavior of curl
+        foreach (preg_split('/[\s,]+/', $noProxy, -1, \PREG_SPLIT_NO_EMPTY) as $rule) {
+            if ('*' === $rule || $host === $rule || str_ends_with($host, '.'.ltrim($rule, '.'))) {
+                return;
+            }
+        }
+
+        throw new TransportException('Cannot use an "https://" proxy: the installed curl does not support HTTPS proxies and could connect to it in cleartext; curl 7.52 or higher is required.');
     }
 
     private function ensureState(): CurlClientState

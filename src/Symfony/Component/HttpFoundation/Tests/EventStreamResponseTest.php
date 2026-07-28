@@ -115,6 +115,35 @@ class EventStreamResponseTest extends TestCase
         $this->assertSameResponseContent($expected, $response);
     }
 
+    public function testRetryIsNotSharedBetweenServerEvents()
+    {
+        $first = new ServerEvent('foo', retry: 3000);
+        $second = new ServerEvent('bar', retry: 3000);
+
+        $this->assertSame("retry: 3000\ndata: foo\n\n", implode('', iterator_to_array($first)));
+        $this->assertSame("retry: 3000\ndata: bar\n\n", implode('', iterator_to_array($second)));
+    }
+
+    public function testRetryIsNotSharedBetweenStreams()
+    {
+        $callback = static function () {
+            yield new ServerEvent('foo');
+            yield new ServerEvent('bar');
+        };
+
+        $expected = <<<STR
+            retry: 2000
+            data: foo
+
+            data: bar
+
+
+            STR;
+
+        $this->assertSameResponseContent($expected, new EventStreamResponse($callback, retry: 2000));
+        $this->assertSameResponseContent($expected, new EventStreamResponse($callback, retry: 2000));
+    }
+
     public function testStreamEventWithSendMethod()
     {
         $response = new EventStreamResponse(static function (EventStreamResponse $response) {

@@ -393,25 +393,9 @@ final class JsonCrawler implements JsonCrawlerInterface
             }
 
             $needsParentheses = true;
-            if (str_starts_with($filterExpr, '(') && str_ends_with($filterExpr, ')')) {
-                $depth = 0;
-                $isWrapped = true;
-                $filterLen = \strlen($filterExpr);
-
-                for ($i = 0; $i < $filterLen; ++$i) {
-                    $char = $filterExpr[$i];
-                    if ('(' === $char) {
-                        ++$depth;
-                    } elseif (')' === $char && 0 === --$depth && $i < $filterLen - 1) {
-                        $isWrapped = false;
-                        break;
-                    }
-                }
-
-                if ($isWrapped) {
-                    $needsParentheses = false;
-                    $filterExpr = trim(substr($filterExpr, 1, -1));
-                }
+            if (str_starts_with($filterExpr, '(') && str_ends_with($filterExpr, ')') && $this->isWrappedInParentheses($filterExpr)) {
+                $needsParentheses = false;
+                $filterExpr = trim(substr($filterExpr, 1, -1));
             }
 
             if ($needsParentheses && !str_starts_with($filterExpr, '(')) {
@@ -543,30 +527,9 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateFilterExpression(string $expr, mixed $context): bool
     {
-        $expr = JsonPathUtils::normalizeWhitespace($expr);
+        $expr = $this->stripWrappingParentheses(JsonPathUtils::normalizeWhitespace($expr));
 
-        // remove outer parentheses if they wrap the entire expression
-        if (str_starts_with($expr, '(') && str_ends_with($expr, ')')) {
-            $depth = 0;
-            $isWrapped = true;
-            $i = -1;
-            while (null !== $char = $expr[++$i] ?? null) {
-                if ('(' === $char) {
-                    ++$depth;
-                } elseif (')' === $char && 0 === --$depth && isset($expr[$i + 1])) {
-                    $isWrapped = false;
-                    break;
-                }
-            }
-            if ($isWrapped) {
-                $expr = trim(substr($expr, 1, -1));
-            }
-        }
-
-        if (str_starts_with($expr, '!')) {
-            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context);
-        }
-
+        // logical operators bind less tightly than the negation
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
             $left = trim(substr($expr, 0, $logicalOp['position']));
             $right = trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])));
@@ -576,6 +539,10 @@ final class JsonCrawler implements JsonCrawlerInterface
             }
 
             return $this->evaluateFilterExpression($left, $context) && $this->evaluateFilterExpression($right, $context);
+        }
+
+        if (str_starts_with($expr, '!')) {
+            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context);
         }
 
         foreach (self::COMPARISON_OPERATORS as $op => $len) {
@@ -624,6 +591,19 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         return false;
+    }
+
+    /**
+     * Removes the outer parentheses as long as they wrap the whole expression,
+     * e.g. `((@.a == 1))` becomes `@.a == 1` while `(@.a == 1) && (@.b == 2)` is left untouched.
+     */
+    private function stripWrappingParentheses(string $expr): string
+    {
+        while (str_starts_with($expr, '(') && str_ends_with($expr, ')') && $this->isWrappedInParentheses($expr)) {
+            $expr = trim(substr($expr, 1, -1));
+        }
+
+        return $expr;
     }
 
     private function findRightmostLogicalOperator(string $expr): ?array
@@ -979,6 +959,86 @@ final class JsonCrawler implements JsonCrawlerInterface
         return preg_match('/@\[.*,.*]/', $expr) || '@.*' === $expr || preg_match('/@\[.*:.*]/', $expr);
     }
 
+    /**
+     * A singular query is made of a leading "@" or "$" followed by name and index selectors only.
+     *
+     * @see https://www.rfc-editor.org/rfc/rfc9535.html#name-comparisons
+     */
+    private function isSingularQuery(string $expr): bool
+    {
+        $expr = trim($expr);
+        $length = \strlen($expr);
+
+        if (!$length || ('@' !== $expr[0] && '$' !== $expr[0])) {
+            return false;
+        }
+
+        $i = 1;
+        while ($i < $length) {
+            if (' ' === $expr[$i] || "\t" === $expr[$i] || "\n" === $expr[$i] || "\r" === $expr[$i]) {
+                ++$i;
+                continue;
+            }
+
+            if ('.' === $expr[$i]) {
+                if ('.' === ($expr[$i + 1] ?? '')) {
+                    return false;
+                }
+
+                $start = ++$i;
+                while ($i < $length && !\in_array($expr[$i], ['.', '[', ' ', "\t", "\n", "\r"], true)) {
+                    ++$i;
+                }
+
+                if (!preg_match('/^[A-Za-z_\x{80}-\x{10FFFF}][A-Za-z0-9_\x{80}-\x{10FFFF}]*+$/u', substr($expr, $start, $i - $start))) {
+                    return false;
+                }
+
+                continue;
+            }
+
+            if ('[' !== $expr[$i]) {
+                return false;
+            }
+
+            $start = ++$i;
+            $quote = null;
+            while ($i < $length) {
+                $char = $expr[$i];
+
+                if (null !== $quote) {
+                    if ('\\' === $char) {
+                        ++$i;
+                    } elseif ($char === $quote) {
+                        $quote = null;
+                    }
+                } elseif ('"' === $char || "'" === $char) {
+                    $quote = $char;
+                } elseif (']' === $char) {
+                    break;
+                }
+
+                ++$i;
+            }
+
+            if ($i >= $length) {
+                return false;
+            }
+
+            $selector = trim(substr($expr, $start, $i - $start));
+            ++$i;
+
+            if (!preg_match('/^-?+\d++$/', $selector)
+                && !preg_match('/^\'(?:[^\'\\\\]|\\\\.)*+\'$/s', $selector)
+                && !preg_match('/^"(?:[^"\\\\]|\\\\.)*+"$/s', $selector)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function findOperatorPosition(string $expr, string $op): int|false
     {
         $bracketDepth = 0;
@@ -1005,11 +1065,35 @@ final class JsonCrawler implements JsonCrawlerInterface
         return false;
     }
 
+    private function isWrappedInParentheses(string $expr): bool
+    {
+        $depth = 0;
+        $length = \strlen($expr);
+
+        for ($i = 0; $i < $length; ++$i) {
+            if ('(' === $expr[$i]) {
+                ++$depth;
+            } elseif (')' === $expr[$i] && 0 === --$depth && $i < $length - 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function validateFilterExpression(string $expr): void
     {
+        $expr = $this->stripWrappingParentheses(trim($expr));
+
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
             $this->validateFilterExpression(trim(substr($expr, 0, $logicalOp['position']))); // left
             $this->validateFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])))); // right
+
+            return;
+        }
+
+        if (str_starts_with($expr, '!')) {
+            $this->validateFilterExpression(trim(substr($expr, 1)));
 
             return;
         }
@@ -1031,8 +1115,8 @@ final class JsonCrawler implements JsonCrawlerInterface
                 }
 
                 if (
-                    str_starts_with($left, '@') && $this->isNonSingularRelativeQuery($left)
-                    || str_starts_with($right, '@') && $this->isNonSingularRelativeQuery($right)
+                    str_starts_with($left, '@') && !$this->isSingularQuery($left)
+                    || str_starts_with($right, '@') && !$this->isSingularQuery($right)
                 ) {
                     throw new JsonCrawlerException($left, 'non-singular query is not comparable');
                 }

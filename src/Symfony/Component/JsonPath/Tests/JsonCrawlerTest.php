@@ -508,12 +508,12 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testWildcardInFilter()
+    public function testWildcardInFilterComparisonThrows()
     {
-        $result = self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.* == "my-publisher")]');
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessageMatches('/non-singular query is not comparable/');
 
-        $this->assertCount(1, $result);
-        $this->assertSame('Sword of Honour', $result[0]['title']);
+        self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.* == "my-publisher")]');
     }
 
     public function testWildcardInFunction()
@@ -614,6 +614,62 @@ class JsonCrawlerTest extends TestCase
         $this->expectExceptionMessage('invalid function "unknown"');
 
         self::getBookstoreCrawler()->find('$.store.book[?unknown(@.extra) != 0]');
+    }
+
+    #[DataProvider('provideNonSingularComparisonOperands')]
+    public function testNonSingularQueryInComparisonThrows(string $jsonPath)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessageMatches('/[Nn]on-singular query is not comparable/');
+
+        (new JsonCrawler('[{"a": 1, "b": {"a": 1}}, {"a": 2}]'))->find($jsonPath);
+    }
+
+    public static function provideNonSingularComparisonOperands(): iterable
+    {
+        foreach ([
+            '@..a',
+            '@[*]',
+            '@.*',
+            '@.b.*',
+            '@.b[*]',
+            '@.b..a',
+            '@[0,1]',
+            '@[0:1]',
+            '@[?@.a]',
+            '@.b[*].a',
+        ] as $operand) {
+            yield [\sprintf('$[?%s == 1]', $operand)];
+            yield [\sprintf('$[?(%s == 1)]', $operand)];
+            yield [\sprintf('$[?1 == %s]', $operand)];
+            yield [\sprintf('$[?(1 == %s)]', $operand)];
+        }
+    }
+
+    #[DataProvider('provideSingularComparisonOperands')]
+    public function testSingularQueryInComparisonIsAccepted(string $jsonPath, array $expected)
+    {
+        $this->assertSame($expected, (new JsonCrawler('[{"a": 1, "b": {"a": 1}}, {"a": 2}]'))->find($jsonPath));
+    }
+
+    public static function provideSingularComparisonOperands(): iterable
+    {
+        yield ['$[?@.a == 1]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?(@.a == 1)]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?@["a"] == 1]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?(@[\'a\'] == 1)]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?@.b.a == 1]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?(@.b["a"] == 1)]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?@.a == 2]', [['a' => 2]]];
+        yield ['$[?@ == 1]', []];
+    }
+
+    public function testNonSingularQueryAsFunctionArgumentIsStillAllowed()
+    {
+        $crawler = new JsonCrawler('[{"a": 1, "b": {"a": 1}}, {"a": 2}]');
+
+        $this->assertSame([['a' => 1, 'b' => ['a' => 1]]], $crawler->find('$[?count(@..a) == 2]'));
+        $this->assertSame([['a' => 1, 'b' => ['a' => 1]]], $crawler->find('$[?(count(@[*]) == 2)]'));
     }
 
     public function testAcceptsJsonPath()

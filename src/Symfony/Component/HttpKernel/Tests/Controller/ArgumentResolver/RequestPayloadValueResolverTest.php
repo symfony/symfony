@@ -51,6 +51,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ValidatorBuilder;
 
@@ -596,6 +597,129 @@ class RequestPayloadValueResolverTest extends TestCase
             $validationFailedException = $e->getPrevious();
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type float.', $validationFailedException->getViolations()[0]->getMessage());
+        }
+    }
+
+    public function testQueryStringSkipInvalidFieldsFallsBackToDefaults()
+    {
+        $query = ['text' => 'hello', 'page' => 'not an int'];
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer([$normalizer], ['json' => new JsonEncoder()]);
+
+        $validator = $this->createMock(ValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
+            ->willReturn(new ConstraintViolationList());
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('search', SearchQuery::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(skipInvalidFields: true),
+        ]);
+
+        $request = Request::create('/', 'GET', $query);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $payload = $event->getArguments()[0];
+        $this->assertInstanceOf(SearchQuery::class, $payload);
+        $this->assertSame('hello', $payload->text);
+        $this->assertSame(1, $payload->page);
+    }
+
+    public function testQueryStringSkipInvalidFieldsWithoutValidator()
+    {
+        $query = ['text' => 'hello', 'page' => 'not an int'];
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer([$normalizer], ['json' => new JsonEncoder()]);
+
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('search', SearchQuery::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(skipInvalidFields: true),
+        ]);
+
+        $request = Request::create('/', 'GET', $query);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $payload = $event->getArguments()[0];
+        $this->assertInstanceOf(SearchQuery::class, $payload);
+        $this->assertSame('hello', $payload->text);
+        $this->assertSame(1, $payload->page);
+    }
+
+    public function testQueryStringSkipInvalidFieldsWithNestedObject()
+    {
+        $query = ['text' => 'hello', 'page' => 'invalid', 'filters' => ['start' => 'invalid', 'length' => '25']];
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer([$normalizer], ['json' => new JsonEncoder()]);
+
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('search', SearchQuery::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(skipInvalidFields: true),
+        ]);
+
+        $request = Request::create('/', 'GET', $query);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $payload = $event->getArguments()[0];
+        $this->assertInstanceOf(SearchQuery::class, $payload);
+        $this->assertSame('hello', $payload->text);
+        $this->assertSame(1, $payload->page);
+        // Only the invalid nested field falls back to its default; the valid sibling is kept.
+        $this->assertSame(0, $payload->filters->start);
+        $this->assertSame(25, $payload->filters->length);
+    }
+
+    public function testQueryStringSkipInvalidFieldsStillRunsValidationConstraints()
+    {
+        // "page" is a valid int but violates the #[Assert\Positive] constraint,
+        // so skipInvalidFields must not suppress validation of well-typed values.
+        $query = ['page' => '-5'];
+
+        $normalizer = new ObjectNormalizer(null, null, null, new ReflectionExtractor());
+        $serializer = new Serializer([$normalizer], ['json' => new JsonEncoder()]);
+
+        $validator = Validation::createValidatorBuilder()
+            ->enableAttributeMapping()
+            ->getValidator();
+
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $argument = new ArgumentMetadata('search', SearchQuery::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(skipInvalidFields: true, validationFailedStatusCode: 422),
+        ]);
+
+        $request = Request::create('/', 'GET', $query);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $this->assertSame(422, $e->getStatusCode());
+            $this->assertInstanceOf(ValidationFailedException::class, $e->getPrevious());
         }
     }
 
@@ -1527,6 +1651,26 @@ class QueryPayload
 {
     public function __construct(public readonly float $page)
     {
+    }
+}
+
+class SearchQuery
+{
+    public function __construct(
+        public readonly string $text = '',
+        #[Assert\Positive]
+        public readonly int $page = 1,
+        public readonly SearchFilters $filters = new SearchFilters(),
+    ) {
+    }
+}
+
+class SearchFilters
+{
+    public function __construct(
+        public readonly int $start = 0,
+        public readonly int $length = 10,
+    ) {
     }
 }
 

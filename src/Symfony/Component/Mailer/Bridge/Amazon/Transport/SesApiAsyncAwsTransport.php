@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\MessageConverter;
 
 /**
@@ -43,8 +44,15 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
 
     protected function getRequest(SentMessage $message): SendEmailRequest
     {
+        $originalMessage = $message->getOriginalMessage();
+
+        if (!$originalMessage instanceof Message) {
+            // the raw endpoint takes the message as-is, the same way an email with attachments does
+            return parent::getRequest($message);
+        }
+
         try {
-            $email = MessageConverter::toEmail($message->getOriginalMessage());
+            $email = MessageConverter::toEmail($originalMessage);
         } catch (\Exception $e) {
             throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
         }

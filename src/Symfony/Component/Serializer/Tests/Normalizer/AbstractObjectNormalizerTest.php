@@ -239,6 +239,40 @@ class AbstractObjectNormalizerTest extends TestCase
         $normalizer->denormalize($data, DuplicateKeyNestedDummy::class, 'any');
     }
 
+    public function testDenormalizePrefersSerializedNameOverRawPropertyName()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $object = $normalizer->denormalize(['subproject' => 'from raw key', 'subproject_id' => 'from serialized name'], SerializedNameDuplicateRawKeyDummy::class, 'any');
+        $this->assertSame('from serialized name', $object->subproject);
+
+        $object = $normalizer->denormalize(['subproject_id' => 'from serialized name', 'subproject' => 'from raw key'], SerializedNameDuplicateRawKeyDummy::class, 'any');
+        $this->assertSame('from serialized name', $object->subproject);
+    }
+
+    public function testDenormalizePrefersSerializedNameOverRawPropertyNameInConstructor()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+
+        $object = $normalizer->denormalize(['subproject' => 'from raw key', 'subproject_id' => 'from serialized name'], SerializedNameDuplicateRawKeyConstructorDummy::class, 'any');
+        $this->assertSame('from serialized name', $object->subproject);
+
+        $object = $normalizer->denormalize(['subproject_id' => 'from serialized name', 'subproject' => 'from raw key'], SerializedNameDuplicateRawKeyConstructorDummy::class, 'any');
+        $this->assertSame('from serialized name', $object->subproject);
+    }
+
+    public function testDenormalizeReportsRawPropertyNameAsExtraAttribute()
+    {
+        $this->expectException(ExtraAttributesException::class);
+        $this->expectExceptionMessage('Extra attributes are not allowed ("subproject" is unknown).');
+
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $normalizer->denormalize([
+            'subproject' => 'from raw key',
+            'subproject_id' => 'from serialized name',
+        ], SerializedNameDuplicateRawKeyDummy::class, 'any', [AbstractObjectNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
+    }
+
     public function testDenormalizeWithNestedAttributesInConstructor()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadata();
@@ -1780,6 +1814,21 @@ class DuplicateKeyNestedDummy
 
     #[SerializedName('quux')]
     public $notquux;
+}
+
+class SerializedNameDuplicateRawKeyDummy
+{
+    #[SerializedName('subproject_id')]
+    public string $subproject;
+}
+
+class SerializedNameDuplicateRawKeyConstructorDummy
+{
+    public function __construct(
+        #[SerializedName('subproject_id')]
+        public string $subproject,
+    ) {
+    }
 }
 
 class ObjectDummyWithContextAttributeAndSerializedPath

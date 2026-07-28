@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">Per favore, inserisci un UUID valido.</target>
+                <target>Per favore, inserisci un UUID valido.</target>
             </trans-unit>
         </body>
     </file>

@@ -383,6 +383,63 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
+    #[DataProvider('provideNestedParenthesesFilters')]
+    public function testFilterWithNestedParentheses(string $path, array $expected)
+    {
+        $crawler = new JsonCrawler('[{"a": 1, "b": 2}, {"a": 2, "b": 2}, {"a": 3, "b": 4}]');
+
+        $this->assertSame($expected, $crawler->find($path));
+    }
+
+    public static function provideNestedParenthesesFilters(): iterable
+    {
+        $first = ['a' => 1, 'b' => 2];
+        $second = ['a' => 2, 'b' => 2];
+        $third = ['a' => 3, 'b' => 4];
+
+        yield 'no parentheses' => ['$[?@.a == 1]', [$first]];
+        yield 'one pair' => ['$[?(@.a == 1)]', [$first]];
+        yield 'two pairs' => ['$[?((@.a == 1))]', [$first]];
+        yield 'three pairs' => ['$[?(((@.a == 1)))]', [$first]];
+        yield 'four pairs' => ['$[?((((@.a == 1))))]', [$first]];
+        yield 'five pairs' => ['$[?(((((@.a == 1)))))]', [$first]];
+
+        yield 'sibling groups' => ['$[?((@.a == 1) && (@.b == 2))]', [$first]];
+        yield 'sibling groups with or' => ['$[?((@.a == 1) || (@.a == 3))]', [$first, $third]];
+        yield 'wrapped sibling groups' => ['$[?(((@.a == 1) && (@.b == 2)))]', [$first]];
+        yield 'nested sibling groups' => ['$[?(((@.a == 1)) && ((@.b == 2)))]', [$first]];
+        yield 'sibling groups with nested or' => ['$[?(((@.a == 1) || (@.a == 2)) && (@.b == 2))]', [$first, $second]];
+
+        yield 'negated group' => ['$[?(!(@.a == 1))]', [$second, $third]];
+        yield 'negated nested group' => ['$[?(!((@.a == 1)))]', [$second, $third]];
+        yield 'negated deeply nested group' => ['$[?(!(((@.a == 1))))]', [$second, $third]];
+        yield 'wrapped negated group' => ['$[?((!(@.a == 1)))]', [$second, $third]];
+        yield 'negated group with and' => ['$[?(!((@.a == 1)) && (@.b == 2))]', [$second]];
+        yield 'negation binds tighter than and' => ['$[?(!(@.a == 1) && (@.b == 2))]', [$second]];
+        yield 'negation binds tighter than or' => ['$[?(!(@.b == 2) || (@.a == 1))]', [$first, $third]];
+        yield 'negation of a whole group' => ['$[?(!((@.a == 1) && (@.b == 2)))]', [$second, $third]];
+
+        yield 'nested function call' => ['$[?((length(@) == 2))]', [$first, $second, $third]];
+    }
+
+    #[DataProvider('provideNestedParenthesesNonSingularFilters')]
+    public function testNonSingularQueryIsRejectedWhateverTheNesting(string $path)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessageMatches('/non-singular query/i');
+
+        (new JsonCrawler('[{"a": 1}]'))->find($path);
+    }
+
+    public static function provideNestedParenthesesNonSingularFilters(): iterable
+    {
+        yield ['$[?(@.* == 1)]'];
+        yield ['$[?((@.* == 1))]'];
+        yield ['$[?(((@.* == 1)))]'];
+        yield ['$[?(!(@.* == 1))]'];
+        yield ['$[?((@.* == 1) && (@.a == 1))]'];
+    }
+
     public function testEmptyResult()
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.price > 1000)]');
@@ -472,12 +529,12 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testWildcardInFilter()
+    public function testWildcardInFilterComparisonThrows()
     {
-        $result = self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.* == "my-publisher")]');
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessageMatches('/non-singular query is not comparable/');
 
-        $this->assertCount(1, $result);
-        $this->assertSame('Sword of Honour', $result[0]['title']);
+        self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.* == "my-publisher")]');
     }
 
     public function testWildcardInFunction()
@@ -595,6 +652,62 @@ class JsonCrawlerTest extends TestCase
         $this->expectExceptionMessage('invalid function "unknown"');
 
         self::getBookstoreCrawler()->find('$.store.book[?unknown(@.extra) != 0]');
+    }
+
+    #[DataProvider('provideNonSingularComparisonOperands')]
+    public function testNonSingularQueryInComparisonThrows(string $jsonPath)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessageMatches('/[Nn]on-singular query is not comparable/');
+
+        (new JsonCrawler('[{"a": 1, "b": {"a": 1}}, {"a": 2}]'))->find($jsonPath);
+    }
+
+    public static function provideNonSingularComparisonOperands(): iterable
+    {
+        foreach ([
+            '@..a',
+            '@[*]',
+            '@.*',
+            '@.b.*',
+            '@.b[*]',
+            '@.b..a',
+            '@[0,1]',
+            '@[0:1]',
+            '@[?@.a]',
+            '@.b[*].a',
+        ] as $operand) {
+            yield [\sprintf('$[?%s == 1]', $operand)];
+            yield [\sprintf('$[?(%s == 1)]', $operand)];
+            yield [\sprintf('$[?1 == %s]', $operand)];
+            yield [\sprintf('$[?(1 == %s)]', $operand)];
+        }
+    }
+
+    #[DataProvider('provideSingularComparisonOperands')]
+    public function testSingularQueryInComparisonIsAccepted(string $jsonPath, array $expected)
+    {
+        $this->assertSame($expected, (new JsonCrawler('[{"a": 1, "b": {"a": 1}}, {"a": 2}]'))->find($jsonPath));
+    }
+
+    public static function provideSingularComparisonOperands(): iterable
+    {
+        yield ['$[?@.a == 1]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?(@.a == 1)]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?@["a"] == 1]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?(@[\'a\'] == 1)]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?@.b.a == 1]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?(@.b["a"] == 1)]', [['a' => 1, 'b' => ['a' => 1]]]];
+        yield ['$[?@.a == 2]', [['a' => 2]]];
+        yield ['$[?@ == 1]', []];
+    }
+
+    public function testNonSingularQueryAsFunctionArgumentIsStillAllowed()
+    {
+        $crawler = new JsonCrawler('[{"a": 1, "b": {"a": 1}}, {"a": 2}]');
+
+        $this->assertSame([['a' => 1, 'b' => ['a' => 1]]], $crawler->find('$[?count(@..a) == 2]'));
+        $this->assertSame([['a' => 1, 'b' => ['a' => 1]]], $crawler->find('$[?(count(@[*]) == 2)]'));
     }
 
     public function testAcceptsJsonPath()

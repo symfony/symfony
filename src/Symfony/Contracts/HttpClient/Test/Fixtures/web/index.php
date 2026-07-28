@@ -198,6 +198,17 @@ switch (parse_url($vars['REQUEST_URI'], \PHP_URL_PATH)) {
         ]);
 
         exit;
+
+    case '/custom':
+        if (isset($_GET['status'])) {
+            http_response_code((int) $_GET['status']);
+        }
+        if (isset($_GET['headers']) && is_array($_GET['headers'])) {
+            foreach ($_GET['headers'] as $header) {
+                header($header);
+            }
+        }
+        break;
 }
 
 header('Content-Type: application/json', true);

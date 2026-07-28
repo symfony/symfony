@@ -19,10 +19,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesApiAsyncAwsTransport;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SesApiAsyncAwsTransportTest extends TestCase
@@ -187,5 +189,24 @@ class SesApiAsyncAwsTransportTest extends TestCase
         $this->expectException(HttpTransportException::class);
         $this->expectExceptionMessage('Unable to send an email: i\'m a teapot (code 418).');
         $transport->send($mail);
+    }
+
+    public function testSendRawMessage()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $content = json_decode($options['body'], true);
+
+            $this->assertSame("Subject: Hello!\r\n\r\nHello There!", base64_decode($content['Content']['Raw']['Data']));
+            $this->assertSame(['saif.gmati@symfony.com'], $content['Destination']['ToAddresses']);
+
+            return new MockResponse('{"MessageId": "foobar"}', ['http_code' => 200]);
+        });
+
+        $transport = new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false]), new NullProvider(), $client));
+
+        $envelope = new Envelope(new Address('fabpot@symfony.com'), [new Address('saif.gmati@symfony.com')]);
+        $message = $transport->send(new RawMessage("Subject: Hello!\r\n\r\nHello There!"), $envelope);
+
+        $this->assertSame('foobar', $message->getMessageId());
     }
 }

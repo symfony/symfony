@@ -211,6 +211,8 @@ abstract class AbstractAsciiTestCase extends TestCase
             [2, 'abc', 'c', 1],
             [4, 'abacabab', 'ab', 1],
             [4, '123abc', 'b', -3],
+            [null, 'abc', 'b', 10],
+            [null, 'abc', 'b', -10],
         ];
     }
 
@@ -241,6 +243,8 @@ abstract class AbstractAsciiTestCase extends TestCase
             [2, 'ABC', 'c', 2],
             [4, 'ABACaBAB', 'Ab', 1],
             [4, '123abc', 'B', -3],
+            [null, 'ABC', 'b', 10],
+            [null, 'ABC', 'b', -10],
         ];
     }
 
@@ -266,6 +270,8 @@ abstract class AbstractAsciiTestCase extends TestCase
             [57, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'amet', 0],
             [57, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'amet', -10],
             [22, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'amet', -30],
+            [null, 'abc', 'b', 10],
+            [null, 'abc', 'b', -10],
         ];
     }
 
@@ -295,6 +301,8 @@ abstract class AbstractAsciiTestCase extends TestCase
             [57, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'AmeT', 0],
             [57, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'aMEt', -10],
             [22, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, amet sagittis felis.', 'AMET', -30],
+            [null, 'ABC', 'b', 10],
+            [null, 'ABC', 'b', -10],
         ];
     }
 

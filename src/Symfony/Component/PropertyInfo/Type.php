@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\PropertyInfo;
 
-trigger_deprecation('symfony/property-info', '7.3', 'The "%s" class is deprecated. Use "%s" class from "symfony/type-info" instead.', Type::class, \Symfony\Component\TypeInfo\Type::class);
-
 /**
  * Type value object (immutable).
  *
@@ -84,6 +82,8 @@ class Type
         array|self|null $collectionKeyType = null,
         array|self|null $collectionValueType = null,
     ) {
+        trigger_deprecation('symfony/property-info', '7.3', 'The "%s" class is deprecated. Use "%s" class from "symfony/type-info" instead.', self::class, \Symfony\Component\TypeInfo\Type::class);
+
         if (!\in_array($builtinType, self::$builtinTypes, true)) {
             throw new \InvalidArgumentException(\sprintf('"%s" is not a valid PHP type.', $builtinType));
         }

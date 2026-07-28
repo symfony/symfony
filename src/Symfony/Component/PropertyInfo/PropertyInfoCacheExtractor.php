@@ -67,7 +67,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
                 return $this->propertyInfoExtractor->getType($class, $property, $context);
             }
 
-            return LegacyTypeConverter::toTypeInfoType($this->propertyInfoExtractor->getTypes($class, $property, $context));
+            return LegacyTypeConverter::fromLegacy(fn () => $this->propertyInfoExtractor->getTypes($class, $property, $context));
         }
 
         // Calling rawurlencode escapes special characters not allowed in PSR-6's keys
@@ -86,7 +86,7 @@ class PropertyInfoCacheExtractor implements PropertyInfoExtractorInterface, Prop
         if (method_exists($this->propertyInfoExtractor, 'getType')) {
             $value = $this->propertyInfoExtractor->getType($class, $property, $context);
         } else {
-            $value = LegacyTypeConverter::toTypeInfoType($this->propertyInfoExtractor->getTypes($class, $property, $context));
+            $value = LegacyTypeConverter::fromLegacy(fn () => $this->propertyInfoExtractor->getTypes($class, $property, $context));
         }
 
         $item->set($value);

@@ -20,6 +20,28 @@ use Symfony\Component\TypeInfo\Type;
 class LegacyTypeConverter
 {
     /**
+     * Silences the legacy Type deprecation while the bridge builds types the caller never asked for.
+     *
+     * @param callable():(LegacyType[]|null) $legacyTypesProvider
+     */
+    public static function fromLegacy(callable $legacyTypesProvider): ?Type
+    {
+        $prevErrorHandler = set_error_handler(static function ($type, $message, $file, $line) use (&$prevErrorHandler) {
+            if (\E_USER_DEPRECATED === $type && str_contains($message, '"'.LegacyType::class.'" class is deprecated')) {
+                return true;
+            }
+
+            return $prevErrorHandler ? $prevErrorHandler($type, $message, $file, $line) : false;
+        });
+
+        try {
+            return self::toTypeInfoType($legacyTypesProvider());
+        } finally {
+            restore_error_handler();
+        }
+    }
+
+    /**
      * @param LegacyType[]|null $legacyTypes
      */
     public static function toTypeInfoType(?array $legacyTypes): ?Type

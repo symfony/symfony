@@ -222,7 +222,63 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
             return null;
         }
 
-        return $this->serializer->denormalize($data, $argument->getType(), 'csv', $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ['filter_bool' => true]);
+        $context = $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ['filter_bool' => true];
+
+        if (!$attribute->skipInvalidFields) {
+            return $this->serializer->denormalize($data, $argument->getType(), 'csv', $context);
+        }
+
+        // When skipping invalid fields, drop every query parameter that cannot be denormalized and
+        // retry, so the mapped object falls back to its own default values for those fields while
+        // keeping the valid ones. Retrying is needed because a single invalid constructor argument
+        // otherwise prevents the constructor (and thus its defaults) from being applied at all.
+        while (true) {
+            try {
+                return $this->serializer->denormalize($data, $argument->getType(), 'csv', $context);
+            } catch (PartialDenormalizationException $e) {
+                $errors = method_exists($e, 'getNotNormalizableValueErrors') ? $e->getNotNormalizableValueErrors() : $e->getErrors();
+                $strippedSomething = false;
+                foreach ($errors as $error) {
+                    if (null !== ($path = $error->getPath()) && $this->unsetPath($data, $path)) {
+                        $strippedSomething = true;
+                    }
+                }
+
+                if (!$strippedSomething) {
+                    // Nothing left to strip (e.g. a missing required field); let the caller report it.
+                    throw $e;
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes the value at the given dot-separated path from the data array.
+     *
+     * @param array<array-key, mixed> $data
+     *
+     * @return bool Whether a value was actually removed
+     */
+    private function unsetPath(array &$data, string $path): bool
+    {
+        $keys = explode('.', $path);
+        $lastKey = array_pop($keys);
+        $cursor = &$data;
+
+        foreach ($keys as $key) {
+            if (!\is_array($cursor) || !\array_key_exists($key, $cursor)) {
+                return false;
+            }
+            $cursor = &$cursor[$key];
+        }
+
+        if (!\is_array($cursor) || !\array_key_exists($lastKey, $cursor)) {
+            return false;
+        }
+
+        unset($cursor[$lastKey]);
+
+        return true;
     }
 
     private function mapRequestPayload(Request $request, ArgumentMetadata $argument, MapRequestPayload $attribute): object|array|null

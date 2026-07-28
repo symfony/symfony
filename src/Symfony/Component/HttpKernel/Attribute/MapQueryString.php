@@ -34,6 +34,7 @@ class MapQueryString extends ValueResolver
      * @param string|Expression|GroupSequence|GroupResolver|array<string>|null $validationGroups           The validation groups to use when validating the query string mapping
      * @param class-string                                                     $resolver                   The class name of the resolver to use
      * @param int                                                              $validationFailedStatusCode The HTTP code to return if the validation fails
+     * @param bool                                                             $skipInvalidFields          Whether to ignore query parameters that cannot be denormalized and fall back to the mapped object's default values instead of failing
      */
     public function __construct(
         public readonly array $serializationContext = [],
@@ -42,6 +43,7 @@ class MapQueryString extends ValueResolver
         public readonly int $validationFailedStatusCode = Response::HTTP_NOT_FOUND,
         public readonly ?string $key = null,
         public bool $mapWhenEmpty = false,
+        public readonly bool $skipInvalidFields = false,
     ) {
         parent::__construct($resolver);
     }

@@ -325,7 +325,7 @@ class HttpClientDataCollectorTest extends TestCase
                             'foo' => [
                                 'bar' => 'baz',
                                 'qux' => [1.10, 1.0],
-                                'fred' => ['<foo>', "'bar'", '"baz"', '&blong&'],
+                                'fred' => ['<foo>', "'bar'", '"baz"', '&belong&'],
                             ],
                         ],
                     ],
@@ -336,12 +336,37 @@ class HttpClientDataCollectorTest extends TestCase
   --url http://localhost:8057/json \\
   --header Content-Type: application/json \\
   --header Accept: */* \\
-  --header Content-Length: 120 \\
+  --header Content-Length: 121 \\
   --header Accept-Encoding: gzip \\
   --header User-Agent: Symfony HttpClient (Native) \\
-  --data-raw {"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}',
+  --data-raw {"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026belong\u0026"]}}',
             ];
         }
+    }
+
+    public function testItEscapesCurlCommandArgumentsForAPosixShell()
+    {
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
+            [
+                'method' => 'POST',
+                'url' => 'http://localhost:8057/json',
+                'options' => [
+                    'headers' => [
+                        'X-Shell' => 'a`id`b $(id) & echo',
+                        'X-Binary' => "a\xffb",
+                    ],
+                    'body' => "it's `id` \$(id)",
+                ],
+            ],
+        ]));
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+
+        self::assertStringContainsString("--header 'X-Shell: a`id`b \$(id) & echo'", $curlCommand);
+        self::assertStringContainsString("--header 'X-Binary: a\xffb'", $curlCommand);
+        self::assertStringContainsString("--data-raw 'it'\\''s `id` \$(id)'", $curlCommand);
     }
 
     public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands()

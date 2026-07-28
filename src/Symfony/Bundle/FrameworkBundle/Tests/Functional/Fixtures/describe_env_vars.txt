@@ -5,6 +5,7 @@
   Default value     "[1, "2.5", 3]"  
   Real value        n/a              
   Processed value   3.0              
+  Used              yes              
  ----------------- ----------------- 
 
 %env(int:key:2:json:JSON)%
@@ -14,4 +15,5 @@
   Default value     "[1, "2.5", 3]"  
   Real value        n/a              
   Processed value   3                
+  Used              yes              
  ----------------- ----------------- 

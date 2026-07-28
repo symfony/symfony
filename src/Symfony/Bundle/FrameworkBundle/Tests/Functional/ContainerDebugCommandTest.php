@@ -249,7 +249,61 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
 
     public function testDescribeEnvVars()
     {
+        $_SERVER['SYMFONY_DOTENV_VARS'] = 'APP_FOO,APP_BAR,APP_BAZ';
         putenv('REAL=value');
+        putenv('APP_FOO=foo');
+        putenv('APP_BAR=bar');
+        putenv('APP_BAZ=baz');
+
+        try {
+            $display = $this->runEnvVarsCommand()->getDisplay(true);
+
+            $this->assertMatchesRegularExpression('/Name\s+Default value\s+Real value\s+Used/', $display);
+
+            // APP_FOO has a container default and APP_BAR has nothing, but no service reads either,
+            // so both are unused; APP_BAZ is in .env and read by a service, so it is used
+            $this->assertMatchesRegularExpression('/^  APP_BAR\s+n\/a\s+"bar"\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_BAZ\s+n\/a\s+"baz"\s+yes\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  APP_FOO\s+"foo"\s+"foo"\s+no\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  JSON\s+"\[1, "2.5", 3\]"\s+n\/a\s+yes\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  REAL\s+n\/a\s+"value"\s+yes\s*$/m', $display);
+            $this->assertMatchesRegularExpression('/^  UNKNOWN\s+n\/a\s+n\/a\s+yes\s*$/m', $display);
+
+            // variables the framework itself reads are listed, and are not reported as missing
+            // because their placeholder carries a "default" fallback
+            $this->assertMatchesRegularExpression('/^  SYMFONY_TRUSTED_HOSTS\s+n\/a\s+\S+\s+yes\s*$/m', $display);
+            $this->assertStringContainsString('The following variables are missing:', $display);
+            $this->assertStringContainsString('* UNKNOWN', $display);
+            $this->assertStringNotContainsString('* SYMFONY_TRUSTED_HOSTS', $display);
+            $this->assertStringNotContainsString('* APP_RUNTIME_ENV', $display);
+        } finally {
+            putenv('REAL');
+            putenv('APP_FOO');
+            putenv('APP_BAR');
+            putenv('APP_BAZ');
+            unset($_SERVER['SYMFONY_DOTENV_VARS']);
+        }
+    }
+
+    public function testDescribeEnvVarsWithoutDotenv()
+    {
+        putenv('REAL=value');
+
+        try {
+            $display = $this->runEnvVarsCommand()->getDisplay(true);
+
+            // an absent SYMFONY_DOTENV_VARS used to add a row with no name and a count of its own
+            $this->assertDoesNotMatchRegularExpression('/^\s+n\/a\s+n\/a\s+(yes|no)\s*$/m', $display);
+            $this->assertStringNotContainsString('* '.\PHP_EOL, $display);
+            $this->assertMatchesRegularExpression('/^  REAL\s+n\/a\s+"value"\s+yes\s*$/m', $display);
+            $this->assertStringNotContainsString('APP_BAR', $display);
+        } finally {
+            putenv('REAL');
+        }
+    }
+
+    private function runEnvVarsCommand(): ApplicationTester
+    {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
         $application = new Application(static::$kernel);
@@ -260,30 +314,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $tester = new ApplicationTester($application);
         $tester->run(['command' => 'debug:container', '--env-vars' => true], ['decorated' => false]);
 
-        $this->assertStringMatchesFormat(<<<'TXT'
-
-            Symfony Container Environment Variables
-            =======================================
-
-             --------- ----------------- ------------%w
-              Name      Default value     Real value%w
-             --------- ----------------- ------------%w
-              JSON      "[1, "2.5", 3]"   n/a%w
-              REAL      n/a               "value"%w
-              UNKNOWN   n/a               n/a%w
-             --------- ----------------- ------------%w
-
-             // Note real values might be different between web and CLI.%w
-
-             [WARNING] The following variables are missing:%w
-
-             * UNKNOWN
-
-            TXT,
-            $tester->getDisplay(true)
-        );
-
-        putenv('REAL');
+        return $tester;
     }
 
     public function testDescribeEnvVar()

@@ -518,6 +518,7 @@ class TextDescriptor extends Descriptor
                         ['<info>Default value</>', $env['default_available'] ? $dump($env['default_value']) : 'n/a'],
                         ['<info>Real value</>', $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a'],
                         ['<info>Processed value</>', $env['default_available'] || $env['runtime_available'] ? $dump($env['processed_value']) : 'n/a'],
+                        ['<info>Used</>', $env['used'] ? 'yes' : 'no'],
                     ]);
                 }
             }
@@ -541,6 +542,7 @@ class TextDescriptor extends Descriptor
         $missing = [];
         foreach ($envs as $env) {
             if (isset($rows[$env['name']])) {
+                $rows[$env['name']][3] = $rows[$env['name']][3] || $env['used'];
                 continue;
             }
 
@@ -548,13 +550,21 @@ class TextDescriptor extends Descriptor
                 $env['name'],
                 $env['default_available'] ? $dump($env['default_value']) : 'n/a',
                 $env['runtime_available'] ? $dump($env['runtime_value']) : 'n/a',
+                $env['used'],
             ];
-            if (!$env['default_available'] && !$env['runtime_available']) {
+            // the "default" processor carries the fallback, so an unset variable is not missing
+            if (!$env['default_available'] && !$env['runtime_available'] && !\in_array('default', explode(':', $env['processor']), true)) {
                 $missing[$env['name']] = true;
             }
         }
 
-        $options['output']->table(['Name', 'Default value', 'Real value'], $rows);
+        $rows = array_map(static function ($row) {
+            $row[3] = $row[3] ? 'yes' : 'no';
+
+            return $row;
+        }, $rows);
+
+        $options['output']->table(['Name', 'Default value', 'Real value', 'Used'], $rows);
         $options['output']->comment('Note real values might be different between web and CLI.');
 
         if ($missing) {

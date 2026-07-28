@@ -115,8 +115,6 @@ class ServerEvent implements \IteratorAggregate
      */
     public function getIterator(): \Traversable
     {
-        static $lastRetry = null;
-
         $head = '';
         if ($this->comment) {
             $head .= \sprintf(': %s', $this->comment)."\n";
@@ -124,8 +122,8 @@ class ServerEvent implements \IteratorAggregate
         if ($this->id) {
             $head .= \sprintf('id: %s', $this->id)."\n";
         }
-        if ($this->retry > 0 && $this->retry !== $lastRetry) {
-            $head .= \sprintf('retry: %s', $lastRetry = $this->retry)."\n";
+        if ($this->retry > 0) {
+            $head .= \sprintf('retry: %s', $this->retry)."\n";
         }
         if ($this->type) {
             $head .= \sprintf('event: %s', $this->type)."\n";

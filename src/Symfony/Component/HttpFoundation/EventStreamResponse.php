@@ -36,6 +36,8 @@ namespace Symfony\Component\HttpFoundation;
  */
 class EventStreamResponse extends StreamedResponse
 {
+    private ?int $lastRetry = null;
+
     /**
      * @param int|null $retry The number of milliseconds the client should wait
      *                        before reconnecting in case of network failure
@@ -82,8 +84,10 @@ class EventStreamResponse extends StreamedResponse
      */
     public function sendEvent(ServerEvent $event): static
     {
-        if ($this->retry > 0 && !$event->getRetry()) {
-            $event->setRetry($this->retry);
+        if (($retry = $event->getRetry()) > 0) {
+            $this->lastRetry = $retry;
+        } elseif ($this->retry > 0 && $this->retry !== $this->lastRetry) {
+            $event->setRetry($this->lastRetry = $this->retry);
         }
 
         foreach ($event as $part) {

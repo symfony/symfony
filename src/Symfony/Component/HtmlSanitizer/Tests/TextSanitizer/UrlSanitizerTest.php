@@ -189,7 +189,7 @@ class UrlSanitizerTest extends TestCase
             'allowedHosts' => null,
             'forceHttps' => false,
             'allowRelative' => true,
-            'expected' => 'http:link.php',
+            'expected' => null,
         ];
 
         yield [
@@ -403,8 +403,170 @@ class UrlSanitizerTest extends TestCase
         ];
 
         yield [
+            'input' => '///evil.com',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => '////evil.com/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https://://evil.com/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https://:/evil.com/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => '//:/evil.com/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => '//://evil.com/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => '//trusted.com/link.php',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => '//trusted.com/link.php',
+        ];
+
+        yield [
+            'input' => '//evil.com/link.php',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https://0/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => '//0/x',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https://0/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['0'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://0/',
+        ];
+
+        yield [
+            'input' => 'https://0/',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://0/',
+        ];
+
+        yield [
             'input' => 'https:\\evil.com',
             'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https:evil.com',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'https:evil.com/login',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'HTTPS:evil.com/login',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'http:evil.com',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'ws:evil.com',
+            'allowedSchemes' => ['ws', 'wss'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'ftp:evil.com',
+            'allowedSchemes' => ['ftp'],
             'allowedHosts' => ['trusted.com'],
             'forceHttps' => false,
             'allowRelative' => true,
@@ -483,6 +645,42 @@ class UrlSanitizerTest extends TestCase
             'forceHttps' => false,
             'allowRelative' => false,
             'expected' => null,
+        ];
+
+        yield [
+            'input' => 'link.php?a=b#c',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => 'link.php?a=b#c',
+        ];
+
+        yield [
+            'input' => 'https://trusted.com/link.php',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => 'https://trusted.com/link.php',
+        ];
+
+        yield [
+            'input' => 'https://untrusted.com/link.php',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'mailto:someone@trusted.com',
+            'allowedSchemes' => ['https', 'mailto'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => 'mailto:someone@trusted.com',
         ];
     }
 

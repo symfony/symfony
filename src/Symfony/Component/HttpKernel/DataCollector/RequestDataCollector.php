@@ -521,12 +521,12 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
             $command[] = '--header '.escapeshellarg(ucwords($name, '-').': '.implode(', ', $values));
         }
 
-        if ($request->cookies->all()) {
-            $cookies = [];
-            foreach ($request->cookies->all() as $name => $value) {
-                $cookies[] = urlencode($name).'='.urlencode($value);
-            }
-            $command[] = '--cookie '.escapeshellarg(implode('; ', $cookies));
+        if ($cookies = $this->flattenCookieArrayForCurl($request->cookies->all())) {
+            $command[] = '--cookie '.escapeshellarg(implode('; ', array_map(
+                static fn ($name, $value) => $name.'='.$value,
+                array_keys($cookies),
+                $cookies
+            )));
         }
 
         if ($content && \in_array($method, [Request::METHOD_POST, Request::METHOD_PUT, Request::METHOD_PATCH, Request::METHOD_DELETE], true)) {
@@ -554,5 +554,28 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         }
 
         return "'".str_replace("'", "'\\''", $payload)."'";
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     *
+     * @return array<array-key, string>
+     */
+    private function flattenCookieArrayForCurl(array $data, string $prefix = ''): array
+    {
+        $pairs = [];
+
+        foreach ($data as $key => $value) {
+            $key = rawurlencode((string) $key);
+            $name = '' === $prefix ? $key : $prefix.'['.$key.']';
+
+            if (\is_array($value)) {
+                $pairs += $this->flattenCookieArrayForCurl($value, $name);
+            } else {
+                $pairs[$name] = rawurlencode((string) $value);
+            }
+        }
+
+        return $pairs;
     }
 }

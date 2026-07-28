@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T07:50:52Z
+
+exception? why not precedence change and favor the attribute since it's the most specific?
+an exception might break existing stuff
+I didn't check the lowest affected branch, did you?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-28T07:58:48Z
+
+Updated, thanks.
+
+I changed the patch to avoid throwing and instead give precedence to the `#[SerializedName]` input key when both the serialized key and the raw PHP property-name key are present.
+
+I also checked the standalone repro against the lower branches: `6.4`, `7.4`, `8.0`, and `8.1` all currently fail with `NotNormalizableValueException`, so I retargeted the PR to `6.4`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T08:25:37Z
+
+Review notes, for the record. Three things were changed on top of the submitted patch.
+
+1. Constructor arguments were not covered. `AbstractNormalizer::instantiateObject()` reads the serialized key and removes it from the working data before the attribute loop runs, so the guard never saw that key and the raw key still overwrote the value the constructor had received. The data is now snapshotted before instantiation and the guard tests against that snapshot.
+
+2. The guard ran before the existing extra-attributes detection, so with `allow_extra_attributes` set to `false` a payload carrying both keys stopped raising `ExtraAttributesException` and was accepted silently. The two blocks are now ordered the other way around, which keeps strict mode exactly as it is on 6.4.
+
+3. The two `@return mixed` docblocks that the patch removed are restored. They only exist on 6.4, where these methods have no native return type, so they carry the only type information available.
+
+Tests now cover both key orders, the constructor case, and strict mode still raising. Verified in three states: on plain 6.4 the two precedence tests fail and the strict-mode test passes, on the submitted patch the constructor test and the strict-mode test fail, and all pass with the current diff. The Serializer, HttpKernel, Messenger, PropertyInfo, Mime and FrameworkBundle suites are green.
+
+The merge into 7.4 is conflict free and the Serializer suite passes there too, so no resolution is needed on merge up. The tests avoid a data provider on purpose: 6.4 runs PHPUnit 9 and 7.4 runs PHPUnit 13, where docblock providers no longer work, so a conflict-free merge would have carried up a test that does not run.
+
+One last point: the commit author was `v <v@v.com>`, which GitHub attributed to a different account. It is now set to `Ousama Ben Younes <benyounes.ousama@gmail.com>`, the identity your earlier commits in this repository use. Let me know if that is not right.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T08:29:58Z
+
+@ousamabenyounes sorry I pushed on your fork and you reverted that (e16d947). Can you please double-check what I had pushed and borrow?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-28T11:09:44Z
+
+Sorry about that, and thanks for the heads-up. I found the commit you had pushed (`e16d9473a6a`) and force-pushed it back to the PR branch.
+
+I compared it with the commit that overwrote it and confirmed the missing parts were exactly the ones from your note: the restored docblocks and your tighter ordering/snapshot change. I also ran the three targeted Serializer tests locally on `e16d9473a6a` with PHP 8.4:
+
+`php ./phpunit src/Symfony/Component/Serializer/Tests/Normalizer/AbstractObjectNormalizerTest.php --filter 'testDenormalizePrefersSerializedNameOverRawPropertyName|testDenormalizePrefersSerializedNameOverRawPropertyNameInConstructor|testDenormalizeReportsRawPropertyNameAsExtraAttribute'`
+
+Result: OK, 3 tests, 6 assertions.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-28T11:27:34Z
+
+Thanks again for catching the bad attribution. I found the cause: this local checkout had an incorrect repo-level Git config overriding my global identity (`user.email=v@v.com`). I fixed the local config and rewrote this PR branch so both author and committer now use my GitHub email.
+
+I also rechecked the other open Symfony PR branches and rewrote the affected ones the same way.

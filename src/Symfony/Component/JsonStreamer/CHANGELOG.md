@@ -7,6 +7,8 @@ CHANGELOG
  * Add `BcMath\Number` value object support with `BcMathNumberValueObjectTransformer`
  * Add `GMP` value object support with `GmpNumberValueObjectTransformer`
  * Add a `cache_variant` option that partitions the generated code cache, so a custom property metadata loader can produce several payload shapes for the same PHP type
+ * Add `Uuid` and `Ulid` value object support with `UuidValueObjectTransformer` and `UlidValueObjectTransformer`
+ * Add a `uid_format` option to control the written UID representation
 
 8.1
 ---

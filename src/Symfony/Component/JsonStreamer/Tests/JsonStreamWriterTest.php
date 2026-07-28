@@ -38,6 +38,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullablePropert
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueObjects;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
@@ -52,8 +53,12 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueObject\Height;
 use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\UuidValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Uid\UuidV7;
 
 class JsonStreamWriterTest extends TestCase
 {
@@ -397,6 +402,31 @@ class JsonStreamWriterTest extends TestCase
         $dummy->gmp = new \GMP('99999999999999999999');
 
         $this->assertWritten('{"gmp":"99999999999999999999"}', $dummy, Type::object(DummyWithGmpNumber::class));
+    }
+
+    public function testWriteObjectWithUids()
+    {
+        $dummy = new DummyWithUids();
+        $dummy->uuid = Uuid::fromString('a7613e0a-5986-4f29-b3f8-3b6f8e5e6b40');
+        $dummy->uuidV7 = UuidV7::fromString('018f7a5e-3c1e-7a4e-8b1a-2c3d4e5f6a7b');
+        $dummy->ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+
+        $this->assertWritten('{"uuid":"a7613e0a-5986-4f29-b3f8-3b6f8e5e6b40","uuidV7":"018f7a5e-3c1e-7a4e-8b1a-2c3d4e5f6a7b","ulid":"01ARZ3NDEKTSV4RRFFQ69G5FAV"}', $dummy, Type::object(DummyWithUids::class));
+    }
+
+    public function testWriteObjectWithUidsUsingFormat()
+    {
+        $dummy = new DummyWithUids();
+        $dummy->uuid = Uuid::fromString('a7613e0a-5986-4f29-b3f8-3b6f8e5e6b40');
+        $dummy->uuidV7 = UuidV7::fromString('018f7a5e-3c1e-7a4e-8b1a-2c3d4e5f6a7b');
+        $dummy->ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+
+        $this->assertWritten(
+            \sprintf('{"uuid":"%s","uuidV7":"%s","ulid":"%s"}', $dummy->uuid->toBase32(), $dummy->uuidV7->toBase32(), $dummy->ulid->toBase32()),
+            $dummy,
+            Type::object(DummyWithUids::class),
+            options: [UuidValueObjectTransformer::FORMAT_KEY => UuidValueObjectTransformer::FORMAT_BASE32],
+        );
     }
 
     public function testWriteObjectWithDollarNamedProperties()

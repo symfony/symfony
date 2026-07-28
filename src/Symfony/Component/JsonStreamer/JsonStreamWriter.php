@@ -24,12 +24,16 @@ use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeZoneValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\GmpNumberValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\UlidValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\UuidValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\JsonStreamer\Write\StreamWriterGenerator;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -38,6 +42,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
  *     date_time_format?: string,
  *     date_time_timezone?: string|\DateTimeZone,
  *     date_interval_format?: string,
+ *     uid_format?: string,
  *     include_null_properties?: bool,
  *     cache_variant?: string,
  *     ...<string, mixed>,
@@ -120,6 +125,8 @@ final class JsonStreamWriter implements StreamWriterInterface
             \DateTimeZone::class => new DateTimeZoneValueObjectTransformer(),
             \BcMath\Number::class => new BcMathNumberValueObjectTransformer(),
             \GMP::class => new GmpNumberValueObjectTransformer(),
+            Uuid::class => new UuidValueObjectTransformer(),
+            Ulid::class => new UlidValueObjectTransformer(),
         ];
 
         $transformersContainer = new class($transformers) implements ContainerInterface {

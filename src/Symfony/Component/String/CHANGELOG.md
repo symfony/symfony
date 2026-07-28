@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `AbstractString::screamingSnake()` method to convert a string to SCREAMING_SNAKE_CASE
+
 8.0
 ---
 

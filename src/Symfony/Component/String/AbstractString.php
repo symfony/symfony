@@ -446,6 +446,11 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $this->camel()->title();
     }
 
+    public function screamingSnake(): static
+    {
+        return $this->snake()->upper();
+    }
+
     abstract public function splice(string $replacement, int $start = 0, ?int $length = null): static;
 
     /**

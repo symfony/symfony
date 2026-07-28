@@ -1,0 +1,58 @@
+---------------------------------------------------------------------------
+
+by mw3e21a at 2023-02-01T19:33:31Z
+
+@GromNaN  Thanks for the suggestions, I made changes in the code.
+
+---------------------------------------------------------------------------
+
+by ibtissem13 at 2025-06-27T12:12:33Z
+
+Will this change be added soon?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T05:45:58Z
+
+I have rewritten the implementation on this branch. Thanks @mw3e21a for the original and @GromNaN for the rebase and the review round; the shape of the feature and the `SYMFONY_DOTENV_VARS` idea are both yours and both kept.
+
+What changed and why.
+
+**The usage count is gone, because it could not be made right.** It was `preg_match_all('/'.preg_quote($env).'/', $file)` over the whole XML dump, which is a substring scan rather than a count of references. Measured on a probe container:
+
+| variable | reported | real |
+|---|---|---|
+| a variable with only an `env()` default and no reader | 1 | 0 |
+| `PROBE_SUB`, referenced nowhere, prefix of `PROBE_SUB_LONG` | 3 | 0 |
+| `MIXED`, used bare and through `int:` | 3 | 2 |
+| `debug` | 308 | 1 |
+
+Realistic collisions are `DATABASE_URL` against `DATABASE_URL_REPLICA` and `APP_SECRET` against `APP_SECRET_KEY`. The fixture in the first version also asserted `APP_FOO ... 1` for a variable no service reads, so the wrong number was pinned as expected output.
+
+Fixing the arithmetic would not have been enough, because a count cannot answer the question anyway. `PhpDumper::dump()` already refuses to compile a container that declares an environment variable nothing reads:
+
+```php
+foreach ($this->container->getEnvCounters() as $env => $use) {
+    if (!$use) { $unusedEnvs[] = $env; }
+}
+if ($unusedEnvs) { throw new EnvParameterException($unusedEnvs, ...); }
+```
+
+So in any container that compiles, every tracked variable is used, and a count column can only ever print numbers greater than zero. The genuinely unused `.env` variables are not in the container at all. The feature is a set difference, not a count, which is why the column is now `Used` and reads `yes` or `no`.
+
+**The list now comes from the compiler.** `ContainerBuilderDebugDumpPass` writes `array_keys($container->getEnvCounters())` into the debug dump, and the descriptor reads it from there instead of re-parsing the XML. The declaration-versus-use distinction then comes for free: a bare `parameters: env(FOO): 'x'` never registers a placeholder, so it never appears as used.
+
+**The empty `SYMFONY_DOTENV_VARS` case is fixed.** `explode(',', '')` returns `['']`, so the empty name was merged into the list and `preg_quote('')` produced the pattern `//`, which matches at every byte offset. Without Dotenv the table gained a nameless row with a count equal to the dump length, plus a `[WARNING] The following variables are missing:` with an empty bullet. That is the default path for anyone not using `symfony/dotenv`, and no test covered it. There is one now, `testDescribeEnvVarsWithoutDotenv`.
+
+**Two things the old regex was hiding.** `{%env\(((?:\w++:)*+\w++)\)%}` requires the chain to end on a word, and allows neither `::` nor `.`, so it silently skipped every `default:` placeholder. Two consequences, both visible now:
+
+* variables the framework itself reads, such as `SYMFONY_TRUSTED_PROXIES`, `SYMFONY_IDE` and `APP_RUNTIME_ENV`, were never listed although the container does read them. They are listed now;
+* a chain ending on the separator, such as `not:default:kernel.runtime_mode.web:`, has no variable name. Those are filtered out rather than rendered as a nameless row.
+
+Since those framework variables are normally unset, they would have filled the missing-variables warning with noise, so a variable whose chain carries a `default` processor is no longer reported as missing. The fallback is the reason that processor exists.
+
+**Test changes.** `testDescribeEnvVar` went back to `assertStringContainsString`: the switch to `assertStringEqualsFile` against a fixture padded to 120 columns made it depend on terminal width, and it failed at the default 80 that a non-tty run gets, passing on CI only because that runner reports a wide terminal. The table assertions are now targeted rather than whole-output, because listing the framework variables makes a full-table match depend on whatever `SYMFONY_IDE` and friends happen to be set to on the machine running the suite. The environment cleanup @fabpot asked for is now in a `finally`, so a failing assertion no longer leaks `SYMFONY_DOTENV_VARS` and four `putenv()` values into every test that follows in the same process.
+
+Revert-verify: restoring only the empty-name filter and leaving everything else in place makes `testDescribeEnvVarsWithoutDotenv` fail on its first assertion, the one that checks no nameless row is printed. Full `FrameworkBundle` suite is green, 1406 tests and 4704 assertions, and the env var tests pass at `COLUMNS` of 80, 120 and 200.
+
+One thing to sort out separately: `configuration.rst` documents the `Usage count` column on the `6.4`, `7.4` and `8.1` branches, from symfony/symfony-docs#17833 merged in December 2023, for a feature that has never shipped. Worth removing from those branches regardless of what happens here.

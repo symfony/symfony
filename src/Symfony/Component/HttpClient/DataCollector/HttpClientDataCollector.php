@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
-use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 
 /**
@@ -189,7 +188,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             $port = parse_url($url, \PHP_URL_PORT) ?: (str_starts_with('http:', $url) ? 80 : 443);
             foreach ($trace['options']['resolve'] as $host => $ip) {
                 if (null !== $ip) {
-                    $command[] = '--resolve '.escapeshellarg("$host:$port:$ip");
+                    $command[] = '--resolve '.$this->escapeArgument("$host:$port:$ip");
                 }
             }
         }
@@ -197,10 +196,10 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         $dataArg = [];
 
         if ($json = $trace['options']['json'] ?? null) {
-            $dataArg[] = '--data-raw '.$this->escapePayload(self::jsonEncode($json));
+            $dataArg[] = '--data-raw '.$this->escapeArgument(self::jsonEncode($json));
         } elseif ($body = $trace['options']['body'] ?? null) {
             if (\is_string($body)) {
-                $dataArg[] = '--data-raw '.$this->escapePayload($body);
+                $dataArg[] = '--data-raw '.$this->escapeArgument($body);
             } elseif (\is_array($body)) {
                 try {
                     $body = self::normalizeBody($body);
@@ -211,7 +210,7 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                     return null;
                 }
                 foreach (explode('&', $body) as $value) {
-                    $dataArg[] = '--data-raw '.$this->escapePayload(urldecode($value));
+                    $dataArg[] = '--data-raw '.$this->escapeArgument(urldecode($value));
                 }
             } else {
                 return null;
@@ -239,11 +238,11 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
             if (preg_match('/^> ([A-Z]+)/', $line, $match)) {
                 $command[] = \sprintf('--request %s', $match[1]);
-                $command[] = \sprintf('--url %s', escapeshellarg($url));
+                $command[] = \sprintf('--url %s', $this->escapeArgument($url));
                 continue;
             }
 
-            $command[] = '--header '.escapeshellarg($line);
+            $command[] = '--header '.$this->escapeArgument($line);
         }
 
         if (null !== $dataArg) {
@@ -253,18 +252,13 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
         return implode(" \\\n  ", $command);
     }
 
-    private function escapePayload(string $payload): string
+    /**
+     * The command joins its arguments with "\" line continuations, so it targets a POSIX
+     * shell on every platform. escapeshellarg() cannot be used: it drops bytes that are
+     * not valid in the current locale, and turns "%" into a space on Windows.
+     */
+    private function escapeArgument(string $value): string
     {
-        static $useProcess;
-
-        if ($useProcess ??= \function_exists('proc_open') && class_exists(Process::class)) {
-            return substr((new Process(['', $payload]))->getCommandLine(), 3);
-        }
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            return '"'.str_replace('"', '""', $payload).'"';
-        }
-
-        return "'".str_replace("'", "'\\''", $payload)."'";
+        return "'".str_replace("'", "'\\''", $value)."'";
     }
 }

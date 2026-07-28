@@ -202,9 +202,14 @@ END'],
                 [null, '한국어', '', 0],
                 [1, '한국어', '국', 0],
                 [5, '한국어어어어국국', '어', 0],
-                // see https://bugs.php.net/bug.php?id=74264
+                // these test the fix done in bugs.php.net/74264
                 [15, 'abcdéf12é45abcdéf', 'é', 0],
                 [8, 'abcdéf12é45abcdéf', 'é', -4],
+                // multi-grapheme needle with overlapping matches: ICU still resolves these
+                // too far left without the offset correction in UnicodeString::indexOfLast()
+                [1, 'ééé', 'éé', -1],
+                [1, 'ééé', 'éé', -2],
+                [1, 'éééé', 'éé', -3],
             ]
         );
     }
@@ -223,11 +228,15 @@ END'],
                 [2, 'DÉJÀÀÀÀ', 'jà', 0],
                 [2, 'DÉJÀÀÀÀ', 'jà', -5],
                 [6, 'DÉJÀÀÀÀ!', 'à', -2],
-                // see https://bugs.php.net/bug.php?id=74264
+                // these test the fix done in bugs.php.net/74264
                 [5, 'DÉJÀÀÀÀ', 'à', -2],
                 [15, 'abcdéf12é45abcdéf', 'é', 0],
                 [8, 'abcdéf12é45abcdéf', 'é', -4],
                 [1, 'aςσb', 'ΣΣ', 0],
+                // multi-grapheme needle with overlapping matches: ICU still resolves these
+                // too far left without the offset correction in UnicodeString::indexOfLast()
+                [1, 'ééé', 'éé', -1],
+                [1, 'éééé', 'éé', -3],
             ]
         );
     }

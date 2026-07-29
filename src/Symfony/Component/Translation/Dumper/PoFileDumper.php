@@ -27,6 +27,7 @@ class PoFileDumper extends FileDumper
         $output .= '"Content-Type: text/plain; charset=UTF-8\n"'."\n";
         $output .= '"Content-Transfer-Encoding: 8bit\n"'."\n";
         $output .= '"Language: '.$messages->getLocale().'\n"'."\n";
+        $output .= '"Plural-Forms: '.$this->getPluralFormsHeader($messages->getLocale()).'\n"'."\n";
         $output .= "\n";
 
         $newLine = false;
@@ -63,6 +64,107 @@ class PoFileDumper extends FileDumper
         }
 
         return $output;
+    }
+
+    /**
+     * Returns the gettext "Plural-Forms" value matching the plural rule Symfony applies for the given
+     * locale (see TranslatorTrait::getPluralizationRule()), so the header stays consistent by
+     * construction with the msgstr indexes this dumper writes. It mirrors that method group by group,
+     * including its single-form default for locales without a specific rule (e.g. ja, ko, zh).
+     */
+    private function getPluralFormsHeader(string $locale): string
+    {
+        $locale = 'pt_BR' !== $locale && 'en_US_POSIX' !== $locale && \strlen($locale) > 3
+            ? substr($locale, 0, strrpos($locale, '_'))
+            : $locale;
+
+        return match ($locale) {
+            'af',
+            'bn',
+            'bg',
+            'ca',
+            'da',
+            'de',
+            'el',
+            'en',
+            'en_US_POSIX',
+            'eo',
+            'es',
+            'et',
+            'eu',
+            'fa',
+            'fi',
+            'fo',
+            'fur',
+            'fy',
+            'gl',
+            'gu',
+            'ha',
+            'he',
+            'hu',
+            'is',
+            'it',
+            'ku',
+            'lb',
+            'ml',
+            'mn',
+            'mr',
+            'nah',
+            'nb',
+            'ne',
+            'nl',
+            'nn',
+            'no',
+            'oc',
+            'om',
+            'or',
+            'pa',
+            'pap',
+            'ps',
+            'pt',
+            'so',
+            'sq',
+            'sv',
+            'sw',
+            'ta',
+            'te',
+            'tk',
+            'ur',
+            'zu' => 'nplurals=2; plural=(n != 1);',
+            'am',
+            'bh',
+            'fil',
+            'fr',
+            'gun',
+            'hi',
+            'hy',
+            'ln',
+            'mg',
+            'nso',
+            'pt_BR',
+            'ti',
+            'wa' => 'nplurals=2; plural=(n > 1);',
+            'be',
+            'bs',
+            'hr',
+            'ru',
+            'sh',
+            'sr',
+            'uk' => 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);',
+            'cs',
+            'sk' => 'nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);',
+            'ga' => 'nplurals=3; plural=(n==1 ? 0 : n==2 ? 1 : 2);',
+            'lt' => 'nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);',
+            'sl' => 'nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);',
+            'mk' => 'nplurals=2; plural=(n%10==1 ? 0 : 1);',
+            'mt' => 'nplurals=4; plural=(n==1 ? 0 : n==0 || (n%100>1 && n%100<11) ? 1 : n%100>10 && n%100<20 ? 2 : 3);',
+            'lv' => 'nplurals=3; plural=(n==0 ? 0 : n%10==1 && n%100!=11 ? 1 : 2);',
+            'pl' => 'nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);',
+            'cy' => 'nplurals=4; plural=(n==1 ? 0 : n==2 ? 1 : n==8 || n==11 ? 2 : 3);',
+            'ro' => 'nplurals=3; plural=(n==1 ? 0 : n==0 || (n%100>0 && n%100<20) ? 1 : 2);',
+            'ar' => 'nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);',
+            default => 'nplurals=1; plural=0;',
+        };
     }
 
     private function getStandardRules(string $id): array

@@ -74,14 +74,4 @@ class AmpHttpClientTest extends HttpClientTestCase
 
         $this->assertLessThan(2, $duration, 'Requests should be processed concurrently');
     }
-
-    #[DataProvider('getRedirectWithAuthTests')]
-    public function testRedirectWithProxyAuthorization(string $url, bool $redirectWithAuth)
-    {
-        if ($redirectWithAuth) {
-            $this->markTestSkipped('AmpHttpClient never forwards Proxy-Authorization to the target host.');
-        }
-
-        parent::testRedirectWithProxyAuthorization($url, $redirectWithAuth);
-    }
 }

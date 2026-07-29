@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\Mailer\Bridge\Brevo\Header\TemplateParametersHeader;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
@@ -82,6 +83,30 @@ class BrevoApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['params']['param2']);
         $this->assertArrayHasKey('foo', $payload['headers']);
         $this->assertEquals('bar', $payload['headers']['foo']);
+    }
+
+    public function testTemplateParametersHeaderSupportsMixedTypes()
+    {
+        $params = [
+            'name' => 'John',
+            'age' => 30,
+            'subscribed' => true,
+            'tags' => ['vip', 'newsletter'],
+            'address' => ['street' => '123 Main St', 'city' => 'Paris'],
+        ];
+
+        $email = new Email();
+        $email->getHeaders()
+            ->addTextHeader('templateId', 1)
+            ->add(new TemplateParametersHeader($params));
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('params', $payload);
+        $this->assertSame($params, $payload['params']);
     }
 
     public function testSendThrowsForErrorResponse()

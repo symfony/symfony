@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-10T22:07:41Z
+
+Thanks for the review @Spomky — agreed on all points, addressed in 8a581fb.
+
+- `BinaryContentEncoder`: dropped the magic `16372`, introduced `private const CHUNK_SIZE = 8192`.
+- `TextPart::getEncoder()`: collapsed the four `if` branches into a single `match` expression with the cached `??=` returning custom encoders untouched.
+- Added a binary test on `TextPart` with a `php://memory` resource and bytes `0xFF 0xFE 0x80 0x00 0x7F 0xC3 0xA9` round-tripping unchanged.
+- Added a `DataPart` binary test covering the same byte range plus the `attachment` / `Content-Transfer-Encoding: binary` headers.
+
+PR description updated with an explicit note that this encoder is for non-SMTP transports (OData/HTTP/custom MIME), since SMTP per RFC 5321 §3.3 will reject it.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-27T15:24:16Z
+
+Thanks @Spomky — sorry for the delay on the resolve clicks; the four points were all addressed in 0fda9d44 but I forgot to mark the threads as resolved:
+
+- `TextPart::getEncoder()` refactored to a `match` expression (no more `if` chain).
+- `BinaryContentEncoder` magic `16372` → `private const CHUNK_SIZE = 8192`.
+- `TextPartTest::testBinaryEncodingWithResourceContainingHighBytes` covers a `php://memory` stream filled with `0xFF 0xFE 0x80` (round-tripped through `getBody()`).
+- `DataPartTest::testBinaryEncodingPreservesRawBytes` covers the same payload via `DataPart`.
+
+Marking the threads as resolved now.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-09T12:50:17Z
+
+Rebased this PR onto current `8.2` and pushed `ee49b8a0980e`.
+
+It is up to date with the target branch again and waiting for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T14:09:52Z
+
+Thanks Ousama. I rebased on 8.2, squashed to one commit and made a few changes before merging:
+
+* Dropped `BinaryContentEncoder`. The `Content-Transfer-Encoding` header comes from `TextPart::$encoding`, not from the encoder, and `getName()` is only used by `addEncoder()` as a registry key, so `binary` can map to `EightBitContentEncoder` directly. Both encoders returned the body untouched, so the bytes on the wire are the same and we avoid a new public class.
+* `addEncoder()` now checks its own list of names instead of `DEFAULT_ENCODERS`. Adding `binary` to that constant would have made `addEncoder()` reject a custom `binary` encoder, which is the workaround described in #60301, so upgrading would have broken the people this feature is for.
+* Moved the CHANGELOG entry to the `8.2` section. The `8.1` section it created does not exist in this file.
+
+Mime and Mailer suites are green.

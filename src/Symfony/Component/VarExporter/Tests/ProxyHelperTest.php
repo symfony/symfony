@@ -27,6 +27,16 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, ProxyHelper::exportSignature($method));
     }
 
+    /**
+     * Since PHP 8.6, reflection renders a null byte in a default value as the octal
+     * escape "\000" instead of "\0". Detect the actual rendering at runtime rather than
+     * relying on PHP_VERSION_ID, which may lag behind the engine change on pre-release builds.
+     */
+    private static function rendersNullByteAsOctal(): bool
+    {
+        return str_contains((string) (new \ReflectionFunction(static function ($b = "a\0b") {}))->getParameters()[0], '\000');
+    }
+
     public static function provideExportSignature()
     {
         $methods = (new \ReflectionClass(TestForProxyHelper::class))->getMethods();
@@ -39,7 +49,7 @@ class ProxyHelperTest extends TestCase
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
             $expected = str_replace('= [namespace\M_PI, new M_PI()]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
 
-            if (\PHP_VERSION_ID >= 80600) {
+            if (self::rendersNullByteAsOctal()) {
                 $expected = str_replace('"a\0b"', '"a\000b"', $expected);
             }
 
@@ -161,7 +171,7 @@ class ProxyHelperTest extends TestCase
 
             EOPHP;
 
-        if (\PHP_VERSION_ID >= 80600) {
+        if (self::rendersNullByteAsOctal()) {
             $expected = str_replace('"a\0b"', '"a\000b"', $expected);
         }
 

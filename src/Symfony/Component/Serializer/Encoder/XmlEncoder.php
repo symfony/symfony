@@ -12,6 +12,7 @@
 namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
@@ -64,6 +65,12 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const IGNORE_EMPTY_ATTRIBUTES = 'ignore_empty_attributes';
     public const PRESERVE_NUMERIC_KEYS = 'preserve_numeric_keys';
 
+    /**
+     * A two-element list with the strings representing true and false when encoding,
+     * e.g. ['true', 'false'] or ['yes', 'no']. Booleans are encoded as 1/0 by default.
+     */
+    public const BOOLEAN_REPR = 'xml_boolean_repr';
+
     private array $defaultContext = [
         self::AS_COLLECTION => false,
         self::DECODER_IGNORED_NODE_TYPES => [\XML_PI_NODE, \XML_COMMENT_NODE],
@@ -78,6 +85,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::CDATA_WRAPPING_PATTERN => '/[<>&]/',
         self::IGNORE_EMPTY_ATTRIBUTES => false,
         self::PRESERVE_NUMERIC_KEYS => false,
+        self::BOOLEAN_REPR => null,
     ];
 
     public function __construct(array $defaultContext = [])
@@ -360,7 +368,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                         $data = $this->serializer->normalize($data, $format, $context);
                     }
                     if (\is_bool($data)) {
-                        $data = (int) $data;
+                        $data = null !== ($booleanRepr = $this->getBooleanRepr($context)) ? $booleanRepr[$data ? 0 : 1] : (int) $data;
                     }
 
                     if ($context[self::IGNORE_EMPTY_ATTRIBUTES] ?? $this->defaultContext[self::IGNORE_EMPTY_ATTRIBUTES]) {
@@ -421,7 +429,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $this->appendNode($parentNode, $data, $format, $context, 'data');
         }
 
-        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : \sprintf('%s resource', get_resource_type($data))));
+        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : \sprintf('"%s" resource', get_resource_type($data))));
     }
 
     /**
@@ -457,6 +465,24 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     }
 
     /**
+     * @return array{0: string, 1: string}|null
+     */
+    private function getBooleanRepr(array $context): ?array
+    {
+        $booleanRepr = \array_key_exists(self::BOOLEAN_REPR, $context) ? $context[self::BOOLEAN_REPR] : $this->defaultContext[self::BOOLEAN_REPR];
+
+        if (null === $booleanRepr) {
+            return null;
+        }
+
+        if (!\is_array($booleanRepr) || [0, 1] !== array_keys($booleanRepr) || '' === $booleanRepr[0] || '' === $booleanRepr[1] || !\is_string($booleanRepr[0]) || !\is_string($booleanRepr[1])) {
+            throw new InvalidArgumentException(\sprintf('The "%s" context option must be a list of the two non-empty strings representing true and false, e.g. ["true", "false"].', self::BOOLEAN_REPR));
+        }
+
+        return [$booleanRepr[0], $booleanRepr[1]];
+    }
+
+    /**
      * Tests the value being passed and decide what sort of element to create.
      *
      * @throws NotEncodableValueException
@@ -486,6 +512,10 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         } elseif (\is_string($val)) {
             return $this->appendText($node, $val);
         } elseif (\is_bool($val)) {
+            if (null !== $booleanRepr = $this->getBooleanRepr($context)) {
+                return $this->appendText($node, $booleanRepr[$val ? 0 : 1]);
+            }
+
             return $this->appendText($node, (int) $val);
         }
 

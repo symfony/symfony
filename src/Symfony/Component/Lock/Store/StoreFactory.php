@@ -138,7 +138,7 @@ class StoreFactory
     private static function requireBridgeClass(string $class, string $package): void
     {
         if (!class_exists($class)) {
-            throw new \LogicException(\sprintf('Class "%s" is missing. Try running "composer require %s" to install the lock store package.', $class, $package));
+            throw new \LogicException(\sprintf('Class "%s" is missing. Try running composer require "%s" to install the lock store package.', $class, $package));
         }
     }
 }

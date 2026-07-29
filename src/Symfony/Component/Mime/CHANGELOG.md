@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Support `binary` as a `Content-Transfer-Encoding`
+
 8.0
 ---
 

@@ -141,6 +141,45 @@ final class TelegramOptionsTest extends TestCase
         $this->assertSame($expected, $options->toArray());
     }
 
+    public function testWithMultilineInlineKeyboard()
+    {
+        $firstRowButton = new InlineKeyboardButton('Button 1');
+        $firstRowButton->callbackData('callback_1');
+
+        $secondRowButton1 = new InlineKeyboardButton('Button 2');
+        $secondRowButton1->callbackData('callback_2');
+
+        $secondRowButton2 = new InlineKeyboardButton('Button 3');
+        $secondRowButton2->callbackData('callback_3');
+
+        $markup = new InlineKeyboardMarkup();
+        $markup->inlineKeyboard([
+            [$firstRowButton],
+            [$secondRowButton1, $secondRowButton2],
+        ]);
+
+        $options = (new TelegramOptions())
+            ->chatId('123456')
+            ->replyMarkup($markup);
+
+        $expected = [
+            'chat_id' => '123456',
+            'reply_markup' => [
+                'inline_keyboard' => [
+                    [
+                        ['text' => 'Button 1', 'callback_data' => 'callback_1'],
+                    ],
+                    [
+                        ['text' => 'Button 2', 'callback_data' => 'callback_2'],
+                        ['text' => 'Button 3', 'callback_data' => 'callback_3'],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->assertSame($expected, $options->toArray());
+    }
+
     public function testOptionsChaining()
     {
         $options = new TelegramOptions();

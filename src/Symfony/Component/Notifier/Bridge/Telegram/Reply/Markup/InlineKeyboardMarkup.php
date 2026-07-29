@@ -26,15 +26,21 @@ final class InlineKeyboardMarkup extends AbstractTelegramReplyMarkup
     }
 
     /**
-     * @param InlineKeyboardButton[] $buttons
+     * @param InlineKeyboardButton[]|InlineKeyboardButton[][] $buttons
      *
      * @return $this
      */
     public function inlineKeyboard(array $buttons): static
     {
-        $buttons = array_map(static fn (InlineKeyboardButton $button) => $button->toArray(), $buttons);
+        $rows = $buttons;
 
-        $this->options['inline_keyboard'][] = $buttons;
+        if ([] === $buttons || $buttons[array_key_first($buttons)] instanceof InlineKeyboardButton) {
+            $rows = [$buttons];
+        }
+
+        foreach ($rows as $buttons) {
+            $this->options['inline_keyboard'][] = array_map(static fn (InlineKeyboardButton $button) => $button->toArray(), $buttons);
+        }
 
         return $this;
     }

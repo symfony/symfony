@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for passing multiple inline keyboard rows to `InlineKeyboardMarkup`
+
 8.1
 ---
 

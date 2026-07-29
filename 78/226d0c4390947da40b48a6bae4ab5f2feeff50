@@ -1,0 +1,122 @@
+---------------------------------------------------------------------------
+
+by eltharin at 2024-07-26T14:46:34Z
+
+seems test fail because it take old test with depedencies ??
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-06T12:15:13Z
+
+The `InvalidCsrfTokenException` in `security/core` is meant to be used for invalid CSRF tokens during the authentication. In that case, extending AuthenticationException is the thing we want.
+
+To me, the issue is that the `IsCsrfTokenValid` attribute should not be reusing that exception.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-08-06T12:16:45Z
+
+Side note, the `IsCsrfTokenValid` attribute should probably not have been added in `security/http`. It should probably have been part of `security/csrf` instead.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2024-08-06T12:27:34Z
+
+So I can keep in place InvalidCsrfTokenException and create another on in Security/Csrf extending BadRequestException and link it to the Exception throw in IsCsrfTokenValidAttributeListener ?
+thanks for review
+
+---------------------------------------------------------------------------
+
+by eltharin at 2024-08-06T13:19:20Z
+
+change is OK, do I move IsCsrfTokenValidAttributeListener  in Security/Csrf ?
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-04-21T05:57:54Z
+
+Ok I revert the move and wait and see
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-05-04T15:54:45Z
+
+I **strongly** disagree here.
+
+Regardless of whether the user is logged in, CSRF is **100% an authentication** problem.
+
+> CSRF is an attack that tricks the victim into submitting a malicious request. It inherits the identity and privileges of the victim…
+([OWASP](https://owasp.org/www-community/attacks/csrf))
+
+The CSRF token system  -and by extension the `IsCsrfTokenValid` attribute- have one purpose: to ensure a request was intentionally sent by the user.
+
+If the listener can’t validate the token, it can’t confirm that the user who sent the request is who they claim to be (again: regardless of its login status).
+
+And not being able to confirm the identity or intent behind a request is, by definition, an authentication failure.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2025-05-04T16:19:43Z
+
+> I **strongly** disagree here.
+>
+> Regardless of whether the user is logged in, CSRF is **100% an authentication** problem.
+>
+> > CSRF is an attack that tricks the victim into submitting a malicious request. It inherits the identity and privileges of the victim…
+> > ([OWASP](https://owasp.org/www-community/attacks/csrf))
+>
+> The CSRF token system -and by extension the `IsCsrfTokenValid` attribute- have one purpose: to ensure a request was intentionally sent by the user.
+>
+> If the listener can’t validate the token, it can’t confirm that the user who sent the request is who they claim to be (again: regardless of its login status).
+>
+> And not being able to confirm the identity or intent behind a request is, by definition, an authentication failure.
+
+We can keep 403 code error, the really problem is the login redirection.
+
+---------------------------------------------------------------------------
+
+by webda2l at 2025-09-08T16:03:54Z
+
+I agree that the current behavior is too restrictive. To address this, adopting a similar approach to the statusCode option used in IsGranted https://github.com/symfony/symfony/blob/7.4/src/Symfony/Component/Security/Http/Attribute/IsGranted.php#L34 could be nice to allow returning a custom HTTP status code (such as 400) when needed, instead a default 403.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2025-12-30T18:51:33Z
+
+@eltharin , you can update section 8.1 rather than 7.3 for the `CHANGELOG.md` file.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2026-04-01T10:32:44Z
+
+> @eltharin , you can update section 8.1 rather than 7.3 for the `CHANGELOG.md` file.
+
+When something will be decided, I don't want to change it at each version during someone accept to correct a bug
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T15:42:34Z
+
+Reviewed and rebased onto the current 8.2. Thanks @eltharin, and sorry for the long wait.
+
+I measured the effect end to end rather than reading the class hierarchy: real kernel, real `ControllerAttributesListener`, real firewall `ExceptionListener`, `debug=false`. With a `form_login` entry point the base branch answers 302 to /login and this PR answers 403; with no entry point, 401 becomes 403; with `http_basic`, the 401 and its `WWW-Authenticate` header become 403. Nothing produces a 500, and no path still returns 401. I also checked disclosure explicitly, since the exception is security-adjacent: the message is byte-identical, both renderers hide it when `debug=false`, and the JSON problem detail only moves from `"Unauthorized"` to `"Forbidden"`, which is status text and not the message.
+
+@smnandre, you strongly disagreed on the grounds that CSRF is an authentication concern. The distinction that decides it for me is where the check runs. `CsrfProtectionListener` verifies the login form token during authentication and should keep throwing the `Security\Core` exception; `#[IsCsrfTokenValid]` guards a controller action reached by a caller who is already identified, and answering it with a login redirect is not useful to anyone. Both keep their own exception after this. Happy to keep talking if you still see it differently.
+
+Three things fixed while amending:
+
+* the CHANGELOG entry was in `SecurityBundle` and, after rebase, inside its 7.3 section. Nothing in SecurityBundle changes here, so it moved to `Security\Http` under 8.2. That was @kbond's request and it had not been applied.
+* `UPGRADE-8.2.md` had no entry. Two things need one: old and new exception share no ancestor below `\RuntimeException`, so an application catching the `Security\Core` one for this case silently stops matching, and stateless firewalls go from 401 to 403.
+* the test asserted only which exception class was thrown, so reparenting it onto something the firewall matches would have kept the suite green while restoring the bug. It now asserts the 403 status and that the exception is not an `AuthenticationException`, and it fails on a clean 8.2.
+
+@nicolas-grekas, on your suggestion of `BadRequestHttpException`: I kept plain `HttpException`. `BadRequestHttpException` means 400, and forcing 403 through it requires bypassing its constructor, which reads oddly. `IsGrantedAttributeListener` throws a plain `HttpException` with a chosen status for the same kind of situation, so this matches the existing precedent in the component. Easy to change if you prefer otherwise.
+
+@webda2l, the configurable `statusCode` you asked for is not in this PR. It is a reasonable follow-up now that the exception is an `HttpException`.
+
+Local runs: Security\Http 637, Security\Core 399, SecurityBundle 378, all green. php-cs-fixer clean.
+
+---------------------------------------------------------------------------
+
+by eltharin at 2026-07-27T07:56:28Z
+
+don't worry for the wait, each thing in this time

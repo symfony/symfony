@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T14:18:52Z
+
+Thanks Ousama. Rebased on 8.2, squashed to one commit, with a few changes before merging:
+
+* `AmqpTransport` now implements `KeepaliveReceiverInterface` and delegates to the receiver, like the four other bridges do. Without it the feature could not be reached: the worker holds the transport, and `Worker::keepalive()` only acts when the receiver it was given implements the interface, so `--keepalive` stayed a no-op for AMQP.
+* Added `AmqpTransportTest::testKeepalive`. Every sibling bridge has that test, and it is what would have caught the point above.
+* Documented on `AmqpReceiver::keepalive()` that `$seconds` is not used, since AMQP has no per-message deadline to extend.
+* CHANGELOG entry reworded like the ones of the other bridges, and the two zero-valued constants inlined in `Connection::keepalive()` with a note on why `qos()` is the frame being sent.
+
+Amqp bridge and Messenger suites are green with the amqp extension loaded.

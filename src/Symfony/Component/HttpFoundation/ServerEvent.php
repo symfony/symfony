@@ -117,27 +117,44 @@ class ServerEvent implements \IteratorAggregate
     {
         $head = '';
         if ($this->comment) {
-            $head .= \sprintf(': %s', $this->comment)."\n";
+            $head .= self::field(': ', $this->comment);
         }
         if ($this->id) {
-            $head .= \sprintf('id: %s', $this->id)."\n";
+            $head .= \sprintf('id: %s', self::singleLine($this->id))."\n";
         }
         if ($this->retry > 0) {
             $head .= \sprintf('retry: %s', $this->retry)."\n";
         }
         if ($this->type) {
-            $head .= \sprintf('event: %s', $this->type)."\n";
+            $head .= \sprintf('event: %s', self::singleLine($this->type))."\n";
         }
         yield $head;
 
         if (is_iterable($this->data)) {
             foreach ($this->data as $data) {
-                yield \sprintf('data: %s', $data)."\n";
+                yield self::field('data: ', $data);
             }
         } elseif ('' !== $this->data) {
-            yield \sprintf('data: %s', $this->data)."\n";
+            yield self::field('data: ', $this->data);
         }
 
         yield "\n";
+    }
+
+    /**
+     * Renders a multi-line value as one prefixed line per line of the value.
+     */
+    private static function field(string $prefix, string $value): string
+    {
+        return $prefix.implode("\n".$prefix, preg_split("/\r\n|[\r\n]/", $value))."\n";
+    }
+
+    /**
+     * Removes the line terminators that would end the field early, as the
+     * SSE specification defines these fields as single-line only.
+     */
+    private static function singleLine(string $value): string
+    {
+        return str_replace(["\r", "\n"], '', $value);
     }
 }

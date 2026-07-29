@@ -486,6 +486,13 @@ class Connection
         }
     }
 
+    public function keepalive(): void
+    {
+        // qos() with no limit changes nothing on the channel, it is sent for the traffic it generates
+        $this->channel()->qos(0, 0);
+        $this->lastActivityTime = time();
+    }
+
     public function setup(): void
     {
         $this->setupExchangeAndQueues();

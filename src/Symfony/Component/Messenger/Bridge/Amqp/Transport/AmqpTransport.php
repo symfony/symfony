@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Transport;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Transport\CloseableTransportInterface;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -23,7 +24,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class AmqpTransport implements QueueReceiverInterface, TransportInterface, SetupableTransportInterface, CloseableTransportInterface, MessageCountAwareInterface
+class AmqpTransport implements QueueReceiverInterface, TransportInterface, SetupableTransportInterface, CloseableTransportInterface, KeepaliveReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
     private AmqpReceiver $receiver;
@@ -64,6 +65,11 @@ class AmqpTransport implements QueueReceiverInterface, TransportInterface, Setup
     public function reject(Envelope $envelope): void
     {
         $this->getReceiver()->reject($envelope);
+    }
+
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        $this->getReceiver()->keepalive($envelope, $seconds);
     }
 
     public function send(Envelope $envelope): Envelope

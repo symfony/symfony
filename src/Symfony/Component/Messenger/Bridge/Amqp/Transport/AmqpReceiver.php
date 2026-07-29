@@ -16,6 +16,7 @@ use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\QueueReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -26,7 +27,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  *
  * @author Samuel Roze <samuel.roze@gmail.com>
  */
-class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
+class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface, MessageCountAwareInterface
 {
     private SerializerInterface $serializer;
 
@@ -151,6 +152,21 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
             $stamp->getAmqpEnvelope(),
             $stamp->getQueueName()
         );
+    }
+
+    /**
+     * AMQP has no per-message deadline to extend, so $seconds is not used: the
+     * frame sent here only tells the broker that the connection is still alive.
+     */
+    public function keepalive(Envelope $envelope, ?int $seconds = null): void
+    {
+        try {
+            $this->findAmqpStamp($envelope);
+
+            $this->connection->keepalive();
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
+        }
     }
 
     public function getMessageCount(): int

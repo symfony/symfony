@@ -15,11 +15,15 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\Internal\CurlClientState;
 
 #[RequiresPhpExtension('curl')]
 #[Group('dns-sensitive')]
 class CurlHttpClientTest extends HttpClientTestCase
 {
+    private const HTTPS_PROXY_ERROR = 'Cannot use an "https://" proxy: the installed curl does not support HTTPS proxies and could connect to it in cleartext; curl 7.52 or higher is required.';
+
     protected function getHttpClient(string $testCase): CurlHttpClient
     {
         $usePersistentConnections = str_contains($testCase, 'Persistent');
@@ -180,6 +184,82 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
+    public function testHttpsProxyIsRejectedWhenCurlLacksSupport()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->withProxyEnvironment([], [], false, function () use ($client) {
+            $this->expectException(TransportException::class);
+            $this->expectExceptionMessage(self::HTTPS_PROXY_ERROR);
+
+            $client->request('GET', 'http://127.0.0.1:8057/', ['proxy' => 'https://127.0.0.1:8057']);
+        });
+    }
+
+    public function testHttpsProxyFromServerVarsIsRejectedWhenCurlLacksSupport()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->withProxyEnvironment(['https_proxy' => 'https://127.0.0.1:8057'], [], false, function () use ($client) {
+            $this->expectException(TransportException::class);
+            $this->expectExceptionMessage(self::HTTPS_PROXY_ERROR);
+
+            $client->request('GET', 'https://127.0.0.1:8057/');
+        });
+    }
+
+    public function testProxyFromProcessEnvIsNotUsed()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        // Only curl reads the process environment, and it must not do so behind our back
+        $this->withProxyEnvironment([], ['http_proxy' => 'http://127.0.0.1:9'], true, function () use ($client) {
+            $response = $client->request('GET', 'http://127.0.0.1:8057/');
+
+            $this->assertSame(200, $response->getStatusCode());
+        });
+    }
+
+    public function testHttpsProxyIsRejectedOnRedirectWhenCurlLacksSupport()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->withProxyEnvironment(['https_proxy' => 'https://127.0.0.1:8057'], [], false, function () use ($client) {
+            $response = $client->request('GET', 'http://127.0.0.1:8057/302?location=https://127.0.0.1:8057/');
+
+            $this->expectException(TransportException::class);
+            $this->expectExceptionMessage(self::HTTPS_PROXY_ERROR);
+
+            $response->getStatusCode();
+        });
+    }
+
+    public function testHttpsProxyIsNotRejectedWhenNoProxyMatches()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->withProxyEnvironment([], [], false, function () use ($client) {
+            $response = $client->request('GET', 'http://127.0.0.1:8057/', [
+                'proxy' => 'https://127.0.0.1:8057',
+                'no_proxy' => '127.0.0.1',
+            ]);
+
+            $this->assertSame(200, $response->getStatusCode());
+        });
+    }
+
+    public function testHttpsProxyIsNotRejectedWhenCurlSupportsIt()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $this->withProxyEnvironment([], [], true, function () use ($client) {
+            $response = $client->request('GET', 'http://127.0.0.1:8057/', ['proxy' => 'https://127.0.0.1:8057']);
+            $response->cancel();
+
+            $this->addToAssertionCount(1);
+        });
+    }
+
     public function testKeepAuthorizationHeaderOnRedirectToSameHostWithConfiguredHostToIpAddressMapping()
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
@@ -314,6 +394,48 @@ class CurlHttpClientTest extends HttpClientTestCase
                 $response->getContent();
 
                 self::assertSame($expectedResult[$i], str_contains($response->getInfo('debug'), 'Re-using existing connection'));
+            }
+        }
+    }
+
+    /**
+     * Runs $test with a controlled proxy environment and a curl that pretends to support HTTPS proxies or not.
+     */
+    private function withProxyEnvironment(array $server, array $env, bool $httpsProxySupport, \Closure $test): void
+    {
+        $backup = [];
+
+        foreach (['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY', 'no_proxy', 'NO_PROXY'] as $name) {
+            $backup[$name] = [\array_key_exists($name, $_SERVER) ? $_SERVER[$name] : null, getenv($name, true)];
+            unset($_SERVER[$name]);
+            putenv($name);
+        }
+
+        foreach ($server as $name => $value) {
+            $_SERVER[$name] = $value;
+        }
+
+        foreach ($env as $name => $value) {
+            putenv($name.'='.$value);
+        }
+
+        $curlVersion = CurlClientState::$curlVersion ?? curl_version();
+        $httpsProxyFeature = \defined('CURL_VERSION_HTTPS_PROXY') ? \CURL_VERSION_HTTPS_PROXY : 1 << 21;
+        CurlClientState::$curlVersion = ['features' => $httpsProxySupport ? $curlVersion['features'] | $httpsProxyFeature : $curlVersion['features'] & ~$httpsProxyFeature] + $curlVersion;
+
+        try {
+            $test();
+        } finally {
+            CurlClientState::$curlVersion = $curlVersion;
+
+            foreach ($backup as $name => [$serverValue, $envValue]) {
+                if (null === $serverValue) {
+                    unset($_SERVER[$name]);
+                } else {
+                    $_SERVER[$name] = $serverValue;
+                }
+
+                false === $envValue ? putenv($name) : putenv($name.'='.$envValue);
             }
         }
     }

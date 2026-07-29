@@ -40,6 +40,40 @@ class SplitterTest extends TestCase
         $this->assertDictBoundaries(['k' => [5, 4]], '{"k":[10]}');
     }
 
+    public function testSplitDictDoesNotRetainKeys()
+    {
+        $countRetainedValues = static function (): int {
+            $count = 0;
+
+            foreach ((new \ReflectionClass(Splitter::class))->getStaticProperties() as $value) {
+                if (\is_array($value)) {
+                    array_walk_recursive($value, static function () use (&$count): void {
+                        ++$count;
+                    });
+                }
+            }
+
+            return $count;
+        };
+
+        $splitUniqueKeys = static function (int $batch): void {
+            for ($i = 0; $i < 100; ++$i) {
+                $resource = fopen('php://temp', 'w');
+                fwrite($resource, \sprintf('{"key_%d_%d":1}', $batch, $i));
+                rewind($resource);
+
+                iterator_to_array((new Splitter())->splitDict($resource));
+            }
+        };
+
+        $splitUniqueKeys(1);
+        $retainedAfterFirstBatch = $countRetainedValues();
+
+        $splitUniqueKeys(2);
+
+        $this->assertSame($retainedAfterFirstBatch, $countRetainedValues());
+    }
+
     #[DataProvider('splitDictInvalidDataProvider')]
     public function testSplitDictInvalidThrowException(string $expectedMessage, string $content)
     {

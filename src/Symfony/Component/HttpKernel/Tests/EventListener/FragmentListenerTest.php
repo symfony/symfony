@@ -73,6 +73,17 @@ class FragmentListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
+    public function testAccessDeniedWithNonStringSignature()
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+        $request = Request::create('http://example.com/_fragment?_path=x&_hash[]=y', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1']);
+
+        $listener = new FragmentListener(new UriSigner('foo'));
+        $event = $this->createRequestEvent($request);
+
+        $listener->onKernelRequest($event);
+    }
+
     public function testWithSignature()
     {
         $signer = new UriSigner('foo');

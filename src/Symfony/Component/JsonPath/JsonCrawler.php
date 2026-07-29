@@ -34,6 +34,9 @@ final class JsonCrawler implements JsonCrawlerInterface
 {
     private const REGEX_BACKTRACK_LIMIT = 10000;
 
+    private const MAX_FILTER_EXPRESSION_LENGTH = 10000;
+    private const MAX_FILTER_EXPRESSION_DEPTH = 100;
+
     /**
      * Comparison operators and their corresponding lengths.
      */
@@ -521,9 +524,15 @@ final class JsonCrawler implements JsonCrawlerInterface
         return $result;
     }
 
-    private function evaluateFilterExpression(string $expr, mixed $context): bool
+    private function evaluateFilterExpression(string $expr, mixed $context, int $depth = 0): bool
     {
-        $expr = $this->stripWrappingParentheses(JsonPathUtils::normalizeWhitespace($expr));
+        $expr = JsonPathUtils::normalizeWhitespace($expr);
+
+        if ($depth > self::MAX_FILTER_EXPRESSION_DEPTH || \strlen($expr) > self::MAX_FILTER_EXPRESSION_LENGTH) {
+            throw new JsonCrawlerException($expr, 'filter expression is too long or too deeply nested');
+        }
+
+        $expr = $this->stripWrappingParentheses($expr);
 
         // logical operators bind less tightly than the negation
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
@@ -531,14 +540,14 @@ final class JsonCrawler implements JsonCrawlerInterface
             $right = trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])));
 
             if ('||' === $logicalOp['operator']) {
-                return $this->evaluateFilterExpression($left, $context) || $this->evaluateFilterExpression($right, $context);
+                return $this->evaluateFilterExpression($left, $context, $depth + 1) || $this->evaluateFilterExpression($right, $context, $depth + 1);
             }
 
-            return $this->evaluateFilterExpression($left, $context) && $this->evaluateFilterExpression($right, $context);
+            return $this->evaluateFilterExpression($left, $context, $depth + 1) && $this->evaluateFilterExpression($right, $context, $depth + 1);
         }
 
         if (str_starts_with($expr, '!')) {
-            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context);
+            return !$this->evaluateFilterExpression(trim(substr($expr, 1)), $context, $depth + 1);
         }
 
         foreach (self::COMPARISON_OPERATORS as $op => $len) {
@@ -1072,19 +1081,25 @@ final class JsonCrawler implements JsonCrawlerInterface
         return false;
     }
 
-    private function validateFilterExpression(string $expr): void
+    private function validateFilterExpression(string $expr, int $depth = 0): void
     {
-        $expr = $this->stripWrappingParentheses(trim($expr));
+        $expr = trim($expr);
+
+        if ($depth > self::MAX_FILTER_EXPRESSION_DEPTH || \strlen($expr) > self::MAX_FILTER_EXPRESSION_LENGTH) {
+            throw new JsonCrawlerException($expr, 'filter expression is too long or too deeply nested');
+        }
+
+        $expr = $this->stripWrappingParentheses($expr);
 
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
-            $this->validateFilterExpression(trim(substr($expr, 0, $logicalOp['position']))); // left
-            $this->validateFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])))); // right
+            $this->validateFilterExpression(trim(substr($expr, 0, $logicalOp['position'])), $depth + 1); // left
+            $this->validateFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator']))), $depth + 1); // right
 
             return;
         }
 
         if (str_starts_with($expr, '!')) {
-            $this->validateFilterExpression(trim(substr($expr, 1)));
+            $this->validateFilterExpression(trim(substr($expr, 1)), $depth + 1);
 
             return;
         }

@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-23T06:21:54Z
+
+Thanks a lot for the thorough analysis, you were completely right, the hardcoded formula was only correct for the English-like group.
+
+I reworked it: `getPluralFormsHeader()` now derives the header from the locale by mirroring `TranslatorTrait::getPluralizationRule()` group by group (same prefix handling for `pt_BR` vs `pt`). Each formula selects the exact same msgstr index as that method, so the header is consistent by construction. Added a data-provider test with one representative per group, plus a second test that cross-checks every locale of `getPluralizationRule()` (and single-form/unknown ones) against the rule, so the two cannot drift apart.
+
+One deliberate deviation from your suggestion: for the locales that hit `getPluralizationRule()`'s default arm (ja, ko, zh, ...), I went with `nplurals=1; plural=0;` instead of the generic two-form formula. That is what makes those locales consistent by construction and turns `ja` into a genuine single-form locale (as your test request implied). If you would rather keep a two-form generic default, I am happy to switch, just let me know.
+
+Also rebased on 8.2, moved the CHANGELOG entry under 8.2, and updated the Q table.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-28T14:26:24Z
+
+Thanks for the follow-up review! Glad the formulas survived a 66-locale, n=0..20000 interrogation, that is more scrutiny than most of my code ever gets. 🙂
+
+Updated accordingly:
+
+* Rebased onto 8.2 (the CHANGELOG conflict is gone, one bullet under one heading).
+* Dropped `testPluralFormsHeaderMatchesPluralizationRuleForEveryLocale()` with its `eval()` and hand-rolled ternary parser: you are right that reflecting into a private method of `translation-contracts` was too much coupling for what the 19-case data provider already pins.
+* The two long `match` arms now list one locale per line, mirroring the layout of `getPluralizationRule()` so future diffs between the two stay readable.
+
+Noted on the rest: I will keep an eye on #64977 and adapt whichever of us lands second, and I can propose a short symfony-docs note about the Zend-derived formulas vs Poedit expectations as a follow-up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T21:01:49Z
+
+Thanks, this is ready from my side. Rebased on 8.2 (`f85ae3d6521`) and pushed, one commit, authorship preserved.
+
+I also trimmed the description: it still claimed a second test that cross-checks every locale of `getPluralizationRule()`, which is the test you removed in this revision. It now says what the suite actually covers, plus a note that drift between the two locale lists is not detected and has to be kept in step by hand.
+
+Re-verified the correctness claim on this revision rather than taking it from the previous round: every emitted formula selects the same index as `getPluralizationRule()` across the locale set, `msgfmt -c` accepts the output when the catalogue's form count matches `nplurals`, and the round trip through `PoFileLoader` is exact. Reformatting the `match` arms one locale per line is a pure whitespace change, the groupings and formulas are identical.
+
+One merge-time detail for whoever lands these two: #64977 adds `PoFileDumperTest::testDumpContext()` with a literal header block. Merging it into this branch produces no git conflict, but that test then fails because it does not expect the new line. Whichever goes second needs
+
+```
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+```
+
+added to that heredoc. Pinging @javiereguiluz so it is not a surprise.
+
+The `MoFileDumper` question came up while reviewing this: it is worse off than the PO dumper and out of scope here. It writes no gettext metadata entry at all, and it stores plurals as Symfony's pipe-joined string instead of the NUL-separated form MO requires, so `ngettext()` finds no plural entry. Adding a `Plural-Forms` header there would describe entries that do not exist. I will open that separately.

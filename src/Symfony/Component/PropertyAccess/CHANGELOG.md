@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for using a `Collection` suffix to derive adder and remover method names
+
 8.1
 ---
 

@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AsymmetricVisibility;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\CollectionSuffixAdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
@@ -476,6 +477,7 @@ class ReflectionExtractorTest extends TestCase
             [SnakeCaseDummy::class, 'snake_property', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnakeProperty', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_method', false, true, PropertyWriteInfo::TYPE_METHOD, 'setSnake_method', null, null, PropertyWriteInfo::VISIBILITY_PUBLIC, false],
             [SnakeCaseDummy::class, 'snake_readonly', false, false, PropertyWriteInfo::TYPE_NONE, null, null, null, null, null],
+            [CollectionSuffixAdderRemoverDummy::class, 'commentCollection', false, true, PropertyWriteInfo::TYPE_ADDER_AND_REMOVER, null, 'addComment', 'removeComment', PropertyWriteInfo::VISIBILITY_PUBLIC, false],
         ];
     }
 

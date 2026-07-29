@@ -100,6 +100,37 @@ class PropertyAccessorCollectionTestCase_CarStructure
     }
 }
 
+class PropertyAccessorCollectionTestCase_Publication
+{
+    private array $comments;
+
+    public function __construct(array $comments)
+    {
+        $this->comments = $comments;
+    }
+
+    public function addComment(string $comment): void
+    {
+        $this->comments[] = $comment;
+    }
+
+    public function removeComment(string $comment): void
+    {
+        foreach ($this->comments as $key => $value) {
+            if ($value === $comment) {
+                unset($this->comments[$key]);
+
+                return;
+            }
+        }
+    }
+
+    public function getCommentCollection(): array
+    {
+        return $this->comments;
+    }
+}
+
 abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayAccessTestCase
 {
     public function testSetValueCallsAdderAndRemoverForCollections()
@@ -152,6 +183,15 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
         ;
 
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
+    }
+
+    public function testSetValueUsesCollectionSuffixForAdderAndRemoverConvention()
+    {
+        $publication = new PropertyAccessorCollectionTestCase_Publication(['second', 'fourth']);
+
+        $this->propertyAccessor->setValue($publication, 'commentCollection', ['first', 'second', 'third']);
+
+        $this->assertSame(['second', 2 => 'first', 3 => 'third'], $publication->getCommentCollection());
     }
 
     public function testSetValueFailsIfNoAdderNorRemoverFound()

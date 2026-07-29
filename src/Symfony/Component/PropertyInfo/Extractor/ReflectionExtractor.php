@@ -42,6 +42,8 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
  */
 class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
+    private const COLLECTION_SUFFIX = 'Collection';
+
     /**
      * @internal
      */
@@ -688,7 +690,17 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         [$addPrefix, $removePrefix] = $this->arrayMutatorPrefixes;
         $errors = [];
 
+        $singulars = [];
+
+        if (str_ends_with($property, self::COLLECTION_SUFFIX) && self::COLLECTION_SUFFIX !== $property) {
+            $singulars[] = substr($property, 0, -\strlen(self::COLLECTION_SUFFIX));
+        }
+
         foreach ($this->inflector->singularize($property) as $singular) {
+            $singulars[] = $singular;
+        }
+
+        foreach (array_unique($singulars) as $singular) {
             $addMethod = $addPrefix.$singular;
             $removeMethod = $removePrefix.$singular;
 

@@ -57,6 +57,7 @@ class PropertyAccessor implements PropertyAccessorInterface
     private const CACHE_PREFIX_READ = 'r';
     private const CACHE_PREFIX_WRITE = 'w';
     private const CACHE_PREFIX_PROPERTY_PATH = 'p';
+    private const COLLECTION_SUFFIX = 'Collection';
     private const RESULT_PROTO = [self::VALUE => null];
 
     private bool $ignoreInvalidIndices;
@@ -617,6 +618,19 @@ class PropertyAccessor implements PropertyAccessorInterface
             'enable_constructor_extraction' => false,
             'enable_adder_remover_extraction' => $useAdderAndRemover,
         ]);
+
+        if ($useAdderAndRemover && PropertyWriteInfo::TYPE_NONE === $mutator->getType() && str_ends_with($property, self::COLLECTION_SUFFIX) && self::COLLECTION_SUFFIX !== $property) {
+            $collectionMutator = $this->writeInfoExtractor->getWriteInfo($class, substr($property, 0, -\strlen(self::COLLECTION_SUFFIX)), [
+                'enable_getter_setter_extraction' => true,
+                'enable_magic_methods_extraction' => $this->magicMethodsFlags,
+                'enable_constructor_extraction' => false,
+                'enable_adder_remover_extraction' => true,
+            ]);
+
+            if ($collectionMutator && PropertyWriteInfo::TYPE_ADDER_AND_REMOVER === $collectionMutator->getType()) {
+                $mutator = $collectionMutator;
+            }
+        }
 
         if (isset($item)) {
             $this->cacheItemPool->save($item->set($mutator));

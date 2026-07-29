@@ -65,6 +65,96 @@ class CookieTest extends TestCase
         Cookie::create('');
     }
 
+    public static function pathsAndDomainsWithSpecialCharacters()
+    {
+        return [
+            ['/p,q'],
+            ['/p;q'],
+            ['/p q'],
+            ["/p\tq"],
+            ["/p\rq"],
+            ["/p\nq"],
+            ["/p\013q"],
+            ["/p\014q"],
+            ['/p; SameSite=None; Secure'],
+            ['victim.com; secure'],
+        ];
+    }
+
+    #[DataProvider('pathsAndDomainsWithSpecialCharacters')]
+    public function testInstantiationThrowsExceptionIfPathContainsSpecialCharacters($path)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Cookie::create('MyCookie', 'MyValue', 0, $path);
+    }
+
+    #[DataProvider('pathsAndDomainsWithSpecialCharacters')]
+    public function testInstantiationThrowsExceptionIfDomainContainsSpecialCharacters($domain)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Cookie::create('MyCookie', 'MyValue', 0, '/', $domain);
+    }
+
+    #[DataProvider('pathsAndDomainsWithSpecialCharacters')]
+    public function testWithPathThrowsExceptionIfPathContainsSpecialCharacters($path)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Cookie::create('MyCookie')->withPath($path);
+    }
+
+    #[DataProvider('pathsAndDomainsWithSpecialCharacters')]
+    public function testWithDomainThrowsExceptionIfDomainContainsSpecialCharacters($domain)
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Cookie::create('MyCookie')->withDomain($domain);
+    }
+
+    public function testFromStringThrowsExceptionIfPathContainsSpecialCharacters()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        Cookie::fromString('foo=bar; path="/p; SameSite=None"');
+    }
+
+    public static function validPathsAndDomains()
+    {
+        return [
+            ['/'],
+            ['/foo'],
+            ['/foo/bar'],
+            ['/foo=bar'],
+            ['/foo%20bar'],
+            ['.myfoodomain.com'],
+            ['myfoodomain.com'],
+        ];
+    }
+
+    #[DataProvider('validPathsAndDomains')]
+    public function testOrdinaryPathsAndDomainsAreAccepted($value)
+    {
+        $cookie = Cookie::create('MyCookie', 'MyValue', 0, $value, $value);
+
+        $this->assertSame($value, $cookie->getPath());
+        $this->assertSame($value, $cookie->getDomain());
+
+        $cookie = Cookie::create('MyCookie')->withPath($value)->withDomain($value);
+
+        $this->assertSame($value, $cookie->getPath());
+        $this->assertSame($value, $cookie->getDomain());
+    }
+
+    public function testNullAndEmptyPathsAndDomainsAreAccepted()
+    {
+        $cookie = Cookie::create('MyCookie', 'MyValue', 0, null, null);
+
+        $this->assertSame('/', $cookie->getPath());
+        $this->assertNull($cookie->getDomain());
+
+        $cookie = Cookie::create('MyCookie', 'MyValue', 0, '', null)->withDomain(null);
+
+        $this->assertSame('/', $cookie->getPath());
+        $this->assertNull($cookie->getDomain());
+    }
+
     public function testInvalidExpiration()
     {
         $this->expectException(\InvalidArgumentException::class);

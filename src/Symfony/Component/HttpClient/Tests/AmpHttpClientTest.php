@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpClient\AmpHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -72,5 +73,15 @@ class AmpHttpClientTest extends HttpClientTestCase
         $duration = microtime(true) - $start;
 
         $this->assertLessThan(2, $duration, 'Requests should be processed concurrently');
+    }
+
+    #[DataProvider('getRedirectWithAuthTests')]
+    public function testRedirectWithProxyAuthorization(string $url, bool $redirectWithAuth)
+    {
+        if ($redirectWithAuth) {
+            $this->markTestSkipped('AmpHttpClient never forwards Proxy-Authorization to the target host.');
+        }
+
+        parent::testRedirectWithProxyAuthorization($url, $redirectWithAuth);
     }
 }

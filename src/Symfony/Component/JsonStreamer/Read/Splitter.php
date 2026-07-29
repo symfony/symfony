@@ -26,13 +26,6 @@ final class Splitter
     private static ?Lexer $lexer = null;
 
     /**
-     * @var array{key: array<string, string>}
-     */
-    private static array $cache = [
-        'key' => [],
-    ];
-
-    /**
      * @param resource $stream
      */
     public static function splitList($stream, int $offset = 0, ?int $length = null): ?\Iterator
@@ -171,7 +164,7 @@ final class Splitter
             }
 
             if (null === $key) {
-                $key = self::$cache['key'][$value] ??= json_decode($value);
+                $key = json_decode($value);
             }
         }
 

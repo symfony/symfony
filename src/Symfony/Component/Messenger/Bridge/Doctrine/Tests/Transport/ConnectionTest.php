@@ -274,7 +274,7 @@ class ConnectionTest extends TestCase
         $queryBuilder->expects($this->once())->method('getSQL')->willReturn('UPDATE');
 
         $driverConnection->expects($this->once())->method('createQueryBuilder')->willReturn($queryBuilder);
-        $driverConnection->expects($this->once())->method('executeStatement')->with('UPDATE');
+        $driverConnection->expects($this->once())->method('executeStatement')->with('UPDATE')->willReturn(1);
 
         // the keepalive runs from a signal handler that can interrupt the connection between a
         // driver call and its nesting-level update, where a transaction corrupts that state

@@ -19,17 +19,24 @@ use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Mime\Part\Multipart\MixedPart;
 use Symfony\Component\Mime\Part\TextPart;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\MimeMessageNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Serializer;
+
+class MessageTestForeignClass
+{
+    public string $marker = '';
+}
 
 class MessageTest extends TestCase
 {
@@ -286,6 +293,42 @@ class MessageTest extends TestCase
 
         $serialized = $serializer->serialize($e, 'json');
         $this->assertStringMatchesFormat($expectedJson, json_encode(json_decode($serialized), \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
+    }
+
+    public function testSymfonySerializePartRoundTrip()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $part = new TextPart('Text content');
+        $part->getHeaders()->addHeader('foo', 'bar');
+
+        $normalized = $serializer->normalize($part);
+        $this->assertSame(TextPart::class, $normalized['class']);
+
+        $this->assertEquals($part, $serializer->denormalize($normalized, AbstractPart::class));
+    }
+
+    public function testSymfonyDenormalizeRejectsForeignClassInPart()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Expected a subclass of "Symfony\Component\Mime\Part\AbstractPart", got "Symfony\Component\Mime\Tests\MessageTestForeignClass".');
+
+        $serializer->denormalize(['class' => MessageTestForeignClass::class, 'marker' => 'foo', 'headers' => []], AbstractPart::class);
+    }
+
+    private function createMimeSerializer(): Serializer
+    {
+        $extractor = new PhpDocExtractor();
+        $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
+
+        return new Serializer([
+            new ArrayDenormalizer(),
+            new MimeMessageNormalizer($propertyNormalizer),
+            new ObjectNormalizer(null, null, null, $extractor),
+            $propertyNormalizer,
+        ], [new JsonEncoder()]);
     }
 
     #[DataProvider('ensureValidityProvider')]

@@ -23,11 +23,12 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter('session.storage.options') || !$container->has('security.http_utils')) {
+        if (!$container->has('security.http_utils')) {
             return;
         }
 
-        $sessionOptions = $container->getParameter('session.storage.options');
+        // Without sessions, fall back to restricting redirections to the current host
+        $sessionOptions = $container->hasParameter('session.storage.options') ? $container->getParameter('session.storage.options') : [];
         $domainRegexp = empty($sessionOptions['cookie_domain']) ? '%%s' : \sprintf('(?:%%%%s|(?:.+\.)?%s)', preg_quote(trim($sessionOptions['cookie_domain'], '.')));
 
         if ('auto' === ($sessionOptions['cookie_secure'] ?? null)) {

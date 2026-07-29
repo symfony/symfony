@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Implement the `KeepaliveReceiverInterface` to enable asynchronously notifying AMQP that the job is still being processed, in order to avoid timeouts
+
 8.1
 ---
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransport;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
@@ -49,6 +50,18 @@ class AmqpTransportTest extends TestCase
 
         $envelopes = iterator_to_array($transport->get());
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+    }
+
+    public function testKeepalive()
+    {
+        $transport = $this->getTransport(
+            null,
+            $connection = $this->createMock(Connection::class),
+        );
+
+        $connection->expects($this->once())->method('keepalive');
+
+        $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmqpReceivedStamp($this->createStub(\AMQPEnvelope::class), 'queueName')]));
     }
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): AmqpTransport

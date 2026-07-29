@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
+use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Serializer as SerializerComponent;
@@ -106,6 +107,33 @@ class AmqpReceiverTest extends TestCase
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
+    }
+
+    public function testItSupportsKeepalive()
+    {
+        $this->assertInstanceOf(KeepaliveReceiverInterface::class, new AmqpReceiver($this->createStub(Connection::class)));
+    }
+
+    public function testItKeepsReceivedMessageAlive()
+    {
+        $amqpEnvelope = $this->createAMQPEnvelope();
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive');
+
+        $receiver = new AmqpReceiver($connection, $this->createStub(SerializerInterface::class));
+        $receiver->keepalive(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
+    }
+
+    public function testItThrowsATransportExceptionIfItCannotKeepMessageAlive()
+    {
+        $this->expectException(TransportException::class);
+
+        $amqpEnvelope = $this->createAMQPEnvelope();
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('keepalive')->willThrowException(new \AMQPException());
+
+        $receiver = new AmqpReceiver($connection, $this->createStub(SerializerInterface::class));
+        $receiver->keepalive(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
     public function testTransportMessageIdStampIsCreatedWhenMessageIdIsSet()

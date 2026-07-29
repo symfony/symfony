@@ -530,6 +530,21 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
+    public function testItKeepsConnectionAlive()
+    {
+        $factory = new TestAmqpFactory(
+            $this->createStub(\AMQPConnection::class),
+            $amqpChannel = $this->createMock(\AMQPChannel::class),
+            $this->createStub(\AMQPQueue::class),
+            $this->createStub(\AMQPExchange::class)
+        );
+
+        $amqpChannel->expects($this->once())->method('qos')->with(0, 0);
+
+        $connection = Connection::fromDsn('amqp://localhost', [], $factory);
+        $connection->keepalive();
+    }
+
     public function testAutoSetupWithDelayDeclaresExchangeQueuesAndDelay()
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
@@ -662,7 +677,6 @@ class ConnectionTest extends TestCase
 
         $connection->publish('{}', ['x-some-headers' => 'foo'], 5000);
     }
-
 
     public function testItDelaysTheMessageWithADifferentRoutingKeyAndTTLs()
     {

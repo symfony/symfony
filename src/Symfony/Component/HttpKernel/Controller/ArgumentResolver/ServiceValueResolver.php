@@ -48,12 +48,12 @@ final class ServiceValueResolver implements ValueResolverInterface
             $controller = substr($controller, 0, $i).strtolower(substr($controller, $i));
         }
 
-        if (!$this->container->has($controller) || !$this->container->get($controller)->has($argument->getName())) {
+        if (!$this->container->has($controller) || !($locator = $this->container->get($controller))->has($argument->getName())) {
             return [];
         }
 
         try {
-            return [$this->container->get($controller)->get($argument->getName())];
+            return [$locator->get($argument->getName())];
         } catch (RuntimeException $e) {
             $what = 'argument $'.$argument->getName();
             $message = str_replace(\sprintf('service "%s"', $argument->getName()), $what, $e->getMessage());

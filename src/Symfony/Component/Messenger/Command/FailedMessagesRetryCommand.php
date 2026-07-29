@@ -63,6 +63,8 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             ->setDefinition([
                 new InputArgument('id', InputArgument::IS_ARRAY, 'Specific message id(s) to retry'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
+                new InputOption(self::FIRST_MESSAGE_ID_OPTION, null, InputOption::VALUE_REQUIRED, 'First message id to retry'),
+                new InputOption(self::LAST_MESSAGE_ID_OPTION, null, InputOption::VALUE_REQUIRED, 'Last message id to retry'),
                 new InputOption('transport', null, InputOption::VALUE_REQUIRED, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('keepalive', null, InputOption::VALUE_REQUIRED, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
             ])
@@ -82,6 +84,10 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
                 Or pass multiple ids at once to process multiple messages:
 
                 <info>php %command.full_name% {id1} {id2} {id3}</info>
+
+                Or pass an inclusive id range:
+
+                <info>php %command.full_name% --from={firstId} --until={lastId}</info>
 
                 EOF
             )
@@ -121,7 +127,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
         $io->writeln(\sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $failureTransportName));
 
         $shouldForce = $input->getOption('force');
-        $ids = $input->getArgument('id');
+        $ids = $this->getMessageIds($input);
         if (0 === \count($ids)) {
             if (!$input->isInteractive()) {
                 throw new RuntimeException('Message id must be passed when in non-interactive mode.');

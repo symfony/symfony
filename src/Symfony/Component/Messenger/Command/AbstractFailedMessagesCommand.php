@@ -14,7 +14,9 @@ namespace Symfony\Component\Messenger\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Dumper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -45,6 +47,9 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 abstract class AbstractFailedMessagesCommand extends Command
 {
     protected const DEFAULT_TRANSPORT_OPTION = 'choose';
+    protected const FIRST_MESSAGE_ID_OPTION = 'from';
+    protected const LAST_MESSAGE_ID_OPTION = 'until';
+    private const MIN_MESSAGE_ID = 1;
 
     public function __construct(
         private ?string $globalFailureReceiverName,
@@ -67,6 +72,34 @@ abstract class AbstractFailedMessagesCommand extends Command
         $stamp = $envelope->last(TransportMessageIdStamp::class);
 
         return $stamp?->getId();
+    }
+
+    protected function getMessageIds(InputInterface $input): array
+    {
+        $ids = (array) $input->getArgument('id');
+        $firstId = $input->getOption(self::FIRST_MESSAGE_ID_OPTION);
+        $lastId = $input->getOption(self::LAST_MESSAGE_ID_OPTION);
+
+        if (null === $firstId && null === $lastId) {
+            return $ids;
+        }
+
+        if ($ids) {
+            throw new RuntimeException(\sprintf('You cannot specify message ids when using the "--%s" and "--%s" options.', self::FIRST_MESSAGE_ID_OPTION, self::LAST_MESSAGE_ID_OPTION));
+        }
+
+        if (null === $firstId || null === $lastId) {
+            throw new RuntimeException(\sprintf('The "--%s" and "--%s" options must be used together.', self::FIRST_MESSAGE_ID_OPTION, self::LAST_MESSAGE_ID_OPTION));
+        }
+
+        $firstId = $this->parseMessageIdRangeBound($firstId, self::FIRST_MESSAGE_ID_OPTION);
+        $lastId = $this->parseMessageIdRangeBound($lastId, self::LAST_MESSAGE_ID_OPTION);
+
+        if ($firstId > $lastId) {
+            throw new RuntimeException(\sprintf('The "--%s" option must be lower than or equal to the "--%s" option.', self::FIRST_MESSAGE_ID_OPTION, self::LAST_MESSAGE_ID_OPTION));
+        }
+
+        return array_map('strval', range($firstId, $lastId));
     }
 
     protected function displaySingleMessage(Envelope $envelope, SymfonyStyle $io, ?SymfonyStyle $errorIo = null): void
@@ -171,6 +204,15 @@ abstract class AbstractFailedMessagesCommand extends Command
         }]);
 
         return $cloner;
+    }
+
+    private function parseMessageIdRangeBound(mixed $id, string $optionName): int
+    {
+        if (false === filter_var($id, \FILTER_VALIDATE_INT, ['options' => ['min_range' => self::MIN_MESSAGE_ID]])) {
+            throw new RuntimeException(\sprintf('The "--%s" option expects a positive integer.', $optionName));
+        }
+
+        return (int) $id;
     }
 
     protected function printWarningAvailableFailureTransports(SymfonyStyle $io, ?string $failureTransportName): void

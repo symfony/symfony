@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `--from` and `--until` options to `messenger:failed:retry` and `messenger:failed:remove` to process a range of failed message ids
  * Add `$serializedTypeNameAliases` parameter to `#[AsMessage]` to accept alternate serialized type names when decoding
 
 8.1

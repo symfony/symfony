@@ -137,6 +137,41 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
+    public function testRetryMessagesByIdRange()
+    {
+        $series = [
+            [['20'], new Envelope(new \stdClass())],
+            [['21'], new Envelope(new \stdClass())],
+            [['22'], new Envelope(new \stdClass())],
+        ];
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->exactly(3))->method('find')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+        $receiver->expects($this->exactly(3))->method('ack');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->exactly(3))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            $bus,
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--from' => '20', '--until' => '22', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
     public function testCompletingTransport()
     {
         $globalFailureReceiverName = 'failure_receiver';

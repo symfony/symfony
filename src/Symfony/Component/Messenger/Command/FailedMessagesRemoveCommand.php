@@ -34,6 +34,8 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 new InputArgument('id', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Specific message id(s) to remove'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Remove all failed messages from the transport'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force the operation without confirmation'),
+                new InputOption(self::FIRST_MESSAGE_ID_OPTION, null, InputOption::VALUE_REQUIRED, 'First message id to remove'),
+                new InputOption(self::LAST_MESSAGE_ID_OPTION, null, InputOption::VALUE_REQUIRED, 'Last message id to remove'),
                 new InputOption('transport', null, InputOption::VALUE_REQUIRED, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
                 new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
@@ -48,6 +50,10 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 You can remove all failed messages from the failure transport by using the "--all" option:
 
                     <info>php %command.full_name% --all</info>
+
+                Or pass an inclusive id range:
+
+                    <info>php %command.full_name% --from={firstId} --until={lastId}</info>
                 EOF
             )
         ;
@@ -66,7 +72,7 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         $receiver = $this->getReceiver($failureTransportName);
 
         $shouldForce = $input->getOption('force');
-        $ids = (array) $input->getArgument('id');
+        $ids = $this->getMessageIds($input);
         $shouldDeleteAllMessages = $input->getOption('all');
 
         $idsCount = \count($ids);

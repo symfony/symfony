@@ -148,8 +148,15 @@ abstract class AttributeClassLoader implements LoaderInterface
             return;
         }
 
-        $name = $attr->name ?? $this->getDefaultRouteName($class, $method);
+        $defaultAliasName = null;
+        if (null === $attr->name) {
+            $name = $this->getDefaultRouteName($class, $method);
+            $defaultAliasName = $this->getDefaultRouteAliasName($class, $method, $this->defaultRouteIndex - 1);
+        } else {
+            $name = $attr->name;
+        }
         $name = $globals['name'].$name;
+        $defaultAliasName = null === $defaultAliasName ? null : $globals['name'].$defaultAliasName;
 
         $requirements = $attr->requirements;
 
@@ -226,6 +233,17 @@ abstract class AttributeClassLoader implements LoaderInterface
             }
         }
 
+        if (null !== $defaultAliasName && $defaultAliasName !== $name) {
+            foreach (array_keys($paths) as $locale) {
+                $suffix = 0 !== $locale ? '.'.$locale : '';
+                $aliasName = $defaultAliasName.$suffix;
+
+                if (!$collection->get($aliasName) && !$collection->getAlias($aliasName)) {
+                    $collection->addAlias($aliasName, $name.$suffix);
+                }
+            }
+        }
+
         foreach ($attr->aliases as $aliasAttribute) {
             $aliasName = $aliasAttribute instanceof DeprecatedAlias ? $aliasAttribute->aliasName : $aliasAttribute;
 
@@ -271,6 +289,24 @@ abstract class AttributeClassLoader implements LoaderInterface
         ++$this->defaultRouteIndex;
 
         return $name;
+    }
+
+    private function getDefaultRouteAliasName(\ReflectionClass $class, \ReflectionMethod $method, int $defaultRouteIndex): string
+    {
+        $namespace = $class->getNamespaceName();
+        $name = ('' === $namespace ? '' : str_replace('\\', '_', $namespace).'_')
+            .$this->camelCaseToSnakeCase($class->getShortName()).'_'.$this->camelCaseToSnakeCase($method->name);
+        $name = \function_exists('mb_strtolower') && preg_match('//u', $name) ? mb_strtolower($name, 'UTF-8') : strtolower($name);
+        if ($defaultRouteIndex > 0) {
+            $name .= '_'.$defaultRouteIndex;
+        }
+
+        return $name;
+    }
+
+    private function camelCaseToSnakeCase(string $name): string
+    {
+        return preg_replace('/(?<=[\p{Ll}\p{N}])(\p{Lu})/u', '_$1', $name) ?? $name;
     }
 
     /**

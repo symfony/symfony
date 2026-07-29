@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add snake_case aliases for automatically generated attribute route names with camelCase segments
+
 8.1
 ---
 

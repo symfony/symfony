@@ -22,6 +22,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasInvokableCon
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\CamelCaseDefaultRouteNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DefaultValueController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DeprecatedAliasCustomMessageRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DeprecatedAliasRouteController;
@@ -192,6 +193,16 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/the/path', $routes->get('post')->getPath());
         $this->assertEquals(new Alias('post'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::post'));
         $this->assertEquals(new Alias('put'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::put'));
+    }
+
+    public function testCamelCaseDefaultRouteNameHasSnakeCaseAlias()
+    {
+        $routes = $this->loader->load(CamelCaseDefaultRouteNameController::class);
+        $routeName = 'symfony_component_routing_tests_fixtures_attributefixtures_camelcasedefaultroutenamecontroller_changepassword';
+        $aliasName = 'symfony_component_routing_tests_fixtures_attributefixtures_camel_case_default_route_name_controller_change_password';
+
+        $this->assertArrayHasKey($routeName, $routes->all());
+        $this->assertEquals(new Alias($routeName), $routes->getAlias($aliasName));
     }
 
     public function testInvokableClassRouteLoadWithMethodAttribute()

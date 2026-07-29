@@ -26,6 +26,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -2161,6 +2162,33 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $url = $container->getDefinition($providerId)->getArgument(0);
 
         $this->assertSame($redisUrl, $url);
+    }
+
+    public function testCacheDefaultProviderDeducesTheAdapterFromTheDsn()
+    {
+        $container = $this->createContainerFromFile('cache_default_provider');
+
+        $pool = $container->getDefinition('cache.app');
+        $this->assertSame([AbstractAdapter::class, 'createAdapter'], $pool->getFactory());
+        $this->assertStringStartsWith('.cache_connection.', (string) $pool->getArgument(0));
+
+        $connection = $container->getDefinition((string) $pool->getArgument(0));
+        $this->assertSame([AbstractAdapter::class, 'createConnection'], $connection->getFactory());
+        $this->assertStringContainsString('APP_CACHE_DSN', $connection->getArgument(0));
+
+        // cache.system keeps its own adapter, the DSN only applies to cache.app
+        $this->assertNull($container->getDefinition('cache.system')->getFactory());
+    }
+
+    public function testCachePoolProviderWithoutAdapterDeducesTheAdapterFromTheDsn()
+    {
+        $container = $this->createContainerFromFile('cache_default_provider');
+
+        $pool = $container->getDefinition('my_pool');
+        $this->assertSame([AbstractAdapter::class, 'createAdapter'], $pool->getFactory());
+
+        $connection = $container->getDefinition((string) $pool->getArgument(0));
+        $this->assertSame('memcached://localhost', $connection->getArgument(0));
     }
 
     public function testCacheDefaultValkeyProvider()

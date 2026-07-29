@@ -26,8 +26,15 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class StoreFactory
 {
-    public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
+    /**
+     * @param array{advisory?: bool} $options Set "advisory" to true to use PostgreSQL advisory locks when reusing
+     *                                        an existing \PDO or Doctrine DBAL Connection instead of the default,
+     *                                        table-based store
+     */
+    public static function createStore(#[\SensitiveParameter] object|string $connection, array $options = []): PersistingStoreInterface
     {
+        $advisory = $options['advisory'] ?? false;
+
         switch (true) {
             case $connection instanceof DynamoDbClient:
                 self::requireBridgeClass(DynamoDbStore::class, 'symfony/amazon-dynamo-db-lock');
@@ -48,10 +55,10 @@ class StoreFactory
                 return new MongoDbStore($connection);
 
             case $connection instanceof \PDO:
-                return new PdoStore($connection);
+                return $advisory ? new PostgreSqlStore($connection) : new PdoStore($connection);
 
             case $connection instanceof Connection:
-                return new DoctrineDbalStore($connection);
+                return $advisory ? new DoctrineDbalPostgreSqlStore($connection) : new DoctrineDbalStore($connection);
 
             case $connection instanceof \Zookeeper:
                 return new ZookeeperStore($connection);

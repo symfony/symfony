@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use AsyncAws\DynamoDb\DynamoDbClient;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
@@ -99,5 +100,56 @@ class StoreFactoryTest extends TestCase
         yield ['flock://'.sys_get_temp_dir(), FlockStore::class];
 
         yield ['null', NullStore::class];
+    }
+
+    /**
+     * @requires extension pdo_sqlite
+     */
+    public function testCreateStoreForPdoConnectionWithoutAdvisory()
+    {
+        $store = StoreFactory::createStore(new \PDO('sqlite::memory:'));
+
+        $this->assertInstanceOf(PdoStore::class, $store);
+    }
+
+    /**
+     * @requires extension pdo_sqlite
+     */
+    public function testCreateAdvisoryStoreForPdoConnectionRoutesToPostgreSqlStore()
+    {
+        $pdo = new \PDO('sqlite::memory:');
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+        // PostgreSqlStore rejects non-pgsql drivers in its constructor, which proves the
+        // factory routed the connection to the advisory store rather than PdoStore.
+        $this->expectException(\Symfony\Component\Lock\Exception\InvalidArgumentException::class);
+        $this->expectExceptionMessage(PostgreSqlStore::class);
+
+        StoreFactory::createStore($pdo, ['advisory' => true]);
+    }
+
+    public function testCreateStoreForDbalConnectionWithoutAdvisory()
+    {
+        if (!class_exists(Connection::class)) {
+            $this->markTestSkipped('The "doctrine/dbal" package is required.');
+        }
+
+        $store = StoreFactory::createStore($this->createStub(Connection::class));
+
+        $this->assertInstanceOf(DoctrineDbalStore::class, $store);
+    }
+
+    public function testCreateAdvisoryStoreForDbalConnectionRoutesToDoctrineDbalPostgreSqlStore()
+    {
+        if (!class_exists(Connection::class) || !class_exists(PostgreSQLPlatform::class)) {
+            $this->markTestSkipped('The "doctrine/dbal" package with the PostgreSQL platform is required.');
+        }
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+
+        $store = StoreFactory::createStore($connection, ['advisory' => true]);
+
+        $this->assertInstanceOf(DoctrineDbalPostgreSqlStore::class, $store);
     }
 }

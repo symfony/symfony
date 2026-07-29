@@ -4,6 +4,7 @@ CHANGELOG
 7.4
 ---
 
+ * Add an `$options` argument to `StoreFactory::createStore()` with an `advisory` flag to use PostgreSQL advisory locks when reusing an existing `\PDO` or Doctrine DBAL `Connection`
  * Add `LockKeyNormalizer`
 
 7.3

@@ -21,6 +21,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterEntryPoin
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterTokenUsageTrackingPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RemoveSecurityDataCollectorListenerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\ReplaceDecoratedRememberMeHandlerPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\SortFirewallListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\CasTokenHandlerFactory;
@@ -93,6 +94,7 @@ class SecurityBundle extends Bundle
         $container->addCompilerPass(new RegisterCsrfFeaturesPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new RegisterLdapLocatorPass());
+        $container->addCompilerPass(new RemoveSecurityDataCollectorListenerPass());
         $container->addCompilerPass(new RegisterEntryPointPass());
         // must be registered after RegisterListenersPass (in the FrameworkBundle)
         $container->addCompilerPass(new RegisterGlobalSecurityEventListenersPass(), PassConfig::TYPE_BEFORE_REMOVING, -200);

@@ -24,7 +24,8 @@
         "symfony/webhook": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<7.4"
+        "symfony/http-foundation": "<7.4",
+        "symfony/remote-event": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Notifier\\Bridge\\Sweego\\": "" },

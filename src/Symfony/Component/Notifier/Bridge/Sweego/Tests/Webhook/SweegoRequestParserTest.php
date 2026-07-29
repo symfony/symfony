@@ -18,6 +18,9 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 class SweegoRequestParserTest extends AbstractRequestParserTestCase
 {
+    private const WEBHOOK_ID = 'a5ccc627-6e43-4012-bb29-f1bfe3a3d13e';
+    private const WEBHOOK_TIMESTAMP = '1725290740';
+
     protected function createRequestParser(): RequestParserInterface
     {
         return new SweegoRequestParser();
@@ -27,9 +30,9 @@ class SweegoRequestParserTest extends AbstractRequestParserTestCase
     {
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
-            'HTTP_webhook-id' => 'a5ccc627-6e43-4012-bb29-f1bfe3a3d13e',
-            'HTTP_webhook-timestamp' => '1725290740',
-            'HTTP_webhook-signature' => 'k7SwzHXZqVKNvCpp6HwGS/5aDZ6NraYnKmVkBdx7MHE=',
+            'HTTP_webhook-id' => self::WEBHOOK_ID,
+            'HTTP_webhook-timestamp' => self::WEBHOOK_TIMESTAMP,
+            'HTTP_webhook-signature' => base64_encode(hash_hmac('sha256', \sprintf('%s.%s.%s', self::WEBHOOK_ID, self::WEBHOOK_TIMESTAMP, $payload), '', true)),
         ], $payload);
     }
 }

@@ -410,7 +410,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     /**
      * Resolves relative URLs on redirects and deals with authentication headers.
      *
-     * Work around CVE-2018-1000007: Authorization, Cookie and Proxy-Authorization headers should not follow redirects - fixed in Curl 7.64
+     * Work around CVE-2018-1000007: Authorization and Cookie headers should not follow redirects - fixed in Curl 7.64
      */
     private static function createRedirectResolver(array $options, string $authority, string $noProxy): \Closure
     {
@@ -419,8 +419,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $redirectHeaders['authority'] = $authority;
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Host:'));
 
-            if (isset($options['normalized_headers']['authorization'][0]) || isset($options['normalized_headers']['cookie'][0]) || isset($options['normalized_headers']['proxy-authorization'][0])) {
-                $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:') && 0 !== stripos($h, 'Proxy-Authorization:'));
+            if (isset($options['normalized_headers']['authorization'][0]) || isset($options['normalized_headers']['cookie'][0])) {
+                $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
             }
         }
 

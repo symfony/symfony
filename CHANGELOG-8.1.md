@@ -7,6 +7,10 @@ in 8.1 minor versions.
 To get the diff for a specific change, go to https://github.com/symfony/symfony/commit/XXX where XXX is the change hash
 To get the diff between two versions, go to https://github.com/symfony/symfony/compare/v8.1.0...v8.1.1
 
+* 8.1.3 (2026-07-29)
+
+ * bug #65036 [HttpClient] Revert " Strip Proxy-Authorization on cross-authority redirects" (GrahamCampbell)
+
 * 8.1.2 (2026-07-29)
 
  * bug #65029 [JsonPath] Add limits for filter expression length and depth in JsonCrawler (alexandre-daubois)

@@ -39,7 +39,7 @@ class ProxyHelperTest extends TestCase
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
             $expected = str_replace('= [namespace\M_PI, new M_PI()]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
 
-            if (\PHP_VERSION_ID >= 80600) {
+            if (self::hasOctalControlChars()) {
                 $expected = str_replace('"a\0b"', '"a\000b"', $expected);
             }
 
@@ -161,7 +161,7 @@ class ProxyHelperTest extends TestCase
 
             EOPHP;
 
-        if (\PHP_VERSION_ID >= 80600) {
+        if (self::hasOctalControlChars()) {
             $expected = str_replace('"a\0b"', '"a\000b"', $expected);
         }
 
@@ -292,6 +292,18 @@ class ProxyHelperTest extends TestCase
         $proxyCode = ProxyHelper::generateLazyProxy(new \ReflectionClass(Hooked::class));
         self::assertStringContainsString('public int $notBacked {', $proxyCode);
         self::assertStringContainsString('public int $backed {', $proxyCode);
+    }
+
+    /**
+     * Whether the running PHP renders control chars in exported default values as octal
+     * escapes rather than as raw bytes. Feature-detected because the change was backported
+     * to several branches, so no single version boundary describes it. Only defaults kept
+     * as an AST go through the export that changed, hence reflecting the very method the
+     * expectations are built from.
+     */
+    private static function hasOctalControlChars(): bool
+    {
+        return str_contains((string) (new \ReflectionMethod(TestForProxyHelper::class, 'foo5'))->getParameters()[0], '\000');
     }
 }
 

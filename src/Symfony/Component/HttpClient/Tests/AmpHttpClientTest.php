@@ -52,14 +52,4 @@ class AmpHttpClientTest extends HttpClientTestCase
     {
         $this->markTestSkipped('A real proxy server would be needed.');
     }
-
-    #[DataProvider('getRedirectWithAuthTests')]
-    public function testRedirectWithProxyAuthorization(string $url, bool $redirectWithAuth)
-    {
-        if ($redirectWithAuth) {
-            $this->markTestSkipped('AmpHttpClient never forwards Proxy-Authorization to the target host.');
-        }
-
-        parent::testRedirectWithProxyAuthorization($url, $redirectWithAuth);
-    }
 }

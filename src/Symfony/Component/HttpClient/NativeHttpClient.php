@@ -388,8 +388,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             $redirectHeaders = ['authority' => $authority];
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Host:'));
 
-            if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie']) || isset($options['normalized_headers']['proxy-authorization'])) {
-                $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:') && 0 !== stripos($h, 'Proxy-Authorization:'));
+            if (isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
+                $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
             }
         }
 
@@ -443,7 +443,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             [$host, $port] = self::parseHostPort($url, $info);
 
             if ($locationHasHost) {
-                // Authorization, Cookie and Proxy-Authorization headers MUST NOT follow except for the initial authority name
+                // Authorization and Cookie headers MUST NOT follow except for the initial authority name
                 $requestHeaders = $redirectHeaders['authority'] === $url['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;
                 $dnsResolve = !self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, 'https:' === $url['scheme']);

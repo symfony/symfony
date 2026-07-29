@@ -355,7 +355,6 @@ final class AmpResponseV4 implements ResponseInterface, StreamableInterface
             if ($request->getUri()->getAuthority() !== $originRequest->getUri()->getAuthority()) {
                 $request->removeHeader('authorization');
                 $request->removeHeader('cookie');
-                $request->removeHeader('proxy-authorization');
                 $request->removeHeader('host');
             }
 

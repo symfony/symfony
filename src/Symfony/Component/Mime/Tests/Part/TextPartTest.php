@@ -143,10 +143,35 @@ class TextPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
+    public function testBinaryEncoding()
+    {
+        $body = "raw\x00binary\x01payload";
+        $p = new TextPart($body, null, 'plain', 'binary');
+        $this->assertSame($body, $p->bodyToString());
+        $this->assertSame($body, implode('', iterator_to_array($p->bodyToIterable())));
+        $this->assertEquals(new Headers(
+            new ParameterizedHeader('Content-Type', 'text/plain'),
+            new UnstructuredHeader('Content-Transfer-Encoding', 'binary')
+        ), $p->getPreparedHeaders());
+    }
+
+    public function testBinaryEncodingWithResourceContainingHighBytes()
+    {
+        $body = "\xFF\xFE\x80\x00\x7F\xC3\xA9";
+        $f = fopen('php://memory', 'r+', false);
+        fwrite($f, $body);
+        rewind($f);
+
+        $p = new TextPart($f, null, 'plain', 'binary');
+        $this->assertSame($body, $p->bodyToString());
+        $this->assertSame($body, implode('', iterator_to_array($p->bodyToIterable())));
+        fclose($f);
+    }
+
     public function testCustomEncoderNeedsToRegisterFirst()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The encoding must be one of "quoted-printable", "base64", "8bit", "upper_encoder" ("this_encoding_does_not_exist" given).');
+        $this->expectExceptionMessage('The encoding must be one of "quoted-printable", "base64", "8bit", "binary", "upper_encoder" ("this_encoding_does_not_exist" given).');
 
         $upperEncoder = $this->createStub(ContentEncoderInterface::class);
         $upperEncoder->method('getName')->willReturn('upper_encoder');

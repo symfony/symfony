@@ -170,6 +170,19 @@ class DataPartTest extends TestCase
         }
     }
 
+    public function testBinaryEncodingPreservesRawBytes()
+    {
+        $body = "\xFF\xFE\x80\x00\x7F\xC3\xA9raw\x01payload";
+        $p = new DataPart($body, 'blob.bin', 'application/octet-stream', 'binary');
+        $this->assertSame($body, $p->bodyToString());
+        $this->assertSame($body, implode('', iterator_to_array($p->bodyToIterable())));
+        $this->assertEquals(new Headers(
+            new ParameterizedHeader('Content-Type', 'application/octet-stream', ['name' => 'blob.bin']),
+            new UnstructuredHeader('Content-Transfer-Encoding', 'binary'),
+            new ParameterizedHeader('Content-Disposition', 'attachment', ['name' => 'blob.bin', 'filename' => 'blob.bin'])
+        ), $p->getPreparedHeaders());
+    }
+
     public function testHasContentId()
     {
         $p = new DataPart('content');

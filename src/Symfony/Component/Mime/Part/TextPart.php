@@ -23,7 +23,10 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class TextPart extends AbstractPart
 {
-    private const DEFAULT_ENCODERS = ['quoted-printable', 'base64', '8bit'];
+    private const DEFAULT_ENCODERS = ['quoted-printable', 'base64', '8bit', 'binary'];
+    // "binary" is missing on purpose: it became a default encoder late, so projects
+    // that registered their own must keep being able to do so
+    private const NON_OVERRIDABLE_ENCODERS = ['quoted-printable', 'base64', '8bit'];
 
     private static array $encoders = [];
 
@@ -202,24 +205,16 @@ class TextPart extends AbstractPart
 
     private function getEncoder(): ContentEncoderInterface
     {
-        if ('8bit' === $this->encoding) {
-            return self::$encoders[$this->encoding] ??= new EightBitContentEncoder();
-        }
-
-        if ('quoted-printable' === $this->encoding) {
-            return self::$encoders[$this->encoding] ??= new QpContentEncoder();
-        }
-
-        if ('base64' === $this->encoding) {
-            return self::$encoders[$this->encoding] ??= new Base64ContentEncoder();
-        }
-
-        return self::$encoders[$this->encoding];
+        return self::$encoders[$this->encoding] ??= match ($this->encoding) {
+            '8bit', 'binary' => new EightBitContentEncoder(),
+            'quoted-printable' => new QpContentEncoder(),
+            'base64' => new Base64ContentEncoder(),
+        };
     }
 
     public static function addEncoder(ContentEncoderInterface $encoder): void
     {
-        if (\in_array($encoder->getName(), self::DEFAULT_ENCODERS, true)) {
+        if (\in_array($encoder->getName(), self::NON_OVERRIDABLE_ENCODERS, true)) {
             throw new InvalidArgumentException('You are not allowed to change the default encoders ("quoted-printable", "base64", and "8bit").');
         }
 

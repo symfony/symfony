@@ -65,6 +65,23 @@ class UriSignerTest extends TestCase
         $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', 1), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 1));
     }
 
+    public function testCheckWithNonStringHash()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertFalse($signer->check('http://example.com/foo?_hash[]=y'));
+        $this->assertFalse($signer->check('http://example.com/foo?_hash[k]=y'));
+        $this->assertFalse($signer->check('http://example.com/foo?foo=bar&_hash[]='));
+    }
+
+    public function testCheckRequestWithNonStringHash()
+    {
+        $signer = new UriSigner('foobar');
+
+        $this->assertFalse($signer->checkRequest(Request::create('http://example.com/foo?_path=x&_hash[]=y')));
+        $this->assertFalse($signer->checkRequest(Request::create('http://example.com/foo?_hash[k]=y')));
+    }
+
     public function testCheckWithDifferentArgSeparator()
     {
         $oldArgSeparatorOutputValue = ini_set('arg_separator.output', '&amp;');

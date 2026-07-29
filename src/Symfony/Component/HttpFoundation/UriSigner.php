@@ -182,11 +182,10 @@ class UriSigner
             parse_str($url['query'], $params);
         }
 
-        if (empty($params[$this->hashParameter])) {
+        if (!\is_string($hash = $params[$this->hashParameter] ?? null) || '' === $hash) {
             return self::STATUS_MISSING;
         }
 
-        $hash = $params[$this->hashParameter];
         unset($params[$this->hashParameter]);
 
         if (!hash_equals($this->computeHash($this->buildUrl($url, $params)), strtr(rtrim($hash, '='), ['/' => '_', '+' => '-']))) {

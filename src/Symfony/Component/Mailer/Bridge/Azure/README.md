@@ -18,6 +18,24 @@ where:
  - `ACS_RESOURCE_NAME` is your Azure Communication Services endpoint resource name (https://ACS_RESOURCE_NAME.communication.azure.com)
  - `KEY` is your Azure Communication Services Email API Key
 
+Webhook
+-------
+
+Azure Event Grid does not sign the events it delivers. It authenticates itself either with a
+Microsoft Entra bearer token, or by repeating the query parameters of the subscription URL on
+every delivery. This bridge uses the second mechanism, so give the subscription URL a `secret`
+query parameter holding the same value as the webhook secret:
+
+```
+https://example.com/webhook/azure?secret=THE_WEBHOOK_SECRET
+```
+
+Requests whose `secret` parameter does not match are rejected with a 401.
+
+Event Grid's automatic subscription handshake is not supported, as it requires echoing a
+validation code in the response body. Register the endpoint with Event Grid's manual
+validation flow instead.
+
 Sponsor
 -------
 

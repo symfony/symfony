@@ -197,6 +197,32 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertEquals($content, $response->getContent());
     }
 
+    public function testAuthHeadersAreStrippedOnCrossAuthorityRedirect()
+    {
+        $content = 'foo';
+
+        $callback = function ($method, $url, $options) use ($content): MockResponse {
+            $this->assertNotContains('Authorization: Basic Zm9vOmJhcg==', $options['headers']);
+            $this->assertNotContains('Proxy-Authorization: Basic Zm9vOmJhcg==', $options['headers']);
+            $this->assertNotContains('Cookie: foo=bar', $options['headers']);
+            $this->assertContains('foo: bar', $options['headers']);
+
+            return new MockResponse($content);
+        };
+        $responses = [
+            new MockResponse('', ['http_code' => 302, 'redirect_url' => 'http://104.26.14.7/']),
+            $callback,
+        ];
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient($responses));
+        $response = $client->request('GET', 'http://104.26.14.6/', ['headers' => [
+            'foo' => 'bar',
+            'authorization' => 'Basic Zm9vOmJhcg==',
+            'proxy-authorization' => 'Basic Zm9vOmJhcg==',
+            'cookie' => 'foo=bar',
+        ]]);
+        $this->assertSame($content, $response->getContent());
+    }
+
     private function getMockHttpClient(string $ipAddr, string $content)
     {
         return new MockHttpClient(new MockResponse($content, ['primary_ip' => $ipAddr]));

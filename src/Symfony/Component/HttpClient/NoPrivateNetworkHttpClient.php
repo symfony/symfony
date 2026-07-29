@@ -102,8 +102,8 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $options['max_redirects'] = 0;
         $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = $options['headers'];
 
-        if (isset($options['normalized_headers']['host']) || isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
-            $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
+        if (isset($options['normalized_headers']['host']) || isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie']) || isset($options['normalized_headers']['proxy-authorization'])) {
+            $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:') && 0 !== stripos($h, 'Proxy-Authorization:'));
         }
 
         return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $subnets, $ipFlags, $dnsCache): \Generator {
@@ -140,7 +140,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                 }
             }
 
-            // Authorization and Cookie headers MUST NOT follow except for the initial host name
+            // Authorization, Cookie and Proxy-Authorization headers MUST NOT follow except for the initial host name
             $port = parse_url($url, \PHP_URL_PORT);
             $options['headers'] = $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
 

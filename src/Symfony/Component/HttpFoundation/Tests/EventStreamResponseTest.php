@@ -175,6 +175,90 @@ class EventStreamResponseTest extends TestCase
         $this->assertSameResponseContent("\n", $response);
     }
 
+    public function testStreamEventWithMultilineStringData()
+    {
+        $response = new EventStreamResponse(static function () {
+            yield new ServerEvent(
+                data: "first line\nsecond line\rthird line\r\nfourth line",
+            );
+        });
+
+        $expected = <<<STR
+            data: first line
+            data: second line
+            data: third line
+            data: fourth line
+
+
+            STR;
+
+        $this->assertSameResponseContent($expected, $response);
+    }
+
+    public function testStreamEventWithMultilineIterableData()
+    {
+        $response = new EventStreamResponse(static function () {
+            yield new ServerEvent(
+                data: ['first line', "second line\nthird line"],
+            );
+        });
+
+        $expected = <<<STR
+            data: first line
+            data: second line
+            data: third line
+
+
+            STR;
+
+        $this->assertSameResponseContent($expected, $response);
+    }
+
+    public function testStreamEventCannotInjectFieldsThroughData()
+    {
+        $response = new EventStreamResponse(static function () {
+            yield new ServerEvent(
+                data: "legit\nevent: adminAlert\ndata: hijacked",
+                type: 'message',
+            );
+        });
+
+        $expected = <<<STR
+            event: message
+            data: legit
+            data: event: adminAlert
+            data: data: hijacked
+
+
+            STR;
+
+        $this->assertSameResponseContent($expected, $response);
+    }
+
+    public function testStreamEventCannotInjectFieldsThroughIdTypeAndComment()
+    {
+        $response = new EventStreamResponse(static function () {
+            yield new ServerEvent(
+                data: 'foo',
+                type: "message\nretry: 1",
+                id: "1\revent: adminAlert",
+                comment: "bla\r\nbla",
+            );
+        });
+
+        $expected = <<<STR
+            : bla
+            : bla
+            id: 1event: adminAlert
+            event: messageretry: 1
+            data: foo
+
+
+            STR;
+
+        $this->assertSameResponseContent($expected, $response);
+    }
+
     private function assertSameResponseContent(string $expected, EventStreamResponse $response): void
     {
         ob_start();

@@ -500,6 +500,16 @@ class JsonCrawlerTest extends TestCase
         $this->assertLessThan(1.0, $elapsed, 'ReDoS pattern must not stall preg_match');
     }
 
+    public function testDeeplyNestedFilterExpressionIsRejected()
+    {
+        // a hostile query of nested logical-NOT operators would otherwise drive
+        // unbounded recursion while validating the filter and exhaust memory (CWE-674)
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('filter expression is too long or too deeply nested');
+
+        (new JsonCrawler('[1]'))->find('$[?'.str_repeat('!', 1000).'@.a]');
+    }
+
     public function testDeepExpressionInFilter()
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.address.city == "Springfield")]');

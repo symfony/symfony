@@ -682,6 +682,31 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         ];
     }
 
+    #[DataProvider('getRedirectWithAuthTests')]
+    public function testRedirectWithProxyAuthorization(string $url, bool $redirectWithAuth)
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('GET', $url, [
+                'headers' => [
+                    'proxy-authorization' => 'Basic Zm9vOmJhcg==',
+                ],
+            ]);
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        if ($redirectWithAuth) {
+            $this->assertSame('Basic Zm9vOmJhcg==', $body['HTTP_PROXY_AUTHORIZATION'] ?? null);
+        } else {
+            $this->assertArrayNotHasKey('HTTP_PROXY_AUTHORIZATION', $body);
+        }
+    }
+
     public function testDefaultContentType()
     {
         $client = $this->getHttpClient(__FUNCTION__);

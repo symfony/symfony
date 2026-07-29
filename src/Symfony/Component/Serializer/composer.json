@@ -35,7 +35,7 @@
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/mime": "^7.4|^8.0",
-        "symfony/property-access": "^8.1.2",
+        "symfony/property-access": "^8.1",
         "symfony/property-info": "^7.4.15|~8.0.15|^8.1.2",
         "symfony/translation-contracts": "^2.5|^3",
         "symfony/type-info": "^7.4|^8.0",
@@ -48,7 +48,7 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
-        "symfony/property-access": "<8.1.2",
+        "symfony/property-access": "<8.1",
         "symfony/property-info": "<7.4.15",
         "symfony/type-info": "<7.4"
     },

@@ -30,9 +30,15 @@ class ValidValidator extends ConstraintValidator
             return;
         }
 
+        if ([] === $constraint->cascadedGroups) {
+            return;
+        }
+
+        $groups = $constraint->cascadedGroups ?? $this->context->getGroup();
+
         $this->context
             ->getValidator()
             ->inContext($this->context)
-            ->validate($value, null, $this->context->getGroup());
+            ->validate($value, null, $groups);
     }
 }

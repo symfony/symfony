@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add the `Cron` constraint to validate cron expressions
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
+ * Add the `cascadedGroups` option to the `Valid` constraint to choose the groups the nested object is validated in; an empty array skips the nested validation
 
 8.1
 ---

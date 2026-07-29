@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Traverse;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\XmlFileLoader;
@@ -55,6 +56,19 @@ class XmlFileLoaderTest extends TestCase
         $metadata = new ClassMetadata('\stdClass');
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
+    }
+
+    public function testLoadValidConstraintWithCascadedGroups()
+    {
+        $loader = new XmlFileLoader(__DIR__.'/valid-cascaded-groups.xml');
+        $metadata = new ClassMetadata(Entity::class);
+
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+
+        [$constraint] = $metadata->getPropertyMetadata('reference')[0]->getConstraints();
+
+        $this->assertInstanceOf(Valid::class, $constraint);
+        $this->assertSame(['Default', 'extra'], $constraint->cascadedGroups);
     }
 
     public function testLoadClassMetadata()

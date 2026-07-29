@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Required;
+use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
@@ -99,6 +100,19 @@ class YamlFileLoaderTest extends TestCase
         $metadata = new ClassMetadata(\stdClass::class);
 
         $this->assertFalse($loader->loadClassMetadata($metadata));
+    }
+
+    public function testLoadValidConstraintWithCascadedGroups()
+    {
+        $loader = new YamlFileLoader(__DIR__.'/valid-cascaded-groups.yml');
+        $metadata = new ClassMetadata(Entity::class);
+
+        $this->assertTrue($loader->loadClassMetadata($metadata));
+
+        [$constraint] = $metadata->getPropertyMetadata('reference')[0]->getConstraints();
+
+        $this->assertInstanceOf(Valid::class, $constraint);
+        $this->assertSame(['Default', 'extra'], $constraint->cascadedGroups);
     }
 
     public function testLoadClassMetadata()

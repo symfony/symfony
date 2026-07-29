@@ -49,6 +49,31 @@ class ValidTest extends TestCase
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }
+
+    public function testCascadedGroupsCanBeSet()
+    {
+        $constraint = new Valid(cascadedGroups: ['Default', 'extra']);
+
+        $this->assertSame(['Default', 'extra'], $constraint->cascadedGroups);
+    }
+
+    public function testCascadedGroupsAreNullByDefault()
+    {
+        $constraint = new Valid();
+
+        $this->assertNull($constraint->cascadedGroups);
+    }
+
+    public function testCascadedGroupsWithGroupsAttribute()
+    {
+        $metadata = new ClassMetadata(ValidDummyWithCascadedGroups::class);
+        $loader = new AttributeLoader();
+        self::assertTrue($loader->loadClassMetadata($metadata));
+
+        [$constraint] = $metadata->getPropertyMetadata('nested')[0]->getConstraints();
+        self::assertSame(['trigger_group'], $constraint->groups);
+        self::assertSame(['Default', 'extra'], $constraint->cascadedGroups);
+    }
 }
 
 class ValidDummy
@@ -61,4 +86,10 @@ class ValidDummy
 
     #[Valid(groups: ['my_group'], payload: 'some attached data')]
     private $c;
+}
+
+class ValidDummyWithCascadedGroups
+{
+    #[Valid(groups: ['trigger_group'], cascadedGroups: ['Default', 'extra'])]
+    private $nested;
 }

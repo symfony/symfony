@@ -109,11 +109,16 @@ class GenericMetadata implements MetadataInterface
         }
 
         if ($constraint instanceof Valid && null === $constraint->groups) {
-            $this->cascadingStrategy = CascadingStrategy::CASCADE;
-            $this->traversalStrategy = $constraint->traverse ? TraversalStrategy::IMPLICIT : TraversalStrategy::NONE;
+            if (null !== $constraint->cascadedGroups) {
+                // the constraint must join the default group to be executed, and thus honor its cascaded groups
+                $constraint->groups = [Constraint::DEFAULT_GROUP];
+            } else {
+                $this->cascadingStrategy = CascadingStrategy::CASCADE;
+                $this->traversalStrategy = $constraint->traverse ? TraversalStrategy::IMPLICIT : TraversalStrategy::NONE;
 
-            // The constraint is not added
-            return $this;
+                // The constraint is not added
+                return $this;
+            }
         }
 
         if ($constraint instanceof DisableAutoMapping || $constraint instanceof EnableAutoMapping) {

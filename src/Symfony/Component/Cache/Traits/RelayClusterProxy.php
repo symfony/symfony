@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Traits;
 use Symfony\Component\Cache\Traits\Relay\RelayCluster20Trait;
 use Symfony\Component\Cache\Traits\Relay\RelayCluster21Trait;
 use Symfony\Component\Cache\Traits\Relay\RelayCluster30Trait;
+use Symfony\Component\Cache\Traits\Relay\RelayCluster40Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -33,6 +34,7 @@ class RelayClusterProxy extends \Relay\Cluster implements ResetInterface, LazyOb
     use RelayCluster20Trait;
     use RelayCluster21Trait;
     use RelayCluster30Trait;
+    use RelayCluster40Trait;
 
     public function __construct($name, $seeds = null, $connect_timeout = 0, $command_timeout = 0, $persistent = false, #[\SensitiveParameter] $auth = null, $context = null)
     {

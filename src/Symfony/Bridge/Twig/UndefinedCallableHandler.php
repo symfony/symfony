@@ -26,6 +26,7 @@ class UndefinedCallableHandler
         'emojify' => 'emoji',
         'humanize' => 'form',
         'form_encode_currency' => 'form',
+        'normalize' => 'serializer',
         'serialize' => 'serializer',
         'trans' => 'translation',
         'sanitize_html' => 'html-sanitizer',

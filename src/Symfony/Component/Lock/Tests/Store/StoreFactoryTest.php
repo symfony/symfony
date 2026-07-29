@@ -13,6 +13,7 @@ namespace Symfony\Component\Lock\Tests\Store;
 
 use AsyncAws\DynamoDb\DynamoDbClient;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +53,76 @@ class StoreFactoryTest extends TestCase
         $this->expectExceptionMessage('The "mysql+advisory://" scheme is not supported, use a PDO DSN such as "mysql+advisory:host=localhost;dbname=app".');
 
         StoreFactory::createStore('mysql+advisory://user:pass@localhost:3306/test');
+    }
+
+    #[RequiresPhpExtension('pdo_sqlite')]
+    public function testCreateStoreForPdoConnectionWithoutAdvisory()
+    {
+        $store = StoreFactory::createStore(new \PDO('sqlite::memory:'));
+
+        $this->assertInstanceOf(PdoStore::class, $store);
+    }
+
+    #[RequiresPhpExtension('pdo_sqlite')]
+    public function testCreateAdvisoryStoreRejectsUnsupportedPdoDriver()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "sqlite" PDO driver does not support advisory locks.');
+
+        StoreFactory::createStore(new \PDO('sqlite::memory:'), ['advisory' => true]);
+    }
+
+    #[RequiresPhpExtension('pdo_pgsql')]
+    public function testCreateAdvisoryStoreForPgsqlPdoConnection()
+    {
+        // The connection is never used, only its driver name is read to route to the advisory store.
+        $store = StoreFactory::createStore($this->createPdoStub('pgsql'), ['advisory' => true]);
+
+        $this->assertInstanceOf(PostgreSqlStore::class, $store);
+    }
+
+    #[RequiresPhpExtension('pdo_mysql')]
+    public function testCreateAdvisoryStoreForMysqlPdoConnection()
+    {
+        $store = StoreFactory::createStore($this->createPdoStub('mysql'), ['advisory' => true]);
+
+        $this->assertInstanceOf(MysqlStore::class, $store);
+    }
+
+    public function testCreateStoreForDbalConnectionWithoutAdvisory()
+    {
+        if (!class_exists(Connection::class)) {
+            $this->markTestSkipped('The "doctrine/dbal" package is required.');
+        }
+
+        $store = StoreFactory::createStore($this->createStub(Connection::class));
+
+        $this->assertInstanceOf(DoctrineDbalStore::class, $store);
+    }
+
+    public function testCreateAdvisoryStoreForDbalConnectionRoutesToPostgreSqlStore()
+    {
+        if (!class_exists(Connection::class) || !class_exists(PostgreSQLPlatform::class)) {
+            $this->markTestSkipped('The "doctrine/dbal" package with the PostgreSQL platform is required.');
+        }
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+
+        $store = StoreFactory::createStore($connection, ['advisory' => true]);
+
+        $this->assertInstanceOf(DoctrineDbalPostgreSqlStore::class, $store);
+    }
+
+    private function createPdoStub(string $driver): \PDO
+    {
+        $pdo = $this->createStub(\PDO::class);
+        $pdo->method('getAttribute')->willReturnMap([
+            [\PDO::ATTR_DRIVER_NAME, $driver],
+            [\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION],
+        ]);
+
+        return $pdo;
     }
 
     #[RequiresPhpExtension('sysvsem')]

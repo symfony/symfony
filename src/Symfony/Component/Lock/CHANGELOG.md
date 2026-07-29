@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add an `$options` argument to `StoreFactory::createStore()` with an `advisory` flag to use advisory locks when reusing an existing `\PDO` or Doctrine DBAL `Connection`
  * Add `MysqlStore` based on MySQL `GET_LOCK()` functionality, usable with the `mysql+advisory:` DSN
 
 8.1

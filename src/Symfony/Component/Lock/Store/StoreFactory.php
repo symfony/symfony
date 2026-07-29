@@ -26,8 +26,15 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class StoreFactory
 {
-    public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
+    /**
+     * @param array{advisory?: bool} $options Set "advisory" to true to use advisory locks (PostgreSQL or MySQL) when
+     *                                        reusing an existing \PDO or Doctrine DBAL Connection instead of the
+     *                                        default, table-based store
+     */
+    public static function createStore(#[\SensitiveParameter] object|string $connection, array $options = []): PersistingStoreInterface
     {
+        $advisory = $options['advisory'] ?? false;
+
         switch (true) {
             case $connection instanceof DynamoDbClient:
                 self::requireBridgeClass(DynamoDbStore::class, 'symfony/amazon-dynamo-db-lock');
@@ -48,10 +55,20 @@ class StoreFactory
                 return new MongoDbStore($connection);
 
             case $connection instanceof \PDO:
-                return new PdoStore($connection);
+                if (!$advisory) {
+                    return new PdoStore($connection);
+                }
+
+                return match ($driver = $connection->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+                    'pgsql' => new PostgreSqlStore($connection),
+                    'mysql' => new MysqlStore($connection),
+                    default => throw new InvalidArgumentException(\sprintf('The "%s" PDO driver does not support advisory locks.', $driver)),
+                };
 
             case $connection instanceof Connection:
-                return new DoctrineDbalStore($connection);
+                // Only PostgreSQL advisory locks are available through Doctrine DBAL; the store
+                // validates the platform and throws a clear exception for any other one.
+                return $advisory ? new DoctrineDbalPostgreSqlStore($connection) : new DoctrineDbalStore($connection);
 
             case $connection instanceof \Zookeeper:
                 return new ZookeeperStore($connection);

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Calling `LocoProvider::read()` without locale now fetch them all
+ * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument: it has no effect and can be removed
 
 7.2
 ---

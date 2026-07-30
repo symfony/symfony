@@ -34,6 +34,7 @@ Loco Translation Provider
 -------------------------
 
  * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument. It has no effect and can be removed.
+ * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
 
 Security
 --------

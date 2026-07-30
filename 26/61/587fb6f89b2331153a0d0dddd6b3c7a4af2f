@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-05-29T08:59:48Z
+
+Updated the PR to instantiate an `XliffFileDumper` by default, that way the old code path can be removed.
+
+`$defaultLocale` is now useless and has been deprecated in a second commit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T12:53:42Z
+
+Thank you @MatTheCat. I rebased on 8.2 (the UPGRADE-8.2.md section conflicted with the new `Security` one) and pushed a commit on top with the following fixes.
+
+**The BC layer did not hold.** In the legacy branch the shifted parameters keep the default value of the *new* signature, so `new XliffFileDumper()` landed in `$restrictToStatus` and in the factory's `$translatorBag`. Every legacy call that omitted a trailing optional argument threw instead of triggering the deprecation:
+
+```
+new LocoProvider($c, $loader, $logger, 'en', $endpoint, $bag)   TypeError: Cannot assign XliffFileDumper to …::$restrictToStatus
+new LocoProvider($c, $loader, $logger, 'en', $endpoint)          TypeError: Cannot assign XliffFileDumper to …::$restrictToStatus
+new LocoProviderFactory($c, $logger, 'en', $loader)              TypeError: Cannot assign XliffFileDumper to …::$translatorBag
+```
+
+The last argument now defaults to `null` and the dumper is instantiated in the constructor body. The legacy tests passed every argument, so they missed all three shapes; `LocoProviderFactoryWithDefaultLocaleTest` now omits the trailing one, and a new test covers the shortest `LocoProvider` legacy call. On the previous state that is 7 errors, all TypeErrors.
+
+**The factory dropped a dumper passed in a legacy call**: `\func_get_args()[6]` had to be `[5]`, since the legacy signature counts six arguments. Covered by a new test that asserts the created provider dumps with the injected dumper.
+
+**Psalm.** The eight errors it reported all came from the `SplObjectStorage` payloads, which it types as `SplObjectStorage<never, null>`. The three methods now carry their per-request data in the `user_data` request option instead, the way `TwitterTransport` already does, so `read()` loses the same pattern and no annotation is needed.
+
+**`formatCatalogue()`** is now called with `['default_locale' => $locale]`, like the Crowdin and Phrase bridges. Without it the dumper falls back to `\Locale::getDefault()`, so the uploaded XLIFF advertised `source-language="en-US-POSIX"` on my machine and whatever `intl.default_locale` says elsewhere. Using the catalogue locale keeps that deterministic without bringing back `$defaultLocale`, but say so if you would rather send something else, since the source locale is a project-wide setting on Loco's side.
+
+Local runs: the bridge suite is green (65 tests) and so is FrameworkBundle's DependencyInjection suite (516 tests).
+
+Points left for you, none of them blocking from my side:
+
+ * `<source>` now carries the prefixed key (`<source>messages__a</source>`), where `createAssets()` used to send the bare key as the asset text. Worth confirming this is what you want to see in Loco for newly created assets.
+ * The import is considered successful only on exactly `200`. If Loco ever answers `201` or `202`, every successful import is logged as an error while `write()` returns normally. I verified that with a `201` mock: four error log records, no exception. `$response->getStatusCode() >= 300` would be safer.
+ * `createMissingLocales()` throws on any status other than `201` and no longer logs, where `createLocale()` logged and only threw on `5xx`. Intentional?
+ * Nothing tests the new FrameworkBundle wiring, and no test covers the real import semantics (`tag-new` scope, whether an import overwrites existing translations), so those rest on the API documentation.
+
+The other red jobs are unrelated: `Cache\Tests\Traits\RedisProxiesTest::testRelayProxy` on the four unit-test jobs, and `RequestDataCollectorTest::testCurlCommandWithCookies` on Windows.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T13:00:39Z
+
+CI came back: Psalm and the low-deps job are green now. My note about which jobs were red no longer applies, since the rebase changed the base: `67a0a2fd2a5` is itself failing "Unit Tests" and "Windows" on `TranslationDefaultDomainNodeVisitorTest::testNewModuleWithoutDefaultDomainTag` and `ProfilerControllerTest::testPanelActionWithLatestToken`, which is what the five red jobs here report. Nothing left in them that concerns this PR.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-30T15:52:35Z
+
+> `<source>` now carries the prefixed key (`<source>messages__a</source>`), where `createAssets()` used to send the bare key as the asset text.
+
+The `read` method will split assets ID to get the domain and the key, so I don’t think the whole ID ends up in the source.
+
+> The import is considered successful only on exactly `200`. If Loco ever answers `201` or `202`, every successful import is logged as an error while write() returns normally.
+
+`202` is not documented and `201` is for async imports and could result in an error. Unless we distrust the documentation the only success code possible in our case is `200`.
+
+> `createMissingLocales()` throws on any status other than 201 and no longer logs, where `createLocale()` logged and only threw on 5xx. Intentional?
+
+I didn’t think it made sense to try pushing translations if locales cannot be created, but I can change it. Regarding the missing logs is it an issue if there is an exception?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T16:25:03Z
+
+Thanks, that settles two of them.
+
+The `200` answer works for me: the documented synchronous import answers `200`, and an unexpected status is still logged rather than swallowed.
+
+Throwing in `createMissingLocales()` is fine too, and no, dropping the log is not a problem when an exception carries the response. One case is worth a thought though: it now aborts on any status other than `201`, including a `4xx` meaning "this locale already exists" or "this code is not valid". That is reachable without a race, since Loco codes are BCP 47 (`fr-FR`) while catalogues carry `fr_FR`, so `array_diff($locales, $this->getLocales())` can report a locale as missing that Loco already has. Before this PR that was logged and the push carried on. Tolerating a `409`, or normalizing the codes before the diff, would keep that working.
+
+On the source text, I was unclear: I am not worried about the pull, `read()` does strip the prefix through `retrieveKeyFromId()` and I checked that. My point is what we upload. The XLIFF sent to `import/xlf` now contains
+
+```xml
+<trans-unit id="…" resname="messages__a">
+  <source>messages__a</source>
+  <target>trans_en_a</target>
+```
+
+while `createAssets()` used to send `id = messages__a` together with `text = a`. So for an asset that Loco creates from the import, its source text gains the domain prefix, which is what a translator reads in the Loco UI. Since you have a project at hand: could you push a new key with this branch and tell us what the asset looks like on Loco's side, source text included? If Loco keeps the bare key, or takes the source only from `resname`, there is nothing to fix and I will drop the point.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-30T17:14:17Z
+
+> Loco codes are BCP 47
+
+My bad missed that point; normalized the codes returned by `getLocales()`.
+
+> what the asset looks like on Loco's side, source text included?
+
+Confirmed that the UI looks identical with or without this PR: the asset’s “slug” includes the domain:
+
+<img width="946" height="309" alt="" src="https://github.com/user-attachments/assets/e7002286-6b1a-4de3-b0ba-8de2f947f7f5" />
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T21:39:11Z
+
+Thanks for checking on a real project, that closes the source text question.
+
+I rebased on the current 8.2 tip, which clears the red jobs: they came from `TranslationDefaultDomainNodeVisitorTest` and `ProfilerControllerTest`, both broken on the older tip this branch sat on and fixed upstream since.
+
+I also amended a test into your normalization commit: it answers `[{"code": "fr-FR"}]` from `GET /locales` for a catalogue in `fr_FR`, and asserts the import goes out with `locale=fr_FR` and no `POST /locales` in between. Without the normalization it fails, since the second request is a locale creation instead of the import.
+
+Local runs on the rebased branch: Loco 68 tests, FrameworkBundle DependencyInjection 525 tests, both green.

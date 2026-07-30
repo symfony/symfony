@@ -497,6 +497,7 @@ class Email extends Message
         }
 
         $otherParts = $relatedParts = [];
+        $cidReplacements = [];
         foreach ($this->attachments as $part) {
             foreach ($names as $name) {
                 if ($name !== $part->getName() && (!$part->hasContentId() || $name !== $part->getContentId())) {
@@ -506,9 +507,7 @@ class Email extends Message
                     continue 2;
                 }
 
-                if ($name !== $part->getContentId()) {
-                    $html = str_replace('cid:'.$name, 'cid:'.$part->getContentId(), $html);
-                }
+                $cidReplacements['cid:'.$name] = 'cid:'.$part->getContentId();
                 $relatedParts[$name] = $part;
                 $part->setName($part->getName() ?? $part->getContentId())->asInline();
 
@@ -516,6 +515,11 @@ class Email extends Message
             }
 
             $otherParts[] = $part;
+        }
+        if ($cidReplacements) {
+            // all references are replaced at once as strtr() matches the longest name first and
+            // never replaces inside already substituted text, unlike successive str_replace() calls
+            $html = strtr($html, $cidReplacements);
         }
         if (null !== $htmlPart) {
             $htmlPart = new TextPart($html, $this->htmlCharset, 'html');

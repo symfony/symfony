@@ -618,6 +618,30 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testExtensionsAndMimeTypesAreCheckedIndependently()
+    {
+        $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'FileValidatorTest.csv';
+        file_put_contents($path, 'plain text');
+
+        try {
+            $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+            try {
+                $file->getMimeType();
+            } catch (\LogicException $e) {
+                $this->markTestSkipped('Guessing the mime type is not possible');
+            }
+
+            $constraint = new File(extensions: ['csv'], mimeTypes: ['text/csv', 'text/plain']);
+
+            $this->validate($file, $constraint);
+
+            $this->assertNoViolation();
+        } finally {
+            @unlink($path);
+        }
+    }
+
     public function testUploadedFileExtensions()
     {
         $file = new UploadedFile(__DIR__.'/Fixtures/bar', 'bar.txt', 'text/plain', \UPLOAD_ERR_OK, true);

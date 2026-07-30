@@ -19,6 +19,7 @@ use Twig\Node\EmptyNode;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FilterExpression;
+use Twig\Node\MacrosNode;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
 use Twig\Node\Nodes;
@@ -35,7 +36,7 @@ class TwigNodeProvider
             new BodyNode([new ConstantExpression($content, 0)]),
             null,
             $emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0),
-            $emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0),
+            class_exists(MacrosNode::class) ? new MacrosNode() : ($emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0)),
             $emptyNodeExists ? new EmptyNode() : new ArrayExpression([], 0),
             $emptyNodeExists ? new EmptyNode() : null,
             new Source('', '')

@@ -94,4 +94,31 @@ class IsGrantedAttributeMethodsController
     public function adminWithMethodGetAndPost(): void
     {
     }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: DummySubjectClass::class)]
+    public function withClassNameSubject()
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: DummySubjectInterface::class)]
+    public function withInterfaceNameSubject()
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: DummySubjectEnum::class)]
+    public function withEnumNameSubject()
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: \DateTime::class)]
+    public function withGlobalClassNameSubject()
+    {
+    }
+
+    // "DateTime" is both a valid global class name and, here, a controller argument name;
+    // the controller argument must take precedence
+    #[IsGranted(attribute: 'ROLE_ADMIN', subject: 'DateTime')]
+    public function withArgumentTakingPrecedenceOverClassName($DateTime)
+    {
+    }
 }

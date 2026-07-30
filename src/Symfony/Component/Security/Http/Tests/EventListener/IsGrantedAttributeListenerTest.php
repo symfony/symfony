@@ -35,6 +35,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Http\EventListener\IsGrantedAttributeListener;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummySubjectClass;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummySubjectEnum;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummySubjectInterface;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeController;
 use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeMethodsController;
 
@@ -195,6 +198,106 @@ class IsGrantedAttributeListenerTest extends TestCase
             $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsController(), 'withSubjectArray'],
             ['arg1Value', null],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsGrantedSubjectFromClassName()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('ROLE_ADMIN', DummySubjectClass::class)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'withClassNameSubject'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsGrantedSubjectFromInterfaceName()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('ROLE_ADMIN', DummySubjectInterface::class)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'withInterfaceNameSubject'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsGrantedSubjectFromEnumName()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('ROLE_ADMIN', DummySubjectEnum::class)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'withEnumNameSubject'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testIsGrantedSubjectFromGlobalClassName()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('ROLE_ADMIN', \DateTime::class)
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'withGlobalClassNameSubject'],
+            [],
+            new Request(),
+            null
+        );
+
+        $listener = new IsGrantedAttributeListener($authChecker);
+        $listener->onKernelControllerArguments($event);
+    }
+
+    public function testControllerArgumentTakesPrecedenceOverClassName()
+    {
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->expects($this->once())
+            ->method('isGranted')
+            ->with('ROLE_ADMIN', 'theArgumentValue')
+            ->willReturn(true);
+
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsGrantedAttributeMethodsController(), 'withArgumentTakingPrecedenceOverClassName'],
+            ['theArgumentValue'],
             new Request(),
             null
         );

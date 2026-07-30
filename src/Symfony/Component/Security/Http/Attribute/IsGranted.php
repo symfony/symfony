@@ -29,7 +29,8 @@ class IsGranted
 
     /**
      * @param string|Expression|\Closure(IsGrantedContext, mixed $subject):bool                  $attribute     The attribute that will be checked against a given authentication token and optional subject
-     * @param array|string|Expression|\Closure(array<string,mixed>, Request, ?object):mixed|null $subject       An optional subject - e.g. the current object being voted on
+     * @param array|string|Expression|\Closure(array<string,mixed>, Request, ?object):mixed|null $subject       An optional subject - e.g. the current object being voted on; strings are
+     *                                                                                                          resolved as controller argument names first, then as class names
      * @param string|null                                                                        $message       A custom message when access is not granted
      * @param int|null                                                                           $statusCode    If set, will throw HttpKernel's HttpException with the given $statusCode; if null, Security\Core's AccessDeniedException will be used
      * @param int|null                                                                           $exceptionCode If set, will add the exception code to thrown exception

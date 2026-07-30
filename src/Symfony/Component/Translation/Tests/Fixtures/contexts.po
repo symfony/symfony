@@ -1,0 +1,10 @@
+msgctxt "menu"
+msgid "foo1"
+msgstr "bar1"
+
+msgid "foo2"
+msgstr "bar2"
+msgctxt "multi-line "
+"context"
+msgid "foo3"
+msgstr "bar3"

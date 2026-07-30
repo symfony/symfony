@@ -1,0 +1,11 @@
+#, fuzzy
+msgid "foo1"
+msgstr "fuzzy bar1"
+msgid "foo2"
+msgstr "bar2"
+# translator comment
+msgid "foo3"
+msgstr "bar3"
+#, fuzzy
+msgid "foo4"
+msgstr "fuzzy bar4"

@@ -471,7 +471,8 @@ class PropertyAccessor implements PropertyAccessorInterface
     {
         $key = str_replace('\\', '.', $class).'..'.$property;
 
-        if (isset($this->readPropertyCache[$key])) {
+        // don't use isset() here, the cached value can be null
+        if (\array_key_exists($key, $this->readPropertyCache)) {
             return $this->readPropertyCache[$key];
         }
 

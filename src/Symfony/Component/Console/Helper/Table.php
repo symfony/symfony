@@ -49,6 +49,7 @@ class Table
     private TableStyle $style;
     private array $columnStyles = [];
     private array $columnWidths = [];
+    private array $configuredColumnWidths = [];
     private array $columnMaxWidths = [];
     private bool $rendered = false;
     private string $displayOrientation = self::DISPLAY_ORIENTATION_DEFAULT;
@@ -138,6 +139,7 @@ class Table
     public function setColumnWidth(int $columnIndex, int $width): static
     {
         $this->columnWidths[$columnIndex] = $width;
+        $this->configuredColumnWidths[$columnIndex] = $width;
 
         return $this;
     }
@@ -150,6 +152,7 @@ class Table
     public function setColumnWidths(array $widths): static
     {
         $this->columnWidths = [];
+        $this->configuredColumnWidths = [];
         foreach ($widths as $index => $width) {
             $this->setColumnWidth($index, $width);
         }
@@ -704,13 +707,18 @@ class Table
                             $this->columnWidths[$item['column']] = $minWidthColumn;
                             $columnsMinWidthProcessed[$item['column']] = true;
                             $cellWidth -= $minWidthColumn + $lengthColumnBorder;
+                        } elseif ('min' === $item['type'] && ($this->configuredColumnWidths[$item['column']] ?? 0) > 0) {
+                            // this column already covers part of the cell, so share only the rest
+                            $columnsMinWidthProcessed[$item['column']] = true;
+                            $cellWidth -= $this->configuredColumnWidths[$item['column']] + $lengthColumnBorder;
                         }
                     }
                     for ($i = $column; $i < ($column + $colspan); ++$i) {
                         if (isset($columnsMinWidthProcessed[$i])) {
                             continue;
                         }
-                        $this->columnWidths[$i] = $cellWidth + $lengthColumnBorder;
+                        // a width set through setColumnWidth() is a minimum, unlike one computed for an earlier row
+                        $this->columnWidths[$i] = max($this->configuredColumnWidths[$i] ?? 0, $cellWidth + $lengthColumnBorder);
                     }
                 }
                 if (!str_contains($cell ?? '', "\n")) {

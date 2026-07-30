@@ -1425,6 +1425,22 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('cache')
                     ->info('Cache configuration')
                     ->addDefaultsIfNotSet()
+                    // "app" is checked before normalization so that setting it explicitly is told apart from
+                    // its default value, and after merging so that the two options cannot come from two files
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(static function ($v) {
+                            if (isset($v['app'], $v['default_provider'])) {
+                                throw new InvalidConfigurationException('The "framework.cache.app" and "framework.cache.default_provider" options cannot be used together, the adapter is deduced from the DSN.');
+                            }
+
+                            return $v;
+                        })
+                    ->end()
+                    ->validate()
+                        ->ifTrue(static fn ($v) => isset($v['default_provider']) && 'cache.adapter.filesystem' !== $v['app'])
+                        ->thenInvalid('The "framework.cache.app" and "framework.cache.default_provider" options cannot be used together, the adapter is deduced from the DSN.')
+                    ->end()
                     ->children()
                         ->scalarNode('prefix_seed')
                             ->info('Used to namespace cache keys when using several apps with the same shared backend.')
@@ -1432,7 +1448,7 @@ class Configuration implements ConfigurationInterface
                             ->example('my-application-name/%kernel.environment%')
                         ->end()
                         ->scalarNode('app')
-                            ->info('App related cache pools configuration.')
+                            ->info('App related cache pools configuration. Cannot be combined with "default_provider".')
                             ->defaultValue('cache.adapter.filesystem')
                         ->end()
                         ->scalarNode('system')
@@ -1441,7 +1457,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                         ->scalarNode('directory')->defaultValue('%kernel.share_dir%/pools/app')->end()
                         ->scalarNode('default_provider')
-                            ->info('DSN of the backend to use for "cache.app"; the adapter is deduced from it.')
+                            ->info('DSN of the backend to use for "cache.app"; the adapter is deduced from it. Replaces "app", which cannot be set alongside it.')
                             ->example('%env(APP_CACHE_DSN)%')
                         ->end()
                         ->scalarNode('default_psr6_provider')->end()

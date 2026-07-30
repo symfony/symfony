@@ -31,6 +31,10 @@
                 <referencedClass name="BcMath\Number"/>
                 <!-- These classes have been added in PHP 8.5 -->
                 <referencedClass name="CurlSharePersistentHandle"/>
+                <!-- These classes come from optional extensions -->
+                <referencedClass name="Couchbase\Collection"/>
+                <referencedClass name="Relay\Cluster"/>
+                <referencedClass name="Relay\Relay"/>
             </errorLevel>
         </UndefinedClass>
         <UnusedClass>

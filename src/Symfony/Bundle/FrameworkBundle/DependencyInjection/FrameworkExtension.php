@@ -34,6 +34,7 @@ use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -2696,13 +2697,20 @@ class FrameworkExtension extends Extension
         }
         foreach (['app', 'system'] as $name) {
             $config['pools']['cache.'.$name] = [
-                'adapters' => [$config[$name]],
+                // an explicit DSN decides which adapter "cache.app" uses, so none is named here
+                'adapters' => 'app' === $name && isset($config['default_provider']) ? [] : [$config[$name]],
+                'provider' => 'app' === $name ? $config['default_provider'] ?? null : null,
                 'public' => true,
                 'tags' => false,
             ];
         }
         $redisTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware']];
         foreach ($config['pools'] as $name => $pool) {
+            if (null === ($pool['provider'] ??= null)) {
+                unset($pool['provider']);
+            }
+            // no adapter named and a provider given: the DSN decides which adapter to build
+            $isDsnPool = !$pool['adapters'] && isset($pool['provider']);
             $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
 
             $isRedisTagAware = \in_array($pool['adapters'], $redisTagAwareAdapters, true);
@@ -2714,7 +2722,16 @@ class FrameworkExtension extends Extension
                 }
             }
 
-            if (1 === \count($pool['adapters'])) {
+            if ($isDsnPool) {
+                $definition = (new Definition(AdapterInterface::class))
+                    ->setFactory([AbstractAdapter::class, 'createAdapter'])
+                    ->setArguments([
+                        new Reference(CachePoolPass::getServiceProvider($container, $pool['provider'])),
+                        '',
+                        0,
+                        new Reference('cache.default_marshaller'),
+                    ]);
+            } elseif (1 === \count($pool['adapters'])) {
                 if (!isset($pool['provider']) && !\is_int($provider)) {
                     $pool['provider'] = $provider;
                 }

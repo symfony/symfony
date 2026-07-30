@@ -70,7 +70,7 @@ final class ArrayShapeGenerator
             $arrayShape .= \sprintf(",%s\n", !$child instanceof ArrayNode ? self::generateInlinePhpDocForNode($child) : '');
         }
 
-        if ($node->shouldIgnoreExtraKeys()) {
+        if ($node->shouldIgnoreExtraKeys() || \in_array(ExprBuilder::TYPE_ANY, $node->getNormalizedTypes(), true)) {
             $arrayShape .= str_repeat('    ', $nestingLevel)."...<string, mixed>\n";
         }
 

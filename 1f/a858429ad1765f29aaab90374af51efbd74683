@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T21:07:10Z
+
+Rebased on 6.4 and amended while reviewing. What changed since the initial submission:
+
+- Dropped the `if ($name !== $part->getContentId())` guard around the queuing. Under `str_replace()` it only skipped a no-op, but under `strtr()` the identity mapping it skipped is exactly what protects a reference made through an explicit Content-ID from being clipped by a shorter part name. With a part named `logo` and another one carrying `setContentId('logo@example.com')`, `cid:logo@example.com` came out as `cid:<content-id-of-logo>@example.com` both before this pull request and with the guard still in place. Added `testGenerateBodyWithInlinedImageReferencedByAContentIdPrefixedByAnotherName` for it.
+- The assertion helper now also checks that no two references resolve to the same part, so a regression that collapses several references onto one part cannot pass unnoticed.
+- Aligned the test addresses with the rest of the file.
+- Shortened the commit subject, the previous one was long enough to be truncated in the pull request title.
+
+Verified on 6.4 with the source restored to its pre-fix state: the three regression tests fail with a dangling reference each, and the non-colliding pair keeps passing, which is what it is there for. Full `Mime` suite green afterwards, and the `Mailgun` bridge suite too, since #65066 fixes the same defect in `MailgunApiTransport::prepareAttachments()`.

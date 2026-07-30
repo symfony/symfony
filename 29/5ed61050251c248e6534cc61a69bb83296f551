@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by philbates35 at 2026-06-24T10:17:08Z
+
+Posted on the linked issue https://github.com/symfony/symfony/issues/64695, but for visibility:
+
+> Reproduction repo: https://github.com/philbates35/symfony-issue-64695/pull/3
+>
+> Specifically, failing CI job that runs phpstan 2.2 on max + bleeding edge: https://github.com/philbates35/symfony-issue-64695/actions/runs/28085340330/job/83149849640?pr=3
+
+We'd need to make sure that whatever fix would make that scenario pass 👍
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-24T14:38:34Z
+
+Thanks @philbates35 — ran your bleeding-edge job (PHPStan 2.2, level max) against the patched branch.
+
+**Before (unpatched):**
+```
+config/packages/doctrine.php:7   orm single-EM shorthand
+config/packages/monolog.php:7    channels list short-form
+ [ERROR] Found 3 errors
+```
+**After (patched):**
+```
+config/packages/doctrine.php:7   framework.cache.pools 'adapter' alias
+ [ERROR] Found 2 errors
+```
+
+The Monolog `channels` and Doctrine `orm` shorthand false positives are gone — the `any`-typed `beforeNormalization()` paths this PR maps to `mixed`. One error remains, of a different kind: `framework.cache.pools` rejects `{adapter: 'cache.app'}` (*"Sealed array shape does not accept array with extra key 'adapter'"*). That node is `arrayNode('adapters', 'adapter')`, so the singular alias is dropped from the sealed shape — not an `any` node, so it's a separate gap I'll track on its own. (The `Function env not found` error is unrelated repro noise, present before and after.)
+
+So this clears the `any`-node cases but not the whole job. I've also retargeted the PR to 7.4, since that's the lowest branch where the generator and these false positives exist.
+
+---------------------------------------------------------------------------
+
+by philbates35 at 2026-06-24T14:45:50Z
+
+Thanks @ousamabenyounes, just out of interest, would I be right in thinking that using `any` here as the fix when using the pre-normalisation format mean that phpstan would never catch errors if you were to use the wrong value? Can't say I know too much about the internals of this stuff but it feels like not having explicit definitions of what the values can be on the pre-normalisation version means makes the idea of using `reference.php` to statically analyse your code not as valuable.
+
+Using doctrine entity managers as an example, what I mean is, if i put the `validate_xml_mapping` etc inside `orm.entity_managers.default.validate_xml_mapping` but set an invalid value phpstan would catch it and error, but if I set it in `orm.validate_xml_mapping` and set that same invalid value, phpstan wouldn't catch it and no error?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-24T14:54:40Z
+
+Update — handled the cache-pool case in this PR too (2nd commit). Re-ran your bleeding-edge job (PHPStan 2.2, level max): the `framework.cache.pools` `adapter` singular-alias false positive is now gone as well.
+
+```
+Before:  Found 3 errors
+After:   Found 1 error
+```
+
+The only remaining one is `Function env not found` — unrelated PHPStan symbol discovery in the repro, not a generated shape. So every config-shape false positive from your reproduction now passes.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-06-24T15:02:30Z
+
+@philbates35 it would probably catch none, because `mixed|list<string, array{...}>` is the same type than `mixed`
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-24T15:56:07Z
+
+Reverted the XML-alias commit (your two points are correct — the singular is XML-only and `mixed` there just erases typing), so this is back to the `any`-typed `beforeNormalization()` change only.
+
+That remaining part is a different case: the Doctrine single-EM `orm` shorthand and the Monolog `channels` list are idiomatic PHP/YAML forms, not XML artifacts — today they're rejected as false positives on valid config. For an opaque `any` closure the generator can't infer their shape, so `mixed` is the only sound type, at the cost of static checking on those nodes. If you'd rather keep the strict shape and accept the false positive, that's your call — happy to follow whichever direction you prefer.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-09T12:50:08Z
+
+Rebased this PR onto current `7.4` and pushed `81bc99221cde`.
+
+It is up to date with the target branch again and waiting for review.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-30T15:05:12Z
+
+Thanks for the direction. Reworked in 4b229babd2a to use the unsealed array-shape form instead of `mixed` in the union.
+
+The generated regular shape now keeps its known keys typed and adds `...<string, mixed>` when the node has an `any` normalization. I removed the prototyped-array test because `list<...>` / `array<string, ...>` cannot be made unsealed this way and that case is separate, as Nicolas noted.
+
+Validation: RED before the fix was the new unsealed-shape test failing on `mixed|array{...}`. GREEN after the fix: local `./run-ci.sh` passes with `OK (41 tests, 43 assertions)`.

@@ -40,6 +40,7 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+ * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
 
 HttpClient
 ----------

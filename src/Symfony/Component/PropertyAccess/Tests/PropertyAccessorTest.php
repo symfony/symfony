@@ -42,6 +42,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
+use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\VarExporter\ProxyHelper;
 
 class PropertyAccessorTest extends TestCase
@@ -717,6 +718,23 @@ class PropertyAccessorTest extends TestCase
         $propertyAccessor->setValue($obj, 'publicGetSetter', 'bar');
         $propertyAccessor->setValue($obj, 'publicGetSetter', 'baz');
         $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'publicGetSetter'));
+    }
+
+    public function testNullReadInfoIsCached()
+    {
+        $obj = new \stdClass();
+        $obj->foo = 'bar';
+
+        $extractor = $this->createMock(PropertyReadInfoExtractorInterface::class);
+        $extractor->expects($this->once())
+            ->method('getReadInfo')
+            ->with(\stdClass::class, 'foo')
+            ->willReturn(null);
+
+        $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH, null, $extractor);
+
+        $this->assertSame('bar', $propertyAccessor->getValue($obj, 'foo'));
+        $this->assertSame('bar', $propertyAccessor->getValue($obj, 'foo'));
     }
 
     public function testAttributeWithSpecialChars()

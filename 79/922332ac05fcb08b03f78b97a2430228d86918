@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T11:02:40Z
+
+Retargeted from 8.2 to 6.4 and rebased. The flaw exists in every maintained branch: `getReadInfo()` became nullable in 5.1 (fc250863a88), while the `isset()` lookup dates back to 2.8 (aa4cc90a877), when the cached value was always an array. `getReadInfo()` is identical in 6.4, 7.4, 8.0, 8.1 and 8.2.
+
+Verified on 6.4:
+
+- with the source change reverted and the test kept, the test fails with `getReadInfo('stdClass', 'foo', Array (...)) was not expected to be called more than once, actually called 2 times`
+- the PropertyAccess (482 tests), PropertyInfo (551), Serializer (1150) and Form (4748) suites pass
+- an 18-case behavior probe gives identical results before and after the change: property created or removed after the `null` entry was cached, cache pool shared between two accessors, `DO_NOT_THROW`, nullsafe paths, and a missing property read twice
+
+Note for the merge up into 8.0: `PropertyAccessorTest.php` conflicts in the import block, because 8.0 does not have `use Symfony\Component\VarExporter\ProxyHelper;` anymore. Keep the new `PropertyInfo\PropertyReadInfoExtractorInterface` import and drop the `ProxyHelper` line.
+
+For reference, `PropertyInfoCacheExtractor::extract()` already uses `array_key_exists()` on its array cache for the same reason.

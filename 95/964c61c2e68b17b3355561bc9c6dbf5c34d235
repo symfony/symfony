@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T16:09:54Z
+
+Thanks, both fixed.
+
+The missing `use` was a real bug, not only a static analysis complaint: `MarshallerInterface` resolved to `Symfony\Component\Cache\Adapter\MarshallerInterface`, so passing a marshaller would have failed the type check. Added a test that goes through that argument.
+
+On the string: it should not have been any string. `PdoAdapter::createConnection()` returns the DSN itself when connecting lazily, which is what `CachePoolPass::getServiceProvider()` asks for, so that is the one case where the "connection" is a string. It is now restricted to the schemes `createConnection()` routes to `PdoAdapter`:
+
+```php
+$connection instanceof \PDO, \is_string($connection) && preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $connection) => new PdoAdapter(...),
+```
+
+Anything else that is a string now falls through to the exception, with a test for it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T13:38:32Z
+
+Right, thanks. Bumped `symfony/cache` to `^8.2` in FrameworkBundle rather than guarding the feature, for the reason you give: a project moving to FrameworkBundle 8.2 can reasonably be asked to move `symfony/cache` with it.
+
+```diff
+-        "symfony/cache": "^7.4|^8.0",
++        "symfony/cache": "^8.2",
+```
+
+Rebased on 8.2 and pushed. FrameworkBundle 1410 tests and Cache 6129 tests green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T13:49:20Z
+
+Psalm was right to complain about the previous push: the branch referenced `\Relay\Relay` and `\Relay\Cluster` directly, and those classes only exist with the extension installed, so Psalm reported `UndefinedClass` on lines that are not in its baseline.
+
+Rather than grow the baseline, the Relay classes are no longer named:
+
+```php
+$connection instanceof \Redis, $connection instanceof \RedisArray, $connection instanceof \RedisCluster,
+$connection instanceof \Predis\ClientInterface,
+\is_object($connection) && str_starts_with($connection::class, 'Relay\\') => new RedisAdapter(...),
+```
+
+`RedisTrait` gets away with `instanceof Relay` because those errors are already baselined; new code should not add more.
+
+`Unit Tests (8.6)` failed on `VarDumper\Tests\Caster\FFICasterTest::testCastNonTrailingCharPointer` under PHP 8.6.0-dev. This branch touches Cache and FrameworkBundle only, so that one is not from here.
+
+Cache 6129 tests and FrameworkBundle 1410 tests green locally.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T13:58:46Z
+
+Psalm surfaced a second one of the same kind once the first cleared: `Couchbase\Collection` also does not exist without the extension. It has stubs for `\Redis`, `\Memcached` and `\PDO`, but not for those two PECL classes.
+
+Both are now matched by class prefix, so this method names no class that might be missing:
+
+```php
+// Relay and Couchbase are matched by class prefix so that this file never names a
+// class from an extension that might not be installed
+$class = \is_object($connection) ? $connection::class : '';
+
+return match (true) {
+    $connection instanceof \Memcached => new MemcachedAdapter(...),
+    $connection instanceof \PDO, \is_string($connection) && preg_match('/^(mysql|oci|pgsql|sqlsrv|sqlite):/', $connection) => new PdoAdapter(...),
+    $connection instanceof \Redis, $connection instanceof \RedisArray, $connection instanceof \RedisCluster,
+    $connection instanceof \Predis\ClientInterface,
+    str_starts_with($class, 'Relay\\') => new RedisAdapter(...),
+    str_starts_with($class, 'Couchbase\\') => new CouchbaseCollectionAdapter(...),
+    default => throw new InvalidArgumentException(\sprintf('Unsupported connection: "%s".', get_debug_type($connection))),
+};
+```
+
+The alternative was two entries in the Psalm baseline, which is how `RedisTrait` gets away with `instanceof Relay` today. I preferred not to grow the baseline for new code, but say so if you would rather see `instanceof` and accept the baseline entries.
+
+The previous run was 12 of 13 with Psalm the only failure, so this should be the last of it. Cache 6129 tests and FrameworkBundle 1410 tests green locally.

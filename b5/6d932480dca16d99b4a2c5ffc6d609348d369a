@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T13:38:28Z
+
+Thank you @MatTheCat. I rebased on 8.2 (the UPGRADE-8.2.md section conflicted with the new `Security` one) and pushed a commit on top, authored by you so this can still be squashed.
+
+**Reading several domains for a missing locale threw.** The new loop cancels the responses of the locale before the stream has yielded them, and the next iteration then reads the status of a cancelled response:
+
+```
+read(['messages', 'validators'], ['de'])   // both 404
+  before: TransportException: Response has been canceled.
+  on 8.2: returns an empty bag, one warning per domain
+```
+
+With a real `CurlHttpClient` (checked against a local server answering 404) nothing breaks, so this only bites `MockHttpClient`, which is what this component's tests and applications' tests use. Cancelled responses are now skipped at the top of the stream loop, and the cancellation walks a plain `array` of the locale's responses, which also removes the two `SplObjectStorage` errors Psalm reports on `LocoProvider.php:136` and `:137`. The 404 branch had no test at all; there is one now, asserting a single warning and an empty bag.
+
+**Keys kept the tag prefix when a mapping was used.** `retrieveKeyFromId()` strips `<domain>__`, but with `['foo' => 'bar']` the assets pushed under the tag are named `foo__…`, so:
+
+| configuration | asset id | key | domain |
+| --- | --- | --- | --- |
+| `['foo' => 'bar']` | `foo__index.hello` | ~~`foo__index.hello`~~ `index.hello` | `bar` |
+| `['foo']` | `foo__index.hello` | `index.hello` | `foo` |
+
+Keys are now retrieved from the filter, which is identical when no mapping is used. `testReadWithDomainMapping` covers it: its fixture now carries the prefix.
+
+**An array mixing domains and filters sent a numeric filter.** `array_is_list()` is false for `['messages', 'foo' => 'bar']`, so the first entry went out as `filter=0`. The normalization is now per entry, and a new test asserts the filters `messages` and `foo` are sent.
+
+**Nothing tested the configuration change**, and it is a no-op for YAML and PHP arrays, which already accept keyed values. It is required for XML though, where `<framework:domain key="foo">bar</framework:domain>` is otherwise rejected with `Expected "scalar", but got "array"`. `ConfigurationTest` now processes the shape an XML file is converted into.
+
+Local runs: the bridge suite is green (60 tests), so are `Translation/Tests/Provider` (32) and FrameworkBundle's DependencyInjection (517).
+
+Two things left for you:
+
+ * `write()` tags assets with the local domain, so a mapped domain cannot round trip: pushing `bar` tags `bar`, pulling reads the tag `foo`. Worth a word in the description, or in the documentation this feature will need.
+ * `FilteringProvider::read()` intersects, so `--domains=unknown` still yields an empty array, that is to say the deprecated "read everything" path, and the deprecation then advises configuring `'' => '*'`. It predates this PR, but the deprecation makes it more visible.
+
+Note this PR and #64143 both rewrite `read()`. Rebasing this one on top of it conflicts in `read()` (one line), in the UPGRADE and CHANGELOG entries and in `LocoProviderTest`, and the cancellation loop then has to read the locale from `$response->getInfo('user_data')`. I checked the combination locally: the resolution is mechanical and the combined suites pass. Merging #64143 first is the cheaper order.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-30T16:05:29Z
+
+> `write()` tags assets with the local domain, so a mapped domain cannot round trip: pushing `bar` tags `bar`, pulling reads the tag `foo`. Worth a word in the description, or in the documentation this feature will need.
+
+This feature really is but a way to avoid a BC break while working on #64155: I don’t think providers should be used that way and as such I wouldn’t document it either.
+
+> `FilteringProvider::read()` intersects, so `--domains=unknown` still yields an empty array, that is to say the deprecated "read everything" path, and the deprecation then advises configuring `'' => '*'`. It predates this PR, but the deprecation makes it more visible.
+
+It only intersects if domains have been configured for the provider but that’s a good point, though not related to this PR. Maybe the `FilteringProvider` should throw or early return in this case, because it doesn’t feel right to return every domain.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T21:50:47Z
+
+Both answers work for me: if the mapping is a transition towards #64155 rather than something to build on, leaving it out of the documentation is fair, and the `FilteringProvider` behaviour is indeed a separate discussion, worth its own issue.
+
+Now that #64143 is merged, I rebased on 8.2. The resolution was mechanical: the domain loop keeps `$responses[]` and the `user_data` payload from 8.2, with `filter` added to it, and the cancellation loop reads the locale from `getInfo('user_data')`. The `composer.json` hunk went away, since the requirement it added is already in.
+
+Local runs on the rebased branch: Loco 80 tests, `Translation/Tests/Provider` 32, FrameworkBundle DependencyInjection 526, all green, and the four behaviours I checked earlier still hold: a mapped domain strips the tag prefix from keys, a plain list is unchanged, `['messages', 'foo' => 'bar']` sends the filters `messages` and `foo`, and a missing locale with several domains logs one warning and returns an empty bag.

@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T22:19:26Z
+
+Rebased on 6.4 and amended while reviewing.
+
+The shared block writes into `$this->columnWidths` itself, and `cleanup()` never resets it, so that array holds both the widths set through `setColumnWidth()` and the ones computed for an earlier spanning row. Keying the new minimum off it made a computed leftover sticky for the rows that follow, which changed the layout of tables that never call `setColumnWidth()` at all:
+
+```php
+(new Table($output))
+    ->setColumnMaxWidth(1, 6)
+    ->setHeaders(['H0', 'H1'])
+    ->setRows([
+        ['value0', 'value1'],
+        [new TableCell('zzzzz', ['colspan' => 2])],
+        [new TableCell('qq', ['colspan' => 2])],
+    ])
+    ->render();
+```
+
+Column H0 came out 10 wide instead of 8. I checked this against the code as it was before `6df3b2d2b6e`, the commit that introduced this block: it gave 8 there too, so that width was not something the pull request was meant to move.
+
+The configured widths are now kept in their own array, so the minimum applies only where the user asked for one. Added `testColumnWidthComputedForASpanningRowIsNotReusedByTheNextOne` for the case above. It passes on 6.4 as well, since it guards a width the branch already produces.
+
+Also dropped the comment in `testColumnMinWidthDoesNotInflateSiblingColumns`. It claimed the minimum on column A never makes column B wider than it is without one, which holds for that table but not in general: with a spanning cell of 20 characters, no minimum gives B a width of 12, while `setColumnWidth(0, 3)` gives it 5.
+
+Verified by rendering 11520 tables (colspan 2 and 3, two styles, every combination of `setColumnWidth` and `setColumnMaxWidth` on two columns, five cell lengths) and diffing the output against 6.4:
+
+- tables configuring neither width: no difference, as before;
+- tables configuring only `setColumnMaxWidth()`: no difference now, 78 tables differed previously;
+- no exception anywhere.
+
+Counting tables whose lines do not all have the same width, which is the visible symptom in the issue: 408 on 6.4, 240 after this change, and none of the remaining ones configure `setColumnWidth()` alone. They all involve `setColumnMaxWidth()`, they are already broken on 6.4, and they belong to the same block, so they are worth a separate look.
+
+Full `Console` suite green, and on 6.4 with the tests kept the two original ones fail with the expected widths.

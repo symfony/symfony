@@ -152,7 +152,7 @@ class MailgunApiTransport extends AbstractApiTransport
 
     private function prepareAttachments(Email $email, ?string $html): array
     {
-        $attachments = $inlines = [];
+        $attachments = $inlines = $replacements = [];
         foreach ($email->getAttachments() as $attachment) {
             $headers = $attachment->getPreparedHeaders();
             if ('inline' === $headers->getHeaderBody('Content-Disposition')) {
@@ -160,7 +160,7 @@ class MailgunApiTransport extends AbstractApiTransport
                 if ($html) {
                     $filename = $headers->getHeaderParameter('Content-Disposition', 'filename');
                     $new = basename($filename);
-                    $html = str_replace('cid:'.$filename, 'cid:'.$new, $html);
+                    $replacements['cid:'.$filename] = 'cid:'.$new;
                     $p = new \ReflectionProperty($attachment, 'filename');
                     $p->setValue($attachment, $new);
                 }
@@ -170,7 +170,8 @@ class MailgunApiTransport extends AbstractApiTransport
             }
         }
 
-        return [$attachments, $inlines, $html];
+        // strtr() replaces the longest match first and never rewrites what it already replaced
+        return [$attachments, $inlines, $replacements ? strtr($html, $replacements) : $html];
     }
 
     private function getEndpoint(): ?string

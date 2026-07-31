@@ -1,0 +1,79 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-07-16T17:13:12Z
+
+Hi @MatTheCat ,
+
+I don't know the Crowding API that much, but is there a risk to reach the API limits (e.g. in case of many supported locales)?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-16T17:16:17Z
+
+@Spomky the only documented limit is about simultaneous requests, which #64563 takes care of: https://support.crowdin.com/developer/api/v2/#section/Introduction/Rate-Limits
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-20T07:51:32Z
+
+Thanks for the detailed feedback @fabpot I added a test and fixed it in df24f38e74d6333f5a3190741968f789e2da07d6
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T22:09:41Z
+
+Thanks @MatTheCat. I rebased on 8.2 and pushed a commit on top, authored by you so this can still be squashed. It answers @fabpot's review, plus two things I found next to it.
+
+**A mapped language was only reachable under its mapped name.** Taking his example, a project whose target language is `uk` with `languageMapping: {uk: {locale: uk-UA}}`:
+
+```
+read(['messages'], ['uk'])      export targetLanguageId=uk    already worked
+read(['messages'], ['uk_UA'])   nothing, "Ignored "uk_UA" locale …"
+write() of a uk_UA catalogue    nothing, same warning
+```
+
+The mapped locale was stored as Crowdin returns it, `uk-UA`, while language IDs went through `str_replace('-', '_', …)`. Normalizing the mapped locale the same way makes `uk` and `uk_UA` both resolve to the `uk` language, on pull and on push, which is what you asked for.
+
+**Reading every locale listed a mapped language twice.** `array_keys($languageIds)` returned `['en', 'uk', 'uk-UA']`, so the same language was exported twice and came back as two catalogues, one of them named in a spelling Symfony never uses. `translation:pull` would have written `messages.uk.xlf` and `messages.uk-UA.xlf`. One locale per language is kept now, the mapped one when there is a mapping.
+
+**The source language could be exported.** The source file was downloaded only when the locale matched `$this->defaultLocale`, so a project whose source language is not the application default locale, for instance source `en` with `en_US` in the application, sent `export targetLanguageId=en`, which Crowdin refuses. The comparison is now on the language ID, and `write()` skips that language for the same reason.
+
+Two test fixtures had to change with it: `testReadForOneLocaleAndOneDomain` and the two read exception tests declared the locale under test as the project *source* language while expecting an export, which cannot happen against the real API. They now declare it as a target language. I also added a request count assertion to `testCompleteWriteProcessAddFileAndUploadTranslations`, which showed that its `en-GB` row never reached the upload it asserts, since `en-GB` was in no project language list.
+
+Three state check: on the previous state the new tests give 1 error and 3 failures, one per behaviour above; with the commit the bridge suite is green (34 tests, 379 assertions).
+
+Left for you: `getLanguageIds()` logs `API key does not allow to access language mapping.` whenever `languageMapping` is missing from the payload. If Crowdin also omits that key for a project that has no mapping configured, every such project gets this warning on each pull and push, and it points at the wrong cause. You can tell from a real project, as you did for Loco.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-31T12:45:44Z
+
+> The mapped locale was stored as Crowdin returns it, `uk-UA`
+
+Locales are mapped by users so I would expect them to use the Symfony format?
+
+> The source language could be exported
+
+The project default locale is considered Crowdin source’s which is not guaranteed. I planned to work on this in another PR since it is a distinct issue with more implications (it should make the provider’s `$defaultLocale` property useless).
+
+> If Crowdin also omits that key for a project that has no mapping configured
+
+That’s not the case: if the API key allows access to the project’s settings the value will be an empty array.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-31T17:32:47Z
+
+> if the API key allows access to the project’s settings the value will be an empty array
+
+Good, the warning is accurate then, nothing to change there.
+
+> Locales are mapped by users so I would expect them to use the Symfony format?
+
+Some will, and for them the normalization changes nothing: `str_replace('-', '_', 'uk_UA')` is `uk_UA`. It only adds the case @fabpot described, where `languageMapping` answers `uk-UA`, which is the spelling Crowdin proposes for the `locale` placeholder. Without it his example stays broken, and a project mapping to the Symfony spelling keeps working exactly as before. The only configuration where this changes an outcome is two languages whose mapped locales differ solely by `-` versus `_`, which would then collide.
+
+> I planned to work on this in another PR since it is a distinct issue
+
+Fair. I split it into its own commit, `[Translation] Recognize the Crowdin source language by its ID`, so you can drop it if you would rather handle it with the `$defaultLocale` work. My reason for keeping it here: this PR is what makes the mismatch reachable on its own. Before it, `export <source language>` only happened if someone explicitly asked for that locale; now reading without locales asks for every language of the project, so a project whose source is `en` while the application default is `en_US` sends that refused request on every pull.
+
+The branch is now four of your commits plus these two, all authored by you, and the bridge suite is green (34 tests, 379 assertions). Reverting the second commit leaves the first one passing on its own (33 tests).

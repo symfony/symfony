@@ -53,6 +53,7 @@ trait RedisTrait
         'dbindex' => 0,
         'failover' => 'none',
         'ssl' => null, // see https://php.net/context.ssl
+        'stream' => null, // see \Redis::connect() $context
     ];
     private \Redis|Relay|RelayCluster|\RedisArray|\RedisCluster|\Predis\ClientInterface $redis;
     private MarshallerInterface $marshaller;
@@ -96,7 +97,9 @@ trait RedisTrait
             str_starts_with($dsn, 'rediss:') => 'rediss',
             str_starts_with($dsn, 'valkey:') => 'valkey',
             str_starts_with($dsn, 'valkeys:') => 'valkeys',
-            default => throw new InvalidArgumentException('Invalid Redis DSN: it does not start with "redis[s]:" nor "valkey[s]:".'),
+            str_starts_with($dsn, 'tcp:') => 'tcp',
+            str_starts_with($dsn, 'tls:') => 'tls',
+            default => throw new InvalidArgumentException('Invalid Redis DSN: it does not start with "redis[s]:", "valkey[s]:", "tcp:" nor "tls:".'),
         };
 
         if (!\extension_loaded('redis') && !\extension_loaded('relay') && !class_exists(\Predis\Client::class)) {
@@ -126,11 +129,19 @@ trait RedisTrait
 
         $query = $hosts = [];
 
-        $tls = 'rediss' === $scheme || 'valkeys' === $scheme;
+        $tls = 'rediss' === $scheme || 'valkeys' === $scheme || 'tls' === $scheme;
         $tcpScheme = $tls ? 'tls' : 'tcp';
 
         if (isset($params['query'])) {
             parse_str($params['query'], $query);
+
+            if (isset($query['database'])) {
+                if (isset($query['dbindex']) && $query['database'] !== $query['dbindex']) {
+                    throw new InvalidArgumentException('Invalid Redis DSN: query "database" and "dbindex" parameters mismatch.');
+                }
+
+                $query['dbindex'] = $query['database'];
+            }
 
             if (isset($query['host'])) {
                 if (!\is_array($hosts = $query['host'])) {
@@ -179,20 +190,22 @@ trait RedisTrait
 
         $params += $query + $options + self::$defaultConnectionOptions;
 
-        $booleanStreamOptions = [
-            'allow_self_signed',
-            'capture_peer_cert',
-            'capture_peer_cert_chain',
-            'disable_compression',
-            'SNI_enabled',
-            'verify_peer',
-            'verify_peer_name',
-        ];
-
-        foreach ($params['ssl'] ?? [] as $streamOption => $value) {
-            if (\in_array($streamOption, $booleanStreamOptions, true) && \is_string($value)) {
-                $params['ssl'][$streamOption] = filter_var($value, \FILTER_VALIDATE_BOOL);
+        if (isset($params['stream'])) {
+            if (!\is_array($params['stream'])) {
+                throw new InvalidArgumentException('Invalid Redis DSN: query parameter "stream" must be an array.');
             }
+
+            if (isset($params['ssl']) && !\is_array($params['ssl'])) {
+                throw new InvalidArgumentException('Invalid Redis DSN: query parameter "ssl" must be an array.');
+            }
+
+            $params['ssl'] = array_replace($params['ssl'] ?? [], self::filterSslOptions($params['stream']));
+        } elseif (isset($params['ssl'])) {
+            if (!\is_array($params['ssl'])) {
+                throw new InvalidArgumentException('Invalid Redis DSN: query parameter "ssl" must be an array.');
+            }
+
+            $params['ssl'] = self::filterSslOptions($params['ssl']);
         }
 
         $aliases = [

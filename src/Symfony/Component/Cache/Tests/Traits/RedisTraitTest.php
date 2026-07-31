@@ -63,6 +63,28 @@ class RedisTraitTest extends TestCase
         self::assertSame('p@ssword', $connection->getAuth());
     }
 
+    public function testRedisExtensionCompatibleDsnAliases()
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection('tls://redis.example.com:6380?database=5&stream[verify_peer]=0&stream[peer_name]=redis.example.com', ['class' => $predisClass]);
+
+        self::assertSame([
+            'scheme' => 'tls',
+            'host' => 'redis.example.com',
+            'port' => 6380,
+            'ssl' => [
+                'verify_peer' => false,
+                'peer_name' => 'redis.example.com',
+            ],
+        ], $predisClass::$captured['parameters']);
+        self::assertSame('5', $predisClass::$captured['options']['parameters']['database']);
+    }
+
     public static function provideCreateConnection(): array
     {
         $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS') ?: ''));

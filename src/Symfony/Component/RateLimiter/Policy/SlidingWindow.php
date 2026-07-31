@@ -28,19 +28,21 @@ final class SlidingWindow implements LimiterStateInterface
     public function __construct(
         private string $id,
         private int $intervalInSeconds,
+        ?float $now = null,
     ) {
         if ($intervalInSeconds < 1) {
             throw new InvalidIntervalException(\sprintf('The interval must be positive integer, "%d" given.', $intervalInSeconds));
         }
-        $this->windowEndAt = microtime(true) + $intervalInSeconds;
+        $this->windowEndAt = ($now ?? microtime(true)) + $intervalInSeconds;
     }
 
-    public static function createFromPreviousWindow(self $window, int $intervalInSeconds): self
+    public static function createFromPreviousWindow(self $window, int $intervalInSeconds, ?float $now = null): self
     {
-        $new = new self($window->id, $intervalInSeconds);
+        $now ??= microtime(true);
+        $new = new self($window->id, $intervalInSeconds, $now);
         $windowEndAt = $window->windowEndAt + $intervalInSeconds;
 
-        if (microtime(true) < $windowEndAt) {
+        if ($now < $windowEndAt) {
             $new->hitCountForLastWindow = $window->hitCount;
             $new->windowEndAt = $windowEndAt;
         }
@@ -56,14 +58,14 @@ final class SlidingWindow implements LimiterStateInterface
     /**
      * Returns the remaining of this timeframe and the next one.
      */
-    public function getExpirationTime(): int
+    public function getExpirationTime(?float $now = null): int
     {
-        return (int) ($this->windowEndAt + $this->intervalInSeconds - microtime(true));
+        return (int) ($this->windowEndAt + $this->intervalInSeconds - ($now ?? microtime(true)));
     }
 
-    public function isExpired(): bool
+    public function isExpired(?float $now = null): bool
     {
-        return microtime(true) > $this->windowEndAt;
+        return ($now ?? microtime(true)) > $this->windowEndAt;
     }
 
     public function add(int $hits = 1): void
@@ -74,24 +76,24 @@ final class SlidingWindow implements LimiterStateInterface
     /**
      * Calculates the sliding window number of request.
      */
-    public function getHitCount(): int
+    public function getHitCount(?float $now = null): int
     {
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $percentOfCurrentTimeFrame = min((microtime(true) - $startOfWindow) / $this->intervalInSeconds, 1);
+        $percentOfCurrentTimeFrame = min((($now ?? microtime(true)) - $startOfWindow) / $this->intervalInSeconds, 1);
 
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
 
-    public function calculateTimeForTokens(int $maxSize, int $tokens): float
+    public function calculateTimeForTokens(int $maxSize, int $tokens, ?float $now = null): float
     {
-        $remaining = $maxSize - $this->getHitCount();
+        $now ??= microtime(true);
+        $remaining = $maxSize - $this->getHitCount($now);
         if ($remaining >= $tokens) {
             return 0;
         }
 
-        $time = microtime(true);
         $startOfWindow = $this->windowEndAt - $this->intervalInSeconds;
-        $timePassed = $time - $startOfWindow;
+        $timePassed = $now - $startOfWindow;
         $windowPassed = min($timePassed / $this->intervalInSeconds, 1);
         $releasable = max(1, $maxSize - floor($this->hitCountForLastWindow * (1 - $windowPassed)));
         $remainingWindow = $this->intervalInSeconds - $timePassed;
@@ -101,7 +103,7 @@ final class SlidingWindow implements LimiterStateInterface
             return $needed * ($remainingWindow / max(1, $releasable));
         }
 
-        return ($this->windowEndAt - $time) + ($needed - $releasable) * ($this->intervalInSeconds / $maxSize);
+        return ($this->windowEndAt - $now) + ($needed - $releasable) * ($this->intervalInSeconds / $maxSize);
     }
 
     public function __serialize(): array

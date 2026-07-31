@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\Policy\CalendarAlignedWindow;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Policy\Window;
@@ -73,6 +74,17 @@ class FixedWindowLimiterTest extends TestCase
             \DateTimeImmutable::createFromFormat('U', $now + 60),
             $rateLimit->getRetryAfter()
         );
+    }
+
+    public function testConsumeUsesConfiguredClock()
+    {
+        $limiter = $this->createLimiter(clock: new MockClock('@1000'));
+
+        $rateLimit = $limiter->consume(10);
+
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1060, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     #[DataProvider('provideConsumeOutsideInterval')]
@@ -520,8 +532,8 @@ class FixedWindowLimiterTest extends TestCase
         yield ['P1Y'];
     }
 
-    private function createLimiter(string $dateIntervalString = 'PT1M'): FixedWindowLimiter
+    private function createLimiter(string $dateIntervalString = 'PT1M', ?MockClock $clock = null): FixedWindowLimiter
     {
-        return new FixedWindowLimiter('test', 10, new \DateInterval($dateIntervalString), $this->storage);
+        return new FixedWindowLimiter('test', 10, new \DateInterval($dateIntervalString), $this->storage, clock: $clock);
     }
 }

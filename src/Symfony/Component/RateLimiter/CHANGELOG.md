@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add an optional `$clock` argument to rate limiter implementations and factories
+
 8.1
 ---
 

@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
@@ -83,6 +84,17 @@ class SlidingWindowLimiterTest extends TestCase
         );
     }
 
+    public function testConsumeUsesConfiguredClock()
+    {
+        $limiter = $this->createLimiter(new MockClock('@1000'));
+
+        $rateLimit = $limiter->consume(10);
+
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1012, $rateLimit->getRetryAfter()->getTimestamp());
+    }
+
     public function testReserve()
     {
         $limiter = $this->createLimiter();
@@ -140,8 +152,8 @@ class SlidingWindowLimiterTest extends TestCase
         }
     }
 
-    private function createLimiter(): SlidingWindowLimiter
+    private function createLimiter(?MockClock $clock = null): SlidingWindowLimiter
     {
-        return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);
+        return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage, clock: $clock);
     }
 }

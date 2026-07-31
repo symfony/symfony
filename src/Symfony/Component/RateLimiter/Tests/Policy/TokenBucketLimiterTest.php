@@ -14,6 +14,7 @@ namespace Symfony\Component\RateLimiter\Tests\Policy;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\Policy\Rate;
 use Symfony\Component\RateLimiter\Policy\TokenBucket;
@@ -113,6 +114,19 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(0, $rateLimit->getRemainingTokens());
         $this->assertTrue($rateLimit->isAccepted());
         $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 10);
+    }
+
+    public function testConsumeUsesConfiguredClock()
+    {
+        $clock = new MockClock('@1000');
+        $rate = Rate::perSecond(1);
+        $limiter = $this->createLimiter(10, $rate, $clock);
+
+        $rateLimit = $limiter->consume(10);
+
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(1001, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     public function testConsumeZeroTokens()
@@ -256,8 +270,8 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEquals(10, $limiter->reserve(1)->getWaitDuration());
     }
 
-    private function createLimiter($initialTokens = 10, ?Rate $rate = null)
+    private function createLimiter($initialTokens = 10, ?Rate $rate = null, ?MockClock $clock = null)
     {
-        return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);
+        return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage, clock: $clock);
     }
 }

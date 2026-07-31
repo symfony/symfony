@@ -26,6 +26,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('config'),
                 abstract_arg('storage'),
                 null,
+                service('clock')->nullOnInvalid(),
             ])
 
         ->set('rate_limiter.attribute_listener', RateLimitAttributeListener::class)

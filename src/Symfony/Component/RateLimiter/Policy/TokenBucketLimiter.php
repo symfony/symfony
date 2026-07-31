@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -31,6 +32,7 @@ final class TokenBucketLimiter implements LimiterInterface
         private Rate $rate,
         StorageInterface $storage,
         ?LockInterface $lock = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
         $this->id = $id;
         $this->storage = $storage;
@@ -59,12 +61,12 @@ final class TokenBucketLimiter implements LimiterInterface
         $this->lock?->acquire(true);
 
         try {
+            $now = $this->now();
             $bucket = $this->storage->fetch($this->id);
             if (!$bucket instanceof TokenBucket) {
-                $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate);
+                $bucket = new TokenBucket($this->id, $this->maxBurst, $this->rate, $now);
             }
 
-            $now = microtime(true);
             $availableTokens = $bucket->getAvailableTokens($now);
 
             if ($availableTokens > $this->maxBurst) {
@@ -116,5 +118,10 @@ final class TokenBucketLimiter implements LimiterInterface
         } catch (MaxWaitDurationExceededException $e) {
             return $e->getRateLimit();
         }
+    }
+
+    private function now(): float
+    {
+        return null === $this->clock ? microtime(true) : (float) $this->clock->now()->format('U.u');
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -42,6 +43,7 @@ final class SlidingWindowLimiter implements LimiterInterface
         \DateInterval $interval,
         StorageInterface $storage,
         ?LockInterface $lock = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
         $this->storage = $storage;
         $this->lock = $lock;
@@ -58,18 +60,18 @@ final class SlidingWindowLimiter implements LimiterInterface
         $this->lock?->acquire(true);
 
         try {
+            $now = $this->now();
             $window = $this->storage->fetch($this->id);
             if (!$window instanceof SlidingWindow) {
-                $window = new SlidingWindow($this->id, $this->interval);
-            } elseif ($window->isExpired()) {
-                $window = SlidingWindow::createFromPreviousWindow($window, $this->interval);
+                $window = new SlidingWindow($this->id, $this->interval, $now);
+            } elseif ($window->isExpired($now)) {
+                $window = SlidingWindow::createFromPreviousWindow($window, $this->interval, $now);
             }
 
-            $now = microtime(true);
-            $hitCount = $window->getHitCount();
+            $hitCount = $window->getHitCount($now);
             $availableTokens = $this->getAvailableTokens($hitCount);
             if (0 === $tokens) {
-                $resetDuration = $window->calculateTimeForTokens($this->limit, $window->getHitCount());
+                $resetDuration = $window->calculateTimeForTokens($this->limit, $window->getHitCount($now), $now);
                 $resetTime = \DateTimeImmutable::createFromFormat('U', $availableTokens ? floor($now) : floor($now + $resetDuration));
 
                 return new Reservation($now, new RateLimit($availableTokens, $resetTime, true, $this->limit));
@@ -79,21 +81,21 @@ final class SlidingWindowLimiter implements LimiterInterface
 
                 $retryAfter = $now;
                 if ($availableTokens === $tokens) {
-                    $retryAfter += $window->calculateTimeForTokens($this->limit, $window->getHitCount());
+                    $retryAfter += $window->calculateTimeForTokens($this->limit, $window->getHitCount($now), $now);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($retryAfter)), true, $this->limit));
+                $reservation = new Reservation($now, new RateLimit($this->getAvailableTokens($window->getHitCount($now)), \DateTimeImmutable::createFromFormat('U', floor($retryAfter)), true, $this->limit));
             } else {
-                $waitDuration = $window->calculateTimeForTokens($this->limit, $tokens);
+                $waitDuration = $window->calculateTimeForTokens($this->limit, $tokens, $now);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($this->getAvailableTokens($window->getHitCount($now)), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
                 }
 
                 $window->add($tokens);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount($now)), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
             }
 
             if (0 !== $tokens) {
@@ -118,5 +120,10 @@ final class SlidingWindowLimiter implements LimiterInterface
     private function getAvailableTokens(int $hitCount): int
     {
         return $this->limit - $hitCount;
+    }
+
+    private function now(): float
+    {
+        return null === $this->clock ? microtime(true) : (float) $this->clock->now()->format('U.u');
     }
 }

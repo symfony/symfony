@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Policy;
 
+use Psr\Clock\ClockInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
 use Symfony\Component\RateLimiter\LimiterInterface;
@@ -46,6 +47,7 @@ final class FixedWindowLimiter implements LimiterInterface
         StorageInterface $storage,
         ?LockInterface $lock = null,
         private readonly ?\DateTimeImmutable $anchorAt = null,
+        private readonly ?ClockInterface $clock = null,
     ) {
         if ($limit < 1) {
             throw new \InvalidArgumentException(\sprintf('Cannot set the limit of "%s" to 0, as that would never accept any hit.', __CLASS__));
@@ -71,7 +73,7 @@ final class FixedWindowLimiter implements LimiterInterface
         $this->lock?->acquire(true);
 
         try {
-            $now = microtime(true);
+            $now = $this->now();
             $window = $this->storage->fetch($this->id);
 
             if (null !== $this->anchorAt) {
@@ -81,7 +83,7 @@ final class FixedWindowLimiter implements LimiterInterface
                     $window = new CalendarAlignedWindow($this->id, $this->limit, $periodStart, $periodEnd);
                 }
             } elseif (!$window instanceof Window) {
-                $window = new Window($this->id, $this->intervalInSeconds, $this->limit);
+                $window = new Window($this->id, $this->intervalInSeconds, $this->limit, $now);
             }
 
             $availableTokens = $window->getAvailableTokens($now);
@@ -158,5 +160,10 @@ final class FixedWindowLimiter implements LimiterInterface
         }
 
         return [$periodStart, $periodEnd];
+    }
+
+    private function now(): float
+    {
+        return null === $this->clock ? microtime(true) : (float) $this->clock->now()->format('U.u');
     }
 }

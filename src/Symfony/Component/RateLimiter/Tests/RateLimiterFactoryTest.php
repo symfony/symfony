@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Policy\NoLimiter;
@@ -142,6 +143,22 @@ class RateLimiterFactoryTest extends TestCase
             'interval' => '5 seconds',
             'anchor_at' => '2024-01-05 00:00:00 UTC',
         ], new InMemoryStorage());
+    }
+
+    public function testCreatePassesClockToLimiter()
+    {
+        $factory = new RateLimiterFactory([
+            'policy' => 'token_bucket',
+            'id' => 'test',
+            'limit' => 5,
+            'rate' => [
+                'interval' => '5 seconds',
+            ],
+        ], new InMemoryStorage(), clock: new MockClock('@1000'));
+
+        $rateLimit = $factory->create('key')->consume(5);
+
+        $this->assertSame(1005, $rateLimit->getRetryAfter()->getTimestamp());
     }
 
     #[Group('time-sensitive')]

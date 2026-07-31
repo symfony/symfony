@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by alexisLefebvre at 2026-07-29T15:57:22Z
+
+Some events exist on Resend https://resend.com/docs/webhooks/event-types but are absent from `ResendPayloadConverter`:
+
+- `email.received`
+- `email.scheduled`
+- `email.suppressed`
+
+These could trigger `Unsupported event: …`. The current workaround is to disable these wehbooks in Resend's UI.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-31T07:07:50Z
+
+Retargeted to 7.4 and rebuilt there while reviewing. What changed:
+
+- **Branch.** The Resend bridge was added in 7.1 and `ResendPayloadConverter` is present on 7.4, 8.0, 8.1 and 8.2, so applications on those branches get a 406 for both events today. Resend announced `email.suppressed` in January 2026, well before the 8.2 cycle, so this is a fix for released code rather than a new feature. 6.4 does not have the bridge, which makes 7.4 the oldest affected branch. `MailerDeliveryEvent::DROPPED` and `setReason()` both exist on 7.4 and the converter is byte-identical there, so nothing needed adapting.
+- **Dropped the CHANGELOG entry**, since a bug fix does not carry one.
+- **Scoped `setReason()` to the two new events.** It was called for every delivery event, so `email.sent`, `email.delivered`, `email.delivery_delayed` and `email.bounced` also went through it. The value was always the empty string they already had, but on a maintained branch it is better not to touch their path at all. Added `testDeliveryEventWithoutFailureCarriesNoReason`, which passes before the fix too, to hold that.
+- Rewrote the commit subject to the `[Component] Summary` form and removed the trailer from the message.
+
+Verified on 7.4 with the converter in its previous state and the tests kept: both new cases fail with `ParseException: Unsupported event "email.failed"` and `... "email.suppressed"`, which is the exact path applications hit. Full bridge suite green afterwards, 23 tests.
+
+Two notes for later, both out of scope here:
+
+- `email.bounced` still reports an empty reason although Resend sends `data.bounce.message`, `type` and `subType`. Same accessor, worth a separate pull request.
+- The converter is tested directly rather than through a webhook fixture, because `ResendRequestParserTest` hardcodes one Svix signature that is only valid for `sent.json`, and the signature depends on the payload. So the 406 path itself is still not covered by the suite. I checked it by hand with a computed signature and the payloads from Resend's documentation.

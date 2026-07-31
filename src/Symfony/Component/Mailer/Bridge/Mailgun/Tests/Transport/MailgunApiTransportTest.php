@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MailgunApiTransportTest extends TestCase
@@ -177,6 +178,37 @@ class MailgunApiTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('foobar2', $message->getMessageId());
+    }
+
+    public function testSendWithInlineAttachmentsSharingANamePrefix()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $content = '';
+            while ($chunk = $options['body']()) {
+                $content .= $chunk;
+            }
+
+            $this->assertStringContainsString("name=\"inline[0]\"; filename=\"b\"\r\n", $content);
+            $this->assertStringContainsString("name=\"inline[1]\"; filename=\"c\"\r\n", $content);
+            $this->assertStringContainsString("\r\n\r\n<img src=\"cid:b\"><img src=\"cid:c\">\r\n", $content);
+
+            return new JsonMockResponse(['id' => 'foobar'], [
+                'http_code' => 200,
+            ]);
+        });
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'symfony', 'us-east-1', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->html('<img src="cid:a/b"><img src="cid:a/b/c">')
+            ->addPart((new DataPart('image', 'a/b', 'image/png'))->asInline())
+            ->addPart((new DataPart('nested-image', 'a/b/c', 'image/png'))->asInline());
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
     }
 
     public function testSendThrowsForErrorResponse()

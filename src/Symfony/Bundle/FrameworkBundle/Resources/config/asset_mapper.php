@@ -186,6 +186,7 @@ return static function (ContainerConfigurator $container) {
                 service('asset_mapper'),
                 service('asset_mapper.compiled_asset_mapper_config_reader'),
                 service('asset_mapper.importmap.config_reader'),
+                abstract_arg('integrity hash algorithms'),
             ])
 
         ->set('asset_mapper.importmap.remote_package_storage', RemotePackageStorage::class)

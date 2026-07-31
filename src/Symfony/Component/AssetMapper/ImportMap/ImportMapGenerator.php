@@ -24,11 +24,17 @@ class ImportMapGenerator
     public const IMPORT_MAP_CACHE_FILENAME = 'importmap.json';
     public const ENTRYPOINT_CACHE_FILENAME_PATTERN = 'entrypoint.%s.json';
 
+    private const INTEGRITY_HASH_ALGORITHMS = ['sha256', 'sha384', 'sha512'];
+
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
         private readonly CompiledAssetMapperConfigReader $compiledConfigReader,
         private readonly ImportMapConfigReader $importMapConfigReader,
+        private readonly array $integrityHashAlgorithms = [],
     ) {
+        if ($unsupportedAlgorithms = array_diff($this->integrityHashAlgorithms, self::INTEGRITY_HASH_ALGORITHMS)) {
+            throw new LogicException(\sprintf('Unsupported integrity hash algorithm "%s". Supported ones are "%s".', implode('", "', $unsupportedAlgorithms), implode('", "', self::INTEGRITY_HASH_ALGORITHMS)));
+        }
     }
 
     /**
@@ -50,7 +56,7 @@ class ImportMapGenerator
     /**
      * @param string[] $entrypointNames
      *
-     * @return array<string, array{path: string, type: string, preload?: bool}>
+     * @return array<string, array{path: string, type: string, preload?: bool, integrity?: string}>
      *
      * @internal
      */
@@ -83,7 +89,7 @@ class ImportMapGenerator
     /**
      * @internal
      *
-     * @return array<string, array{path: string, type: string}>
+     * @return array<string, array{path: string, type: string, integrity?: string}>
      */
     public function getRawImportMapData(): array
     {
@@ -107,6 +113,9 @@ class ImportMapGenerator
 
             $path = $asset->publicPath;
             $data = ['path' => $path, 'type' => $entry->type->value];
+            if (null !== $integrity = $this->getIntegrity($asset)) {
+                $data['integrity'] = $integrity;
+            }
             $rawImportMapData[$entry->importName] = $data;
         }
 
@@ -267,5 +276,20 @@ class ImportMapGenerator
         }
 
         throw new LogicException(\sprintf('The asset "%s" cannot be found in any asset map paths.', $entry->path));
+    }
+
+    /**
+     * Computes the subresource integrity of an asset that lands in the import map.
+     */
+    private function getIntegrity(MappedAsset $asset): ?string
+    {
+        $integrity = null;
+
+        foreach ($this->integrityHashAlgorithms as $algorithm) {
+            $hash = null !== $asset->content ? hash($algorithm, $asset->content, true) : hash_file($algorithm, $asset->sourcePath, true);
+            $integrity .= \sprintf('%s%s-%s', $integrity ? ' ' : '', $algorithm, base64_encode($hash));
+        }
+
+        return $integrity;
     }
 }

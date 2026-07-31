@@ -1476,6 +1476,11 @@ class FrameworkExtension extends Extension
         ;
 
         $container
+            ->getDefinition('asset_mapper.importmap.generator')
+            ->replaceArgument(3, $config['importmap_integrity_algorithms'])
+        ;
+
+        $container
             ->getDefinition('asset_mapper.importmap.config_reader')
             ->replaceArgument(0, $config['importmap_path'])
         ;

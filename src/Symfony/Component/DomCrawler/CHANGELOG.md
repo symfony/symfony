@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Use native HTML selector methods when crawling HTML documents
+
 8.1
 ---
 

@@ -22,6 +22,8 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
  */
 class Crawler implements \Countable, \IteratorAggregate
 {
+    private const CSS_SELECTOR_FALLBACK_PSEUDO_CLASSES = '#:(?:checked|contains|disabled|enabled|link)\b#i';
+
     /**
      * The default namespace prefix to be used with XPath and CSS expressions.
      */
@@ -44,6 +46,21 @@ class Crawler implements \Countable, \IteratorAggregate
     private ?string $baseHref;
 
     private ?\DOMDocument $document = null;
+
+    /**
+     * Keeps native HTML nodes alive for selector lookups while exposing legacy DOM nodes.
+     */
+    private ?\Dom\HTMLDocument $html5Document = null;
+
+    /**
+     * @var \WeakMap<\DOMNode, \Dom\Node>|null
+     */
+    private ?\WeakMap $domToHtml5Nodes = null;
+
+    /**
+     * @var \WeakMap<\Dom\Node, \DOMNode>|null
+     */
+    private ?\WeakMap $html5ToDomNodes = null;
 
     /**
      * @var list<\DOMNode>
@@ -92,6 +109,9 @@ class Crawler implements \Countable, \IteratorAggregate
     {
         $this->nodes = [];
         $this->document = null;
+        $this->html5Document = null;
+        $this->domToHtml5Nodes = null;
+        $this->html5ToDomNodes = null;
         $this->cachedNamespaces = new \ArrayObject();
     }
 
@@ -385,6 +405,10 @@ class Crawler implements \Countable, \IteratorAggregate
             return false;
         }
 
+        if (null !== $matches = $this->matchesNativeHtmlSelector($this->getNode(0), $selector)) {
+            return $matches;
+        }
+
         $converter = $this->createCssSelectorConverter();
         $xpath = $converter->toXPath($selector, 'self::');
 
@@ -405,6 +429,9 @@ class Crawler implements \Countable, \IteratorAggregate
         }
 
         $domNode = $this->getNode(0);
+        if (null !== $closest = $this->closestNativeHtmlSelector($domNode, $selector)) {
+            return $closest;
+        }
 
         while (null !== $domNode && \XML_ELEMENT_NODE === $domNode->nodeType) {
             $node = $this->createSubCrawler($domNode);
@@ -482,6 +509,10 @@ class Crawler implements \Countable, \IteratorAggregate
         }
 
         if (null !== $selector) {
+            if (null !== $crawler = $this->childrenNativeHtmlSelector($selector)) {
+                return $crawler;
+            }
+
             $converter = $this->createCssSelectorConverter();
             $xpath = $converter->toXPath($selector, 'child::');
 
@@ -710,6 +741,10 @@ class Crawler implements \Countable, \IteratorAggregate
      */
     public function filter(string $selector): static
     {
+        if (null !== $crawler = $this->filterNativeHtmlSelector($selector)) {
+            return $crawler;
+        }
+
         $converter = $this->createCssSelectorConverter();
 
         // The CssSelector already prefixes the selector with descendant-or-self::
@@ -1063,6 +1098,9 @@ class Crawler implements \Countable, \IteratorAggregate
         libxml_use_internal_errors($internalErrors);
 
         $dom = new \DOMDocument('1.0', $document->inputEncoding);
+        $this->html5Document = $document;
+        $this->domToHtml5Nodes = new \WeakMap();
+        $this->html5ToDomNodes = new \WeakMap();
         $this->copyFromHtml5ToDom($document->documentElement, $dom);
 
         return $dom;
@@ -1145,10 +1183,132 @@ class Crawler implements \Countable, \IteratorAggregate
         $crawler = new static($nodes, $this->uri, $this->baseHref);
         $crawler->isHtml = $this->isHtml;
         $crawler->document = $this->document;
+        $crawler->html5Document = $this->html5Document;
+        $crawler->domToHtml5Nodes = $this->domToHtml5Nodes;
+        $crawler->html5ToDomNodes = $this->html5ToDomNodes;
         $crawler->namespaces = $this->namespaces;
         $crawler->cachedNamespaces = $this->cachedNamespaces;
 
         return $crawler;
+    }
+
+    private function filterNativeHtmlSelector(string $selector): ?static
+    {
+        if (!$this->isHtml || null === $this->domToHtml5Nodes || null === $this->html5ToDomNodes || $this->requiresCssSelectorFallback($selector)) {
+            return null;
+        }
+
+        $nodes = [];
+        foreach ($this->nodes as $node) {
+            $html5Node = $this->domToHtml5Nodes[$node] ?? null;
+            if (!$html5Node instanceof \Dom\Element && !$html5Node instanceof \Dom\Document) {
+                return null;
+            }
+
+            try {
+                if ($html5Node instanceof \Dom\Element && $html5Node->matches($selector)) {
+                    $this->addNativeHtmlNode($html5Node, $nodes);
+                }
+
+                foreach ($html5Node->querySelectorAll($selector) as $matchedNode) {
+                    $this->addNativeHtmlNode($matchedNode, $nodes);
+                }
+            } catch (\DOMException) {
+                return null;
+            }
+        }
+
+        return $this->createSubCrawler($nodes);
+    }
+
+    private function matchesNativeHtmlSelector(\DOMNode $node, string $selector): ?bool
+    {
+        if (!$this->isHtml || null === $this->domToHtml5Nodes || $this->requiresCssSelectorFallback($selector)) {
+            return null;
+        }
+
+        $html5Node = $this->domToHtml5Nodes[$node] ?? null;
+        if (!$html5Node instanceof \Dom\Element) {
+            return null;
+        }
+
+        try {
+            return $html5Node->matches($selector);
+        } catch (\DOMException) {
+            return null;
+        }
+    }
+
+    private function closestNativeHtmlSelector(\DOMNode $node, string $selector): ?static
+    {
+        if (!$this->isHtml || null === $this->domToHtml5Nodes || null === $this->html5ToDomNodes || !$node->isConnected || $this->requiresCssSelectorFallback($selector)) {
+            return null;
+        }
+
+        $html5Node = $this->domToHtml5Nodes[$node] ?? null;
+        if (!$html5Node instanceof \Dom\Element) {
+            return null;
+        }
+
+        try {
+            $closestNode = $html5Node->closest($selector);
+        } catch (\DOMException) {
+            return null;
+        }
+
+        if (null === $closestNode) {
+            return null;
+        }
+
+        $domNode = $this->html5ToDomNodes[$closestNode] ?? null;
+
+        return $domNode instanceof \DOMNode ? $this->createSubCrawler($domNode) : null;
+    }
+
+    private function childrenNativeHtmlSelector(string $selector): ?static
+    {
+        if (!$this->isHtml || null === $this->domToHtml5Nodes || $this->requiresCssSelectorFallback($selector)) {
+            return null;
+        }
+
+        $nodes = [];
+        $node = $this->getNode(0)->firstChild;
+        while ($node) {
+            if (\XML_ELEMENT_NODE === $node->nodeType) {
+                $html5Node = $this->domToHtml5Nodes[$node] ?? null;
+                if (!$html5Node instanceof \Dom\Element) {
+                    return null;
+                }
+
+                try {
+                    if ($html5Node->matches($selector)) {
+                        $nodes[] = $node;
+                    }
+                } catch (\DOMException) {
+                    return null;
+                }
+            }
+
+            $node = $node->nextSibling;
+        }
+
+        return $this->createSubCrawler($nodes);
+    }
+
+    /**
+     * @param list<\DOMNode> $nodes
+     */
+    private function addNativeHtmlNode(\Dom\Node $html5Node, array &$nodes): void
+    {
+        $domNode = $this->html5ToDomNodes[$html5Node] ?? null;
+        if ($domNode instanceof \DOMNode && !\in_array($domNode, $nodes, true)) {
+            $nodes[] = $domNode;
+        }
+    }
+
+    private function requiresCssSelectorFallback(string $selector): bool
+    {
+        return 1 === preg_match(self::CSS_SELECTOR_FALLBACK_PSEUDO_CLASSES, $selector);
     }
 
     /**
@@ -1173,12 +1333,16 @@ class Crawler implements \Countable, \IteratorAggregate
 
             foreach ($children as $source) {
                 if ($source instanceof \Dom\CharacterData) {
-                    $parent->appendChild(match (true) {
+                    $node = match (true) {
                         $source instanceof \Dom\Text => $target->createTextNode($source->data),
                         $source instanceof \Dom\Comment => $target->createComment($source->data),
                         $source instanceof \Dom\CDATASection => $target->createCDATASection($source->data),
                         $source instanceof \Dom\ProcessingInstruction => $target->createProcessingInstruction($source->target, $source->data),
-                    });
+                    };
+
+                    $parent->appendChild($node);
+                    $this->domToHtml5Nodes[$node] = $source;
+                    $this->html5ToDomNodes[$source] = $node;
                     continue;
                 }
 
@@ -1204,6 +1368,8 @@ class Crawler implements \Countable, \IteratorAggregate
                 }
 
                 $parent->appendChild($element);
+                $this->domToHtml5Nodes[$element] = $source;
+                $this->html5ToDomNodes[$source] = $element;
 
                 $stack[] = [$source->childNodes, $element];
             }

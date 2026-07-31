@@ -22,6 +22,8 @@ use Symfony\Component\DomCrawler\Link;
 
 class CrawlerTest extends TestCase
 {
+    private const NATIVE_HTML_SELECTOR = 'li:nth-child(-n+2 of .enabled)';
+
     public static function getDoctype(): string
     {
         return '<!DOCTYPE html>';
@@ -665,6 +667,43 @@ class CrawlerTest extends TestCase
         $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
     }
 
+    public function testFilterUsesNativeHtmlSelectors()
+    {
+        $crawler = $this->createCrawler($this->getDoctype().<<<'HTML'
+            <html lang="en">
+            <body>
+                <ul id="menu">
+                    <li class="enabled">One</li>
+                    <li>Two</li>
+                    <li class="enabled">Three</li>
+                    <li class="enabled">Four</li>
+                </ul>
+            </body>
+            </html>
+            HTML);
+
+        $items = $crawler->filter('#menu')->filter(self::NATIVE_HTML_SELECTOR);
+
+        $this->assertCount(2, $items);
+        $this->assertSame('One', $items->eq(0)->text());
+        $this->assertSame('Three', $items->eq(1)->text());
+    }
+
+    public function testFilterKeepsCssSelectorFallbackPseudoClasses()
+    {
+        $crawler = $this->createCrawler($this->getDoctype().<<<'HTML'
+            <html lang="en">
+            <body>
+                <form>
+                    <input type="checkbox" name="rememberMe" checked>
+                </form>
+            </body>
+            </html>
+            HTML);
+
+        $this->assertCount(1, $crawler->filter('input[name="rememberMe"]:checked'));
+    }
+
     public function testFilterWithDefaultNamespace()
     {
         $crawler = $this->createTestXmlCrawler()->filter('default|entry default|id');
@@ -1058,6 +1097,26 @@ class CrawlerTest extends TestCase
         $this->assertNull($notFound);
     }
 
+    public function testClosestUsesNativeHtmlSelectors()
+    {
+        $crawler = $this->createCrawler($this->getDoctype().<<<'HTML'
+            <html lang="en">
+            <body>
+                <section>
+                    <article class="published">
+                        <p id="content">Content</p>
+                    </article>
+                </section>
+            </body>
+            </html>
+            HTML);
+
+        $article = $crawler->filter('#content')->closest('article:nth-child(odd of .published)');
+
+        $this->assertInstanceOf(Crawler::class, $article);
+        $this->assertSame('published', $article->attr('class'));
+    }
+
     public function testClosestWithOrphanedNode()
     {
         $html = <<<'HTML'
@@ -1196,6 +1255,27 @@ class CrawlerTest extends TestCase
         $this->assertEquals(1, $foo->children('span')->count());
         $this->assertEquals(1, $foo->children('span.ipsum')->count());
         $this->assertEquals(1, $foo->children('.ipsum')->count());
+    }
+
+    public function testChildrenUsesNativeHtmlSelectors()
+    {
+        $crawler = $this->createCrawler($this->getDoctype().<<<'HTML'
+            <html lang="en">
+            <body>
+                <ul id="menu">
+                    <li class="enabled">One</li>
+                    <li>Two</li>
+                    <li class="enabled">Three</li>
+                </ul>
+            </body>
+            </html>
+            HTML);
+
+        $items = $crawler->filter('#menu')->children(self::NATIVE_HTML_SELECTOR);
+
+        $this->assertCount(2, $items);
+        $this->assertSame('One', $items->eq(0)->text());
+        $this->assertSame('Three', $items->eq(1)->text());
     }
 
     public function testAncestors()

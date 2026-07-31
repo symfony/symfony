@@ -130,6 +130,19 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const FILTER_BOOL = 'filter_bool';
 
     /**
+     * While denormalizing, ignore the attributes whose value cannot be used.
+     *
+     * Such an attribute is handled as if it were absent from the input: a
+     * constructor argument falls back to DEFAULT_CONSTRUCTOR_ARGUMENTS, then to
+     * its default value, then to null when it is nullable; any other attribute
+     * is left untouched. No error is reported for it.
+     *
+     * Where ALLOW_EXTRA_ATTRIBUTES covers the attributes the class does not
+     * know about, this one covers the attributes it cannot use.
+     */
+    public const SKIP_INVALID_ATTRIBUTES = 'skip_invalid_attributes';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -336,6 +349,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $params = [];
             $unsetKeys = [];
             $collectedErrorCountBeforeConstructor = \count($context['not_normalizable_value_exceptions'] ?? []);
+            $skipInvalidAttributes = $context[self::SKIP_INVALID_ATTRIBUTES] ?? $this->defaultContext[self::SKIP_INVALID_ATTRIBUTES] ?? false;
 
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
@@ -344,8 +358,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes, true);
                 $ignored = !$this->isAllowedAttribute($class, $paramName, $format, $context);
+                $provided = $allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data));
+
                 if ($constructorParameter->isVariadic()) {
-                    if ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
+                    if ($provided) {
                         if (!\is_array($data[$key])) {
                             throw new RuntimeException(\sprintf('Cannot create an instance of "%s" from serialized data because the variadic parameter "%s" can only accept an array.', $class, $constructorParameter->name));
                         }
@@ -355,6 +371,10 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                             try {
                                 $variadicParameters[$parameterKey] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $attributeContext, $format);
                             } catch (NotNormalizableValueException $exception) {
+                                if ($skipInvalidAttributes) {
+                                    continue;
+                                }
+
                                 if (!isset($context['not_normalizable_value_exceptions'])) {
                                     throw $exception;
                                 }
@@ -367,7 +387,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         $params = array_merge(array_values($params), $variadicParameters);
                         $unsetKeys[] = $key;
                     }
-                } elseif ($allowed && !$ignored && (isset($data[$key]) || \array_key_exists($key, $data))) {
+
+                    continue;
+                }
+
+                if ($provided) {
                     $parameterData = $data[$key];
                     if (null === $parameterData && $constructorParameter->allowsNull()) {
                         $params[$paramName] = null;
@@ -376,19 +400,28 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         continue;
                     }
 
+                    $unsetKeys[] = $key;
+                    $skipped = false;
+
                     try {
                         $params[$paramName] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $attributeContext, $format);
                     } catch (NotNormalizableValueException $exception) {
-                        if (!isset($context['not_normalizable_value_exceptions'])) {
+                        if ($skipInvalidAttributes) {
+                            $skipped = true;
+                        } elseif (!isset($context['not_normalizable_value_exceptions'])) {
                             throw $exception;
+                        } else {
+                            $context['not_normalizable_value_exceptions'][] = $exception;
+                            $params[$paramName] = $parameterData;
                         }
-
-                        $context['not_normalizable_value_exceptions'][] = $exception;
-                        $params[$paramName] = $parameterData;
                     }
 
-                    $unsetKeys[] = $key;
-                } elseif (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
+                    if (!$skipped) {
+                        continue;
+                    }
+                }
+
+                if (\array_key_exists($key, $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[$paramName] = $context[static::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];
                 } elseif (\array_key_exists($key, $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class] ?? [])) {
                     $params[$paramName] = $this->defaultContext[self::DEFAULT_CONSTRUCTOR_ARGUMENTS][$class][$key];

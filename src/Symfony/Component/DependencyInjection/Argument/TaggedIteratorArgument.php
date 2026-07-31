@@ -43,7 +43,6 @@ class TaggedIteratorArgument extends IteratorArgument
 
         if (\func_num_args() > 5 || !\is_bool($needsIndexes) || !\is_array($exclude) || !\is_bool($excludeSelf)) {
             [, , $defaultIndexMethod, $needsIndexes, $defaultPriorityMethod, $exclude, $excludeSelf] = \func_get_args() + [2 => null, false, null, [], true];
-            trigger_deprecation('symfony/dependency-injection', '8.1', 'The $defaultIndexMethod and $defaultPriorityMethod arguments of tagged locators and iterators are deprecated, use the #[AsTaggedItem] attribute instead. (tag: "%s")', $tag);
         } else {
             $defaultIndexMethod = $defaultPriorityMethod = false;
         }
@@ -70,15 +69,8 @@ class TaggedIteratorArgument extends IteratorArgument
         return $this->indexAttribute;
     }
 
-    /**
-     * @deprecated since Symfony 8.1, use the #[AsTaggedItem] attribute instead of default methods
-     */
-    public function getDefaultIndexMethod(/* bool $triggerDeprecation = true */): ?string
+    public function getDefaultIndexMethod(): ?string
     {
-        if (!\func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/dependency-injection', '8.1', 'The "%s()" method is deprecated, use the #[AsTaggedItem] attribute instead of default methods.', __METHOD__);
-        }
-
         return $this->defaultIndexMethod;
     }
 
@@ -87,15 +79,8 @@ class TaggedIteratorArgument extends IteratorArgument
         return $this->needsIndexes;
     }
 
-    /**
-     * @deprecated since Symfony 8.1, use the #[AsTaggedItem] attribute instead of default methods
-     */
-    public function getDefaultPriorityMethod(/* bool $triggerDeprecation = true */): ?string
+    public function getDefaultPriorityMethod(): ?string
     {
-        if (!\func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/dependency-injection', '8.1', 'The "%s()" method is deprecated, use the #[AsTaggedItem] attribute instead of default methods.', __METHOD__);
-        }
-
         return $this->defaultPriorityMethod;
     }
 

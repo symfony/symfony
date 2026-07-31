@@ -25,7 +25,6 @@ DependencyInjection
 -------------------
 
  * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`
- * Deprecate default index/priority methods when defining tagged locators/iterators; use the `#[AsTaggedItem]` attribute instead
  * Deprecate named autowiring aliases that don't use `#[Target]`
    ```diff
     use Symfony\Component\DependencyInjection\Attribute\Target;

@@ -442,8 +442,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecatedTaggedArguments()
     {
         $container = new ContainerBuilder();
@@ -561,8 +559,6 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('tag_name_no_string.yml');
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testParsesIteratorArgument()
     {
         $container = new ContainerBuilder();
@@ -1029,8 +1025,6 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame([['interface' => 'SomeInterface']], $definition->getTag('proxy'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testServiceWithSameNameAsInterfaceAndFactoryIsNotTagged()
     {
         $container = new ContainerBuilder();

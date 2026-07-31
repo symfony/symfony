@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
@@ -117,8 +115,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testOnlyTheIndexedTagsAreListed()
     {
         $container = new ContainerBuilder();
@@ -145,8 +141,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTheIndexedTagsByDefaultIndexMethod()
     {
         $container = new ContainerBuilder();
@@ -179,8 +173,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
     }
 
     #[DataProvider('provideInvalidDefaultMethods')]
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTheIndexedTagsByDefaultIndexMethodFailure(string $defaultIndexMethod, ?string $indexAttribute, string $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -206,8 +198,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         yield ['getMethodShouldBePublicInsteadPrivate', 'foo', \sprintf('Either method "%s::getMethodShouldBePublicInsteadPrivate()" should be public or tag "my_custom_tag" on service "service1" is missing attribute "foo".', FooTaggedForInvalidDefaultMethodClass::class)];
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedItemAttributes()
     {
         $container = new ContainerBuilder();
@@ -250,8 +240,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testResolveIndexedTags()
     {
         $container = new ContainerBuilder();
@@ -280,8 +268,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test($tag, $container));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testAttributesAreMergedWithTags()
     {
         $container = new ContainerBuilder();
@@ -307,8 +293,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $services);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testAttributesAreFallbacks()
     {
         $container = new ContainerBuilder();
@@ -326,8 +310,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals(['z' => new TypedReference('service_attr_first', MultiTagHelloNamedService::class)], $services);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedIteratorWithDefaultNameMethod()
     {
         $container = new ContainerBuilder();
@@ -340,8 +322,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals([new Reference('service')], $services);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testIndexedIteratorUsesTagAttributeOverDefaultMethod()
     {
         $container = new ContainerBuilder();
@@ -359,8 +339,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertSame('service.a', (string) $services['from_tag']);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testIndexedIteratorUsesDefaultMethodAsFallback()
     {
         $container = new ContainerBuilder();
@@ -377,8 +355,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertInstanceOf(TypedReference::class, $services['from_static_method']);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testIndexedIteratorUsesTagIndexAndDefaultPriorityMethod()
     {
         $container = new ContainerBuilder();
@@ -400,8 +376,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertSame(['tag_index', 'another_index'], array_keys($services));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorWithProvidedIndexAttributeAndNonStaticDefaultIndexMethod()
     {
         $container = new ContainerBuilder();
@@ -415,8 +389,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals(['foo' => new TypedReference('service', NonStaticDefaultIndexClass::class)], $services);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorWithoutIndexAttributeAndNonStaticDefaultIndexMethod()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -448,8 +420,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals(['bar' => new TypedReference('service', AsTaggedItemClassWithBusinessMethod::class)], $services);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testPriorityFallbackWithoutIndexAndStaticPriorityMethod()
     {
         $container = new ContainerBuilder();
@@ -463,8 +433,6 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals([new Reference('service')], $services);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testMultiTagsWithMixedAttributesAndNonStaticDefault()
     {
         $container = new ContainerBuilder();

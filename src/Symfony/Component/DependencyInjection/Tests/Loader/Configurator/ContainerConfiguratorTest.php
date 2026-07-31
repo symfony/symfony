@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader\Configurator;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -86,25 +84,21 @@ class ContainerConfiguratorTest extends TestCase
         $this->assertTrue($argument->excludeSelf());
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedIteratorBcDetectsNullPositionalDefaultPriorityMethod()
     {
         $argument = tagged_iterator('foo', 'idx', 'fetchId', null);
 
         $this->assertInstanceOf(TaggedIteratorArgument::class, $argument);
-        $this->assertSame('fetchId', $argument->getDefaultIndexMethod(false));
+        $this->assertSame('fetchId', $argument->getDefaultIndexMethod());
         $this->assertSame([], $argument->getExclude());
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorBcDetectsNullPositionalDefaultPriorityMethod()
     {
         $argument = tagged_locator('foo', 'idx', 'fetchId', null);
 
         $this->assertInstanceOf(ServiceLocatorArgument::class, $argument);
-        $this->assertSame('fetchId', $argument->getTaggedIteratorArgument()->getDefaultIndexMethod(false));
+        $this->assertSame('fetchId', $argument->getTaggedIteratorArgument()->getDefaultIndexMethod());
         $this->assertSame([], $argument->getTaggedIteratorArgument()->getExclude());
     }
 }

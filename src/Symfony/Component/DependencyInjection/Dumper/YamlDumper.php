@@ -278,11 +278,11 @@ class YamlDumper extends Dumper
 
                     $defaultPrefix = 'getDefault'.str_replace(' ', '', ucwords(preg_replace('/[^a-zA-Z0-9\x7f-\xff]++/', ' ', $tag->getIndexAttribute())));
 
-                    if (!\in_array($tag->getDefaultIndexMethod(false), [null, $defaultPrefix.'Name'], true)) {
-                        $content['default_index_method'] = $tag->getDefaultIndexMethod(false);
+                    if (!\in_array($tag->getDefaultIndexMethod(), [null, $defaultPrefix.'Name'], true)) {
+                        $content['default_index_method'] = $tag->getDefaultIndexMethod();
                     }
-                    if (!\in_array($tag->getDefaultPriorityMethod(false), [null, $defaultPrefix.'Priority'], true)) {
-                        $content['default_priority_method'] = $tag->getDefaultPriorityMethod(false);
+                    if (!\in_array($tag->getDefaultPriorityMethod(), [null, $defaultPrefix.'Priority'], true)) {
+                        $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
                     }
                 }
                 if ($excludes = $tag->getExclude()) {

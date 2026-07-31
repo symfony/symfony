@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -345,8 +343,6 @@ class IntegrationTest extends TestCase
         ];
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceWithIndexAttribute()
     {
         $container = new ContainerBuilder();
@@ -371,8 +367,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceWithIndexAttributeAndDefaultMethod()
     {
         $container = new ContainerBuilder();
@@ -424,8 +418,6 @@ class IntegrationTest extends TestCase
         self::assertSame('foo', $s->locator->get('subscribed1'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -450,8 +442,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedIteratorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -476,8 +466,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tag_class' => $container->get(BarTagClass::class), 'foo_tag_class' => $container->get(FooTagClass::class)], $param);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedIteratorWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -502,8 +490,6 @@ class IntegrationTest extends TestCase
         $this->assertSame([0 => $container->get(FooTagClass::class), 1 => $container->get(BarTagClass::class)], $param);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedIteratorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -528,8 +514,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['foo_tag_class' => $container->get(FooTagClass::class), 'bar_tag_class' => $container->get(BarTagClass::class)], $param);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -556,8 +540,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorConfiguredViaAttributeWithoutIndex()
     {
         $container = new ContainerBuilder();
@@ -584,8 +566,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get(FooTagClass::class));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -612,8 +592,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -643,8 +621,6 @@ class IntegrationTest extends TestCase
         self::assertSame([FooTagClass::class, BarTagClass::class], array_keys($factories->getValue($locator)));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
     {
         $container = new ContainerBuilder();
@@ -676,8 +652,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo_tag_class'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
     {
         $container = new ContainerBuilder();
@@ -725,8 +699,6 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('my_service'));
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceWithDefaultPriorityMethod()
     {
         $container = new ContainerBuilder();
@@ -751,8 +723,6 @@ class IntegrationTest extends TestCase
         $this->assertSame([$container->get(FooTagClass::class), $container->get(BarTagClass::class)], $param);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceLocatorWithIndexAttribute()
     {
         $container = new ContainerBuilder();
@@ -784,8 +754,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceLocatorWithMultipleIndexAttribute()
     {
         $container = new ContainerBuilder();
@@ -820,8 +788,6 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar' => $container->get('bar_tag'), 'bar_duplicate' => $container->get('bar_tag'), 'foo_tag_class' => $container->get('foo_tag')], $same);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod()
     {
         $container = new ContainerBuilder();

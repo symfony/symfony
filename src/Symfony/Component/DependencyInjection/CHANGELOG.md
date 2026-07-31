@@ -13,7 +13,6 @@ CHANGELOG
  * Add support for decorating all services with a specific tag using the `container.tag_decorator` resource tag or `#[AsTagDecorator]`
  * Add support for `SOURCE_DATE_EPOCH` environment variable
  * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`
- * Deprecate default index/priority methods when defining tagged locators/iterators; use the `#[AsTaggedItem]` attribute instead
  * Allow environment variables with `.` in them
  * Add argument `exclude` to `ContainerConfigurator::import()`
  * Add `target` parameter to `#[AsAlias]` to create target-specific autowiring aliases

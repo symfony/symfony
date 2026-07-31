@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
@@ -139,8 +137,6 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_with_tagged_argument.yml', $dumper->dump());
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecatedTaggedArguments()
     {
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');

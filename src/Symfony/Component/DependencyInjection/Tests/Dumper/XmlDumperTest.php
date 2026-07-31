@@ -12,8 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
@@ -232,8 +230,6 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_arguments.xml', $dumper->dump());
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testLegacyTaggedArguments()
     {
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', false, 'getPriority');

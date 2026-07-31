@@ -17,7 +17,7 @@ BrowserKit
 Cache
 -----
 
- * Bump ext-redis to 6.1 and ext-relay to 0.11 minimum
+ * Bump ext-relay to 0.11 minimum
 
 Config
 ------

@@ -31,6 +31,8 @@ jobs:
             mode: high-deps
           - php: '8.2'
             mode: low-deps
+            # the oldest ext-redis we support, as shipped by Debian Bookworm
+            extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis-5.3.7,relay,zstd
           - php: '8.3'
           - php: '8.4'
           - php: '8.5'

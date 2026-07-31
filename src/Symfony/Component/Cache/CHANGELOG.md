@@ -4,7 +4,7 @@ CHANGELOG
 7.4
 ---
 
- * Bump ext-redis to 6.1 and ext-relay to 0.12 minimum
+ * Bump ext-relay to 0.12 minimum
 
 7.3
 ---

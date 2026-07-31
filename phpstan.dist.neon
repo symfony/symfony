@@ -15,6 +15,16 @@ parameters:
         - src/Symfony/*/*/*/*/Tests/*
         - src/Symfony/Component/Intl/Resources/data/*
         - src/Symfony/Component/Emoji/Resources/data/*
+        # Auto-generated proxies: they mirror the signatures of the ext-redis version they target,
+        # so they never match the one the analyzer knows about
+        - src/Symfony/Component/Cache/Traits/Redis*[0-9]Proxy*.php
     ignoreErrors:
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
+        # RedisProxy and RedisClusterProxy are class_alias()'ed to the proxy matching the loaded ext-redis
+        - '#^Call to an undefined static method Symfony\\Component\\Cache\\Traits\\Redis(Cluster)?Proxy::createLazyProxy\(\)\.$#'
+        -
+            message: '#^If condition is always false\.$#'
+            paths:
+                - src/Symfony/Component/Cache/Traits/RedisClusterProxy.php
+                - src/Symfony/Component/Cache/Traits/RedisProxy.php

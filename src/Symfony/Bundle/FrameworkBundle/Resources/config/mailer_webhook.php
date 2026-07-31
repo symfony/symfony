@@ -35,6 +35,8 @@ use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverte
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
 use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sweego\Webhook\SweegoRequestParser;
+use Symfony\Component\Mailer\Bridge\TurboSmtp\RemoteEvent\TurboSmtpPayloadConverter;
+use Symfony\Component\Mailer\Bridge\TurboSmtp\Webhook\TurboSmtpRequestParser;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -97,5 +99,10 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.mailchimp', MailchimpRequestParser::class)
             ->args([service('mailer.payload_converter.mailchimp')])
         ->alias(MailchimpRequestParser::class, 'mailer.webhook.request_parser.mailchimp')
+
+        ->set('mailer.payload_converter.turbosmtp', TurboSmtpPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.turbosmtp', TurboSmtpRequestParser::class)
+            ->args([service('mailer.payload_converter.turbosmtp')])
+        ->alias(TurboSmtpRequestParser::class, 'mailer.webhook.request_parser.turbosmtp')
     ;
 };

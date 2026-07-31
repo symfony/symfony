@@ -1116,6 +1116,73 @@ class UrlGeneratorTest extends TestCase
         $this->assertSame('/app.php/user/john?a=123&b=bar&c=baz&d=789', $url);
     }
 
+    public function testQueryParametersDefinedAsDefaultsAreAddedToTheUrl()
+    {
+        $routes = $this->getRoutes('user', new Route('/user', [
+            '_query' => [
+                'page' => 1,
+                'sort' => 'name',
+            ],
+        ]));
+
+        $this->assertSame('/app.php/user?page=1&sort=name', $this->getGenerator($routes)->generate('user'));
+    }
+
+    public function testQueryParametersCanBeDefinedAsDefaults()
+    {
+        $routes = $this->getRoutes('user', new Route('/user', [
+            '_query' => [
+                'page' => 1,
+                'sort' => 'name',
+            ],
+        ]));
+
+        $url = $this->getGenerator($routes)->generate('user', [
+            '_query' => [
+                'page' => 2,
+            ],
+        ]);
+
+        $this->assertSame('/app.php/user?page=2&sort=name', $url);
+    }
+
+    public function testQueryParametersDefinedAsDefaultsAreOverriddenByParameters()
+    {
+        $routes = $this->getRoutes('user', new Route('/user', [
+            '_query' => [
+                'page' => 1,
+                'sort' => 'name',
+            ],
+        ]));
+
+        $url = $this->getGenerator($routes)->generate('user', ['page' => 2]);
+
+        $this->assertSame('/app.php/user?page=2&sort=name', $url);
+    }
+
+    public function testQueryParametersDefinedAsDefaultsCanBeRemoved()
+    {
+        $routes = $this->getRoutes('user', new Route('/user', [
+            '_query' => [
+                'page' => 1,
+            ],
+        ]));
+
+        $url = $this->getGenerator($routes)->generate('user', ['_query' => ['page' => null]]);
+
+        $this->assertSame('/app.php/user', $url);
+    }
+
+    public function testQueryParametersDefinedAsDefaultsMustBeAnArray()
+    {
+        $routes = $this->getRoutes('user', new Route('/user', ['_query' => 'page=1']));
+
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Default "_query" must be an array of query parameters for route "user".');
+
+        $this->getGenerator($routes)->generate('user');
+    }
+
     public function testRouteHostParameterAndQueryParameterWithSameName()
     {
         $routes = $this->getRoutes('admin_stats', new Route('/admin/stats', requirements: ['domain' => '.+'], host: '{siteCode}.{domain}'));

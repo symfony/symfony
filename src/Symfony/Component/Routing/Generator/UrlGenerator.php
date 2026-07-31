@@ -143,6 +143,12 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      */
     protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = []): string
     {
+        $defaultQuery = $defaults['_query'] ?? [];
+
+        if (!\is_array($defaultQuery)) {
+            throw new InvalidParameterException(\sprintf('Default "_query" must be an array of query parameters for route "%s".', $name));
+        }
+
         $queryParameters = [];
 
         if (isset($parameters['_query'])) {
@@ -277,7 +283,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         // add a query string if needed
         $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, static fn ($a, $b) => $a == $b ? 0 : 1);
-        $extra = array_replace($extra, $queryParameters);
+        $extra = array_replace($defaultQuery, $extra, $queryParameters);
 
         $seen = [];
         array_walk_recursive($extra, $caster = static function (&$v) use (&$caster, &$seen, $name) {

@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -144,7 +145,19 @@ class RouterListener implements EventSubscriberInterface
             }
 
             $request->attributes->add($attributes);
-            unset($parameters['_route'], $parameters['_controller']);
+
+            // the route may declare query parameters it always carries, the request wins over them
+            if (!\is_array($query = $attributes['_query'] ?? [])) {
+                throw new InvalidParameterException(\sprintf('Default "_query" must be an array of query parameters for route "%s".', $parameters['_route'] ?? ''));
+            }
+
+            if ($query = array_filter($query, static fn ($value) => null !== $value)) {
+                // going through the query string gives the same values a real one would have parsed to
+                parse_str(http_build_query($query, '', '&', \PHP_QUERY_RFC3986), $query);
+                $request->query->add(array_diff_key($query, $request->query->all()));
+            }
+
+            unset($parameters['_route'], $parameters['_controller'], $parameters['_query']);
             $request->attributes->set('_route_params', $parameters);
         } catch (ResourceNotFoundException $e) {
             $message = \sprintf('No route found for "%s %s"', $request->getMethod(), $request->getUriForPath($request->getPathInfo()));

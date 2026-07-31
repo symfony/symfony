@@ -1163,6 +1163,89 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
+    public function testColumnWidthIsKeptWhenARowSpansColumns()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['ISBN', 'Author'])
+            ->setRows([
+                ['9971-5-0210-0', 'Dante Alighieri'],
+                [new TableCell('span', ['colspan' => 2])],
+            ])
+            ->setColumnWidth(0, 20);
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
+                +----------------------+-----------------+
+                | ISBN                 | Author          |
+                +----------------------+-----------------+
+                | 9971-5-0210-0        | Dante Alighieri |
+                | span                                   |
+                +----------------------------------------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnMinWidthDoesNotInflateSiblingColumns()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['A', 'B'])
+            ->setRows([
+                ['x', 'y'],
+                [new TableCell('short span', ['colspan' => 2])],
+            ])
+            ->setColumnWidth(0, 20);
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
+                +----------------------+-------+
+                | A                    | B     |
+                +----------------------+-------+
+                | x                    | y     |
+                | short span                   |
+                +------------------------------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
+    public function testColumnWidthComputedForASpanningRowIsNotReusedByTheNextOne()
+    {
+        $table = new Table($output = $this->getOutputStream());
+        $table
+            ->setHeaders(['H0', 'H1'])
+            ->setRows([
+                ['value0', 'value1'],
+                [new TableCell('zzzzz', ['colspan' => 2])],
+                [new TableCell('qq', ['colspan' => 2])],
+            ])
+            ->setColumnMaxWidth(1, 6);
+
+        $table->render();
+
+        $expected =
+            <<<TABLE
+                +--------+--------+
+                | H0     | H1     |
+                +--------+--------+
+                | value0 | value1 |
+                | zzzzz           |
+                | qq              |
+                +-----------------+
+
+                TABLE;
+
+        $this->assertEquals($expected, $this->getOutputContent($output));
+    }
+
     public function testSectionOutput()
     {
         $sections = [];

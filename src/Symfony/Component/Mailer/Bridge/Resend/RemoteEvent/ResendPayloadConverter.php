@@ -21,15 +21,19 @@ final class ResendPayloadConverter implements PayloadConverterInterface
 {
     public function convert(array $payload): AbstractMailerEvent
     {
-        if (\in_array($payload['type'], ['email.sent', 'email.delivered', 'email.delivery_delayed', 'email.bounced'], true)) {
+        if (\in_array($payload['type'], ['email.sent', 'email.delivered', 'email.delivery_delayed', 'email.bounced', 'email.failed', 'email.suppressed'], true)) {
             $name = match ($payload['type']) {
                 'email.sent' => MailerDeliveryEvent::RECEIVED,
                 'email.delivered' => MailerDeliveryEvent::DELIVERED,
                 'email.delivery_delayed' => MailerDeliveryEvent::DEFERRED,
                 'email.bounced' => MailerDeliveryEvent::BOUNCE,
+                'email.failed', 'email.suppressed' => MailerDeliveryEvent::DROPPED,
             };
 
             $event = new MailerDeliveryEvent($name, $payload['data']['email_id'], $payload);
+            if (MailerDeliveryEvent::DROPPED === $name) {
+                $event->setReason($payload['data']['failed']['reason'] ?? $payload['data']['suppressed']['message'] ?? '');
+            }
         } else {
             $name = match ($payload['type']) {
                 'email.clicked' => MailerEngagementEvent::CLICK,

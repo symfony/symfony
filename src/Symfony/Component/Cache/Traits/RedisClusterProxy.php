@@ -11,7 +11,8 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-class_alias(6.0 <= (float) phpversion('redis') ? RedisCluster6Proxy::class : RedisCluster5Proxy::class, RedisClusterProxy::class);
+use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
@@ -1145,5 +1146,6 @@ class RedisClusterProxy extends \RedisCluster implements ResetInterface, LazyObj
 
     public function zunionstore($dst, $keys, $weights = null, $aggregate = null): \RedisCluster|false|int
     {
+        return $this->initializeLazyObject()->zunionstore(...\func_get_args());
     }
 }

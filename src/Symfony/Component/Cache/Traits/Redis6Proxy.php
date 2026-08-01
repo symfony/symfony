@@ -11,17 +11,20 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-class_alias(6.0 <= (float) phpversion('redis') ? Redis6Proxy::class : Redis5Proxy::class, RedisProxy::class);
+use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 // Help opcache.preload discover always-needed symbols
+class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
 
 /**
  * @internal
  */
-class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
+class Redis6Proxy extends \Redis implements ResetInterface, LazyObjectInterface
 {
+    use Redis61ProxyTrait;
     use Redis62ProxyTrait;
     use Redis63ProxyTrait;
     use RedisProxyTrait {
@@ -38,9 +41,9 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->_compress(...\func_get_args());
     }
 
-    public function _pack($value): string
+    public function _uncompress($value): string
     {
-        return $this->initializeLazyObject()->_pack(...\func_get_args());
+        return $this->initializeLazyObject()->_uncompress(...\func_get_args());
     }
 
     public function _prefix($key): string
@@ -53,19 +56,19 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->_serialize(...\func_get_args());
     }
 
-    public function _uncompress($value): string
+    public function _unserialize($value): mixed
     {
-        return $this->initializeLazyObject()->_uncompress(...\func_get_args());
+        return $this->initializeLazyObject()->_unserialize(...\func_get_args());
+    }
+
+    public function _pack($value): string
+    {
+        return $this->initializeLazyObject()->_pack(...\func_get_args());
     }
 
     public function _unpack($value): mixed
     {
         return $this->initializeLazyObject()->_unpack(...\func_get_args());
-    }
-
-    public function _unserialize($value): mixed
-    {
-        return $this->initializeLazyObject()->_unserialize(...\func_get_args());
     }
 
     public function acl($subcmd, ...$args): mixed
@@ -113,16 +116,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->blPop(...\func_get_args());
     }
 
-    public function blmove($src, $dst, $wherefrom, $whereto, $timeout): \Redis|false|string
-    {
-        return $this->initializeLazyObject()->blmove(...\func_get_args());
-    }
-
-    public function blmpop($timeout, $keys, $from, $count = 1): \Redis|array|false|null
-    {
-        return $this->initializeLazyObject()->blmpop(...\func_get_args());
-    }
-
     public function brPop($key_or_keys, $timeout_or_key, ...$extra_args): \Redis|array|false|null
     {
         return $this->initializeLazyObject()->brPop(...\func_get_args());
@@ -148,14 +141,24 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->bzmpop(...\func_get_args());
     }
 
+    public function zmpop($keys, $from, $count = 1): \Redis|array|false|null
+    {
+        return $this->initializeLazyObject()->zmpop(...\func_get_args());
+    }
+
+    public function blmpop($timeout, $keys, $from, $count = 1): \Redis|array|false|null
+    {
+        return $this->initializeLazyObject()->blmpop(...\func_get_args());
+    }
+
+    public function lmpop($keys, $from, $count = 1): \Redis|array|false|null
+    {
+        return $this->initializeLazyObject()->lmpop(...\func_get_args());
+    }
+
     public function clearLastError(): bool
     {
         return $this->initializeLazyObject()->clearLastError(...\func_get_args());
-    }
-
-    public function clearTransferredBytes(): void
-    {
-        $this->initializeLazyObject()->clearTransferredBytes(...\func_get_args());
     }
 
     public function client($opt, ...$args): mixed
@@ -223,11 +226,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->discard(...\func_get_args());
     }
 
-    public function dump($key): \Redis|false|string
-    {
-        return $this->initializeLazyObject()->dump(...\func_get_args());
-    }
-
     public function echo($str): \Redis|false|string
     {
         return $this->initializeLazyObject()->echo(...\func_get_args());
@@ -273,14 +271,19 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->expireAt(...\func_get_args());
     }
 
+    public function failover($to = null, $abort = false, $timeout = 0): \Redis|bool
+    {
+        return $this->initializeLazyObject()->failover(...\func_get_args());
+    }
+
     public function expiretime($key): \Redis|false|int
     {
         return $this->initializeLazyObject()->expiretime(...\func_get_args());
     }
 
-    public function failover($to = null, $abort = false, $timeout = 0): \Redis|bool
+    public function pexpiretime($key): \Redis|false|int
     {
-        return $this->initializeLazyObject()->failover(...\func_get_args());
+        return $this->initializeLazyObject()->pexpiretime(...\func_get_args());
     }
 
     public function fcall($fn, $keys = [], $args = []): mixed
@@ -373,6 +376,11 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->getBit(...\func_get_args());
     }
 
+    public function getEx($key, $options = []): \Redis|bool|string
+    {
+        return $this->initializeLazyObject()->getEx(...\func_get_args());
+    }
+
     public function getDBNum(): int
     {
         return $this->initializeLazyObject()->getDBNum(...\func_get_args());
@@ -381,11 +389,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function getDel($key): \Redis|bool|string
     {
         return $this->initializeLazyObject()->getDel(...\func_get_args());
-    }
-
-    public function getEx($key, $options = []): \Redis|bool|string
-    {
-        return $this->initializeLazyObject()->getEx(...\func_get_args());
     }
 
     public function getHost(): string
@@ -423,9 +426,19 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->getRange(...\func_get_args());
     }
 
+    public function lcs($key1, $key2, $options = null): \Redis|array|false|int|string
+    {
+        return $this->initializeLazyObject()->lcs(...\func_get_args());
+    }
+
     public function getReadTimeout(): float
     {
         return $this->initializeLazyObject()->getReadTimeout(...\func_get_args());
+    }
+
+    public function getset($key, $value): \Redis|false|string
+    {
+        return $this->initializeLazyObject()->getset(...\func_get_args());
     }
 
     public function getTimeout(): false|float
@@ -438,9 +451,9 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->getTransferredBytes(...\func_get_args());
     }
 
-    public function getset($key, $value): \Redis|false|string
+    public function clearTransferredBytes(): void
     {
-        return $this->initializeLazyObject()->getset(...\func_get_args());
+        $this->initializeLazyObject()->clearTransferredBytes(...\func_get_args());
     }
 
     public function hDel($key, $field, ...$other_fields): \Redis|false|int
@@ -491,16 +504,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function hMset($key, $fieldvals): \Redis|bool
     {
         return $this->initializeLazyObject()->hMset(...\func_get_args());
-    }
-
-    public function hRandField($key, $options = null): \Redis|array|false|string
-    {
-        return $this->initializeLazyObject()->hRandField(...\func_get_args());
-    }
-
-    public function hSet($key, ...$fields_and_vals): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->hSet(...\func_get_args());
     }
 
     public function hSetNx($key, $field, $value): \Redis|bool
@@ -568,6 +571,11 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->lMove(...\func_get_args());
     }
 
+    public function blmove($src, $dst, $wherefrom, $whereto, $timeout): \Redis|false|string
+    {
+        return $this->initializeLazyObject()->blmove(...\func_get_args());
+    }
+
     public function lPop($key, $count = 0): \Redis|array|bool|string
     {
         return $this->initializeLazyObject()->lPop(...\func_get_args());
@@ -583,9 +591,19 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->lPush(...\func_get_args());
     }
 
+    public function rPush($key, ...$elements): \Redis|false|int
+    {
+        return $this->initializeLazyObject()->rPush(...\func_get_args());
+    }
+
     public function lPushx($key, $value): \Redis|false|int
     {
         return $this->initializeLazyObject()->lPushx(...\func_get_args());
+    }
+
+    public function rPushx($key, $value): \Redis|false|int
+    {
+        return $this->initializeLazyObject()->rPushx(...\func_get_args());
     }
 
     public function lSet($key, $index, $value): \Redis|bool
@@ -598,19 +616,9 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->lastSave(...\func_get_args());
     }
 
-    public function lcs($key1, $key2, $options = null): \Redis|array|false|int|string
-    {
-        return $this->initializeLazyObject()->lcs(...\func_get_args());
-    }
-
     public function lindex($key, $index): mixed
     {
         return $this->initializeLazyObject()->lindex(...\func_get_args());
-    }
-
-    public function lmpop($keys, $from, $count = 1): \Redis|array|false|null
-    {
-        return $this->initializeLazyObject()->lmpop(...\func_get_args());
     }
 
     public function lrange($key, $start, $end): \Redis|array|false
@@ -626,11 +634,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function ltrim($key, $start, $end): \Redis|bool
     {
         return $this->initializeLazyObject()->ltrim(...\func_get_args());
-    }
-
-    public function mget($keys): \Redis|array|false
-    {
-        return $this->initializeLazyObject()->mget(...\func_get_args());
     }
 
     public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Redis|bool
@@ -686,11 +689,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function pexpireAt($key, $timestamp, $mode = null): \Redis|bool
     {
         return $this->initializeLazyObject()->pexpireAt(...\func_get_args());
-    }
-
-    public function pexpiretime($key): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->pexpiretime(...\func_get_args());
     }
 
     public function pfadd($key, $elements): \Redis|int
@@ -758,16 +756,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->rPop(...\func_get_args());
     }
 
-    public function rPush($key, ...$elements): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->rPush(...\func_get_args());
-    }
-
-    public function rPushx($key, $value): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->rPushx(...\func_get_args());
-    }
-
     public function randomKey(): \Redis|false|string
     {
         return $this->initializeLazyObject()->randomKey(...\func_get_args());
@@ -786,11 +774,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function renameNx($key_src, $key_dst): \Redis|bool
     {
         return $this->initializeLazyObject()->renameNx(...\func_get_args());
-    }
-
-    public function replicaof($host = null, $port = 6379): \Redis|bool
-    {
-        return $this->initializeLazyObject()->replicaof(...\func_get_args());
     }
 
     public function restore($key, $ttl, $value, $options = null): \Redis|bool
@@ -833,6 +816,11 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->sInter(...\func_get_args());
     }
 
+    public function sintercard($keys, $limit = -1): \Redis|false|int
+    {
+        return $this->initializeLazyObject()->sintercard(...\func_get_args());
+    }
+
     public function sInterStore($key, ...$other_keys): \Redis|false|int
     {
         return $this->initializeLazyObject()->sInterStore(...\func_get_args());
@@ -856,11 +844,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function sPop($key, $count = 0): \Redis|array|false|string
     {
         return $this->initializeLazyObject()->sPop(...\func_get_args());
-    }
-
-    public function sRandMember($key, $count = 0): mixed
-    {
-        return $this->initializeLazyObject()->sRandMember(...\func_get_args());
     }
 
     public function sUnion($key, ...$other_keys): \Redis|array|false
@@ -908,14 +891,14 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->setBit(...\func_get_args());
     }
 
-    public function setOption($option, $value): bool
-    {
-        return $this->initializeLazyObject()->setOption(...\func_get_args());
-    }
-
     public function setRange($key, $index, $value): \Redis|false|int
     {
         return $this->initializeLazyObject()->setRange(...\func_get_args());
+    }
+
+    public function setOption($option, $value): bool
+    {
+        return $this->initializeLazyObject()->setOption(...\func_get_args());
     }
 
     public function setex($key, $expire, $value)
@@ -928,11 +911,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->setnx(...\func_get_args());
     }
 
-    public function sintercard($keys, $limit = -1): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->sintercard(...\func_get_args());
-    }
-
     public function sismember($key, $value): \Redis|bool
     {
         return $this->initializeLazyObject()->sismember(...\func_get_args());
@@ -943,6 +921,16 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->slaveof(...\func_get_args());
     }
 
+    public function replicaof($host = null, $port = 6379): \Redis|bool
+    {
+        return $this->initializeLazyObject()->replicaof(...\func_get_args());
+    }
+
+    public function touch($key_or_array, ...$more_keys): \Redis|false|int
+    {
+        return $this->initializeLazyObject()->touch(...\func_get_args());
+    }
+
     public function slowlog($operation, $length = 0): mixed
     {
         return $this->initializeLazyObject()->slowlog(...\func_get_args());
@@ -951,6 +939,11 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function sort($key, $options = null): mixed
     {
         return $this->initializeLazyObject()->sort(...\func_get_args());
+    }
+
+    public function sort_ro($key, $options = null): mixed
+    {
+        return $this->initializeLazyObject()->sort_ro(...\func_get_args());
     }
 
     public function sortAsc($key, $pattern = null, $get = null, $offset = -1, $count = -1, $store = null): array
@@ -971,11 +964,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function sortDescAlpha($key, $pattern = null, $get = null, $offset = -1, $count = -1, $store = null): array
     {
         return $this->initializeLazyObject()->sortDescAlpha(...\func_get_args());
-    }
-
-    public function sort_ro($key, $options = null): mixed
-    {
-        return $this->initializeLazyObject()->sort_ro(...\func_get_args());
     }
 
     public function srem($key, $value, ...$other_values): \Redis|false|int
@@ -1018,11 +1006,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->time(...\func_get_args());
     }
 
-    public function touch($key_or_array, ...$more_keys): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->touch(...\func_get_args());
-    }
-
     public function ttl($key): \Redis|false|int
     {
         return $this->initializeLazyObject()->ttl(...\func_get_args());
@@ -1048,19 +1031,14 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->unwatch(...\func_get_args());
     }
 
-    public function wait($numreplicas, $timeout): false|int
-    {
-        return $this->initializeLazyObject()->wait(...\func_get_args());
-    }
-
-    public function waitaof($numlocal, $numreplicas, $timeout): \Redis|array|false
-    {
-        return $this->initializeLazyObject()->waitaof(...\func_get_args());
-    }
-
     public function watch($key, ...$other_keys): \Redis|bool
     {
         return $this->initializeLazyObject()->watch(...\func_get_args());
+    }
+
+    public function wait($numreplicas, $timeout): false|int
+    {
+        return $this->initializeLazyObject()->wait(...\func_get_args());
     }
 
     public function xack($key, $group, $ids): false|int
@@ -1173,11 +1151,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->zPopMin(...\func_get_args());
     }
 
-    public function zRandMember($key, $options = null): \Redis|array|string
-    {
-        return $this->initializeLazyObject()->zRandMember(...\func_get_args());
-    }
-
     public function zRange($key, $start, $end, $options = null): \Redis|array|false
     {
         return $this->initializeLazyObject()->zRange(...\func_get_args());
@@ -1191,6 +1164,16 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function zRangeByScore($key, $start, $end, $options = []): \Redis|array|false
     {
         return $this->initializeLazyObject()->zRangeByScore(...\func_get_args());
+    }
+
+    public function zrangestore($dstkey, $srckey, $start, $end, $options = null): \Redis|false|int
+    {
+        return $this->initializeLazyObject()->zrangestore(...\func_get_args());
+    }
+
+    public function zRandMember($key, $options = null): \Redis|array|string
+    {
+        return $this->initializeLazyObject()->zRandMember(...\func_get_args());
     }
 
     public function zRank($key, $member): \Redis|false|int
@@ -1268,16 +1251,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->zinterstore(...\func_get_args());
     }
 
-    public function zmpop($keys, $from, $count = 1): \Redis|array|false|null
-    {
-        return $this->initializeLazyObject()->zmpop(...\func_get_args());
-    }
-
-    public function zrangestore($dstkey, $srckey, $start, $end, $options = null): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->zrangestore(...\func_get_args());
-    }
-
     public function zscan($key, &$iterator, $pattern = null, $count = 0): \Redis|array|false
     {
         return $this->initializeLazyObject()->zscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
@@ -1290,5 +1263,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
 
     public function zunionstore($dst, $keys, $weights = null, $aggregate = null): \Redis|false|int
     {
+        return $this->initializeLazyObject()->zunionstore(...\func_get_args());
     }
 }

@@ -7,10 +7,10 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
     try {
         $prefix1 = '';
         yield "{{$prefix1}\"@id\":";
-        yield \json_encode($data->id, \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode($data->id, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         $prefix1 = ',';
         yield "{$prefix1}\"name\":";
-        yield \json_encode($data->name, \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode($data->name, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         yield "}";
     } catch (\JsonException $e) {
         throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes\" to JSON: {$e->getMessage()}.", 0, $e);

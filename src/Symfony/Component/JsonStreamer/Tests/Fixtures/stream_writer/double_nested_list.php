@@ -20,22 +20,22 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
                 foreach ($value2->dummies as $value3) {
                     $prefix6 = '';
                     yield "{$prefix5}{{$prefix6}\"id\":";
-                    yield \json_encode($value3->id, \JSON_THROW_ON_ERROR, 506);
+                    yield \json_encode($value3->id, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 506);
                     $prefix6 = ',';
                     yield "{$prefix6}\"name\":";
-                    yield \json_encode($value3->name, \JSON_THROW_ON_ERROR, 506);
+                    yield \json_encode($value3->name, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 506);
                     yield "}";
                     $prefix5 = ',';
                 }
                 $prefix4 = ',';
                 yield "]{$prefix4}\"customProperty\":";
-                yield \json_encode($value2->customProperty, \JSON_THROW_ON_ERROR, 508);
+                yield \json_encode($value2->customProperty, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 508);
                 yield "}";
                 $prefix3 = ',';
             }
             $prefix2 = ',';
             yield "]{$prefix2}\"stringProperty\":";
-            yield \json_encode($value1->stringProperty, \JSON_THROW_ON_ERROR, 510);
+            yield \json_encode($value1->stringProperty, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 510);
             yield "}";
             $prefix1 = ',';
         }

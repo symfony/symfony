@@ -1,0 +1,3 @@
+[codespell]
+# "smove" is the name of a Redis command
+ignore-words-list = smove

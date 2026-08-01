@@ -64,7 +64,14 @@ jobs:
           sudo apt-get install zopfli ffmpeg
 
       - name: Configure environment
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # Credentials are not persisted by the checkout, so remote operations are given
+          # the job token explicitly. Public repositories would also accept anonymous reads,
+          # private forks do not.
+          GIT_REMOTE="https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY"
+
           git config --global user.email ""
           git config --global user.name "Symfony"
           git config --global init.defaultBranch main
@@ -79,7 +86,6 @@ jobs:
           echo PHPUNIT="$(pwd)/phpunit --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group integration --exclude-group transient" >> $GITHUB_ENV
           echo COMPOSER_UP='composer update --no-progress --ansi'$([[ "${{ matrix.mode }}" != low-deps ]] && echo ' --ignore-platform-req=php+') >> $GITHUB_ENV
 
-          SYMFONY_VERSIONS=$(git ls-remote -q --heads | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
           SYMFONY_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | cut -d "'" -f2 | cut -d '.' -f 1-2)
           SYMFONY_FEATURE_BRANCH=$(curl -s https://raw.githubusercontent.com/symfony/recipes/flex/main/index.json | jq -r '.versions."dev-name"')
 
@@ -91,7 +97,7 @@ jobs:
           #SYMFONY_PHPUNIT_BRIDGE_PR=32886
 
           if [[ $SYMFONY_PHPUNIT_BRIDGE_PR ]]; then
-            git fetch --depth=2 origin refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
+            git fetch --depth=2 "$GIT_REMOTE" refs/pull/$SYMFONY_PHPUNIT_BRIDGE_PR/head
             git rm -rq src/Symfony/Bridge/PhpUnit
             git checkout -q FETCH_HEAD -- src/Symfony/Bridge/PhpUnit
             SYMFONY_PHPUNIT_BRIDGE_REF=$(curl -s https://api.github.com/repos/symfony/symfony/pulls/$SYMFONY_PHPUNIT_BRIDGE_PR | jq -r .base.ref)
@@ -116,12 +122,16 @@ jobs:
           fi
 
           # For the highest branch, in high-deps mode, the version before it is checked out and tested with the locally patched components
-          if [[ "${{ matrix.mode }}" = high-deps && $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
-            echo FLIP='^' >> $GITHUB_ENV
-            SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//)
-            git fetch --depth=2 origin $SYMFONY_VERSION
-            git checkout -m FETCH_HEAD
-            echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+          if [[ "${{ matrix.mode }}" = high-deps ]]; then
+            SYMFONY_VERSIONS=$(git ls-remote -q --heads "$GIT_REMOTE" | cut -f2 | grep -o '/[1-9][0-9]*\.[0-9].*' | sort -V)
+
+            if [[ $SYMFONY_VERSION = $(echo "$SYMFONY_VERSIONS" | tail -n 1 | sed s/.//) ]]; then
+              echo FLIP='^' >> $GITHUB_ENV
+              SYMFONY_VERSION=$(echo "$SYMFONY_VERSIONS" | grep -FB1 /$SYMFONY_VERSION | head -n 1 | sed s/.//)
+              git fetch --depth=2 "$GIT_REMOTE" $SYMFONY_VERSION
+              git checkout -m FETCH_HEAD
+              echo COMPONENTS=$(find src/Symfony -mindepth 2 -type f -name phpunit.xml.dist -printf '%h ') >> $GITHUB_ENV
+            fi
           fi
 
           # Skip the phpunit-bridge on bugfix-branches when not in *-deps mode
@@ -168,7 +178,11 @@ jobs:
           php .github/patch-types.php lint
 
       - name: Run tests
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          GIT_REMOTE="https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY"
+
           _run_tests() {
             local ok=0
             local title="$1$FLIP"
@@ -223,7 +237,7 @@ jobs:
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
               export COMPOSER_ROOT_VERSION=$SYMFONY_VERSION.x-dev
               export SYMFONY_REQUIRE=">=$SYMFONY_VERSION"
-              git fetch --depth=2 origin $SYMFONY_VERSION
+              git fetch --depth=2 "$GIT_REMOTE" $SYMFONY_VERSION
               git checkout -m FETCH_HEAD
               PATCHED_COMPONENTS=$(echo "$PATCHED_COMPONENTS" | xargs dirname | xargs -I{} bash -c "[ -e '{}/phpunit.xml.dist' ] && echo '{}'" | sort || true)
               if [[ $PATCHED_COMPONENTS ]]; then

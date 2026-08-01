@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
         'slack' => Bridge\Slack\SlackTransportFactory::class,
         'telegram' => Bridge\Telegram\TelegramTransportFactory::class,
         'twitter' => Bridge\Twitter\TwitterTransportFactory::class,
+        'whats-app' => Bridge\WhatsApp\WhatsAppTransportFactory::class,
         'zendesk' => Bridge\Zendesk\ZendeskTransportFactory::class,
         'zulip' => Bridge\Zulip\ZulipTransportFactory::class,
     ];

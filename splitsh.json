@@ -155,6 +155,7 @@
         "twitter-notifier": "src/Symfony/Component/Notifier/Bridge/Twitter",
         "unifonic-notifier": "src/Symfony/Component/Notifier/Bridge/Unifonic",
         "vonage-notifier": "src/Symfony/Component/Notifier/Bridge/Vonage",
+        "whats-app-notifier": "src/Symfony/Component/Notifier/Bridge/WhatsApp",
         "yunpian-notifier": "src/Symfony/Component/Notifier/Bridge/Yunpian",
         "zendesk-notifier": "src/Symfony/Component/Notifier/Bridge/Zendesk",
         "zulip-notifier": "src/Symfony/Component/Notifier/Bridge/Zulip",

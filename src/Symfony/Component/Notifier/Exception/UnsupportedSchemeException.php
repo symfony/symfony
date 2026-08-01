@@ -336,6 +336,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Vonage\VonageTransportFactory::class,
             'package' => 'symfony/vonage-notifier',
         ],
+        'whatsapp' => [
+            'class' => Bridge\WhatsApp\WhatsAppTransportFactory::class,
+            'package' => 'symfony/whats-app-notifier',
+        ],
         'yunpian' => [
             'class' => Bridge\Yunpian\YunpianTransportFactory::class,
             'package' => 'symfony/yunpian-notifier',

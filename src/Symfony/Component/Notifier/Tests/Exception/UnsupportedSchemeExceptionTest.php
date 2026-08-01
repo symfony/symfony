@@ -105,6 +105,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Twitter\TwitterTransportFactory::class => false,
             Bridge\Unifonic\UnifonicTransportFactory::class => false,
             Bridge\Vonage\VonageTransportFactory::class => false,
+            Bridge\WhatsApp\WhatsAppTransportFactory::class => false,
             Bridge\Yunpian\YunpianTransportFactory::class => false,
             Bridge\Zendesk\ZendeskTransportFactory::class => false,
             Bridge\Zulip\ZulipTransportFactory::class => false,
@@ -196,6 +197,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['twitter', 'symfony/twitter-notifier'];
         yield ['unifonic', 'symfony/unifonic-notifier'];
         yield ['vonage', 'symfony/vonage-notifier'];
+        yield ['whatsapp', 'symfony/whats-app-notifier'];
         yield ['yunpian', 'symfony/yunpian-notifier'];
         yield ['zendesk', 'symfony/zendesk-notifier'];
         yield ['zulip', 'symfony/zulip-notifier'];

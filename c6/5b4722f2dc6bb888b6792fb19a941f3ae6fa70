@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-31T17:47:43Z
+
+I squashed your commit with three tests on top, keeping you as the author:
+
+ * a locale is requested while none is configured, which the patch also fixes: `array_intersect([], $locales)` used to discard it, so `--locales=fr` was ignored and providers reading every locale when passed none returned the whole project. Worth a line in the description, as it is a second bug this closes;
+ * a partial match, configured `[fr, en]` with `[fr, de]` requested, which must delegate with `fr` alone;
+ * the domains branch returning a catalogue only for the locales that matched, `fr` and not `de`.
+
+I also checked `translation:pull --force` with local files in place: neither early return writes anything, since a catalogue without domains produces no file, and the nominal case still overwrites as documented. So the empty catalogues are harmless there.
+
+One thing left to settle, the branch. Loco and Crowdin only started reading every locale when passed none in 8.2, but `LokaliseProvider::exportFiles()` has always sent `filter_langs` and `filter_filenames` straight from these arrays, with the same code on 7.4 and 6.4, so an empty filter exports the whole project there too. If that is right, this is a 7.4 bug. I opened #65092 with the same patch on 7.4 and asked you there to confirm the Lokalise behaviour from a real project. Whichever way it goes, only the target changes, not the code.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T14:48:40Z
+
+@MatTheCat you were right about the branch, this is 8.2. It changes what end users get out of `translation:pull` rather than fixing a crash, and the dev branch is the conservative place for that. I closed #65092 in favour of this one.
+
+While preparing the merge I hit a regression in the patch as it stood. `read()` returned an empty bag whenever the requested locales were empty and locales were configured, because `array_intersect(['en', 'fr'], [])` is empty. That path is reachable from `TranslationPullCommand::execute()`, which does `$locales = $input->getOption('locales') ?: $this->enabledLocales;` while the option has no default and `framework.enabled_locales` has no default value either, so a bare `translation:pull` arrives with `[]`. `FilteringProvider` exposes `getDomains()` but no `getLocales()`, so the command cannot compensate.
+
+Measured with a `CommandTester`, `enabled_locales` unset, provider configured with `locales: [en, fr]` and `domains: [messages]`, `translation:pull` with no options:
+
+ * on 8.2: `messages.de.xlf`, `messages.en.xlf`, `messages.fr.xlf`, `messages.ja.xlf`, the whole project, which is the bug you are fixing;
+ * with the patch as it stood: no file at all, and the command still printed `[OK] New translations ... has been written locally`, so no signal either;
+ * now: `messages.en.xlf` and `messages.fr.xlf`.
+
+So `read()` falls back to the configured filters when it is passed none:
+
+```php
+if ($this->locales && !$locales = $locales ? array_intersect($this->locales, $locales) : $this->locales) {
+```
+
+Same shape for domains. That half is belt and braces, since both commands already fall back to `getDomains()` before calling `read()`, but it keeps the two branches consistent.
+
+On the tests, `testReadNoConfiguredLocales` asserted that `read(['messages'], [])` returns zero catalogues, which pinned exactly the behaviour above, so that assertion had to go. What is left is the `['en']` configured, `['fr']` requested case, which is a no-match case and not a no-config one, hence the rename to `testReadNoMatchingLocales`; the no-config case is `testReadRequestedLocalesWithoutConfiguredLocales`. Same rename for the domains twin. I also swapped `assertCount(0, $bag->getCatalogue('en')->getDomains())` for an assertion on `getCatalogues()`, since `TranslatorBag::getCatalogue()` creates the catalogue when it is missing and the original assertion therefore passed on a completely empty bag. Two tests cover the fallback.
+
+Verification: restoring `FilteringProvider.php` to the 8.2 tip while keeping the tests fails 6 of the 11, the two new ones included. Full component suite is 834 tests and 2513 assertions, green apart from a local ICU wording failure in `TranslationLintCommandTest` that reproduces on 8.2 untouched.
+
+Rebased on 8.2 and squashed into a single commit, still yours.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T15:25:05Z
+
+Added an `UPGRADE-8.2.md` entry and flipped the "Bug fix?" answer to no.
+
+The two were inconsistent: the pull request was filed against 8.2 rather than the oldest affected branch precisely because the change is observable for end users, and that is what makes it not a plain bug fix. Left as it was, the record showed a bug fix on the dev branch with nothing explaining the choice, and nothing outside the diff telling an upgrading user why fewer files get pulled.
+
+```
+Translation
+-----------
+
+ * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider
+```
+
+The description now also names the symptom people will recognise: with Lokalise an empty filter means "no filter", so a request with no matching locales exported the entire project.
+
+Suite unchanged, 834 tests against 825 on the base, with the same single pre-existing `TranslationLintCommandTest::testLintMalformedIcuTranslations` failure on both sides from a local ICU version.

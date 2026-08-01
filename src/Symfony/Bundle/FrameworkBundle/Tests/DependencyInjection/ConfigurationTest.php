@@ -375,6 +375,54 @@ class ConfigurationTest extends TestCase
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore']]]];
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock'], 'bar' => ['semaphore']]]];
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
+
+        // service id and advisory locks
+
+        $advisory = ['service_id' => 'my_connection', 'advisory' => true];
+        $tableBased = ['service_id' => 'my_connection', 'advisory' => false];
+
+        yield [['service_id' => 'my_connection'], ['enabled' => true, 'resources' => ['default' => [$tableBased]]]];
+        yield [$advisory, ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
+        yield [['advisory' => true, 'service_id' => 'my_connection'], ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
+        yield [[$advisory], ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
+        yield [['flock', $advisory], ['enabled' => true, 'resources' => ['default' => ['flock', $advisory]]]];
+        yield [['foo' => $advisory], ['enabled' => true, 'resources' => ['foo' => [$advisory]]]];
+        yield [['foo' => [$advisory]], ['enabled' => true, 'resources' => ['foo' => [$advisory]]]];
+        yield [['foo' => ['flock', $advisory], 'bar' => 'semaphore'], ['enabled' => true, 'resources' => ['foo' => ['flock', $advisory], 'bar' => ['semaphore']]]];
+        yield [['resources' => $advisory], ['enabled' => true, 'resources' => ['default' => [$advisory]]]];
+        yield [['resources' => ['foo' => $advisory]], ['enabled' => true, 'resources' => ['foo' => [$advisory]]]];
+        yield [['resources' => ['foo' => ['flock', $advisory]]], ['enabled' => true, 'resources' => ['foo' => ['flock', $advisory]]]];
+        yield [['enabled' => false, 'foo' => $advisory], ['enabled' => false, 'resources' => ['foo' => [$advisory]]]];
+    }
+
+    #[DataProvider('provideInvalidLockConfigurationTests')]
+    public function testInvalidLockConfiguration(array $lockConfig, string $expectedMessage)
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $processor->processConfiguration($configuration, [['lock' => $lockConfig]]);
+    }
+
+    public static function provideInvalidLockConfigurationTests(): iterable
+    {
+        yield [
+            ['foo' => ['advisory' => true]],
+            'Invalid configuration for path "framework.lock.resources.foo.0": A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got {"service_id":null,"advisory":true}.',
+        ];
+
+        yield [
+            ['foo' => ['service_id' => 'my_connection', 'advisory' => 'yes']],
+            'Invalid configuration for path "framework.lock.resources.foo.0": A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got {"service_id":"my_connection","advisory":"yes"}.',
+        ];
+
+        yield [
+            ['foo' => ['service_id' => 'my_connection', 'store' => 'postgresql_advisory']],
+            'Invalid configuration for path "framework.lock.resources.foo.0": A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got {"service_id":"my_connection","advisory":false,"store":"postgresql_advisory"}.',
+        ];
     }
 
     public function testLockMergeConfigs()

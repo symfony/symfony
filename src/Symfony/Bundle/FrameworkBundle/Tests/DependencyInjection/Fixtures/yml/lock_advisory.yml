@@ -1,0 +1,15 @@
+services:
+    my_connection:
+        class: Doctrine\DBAL\Connection
+
+framework:
+    lock:
+        foo:
+            service_id: my_connection
+            advisory: true
+        bar:
+            service_id: my_connection
+        baz:
+            - flock
+            - service_id: my_connection
+              advisory: true

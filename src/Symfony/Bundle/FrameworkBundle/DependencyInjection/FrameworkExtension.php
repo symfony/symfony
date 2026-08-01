@@ -2278,13 +2278,17 @@ class FrameworkExtension extends Extension
                 }
                 $usedEnvs = [];
                 $storeDsn = $container->resolveEnvPlaceholders($resourceStore, null, $usedEnvs);
-                if (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore, ['flock', 'semaphore', 'in-memory', 'null'], true)) {
+                $advisory = false;
+                if (\is_array($resourceStore)) {
+                    $advisory = $resourceStore['advisory'];
+                    $resourceStore = new Reference($resourceStore['service_id']);
+                } elseif (!$usedEnvs && !str_contains($resourceStore, ':') && !\in_array($resourceStore, ['flock', 'semaphore', 'in-memory', 'null'], true)) {
                     $resourceStore = new Reference($resourceStore);
                 }
                 $storeDefinition = new Definition(PersistingStoreInterface::class);
                 $storeDefinition
                     ->setFactory([StoreFactory::class, 'createStore'])
-                    ->setArguments([$resourceStore])
+                    ->setArguments($advisory ? [$resourceStore, true] : [$resourceStore])
                     ->addTag('lock.store');
 
                 $container->setDefinition($storeDefinitionId = '.lock.'.$resourceName.'.store.'.$container->hash($storeDsn), $storeDefinition);

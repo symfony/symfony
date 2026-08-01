@@ -1,0 +1,81 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-01T06:01:59Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-01T13:47:46Z
+
+EDIT: could reproduce the issue emulating a 2G connection; a simpler fix is to ensure loading the CSS blocks the toolbar’s rendering. This can be achieved by moving the `link` above the toolbar and adding a single-space `script` after it (see https://jakearchibald.com/2016/link-in-body/#firefixing):
+
+```html
+<link rel="stylesheet"{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %} href="{{ url('_wdt_stylesheet') }}" />
+<script> </script>
+
+<div class="sf-toolbar sf-toolbar-opened" role="toolbar" aria-label="Symfony Web Debug Toolbar" data-frankenphp-hot-reload-preserve>
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T14:41:29Z
+
+I reviewed this and pushed the changes below on top of your commit, rebased on the current 7.4. The approach was already sound, the inline rule is parsed before the container exists and the inline script cannot run before the in-body `<link>` resolves, so the ordering does what it needs to do.
+
+What changed:
+
+1. **The class was only cleared in `showToolbar()`.** Enumerating the terminal outcomes of `loadToolbar()`, that covers a 200 that reaches `initToolbar()`, the retry loop reaching attempt 3, and a non-200/non-404 (which rewrites the whole class attribute via `setAttribute('class', 'sf-toolbar sf-error-toolbar')`). It does not cover `xhr.status === 0`: a reset connection, a dev server restarted mid-request, or an XHR blocked by an application `connect-src` that the bundle does not patch. That case hits `if (xhr.status !== 0 && !options.stop)` and does nothing, so the container stayed `display:none` forever. Before this PR the developer saw a stuck "Loading the web debug toolbar..." block, which is bad; afterwards the toolbar silently did not exist at all, which is worse for a debugging tool. Two success paths were affected too: the early return when `sfToolbarMainContent-<token>` is missing (toolbar already replaced) and the early return when the response carries no `sf-toolbarreset` markup.
+
+2. **`hideToolbar()` did not clear it either**, so correctness rested on the undocumented invariant that the Cancel button is unreachable inside a `display:none` subtree. That holds today, since Cancel only becomes clickable once attempt 3 has revealed the placeholder, but it is one refactor away from a permanently invisible toolbar.
+
+Rather than sprinkling `removeClass` calls around, the class is now owned by a single `stopLoading()` closure in `loadToolbar()`, called at each terminal transition: the success callback (before its early returns), the error callback (before the `status !== 0` guard), the `count === 3` reveal, and the Cancel handler. `showToolbar()` and `hideToolbar()` go back to being only about the opened/closed state.
+
+3. **Placeholder timing kept as is.** Revealing at `count === 3` means the "Attempt #N / Cancel" affordance now appears roughly 500 ms plus two round-trips later than before. I kept that deliberately: the `count === 3` gate is pre-existing and was written precisely so the loading block is not shown for fast loads, and before this PR it only deferred wiring the toggle button while the placeholder was already visible from the first paint. 500 ms is under the threshold where a user needs progress feedback, and the concern that Cancel is the only escape hatch from a wedged toolbar is addressed by point 1, which makes a failed request reveal the toolbar rather than hide it.
+
+4. Trimmed the Twig comment to two lines. The rationale for inlining is worth keeping since it explains why the rule cannot live in `toolbar.css.twig`.
+
+Verification: this is a browser paint-timing property and is not meaningfully unit-testable, so I did not add a test. `WebDebugToolbarListenerTest` mocks the Twig environment to return a literal string, so the template never renders, and no functional test exercises `toolbar_js.html.twig`; a test asserting the rendered output contains `sf-toolbar-loading` would just restate the diff. Instead I rendered the template through Twig, applied the same newline stripping `WebDebugToolbarListener::injectToolbar()` does, confirmed the element order (inline `<style>`, then the container, then the `<link>`, then the `<script>`) and the nonce on the new element, then drove the emitted JS through each terminal outcome. Before: hidden on `status === 0`, on "toolbar already replaced", on an empty response, and after Cancel. After: visible in all of them, and still hidden only while a retry is genuinely pending. `./phpunit src/Symfony/Bundle/WebProfilerBundle` gives `OK (160 tests, 471 assertions)`, same as the merge base.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-01T14:51:04Z
+
+@nicolas-grekas did you see https://github.com/symfony/symfony/pull/65095#issuecomment-5151697610?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T15:11:47Z
+
+@MatTheCat sorry, I missed your comment and pushed before reading it. You are right, and I switched the pull request to your approach.
+
+It is better for a reason my own review had already demonstrated without me drawing the conclusion. The previous shape hid the toolbar with a class and relied on JavaScript to take it off again, and when I enumerated the terminal outcomes of `loadToolbar()` there were four paths that never removed it: `xhr.status === 0`, the early return when `sfToolbarMainContent-<token>` is missing, the early return when the response carries no `sf-toolbarreset` markup, and Cancel during a retry wait. In each of those the toolbar did not merely flash, it silently did not exist, which is worse than the bug being fixed. I had centralised the removal into a single closure to cover them. Your version has nothing to remove, so none of those paths can exist at all. Deleting the failure mode beats fixing it.
+
+Your reproduction on an emulated 2G connection is also better evidence than what I had, which was markup ordering plus driving the emitted JavaScript through a fake DOM.
+
+Two adjustments to the snippet. The empty `script` needs the script nonce, otherwise a strict policy drops it and the blocking effect disappears silently; the file already uses `{% if csp_script_nonce is defined and csp_script_nonce %}` a few lines below. And the `role="toolbar"` in your snippet is the 8.1 and 8.2 form, this branch has `role="region"`.
+
+The diff is now five lines added and two removed, with no class, no inline style and no JavaScript involved. I verified the rendered order and both nonces by rendering the template through Twig and applying the same newline stripping `WebDebugToolbarListener::injectToolbar()` does. `./phpunit src/Symfony/Bundle/WebProfilerBundle` gives `OK (160 tests, 471 assertions)`.
+
+One consequence worth recording: the page's `DOMContentLoaded` now waits for the toolbar stylesheet. Same development server, toolbar-only, so I think that is a fair price for removing the whole class of stuck-hidden bugs, but it is a real change and it is in the description.

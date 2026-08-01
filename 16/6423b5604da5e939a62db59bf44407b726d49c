@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T14:44:49Z
+
+I reworked the patch and pushed it to your branch, so the PR now takes a different approach than capping the wait. Summary of the changes and why.
+
+**From capping to not waiting at all.** Your diff bounded the fallback wait in `get()` to a hardcoded 1000 ms. That fixed the two symptoms you measured, but it makes the connection guess a policy it has no input for. `get()` is called for one receiver of a worker that may consume several transports: it cannot see how many, it cannot see `--sleep`, and it cannot see `--time-limit`. A fixed 1000 ms bound therefore overrides the polling rate the user asked for. With `--sleep 0.1 --time-limit 3`, the capped version polls the sibling receiver 6 times (once per second, dictated by the cap) where the worker was asked to poll 30 times; not waiting at all gives 29.
+
+`PostgreSqlNotifyOnIdleListener` already has that context. It subscribes to `WorkerStartedEvent`, so it caps its wait to the worker's idle timeout when non-PostgreSQL transports are consumed, caps it to the worker deadline, and caps it to the earliest delayed message. So the fallback in `get()` is now non-blocking (`getNotify()` with a zero timeout), and all blocking belongs to the listener. That is also what 6.4, 7.4 and 8.0 do; the `usleep(1000)` and the `LISTEN` those branches keep are restored along with it.
+
+**Tests.** The two tests asserting the capped value now assert that the fallback requests no wait, including with `get_notify_timeout: 0`. `testWaitForNotifyCallsListenAndGetNotify` now asserts the full timeout reaches `getNotify()`, so the listener path is protected against a future cap being pushed down into `waitForNotify()`. Added a worker-level regression test: a real `Worker` with a `DoctrineReceiver` and a second receiver, a `MockClock` moved forward by however long `getNotify()` is asked to wait, and `--time-limit=5`. On the current 8.1 the sibling receiver is polled twice and the worker returns 61 s later; with the patch it is polled once per second and the worker returns exactly on its deadline.
+
+**Two claims removed from the description.** "Nothing in symfony/symfony registers the listener" was incomplete: DoctrineBundle wires it since 3.3.0, so applications on that version or later never took the fallback path, which is worth stating because it bounds who is affected. And `get_notify_timeout: 0` was never documented as disabling the wait in this repo: `5424fc5ef77` documented it as "0, which means until `check_delayed_interval` is reached", and `8375c2c51aa` dropped any mention of `0`. Only symfony-docs still carries the pre-8.1 wording, which needs its own docs PR; the description says what it should say.
+
+Thanks for the report and the harness idea, both were what made the root cause easy to pin down.

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Provider;
 
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\TranslatorBagInterface;
 
@@ -41,8 +42,19 @@ class FilteringProvider implements ProviderInterface
 
     public function read(array $domains, array $locales): TranslatorBag
     {
-        $domains = !$this->domains ? $domains : array_intersect($this->domains, $domains);
-        $locales = array_intersect($this->locales, $locales);
+        if ($this->locales && !$locales = $locales ? array_intersect($this->locales, $locales) : $this->locales) {
+            return new TranslatorBag();
+        }
+
+        if ($this->domains && !$domains = $domains ? array_intersect($this->domains, $domains) : $this->domains) {
+            $translatorBag = new TranslatorBag();
+
+            foreach ($locales as $locale) {
+                $translatorBag->addCatalogue(new MessageCatalogue($locale));
+            }
+
+            return $translatorBag;
+        }
 
         return $this->provider->read($domains, $locales);
     }

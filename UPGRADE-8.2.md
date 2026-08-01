@@ -59,3 +59,8 @@ Serializer
 ----------
 
  * Deprecate denormalizing an array that is not a list into a `list`-typed property, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when the input does not satisfy `array_is_list()`
+
+Translation
+-----------
+
+ * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider

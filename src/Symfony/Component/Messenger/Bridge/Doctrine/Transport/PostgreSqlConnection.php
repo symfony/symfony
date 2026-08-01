@@ -29,7 +29,8 @@ final class PostgreSqlConnection extends Connection
 
     /**
      * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
-     * * get_notify_timeout: The maximum time to wait for a NOTIFY, in milliseconds. Default: 60000 (1 minute).
+     * * get_notify_timeout: The maximum time PostgreSqlNotifyOnIdleListener waits for a NOTIFY while the worker is idle,
+     *                       in milliseconds. Set to 0 to disable waiting. Default: 60000 (1 minute).
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
         'check_delayed_interval' => 60000,
@@ -68,8 +69,10 @@ final class PostgreSqlConnection extends Connection
             return parent::get($fetchSize);
         }
 
-        // Fallback: when no external listener handles LISTEN/NOTIFY,
-        // block here until a notification arrives or timeout expires
+        // Fallback: when no external listener handles LISTEN/NOTIFY, only collect the
+        // notifications that already arrived. Waiting for one is up to
+        // PostgreSqlNotifyOnIdleListener, which knows how long the worker can afford to
+        // block, while get() is called for a single receiver of that worker.
 
         // This is secure because the table name must be a valid identifier:
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -79,16 +82,16 @@ final class PostgreSqlConnection extends Connection
 
         /** @var \PDO $nativeConnection */
         $nativeConnection = $this->driverConnection->getNativeConnection();
-        $timeout = $this->configuration['check_delayed_interval'] - (microtime(true) * 1000 - $this->queueEmptiedAt);
-        $timeout = max(0, ceil(min($this->configuration['get_notify_timeout'] ?: $timeout, $timeout)));
 
-        $notification = $nativeConnection->getNotify(\PDO::FETCH_ASSOC, $timeout);
+        $notification = $nativeConnection->getNotify(\PDO::FETCH_ASSOC, 0);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])
             // delayed messages
             && (microtime(true) * 1000 - $this->queueEmptiedAt < $this->configuration['check_delayed_interval'])
         ) {
+            usleep(1000);
+
             return null;
         }
 

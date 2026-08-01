@@ -47,10 +47,15 @@ jobs:
         run: ./vendor/bin/psalm.phar --set-baseline=.github/sa-tools/psalm.baseline.xml --no-progress
 
       - name: Switch to PR
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # Credentials are not persisted by the checkout, so remote operations are given
+          # the job token explicitly. Public repositories would also accept anonymous reads,
+          # private forks do not.
           git checkout composer.json
           base_sha=$(git rev-parse HEAD)
-          git fetch --depth=1 origin '+${{ github.event.pull_request.head.sha }}'
+          git fetch --depth=1 "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY" '+${{ github.event.pull_request.head.sha }}'
           git checkout -m FETCH_HEAD
 
           # update dependencies when the PR changes composer.json so that packages it adds are resolvable
@@ -95,10 +100,15 @@ jobs:
         run: ./vendor/bin/phpstan analyse --error-format=json --no-progress --autoload-file='.github/sa-tools/rules/bootstrap.php' > .github/sa-tools/phpstan-base.json || true
 
       - name: Switch to PR
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # Credentials are not persisted by the checkout, so remote operations are given
+          # the job token explicitly. Public repositories would also accept anonymous reads,
+          # private forks do not.
           git checkout composer.json
           base_sha=$(git rev-parse HEAD)
-          git fetch --depth=1 origin '+${{ github.event.pull_request.head.sha }}'
+          git fetch --depth=1 "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY" '+${{ github.event.pull_request.head.sha }}'
           git checkout -m FETCH_HEAD
 
           # update dependencies when the PR changes composer.json so that packages it adds are resolvable

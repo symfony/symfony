@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-07-31T12:45:44Z
+
+Do we actually need dependabot for each branch there ? We are merging the CI setup up anyway.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-07-31T12:48:53Z
+
+We apparently have workflows on 7.4 that don't exist on 6.4. Those wouldn't be updated if we had Dependabot watch the 6.4 branch only.

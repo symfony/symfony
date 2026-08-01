@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Ši reikšmė nėra tinkamas XML.</target>
+                <target>Ši reikšmė nėra tinkamas XML.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Ši reikšmė neatitinka laukiamos XSD schemos.</target>
+                <target>Ši reikšmė neatitinka laukiamos XSD schemos.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Ši XML naudingoji apkrova yra per didelė ({{ size }} baitų): ji viršija {{ limit }} baitų ribą.</target>
+                <target>Ši XML apkrova per didelė ({{ size }} baitų): ji viršija {{ limit }} baitų ribą.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Ši reikšmė nėra galiojanti cron išraiška.</target>
+                <target>Ši reikšmė nėra tinkama cron išraiška.</target>
             </trans-unit>
         </body>
     </file>

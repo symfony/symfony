@@ -13,8 +13,10 @@ namespace Symfony\Component\JsonStreamer\Tests\Write;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader;
@@ -158,6 +160,21 @@ class StreamWriterGeneratorTest extends TestCase
         $this->expectExceptionMessage(\sprintf('"%s" type is not supported.', DummyEnum::class));
 
         $generator->generate(Type::enum(DummyEnum::class));
+    }
+
+    public function testThrowWhenStreamedNameCannotBeEncoded()
+    {
+        $streamedName = "invalid\xB1name";
+
+        $propertyMetadataLoader = $this->createStub(PropertyMetadataLoaderInterface::class);
+        $propertyMetadataLoader->method('load')->willReturn([$streamedName => new PropertyMetadata('id', Type::int())]);
+
+        $generator = new StreamWriterGenerator($propertyMetadataLoader, $this->streamWritersDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot encode "%s"', $streamedName));
+
+        $generator->generate(Type::object(ClassicDummy::class));
     }
 
     public function testCallPropertyMetadataLoaderWithProperContext()

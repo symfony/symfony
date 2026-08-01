@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by saifulferoz at 2026-07-29T06:57:17Z
+
+Hi @nicolas-grekas  thanks again for your review and valuable feedback on my previous PR. I’ve addressed all of your observations in this PR. When you have a chance, could you please take another look? I’d really appreciate your review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T09:53:54Z
+
+Thank you @saifulferoz.
+
+I rebased the branch on the current 8.2, squashed it to a single commit and applied the following changes.
+
+**Dropped the second commit** (`Quote the package name in the requireBridgeClass exception message`). It is the fabbot false positive I asked to revert in https://github.com/symfony/symfony/pull/65016#discussion_r3670879130, and the same suggestion was already declined on #64757. It also produced nested unescaped quotes (`Try running "composer require "%s""`), and every other occurrence of that idiom in the tree uses the plain form. It was unrelated to advisory locks anyway.
+
+**The DBAL branch now routes on the platform.** It used to return `DoctrineDbalPostgreSqlStore` unconditionally, so a MySQL connection failed with `The adapter "…\DoctrineDbalPostgreSqlStore" does not support the "MySQL80Platform" platform.`, naming a class the caller never mentioned. That was my `why PostgreSql?` question on #65016. Since #64987 landed, `DoctrineDbalMysqlStore` exists, so the branch can send `PostgreSQLPlatform` to `DoctrineDbalPostgreSqlStore`, `AbstractMySQLPlatform` to `DoctrineDbalMysqlStore`, and anything else to a dedicated exception naming the platform, symmetric with the PDO branch. The test is on `AbstractMySQLPlatform` on purpose: DBAL declares `MariaDBPlatform` as a sibling of `MySQLPlatform`, so a check on `MySQLPlatform` would drop MariaDB into the unsupported branch. A data-provider case covers MariaDB and fails if that check is ever narrowed. The stale comment claiming only PostgreSQL advisory locks are reachable through DBAL is gone.
+
+**`array $options` became `bool $advisory = false`.** The array had exactly one recognised key and validated nothing: `['advisery' => true]` was silently ignored and `['advisory' => 'no']` was truthy. A typed boolean is statically checkable and reads well at call sites (`createStore($conn, advisory: true)`). Another option can still be added later as another named parameter.
+
+**Removed the two `#[RequiresPhpExtension]` attributes** on the stub-based tests. Both build a PHPUnit stub, no driver is ever loaded, so the gate only made the MySQL routing case, the branch with no other coverage, skip on machines without `pdo_mysql`. The DBAL routing cases use `DriverManager::getConnection()` with a `serverVersion`, which resolves the platform without connecting and without the extension.
+
+**Documented two things a caller cannot infer** on `createStore()`: advisory locks are session scoped, so a reconnection, `EntityManager::close()` or a `wait_timeout` drop releases every lock silently; and a DBAL connection without `serverVersion` connects when the platform is resolved, which turns a container factory call into a database round trip.
+
+**`Fix #64775` became `Refs #64775`** in the description. That issue asks for a FrameworkBundle knob. `Configuration::addLockSection()` still types each resource as a bare string and `FrameworkExtension` still calls the factory with one argument, so a user coming through the bundle is not affected by this PR. Wiring the bundle deserves its own PR and its own config-format discussion.
+
+Local run of the Lock suite: 488 tests, the only failures are the pre-existing Redis and timing noise of this machine, identical on the merge base.
+
+Note that the Fabbot job is red for that reverted line only: it suggests the very `composer require "%s"` patch that was declined twice. The line is on 8.2 unchanged, so the check fails for any PR touching this file.
+
+The two other red jobs are unrelated flakes: `Unit Tests (8.4, low-deps)` fails on `Bridge/Doctrine MiddlewareTest::testTransaction@rollback` (`Failed asserting that 0.0 is greater than 0`) and `x86 / minimal-exts / lowest-php` on `AmpHttpClientTest::testTimeoutIsNotAFatalError`. The Lock component is green in both, including on Windows without `pdo_mysql` and `pdo_pgsql`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T12:00:36Z
+
+Correction pushed: adding `bool $advisory = false` to the declared signature was a BC break. `StoreFactory` is neither final nor `@internal`, `createStore()` is public static, and PHP enforces signature compatibility on static methods too, so any child class overriding `createStore(object|string $connection)` would fatal with `Declaration of Child::createStore($connection) must be compatible with StoreFactory::createStore($connection, $advisory = false)`.
+
+The argument now follows the pattern used elsewhere in the tree for a minor branch, for instance `UriSigner::check()`, `Cookie::create()` and `DoctrineDbalStore::configureSchema()` right in this component:
+
+```php
+public static function createStore(#[\SensitiveParameter] object|string $connection/* , bool $advisory = false */): PersistingStoreInterface
+{
+    $advisory = 1 < \func_num_args() ? func_get_arg(1) : false;
+```
+
+It is declared in the docblock with `@param bool $advisory`, kept in a trailing comment in the parameter list, and read with `func_num_args()`. Consequence for callers: it must be passed positionally, `createStore($connection, true)`; a named `advisory: true` no longer works, since the parameter does not formally exist. The tests were converted accordingly.
+
+Added the matching `Lock` section to `UPGRADE-8.2.md`, between `HttpFoundation` and `Loco Translation Provider`:
+
+```
+Lock
+----
+
+ * Add argument `$advisory` to `StoreFactory::createStore()`
+```
+
+The CHANGELOG line was reworded to `Add argument $advisory to StoreFactory::createStore()`, matching the convention used by the other argument additions.
+
+Everything else is unchanged: the platform routing, the removed extension gates, the docblock caveats and all the tests. Lock suite still 488 tests locally, with only the pre-existing Redis and timing noise of this machine.

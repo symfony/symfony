@@ -7,7 +7,7 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
     try {
         $prefix1 = '';
         yield "{{$prefix1}\"synthetic\":";
-        yield \json_encode(Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader::true(null, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode(Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader::true(null, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         yield "}";
     } catch (\JsonException $e) {
         throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithSyntheticProperties\" to JSON: {$e->getMessage()}.", 0, $e);

@@ -21,6 +21,11 @@
             <directory name="src/Symfony/Component/Intl/Resources/data/" />
             <directory name="src/Symfony/Component/Emoji/Resources/data/" />
             <directory name="vendor" />
+            <!--
+                Auto-generated proxies: they mirror the signatures of the ext-redis version they
+                target, so they never match the one the analyzer knows about.
+            -->
+            <file name="src/Symfony/Component/Cache/Traits/Redis*[0-9]Proxy*.php" />
         </ignoreFiles>
     </projectFiles>
 
@@ -37,6 +42,13 @@
                 <referencedClass name="Relay\Relay"/>
             </errorLevel>
         </UndefinedClass>
+        <UndefinedMethod>
+            <errorLevel type="suppress">
+                <!-- RedisProxy and RedisClusterProxy are class_alias()'ed to the proxy matching the loaded ext-redis -->
+                <referencedMethod name="Symfony\Component\Cache\Traits\RedisClusterProxy::createLazyProxy"/>
+                <referencedMethod name="Symfony\Component\Cache\Traits\RedisProxy::createLazyProxy"/>
+            </errorLevel>
+        </UndefinedMethod>
         <UnusedClass>
             <errorLevel type="suppress">
                 <!--

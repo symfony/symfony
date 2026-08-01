@@ -7,14 +7,14 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
     try {
         $prefix1 = '';
         yield "{{$prefix1}\"id\":";
-        yield \json_encode($transformers->get('Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Transformer\\DoubleIntAndCastToStringValueTransformer')->transform($data->id, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode($transformers->get('Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Transformer\\DoubleIntAndCastToStringValueTransformer')->transform($data->id, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         $prefix1 = ',';
         yield "{$prefix1}\"active\":";
-        yield \json_encode($transformers->get('Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Transformer\\BooleanToStringValueTransformer')->transform($data->active, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode($transformers->get('Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Transformer\\BooleanToStringValueTransformer')->transform($data->active, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         yield "{$prefix1}\"name\":";
-        yield \json_encode(strtolower($data->name), \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode(strtolower($data->name), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         yield "{$prefix1}\"range\":";
-        yield \json_encode(Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes::concatRange($data->range, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR, 511);
+        yield \json_encode(Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes::concatRange($data->range, ['_current_object' => $data] + $options), \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
         yield "}";
     } catch (\JsonException $e) {
         throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithValueTransformerAttributes\" to JSON: {$e->getMessage()}.", 0, $e);

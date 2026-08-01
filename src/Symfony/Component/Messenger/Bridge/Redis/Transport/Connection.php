@@ -83,7 +83,7 @@ class Connection
         $sentinelMaster = $options['sentinel'] ?? $options['redis_sentinel'] ?? $options['sentinel_master'] ?? null;
 
         if (null !== $sentinelMaster && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
-            throw new InvalidArgumentException('Redis Sentinel support requires ext-redis>=6.1, or ext-relay.');
+            throw new InvalidArgumentException('Redis Sentinel support requires ext-redis>=5.2, or ext-relay.');
         }
 
         if (null !== $sentinelMaster && $redis instanceof \RedisCluster) {
@@ -117,7 +117,7 @@ class Connection
                         }
 
                         try {
-                            if (\extension_loaded('redis')) {
+                            if (\extension_loaded('redis') && version_compare(phpversion('redis'), '6.0.0-dev', '>=')) {
                                 $params = [
                                     'host' => $host,
                                     'port' => $port,
@@ -239,12 +239,12 @@ class Connection
             }
         } else {
             $dsns = explode(',', $dsn);
-            $paramss = array_map(static function ($dsn) use (&$options) {
+            $dsnParams = array_map(static function ($dsn) use (&$options) {
                 return self::parseDsn($dsn, $options);
             }, $dsns);
 
             // Merge all the URLs, the last one overrides the previous ones
-            $params = array_merge(...$paramss);
+            $params = array_merge(...$dsnParams);
             $tls = 'rediss' === $params['scheme'] || 'valkeys' === $params['scheme'];
 
             // Regroup all the hosts in an array interpretable by RedisCluster
@@ -257,7 +257,7 @@ class Connection
                 }
 
                 return $params['host'].':'.($params['port'] ?? 6379);
-            }, $paramss, $dsns);
+            }, $dsnParams, $dsns);
         }
 
         if (isset($options['sentinel']) && isset($options['redis_sentinel']) && $options['sentinel'] !== $options['redis_sentinel']) {
@@ -481,7 +481,7 @@ class Connection
 
             if (\strlen($expiry) === \strlen($now) ? $expiry > $now : \strlen($expiry) < \strlen($now)) {
                 // if a future-placed message is popped because of a race condition with
-                // another running consumer, the message is readded to the queue
+                // another running consumer, the message is re-added to the queue
 
                 if (!$this->rawCommand('ZADD', 'NX', $expiry, $queuedMessage)) {
                     throw new TransportException('Could not add a message to the redis stream.');

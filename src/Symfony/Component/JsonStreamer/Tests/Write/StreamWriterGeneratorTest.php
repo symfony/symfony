@@ -167,6 +167,21 @@ class StreamWriterGeneratorTest extends TestCase
         $generator->generate(Type::enum(DummyEnum::class));
     }
 
+    public function testThrowWhenStreamedNameCannotBeEncoded()
+    {
+        $streamedName = "invalid\xB1name";
+
+        $propertyMetadataLoader = $this->createStub(PropertyMetadataLoaderInterface::class);
+        $propertyMetadataLoader->method('load')->willReturn([$streamedName => new PropertyMetadata('id', Type::int())]);
+
+        $generator = new StreamWriterGenerator($propertyMetadataLoader, new ServiceContainer(), $this->streamWritersDir);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot encode "%s"', $streamedName));
+
+        $generator->generate(Type::object(ClassicDummy::class));
+    }
+
     public function testCallPropertyMetadataLoaderWithProperContext()
     {
         $type = Type::object(self::class);

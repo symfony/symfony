@@ -32,18 +32,6 @@ updates:
 
     - package-ecosystem: 'github-actions'
       directory: '/'
-      target-branch: '8.0'
-      schedule:
-          interval: 'weekly'
-      groups:
-          github-actions:
-              patterns:
-                  - '*'
-      cooldown:
-          default-days: 9
-
-    - package-ecosystem: 'github-actions'
-      directory: '/'
       target-branch: '8.1'
       schedule:
           interval: 'weekly'

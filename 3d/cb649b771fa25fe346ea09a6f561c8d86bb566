@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by mtarld at 2026-08-01T10:28:26Z
+
+Yes indeed, looks like a bug fix to me
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-08-01T11:25:47Z
+
+Updated after the review:
+
+- retargeted the PR to `7.4` as a bug fix;
+- added `JSON_PRESERVE_ZERO_FRACTION` to the default readable JSON flags;
+- kept `JSON_THROW_ON_ERROR` on generated runtime `json_encode()` calls;
+- left the generation-time property-name `json_encode()` on its existing `false` guard path, because that call runs while generating PHP code;
+- added regressions for readable scalar output and generated object-dictionary keys.
+
+Verification:
+
+- RED on `upstream/7.4` with only the new tests: 2 tests, 2 failures. The old output escaped slashes and Unicode, and rendered `1.0` as `1`.
+- GREEN after the fix: `./phpunit --filter 'testWriteReadableJson' src/Symfony/Component/JsonStreamer/Tests/JsonStreamWriterTest.php` in Docker: 2 tests, 2 assertions, OK.
+- Full focused file: `./phpunit src/Symfony/Component/JsonStreamer/Tests/JsonStreamWriterTest.php` in Docker: 26 tests, 54 assertions, OK.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T12:21:15Z
+
+Rebased on 7.4, squashed into a single commit, authorship preserved. Changes I made on top of the original patch:
+
+**Tests**
+
+* Added `JsonStreamWriterTest::testThrowWhenDictionaryKeyCannotBeEncoded()`. This covers the one real behaviour change of the patch: with a key holding invalid UTF-8, the base branch silently wrote `{"":{...},"":{...}}` because `json_encode($key)` returned `false` and `substr(false, 1, -1)` yielded an empty string. It now raises a `NotEncodableValueException`.
+* Added `JsonStreamWriterTest::testWriteReadablePropertyNamesByDefault()` with a new `DummyWithSpecialCharacterNamedProperties` fixture. Nothing exercised the property-name encoding path before, since no fixture model had a slash-bearing or non-ASCII streamed name. The fixture also carries a U+2028 name, which pins that line terminators stay escaped because `JSON_UNESCAPED_LINE_TERMINATORS` is not part of the set.
+* Added `StreamWriterGeneratorTest::testThrowWhenStreamedNameCannotBeEncoded()` for the previously uncovered `Cannot encode "%s"` guard. This one passes on the base branch too; its role is to pin that `JSON_THROW_ON_ERROR` is deliberately absent at generation time, where `false` is checked instead.
+* Inlined the four private constants that had been introduced in the test class, so the assertions read like the rest of the file.
+
+**Source**
+
+* `MAX_DEPTH` is now also used in the generated `if ($depth >= ...)` line, which still had a hardcoded `512`.
+* Renamed the two flag constants so their difference is visible from their names: `JSON_ENCODE_FLAGS` for the generation-time call, `THROWING_JSON_ENCODE_FLAGS_EXPRESSION` for the expression inlined in the generated code.
+
+**Verification**
+
+* Full suite: 462 tests, 870 assertions, 3 skipped, OK.
+* Revert-verify, `Write/PhpGenerator.php` restored to the merge base with the tests and fixtures kept: 33 failures, being the 29 generated-writer fixtures plus the 4 writer tests listed above.
+* The 33 fixture files differ from the base only by the flag list. Reversing that one substitution reproduces the base content byte for byte, so the fixture diff carries no semantic edit.
+
+No CHANGELOG or UPGRADE entry, as this is a bugfix on a maintained branch.

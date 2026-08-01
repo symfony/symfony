@@ -1,0 +1,34 @@
+{
+    "name": "symfony/turbo-smtp-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony TurboSMTP Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dominik Spitzli",
+            "email": "dominik@spitzli.dev"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "psr/event-dispatcher": "^1",
+        "symfony/mailer": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/webhook": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\TurboSmtp\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

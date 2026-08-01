@@ -3082,6 +3082,7 @@ class FrameworkExtension extends Extension
             MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => ['symfony/sendgrid-mailer', 'mailer.transport_factory.sendgrid'],
             MailerBridge\Amazon\Transport\SesTransportFactory::class => ['symfony/amazon-mailer', 'mailer.transport_factory.amazon'],
             MailerBridge\Sweego\Transport\SweegoTransportFactory::class => ['symfony/sweego-mailer', 'mailer.transport_factory.sweego'],
+            MailerBridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class => ['symfony/turbo-smtp-mailer', 'mailer.transport_factory.turbosmtp'],
         ];
 
         foreach ($classToServices as $class => [$package, $service]) {
@@ -3158,6 +3159,7 @@ class FrameworkExtension extends Extension
                 MailerBridge\Resend\Webhook\ResendRequestParser::class => ['symfony/resend-mailer', 'mailer.webhook.request_parser.resend'],
                 MailerBridge\Sendgrid\Webhook\SendgridRequestParser::class => ['symfony/sendgrid-mailer', 'mailer.webhook.request_parser.sendgrid'],
                 MailerBridge\Sweego\Webhook\SweegoRequestParser::class => ['symfony/sweego-mailer', 'mailer.webhook.request_parser.sweego'],
+                MailerBridge\TurboSmtp\Webhook\TurboSmtpRequestParser::class => ['symfony/turbo-smtp-mailer', 'mailer.webhook.request_parser.turbosmtp'],
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {

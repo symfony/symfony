@@ -31,6 +31,7 @@ use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
+use Symfony\Component\Mailer\Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\NativeTransportFactory;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
@@ -73,6 +74,7 @@ return static function (ContainerConfigurator $container) {
         'sendmail' => SendmailTransportFactory::class,
         'smtp' => EsmtpTransportFactory::class,
         'sweego' => SweegoTransportFactory::class,
+        'turbosmtp' => TurboSmtpTransportFactory::class,
     ];
 
     foreach ($factories as $name => $class) {

@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T15:38:28Z
+
+Reviewed and pushed two changes on top of your commit, rebased on the current 7.4.
+
+**The fix silently disabled an existing test.** `testOnKernelRequestShouldSkipSubrequests` detects a removed main-request guard only because the production code calls a method the stub is told to throw from. That method was `getIterator()`; after the fix it is `getArrayCopy()`, which the stub answers with `[]`, so the loop ran over nothing and the test passed whether or not the guard was there. Changing the stubbed method restores the detection. Measured on all four combinations, running only that test and deleting the guard from `Listener.php`:
+
+| stubbed method | guard present | guard deleted |
+| --- | --- | --- |
+| `getIterator` | OK | OK, nothing detected |
+| `getArrayCopy` | OK | Errors: 1 |
+
+**Removed the `Co-authored-by: Cursor` trailer** from the commit message, per the repository's contribution rules.
+
+I also rewrote the description. It previously said the skipped connection "is never revisited", which is not what happens: it keeps its stale expiry and is picked up on the next main request, so the damage is a window of one request in which the application can be handed a connection that should have been closed. That is still enough to produce the error you reported, and the fix is unchanged, but the claim would have ended up in the merge commit.
+
+Verified separately that nothing regresses in the other direction: with four expired connections all four are now closed exactly once, a connection whose expiry is in the future is untouched, the `$timestamp >= $expiry` boundary behaves identically before and after, and an expiry registered from inside `close()` survives the loop. `./phpunit src/Symfony/Bridge/Doctrine` gives 479 tests, 8 skipped, no failures.
+
+Nice catch, this one is easy to miss because a single connection never triggers it.

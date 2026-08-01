@@ -712,6 +712,28 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertSame([], $translatorBag->getCatalogues());
     }
 
+    public function testReadSendsFilterFilenamesAsJsonArray()
+    {
+        $response = function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/export', $url);
+
+            $body = json_decode($options['body'], true);
+
+            $this->assertSame(['validators.xliff'], $body['filter_filenames']);
+            $this->assertSame(['en'], $body['filter_langs']);
+
+            return new JsonMockResponse(['files' => []]);
+        };
+
+        $provider = self::createProvider((new MockHttpClient($response))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+
+        // FilteringProvider narrows domains and locales with array_intersect(), which preserves the original keys.
+        $provider->read([1 => 'validators'], [1 => 'en']);
+    }
+
     #[RequiresPhpExtension('zip')]
     public function testReadWithExportAsync()
     {
@@ -720,9 +742,16 @@ class LokaliseProviderTest extends ProviderTestCase
             ['error' => ['code' => 413, 'message' => 'test']],
             ['http_code' => 413],
         );
-        $secondResponse = static fn (): ResponseInterface => new JsonMockResponse(
-            ['process_id' => 123],
-        );
+        $secondResponse = function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/files/async-download', $url);
+
+            $body = json_decode($options['body'], true);
+
+            $this->assertSame(['foo.xliff'], $body['filter_filenames']);
+            $this->assertSame(['baz'], $body['filter_langs']);
+
+            return new JsonMockResponse(['process_id' => 123]);
+        };
         $thirdResponse = static fn (): ResponseInterface => new JsonMockResponse(
             ['process' => ['status' => 'finished', 'details' => ['download_url' => 'https://api.lokalise.com/Symfony-locale.zip']]],
         );
@@ -738,7 +767,8 @@ class LokaliseProviderTest extends ProviderTestCase
             'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
             'headers' => ['X-Api-Token' => 'API_KEY'],
         ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
-        $translatorBag = $provider->read(['foo'], ['baz']);
+        // FilteringProvider narrows domains and locales with array_intersect(), which preserves the original keys.
+        $translatorBag = $provider->read([1 => 'foo'], [1 => 'baz']);
 
         // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
         /** @var MessageCatalogue $catalogue */

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
-use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\SharedLockStoreInterface;
 
 /**
@@ -25,11 +25,18 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  * It requires MySQL 5.7.5 or MariaDB 10.0.2, the versions that let a session hold several
  * named locks at once. On older servers, acquiring a lock releases the previous one.
  *
+ * Shared and read locks are not supported: MySQL has no equivalent of pg_advisory_lock_shared,
+ * so Lock::acquireRead() silently gives an exclusive lock instead of failing.
+ *
+ * The connection should be dedicated to locking: advisory locks are bound to the session, so
+ * RELEASE_ALL_LOCKS(), EntityManager::close(), a wait_timeout expiration or a transparent
+ * reconnection release every lock held, and nothing detects it.
+ *
  * @author Ryan Pon <me@ryanpon.com>
  * @author rtek
  * @author Jérôme TAMARELLE <jerome@tamarelle.net>
  */
-class MysqlStore implements PersistingStoreInterface
+class MysqlStore implements BlockingStoreInterface
 {
     private \PDO $conn;
 
@@ -75,15 +82,70 @@ class MysqlStore implements PersistingStoreInterface
 
     public function save(Key $key): void
     {
+        // timeout 0 means no waiting
+        $this->saveWithTimeout($key, 0);
+    }
+
+    public function waitAndSave(Key $key): void
+    {
+        // timeout -1 will wait forever
+        $this->saveWithTimeout($key, -1);
+    }
+
+    public function putOffExpiration(Key $key, float $ttl): void
+    {
+        // mysql locks forever.
+        // check if lock still exists
+        if (!$this->exists($key)) {
+            throw new LockConflictedException();
+        }
+    }
+
+    public function delete(Key $key): void
+    {
+        // prevent deleting locks owned by another key in the same connection
+        if ($this->exists($key)) {
+            $stmt = $this->deleteStmt ??
+                $this->deleteStmt = $this->getConnection()->prepare('DO RELEASE_LOCK(:name)');
+
+            $stmt->execute(['name' => self::getHashedKey($key)]);
+        }
+
+        // the internal store is cleared even when the server already dropped the lock,
+        // otherwise the resource would stay taken for the rest of the process
+        $this->getInternalStore()->delete($key);
+    }
+
+    public function exists(Key $key): bool
+    {
+        $stmt = $this->existsStmt ??
+            $this->existsStmt = $this->getConnection()->prepare('SELECT IS_USED_LOCK(:name) = CONNECTION_ID()');
+
+        $stmt->execute(['name' => self::getHashedKey($key)]);
+        $result = (int) $stmt->fetchColumn();
+
+        if (1 === $result) {
+            return $this->getInternalStore()->exists($key);
+        }
+
+        return false;
+    }
+
+    private function saveWithTimeout(Key $key, int $timeout): void
+    {
         $this->getInternalStore()->save($key);
 
         $lockAcquired = false;
 
         try {
+            // the lock name is bound twice because native prepared statements reject a repeated placeholder
             $stmt = $this->saveStmt ??
-                $this->saveStmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name1) = CONNECTION_ID(), -1, GET_LOCK(:name2, 0))');
+                $this->saveStmt = $this->getConnection()->prepare('SELECT IF(IS_USED_LOCK(:name1) = CONNECTION_ID(), -1, GET_LOCK(:name2, :timeout))');
             $name = self::getHashedKey($key);
-            $stmt->execute(['name1' => $name, 'name2' => $name]);
+            $stmt->bindValue('name1', $name);
+            $stmt->bindValue('name2', $name);
+            $stmt->bindValue('timeout', $timeout, \PDO::PARAM_INT);
+            $stmt->execute();
             $maybeResult = $stmt->fetchColumn();
             if (null === $maybeResult) {
                 throw new LockAcquiringException('Failed to acquire lock due to mysql error.');
@@ -110,45 +172,6 @@ class MysqlStore implements PersistingStoreInterface
                 $this->getInternalStore()->delete($key);
             }
         }
-    }
-
-    public function putOffExpiration(Key $key, float $ttl): void
-    {
-        // mysql locks forever.
-        // check if lock still exists
-        if (!$this->exists($key)) {
-            throw new LockConflictedException();
-        }
-    }
-
-    public function delete(Key $key): void
-    {
-        // Prevent deleting locks own by an other key in the same connection
-        if ($this->exists($key)) {
-            $stmt = $this->deleteStmt ??
-                $this->deleteStmt = $this->getConnection()->prepare('DO RELEASE_LOCK(:name)');
-
-            $stmt->execute(['name' => self::getHashedKey($key)]);
-        }
-
-        // the internal store is cleared even when the server already dropped the lock,
-        // otherwise the resource would stay taken for the rest of the process
-        $this->getInternalStore()->delete($key);
-    }
-
-    public function exists(Key $key): bool
-    {
-        $stmt = $this->existsStmt ??
-            $this->existsStmt = $this->getConnection()->prepare('SELECT IS_USED_LOCK(:name) = CONNECTION_ID()');
-
-        $stmt->execute(['name' => self::getHashedKey($key)]);
-        $result = (int) $stmt->fetchColumn();
-
-        if (1 === $result) {
-            return $this->getInternalStore()->exists($key);
-        }
-
-        return false;
     }
 
     private function getConnection(): \PDO

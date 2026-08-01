@@ -119,7 +119,9 @@ class StoreFactory
                 return new PostgreSqlStore(preg_replace('/^([^:+]+)\+advisory/', '$1', $connection));
 
             case str_starts_with($connection, 'mysql+advisory://'):
-                throw new InvalidArgumentException('The "mysql+advisory://" scheme is not supported, use a PDO DSN such as "mysql+advisory:host=localhost;dbname=app".');
+            case str_starts_with($connection, 'mysql2+advisory://'):
+                return new DoctrineDbalMysqlStore($connection);
+
             case str_starts_with($connection, 'mysql+advisory:'):
                 return new MysqlStore(preg_replace('/^([^:+]+)\+advisory/', '$1', $connection));
 

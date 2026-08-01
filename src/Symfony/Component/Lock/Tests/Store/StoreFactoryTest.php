@@ -19,7 +19,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
-use Symfony\Component\Lock\Exception\InvalidArgumentException;
+use Symfony\Component\Lock\Store\DoctrineDbalMysqlStore;
 use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
 use Symfony\Component\Lock\Store\DoctrineDbalStore;
 use Symfony\Component\Lock\Store\FlockStore;
@@ -44,14 +44,6 @@ class StoreFactoryTest extends TestCase
         $store = StoreFactory::createStore($connection);
 
         $this->assertInstanceOf($expectedStoreClass, $store);
-    }
-
-    public function testCreateStoreRejectsMysqlAdvisoryUrl()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "mysql+advisory://" scheme is not supported, use a PDO DSN such as "mysql+advisory:host=localhost;dbname=app".');
-
-        StoreFactory::createStore('mysql+advisory://user:pass@localhost:3306/test');
     }
 
     #[RequiresPhpExtension('sysvsem')]
@@ -107,6 +99,8 @@ class StoreFactoryTest extends TestCase
             yield ['sqlite3:///tmp/test', DoctrineDbalStore::class];
             yield ['oci8://server.com/test', DoctrineDbalStore::class];
             yield ['mssql://server.com/test', DoctrineDbalStore::class];
+            yield ['mysql+advisory://server.com/test', DoctrineDbalMysqlStore::class];
+            yield ['mysql2+advisory://server.com/test', DoctrineDbalMysqlStore::class];
             yield ['pgsql+advisory://server.com/test', DoctrineDbalPostgreSqlStore::class];
             yield ['postgres+advisory://server.com/test', DoctrineDbalPostgreSqlStore::class];
             yield ['postgresql+advisory://server.com/test', DoctrineDbalPostgreSqlStore::class];

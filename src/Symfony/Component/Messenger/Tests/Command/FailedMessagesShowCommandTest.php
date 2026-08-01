@@ -13,12 +13,14 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
@@ -516,5 +518,149 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('3', $stdout);
         $this->assertStringContainsString('messages pending', $stdout);
         $this->assertStringNotContainsString('messages pending', $stderr);
+    }
+
+    public function testListMessagesFilteredByFailureTime()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-01 10:00:00', 'Older failure'),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00', 'Recent failure'),
+            $this->createFailedEnvelope(30, '2024-05-03 10:00:00', 'Newest failure'),
+        ]);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--failed-after' => '2024-05-02 00:00:00', '--failed-before' => '2024-05-02 23:59:59']);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('Recent failure', $display);
+        $this->assertStringNotContainsString('Older failure', $display);
+        $this->assertStringNotContainsString('Newest failure', $display);
+        $this->assertStringContainsString('Displaying only messages that failed after 2024-05-02 00:00:00', $display);
+        $this->assertStringContainsString('Displaying only messages that failed before 2024-05-02 23:59:59', $display);
+        $this->assertStringContainsString('Showing 1 message(s).', $display);
+    }
+
+    public function testListMessagesFilteredByClassAndFailureTime()
+    {
+        $anotherClass = new class extends \stdClass {};
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00', 'Matching failure'),
+            new Envelope(new $anotherClass(), [
+                new TransportMessageIdStamp(20),
+                new RedeliveryStamp(0, new \DateTimeImmutable('2024-05-02 11:00:00')),
+                ErrorDetailsStamp::create(new \RuntimeException('Other class failure')),
+            ]),
+            $this->createFailedEnvelope(30, '2024-05-05 10:00:00', 'Out of window failure'),
+        ]);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--class-filter' => 'stdClass', '--failed-before' => '2024-05-03 00:00:00']);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('Matching failure', $display);
+        $this->assertStringNotContainsString('Other class failure', $display);
+        $this->assertStringNotContainsString('Out of window failure', $display);
+    }
+
+    public function testListMessagesExcludesMessagesWithoutRedeliveryStampWhenFilteringByFailureTime()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->exactly(2))->method('all')->willReturn([
+            new Envelope(new \stdClass(), [
+                new TransportMessageIdStamp(10),
+                ErrorDetailsStamp::create(new \RuntimeException('Never redelivered')),
+            ]),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00', 'Redelivered once'),
+        ]);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute([]);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('Never redelivered', $display);
+        $this->assertStringContainsString('Redelivered once', $display);
+
+        $tester->execute(['--failed-after' => '2024-05-01 00:00:00']);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringNotContainsString('Never redelivered', $display);
+        $this->assertStringContainsString('Redelivered once', $display);
+    }
+
+    public function testListMessagesPerClassFilteredByFailureTime()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-01 10:00:00', 'Older failure'),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00', 'Recent failure'),
+            $this->createFailedEnvelope(30, '2024-05-03 10:00:00', 'Newest failure'),
+        ]);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--stats' => true, '--failed-after' => '2024-05-02 00:00:00']);
+
+        $this->assertStringContainsString('stdClass   2', $tester->getDisplay(true));
+    }
+
+    public function testListMessagesWithFilterMatchingNothing()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-01 10:00:00', 'Older failure'),
+        ]);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--failed-after' => '2024-06-01 00:00:00']);
+
+        $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
+    }
+
+    public function testShowWithIdAndFilterThrows()
+    {
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot specify message ids when using the "--class-filter", "--failed-after" or "--failed-before" options.');
+        $tester->execute(['id' => '10', '--failed-after' => '2024-05-01 00:00:00']);
+    }
+
+    public function testShowWithUnparsableFailureTimeThrows()
+    {
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of the "--failed-after" option is not a valid date: "last thursdayish".');
+        $tester->execute(['--failed-after' => 'last thursdayish']);
+    }
+
+    private function createFailedEnvelope(int $id, string $failedAt, string $error): Envelope
+    {
+        return new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp($id),
+            new SentToFailureTransportStamp('async'),
+            new RedeliveryStamp(0, new \DateTimeImmutable($failedAt)),
+            ErrorDetailsStamp::create(new \RuntimeException($error)),
+        ]);
     }
 }

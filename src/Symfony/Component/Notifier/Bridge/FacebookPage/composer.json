@@ -1,0 +1,39 @@
+{
+    "name": "symfony/facebook-page-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Facebook Page Notifier Bridge, via Meta Graph API Page feed",
+    "keywords": [
+        "facebook",
+        "facebook page",
+        "meta",
+        "pages",
+        "notifier",
+        "chat"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Ledru",
+            "email": "matyo91@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/notifier": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\FacebookPage\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

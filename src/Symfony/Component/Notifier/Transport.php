@@ -41,6 +41,7 @@ final class Transport
         Bridge\Engagespot\EngagespotTransportFactory::class,
         Bridge\Esendex\EsendexTransportFactory::class,
         Bridge\Expo\ExpoTransportFactory::class,
+        Bridge\FacebookPage\FacebookPageTransportFactory::class,
         Bridge\FakeChat\FakeChatTransportFactory::class,
         Bridge\FakeSms\FakeSmsTransportFactory::class,
         Bridge\Firebase\FirebaseTransportFactory::class,

@@ -39,6 +39,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Engagespot\EngagespotTransportFactory::class => false,
             Bridge\Esendex\EsendexTransportFactory::class => false,
             Bridge\Expo\ExpoTransportFactory::class => false,
+            Bridge\FacebookPage\FacebookPageTransportFactory::class => false,
             Bridge\FakeChat\FakeChatTransportFactory::class => false,
             Bridge\FakeSms\FakeSmsTransportFactory::class => false,
             Bridge\Firebase\FirebaseTransportFactory::class => false,
@@ -138,6 +139,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['engagespot', 'symfony/engagespot-notifier'];
         yield ['esendex', 'symfony/esendex-notifier'];
         yield ['expo', 'symfony/expo-notifier'];
+        yield ['facebook-page', 'symfony/facebook-page-notifier'];
         yield ['fakechat', 'symfony/fake-chat-notifier'];
         yield ['fakesms', 'symfony/fake-sms-notifier'];
         yield ['firebase', 'symfony/firebase-notifier'];

@@ -19,7 +19,13 @@ jobs:
           persist-credentials: false
 
       - name: Fetch branch from where the PR started
-        run: git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Credentials are not persisted by the checkout, so remote operations are given
+          # the job token explicitly. Public repositories would also accept anonymous reads,
+          # private forks do not.
+          git fetch --no-tags --prune --depth=1 "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY" +refs/heads/*:refs/remotes/origin/*
 
       - name: Find packages
         id: find-packages

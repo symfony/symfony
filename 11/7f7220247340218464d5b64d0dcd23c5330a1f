@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by recchia at 2026-07-13T11:26:51Z
+
+Thanks for the review! Fixed in 3f40c89f0: registered `metawhatsapp` in `Transport::FACTORY_CLASSES` and `UnsupportedSchemeException::SCHEME_TO_PACKAGE_MAP`, plus the corresponding entries in `UnsupportedSchemeExceptionTest`'s `ClassExistsMock` list and data provider — same spot alphabetically as every other bridge.
+
+Verified locally: full `symfony/notifier` component suite (2409 tests) and the MetaWhatsApp bridge's own suite (24 tests) both pass.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-07-13T14:15:16Z
+
+I would be in favor of `WhatsApp` naming instead of `MetaWhatsApp`. The Bridge should rely on the product, not the company behind.
+
+---------------------------------------------------------------------------
+
+by recchia at 2026-07-13T15:59:23Z
+
+Good call, done in 7e2ee1d33 — renamed the bridge from `MetaWhatsApp` to `WhatsApp` throughout: class/namespace (`Bridge\WhatsApp`), DSN scheme (`whatsapp://`), package (`symfony/whats-app-notifier`), and repositioned it alphabetically in every registry (`Transport::FACTORY_CLASSES`, `UnsupportedSchemeException`, its test provider, `FrameworkExtension`, `notifier_transports.php`).
+
+I also added a note to the README calling out that this bridge talks to Meta's Cloud API directly, since `Twilio` and `Vonage` also expose WhatsApp sending through their own gateway integrations — wanted to save anyone searching "whatsapp" from picking the wrong one of the three.
+
+Verified: full `symfony/notifier` suite (2409 tests), the bridge's own suite (24 tests), and the FrameworkBundle `testIfNotifierTransportsAreKnownByFrameworkExtension` test all pass.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T13:31:56Z
+
+Thanks @recchia. I rebased on 8.2, squashed the six commits into one, and pushed the following changes on top.
+
+**Missing split package.** `splitsh.json` listed 82 of the 83 notifier bridge directories; `WhatsApp` was
+the only one absent, so `symfony/whats-app-notifier` would never have been published while both
+`UnsupportedSchemeException` and `FrameworkExtension` tell users to require it. Added the entry.
+
+**Exception contract.** `doSend()` called `$response->toArray(false)` unconditionally, before the status
+check. A non-JSON body, such as a proxy's HTML 502 page or a 200 with an empty body, escaped as
+`HttpClient\Exception\JsonException`, which does not implement `Notifier\Exception\TransportExceptionInterface`,
+the only exception `TransportInterface::send()` documents. The decode now happens inside the failure
+branch and falls back to `getContent(false)`, and the success decode is guarded too. Both shapes are
+covered by tests.
+
+**`supports()`.** It returned `true` for a bare `ChatMessage`, but `doSend()` always throws for one since
+there is no DSN-level default recipient. In a chatter with several transports, WhatsApp claimed
+messages it could not deliver and they never reached a transport that could. It now requires a
+resolvable recipient, via the existing `ChatMessage::getRecipientId()`.
+
+**Test coverage.** Three mutations survived the original 24-test suite: dropping `messaging_product`
+(a required Cloud API field), dropping `recipient_type`, and replacing `auth_bearer` with an arbitrary
+header, which left the authentication entirely unasserted. All three are now asserted on the outgoing
+request and are caught.
+
+**API version.** `DEFAULT_API_VERSION` was `v21.0`, released October 2024 and due to expire in January
+2027, before 8.2 reaches end of life. Bumped to `v26.0`, the current Graph API version. Still
+overridable with `?api_version=`.
+
+**Smaller items.** Fixed the `phpunit.xml.dist` test suite name, which still carried the old bridge
+name; dropped the README claim that the `Vonage` bridge supports WhatsApp, since it has no WhatsApp
+handling at all, and pointed at `Twilio` instead; removed two em-dashes; relaxed the
+`recipientPhoneNumber()` docblock, which claimed digits only although Meta accepts a leading `+` and
+nothing normalized it; added `WhatsAppOptions::getTemplate()` in place of reaching into `toArray()`.
+
+A DSN-level default recipient looks like a reasonable follow-up but is out of scope here, and is
+noted as such in the description.
+
+@alexandre-daubois your review is fully addressed: `Transport::FACTORY_CLASSES`,
+`UnsupportedSchemeException::SCHEME_TO_PACKAGE_MAP` and its test provider are all wired up, so it can
+be resolved.
+
+Bridge suite is at 28 tests, 49 assertions. `src/Symfony/Component/Notifier/Tests` passes with 185
+tests, 347 assertions.

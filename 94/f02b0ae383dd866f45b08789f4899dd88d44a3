@@ -1,0 +1,147 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-07-17T17:40:37Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-31T07:34:14Z
+
+Merge preparation, squashed into a single commit on top of the current 8.2 tip.
+
+**Packaging**
+
+ * `splitsh.json`: registered `turbo-smtp-mailer`. Without it the read only
+   repository is never created, while `UnsupportedSchemeException` and
+   `FrameworkExtension` already tell users to run
+   `composer require symfony/turbo-smtp-mailer`.
+ * `Bridge/TurboSmtp/composer.json`: `php` raised to `>=8.4.1` and the Symfony
+   constraints to `^7.4|^8.0`, which is what every other bridge on this branch
+   requires. Added the `psr/event-dispatcher` requirement, since both transports
+   type hint `Psr\EventDispatcher\EventDispatcherInterface`. Emptied `keywords`
+   and inlined the `psr-4` map to match the sibling bridges.
+
+**Webhook**
+
+ * `TurboSmtpPayloadConverter`: the spam status is spelled `REPORT` in the Event
+   Webhook Reference, and none of `spam`, `spam report` or `spamreport` matched
+   it, so every complaint was rejected with a 406. Added it.
+ * `TurboSmtpPayloadConverter`: for `DROPPED` and `BOUNCED` the provider sends
+   `reason` as an object with a `response` key, not as a string. Passing it to
+   `MailerDeliveryEvent::setReason()` raised a `TypeError`, which is not a
+   `ParseException` and so escaped the parser instead of producing a 406. The
+   converter now unwraps `response`.
+ * `TurboSmtpRequestParser`: dropped the batch branch and its comment. The
+   reference documents one event object per request and shows no array form, and
+   the branch had no fixture behind it. `doParse()` now returns a single
+   `?AbstractMailerEvent`, like the other single event mailer bridges.
+ * Fixtures: added `processed`, `dropped`, `deferred`, `opened`, `unsubscribed`
+   and `report`, modelled on the payloads in the reference, so all nine
+   documented statuses are covered.
+
+**Tests**
+
+ * Added `TurboSmtpSmtpTransportTest` covering the endpoint string for the
+   default and EU hosts, the credentials, and that port 587 is not wrapped in
+   implicit TLS.
+ * `TurboSmtpApiTransportTest`: added coverage for attachments, for the absence
+   of the `attachments` key when there is none, for the error message built from
+   the `errors` array, and for the headers that must not be forwarded as
+   `custom_headers`.
+
+**Transport**
+
+ * `TurboSmtpApiTransport`: attachments were dropped silently. They are now sent
+   as the documented `{name, type, content}` objects with base64 content.
+ * `TurboSmtpApiTransport`: a failed response carries its detail in an `errors`
+   array, which was ignored in favour of the generic `message`. Both are used
+   now, `errors` first.
+ * `TurboSmtpApiTransport`: extended the header blocklist so MIME level headers
+   are not echoed back as `custom_headers`.
+
+**Cleanups**
+
+ * Removed the `Add TurboSMTP bridge` line from `Mailer/CHANGELOG.md`. Bridges
+   are separate packages and carry their own changelog, which this one does; no
+   earlier bridge touched the component changelog.
+ * Reverted the whitespace change on the Prelude notifier line in
+   `FrameworkExtension.php`, unrelated to this bridge.
+ * Removed the README `Maintenance` section. Nothing supports the claim that the
+   package is maintained by the vendor, and it contradicted the `Sponsor`
+   section right below it. No other mailer or notifier bridge has such a
+   section.
+
+**Open questions for the provider**
+
+ * The API transport authenticates with `consumerKey` and `consumerSecret`
+   request headers. The public API reference documents `authuser` and `authpass`
+   instead, holding the account email and password, and never mentions consumer
+   credentials for the API. Consumer Key and Consumer Secret are documented only
+   as the SMTP username and password. Left as is, but it needs confirmation from
+   someone with a live account.
+ * The API payload sends `from` as `"Name" <address>`. The reference describes
+   `from` as a sender email address and documents no companion name field. Also
+   left as is for the same reason.
+
+---------------------------------------------------------------------------
+
+by NewtTheWolf at 2026-07-31T18:19:25Z
+
+Thanks for the merge prep @nicolas-grekas. I checked the two open questions live on a real account.
+
+**Authentication.** The transport uses `consumerKey` / `consumerSecret` request
+headers, which is the current documented method for `/mail/send`, confirmed with a
+live send (HTTP 200 + `mid`). The `authuser` / `authpass` you saw is the older
+method: the "Send email V2" page at https://serversmtp.com/turbo-api-1/#send-email-v2
+still documents it, while the current OpenAPI reference at
+https://serversmtp.com/turbo-api/ documents `consumerKey` / `consumerSecret`. They
+also aren't SMTP-only: the same pair authenticates the SMTP relay (`AUTH` returns
+`235`, message queued) and the API (200).
+
+**`from` as `"Name" <address>`.** Accepted, and delivered with the name intact. It's
+a standard [RFC 5322](https://www.rfc-editor.org/rfc/rfc5322#section-3.4) mailbox, not
+a provider field. The bridge doesn't hand-roll it: `from` is
+`$envelope->getSender()->toString()`, and Symfony's `Mime\Address::toString()` always
+quotes the display name, so `"Spitzli, Dominik" <addr>` can't split the address. I
+sent bare, quoted, comma and inner-quote forms live and all were accepted.
+
+I also confirmed the attachment fix end-to-end (a `.txt` and a `.png`, both delivered),
+and pushed a small follow-up for inline images. `$email->embed()` parts arrived as
+plain attachments, because TurboSMTP keys inline parts by `<cid@sender-domain>` and a
+bare `cid:logo` reference never matches. `getAttachments` now sets `content_id` for
+inline parts and `getPayload` qualifies the HTML `cid:` with the sender domain.
+Verified live (renders inline in Proton and Thunderbird) and covered by a unit test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T12:58:54Z
+
+Thanks for checking both questions against a live account, that settles them.
+
+One more mapping change pushed: `processed` now maps to `MailerDeliveryEvent::RECEIVED` instead of `DELIVERED`, and the `processed` webhook fixture follows.
+
+The two constants describe two different hops. `RECEIVED` is the provider accepting the message from the application, `DELIVERED` is the recipient's server accepting it. Every other bridge keeps them apart: Mailgun `accepted` and `delivered`, Brevo `request` and `delivered`, Resend `email.sent` and `email.delivered`, and the same in AhaSend, MailerSend, Mailchimp, Sweego and Mailomat. TurboSMTP documents PROCESSED as the message being taken in and queued, which is the first hop.
+
+The mapping came from `SendgridPayloadConverter`, which maps `'processed', 'delivered'` to `DELIVERED` and is the only delivery converter in the tree with no `RECEIVED` mapping at all. That looks like an oversight rather than a decision: the line has not been touched since the bridge was added in 2023, and `MailerDeliveryEvent::RECEIVED` already existed four months before it. The effect there is two `DELIVERED` events per message, so anything counting deliveries double counts. I opened a separate pull request for it against 6.4.

@@ -30,6 +30,11 @@ HttpFoundation
 
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
 
+Lock
+----
+
+ * Add argument `$advisory` to `StoreFactory::createStore()`
+
 Loco Translation Provider
 -------------------------
 

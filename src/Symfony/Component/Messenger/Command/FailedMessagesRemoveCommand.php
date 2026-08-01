@@ -37,6 +37,8 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 new InputOption('transport', null, InputOption::VALUE_REQUIRED, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('show-messages', null, InputOption::VALUE_NONE, 'Display messages before removing it (if multiple ids are given)'),
                 new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
+                new InputOption('failed-after', null, InputOption::VALUE_REQUIRED, 'Only select messages that failed at or after this date; messages with no known failure time are never selected'),
+                new InputOption('failed-before', null, InputOption::VALUE_REQUIRED, 'Only select messages that failed at or before this date; messages with no known failure time are never selected'),
             ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> removes given messages that are pending in the failure transport.
@@ -48,6 +50,19 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 You can remove all failed messages from the failure transport by using the "--all" option:
 
                     <info>php %command.full_name% --all</info>
+
+                Instead of ids, messages can be selected by class name, by failure time, or by both:
+
+                    <info>php %command.full_name% --class-filter='App\Message\SendEmail'</info>
+                    <info>php %command.full_name% --failed-after='-1 hour'</info>
+                    <info>php %command.full_name% --failed-after='2024-05-01 08:00' --failed-before='2024-05-01 09:30'</info>
+
+                The "--failed-after" and "--failed-before" options accept any expression supported by
+                DateTimeImmutable and both bounds are inclusive. The failure time comes from the message
+                history, so messages that were never redelivered are never selected by these options.
+
+                Filters cannot be combined with message ids nor with the "--all" option, and the number of
+                matching messages is confirmed before anything is removed.
                 EOF
             )
         ;
@@ -58,6 +73,10 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         $io = new SymfonyStyle($input, $output);
         $errorIo = $io->getErrorStyle();
 
+        $ids = (array) $input->getArgument('id');
+        [$classFilter, $failedAfter, $failedBefore] = $this->getFilters($input, (bool) $ids);
+        $hasFilters = null !== $classFilter || null !== $failedAfter || null !== $failedBefore;
+
         $failureTransportName = $input->getOption('transport');
         if (self::DEFAULT_TRANSPORT_OPTION === $failureTransportName) {
             $failureTransportName = $this->getGlobalFailureReceiverName();
@@ -66,7 +85,6 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
         $receiver = $this->getReceiver($failureTransportName);
 
         $shouldForce = $input->getOption('force');
-        $ids = (array) $input->getArgument('id');
         $shouldDeleteAllMessages = $input->getOption('all');
 
         $idsCount = \count($ids);
@@ -75,8 +93,12 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
             throw new RuntimeException(\sprintf('The "%s" receiver does not support removing specific messages.', $failureTransportName));
         }
 
-        if (!$idsCount && null !== $input->getOption('class-filter')) {
-            $ids = $this->getMessageIdsByClassFilter($input->getOption('class-filter'), $receiver);
+        if ($shouldDeleteAllMessages && $hasFilters) {
+            throw new RuntimeException('You cannot use the "--all" option together with the "--class-filter", "--failed-after" or "--failed-before" options.');
+        }
+
+        if ($hasFilters) {
+            $ids = $this->getMessageIdsByFilter($receiver, $classFilter, $failedAfter, $failedBefore);
             $idsCount = \count($ids);
 
             if (!$idsCount) {
@@ -132,26 +154,6 @@ class FailedMessagesRemoveCommand extends AbstractFailedMessagesCommand
                 $errorIo->note(\sprintf('Message with id %s not removed.', $id));
             }
         }
-    }
-
-    private function getMessageIdsByClassFilter(string $classFilter, ListableReceiverInterface $receiver): array
-    {
-        $ids = [];
-
-        $this->phpSerializer?->acceptPhpIncompleteClass();
-        try {
-            foreach ($receiver->all() as $envelope) {
-                if ($classFilter !== $envelope->getMessage()::class) {
-                    continue;
-                }
-
-                $ids[] = $this->getMessageId($envelope);
-            }
-        } finally {
-            $this->phpSerializer?->rejectPhpIncompleteClass();
-        }
-
-        return $ids;
     }
 
     private function removeAllMessages(ListableReceiverInterface $receiver, SymfonyStyle $io, SymfonyStyle $errorIo, bool $shouldForce, bool $shouldDisplayMessages): void

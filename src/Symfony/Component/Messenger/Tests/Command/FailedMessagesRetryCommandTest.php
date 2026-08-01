@@ -12,18 +12,22 @@
 namespace Symfony\Component\Messenger\Tests\Command;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
@@ -333,5 +337,209 @@ class FailedMessagesRetryCommandTest extends TestCase
 
         $tester->execute(['id' => ['10']]);
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryMessagesFilteredByClass()
+    {
+        $anotherClass = new class extends \stdClass {};
+
+        $envelopes = [
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(10)]),
+            new Envelope(new $anotherClass(), [new TransportMessageIdStamp(20)]),
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(30)]),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [10, 30]);
+        $tester->execute(['--class-filter' => 'stdClass', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryMessagesFilteredByFailureTime()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-01 10:00:00'),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00'),
+            $this->createFailedEnvelope(30, '2024-05-03 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20]);
+        $tester->execute(['--failed-after' => '2024-05-02 00:00:00', '--failed-before' => '2024-05-02 23:59:59', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryMessagesFilteredByRelativeFailureTime()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '-1 year'),
+            $this->createFailedEnvelope(20, '-1 minute'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20]);
+        $tester->execute(['--failed-after' => '-1 hour', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryMessagesFilteredByClassAndFailureTime()
+    {
+        $anotherClass = new class extends \stdClass {};
+
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00'),
+            new Envelope(new $anotherClass(), [new TransportMessageIdStamp(20), new RedeliveryStamp(0, new \DateTimeImmutable('2024-05-02 11:00:00'))]),
+            $this->createFailedEnvelope(30, '2024-05-05 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [10]);
+        $tester->execute(['--class-filter' => 'stdClass', '--failed-before' => '2024-05-03 00:00:00', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryExcludesMessagesWithoutRedeliveryStampWhenFilteringByFailureTime()
+    {
+        $envelopes = [
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(10)]),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20]);
+        $tester->execute(['--failed-after' => '2024-05-01 00:00:00', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryIncludesMessagesWithoutRedeliveryStampWhenFilteringByClassOnly()
+    {
+        $envelopes = [
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(10)]),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [10, 20]);
+        $tester->execute(['--class-filter' => 'stdClass', '--force' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRetryWithIdsAndFilterThrows()
+    {
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot specify message ids when using the "--class-filter", "--failed-after" or "--failed-before" options.');
+        $tester->execute(['id' => [10], '--class-filter' => 'stdClass']);
+    }
+
+    public function testRetryWithFilterMatchingNothingThrows()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00'),
+        ]);
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('No failed messages were found with this filter.');
+        $tester->execute(['--failed-after' => '2024-06-01 00:00:00', '--force' => true]);
+    }
+
+    public function testRetryWithFilterOnNonListableReceiverThrows()
+    {
+        $receiver = $this->createStub(ReceiverInterface::class);
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "failure_receiver" receiver does not support filtering messages.');
+        $tester->execute(['--class-filter' => 'stdClass', '--force' => true]);
+    }
+
+    public function testRetryWithUnparsableFailureTimeThrows()
+    {
+        $receiver = $this->createStub(ListableReceiverInterface::class);
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of the "--failed-after" option is not a valid date: "not a date".');
+        $tester->execute(['--failed-after' => 'not a date']);
+    }
+
+    private function createFailedEnvelope(int $id, string $failedAt): Envelope
+    {
+        return new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp($id),
+            new RedeliveryStamp(0, new \DateTimeImmutable($failedAt)),
+        ]);
+    }
+
+    /**
+     * @param Envelope[] $envelopes   the messages listed by the failure transport
+     * @param int[]      $expectedIds the ids expected to be retried, in order
+     */
+    private function createCommandTester(array $envelopes, array $expectedIds): CommandTester
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn($envelopes);
+        $receiver->expects($this->exactly(\count($expectedIds)))->method('find')
+            ->willReturnCallback(function (...$args) use ($envelopes, &$expectedIds) {
+                $this->assertSame([array_shift($expectedIds)], $args);
+
+                foreach ($envelopes as $envelope) {
+                    if ([$envelope->last(TransportMessageIdStamp::class)->getId()] === $args) {
+                        return $envelope;
+                    }
+                }
+
+                return null;
+            })
+        ;
+        $receiver->expects($this->exactly(\count($expectedIds)))->method('ack');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->exactly(\count($expectedIds)))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            $bus,
+            new EventDispatcher()
+        );
+
+        return new CommandTester($command);
     }
 }

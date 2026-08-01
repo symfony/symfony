@@ -24,6 +24,8 @@ use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 #[Group('integration')]
 class MysqlStoreTest extends AbstractStoreTestCase
 {
+    use BlockingStoreTestTrait;
+
     protected function getEnv(): array
     {
         if (!$dsn = getenv('MYSQL_DSN')) {

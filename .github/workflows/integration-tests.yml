@@ -274,5 +274,6 @@ jobs:
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432
           MYSQL_DSN: mysql:host=localhost
+          MYSQL_HOST: 127.0.0.1
           MYSQL_USERNAME: root
           MYSQL_PASSWORD: root

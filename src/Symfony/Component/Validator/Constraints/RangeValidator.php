@@ -27,6 +27,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class RangeValidator extends ConstraintValidator
 {
+    use BcMathNumberTrait;
+
     public function __construct(
         private ?PropertyAccessorInterface $propertyAccessor = null,
         private ?ClockInterface $clock = null,
@@ -46,7 +48,7 @@ class RangeValidator extends ConstraintValidator
         $min = $this->getLimit($constraint->minPropertyPath, $constraint->min, $constraint);
         $max = $this->getLimit($constraint->maxPropertyPath, $constraint->max, $constraint);
 
-        if (!is_numeric($value) && !$value instanceof \DateTimeInterface) {
+        if (!is_numeric($value) && !$value instanceof \DateTimeInterface && !$value instanceof \BcMath\Number) {
             if ($this->isParsableDatetimeString($min) && $this->isParsableDatetimeString($max)) {
                 $this->context->buildViolation($constraint->invalidDateTimeMessage)
                     ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
@@ -84,6 +86,12 @@ class RangeValidator extends ConstraintValidator
             }
         }
 
+        // Scalar limits are converted so that the comparison keeps its arbitrary precision
+        if ($value instanceof \BcMath\Number) {
+            $min = self::toBcMathNumber($min);
+            $max = self::toBcMathNumber($max);
+        }
+
         $hasLowerLimit = null !== $min;
         $hasUpperLimit = null !== $max;
 
@@ -92,9 +100,9 @@ class RangeValidator extends ConstraintValidator
             $code = Range::NOT_IN_RANGE_ERROR;
 
             $violationBuilder = $this->context->buildViolation($message)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE))
-                ->setParameter('{{ max }}', $this->formatValue($max, self::PRETTY_DATE))
+                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE | self::OBJECT_TO_STRING))
+                ->setParameter('{{ min }}', $this->formatValue($min, self::PRETTY_DATE | self::OBJECT_TO_STRING))
+                ->setParameter('{{ max }}', $this->formatValue($max, self::PRETTY_DATE | self::OBJECT_TO_STRING))
                 ->setCode($code);
 
             if (null !== $constraint->maxPropertyPath) {
@@ -112,8 +120,8 @@ class RangeValidator extends ConstraintValidator
 
         if ($hasUpperLimit && $value > $max) {
             $violationBuilder = $this->context->buildViolation($constraint->maxMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE))
+                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE | self::OBJECT_TO_STRING))
+                ->setParameter('{{ limit }}', $this->formatValue($max, self::PRETTY_DATE | self::OBJECT_TO_STRING))
                 ->setCode(Range::TOO_HIGH_ERROR);
 
             if (null !== $constraint->maxPropertyPath) {
@@ -131,8 +139,8 @@ class RangeValidator extends ConstraintValidator
 
         if ($hasLowerLimit && $value < $min) {
             $violationBuilder = $this->context->buildViolation($constraint->minMessage)
-                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE))
-                ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE))
+                ->setParameter('{{ value }}', $this->formatValue($value, self::PRETTY_DATE | self::OBJECT_TO_STRING))
+                ->setParameter('{{ limit }}', $this->formatValue($min, self::PRETTY_DATE | self::OBJECT_TO_STRING))
                 ->setCode(Range::TOO_LOW_ERROR);
 
             if (null !== $constraint->maxPropertyPath) {

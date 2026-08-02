@@ -1143,7 +1143,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 (clone $definition)
                     ->setClass($class)
                     ->setTags(($definition->hasTag('proxy') ? ['proxy' => $parameterBag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags()),
-                $id, function ($proxy = false) use ($definition, &$inlineServices, $id) {
+                $id ?? $class, function ($proxy = false) use ($definition, &$inlineServices, $id) {
                     return $this->createService($definition, $inlineServices, true, $id, $proxy);
                 }
             );

@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T14:14:00Z
+
+Thanks for the review, the mutation testing angle is humbling and effective (a webhook parser that quietly drops two thirds of a batch is a fine way to lose data with a 200 OK). All addressed, squashed and rebased onto 8.2:
+
+* **DI wiring added**: `mailer.payload_converter.azure` and `mailer.webhook.request_parser.azure` are registered in `mailer_webhook.php`, and `FrameworkExtension` lists the parser (in the new `[package, service]` shape that landed on 8.2 in the meantime), so `framework.webhook.routing` can reference it.
+* **Batches are fully parsed**: `doParse()` now `array_map`s over every event and returns `AbstractMailerEvent[]`, like the Sendgrid parser. A `batch.json` fixture with a delivery and an engagement event covers it.
+* **Incomplete payloads are rejected**: missing `status`/`recipient`/`deliveryAttemptTimeStamp` (delivery) or `engagementType`/`recipient`/`userActionTimeStamp` (engagement) now throw a descriptive `ParseException`, surfaced as a 406 instead of a `TypeError` 500.
+* **The mutations you found are killed**: fixtures now use Azure's real 7-digit .NET-ticks fractions, so removing the date normalization breaks three tests; engagement fixtures carry `data.recipient` and the converter now sets the recipient on engagement events (that was a real gap, thanks).
+* Fabbot newlines on all files, CHANGELOG heading fixed (space removed and moved under 8.2).
+* **The handshake limitation is now stated** in the parser docblock and the description: Event Grid's automatic validation handshake needs the validation code echoed in the response body, which the webhook component's flow does not provide, so the endpoint must be registered through the manual validation flow.
+
+Local runs: bridge suite green, zero PHPStan/Psalm findings on the new classes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T08:15:17Z
+
+Thanks Amoifr, the DI wiring and the batch handling are right now. Rebased on 8.2, with four changes before merging.
+
+The `$secret` argument was accepted and never used, so any well-formed JSON posted to the endpoint was dispatched onto the bus and a configured secret did nothing. Event Grid does not sign its payloads, which is why there was nothing obvious to verify, but it does authenticate itself another way: it repeats the query parameters of the subscription URL on every delivery, and Microsoft documents that as the way to secure a webhook that is not behind Entra ID. So the parser now compares a `secret` query parameter against the configured secret with `hash_equals()` and rejects a mismatch with a 401. The subscription URL becomes `https://example.com/webhook/azure?secret=...`, and the README says so.
+
+`Hardening tests` was failing: the repo requires every `AbstractRequestParser` to ship a test that expects a `RejectWebhookException`, and the allow-list is closed. `AzureMalformedPayloadRequestParserTest` covers the seven rejection paths, so the 401 and 406 branches are no longer untested.
+
+The `isset()` guards checked presence, not type, so a payload with an array where a string belongs still reached the setters and produced a 500 rather than a 406. They check the type now, and one of the new rejection cases pins it.
+
+Two fixtures were added, `expanded` and `suppressed`. Five of the seven documented statuses had none, so the mapping was free to drift: flipping `Expanded` to `DROPPED`, or the `Suppressed`/`Quarantined`/`FilteredSpam`/`Failed` group to `BOUNCE`, both left the suite green. Both mutations now fail.
+
+The description was rewritten to read as documentation and ends with the points a symfony-docs PR should carry.

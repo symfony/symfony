@@ -182,4 +182,19 @@ class AddressTest extends TestCase
         $address = new Address('fabien@symfony.com', 'Fabien, "Potencier');
         $this->assertSame('"Fabien, \"Potencier" <fabien@symfony.com>', $address->toString());
     }
+
+    public function testEncodeNameIfNameContainsBackslashes()
+    {
+        $address = new Address('fabien@symfony.com', 'Fabien \ "Potencier');
+        $this->assertSame('"Fabien \\\\ \"Potencier" <fabien@symfony.com>', $address->toString());
+
+        $address = new Address('fabien@symfony.com', 'Fabien\\');
+        $this->assertSame('"Fabien\\\\" <fabien@symfony.com>', $address->toString());
+    }
+
+    public function testEncodeNameIfNameIsNotValidUtf8()
+    {
+        $address = new Address('fabien@symfony.com', "Fabien \xB1 \\ Potencier");
+        $this->assertSame("\"Fabien \xB1 \\\\ Potencier\" <fabien@symfony.com>", $address->toString());
+    }
 }

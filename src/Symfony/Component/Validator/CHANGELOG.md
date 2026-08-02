@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `restrictGroups` option to the `Valid` constraint
  * Add the `Cron` constraint to validate cron expressions
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
 

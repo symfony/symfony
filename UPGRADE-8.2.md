@@ -65,3 +65,8 @@ Translation
 -----------
 
  * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider
+
+Validator
+---------
+
+ * Add argument `$restrictGroups` to `Valid::__construct()`

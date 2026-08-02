@@ -63,6 +63,13 @@ class GenericMetadata implements MetadataInterface
      */
     private int $autoMappingStrategy = AutoMappingStrategy::NONE;
 
+    /**
+     * The groups that trigger the cascade, when it is not triggered unconditionally.
+     *
+     * @var string[]|null
+     */
+    private ?array $cascadeGroups = null;
+
     public function __serialize(): array
     {
         return array_filter([
@@ -71,6 +78,7 @@ class GenericMetadata implements MetadataInterface
             'cascadingStrategy' => CascadingStrategy::NONE !== $this->cascadingStrategy ? $this->cascadingStrategy : null,
             'traversalStrategy' => TraversalStrategy::NONE !== $this->traversalStrategy ? $this->traversalStrategy : null,
             'autoMappingStrategy' => AutoMappingStrategy::NONE !== $this->autoMappingStrategy ? $this->autoMappingStrategy : null,
+            'cascadeGroups' => $this->cascadeGroups,
         ]);
     }
 
@@ -108,9 +116,10 @@ class GenericMetadata implements MetadataInterface
             throw new ConstraintDefinitionException(\sprintf('The constraint "%s" can only be put on classes. Please use "Symfony\Component\Validator\Constraints\Valid" instead.', get_debug_type($constraint)));
         }
 
-        if ($constraint instanceof Valid && null === $constraint->groups) {
+        if ($constraint instanceof Valid && (null === $constraint->groups || !$constraint->restrictGroups)) {
             $this->cascadingStrategy = CascadingStrategy::CASCADE;
             $this->traversalStrategy = $constraint->traverse ? TraversalStrategy::IMPLICIT : TraversalStrategy::NONE;
+            $this->cascadeGroups = $constraint->groups;
 
             // The constraint is not added
             return $this;
@@ -176,6 +185,16 @@ class GenericMetadata implements MetadataInterface
     public function findConstraints(string $group): array
     {
         return $this->constraintsByGroup[$group] ?? [];
+    }
+
+    /**
+     * Returns the groups that trigger the cascade, or null when it is triggered unconditionally.
+     *
+     * @return string[]|null
+     */
+    public function getCascadeGroups(): ?array
+    {
+        return $this->cascadeGroups;
     }
 
     public function getCascadingStrategy(): int

@@ -17,8 +17,10 @@ require_once __DIR__.'/../Fixtures/includes/fixture_app_services.php';
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Dumper\YamlDumper;
@@ -149,6 +151,34 @@ class PhpFileLoaderTest extends TestCase
         yield ['array_config_tagged_iterator'];
         yield ['object_array_config'];
         yield ['return_when_env'];
+    }
+
+    public function testConfigLazyProxyArgument()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/services_with_lazy_proxy_argument.php');
+
+        $this->assertEquals([
+            new LazyProxyArgument(new Reference('foo_service')),
+            new LazyProxyArgument(new Reference('foo_service'), 'SomeInterface'),
+            new LazyProxyArgument(new Reference('foo_service'), ['SomeInterface', 'AnotherInterface']),
+        ], $container->getDefinition('bar_service')->getArguments());
+    }
+
+    public function testConfigLazyProxyArgumentWithInvalidBehavior()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/services_with_lazy_proxy_invalid_behavior.php');
+
+        $this->assertEquals([
+            new LazyProxyArgument(new Reference('foo_service', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            new LazyProxyArgument(new Reference('foo_service', ContainerInterface::NULL_ON_INVALID_REFERENCE)),
+            new LazyProxyArgument(new Reference('foo_service', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)),
+            new LazyProxyArgument(new Reference('foo_service', ContainerInterface::IGNORE_ON_INVALID_REFERENCE), 'SomeInterface'),
+            new LazyProxyArgument(new Reference('foo_service', ContainerInterface::NULL_ON_INVALID_REFERENCE), ['SomeInterface', 'AnotherInterface']),
+        ], $container->getDefinition('bar_service')->getArguments());
     }
 
     public function testResourceTags()

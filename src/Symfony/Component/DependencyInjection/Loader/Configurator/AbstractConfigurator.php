@@ -15,6 +15,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -93,7 +94,11 @@ abstract class AbstractConfigurator
         if ($value instanceof ReferenceConfigurator) {
             $reference = new Reference($value->id, $value->invalidBehavior);
 
-            return $value instanceof ClosureReferenceConfigurator ? new ServiceClosureArgument($reference) : $reference;
+            return match (true) {
+                $value instanceof ClosureReferenceConfigurator => new ServiceClosureArgument($reference),
+                $value instanceof LazyProxyReferenceConfigurator => new LazyProxyArgument($reference, $value->interfaces),
+                default => $reference,
+            };
         }
 
         if ($value instanceof InlineServiceConfigurator) {

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T13:10:22Z
+
+Thanks for the review! You had, in fact, already designed this API in the issue thread last year, so I stopped arguing with the record and implemented it. 🙂
+
+* **API reshaped to the agreed form**: the boolean flag is gone, the option is now `XmlEncoder::BOOLEAN_REPR => ['true', 'false']` (constant name per the issue thread), so `['yes', 'no']` and friends work too. The value is validated (a list of exactly two strings, otherwise a descriptive `InvalidArgumentException`).
+* **Attributes are covered**: `['@active' => true]` with the option gives `active="true"`, which was the actual case in #58305. A scalar boolean at the document root is covered as well, and both have tests, plus a test pinning the unchanged `1`/`0` default (including on attributes).
+* The unrelated `'%s resource'` message change is reverted, which un-breaks `testNotEncodableValueExceptionMessageForAResource` and the four red CI jobs with it.
+* CHANGELOG entry moved under a new `8.2` heading, `XmlEncoderContextBuilder::withBooleanRepr()` updated accordingly.
+* Test strength: the attribute tests fail when the attribute branch is reverted, and the element test fails when the `selectNodeType()` branch is removed, so both halves of the feature are pinned independently.
+
+Title and description refreshed to match the new option name. Rebased onto 8.2, full Serializer suite green locally.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T07:55:44Z
+
+Thanks Amoifr, the two-value option is exactly right. Rebased on 8.2 and made three changes before merging.
+
+My earlier advice on the resource message was half wrong, sorry. Reverting it did not fix the failure, it moved it: Fabbot lints every file a PR touches, and it wants the quoted form. So the message is now `'"%s" resource'` and the assertion in `XmlEncoderTest` was updated to match. That clears the job.
+
+`null` in a per-call context now really disables the option. `getBooleanRepr()` read it with `??`, so `null` fell through to the constructor default and `withBooleanRepr(null)` was a no-op against a configured encoder, despite the `?array` signature. It reads the key with `array_key_exists()` now, with a test.
+
+Empty strings are rejected. `['', 'no']` made true and false indistinguishable, and combined with `IGNORE_EMPTY_ATTRIBUTES` it silently dropped every attribute whose value was `true`. Two provider cases cover it.
+
+On making `['', '']` mean the XHTML idiom, true written as `foo="foo"` and false omitted: it reads well for attributes, but this option also governs element text, where `true` would have to become `<foo>foo</foo>` and `false` would have to remove the element, which is what `REMOVE_EMPTY_TAGS` already decides. It also changes which nodes exist rather than how a value is spelled. Rejecting empty strings keeps that pair free, so it can get its own explicit spelling later if we want it.
+
+Left alone, worth knowing: the option is validated on each boolean node rather than once, and the boolean branch skips CDATA wrapping, so `['<yes>', '<no>']` gives `&lt;yes&gt;` where the same literal string would be wrapped in CDATA. Both harmless.

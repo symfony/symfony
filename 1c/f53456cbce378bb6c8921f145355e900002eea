@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T09:54:28Z
+
+Added `testMetadataSerializedBeforeCascadeGroupsExistedStillCascades()`: it unserializes a `validator.mapping.cache` payload written before the `cascadeGroups` key existed and asserts the cascade still fires unconditionally. Without the `= null` default on the property it fails with `Typed property ...$cascadeGroups must not be accessed before initialization`, which is the failure mode a warm cache would have hit on upgrade.

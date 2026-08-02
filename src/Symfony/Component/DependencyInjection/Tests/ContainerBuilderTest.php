@@ -508,6 +508,19 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(\Bar\FooClass::class, $foo1);
     }
 
+    public function testCreateLazyProxyForInlineDefinition()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass')
+            ->setPublic(true)
+            ->setArguments([(new Definition('Bar\FooClass'))->setLazy(true)]);
+
+        $inline = $builder->get('foo')->arguments;
+
+        $this->assertInstanceOf(\Bar\FooClass::class, $inline);
+        $this->assertNotSame(\Bar\FooClass::class, $inline::class, 'The inline service is injected as a proxy');
+    }
+
     public function testClosureProxy()
     {
         $container = new ContainerBuilder();

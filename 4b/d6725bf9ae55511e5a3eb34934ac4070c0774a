@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T07:13:24Z
+
+Thanks for the review! The Bcc finding was the humbling one: the transport shipped emails that politely never reached the hidden recipients. All fixed and pushed, rebased onto 8.2.
+
+Blockers:
+
+* `composer.json`: `symfony/clock`, `symfony/http-client` and `ext-openssl` are now in `require`, matching the MicrosoftGraph bridge.
+* `Transport::fromDsn()` without an explicit client works: the factory falls back to `HttpClient::create()` behind a `class_exists()` guard and shares that client between the `TokenManager` and the transport.
+* Bcc delivery: the raw payload now carries a `Bcc` header built from the envelope recipients that are not part of To/Cc; the Gmail API honors it for delivery and strips it from the delivered message. The test asserts the header is present, instead of locking the bug in.
+* Custom envelopes are honored the same way: extra envelope recipients go through the `Bcc` header (test added). The envelope sender cannot be honored, the API always sends as the authenticated user; the README states it.
+* `#[DataProvider]` instead of `@dataProvider`, and the bridge now has a README section (including the base64 requirement for the private key, which was indeed hiding in a commit message) and a CHANGELOG entry.
+* Fabbot: newlines added, unused import removed.
+
+Smaller points:
+
+* 60 seconds of expiry leeway on the cached token, with a test at 30 seconds before expiry.
+* A token response missing `expires_in` (or `access_token`) now throws a `HttpTransportException` instead of surfacing a `DateMalformedStringException`.
+* `TokenManagerTest` uses `ClockSensitiveTrait`, no more leaking global clock.
+* `TokenManager` and `GmailApiTransport` are `final`, and on the duplication question: `TokenManager` is now also `@internal` (its mock subclass in tests is gone, tests use the real class over a `MockHttpClient`), so extracting a shared implementation with the MicrosoftGraph bridge later stays possible without any BC concern. Happy to attempt that extraction in a follow-up if you think it belongs in mailer core.
+* `create()` derives from `getSupportedSchemes()`, no more parallel scheme lists.
+
+Local runs: 28 bridge tests green, php 8.5 clean, zero PHPStan/Psalm findings on the bridge.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T08:36:26Z
+
+Thanks Amoifr, the Bcc handling and the packaging are right now. Rebased on 8.2, with four changes before merging.
+
+The envelope is authoritative rather than additive. `getEnvelopeOnlyRecipients()` only added addresses, so an envelope that narrows the recipients was ignored and the message still reached the original ones. That is the staging redirect shape, `framework.mailer.envelope.recipients`, where being ignored does real damage: the envelope said `staging@symfony.com`, the raw still carried `To: real-customer@example.com` and `Cc: real-boss@example.com`, and Gmail delivered to both. `applyEnvelope()` now removes from `To` and `Cc` what the envelope drops and sends what it adds through `Bcc`. An envelope sender still cannot be expressed, the API has no field for it, and the README says so.
+
+The message sent and the message reported no longer disagree. Rebuilding the payload from `getPreparedHeaders()` generated a second `Message-ID`, because that method works on a clone and mints one when the email has none, so the id you logged was not the id you sent. `SentMessage` has already settled on an id by then, so the raw reuses it.
+
+Both x86 jobs were red, and only on this bridge: deleting `TokenManagerMock` moved RSA key generation into a data provider, and those runners cannot do it (`openssl_pkey_export(): Cannot get key from parameter 1`, then `The data provider ... is invalid`). There is a committed key at `Tests/Fixtures/private_key.pem` now, and no test generates one any more.
+
+`TokenManager` is no longer `@internal`: it is the first constructor argument of a public final transport, so it cannot be built without it.
+
+Two new tests cover the first two points and both fail when the fix is reverted. Left as follow-ups: the duplication with the MicrosoftGraph `TokenManager`, and the private key being visible through `print_r()` on the manager.

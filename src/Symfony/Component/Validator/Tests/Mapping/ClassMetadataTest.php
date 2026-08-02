@@ -240,6 +240,27 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals($reflClass, $this->metadata->getReflectionClass());
     }
 
+    public function testCascadeGroupsSurviveSerialization()
+    {
+        $this->metadata->addPropertyConstraint('firstName', new Valid(groups: ['trigger'], restrictGroups: false));
+
+        $metadata = unserialize(serialize($this->metadata));
+
+        $this->assertSame(['trigger'], $metadata->getPropertyMetadata('firstName')[0]->getCascadeGroups());
+    }
+
+    public function testMetadataSerializedBeforeCascadeGroupsExistedStillCascades()
+    {
+        $this->metadata->addPropertyConstraint('firstName', new Valid());
+
+        // a validator.mapping.cache entry written by a version that did not know the key
+        $legacy = str_replace('cascadeGroups', 'zzzzzzzzzzzzz', serialize($this->metadata));
+        $propertyMetadata = unserialize($legacy)->getPropertyMetadata('firstName')[0];
+
+        $this->assertNull($propertyMetadata->getCascadeGroups());
+        $this->assertSame(CascadingStrategy::CASCADE, $propertyMetadata->getCascadingStrategy());
+    }
+
     public function testSerialize()
     {
         $this->metadata->addConstraint(new ConstraintA('A'));

@@ -631,6 +631,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             return;
         }
 
+        // A Valid constraint carrying groups only cascades when one of them is being validated
+        if ($metadata instanceof GenericMetadata && null !== $cascadeGroups = $metadata->getCascadeGroups()) {
+            if (!array_intersect($groups, $cascadeGroups)) {
+                return;
+            }
+        }
+
         // If no specific traversal strategy was requested when this method
         // was called, use the traversal strategy of the node's metadata
         if ($traversalStrategy & TraversalStrategy::IMPLICIT) {

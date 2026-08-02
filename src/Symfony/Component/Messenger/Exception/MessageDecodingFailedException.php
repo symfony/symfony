@@ -14,6 +14,6 @@ namespace Symfony\Component\Messenger\Exception;
 /**
  * Thrown when a message cannot be decoded in a serializer.
  */
-class MessageDecodingFailedException extends InvalidArgumentException
+class MessageDecodingFailedException extends InvalidArgumentException implements UnrecoverableExceptionInterface
 {
 }

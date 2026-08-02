@@ -12,10 +12,15 @@
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Retry\RetryStrategyInterface;
+use Symfony\Component\Messenger\Stamp\SentForRetryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
@@ -183,5 +188,31 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
         $listener->onMessageFailed($event);
+    }
+
+    public function testMessageDecodingFailedExceptionCausesNoRetry()
+    {
+        $sender = $this->createMock(SenderInterface::class);
+        $sender->expects($this->never())->method('send');
+        $senderLocator = new Container();
+        $senderLocator->set('my_receiver', $sender);
+
+        $retryStrategy = $this->createMock(RetryStrategyInterface::class);
+        $retryStrategy->expects($this->never())->method('isRetryable');
+        $retryStrategyLocator = new Container();
+        $retryStrategyLocator->set('my_receiver', $retryStrategy);
+
+        $listener = new SendFailedMessageForRetryListener($senderLocator, $retryStrategyLocator);
+
+        $event = new WorkerMessageFailedEvent(
+            new Envelope(new \stdClass()),
+            'my_receiver',
+            new MessageDecodingFailedException('Could not decode message'),
+        );
+        $listener->onMessageFailed($event);
+
+        $sentForRetryStamp = $event->getEnvelope()->last(SentForRetryStamp::class);
+        $this->assertInstanceOf(SentForRetryStamp::class, $sentForRetryStamp);
+        $this->assertFalse($sentForRetryStamp->isSent);
     }
 }

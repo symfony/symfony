@@ -1,0 +1,74 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-30T15:38:20Z
+
+Thanks for the review @mtarld! 🙏
+
+Just pushed the fixes:
+- Added trailing newlines to both files
+- Simplified tests to use `denormalize()` directly instead of `deserialize()`
+- Removed the redundant third test
+
+Let me know if anything else needs adjustment!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-31T05:28:42Z
+
+Thanks @mtarld for the thorough review! 🙏
+
+Just pushed the fixes:
+- Added inline key type validation (like `ArrayDenormalizer` does)
+- Moved `createChildContext()` inside the loop
+- Added tests for string-keyed arrays and invalid key type validation
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-31T09:22:00Z
+
+All points addressed! Thank you so much @mtarld for this incredibly thorough and insightful review! 🙏
+
+Your feedback really helped raise the quality bar here — from the namespace organization, the class naming consistency, the type hint suggestion (though I had to fall back to the same `@var` annotation approach as `ArrayDenormalizer` to satisfy Psalm), and especially the `deserialization_path` consistency with `ArrayDenormalizer`.
+
+It's always a pleasure to receive such precise and constructive feedback. Really appreciate you taking the time to dig into the details! 🙂
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-31T11:47:38Z
+
+Thanks again @mtarld for these excellent suggestions! 🙏
+
+Using `strval` and `Type::accepts()` makes the code much cleaner and more idiomatic. Really appreciate you taking the time to guide me towards better patterns — it's a great learning experience!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T08:23:15Z
+
+Thanks for the review, the nullable finding was a great catch (and the test one stung, rightly: a test that cannot fail is just documentation with extra steps 🙂). All addressed, squashed into a single commit and rebased onto current 8.2.
+
+* **Nullable element types fixed**: the recursion now receives `$collectionValueType` (the wrapped type) instead of the unwrapped base, so `array<Foo|Bar|null>` keeps its `null` elements. Covered by a test that fails on the previous code.
+* **The tests now prove the feature**: `UnionTypeFooDummy`/`UnionTypeBarDummy` have required constructor arguments, so the payloads actually discriminate, and every assertion names the concrete class and value (`items[1]` is a `UnionTypeBarDummy` with `bar === true`, not just "one of the two").
+* **One fixture class per file**, so the tests pass standalone; the multi-class file is gone.
+* @mtarld's point is in: the dead `null !== $collectionKeyType` guards are removed (`getCollectionKeyType()` is non-nullable).
+* **Error message aligned**: the not-an-array case now emits the component's usual `The type of the "items" attribute for class "..." must be one of "array" ("string" given).` and passes a `Type` object as expected type, like the neighbouring calls.
+* **Behaviour notes in the CHANGELOG** (new 8.2 entry): elements matching no union member (a float for `array<int|string>`, unions of unknown classes) now throw `NotNormalizableValueException` instead of being returned raw. Both shapes are pinned by tests, including the pass-through for valid scalar unions.
+
+Known limitations, unchanged in this PR and happy to tackle as follow-ups: nested `array<array<Foo|Bar>>` still yields raw inner arrays, and `iterable<Foo|Bar>` is not a `CollectionType` so it is untouched.
+
+Local runs: full Serializer suite green (1305 tests), zero new PHPStan/Psalm findings on `AbstractObjectNormalizer` compared to base.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T08:06:32Z
+
+Thanks Amoifr, the nullable case and the fixtures are right now. Rebased on 8.2 and made three changes before merging.
+
+Added the `UPGRADE-8.2.md` entry under `Serializer`. Three shapes that returned raw data before now throw: an element matching no member of the union, a class the denormalizer does not know, and a key whose type does not match the declared one. That is the kind of change people need to read before upgrading.
+
+Shortened the CHANGELOG entry to one line. It also named the wrong exception: for a union of classes with required constructor arguments the exception is `MissingConstructorArgumentsException`, which extends `RuntimeException` and not `NotNormalizableValueException`. That matches what the existing direct-union path does, so only the wording was wrong, and the detail belongs in the docs rather than in the changelog.
+
+Added `testDenormalizeArrayOfUnknownClassUnionTypesRejectsElements`. Your comment said both tightenings were pinned by tests, but only the float case was; the unknown-class one had none. It fails on base for the right reason.
+
+Note the rebase now conflicts with #63803, which merged in the meantime, so I resolved the CHANGELOG by keeping both entries.
+
+The PR description was rewritten to read as documentation, and it ends with the points a symfony-docs PR should carry. The nested `array<array<Foo|Bar>>` and `iterable<Foo|Bar>` cases are stated there as out of scope.

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\CustomNormalizer;
@@ -863,6 +864,94 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expectedXml, $actualXml);
     }
 
+    public function testEncodeXmlWithBooleanRepr()
+    {
+        $expectedXml = <<<'XML'
+            <?xml version="1.0"?>
+            <response active="true"><foo>true</foo><bar>false</bar></response>
+
+            XML;
+
+        $actualXml = $this->encoder->encode(['@active' => true, 'foo' => true, 'bar' => false], 'xml', [XmlEncoder::BOOLEAN_REPR => ['true', 'false']]);
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
+    public function testEncodeXmlWithCustomBooleanRepr()
+    {
+        $expectedXml = <<<'XML'
+            <?xml version="1.0"?>
+            <response enabled="yes"><foo>yes</foo><bar>no</bar></response>
+
+            XML;
+
+        $encoder = new XmlEncoder([XmlEncoder::BOOLEAN_REPR => ['yes', 'no']]);
+        $actualXml = $encoder->encode(['@enabled' => true, 'foo' => true, 'bar' => false], 'xml');
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
+    public function testEncodeScalarRootBooleanWithBooleanRepr()
+    {
+        $expectedXml = <<<'XML'
+            <?xml version="1.0"?>
+            <response>true</response>
+
+            XML;
+
+        $actualXml = $this->encoder->encode(true, 'xml', [XmlEncoder::BOOLEAN_REPR => ['true', 'false']]);
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
+    public function testEncodeBooleansAsIntegersByDefault()
+    {
+        $expectedXml = <<<'XML'
+            <?xml version="1.0"?>
+            <response active="1"><foo>1</foo><bar>0</bar></response>
+
+            XML;
+
+        $actualXml = $this->encoder->encode(['@active' => true, 'foo' => true, 'bar' => false], 'xml');
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
+    #[DataProvider('provideInvalidBooleanRepr')]
+    public function testEncodeWithInvalidBooleanReprThrows(mixed $booleanRepr)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "xml_boolean_repr" context option must be a list of the two non-empty strings representing true and false, e.g. ["true", "false"].');
+
+        $this->encoder->encode(['foo' => true], 'xml', [XmlEncoder::BOOLEAN_REPR => $booleanRepr]);
+    }
+
+    public static function provideInvalidBooleanRepr(): iterable
+    {
+        yield 'not an array' => ['true'];
+        yield 'one element' => [['true']];
+        yield 'three elements' => [['true', 'false', 'maybe']];
+        yield 'non-string elements' => [[1, 0]];
+        yield 'associative array' => [['true' => 'yes', 'false' => 'no']];
+        yield 'empty true' => [['', 'no']];
+        yield 'empty false' => [['yes', '']];
+    }
+
+    public function testEncodeXmlWithBooleanReprDisabledInContext()
+    {
+        $encoder = new XmlEncoder([XmlEncoder::BOOLEAN_REPR => ['yes', 'no']]);
+
+        $expectedXml = <<<'XML'
+            <?xml version="1.0"?>
+            <response active="1"><foo>0</foo></response>
+
+            XML;
+
+        $actualXml = $encoder->encode(['@active' => true, 'foo' => false], 'xml', [XmlEncoder::BOOLEAN_REPR => null]);
+
+        $this->assertEquals($expectedXml, $actualXml);
+    }
+
     public function testEncodeXmlWithDomNodeValue()
     {
         $expectedXml = <<<'XML'
@@ -898,7 +987,7 @@ class XmlEncoderTest extends TestCase
     public function testNotEncodableValueExceptionMessageForAResource()
     {
         $this->expectException(NotEncodableValueException::class);
-        $this->expectExceptionMessage('An unexpected value could not be serialized: stream resource');
+        $this->expectExceptionMessage('An unexpected value could not be serialized: "stream" resource');
 
         (new XmlEncoder())->encode(tmpfile(), 'xml');
     }

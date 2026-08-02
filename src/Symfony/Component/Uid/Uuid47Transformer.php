@@ -59,7 +59,7 @@ class Uuid47Transformer
             throw new InvalidArgumentException('The secret must be at least 16 bytes.');
         }
 
-        if ($secret === str_repeat($secret[0], 16)) {
+        if ($secret === str_repeat($secret[0], \strlen($secret))) {
             throw new InvalidArgumentException('The secret is trivially weak; use random_bytes(16) or a key derived from a passphrase via hash_hkdf().');
         }
 

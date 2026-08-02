@@ -1552,6 +1552,20 @@ class AutowirePassTest extends TestCase
         $this->assertFalse($container->hasDefinition('.lazy.'.A::class));
     }
 
+    public function testLazyServiceAttributeWithInterface()
+    {
+        $container = new ContainerBuilder();
+        $container->register(FinalLazyProxyImplementation::class, FinalLazyProxyImplementation::class)->setAutowired(true);
+        $container->register('foo', LazyServiceAttributeWithInterfaceAutowiring::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+
+        $definition = $container->getDefinition((string) $container->getDefinition('foo')->getArgument(0));
+
+        $this->assertTrue($definition->isLazy());
+        $this->assertSame([['interface' => LazyProxyTestInterface::class]], $definition->getTag('proxy'));
+    }
+
     public function testLazyNotCompatibleWithAutowire()
     {
         $container = new ContainerBuilder();

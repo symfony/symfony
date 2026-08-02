@@ -35,7 +35,8 @@ final class Listener implements EventSubscriberInterface
         }
         $timestamp = time();
 
-        foreach ($this->connectionExpiries as $name => $expiry) {
+        // iterate over a copy: removing the current key would make the iterator skip the next one
+        foreach ($this->connectionExpiries->getArrayCopy() as $name => $expiry) {
             if ($timestamp >= $expiry) {
                 // unset before so that we won't retry in case of any failure
                 $this->connectionExpiries->offsetUnset($name);

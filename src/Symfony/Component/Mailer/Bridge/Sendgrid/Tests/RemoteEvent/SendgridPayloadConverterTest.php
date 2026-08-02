@@ -42,7 +42,7 @@ class SendgridPayloadConverterTest extends TestCase
 
     public static function provideDeliveryEvents(): iterable
     {
-        yield ['processed', MailerDeliveryEvent::DELIVERED];
+        yield ['processed', MailerDeliveryEvent::RECEIVED];
         yield ['delivered', MailerDeliveryEvent::DELIVERED];
         yield ['bounce', MailerDeliveryEvent::BOUNCE];
         yield ['dropped', MailerDeliveryEvent::DROPPED];

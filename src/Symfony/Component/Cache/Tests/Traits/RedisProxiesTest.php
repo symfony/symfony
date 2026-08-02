@@ -28,12 +28,13 @@ class RedisProxiesTest extends TestCase
     #[TestWith([\RedisCluster::class])]
     public function testRedisProxy($class)
     {
-        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}Proxy.php");
+        $version = version_compare(phpversion('redis'), '6', '>') ? '6' : '5';
+        $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}{$version}Proxy.php");
         $proxy = substr($proxy, 0, 2 + strpos($proxy, '[];'));
         $expected = substr($proxy, 0, 2 + strpos($proxy, '}'));
         $methods = [];
 
-        foreach ((new \ReflectionClass(\sprintf('Symfony\Component\Cache\Traits\\%sProxy', $class)))->getMethods() as $method) {
+        foreach ((new \ReflectionClass(\sprintf('Symfony\Component\Cache\Traits\\%s%dProxy', $class, $version)))->getMethods() as $method) {
             if ('reset' === $method->name || method_exists(RedisProxyTrait::class, $method->name) || $method->isInternal()) {
                 continue;
             }

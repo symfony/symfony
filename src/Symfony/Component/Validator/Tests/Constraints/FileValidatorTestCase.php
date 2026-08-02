@@ -592,6 +592,32 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    public function testExtensionsAndMimeTypesWithoutCommonValue()
+    {
+        $path = __DIR__.'/Fixtures/test.gif';
+        $file = new \Symfony\Component\HttpFoundation\File\File($path);
+
+        try {
+            $file->getMimeType();
+        } catch (\LogicException $e) {
+            $this->markTestSkipped('Guessing the mime type is not possible');
+        }
+
+        $constraint = new File(mimeTypes: ['application/pdf'], mimeTypesMessage: 'myMessage', extensions: ['gif']);
+
+        $this->validator->validate($file, $constraint);
+
+        $this->buildViolation('myMessage')
+            ->setParameters([
+                '{{ file }}' => '"'.$path.'"',
+                '{{ name }}' => '"test.gif"',
+                '{{ type }}' => '"image/gif"',
+                '{{ types }}' => '"application/pdf"',
+            ])
+            ->setCode(File::INVALID_MIME_TYPE_ERROR)
+            ->assertRaised();
+    }
+
     public function testUploadedFileExtensions()
     {
         $file = new UploadedFile(__DIR__.'/Fixtures/bar', 'bar.txt', 'text/plain', \UPLOAD_ERR_OK, true);

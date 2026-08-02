@@ -106,6 +106,31 @@ class PoFileLoaderTest extends TestCase
         $this->assertArrayHasKey('foo3', $messages);
     }
 
+    public function testSkipFuzzyTranslationsWithoutBlankLines()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../Fixtures/fuzzy-translations-no-blank-lines.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals([
+            'foo2' => 'bar2',
+            'foo3' => 'bar3',
+        ], $catalogue->all('domain1'));
+    }
+
+    public function testContextsAreDiscarded()
+    {
+        $loader = new PoFileLoader();
+        $resource = __DIR__.'/../Fixtures/contexts.po';
+        $catalogue = $loader->load($resource, 'en', 'domain1');
+
+        $this->assertEquals([
+            'foo1' => 'bar1',
+            'foo2' => 'bar2',
+            'foo3' => 'bar3',
+        ], $catalogue->all('domain1'));
+    }
+
     public function testMissingPlurals()
     {
         $loader = new PoFileLoader();

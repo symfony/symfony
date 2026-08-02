@@ -274,6 +274,28 @@ class ArrayShapeGeneratorTest extends TestCase
             CODE, ArrayShapeGenerator::generate($root->getNode()));
     }
 
+    public function testBeforeNormalizationIfTrueMakesArrayShapeUnsealed()
+    {
+        $root = new ArrayNodeDefinition('root');
+        $root
+            ->children()
+                ->scalarNode('child')->end()
+            ->end()
+            ->beforeNormalization()
+                ->ifTrue(static fn ($v) => \is_array($v) && isset($v['extra']))
+                ->then(static fn ($v) => $v)
+            ->end();
+
+        $shape = ArrayShapeGenerator::generate($root->getNode());
+
+        $this->assertStringContainsString(<<<'CODE'
+            array{
+             *     child?: scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null,
+             *     ...<string, mixed>
+             * }
+            CODE, $shape);
+    }
+
     #[DataProvider('provideQuotedNodes')]
     public function testPhpdocQuoteNodeName(NodeInterface $node, string $expected)
     {

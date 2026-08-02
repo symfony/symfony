@@ -29,6 +29,7 @@ class ProxyHelperTest extends TestCase
     {
         $methods = (new \ReflectionClass(TestForProxyHelper::class))->getMethods();
         $source = file(__FILE__);
+        $hasOctalControlChars = self::hasOctalControlChars();
 
         foreach ($methods as $method) {
             $expected = substr($source[$method->getStartLine() - 1], $method->isAbstract() ? 13 : 4, -(1 + $method->isAbstract()));
@@ -37,7 +38,7 @@ class ProxyHelperTest extends TestCase
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
             $expected = str_replace('= [namespace\M_PI, new M_PI()]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
 
-            if (self::hasOctalControlChars()) {
+            if ($hasOctalControlChars) {
                 $expected = str_replace('"a\0b"', '"a\000b"', $expected);
             }
 

@@ -26,7 +26,8 @@ final class SendgridPayloadConverter implements PayloadConverterInterface
     {
         if (\in_array($payload['event'], ['processed', 'delivered', 'bounce', 'dropped', 'deferred'], true)) {
             $name = match ($payload['event']) {
-                'processed', 'delivered' => MailerDeliveryEvent::DELIVERED,
+                'processed' => MailerDeliveryEvent::RECEIVED,
+                'delivered' => MailerDeliveryEvent::DELIVERED,
                 'dropped' => MailerDeliveryEvent::DROPPED,
                 'deferred' => MailerDeliveryEvent::DEFERRED,
                 'bounce' => MailerDeliveryEvent::BOUNCE,

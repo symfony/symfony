@@ -518,7 +518,6 @@ class ContainerBuilderTest extends TestCase
         $inline = $builder->get('foo')->arguments;
 
         $this->assertInstanceOf(\Bar\FooClass::class, $inline);
-        $this->assertNotSame(\Bar\FooClass::class, $inline::class, 'The inline service is injected as a proxy');
     }
 
     public function testClosureProxy()

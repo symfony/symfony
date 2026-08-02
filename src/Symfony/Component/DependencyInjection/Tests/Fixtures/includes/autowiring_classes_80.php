@@ -184,6 +184,13 @@ class LazyServiceAttributeAutowiring
     }
 }
 
+class LazyServiceAttributeWithInterfaceAutowiring
+{
+    public function __construct(#[Lazy(LazyProxyTestInterface::class)] FinalLazyProxyImplementation $impl)
+    {
+    }
+}
+
 class LazyAutowireServiceAttributesAutowiring
 {
     public function __construct(#[Lazy, Autowire(lazy: true)] A $a)

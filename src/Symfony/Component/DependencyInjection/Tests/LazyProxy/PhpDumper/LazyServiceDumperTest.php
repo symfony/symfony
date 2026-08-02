@@ -65,6 +65,43 @@ class LazyServiceDumperTest extends TestCase
         $dumper->getProxyCode($definition);
     }
 
+    public function testMissingInterfaceAttribute()
+    {
+        $dumper = new LazyServiceDumper();
+        $definition = (new Definition(TestContainer::class))
+            ->setLazy(true)
+            ->addTag('proxy', []);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid definition for service "Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper\TestContainer": the "interface" attribute is missing on a "proxy" tag.');
+        $dumper->getProxyCode($definition);
+    }
+
+    public function testUnknownInterface()
+    {
+        $dumper = new LazyServiceDumper();
+        $definition = (new Definition(TestContainer::class))
+            ->setLazy(true)
+            ->addTag('proxy', ['interface' => 'Not\A\Real\Interfase']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "proxy" tag for service "Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper\TestContainer": "Not\A\Real\Interfase" is neither a class nor an interface.');
+        $dumper->getProxyCode($definition);
+    }
+
+    public function testSeveralProxyTagsRequireInterfaces()
+    {
+        $dumper = new LazyServiceDumper();
+        $definition = (new Definition(TestContainer::class))
+            ->setLazy(true)
+            ->addTag('proxy', ['interface' => TestContainer::class])
+            ->addTag('proxy', ['interface' => ContainerInterface::class]);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid "proxy" tag for service "Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper\TestContainer": several "proxy" tags found but "Symfony\Component\DependencyInjection\Tests\LazyProxy\PhpDumper\TestContainer" is not an interface.');
+        $dumper->getProxyCode($definition);
+    }
+
     public function testReadonlyClass()
     {
         $dumper = new LazyServiceDumper();

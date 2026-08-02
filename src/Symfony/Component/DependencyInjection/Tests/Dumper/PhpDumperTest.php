@@ -52,7 +52,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AAndIInterfaceConsumer;
 use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\EInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\EnvAutowireWithMissingArgument;
+use Symfony\Component\DependencyInjection\Tests\Compiler\F;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
@@ -1087,6 +1089,28 @@ class PhpDumperTest extends TestCase
         $dumper = new PhpDumper($container);
 
         $this->assertStringEqualsGeneratedFile('services_dedup_lazy.php', $dumper->dump());
+    }
+
+    public function testDedupLazyProxyWithDifferentInterfaces()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', F::class)
+            ->setLazy(true)
+            ->setPublic(true)
+            ->addTag('proxy', ['interface' => EInterface::class]);
+        $container->register('bar', F::class)
+            ->setLazy(true)
+            ->setPublic(true)
+            ->addTag('proxy', ['interface' => IInterface::class]);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Service_Dedup_Lazy_Proxy_Interfaces']));
+
+        $container = new \Symfony_DI_PhpDumper_Service_Dedup_Lazy_Proxy_Interfaces();
+
+        $this->assertInstanceOf(EInterface::class, $container->get('foo'));
+        $this->assertInstanceOf(IInterface::class, $container->get('bar'));
     }
 
     public function testLazyArgumentProvideGenerator()

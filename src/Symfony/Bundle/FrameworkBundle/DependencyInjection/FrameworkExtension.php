@@ -3148,6 +3148,7 @@ class FrameworkExtension extends Extension
             $debug = $container->getParameter('kernel.debug');
             $webhookRequestParsers = [
                 MailerBridge\AhaSend\Webhook\AhaSendRequestParser::class => ['symfony/aha-send-mailer', 'mailer.webhook.request_parser.ahasend'],
+                MailerBridge\Azure\Webhook\AzureRequestParser::class => ['symfony/azure-mailer', 'mailer.webhook.request_parser.azure'],
                 MailerBridge\Brevo\Webhook\BrevoRequestParser::class => ['symfony/brevo-mailer', 'mailer.webhook.request_parser.brevo'],
                 MailerBridge\MailerSend\Webhook\MailerSendRequestParser::class => ['symfony/mailer-send-mailer', 'mailer.webhook.request_parser.mailersend'],
                 MailerBridge\Mailchimp\Webhook\MailchimpRequestParser::class => ['symfony/mailchimp-mailer', 'mailer.webhook.request_parser.mailchimp'],

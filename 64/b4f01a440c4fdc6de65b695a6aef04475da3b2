@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by semx at 2026-08-02T11:40:17Z
+
+A note on the red Fabbot check, since it is not caused by this PR.
+
+Fabbot asks to rewrite six pre-existing lines in `Uuid47Transformer::transform()` from `$bytes[0] = $bytes[0] ^ $hash[5]` to `$bytes[0] ^= $hash[5]`. Applying that patch makes the component fatal:
+
+```
+PHP Fatal error: Cannot use assign-op operators with string offsets
+```
+
+PHP does not allow assign-op on a string offset, and `long_to_shorthand_operator` is marked RISKY precisely for this case. The rule only reaches this file now because Fabbot inspects changed files and nobody had touched it since 8.1.
+
+I opened #65106 to remove the pattern the rule trips on. Once that lands I will rebase this one and the check should go green. Happy to reorder or combine them if you prefer.

@@ -101,13 +101,8 @@ class Uuid47Transformer
         // so we XOR in reverse byte order.
         $hash = sodium_crypto_shorthash($sipInput, $secret);
 
-        $bytes[0] = $bytes[0] ^ $hash[5];
-        $bytes[1] = $bytes[1] ^ $hash[4];
-        $bytes[2] = $bytes[2] ^ $hash[3];
-        $bytes[3] = $bytes[3] ^ $hash[2];
-        $bytes[4] = $bytes[4] ^ $hash[1];
-        $bytes[5] = $bytes[5] ^ $hash[0];
-        $hex = bin2hex($bytes);
+        $mask = $hash[5].$hash[4].$hash[3].$hash[2].$hash[1].$hash[0];
+        $hex = bin2hex((substr($bytes, 0, 6) ^ $mask).substr($bytes, 6));
 
         return substr($hex, 0, 8).'-'.substr($hex, 8, 4).'-'.$targetVersion.substr($rfc4122, 15);
     }

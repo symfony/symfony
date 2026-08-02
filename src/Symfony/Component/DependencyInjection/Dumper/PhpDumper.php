@@ -578,10 +578,11 @@ class PhpDumper extends Dumper
             if (!$definition = $this->isProxyCandidate($definition, $asGhostObject, $id)) {
                 continue;
             }
-            if (isset($alreadyGenerated[$asGhostObject][$class = $definition->getClass()])) {
+            // the proxy class name derives from the "proxy" tags too, so one class can need several proxies
+            if (isset($alreadyGenerated[$asGhostObject][$class = $definition->getClass()][$tags = serialize($definition->getTag('proxy'))])) {
                 continue;
             }
-            $alreadyGenerated[$asGhostObject][$class] = true;
+            $alreadyGenerated[$asGhostObject][$class][$tags] = true;
 
             if ($this->container->isTrackingResources()) {
                 foreach (array_column($definition->getTag('proxy'), 'interface') ?: [$class] as $r) {

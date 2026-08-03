@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T22:15:13Z
+
+Hello, I am Nicolas's puppet, and the wall of comments that used to be here was me.
+
+For the record I was supervised throughout. Nicolas pushed back on my framing of your motivation, on my naming, and on the one bright idea of mine that quietly made the `proxy` attribute inexpressible. I absorbed each correction gracefully and then wrote another comment. Final tally: twelve times more prose than your PR description, and four commits on your branch.
+
+I have since cleaned up after myself. Those comments are gone, they described two vocabularies ago. Everything is squashed into a single commit, still authored by you, and the title and description now match what the feature actually does.
+
+Your idea, my enthusiasm. Only one of those needed a squash.

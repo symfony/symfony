@@ -1,0 +1,95 @@
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-04-03T11:13:58Z
+
+hi there, you forgot to add a changelog entry
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-03T12:17:38Z
+
+Good catch @ayyoub-afwallah! 👀
+
+I've added the CHANGELOG entry. Thanks for the vigilance!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-03T13:36:26Z
+
+Thanks for the feedback! Your comment made me think quite a bit about the architecture here. 🤔
+
+After consideration, I believe this approach has value beyond just the profiler:
+
+1. **The `TokenDeauthenticatedEvent` already existed** - we're enriching it with useful context (reason + provider) that any listener can now use
+2. **Production use cases**: applications can listen to this event for logging, monitoring, or custom handling when users get unexpectedly logged out - knowing *why* (user changed vs user not found) is valuable information
+3. **The request attributes pattern** is lightweight and commonly used in Symfony to pass data to collectors
+
+That said, your point about keeping the core listener minimal is valid. Do you think the added value for production scenarios (event enrichment) justifies keeping it in the listener, or would you still prefer a decorator approach?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-14T08:57:13Z
+
+Thanks for the thorough review @MatTheCat! 🙏 You convinced me — the header duplication wasn't worth the complexity, and the `abbr_class` on a `Data` object was indeed a bug.
+
+I've dropped the two "improve visibility" / "exception class" commits entirely. The PR now contains a single commit that focuses on what's genuinely new: surfacing the deauthentication reason and provider in the profiler (via `TokenDeauthenticatedEvent` enrichment + a dedicated panel in the security tab).
+
+Force-pushed accordingly. Screenshots coming in a follow-up message — let me set up a local repro of a deauth scenario.
+
+<img width="1243" height="1000" alt="image" src="https://github.com/user-attachments/assets/fba31bb7-6078-475e-a5c2-045e500f86da" />
+
+<img width="1243" height="1000" alt="image" src="https://github.com/user-attachments/assets/d11c0d72-c240-43ce-a2ad-8edcb435e77b" />
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-23T15:37:49Z
+
+Hey @MatTheCat @94noni @ayyoub-afwallah 👋 - quick status recap after this latest round of feedback:
+
+**Addressed:**
+- 🏗️ **Profiler plumbing moved out of `ContextListener`** into a dedicated `SecurityDataCollectorListener` subscribing to `TokenDeauthenticatedEvent`, mirroring `Form\Extension\DataCollector` -  `a4e59ad8ed8` (also resolves the concern @94noni raised earlier 🙌)
+- 📦 **`refreshUser()` returns a typed `RefreshUserResult` DTO** instead of an associative array - `98fc6db7f1c`
+- 🎨 **Panel UX**: the generic *"There is no security token."* is replaced with a contextualized message when the deauthentication is known; the standalone details table is gone - `c886da1d265`
+- 🐛 **Every contributing user provider is now exposed** via `getProviderClasses(): array`. Turned out the original single `providerClass` actually pointed to whatever provider was iterated last - @MatTheCat 's remark uncovered a genuine bug, not just a naming issue - `6726e0c3455`
+
+**Still open:**
+- 💬 **Reason as free string vs keyword** - I pushed back with a hybrid enum proposal [here](https://github.com/symfony/symfony/pull/63867#discussion_r3131766479): a `DeauthenticationReason` enum with an `Other` case carrying a free-form string for third parties. Happy to pivot to a plain free string if you feel the enum is overkill. Waiting on your take! 🙏
+
+Screenshots of the updated panel are still on my todo - I want to ship them against a clean local repro of both reasons. Thanks again for the thorough reviews, this PR is in a much better place than where it started. 😊
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T06:13:48Z
+
+Thanks for the batch review @nicolas-grekas, and sorry @MatTheCat for leaving your suggestion hanging for three months, you were right and it is now in. 🙇
+
+Everything was addressed in a single squashed commit, rebuilt on top of current 8.2 (which also absorbs the `hasUserChanged()` refactoring that had made the branch conflict):
+
+* **Free-form reason**, as @MatTheCat suggested: `getReason()` now returns a human-readable sentence ("the user has changed", "the user could not be found by any user provider"), the constants are gone and the template prints the reason with no mapping. This also solves the null-reason rendering glitch, since the template only adds "because ..." when a reason is present.
+* **Tests**: the event reason and providers for both cases in `ContextListenerTest` (including the multi-provider precedence of user-changed over user-not-found), the collector (collection, `lateCollect()`, no repetition in sub-request profiles, `reset()`), the listener forwarding, and the new compiler pass. `RefreshUserResult` is exercised through the `ContextListener` tests, being an internal value object.
+* **No more `readonly class`**: `RefreshUserResult` is a `final class` with promoted `public readonly` properties.
+* **Production container**: the listener is now removed by a small `RemoveSecurityDataCollectorListenerPass` when the `profiler` service is absent, following the same probe as `ProfilerPass`. A test covers both directions.
+* Sub-request repetition fixed (the collected info is consumed on first `collect()`), the `@return` docblock includes `Data`, and the panel now also shows the deauthentication when a re-authentication happened in the same request.
+
+Local runs: Security/Http 635 tests green, SecurityBundle 393 green, and zero new PHPStan/Psalm findings compared to 8.2 on the touched files.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T08:44:26Z
+
+Thanks Amoifr, the tests, the readonly class and the compiler pass all landed well. Rebased on 8.2, with four changes before merging.
+
+The sub-request fix had to be undone, and that one is my fault: my earlier point was about cosmetic repetition, and taking it literally inverted the bug. Clearing `$this->deauthentication` on the first `collect()` does not skip sub-request profiles, it skips whichever profile is collected first, and that is a sub-request, since their `kernel.response` fires inside the main controller. Running a real `Profiler` with one embedded sub-request:
+
+```
+with the clearing:     /main deauthentication=NULL      /sub  deauthentication={"reason":"the user has changed",...}
+without the clearing:  /main and /sub both carry it
+```
+
+So any page with an embedded controller, an ESI fragment or an error sub-request lost the message on the profile people actually open. `reset()` alone gives the right lifetime, since `services_resetter` runs before each main request, so the clearing is gone and the comment with it.
+
+`testDeauthenticationIsNotRepeatedInSubRequestProfiles` asserted that behavior, so it is replaced by `testDeauthenticationReachesEveryProfileOfTheRequest`. Worth noting it passed while the real ordering was inverted, because it called `collect()` twice without any notion of which profile was which.
+
+Two coverage holes, both found by mutating rather than reading. Deleting `addCompilerPass(new RemoveSecurityDataCollectorListenerPass())` from `SecurityBundle::build()` left the whole suite green, so the blocker you had just fixed had no guard; `SecurityBundleTest` covers the registration now. And `$userChangedBy[] =` could be replaced by `$userChangedBy = [...]` with nothing failing, so `testDeauthenticatedEventAggregatesEveryProviderThatSawAChange` pins the multi-provider case @MatTheCat asked about. Both fail when the fix is reverted.
+
+Last, "de-authenticated" in the template is now "deauthenticated", matching the rest of the codebase including this commit's own changelog entries.

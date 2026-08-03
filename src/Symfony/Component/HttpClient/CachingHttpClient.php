@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Caching\Freshness;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -144,6 +145,12 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
         $fullUrlTag = self::hash($fullUrl);
         $requestCacheControl = self::parseRequestCacheControlHeader($options['normalized_headers']['cache-control'] ?? []);
 
+        $cacheHook = $options['extra']['cache_policy'] ?? null;
+
+        if (null !== $cacheHook && !\is_callable($cacheHook)) {
+            throw new InvalidArgumentException(\sprintf('The "extra.cache_policy" option must be a callable, "%s" given.', get_debug_type($cacheHook)));
+        }
+
         if ('' !== $options['body'] || ($options['extra']['no_cache'] ?? false) || isset($options['normalized_headers']['range']) || !\in_array($method, self::CACHEABLE_METHODS, true)) {
             if (isset($requestCacheControl['only-if-cached'])) {
                 return self::createGatewayTimeoutResponse($method, $url, $options);
@@ -230,6 +237,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
         $passthru = function (ChunkInterface $chunk, AsyncContext $context) use (
             $expiresAt,
             $fullUrlTag,
+            $cacheHook,
             $requestHash,
             $varyKey,
             $varyFields,
@@ -246,6 +254,11 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             static $attemptTag = null;
             static $firstChunkKey = null;
             static $chunkKey = null;
+            static $cachePolicy = null;
+            static $tagsFromResponseResolver = null;
+            static $extraTags = [];
+            static $pendingChunks = [];
+            static $accumulatedContent = '';
 
             if (null !== $chunk->getError() || $chunk->isTimeout()) {
                 null !== $attemptTag && $this->cache->invalidateTags([$attemptTag]);
@@ -303,14 +316,28 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                     }
                     $correctedInitialAge = self::getCorrectedInitialAge($headers, $requestTime, $responseTime);
                     $updatedHeaders = self::filterStorableHeaders(array_merge($cachedData['headers'], $headers), self::getExcludedHeaders($headers));
+                    // The entry is shared between requests, so the tags it already carries must
+                    // survive: a revalidating request can only add to them. Tags coming from the
+                    // response cannot be re-resolved here anyway, a 304 carries no body.
+                    $revalidationPolicy = null;
+
+                    if (null !== $cacheHook) {
+                        $cacheHook($revalidationPolicy = new CachePolicy(), $cachedData['status_code'], $updatedHeaders);
+                    }
+
+                    $tagsForRevalidation = self::mergeCacheTags(
+                        $cachedData['cache_tags'] ?? [],
+                        $revalidationPolicy?->getTags() ?? [],
+                    );
                     $updatedCachedData = array_replace($cachedData, [
                         'stored_at' => $responseTime,
                         'initial_age' => $correctedInitialAge,
                         'headers' => $updatedHeaders,
+                        'cache_tags' => $tagsForRevalidation,
                     ]);
 
                     $updatedCacheControl = self::parseCacheControlHeader($updatedCachedData['headers']['cache-control'] ?? []);
-                    $updatedCachedData['expires_at'] = self::calculateExpiresAt($this->determineMaxAge($updatedCachedData['headers'], $updatedCacheControl, $correctedInitialAge, $requestTime, $responseTime));
+                    $updatedCachedData['expires_at'] = self::calculateExpiresAt($revalidationPolicy?->getTtl() ?? $this->determineMaxAge($updatedCachedData['headers'], $updatedCacheControl, $correctedInitialAge, $requestTime, $responseTime));
 
                     $newVaryFields = $this->parseVaryFields($updatedCachedData['headers']['vary'] ?? []);
                     $updatedMetadataIsCacheable = !\in_array('*', $newVaryFields, true)
@@ -323,14 +350,14 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                         $context->passthru();
 
                         if (!$hasClientConditionalValidator) {
-                            $context->replaceResponse($this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt));
+                            $context->replaceResponse($this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt, [$fullUrlTag, $metadataKey, ...$tagsForRevalidation]));
                         }
 
                         return;
                     }
 
-                    $updatedCachedData = $this->cache->get($metadataKey, static function (ItemInterface $item) use ($updatedCachedData, $expiresAt, $fullUrlTag, $metadataKey): array {
-                        $item->expiresAt($expiresAt)->tag([$fullUrlTag, $metadataKey]);
+                    $updatedCachedData = $this->cache->get($metadataKey, static function (ItemInterface $item) use ($updatedCachedData, $expiresAt, $fullUrlTag, $metadataKey, $tagsForRevalidation): array {
+                        $item->expiresAt($expiresAt)->tag([$fullUrlTag, $metadataKey, ...$tagsForRevalidation]);
 
                         return $updatedCachedData;
                     }, \INF);
@@ -338,7 +365,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                     $context->passthru();
 
                     if (!$hasClientConditionalValidator) {
-                        $context->replaceResponse($this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt));
+                        $context->replaceResponse($this->createResponseFromCache($updatedCachedData, $method, $url, $options, $metadataKey, $expiresAt, [$fullUrlTag, $metadataKey, ...$tagsForRevalidation]));
                     }
 
                     return;
@@ -367,7 +394,12 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
 
                 $cacheControl = self::parseCacheControlHeader($headers['cache-control'] ?? []);
 
-                if (!$this->isServerResponseCacheable($statusCode, $options['normalized_headers'], $headers, $cacheControl)) {
+                if (null !== $cacheHook) {
+                    $cacheHook($cachePolicy = new CachePolicy(), $statusCode, $headers);
+                }
+
+                // a forced TTL stores the response whatever its directives say
+                if (null === $cachePolicy?->getTtl() && !$this->isServerResponseCacheable($statusCode, $options['normalized_headers'], $headers, $cacheControl)) {
                     $context->passthru();
 
                     yield $chunk;
@@ -400,6 +432,23 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                     return $newVaryFields;
                 }, \INF);
 
+                // Tags depending on the response body are added at isLast(); see below.
+                $extraTags = $cachePolicy?->getTags() ?? [];
+                $tagsFromResponseResolver = $cachePolicy?->getBodyTagResolver();
+
+                // Tagging from the body means holding it in memory until the last chunk, which
+                // is the caller's decision to make through the "buffer" option. Asking for both
+                // is contradictory: the tags are dropped, and saying so out loud matters, the
+                // entry would otherwise be stored without the tags meant to invalidate it.
+                if (null !== $tagsFromResponseResolver && true !== ($options['buffer'] ?? true)) {
+                    $this->logger?->warning('Ignoring the tags of "tagFromBody()" for "{method} {url}": the "extra.cache_policy" option needs the "buffer" option to be true to read the response body.', [
+                        'method' => $method,
+                        'url' => $url,
+                    ]);
+
+                    $tagsFromResponseResolver = null;
+                }
+
                 $firstChunkKey = $chunkKey = self::generateChunkKey();
 
                 yield $chunk;
@@ -415,8 +464,30 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             }
 
             if ($chunk->isLast()) {
-                $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $chunk, $attemptTag): array {
-                    $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
+                if (null !== $tagsFromResponseResolver) {
+                    $accumulatedContent .= $chunk->getContent();
+                    $extraTags = self::mergeCacheTags(
+                        $extraTags,
+
+                        self::resolveCacheTagsFromBody($tagsFromResponseResolver, $accumulatedContent),
+                    );
+
+                    foreach ($pendingChunks as $pending) {
+                        $content = substr($accumulatedContent, $pending['offset'], $pending['length']);
+                        $writeChunk = static function (ItemInterface $item) use ($content, $pending, $expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $extraTags): array {
+                            $item->tag([$fullUrlTag, $metadataKey, $attemptTag, ...$extraTags])->expiresAt($expiresAt);
+
+                            return [
+                                'content' => $content,
+                                'next_chunk' => $pending['next_chunk'],
+                            ];
+                        };
+                        $this->cache->get($pending['key'], $writeChunk, \INF);
+                    }
+                }
+
+                $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $chunk, $attemptTag, $extraTags): array {
+                    $item->tag([$fullUrlTag, $metadataKey, $attemptTag, ...$extraTags])->expiresAt($expiresAt);
 
                     return [
                         'content' => $chunk->getContent(),
@@ -427,9 +498,9 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                 $requestTime = (int) ($context->getInfo('start_time') ?? time());
                 $responseTime = time();
                 $correctedInitialAge = self::getCorrectedInitialAge($headers, $requestTime, $responseTime);
-                $maxAge = $this->determineMaxAge($headers, self::parseCacheControlHeader($headers['cache-control'] ?? []), $correctedInitialAge, $requestTime, $responseTime);
-                $this->cache->get($metadataKey, static function (ItemInterface $item) use ($context, $headers, $maxAge, $expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $firstChunkKey, $responseTime, $correctedInitialAge): array {
-                    $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
+                $maxAge = $cachePolicy?->getTtl() ?? $this->determineMaxAge($headers, self::parseCacheControlHeader($headers['cache-control'] ?? []), $correctedInitialAge, $requestTime, $responseTime);
+                $this->cache->get($metadataKey, static function (ItemInterface $item) use ($context, $headers, $maxAge, $expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $firstChunkKey, $responseTime, $correctedInitialAge, $extraTags): array {
+                    $item->tag([$fullUrlTag, $metadataKey, $attemptTag, ...$extraTags])->expiresAt($expiresAt);
 
                     return [
                         'status_code' => $context->getStatusCode(),
@@ -438,6 +509,7 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
                         'stored_at' => $responseTime,
                         'expires_at' => self::calculateExpiresAt($maxAge),
                         'next_chunk' => $firstChunkKey,
+                        'cache_tags' => $extraTags,
                     ];
                 }, \INF);
 
@@ -447,14 +519,27 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             }
 
             $nextChunkKey = self::generateChunkKey();
-            $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $chunk, $nextChunkKey): array {
-                $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
-
-                return [
-                    'content' => $chunk->getContent(),
+            if (null !== $tagsFromResponseResolver) {
+                // chunk contents are sliced back out of $accumulatedContent at flush
+                // time, so the body is only held once in memory
+                $content = $chunk->getContent();
+                $pendingChunks[] = [
+                    'key' => $chunkKey,
+                    'offset' => \strlen($accumulatedContent),
+                    'length' => \strlen($content),
                     'next_chunk' => $nextChunkKey,
                 ];
-            }, \INF);
+                $accumulatedContent .= $content;
+            } else {
+                $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $chunk, $nextChunkKey, $extraTags): array {
+                    $item->tag([$fullUrlTag, $metadataKey, $attemptTag, ...$extraTags])->expiresAt($expiresAt);
+
+                    return [
+                        'content' => $chunk->getContent(),
+                        'next_chunk' => $nextChunkKey,
+                    ];
+                }, \INF);
+            }
             $chunkKey = $nextChunkKey;
 
             yield $chunk;
@@ -522,6 +607,29 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
     private static function generateChunkKey(): string
     {
         return str_replace('/', '_', base64_encode(random_bytes(6)));
+    }
+
+    /**
+     * @return list<non-empty-string>
+     */
+    private static function resolveCacheTagsFromBody(\Closure $resolver, string $body): array
+    {
+        $policy = new CachePolicy();
+        $policy->tag($resolver($body));
+
+        return $policy->getTags();
+    }
+
+    /**
+     * Merges multiple sets of cache tags while preserving insertion order and removing duplicates.
+     *
+     * @param list<string> ...$tagSets
+     *
+     * @return list<non-empty-string>
+     */
+    private static function mergeCacheTags(array ...$tagSets): array
+    {
+        return array_values(array_unique(array_merge(...array_values($tagSets))));
     }
 
     /**
@@ -1149,8 +1257,10 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
      * returned.
      *
      * @param array{next_chunk: string, status_code: int, initial_age: int, headers: array<string, string|string[]>, stored_at: int} $cachedData
+     * @param list<string>                                                                                                           $newTags    The tags to attach to the chunk items rewritten when extending their expiry,
+     *                                                                                                                                           as rewriting a tagged item without re-tagging it drops its tags
      */
-    private function createResponseFromCache(array $cachedData, string $method, string $url, array $options, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false): MockResponse
+    private function createResponseFromCache(array $cachedData, string $method, string $url, array $options, string $metadataKey, \DateTimeImmutable|false|null $newExpiresAt = false, array $newTags = []): MockResponse
     {
         $cache = $this->cache;
 
@@ -1163,12 +1273,12 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
 
         if (false !== $newExpiresAt) {
             $beta = \INF;
-            $callback = static function (ItemInterface $item) use ($callback, $newExpiresAt): array {
+            $callback = static function (ItemInterface $item) use ($callback, $newExpiresAt, $newTags): array {
                 if (!$item->isHit()) {
                     $callback($item);
                 }
 
-                $item->expiresAt($newExpiresAt);
+                $item->tag($newTags)->expiresAt($newExpiresAt);
 
                 return $item->get();
             };

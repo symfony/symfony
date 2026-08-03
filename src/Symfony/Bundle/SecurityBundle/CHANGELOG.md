@@ -9,6 +9,7 @@ CHANGELOG
  * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect
  * Add the `ldap_users_only` option to the LDAP authenticators, to bind only `LdapUser` instances against the LDAP server
  * Show the deauthentication reason and the responsible user providers in the security profiler panel
+ * Serve the CSRF token id of a firewall through the `csrf_token_manager` it configures, so that `csrf_token()` no longer mints a token the firewall rejects
 
 8.1
 ---

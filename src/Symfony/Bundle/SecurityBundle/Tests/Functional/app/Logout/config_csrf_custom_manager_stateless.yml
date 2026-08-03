@@ -1,0 +1,6 @@
+imports:
+- { resource: ./config_csrf_custom_manager.yml }
+
+framework:
+    csrf_protection:
+        stateless_token_ids: [logout]

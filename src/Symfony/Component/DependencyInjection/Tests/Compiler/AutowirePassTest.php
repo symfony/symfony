@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -26,6 +27,7 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\Compiler\TagDecoratorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -1536,6 +1538,11 @@ class AutowirePassTest extends TestCase
 
         (new AutowirePass())->process($container);
 
+        $expected = new LazyProxyArgument(new TypedReference(A::class, A::class));
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
+
+        (new ResolveLazyProxyPass())->process($container);
+
         $expected = new Reference('.lazy.'.A::class);
         $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
     }
@@ -1548,6 +1555,11 @@ class AutowirePassTest extends TestCase
 
         (new AutowirePass())->process($container);
 
+        $expected = new LazyProxyArgument(new TypedReference(A::class, A::class));
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
+
+        (new ResolveLazyProxyPass())->process($container);
+
         $this->assertSame(A::class, (string) $container->getDefinition('foo')->getArgument(0));
         $this->assertFalse($container->hasDefinition('.lazy.'.A::class));
     }
@@ -1559,6 +1571,11 @@ class AutowirePassTest extends TestCase
         $container->register('foo', LazyServiceAttributeWithInterfaceAutowiring::class)->setAutowired(true);
 
         (new AutowirePass())->process($container);
+
+        $expected = new LazyProxyArgument(new TypedReference(FinalLazyProxyImplementation::class, FinalLazyProxyImplementation::class), LazyProxyTestInterface::class);
+        $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
+
+        (new ResolveLazyProxyPass())->process($container);
 
         $definition = $container->getDefinition((string) $container->getDefinition('foo')->getArgument(0));
 

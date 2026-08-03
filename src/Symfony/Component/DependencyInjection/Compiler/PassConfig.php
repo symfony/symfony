@@ -71,6 +71,7 @@ class PassConfig
             new CheckDefinitionValidityPass(),
             new AutowirePass(false),
             new ServiceLocatorTagPass(),
+            new ResolveLazyProxyPass(),
             new ResolveTaggedIteratorArgumentPass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),

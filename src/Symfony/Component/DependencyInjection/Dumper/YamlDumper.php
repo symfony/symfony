@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -253,6 +254,15 @@ class YamlDumper extends Dumper
             $value = $value->getValues()[0];
 
             return new TaggedValue('service_closure', $this->dumpValue($value));
+        }
+        if ($value instanceof LazyProxyArgument) {
+            [$reference, $interfaces] = $value->getValues();
+
+            if (!$interfaces) {
+                return new TaggedValue('lazy_proxy', $this->dumpValue($reference));
+            }
+
+            return new TaggedValue('lazy_proxy', ['service' => $this->dumpValue($reference), 'interface' => $interfaces]);
         }
         if ($value instanceof EnvClosureArgument) {
             $envExpr = $this->container->resolveEnvPlaceholders($value->getValue());

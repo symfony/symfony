@@ -3652,7 +3652,7 @@ class FrameworkExtension extends Extension
         ;
 
         $container->registerAttributeForAutoconfiguration(AsFeature::class,
-            static function (ChildDefinition $definition, AsFeature $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+            static function (ChildDefinition $definition, AsFeature $attribute, \Reflector $reflector): void {
                 $featureName = $attribute->name;
 
                 if ($reflector instanceof \ReflectionClass) {
@@ -3660,7 +3660,7 @@ class FrameworkExtension extends Extension
                     $method = $attribute->method ?? '__invoke';
 
                     $featureName ??= $className;
-                } else {
+                } elseif ($reflector instanceof \ReflectionMethod) {
                     $className = $reflector->getDeclaringClass()->getName();
                     if (null !== $attribute->method && $reflector->getName() !== $attribute->method) {
                         throw new LogicException(\sprintf('Using the #[%s(method: "%s")] attribute on a method is not valid. Either remove the method value or move this to the top of the class (%s).', AsFeature::class, $attribute->method, $className));
@@ -3668,6 +3668,8 @@ class FrameworkExtension extends Extension
 
                     $method = $reflector->getName();
                     $featureName ??= "{$className}::{$method}";
+                } else {
+                    return;
                 }
 
                 $definition->addTag('feature_flag.feature', [

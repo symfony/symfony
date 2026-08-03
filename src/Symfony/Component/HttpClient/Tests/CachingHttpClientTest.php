@@ -15,11 +15,15 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LogLevel;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
+use Symfony\Component\HttpClient\CachePolicy;
 use Symfony\Component\HttpClient\CachingHttpClient;
+use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
@@ -2485,9 +2489,126 @@ class CachingHttpClientTest extends TestCase
         new CachingHttpClient(new MockHttpClient([]), $this->cacheAdapter, [], true, null);
     }
 
-    /**
-     * @param iterable<MockResponse> $responses
-     */
+    public function testTagsAllowTargetedInvalidation()
+    {
+        $client = $this->buildClient([
+            new MockResponse('body', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('miss'),
+        ]);
+        $options = ['extra' => ['cache_policy' => static fn (CachePolicy $cache) => $cache->tag(['product-1', 'catalog'])]];
+
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent());
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent());
+
+        $this->cacheAdapter->invalidateTags(['catalog']);
+
+        $this->assertSame('miss', $client->request('GET', 'http://example.com/p', $options)->getContent());
+    }
+
+    public function testTagsCanBeDerivedFromTheHeaders()
+    {
+        $client = $this->buildClient([
+            new MockResponse('body', ['response_headers' => ['Cache-Control' => 'max-age=300', 'X-Entity' => 'order-7']]),
+            new MockResponse('miss'),
+        ]);
+        $options = ['extra' => ['cache_policy' => static fn (CachePolicy $cache, int $status, array $headers) => $cache->tag($headers['x-entity'] ?? [])]];
+
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent());
+
+        $this->cacheAdapter->invalidateTags(['order-7']);
+
+        $this->assertSame('miss', $client->request('GET', 'http://example.com/p', $options)->getContent());
+    }
+
+    public function testTagsCanBeDerivedFromTheBody()
+    {
+        $client = $this->buildClient([
+            new MockResponse('{"id":9}', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('miss'),
+        ]);
+        $options = ['extra' => ['cache_policy' => static fn (CachePolicy $cache) => $cache->tagFromBody(
+            static fn (string $body): array => \is_array($data = json_decode($body, true)) ? ['item-'.$data['id']] : [],
+        )]];
+
+        $this->assertSame('{"id":9}', $client->request('GET', 'http://example.com/p', $options)->getContent());
+
+        $this->cacheAdapter->invalidateTags(['item-9']);
+
+        $this->assertSame('miss', $client->request('GET', 'http://example.com/p', $options)->getContent());
+    }
+
+    public function testTagsFromTheBodyAreDroppedAndLoggedWhenBufferingIsOff()
+    {
+        $logger = new class extends AbstractLogger {
+            public array $records = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->records[] = [$level, $message];
+            }
+        };
+
+        $client = $this->buildClient([
+            new MockResponse('{"id":9}', ['response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+        $client->setLogger($logger);
+
+        $response = $client->request('GET', 'http://example.com/p', [
+            'buffer' => false,
+            'extra' => ['cache_policy' => static fn (CachePolicy $cache) => $cache->tagFromBody(static fn (string $body): array => ['item-9'])],
+        ]);
+        foreach ($client->stream($response) as $chunk) {
+        }
+
+        $this->assertContains(
+            [LogLevel::WARNING, 'Ignoring the tags of "tagFromBody()" for "{method} {url}": the "extra.cache_policy" option needs the "buffer" option to be true to read the response body.'],
+            $logger->records,
+        );
+    }
+
+    public function testExpiresAfterCachesAResponseThatSaysNotTo()
+    {
+        $client = $this->buildClient([
+            new MockResponse('body', ['response_headers' => ['Cache-Control' => 'no-store']]),
+            new MockResponse('miss'),
+        ]);
+        $options = ['extra' => ['cache_policy' => static fn (CachePolicy $cache) => $cache->expiresAfter(3600)]];
+
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent());
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent(), 'the forced TTL stores a response the server marked as no-store');
+    }
+
+    public function testWithoutTheHookANoStoreResponseIsNotCached()
+    {
+        $client = $this->buildClient([
+            new MockResponse('body', ['response_headers' => ['Cache-Control' => 'no-store']]),
+            new MockResponse('miss'),
+        ]);
+
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p')->getContent());
+        $this->assertSame('miss', $client->request('GET', 'http://example.com/p')->getContent());
+    }
+
+    public function testExpiresAfterReplacesTheFreshnessOfTheHeaders()
+    {
+        $client = $this->buildClient([
+            new MockResponse('body', ['response_headers' => ['Cache-Control' => 'max-age=0']]),
+            new MockResponse('miss'),
+        ]);
+        $options = ['extra' => ['cache_policy' => static fn (CachePolicy $cache) => $cache->expiresAfter(3600)]];
+
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent());
+        $this->assertSame('body', $client->request('GET', 'http://example.com/p', $options)->getContent(), 'max-age=0 would have revalidated, the forced TTL keeps it fresh');
+    }
+
+    public function testTheHookMustBeCallable()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "extra.cache_policy" option must be a callable, "string" given.');
+
+        $this->buildClient([new MockResponse('body')])->request('GET', 'http://example.com/p', ['extra' => ['cache_policy' => 'nope']]);
+    }
+
     private function buildClient(iterable $responses, array $defaultOptions = [], bool $sharedCache = true, int $maxTtl = 86400): CachingHttpClient
     {
         return new CachingHttpClient(

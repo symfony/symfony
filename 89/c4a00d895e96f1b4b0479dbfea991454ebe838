@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T17:02:46Z
+
+Rebased on 7.4 and amended. Two things changed compared to the version submitted.
+
+The first version returned nothing when the filter failed, so the value fell through to the other members of the union. That fixed the reported case, but it also dropped the behavior `filter_bool` has had since 7.1.2, where a nullable bool with an unparsable value denormalizes to `null` instead of throwing. Fifteen cases of `AbstractObjectNormalizerTest::testDenormalizeBooleanTypeWithFilterBool` and its two format variants failed, which is what the red Unit Tests jobs were reporting.
+
+Checked against the three states to be sure which behavior is the reference:
+
+| state | `testDenormalizeBooleanTypeWithFilterBool` |
+| --- | --- |
+| 7.4.14 | 29 tests, green |
+| 7.4 tip | 87 tests, green |
+| this PR, first version | 15 errors |
+
+So `?bool` with an unparsable value returning `null` is not something 7.4.15 introduced, and restoring the throw would be a second behavior change on a patch branch. The fall-through now happens first, and returning `null` is kept as a last resort, applied only when no member of the union matched and the declared type accepts `null`. Ordering it that way also means `bool|string|null` with `'publish'` resolves to `'publish'` rather than `null`.
+
+The second change is a regression test, in both the TypeInfo and the legacy path. With the source reverted it fails with `TypeError: Cannot assign null to property UnionBoolPropertyDummy::$foo of type string|bool`, which is the reported failure.
+
+Full Serializer suite: 1404 tests, 2833 assertions, 15 skipped, green.

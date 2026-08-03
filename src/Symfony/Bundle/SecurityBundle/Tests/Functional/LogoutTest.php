@@ -109,6 +109,48 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/');
     }
 
+    public function testTheLogoutFormHelperBuildsAFormTheListenerAccepts()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $crawler = $client->request('GET', '/logout-form');
+        $client->submit($crawler->selectButton('logout')->form());
+
+        $this->assertRedirect($client->getResponse(), '/');
+    }
+
+    public function testLoggingOutWithoutTheTokenTheFormCarriesIsDenied()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('POST', '/logout');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+    }
+
+    public function testTheLogoutPathCannotBeFollowedAsALinkWhenTheRouteIsPostOnly()
+    {
+        $client = $this->createAuthenticatedClient();
+
+        $client->request('GET', '/logout');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_METHOD_NOT_ALLOWED);
+    }
+
+    private function createAuthenticatedClient(): KernelBrowser
+    {
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'logout_csrf.yml']);
+        $client->followRedirects(true);
+
+        $form = $client->request('GET', '/login')->selectButton('login')->form();
+        $form['_username'] = 'johannes';
+        $form['_password'] = 'test';
+        $client->submit($form);
+        $client->followRedirects(false);
+
+        return $client;
+    }
+
     private function callInRequestContext(KernelBrowser $client, callable $callable): void
     {
         /** @var EventDispatcherInterface $eventDispatcher */

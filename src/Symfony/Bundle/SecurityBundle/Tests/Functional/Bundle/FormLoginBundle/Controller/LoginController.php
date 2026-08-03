@@ -55,6 +55,11 @@ class LoginController implements ServiceSubscriberInterface
         return new Response('', 400);
     }
 
+    public function logoutFormAction()
+    {
+        return new Response($this->container->get('twig')->render('@FormLogin/Login/logout_form.html.twig'));
+    }
+
     public function secureAction()
     {
         throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));

@@ -1,0 +1,8 @@
+imports:
+    - { resource: ./base_config.yml }
+
+security:
+    firewalls:
+        default:
+            logout:
+                enable_csrf: true

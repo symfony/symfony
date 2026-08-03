@@ -170,6 +170,11 @@ class CacheClearCommand extends Command
                 $fs->rename($realBuildDir, $oldBuildDir);
             }
 
+            // Under load, a concurrent request can boot the kernel and rebuild the cache
+            // in $realBuildDir while it is moved aside above. Drop that partial rebuild,
+            // the warmed-up directory supersedes it.
+            $fs->remove($realBuildDir);
+
             $fs->rename($warmupDir, $realBuildDir);
 
             if ($output->isVerbose()) {

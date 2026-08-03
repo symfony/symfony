@@ -1643,6 +1643,34 @@ class AbstractObjectNormalizerTest extends TestCase
         }
     }
 
+    public function testDenormalizeUnionTypeWithFilterBool()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        foreach ([null, XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize(['foo' => 'publish'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertSame('publish', $dummy->foo);
+
+            $dummy = $normalizer->denormalize(['foo' => 'on'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertTrue($dummy->foo);
+        }
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDenormalizeUnionTypeWithFilterBoolLegacy()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor();
+
+        foreach ([null, XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize(['foo' => 'publish'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertSame('publish', $dummy->foo);
+
+            $dummy = $normalizer->denormalize(['foo' => 'on'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertTrue($dummy->foo);
+        }
+    }
+
     public static function provideDenormalizeWithFilterBoolData(): array
     {
         return [
@@ -2050,6 +2078,11 @@ class BoolPropertyDummy
     public $foo;
 }
 
+class UnionBoolPropertyDummy
+{
+    public bool|string $foo;
+}
+
 class DummyWithArrayObject
 {
     /** @var \ArrayObject<string, mixed> */
@@ -2291,6 +2324,43 @@ class AbstractObjectNormalizerWithMetadataAndLegacyPropertyTypeExtractor extends
             public function getTypes(string $class, string $property, array $context = []): ?array
             {
                 return [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL, true)];
+            }
+        });
+    }
+
+    protected function extractAttributes(object $object, ?string $format = null, array $context = []): array
+    {
+        return [];
+    }
+
+    protected function getAttributeValue(object $object, string $attribute, ?string $format = null, array $context = []): mixed
+    {
+        return null;
+    }
+
+    protected function setAttributeValue(object $object, string $attribute, mixed $value, ?string $format = null, array $context = []): void
+    {
+        if (property_exists($object, $attribute)) {
+            $object->$attribute = $value;
+        }
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [
+            '*' => false,
+        ];
+    }
+}
+
+class AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor extends AbstractObjectNormalizer
+{
+    public function __construct()
+    {
+        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new class implements PropertyTypeExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
             }
         });
     }

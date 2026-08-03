@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
@@ -374,6 +375,75 @@ class SerializerTest extends TestCase
         $this->assertInstanceOf(DummyMessageWithSerializedTypeName::class, $decodedEnvelope->getMessage());
         $this->assertSame('Hello', $decodedEnvelope->getMessage()->getMessage());
     }
+
+    public function testDecodingFailureKeepsDecodedStampsOnTheWrappedEnvelope()
+    {
+        $serializer = new Serializer();
+
+        // a payload whose stamps decode fine but whose body cannot be deserialized
+        $encodedEnvelope = [
+            'body' => '{}',
+            'headers' => [
+                'type' => DummyMessageWithPrivateConstructorProperty::class,
+                'X-Message-Stamp-'.RedeliveryStamp::class => '[{"retryCount":2,"redeliveredAt":"2026-08-03T11:47:47+00:00"}]',
+                'Content-Type' => 'application/json',
+            ],
+        ];
+
+        $envelope = $serializer->decode($encodedEnvelope);
+
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+
+        $redeliveryStamp = $envelope->last(RedeliveryStamp::class);
+        $this->assertNotNull($redeliveryStamp, 'Stamps decoded from headers must be kept on the wrapper envelope, otherwise the retry counter resets on every redelivery.');
+        $this->assertSame(2, $redeliveryStamp->getRetryCount());
+    }
+
+    public function testEncodingDecodeFailureWrapperReemitsOriginalPayload()
+    {
+        $serializer = new Serializer();
+
+        $originalEncoded = [
+            'body' => '{"some":"payload"}',
+            'headers' => ['type' => 'App\NonExistentMessage', 'Content-Type' => 'application/json'],
+        ];
+
+        $wrapperEnvelope = $serializer->decode($originalEncoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $wrapperEnvelope->getMessage());
+
+        $reEncoded = $serializer->encode($wrapperEnvelope->with(new RedeliveryStamp(1)));
+
+        $this->assertSame($originalEncoded['body'], $reEncoded['body'], 'Re-sending a decode-failure wrapper must re-emit the original payload.');
+        $this->assertSame('App\NonExistentMessage', $reEncoded['headers']['type'], 'The original type header must be preserved so a later decode can succeed after a fix.');
+        $this->assertArrayHasKey('X-Message-Stamp-'.RedeliveryStamp::class, $reEncoded['headers'], 'Current stamps must be in the headers so the retry counter survives.');
+    }
+
+    public function testEncodingDecodeFailureWrapperWithoutOriginalHeaders()
+    {
+        $serializer = new Serializer();
+
+        // PhpSerializer::encode() returns a body without any headers
+        $envelope = new Envelope(new MessageDecodingFailedException('Could not decode message', 0, null, ['body' => 'a:0:{}']));
+
+        $reEncoded = $serializer->encode($envelope);
+
+        $this->assertSame('a:0:{}', $reEncoded['body']);
+        $this->assertSame(MessageDecodingFailedException::class, $reEncoded['headers']['type']);
+        $this->assertArrayNotHasKey('Content-Type', $reEncoded['headers'], 'The content type must not describe a body encoded by another serializer.');
+    }
+
+    public function testEncodingDecodeFailureWrapperWithoutOriginalBody()
+    {
+        $serializer = new Serializer();
+
+        $envelope = new Envelope(new MessageDecodingFailedException('Could not decode message', 0, null, ['headers' => ['type' => 'App\NonExistentMessage']]));
+
+        $reEncoded = $serializer->encode($envelope);
+
+        $this->assertStringContainsString('Could not decode message', $reEncoded['body']);
+        $this->assertSame(MessageDecodingFailedException::class, $reEncoded['headers']['type'], 'Without an original body, the headers must describe the body that was actually encoded.');
+        $this->assertSame('application/json', $reEncoded['headers']['Content-Type']);
+    }
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface
 {
@@ -381,6 +451,12 @@ class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterfac
 class DummySymfonySerializerInvalidConstructor
 {
     public function __construct(string $missingArgument)
+    {
+    }
+}
+class DummyMessageWithPrivateConstructorProperty
+{
+    public function __construct(private string $secret)
     {
     }
 }

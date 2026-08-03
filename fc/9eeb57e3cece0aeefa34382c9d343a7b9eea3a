@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-03T13:12:02Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T17:18:41Z
+
+Rebased on 8.1, milestone moved from 8.2 to 8.1, and amended.
+
+The approach is right and the end-to-end behavior checks out: with a poison message and `max_retries: 3`, the payload stays at its original size, the retry counter goes 0, 1, 2, 3, and the message reaches the failure transport. A decode failure that is transient is retried and then handled once the cause is fixed, and replaying from the failure transport works with both a `PhpSerializer` and a JSON failure transport.
+
+One regression had to be fixed before this could go in. `encode()` read `$decodingFailure['headers']` unguarded, while treating the array as present as soon as it was non-empty. `PhpSerializer::encode()` returns `['body' => $body]` with no `headers` key, and that array is what ends up in `encodedEnvelope`. So a transport using the default `PhpSerializer` with a failure transport using the JSON serializer killed the worker:
+
+```
+PHP Warning:  Undefined array key "headers" in Serializer.php on line 152
+TypeError: Unsupported operand types: array + null
+```
+
+`encodedEnvelope` is a public property with no enforced shape, so `encode()` cannot assume one. The re-emission is now conditional on the original actually carrying a string body, and the headers are merged with `?? []`.
+
+Two smaller things came out of that. `Content-Type` was taken from the encoding serializer while the body came from the original, which is wrong as soon as the two use different formats: re-encoding a JSON payload through an XML serializer produced `Content-Type: application/xml` on a JSON body. It now follows the body. And when the original has a `headers` key but no body, the exception is serialized normally and the headers describe what was actually written, rather than claiming the original type.
+
+Added tests for both shapes. Against the previous version they fail with `TypeError: Unsupported operand types: array + null` and with the wrong `type` header.
+
+One gap is left open and is now noted in the description: only the `deserialize()` failure path carries stamps. The earlier returns in `decode()`, for an empty body, a missing `type` header, or stamp headers that fail to decode, still build a stampless wrapper. Those messages no longer grow, but the counter still does not advance, so they are retried without end. `SigningSerializer` with a bad signature behaves the same way. Worth a separate issue rather than widening this one.
+
+Suites, on the current 8.1 tip: Messenger 567 tests, AmazonSqs 86, Amqp 97, Beanstalkd 45, Doctrine 112, Redis 133, all green.
+
+The three red checks were unrelated. PHPStan reported 101 errors, none in Messenger. Psalm reported 289, of which the Messenger ones are all `UndefinedClass: Relay\Relay` in the Redis bridge. Neither had a single error in the file this PR touches. The `x86 / minimal-exts / lowest-php` failure was `AmpHttpClientTest::testTimeoutOnStream`.

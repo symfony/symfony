@@ -13,6 +13,8 @@ namespace Symfony\Component\Lock\Store;
 
 use AsyncAws\DynamoDb\DynamoDbClient;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
@@ -26,8 +28,21 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class StoreFactory
 {
-    public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
+    /**
+     * Advisory locks are held by the database session, not by a table: a reconnection, an explicit
+     * close or the server's idle timeout releases every lock the application holds, and nothing
+     * detects it. Prefer a connection dedicated to locking.
+     *
+     * With a Doctrine DBAL connection, the platform selects the advisory store, so a connection
+     * configured without a "serverVersion" parameter connects to the database to resolve it.
+     *
+     * @param bool $advisory Whether to use advisory locks (PostgreSQL or MySQL) instead of the default
+     *                       table-based store when reusing an existing \PDO or DBAL connection
+     */
+    public static function createStore(#[\SensitiveParameter] object|string $connection/* , bool $advisory = false */): PersistingStoreInterface
     {
+        $advisory = 1 < \func_num_args() ? func_get_arg(1) : false;
+
         switch (true) {
             case $connection instanceof DynamoDbClient:
                 self::requireBridgeClass(DynamoDbStore::class, 'symfony/amazon-dynamo-db-lock');
@@ -48,10 +63,28 @@ class StoreFactory
                 return new MongoDbStore($connection);
 
             case $connection instanceof \PDO:
-                return new PdoStore($connection);
+                if (!$advisory) {
+                    return new PdoStore($connection);
+                }
+
+                return match ($driver = $connection->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+                    'pgsql' => new PostgreSqlStore($connection),
+                    'mysql' => new MysqlStore($connection),
+                    default => throw new InvalidArgumentException(\sprintf('The "%s" PDO driver does not support advisory locks.', $driver)),
+                };
 
             case $connection instanceof Connection:
-                return new DoctrineDbalStore($connection);
+                if (!$advisory) {
+                    return new DoctrineDbalStore($connection);
+                }
+
+                $platform = $connection->getDatabasePlatform();
+
+                return match (true) {
+                    $platform instanceof PostgreSQLPlatform => new DoctrineDbalPostgreSqlStore($connection),
+                    $platform instanceof AbstractMySQLPlatform => new DoctrineDbalMysqlStore($connection),
+                    default => throw new InvalidArgumentException(\sprintf('The "%s" platform does not support advisory locks.', $platform::class)),
+                };
 
             case $connection instanceof \Zookeeper:
                 return new ZookeeperStore($connection);
@@ -119,7 +152,9 @@ class StoreFactory
                 return new PostgreSqlStore(preg_replace('/^([^:+]+)\+advisory/', '$1', $connection));
 
             case str_starts_with($connection, 'mysql+advisory://'):
-                throw new InvalidArgumentException('The "mysql+advisory://" scheme is not supported, use a PDO DSN such as "mysql+advisory:host=localhost;dbname=app".');
+            case str_starts_with($connection, 'mysql2+advisory://'):
+                return new DoctrineDbalMysqlStore($connection);
+
             case str_starts_with($connection, 'mysql+advisory:'):
                 return new MysqlStore(preg_replace('/^([^:+]+)\+advisory/', '$1', $connection));
 

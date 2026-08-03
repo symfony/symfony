@@ -47,6 +47,19 @@ class PoFileDumperTest extends TestCase
         $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.po', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 
+    public function testDumpIntlDomainKeepsPipes()
+    {
+        $id = '{{subject}} must not be an instance of {{class|quote}}';
+        $catalogue = new MessageCatalogue('en');
+        $catalogue->set($id, $id, 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX);
+
+        $dumper = new PoFileDumper();
+        $dump = $dumper->formatCatalogue($catalogue, 'messages'.MessageCatalogue::INTL_DOMAIN_SUFFIX);
+
+        $this->assertStringContainsString(\sprintf('msgid "%s"', $id), $dump);
+        $this->assertStringNotContainsString('msgid_plural', $dump);
+    }
+
     public function testDumpPlurals()
     {
         $catalogue = new MessageCatalogue('en');

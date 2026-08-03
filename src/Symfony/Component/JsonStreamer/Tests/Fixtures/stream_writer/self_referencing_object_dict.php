@@ -13,7 +13,7 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
         yield "{";
         $prefix2 = '';
         foreach ($data->items as $key1 => $value1) {
-            $key1 = \substr(\json_encode($key1), 1, -1);
+            $key1 = \substr(\json_encode($key1, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE), 1, -1);
             yield "{$prefix2}\"{$key1}\":";
             yield from $generators['Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\SelfReferencingDummyDict']($value1, $depth + 1);
             $prefix2 = ',';

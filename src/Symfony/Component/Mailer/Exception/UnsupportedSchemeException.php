@@ -100,6 +100,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Sweego\Transport\SweegoTransportFactory::class,
             'package' => 'symfony/sweego-mailer',
         ],
+        'turbosmtp' => [
+            'class' => Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class,
+            'package' => 'symfony/turbo-smtp-mailer',
+        ],
     ];
 
     public function __construct(Dsn $dsn, ?string $name = null, array $supported = [])

@@ -35,13 +35,78 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\VarDumper\Caster\ClassStub;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SecurityDataCollectorTest extends TestCase
 {
+    public function testCollectDeauthentication()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', 'password'), 'main', ['ROLE_USER']);
+        $event = new TokenDeauthenticatedEvent($token, new Request(), 'the user has changed', [InMemoryUserProvider::class]);
+
+        $collector = new SecurityDataCollector(new TokenStorage());
+        $collector->collectDeauthentication($event);
+        $collector->collect(new Request(), new Response());
+
+        $this->assertSame([
+            'reason' => 'the user has changed',
+            'providers' => [InMemoryUserProvider::class],
+            'user' => 'jane',
+        ], $collector->getDeauthentication());
+    }
+
+    public function testDeauthenticationReachesEveryProfileOfTheRequest()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', 'password'), 'main', ['ROLE_USER']);
+
+        $collector = new SecurityDataCollector(new TokenStorage());
+        $collector->collectDeauthentication(new TokenDeauthenticatedEvent($token, new Request()));
+
+        // a sub-request finishes before the main one, so it collects first
+        $collector->collect(new Request(), new Response());
+        $this->assertNotNull($collector->getDeauthentication());
+
+        $collector->collect(new Request(), new Response());
+        $this->assertNotNull($collector->getDeauthentication());
+    }
+
+    public function testResetClearsDeauthentication()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', 'password'), 'main', ['ROLE_USER']);
+
+        $collector = new SecurityDataCollector(new TokenStorage());
+        $collector->collectDeauthentication(new TokenDeauthenticatedEvent($token, new Request()));
+        $collector->reset();
+        $collector->collect(new Request(), new Response());
+
+        $this->assertNull($collector->getDeauthentication());
+    }
+
+    public function testGetDeauthenticationAfterLateCollect()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('jane', 'password'), 'main', ['ROLE_USER']);
+
+        $collector = new SecurityDataCollector(new TokenStorage());
+        $collector->collectDeauthentication(new TokenDeauthenticatedEvent($token, new Request(), 'the user could not be found by any user provider', [InMemoryUserProvider::class]));
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $deauthentication = $collector->getDeauthentication();
+
+        $this->assertInstanceOf(Data::class, $deauthentication);
+        $this->assertSame([
+            'reason' => 'the user could not be found by any user provider',
+            'providers' => [InMemoryUserProvider::class],
+            'user' => 'jane',
+        ], $deauthentication->getValue(true));
+    }
+
     public function testCollectWhenSecurityIsDisabled()
     {
         $collector = new SecurityDataCollector(null, null, null, null, null, null);

@@ -50,6 +50,8 @@ use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildA;
 use Symfony\Component\Validator\Tests\Constraints\Fixtures\ChildB;
 use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
 use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupSequenceProviderCascadeChild;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupSequenceProviderCascadeEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CascadedChild;
 use Symfony\Component\Validator\Tests\Fixtures\CascadingEntity;
 use Symfony\Component\Validator\Tests\Fixtures\EntityWithGroupedConstraintOnMethods;
@@ -59,6 +61,7 @@ use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\Reference;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\LazyProperty;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
@@ -1118,7 +1121,7 @@ class RecursiveValidatorTest extends TestCase
             groups: ['Group 1'],
         ));
 
-        $stringableGroup = new class() implements \Stringable {
+        $stringableGroup = new class implements \Stringable {
             public function __toString(): string
             {
                 return 'Group 1';
@@ -1198,6 +1201,91 @@ class RecursiveValidatorTest extends TestCase
         $this->assertSame('Violation in Group 2', $violations[0]->getMessage());
     }
 
+    public function testValidGroupsOnlyTriggerTheCascadeWhenNotRestricting()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addPropertyConstraint('reference', new Valid(groups: ['trigger'], restrictGroups: false));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: static fn ($value, ExecutionContextInterface $context) => $context->addViolation('Violation in Default group'),
+            groups: ['Default'],
+        ));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: static fn ($value, ExecutionContextInterface $context) => $context->addViolation('Violation in other group'),
+            groups: ['other'],
+        ));
+
+        $violations = $this->validate($entity, null, ['Default', 'trigger', 'other']);
+
+        $this->assertCount(2, $violations);
+        $this->assertSame('Violation in Default group', $violations[0]->getMessage());
+        $this->assertSame('Violation in other group', $violations[1]->getMessage());
+    }
+
+    public function testValidGroupsNotRestrictingStillHonorTraverse()
+    {
+        $entity = new Entity();
+        $entity->reference = new \ArrayIterator(['key' => new Reference()]);
+
+        $this->metadataFactory->addMetadata(new ClassMetadata('ArrayIterator'));
+        $this->metadata->addPropertyConstraint('reference', new Valid(groups: ['trigger'], restrictGroups: false, traverse: false));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: static fn ($value, ExecutionContextInterface $context) => $context->addViolation('Violation in Default group'),
+            groups: ['Default'],
+        ));
+
+        $violations = $this->validate($entity, null, ['Default', 'trigger']);
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function testValidGroupsStillRestrictTheReferenceByDefault()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addPropertyConstraint('reference', new Valid(groups: ['trigger']));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: static fn ($value, ExecutionContextInterface $context) => $context->addViolation('Violation in Default group'),
+            groups: ['Default'],
+        ));
+
+        $violations = $this->validate($entity, null, ['Default', 'trigger']);
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function testValidGroupsNotBeingValidatedDoNotTriggerTheCascade()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $this->metadata->addPropertyConstraint('reference', new Valid(groups: ['trigger'], restrictGroups: false));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: static fn ($value, ExecutionContextInterface $context) => $context->addViolation('Violation in Default group'),
+            groups: ['Default'],
+        ));
+
+        $violations = $this->validate($entity, null, ['Default']);
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function testGroupSequenceProviderReturningAnArrayCanCascadeTheCurrentGroup()
+    {
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+
+        $entity = new GroupSequenceProviderCascadeEntity();
+        $entity->child = new GroupSequenceProviderCascadeChild();
+        $entity->child->a = 'too long';
+
+        $violations = $validator->validate($entity);
+
+        $this->assertCount(1, $violations);
+        $this->assertSame('child.a', $violations[0]->getPropertyPath());
+    }
+
     public function testPropagateDefaultGroupToReferenceWhenReplacingDefaultGroup()
     {
         $entity = new Entity();
@@ -1225,6 +1313,74 @@ class RecursiveValidatorTest extends TestCase
 
         $violations = $this->validate($entity, null, 'Default');
 
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(1, $violations);
+        $this->assertSame('Violation in Default group', $violations[0]->getMessage());
+    }
+
+    public function testPropagateCurrentGroupToReferenceWhenReplacingDefaultGroupAndCascadingCurrentGroup()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback1 = static function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Violation in Default group');
+        };
+        $callback2 = static function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Violation in group sequence');
+        };
+
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: $callback1,
+            groups: ['Default'],
+        ));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: $callback2,
+            groups: ['Group 1'],
+        ));
+
+        $sequence = new GroupSequence(['Group 1', 'Entity'], cascadeCurrentGroup: true);
+        $this->metadata->setGroupSequence($sequence);
+
+        $violations = $this->validate($entity, null, 'Default');
+
+        // With "cascadeCurrentGroup" enabled, the "Group 1" constraint of the
+        // referenced object is validated alongside its "Default" constraints.
+        /* @var ConstraintViolationInterface[] $violations */
+        $this->assertCount(2, $violations);
+        $this->assertSame('Violation in Default group', $violations[0]->getMessage());
+        $this->assertSame('Violation in group sequence', $violations[1]->getMessage());
+    }
+
+    public function testDoNotPropagateCurrentGroupToReferenceWhenNotCascadingCurrentGroup()
+    {
+        $entity = new Entity();
+        $entity->reference = new Reference();
+
+        $callback1 = static function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Violation in Default group');
+        };
+        $callback2 = static function ($value, ExecutionContextInterface $context) {
+            $context->addViolation('Violation in group sequence');
+        };
+
+        $this->metadata->addPropertyConstraint('reference', new Valid());
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: $callback1,
+            groups: ['Default'],
+        ));
+        $this->referenceMetadata->addConstraint(new Callback(
+            callback: $callback2,
+            groups: ['Group 1'],
+        ));
+
+        $this->metadata->setGroupSequence(new GroupSequence(['Group 1', 'Entity']));
+
+        $violations = $this->validate($entity, null, 'Default');
+
+        // Without "cascadeCurrentGroup", the referenced object is only validated
+        // in the "Default" group, as before
         /* @var ConstraintViolationInterface[] $violations */
         $this->assertCount(1, $violations);
         $this->assertSame('Violation in Default group', $violations[0]->getMessage());

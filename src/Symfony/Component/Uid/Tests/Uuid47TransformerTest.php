@@ -55,6 +55,9 @@ class Uuid47TransformerTest extends TestCase
         yield 'all NUL' => [str_repeat("\x00", 16)];
         yield 'all 0xFF' => [str_repeat("\xff", 16)];
         yield 'all "a"' => [str_repeat('a', 16)];
+        yield 'all NUL, longer than 16 bytes' => [str_repeat("\x00", 17)];
+        yield 'all 0xFF, longer than 16 bytes' => [str_repeat("\xff", 32)];
+        yield 'all "a", longer than 16 bytes' => [str_repeat('a', 64)];
     }
 
     #[DataProvider('provideWeakKeys')]

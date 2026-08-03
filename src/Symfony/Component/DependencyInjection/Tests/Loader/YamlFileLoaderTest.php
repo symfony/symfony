@@ -24,6 +24,7 @@ use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -488,6 +489,74 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_with_service_closure.yml');
 
         $this->assertEquals(new ServiceClosureArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)), $container->getDefinition('foo')->getArgument(0));
+    }
+
+    public function testParseLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_lazy_proxy_argument.yml');
+
+        $this->assertEquals([
+            new LazyProxyArgument(new Reference('foo_service')),
+            new LazyProxyArgument(new Reference('foo_service'), 'SomeInterface'),
+            new LazyProxyArgument(new Reference('foo_service'), ['SomeInterface', 'AnotherInterface']),
+            new LazyProxyArgument(new Reference('foo_service', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+        ], $container->getDefinition('bar_service')->getArguments());
+    }
+
+    public function testParseLazyProxyArgumentWithUnsupportedKey()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"!lazy_proxy" tag contains unsupported key "foo"; supported ones are "service", "interface".');
+
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('lazy_proxy_invalid_key.yml');
+    }
+
+    public function testParseLazyProxyArgumentWithUnsupportedValue()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"!lazy_proxy" tag only accepts a service reference or an array with a "service" key in');
+
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('lazy_proxy_invalid_value.yml');
+    }
+
+    public function testParseShortLazyProxyWithUnsupportedValue()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "@~" prefix only accepts a service reference in');
+
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('short_lazy_proxy_invalid_value.yml');
+    }
+
+    public function testParseShortLazyProxy()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_short_lazy_proxy.yml');
+
+        $this->assertEquals([
+            new LazyProxyArgument(new Reference('bar')),
+            new LazyProxyArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)),
+            new LazyProxyArgument(new Reference('bar', ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE)),
+        ], $container->getDefinition('foo')->getArguments());
+    }
+
+    public function testShortLazyProxyMatchesThePhpDsl()
+    {
+        $yamlLoader = new YamlFileLoader($yamlContainer = new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/yaml'));
+        $yamlLoader->load('services_with_short_lazy_proxy.yml');
+
+        $phpLoader = new PhpFileLoader($phpContainer = new ContainerBuilder(), new FileLocator(self::$fixturesPath.'/config'));
+        $phpLoader->load('services_with_short_lazy_proxy.php');
+
+        $this->assertEquals(
+            $yamlContainer->getDefinition('foo')->getArguments(),
+            $phpContainer->getDefinition('foo')->getArguments(),
+        );
     }
 
     public function testParseShortServiceClosure()

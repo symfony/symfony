@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `AbstractAdapter::createAdapter()` to create the adapter matching a connection
+
 8.0
 ---
 

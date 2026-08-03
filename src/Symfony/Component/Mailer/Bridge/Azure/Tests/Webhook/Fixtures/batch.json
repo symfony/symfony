@@ -1,0 +1,39 @@
+[
+  {
+    "id": "00000000-0000-0000-0000-000000000000",
+    "topic": "/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/microsoft.communication/communicationservices/{communication-services-resource-name}",
+    "subject": "sender/test@azure.com/message/00000000-0000-0000-0000-000000000001",
+    "data": {
+      "sender": "test@azure.com",
+      "recipient": "receiver@example.com",
+      "messageId": "00000000-0000-0000-0000-000000000001",
+      "status": "Delivered",
+      "deliveryStatusDetails": {
+        "statusMessage": "Message delivered successfully"
+      },
+      "deliveryAttemptTimeStamp": "2026-03-18T00:22:20.2855741+00:00"
+    },
+    "eventType": "Microsoft.Communication.EmailDeliveryReportReceived",
+    "dataVersion": "1.0",
+    "metadataVersion": "1",
+    "eventTime": "2026-03-18T00:22:20.822Z"
+  },
+  {
+    "id": "00000000-0000-0000-0000-000000000004",
+    "topic": "/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/microsoft.communication/communicationservices/{communication-services-resource-name}",
+    "subject": "sender/test@azure.com/message/00000000-0000-0000-0000-000000000005",
+    "data": {
+      "sender": "test@azure.com",
+      "recipient": "receiver@example.com",
+      "messageId": "00000000-0000-0000-0000-000000000005",
+      "userActionTimeStamp": "2026-03-18T10:34:52.130359+00:00",
+      "engagementContext": "",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "engagementType": "View"
+    },
+    "eventType": "Microsoft.Communication.EmailEngagementTrackingReportReceived",
+    "dataVersion": "1.0",
+    "metadataVersion": "1",
+    "eventTime": "2026-03-18T10:34:52.688Z"
+  }
+]

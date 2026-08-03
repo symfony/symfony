@@ -585,6 +585,35 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         $class = $collectionValueBaseType->getClassName().'[]';
                         $context['key_type'] = $collectionKeyType;
                         $context['value_type'] = $collectionValueType;
+                    } elseif ($collectionValueBaseType instanceof UnionType) {
+                        if (!\is_array($data)) {
+                            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the "%s" attribute for class "%s" must be one of "array" ("%s" given).', $attribute, $currentClass, get_debug_type($data)), $data, [Type::array()], $context['deserialization_path'] ?? null);
+                        }
+
+                        $keyTypeIdentifiers = array_map('strval', $collectionKeyType instanceof UnionType ? $collectionKeyType->getTypes() : [$collectionKeyType]);
+
+                        $result = [];
+
+                        foreach ($data as $key => $value) {
+                            $childContext = $this->createChildContext($context, $attribute, $format);
+                            $childContext['deserialization_path'] = ($context['deserialization_path'] ?? false) ? \sprintf('%s[%s]', $context['deserialization_path'], $key) : "[$key]";
+
+                            if (!$collectionKeyType->accepts($key)) {
+                                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('The type of the key "%s" must be "%s" ("%s" given).', $key, implode('", "', $keyTypeIdentifiers), get_debug_type($key)), $key, $keyTypeIdentifiers, $childContext['deserialization_path'], true);
+                            }
+
+                            // the wrapped type is passed on so that a nullable element type keeps accepting null
+                            $result[$key] = $this->validateAndDenormalize(
+                                $collectionValueType,
+                                $currentClass,
+                                $attribute,
+                                $value,
+                                $format,
+                                $childContext
+                            );
+                        }
+
+                        return $result;
                     } elseif ($collectionValueBaseType instanceof BuiltinType && TypeIdentifier::ARRAY === $collectionValueBaseType->getTypeIdentifier()) {
                         // get inner type for any nested array
                         $innerType = $collectionValueType;

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `$serializedTypeNameAliases` parameter to `#[AsMessage]` to accept alternate serialized type names when decoding
+ * Add `--failed-after` and `--failed-before` options to the `messenger:failed:retry`, `messenger:failed:remove` and `messenger:failed:show` commands, and a `--class-filter` option to `messenger:failed:retry`
 
 8.1
 ---

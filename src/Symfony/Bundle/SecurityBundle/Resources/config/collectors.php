@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\SecurityBundle\DataCollector\EventListener\SecurityDataCollectorListener;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 
 return static function (ContainerConfigurator $container) {
@@ -29,5 +30,12 @@ return static function (ContainerConfigurator $container) {
                 'id' => 'security',
                 'priority' => 270,
             ])
+
+        // removed by RemoveSecurityDataCollectorListenerPass when the profiler is not enabled
+        ->set('data_collector.security.listener', SecurityDataCollectorListener::class)
+            ->args([
+                service('data_collector.security'),
+            ])
+            ->tag('kernel.event_subscriber')
     ;
 };

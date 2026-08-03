@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\EnvClosure;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
@@ -54,7 +55,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\Tests\Compiler\FinalLazyProxyImplementation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
+use Symfony\Component\DependencyInjection\Tests\Compiler\LazyProxyTestInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\MyCallable;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
@@ -516,6 +519,18 @@ class ContainerBuilderTest extends TestCase
         $this->assertInstanceOf(\Bar\FooClass::class, $foo1);
     }
 
+    public function testCreateLazyProxyForInlineDefinition()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'Bar\FooClass')
+            ->setPublic(true)
+            ->setArguments([(new Definition('Bar\FooClass'))->setLazy(true)]);
+
+        $inline = $builder->get('foo')->arguments;
+
+        $this->assertInstanceOf(\Bar\FooClass::class, $inline);
+    }
+
     public function testClosureProxy()
     {
         $container = new ContainerBuilder();
@@ -728,6 +743,44 @@ class ContainerBuilderTest extends TestCase
         $this->expectExceptionMessage('Argument "$baz" of service "foo" is abstract: should be defined by Pass.');
 
         $builder->get('foo');
+    }
+
+    public function testResolveServicesWithLazyProxyArgument()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'BarClass');
+
+        $proxy = $builder->resolveServices(new LazyProxyArgument(new Reference('bar')));
+
+        $this->assertInstanceOf(\BarClass::class, $proxy);
+        $this->assertFalse($builder->initialized('bar'), 'The proxied service is not instantiated upfront');
+
+        $builder->get('bar')->foo = 'mutated';
+
+        $this->assertSame('mutated', $proxy->foo, 'The proxy resolves to the shared service');
+    }
+
+    public function testResolveServicesWithLazyProxyArgumentAndExplicitInterface()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', FinalLazyProxyImplementation::class);
+
+        $proxy = $builder->resolveServices(new LazyProxyArgument(new Reference('bar'), LazyProxyTestInterface::class));
+
+        $this->assertInstanceOf(LazyProxyTestInterface::class, $proxy);
+        $this->assertNotInstanceOf(FinalLazyProxyImplementation::class, $proxy);
+        $this->assertFalse($builder->initialized('bar'), 'The proxied service is not instantiated upfront');
+
+        $proxy->getSelf();
+
+        $this->assertTrue($builder->initialized('bar'), 'Using the proxy resolves the service');
+    }
+
+    public function testResolveServicesWithLazyProxyArgumentAndIgnoredMissingService()
+    {
+        $builder = new ContainerBuilder();
+
+        $this->assertNull($builder->resolveServices(new LazyProxyArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))));
     }
 
     public function testResolveServices()

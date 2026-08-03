@@ -11,10 +11,10 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
             foreach ($data as $value1) {
                 $prefix2 = '';
                 yield "{$prefix1}{{$prefix2}\"@id\":";
-                yield \json_encode($value1->id, \JSON_THROW_ON_ERROR, 510);
+                yield \json_encode($value1->id, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 510);
                 $prefix2 = ',';
                 yield "{$prefix2}\"name\":";
-                yield \json_encode($value1->name, \JSON_THROW_ON_ERROR, 510);
+                yield \json_encode($value1->name, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 510);
                 yield "}";
                 $prefix1 = ',';
             }

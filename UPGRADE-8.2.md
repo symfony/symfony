@@ -30,6 +30,17 @@ HttpFoundation
 
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
 
+Lock
+----
+
+ * Add argument `$advisory` to `StoreFactory::createStore()`
+
+Loco Translation Provider
+-------------------------
+
+ * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument. It has no effect and can be removed.
+ * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
+
 Security
 --------
 
@@ -48,3 +59,16 @@ Serializer
 ----------
 
  * Deprecate denormalizing an array that is not a list into a `list`-typed property, in version 9.0 a `Symfony\Component\Serializer\Exception\NotNormalizableValueException` will be thrown when the input does not satisfy `array_is_list()`
+ * Denormalize the elements of a union-typed collection, e.g. `array<Foo|Bar>`, instead of returning the raw data. An element that matches no member of the union, or a key whose type does not match, now throws instead of being returned as-is
+
+Translation
+-----------
+
+ * `FilteringProvider::read()` now returns an empty `TranslatorBag` when none of the requested locales match the configured ones, and a bag of empty catalogues when no requested domain matches, instead of delegating to the wrapped provider
+
+Validator
+---------
+
+ * Add argument `$restrictGroups` to `Valid::__construct()`
+ * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
+ * Add argument `$cascadeCurrentGroup` to `GroupSequenceProvider::__construct()`

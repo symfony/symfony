@@ -184,6 +184,25 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_with_service_closure.yml', $dumper->dump());
     }
 
+    public function testDumpLoadLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_lazy_proxy_argument.yml');
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsGeneratedFile('services_dump_load_lazy_proxy.yml', $dumper->dump());
+
+        $reloadedContainer = new ContainerBuilder();
+        $loader = new YamlFileLoader($reloadedContainer, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_dump_load_lazy_proxy.yml');
+
+        $this->assertEquals(
+            $container->getDefinition('bar_service')->getArguments(),
+            $reloadedContainer->getDefinition('bar_service')->getArguments(),
+        );
+    }
+
     public function testEnvClosure()
     {
         $container = new ContainerBuilder();

@@ -20,6 +20,7 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceiver;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
+use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
@@ -400,5 +401,187 @@ class FailedMessagesRemoveCommandTest extends TestCase
 
         $this->assertStringNotContainsString('[NOTE]', $stdout);
         $this->assertStringContainsString('Message with id some_id not removed', $stderr);
+    }
+
+    public function testRemoveMessagesFilteredByFailureTime()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-01 10:00:00'),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00'),
+            $this->createFailedEnvelope(30, '2024-05-03 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20, 30]);
+        $tester->execute(['--failed-after' => '2024-05-02 00:00:00', '--force' => true]);
+
+        $this->assertStringContainsString('Can you confirm you want to remove 2 messages?', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
+    }
+
+    public function testRemoveMessagesFilteredByRelativeFailureTime()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '-1 year'),
+            $this->createFailedEnvelope(20, '-1 minute'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20]);
+        $tester->execute(['--failed-after' => '-1 hour', '--force' => true]);
+
+        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+    }
+
+    public function testRemoveMessagesFilteredByClassAndFailureTime()
+    {
+        $anotherClass = new class extends \stdClass {};
+
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00'),
+            new Envelope(new $anotherClass(), [new TransportMessageIdStamp(20), new RedeliveryStamp(0, new \DateTimeImmutable('2024-05-02 11:00:00'))]),
+            $this->createFailedEnvelope(30, '2024-05-05 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [10]);
+        $tester->execute(['--class-filter' => 'stdClass', '--failed-before' => '2024-05-03 00:00:00', '--force' => true]);
+
+        $this->assertStringContainsString('Can you confirm you want to remove 1 message?', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 10 removed.', $tester->getDisplay());
+    }
+
+    public function testRemoveExcludesMessagesWithoutRedeliveryStampWhenFilteringByFailureTime()
+    {
+        $envelopes = [
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(10)]),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [20]);
+        $tester->execute(['--failed-after' => '2024-05-01 00:00:00', '--force' => true]);
+
+        $this->assertStringContainsString('Can you confirm you want to remove 1 message?', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+        $this->assertStringNotContainsString('Message with id 10 removed.', $tester->getDisplay());
+    }
+
+    public function testRemoveIncludesMessagesWithoutRedeliveryStampWhenFilteringByClassOnly()
+    {
+        $envelopes = [
+            new Envelope(new \stdClass(), [new TransportMessageIdStamp(10)]),
+            $this->createFailedEnvelope(20, '2024-05-02 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [10, 20]);
+        $tester->execute(['--class-filter' => 'stdClass', '--force' => true]);
+
+        $this->assertStringContainsString('Message with id 10 removed.', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
+    }
+
+    public function testRemoveMessagesFilteredByFailureTimeCanBeAborted()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00'),
+        ]);
+        $receiver->expects($this->never())->method('find');
+        $receiver->expects($this->never())->method('reject');
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['no']);
+        $tester->execute(['--failed-after' => '2024-05-01 00:00:00', '--force' => true]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('Can you confirm you want to remove 1 message?', $tester->getDisplay());
+    }
+
+    public function testRemoveWithForceDoesNotAskForEachFilteredMessage()
+    {
+        $envelopes = [
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00'),
+        ];
+
+        $tester = $this->createCommandTester($envelopes, [10]);
+        $tester->execute(['--failed-after' => '2024-05-01 00:00:00', '--force' => true]);
+
+        $this->assertStringNotContainsString('Do you want to permanently remove this message?', $tester->getDisplay());
+        $this->assertStringContainsString('Message with id 10 removed.', $tester->getDisplay());
+    }
+
+    public function testRemoveWithIdsAndFilterThrows()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $command = new FailedMessagesRemoveCommand($globalFailureReceiverName, new ServiceLocator([$globalFailureReceiverName => fn () => $this->createStub(ListableReceiverInterface::class)]));
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('You cannot specify message ids when using the "--class-filter", "--failed-after" or "--failed-before" options.');
+        $tester->execute(['id' => [20], '--failed-after' => '2024-05-01 00:00:00']);
+    }
+
+    public function testRemoveWithFilterMatchingNothingThrows()
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn([
+            $this->createFailedEnvelope(10, '2024-05-02 10:00:00'),
+        ]);
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+        $tester = new CommandTester($command);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('No failed messages were found with this filter.');
+        $tester->execute(['--failed-after' => '2024-06-01 00:00:00', '--force' => true]);
+    }
+
+    public function testRemoveWithUnparsableFailureTimeThrows()
+    {
+        $globalFailureReceiverName = 'failure_receiver';
+
+        $command = new FailedMessagesRemoveCommand($globalFailureReceiverName, new ServiceLocator([$globalFailureReceiverName => fn () => $this->createStub(ListableReceiverInterface::class)]));
+        $tester = new CommandTester($command);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The value of the "--failed-before" option is not a valid date: "yesterdayish".');
+        $tester->execute(['--failed-before' => 'yesterdayish']);
+    }
+
+    private function createFailedEnvelope(int $id, string $failedAt): Envelope
+    {
+        return new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp($id),
+            new RedeliveryStamp(0, new \DateTimeImmutable($failedAt)),
+        ]);
+    }
+
+    /**
+     * @param Envelope[] $envelopes   the messages listed by the failure transport
+     * @param int[]      $expectedIds the ids expected to be removed, in order
+     */
+    private function createCommandTester(array $envelopes, array $expectedIds): CommandTester
+    {
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->willReturn($envelopes);
+        $receiver->expects($this->exactly(\count($expectedIds)))->method('find')
+            ->willReturnCallback(function (...$args) use ($envelopes, &$expectedIds) {
+                $this->assertSame([array_shift($expectedIds)], $args);
+
+                foreach ($envelopes as $envelope) {
+                    if ([$envelope->last(TransportMessageIdStamp::class)->getId()] === $args) {
+                        return $envelope;
+                    }
+                }
+
+                return null;
+            })
+        ;
+        $receiver->expects($this->exactly(\count($expectedIds)))->method('reject');
+
+        $command = new FailedMessagesRemoveCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+
+        return new CommandTester($command);
     }
 }

@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Argument\EnvClosure;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
@@ -35,6 +36,7 @@ use Symfony\Component\DependencyInjection\Compiler\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResolveEnvPlaceholdersPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -1141,7 +1143,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 (clone $definition)
                     ->setClass($class)
                     ->setTags(($definition->hasTag('proxy') ? ['proxy' => $parameterBag->resolveValue($definition->getTag('proxy'))] : []) + $definition->getTags()),
-                $id, function ($proxy = false) use ($definition, &$inlineServices, $id) {
+                $id ?? $class, function ($proxy = false) use ($definition, &$inlineServices, $id) {
                     return $this->createService($definition, $inlineServices, true, $id, $proxy);
                 }
             );
@@ -1322,6 +1324,12 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 $types[$k] = $v instanceof TypedReference ? $v->getType() : '?';
             }
             $value = new ServiceLocator($this->resolveServices(...), $refs, $types);
+        } elseif ($value instanceof LazyProxyArgument) {
+            [$reference, $interfaces] = $value->getValues();
+
+            $value = ($definition = ResolveLazyProxyPass::createProxyDefinition($this, $reference, $interfaces))
+                ? $this->createService($definition->setShared(false), $inlineServices, $isConstructorArgument, '.lazy.'.$reference)
+                : $this->doResolveServices($reference, $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Reference) {
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Definition) {

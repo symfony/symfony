@@ -34,6 +34,7 @@ use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\Compiler\AssetCompilerInterface;
 use Symfony\Component\BrowserKit\AbstractBrowser;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
@@ -2696,13 +2697,20 @@ class FrameworkExtension extends Extension
         }
         foreach (['app', 'system'] as $name) {
             $config['pools']['cache.'.$name] = [
-                'adapters' => [$config[$name]],
+                // an explicit DSN decides which adapter "cache.app" uses, so none is named here
+                'adapters' => 'app' === $name && isset($config['default_provider']) ? [] : [$config[$name]],
+                'provider' => 'app' === $name ? $config['default_provider'] ?? null : null,
                 'public' => true,
                 'tags' => false,
             ];
         }
         $redisTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware']];
         foreach ($config['pools'] as $name => $pool) {
+            if (null === ($pool['provider'] ??= null)) {
+                unset($pool['provider']);
+            }
+            // no adapter named and a provider given: the DSN decides which adapter to build
+            $isDsnPool = !$pool['adapters'] && isset($pool['provider']);
             $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
 
             $isRedisTagAware = \in_array($pool['adapters'], $redisTagAwareAdapters, true);
@@ -2714,7 +2722,16 @@ class FrameworkExtension extends Extension
                 }
             }
 
-            if (1 === \count($pool['adapters'])) {
+            if ($isDsnPool) {
+                $definition = (new Definition(AdapterInterface::class))
+                    ->setFactory([AbstractAdapter::class, 'createAdapter'])
+                    ->setArguments([
+                        new Reference(CachePoolPass::getServiceProvider($container, $pool['provider'])),
+                        '',
+                        0,
+                        new Reference('cache.default_marshaller'),
+                    ]);
+            } elseif (1 === \count($pool['adapters'])) {
                 if (!isset($pool['provider']) && !\is_int($provider)) {
                     $pool['provider'] = $provider;
                 }
@@ -3065,6 +3082,7 @@ class FrameworkExtension extends Extension
             MailerBridge\Sendgrid\Transport\SendgridTransportFactory::class => ['symfony/sendgrid-mailer', 'mailer.transport_factory.sendgrid'],
             MailerBridge\Amazon\Transport\SesTransportFactory::class => ['symfony/amazon-mailer', 'mailer.transport_factory.amazon'],
             MailerBridge\Sweego\Transport\SweegoTransportFactory::class => ['symfony/sweego-mailer', 'mailer.transport_factory.sweego'],
+            MailerBridge\TurboSmtp\Transport\TurboSmtpTransportFactory::class => ['symfony/turbo-smtp-mailer', 'mailer.transport_factory.turbosmtp'],
         ];
 
         foreach ($classToServices as $class => [$package, $service]) {
@@ -3130,6 +3148,7 @@ class FrameworkExtension extends Extension
             $debug = $container->getParameter('kernel.debug');
             $webhookRequestParsers = [
                 MailerBridge\AhaSend\Webhook\AhaSendRequestParser::class => ['symfony/aha-send-mailer', 'mailer.webhook.request_parser.ahasend'],
+                MailerBridge\Azure\Webhook\AzureRequestParser::class => ['symfony/azure-mailer', 'mailer.webhook.request_parser.azure'],
                 MailerBridge\Brevo\Webhook\BrevoRequestParser::class => ['symfony/brevo-mailer', 'mailer.webhook.request_parser.brevo'],
                 MailerBridge\MailerSend\Webhook\MailerSendRequestParser::class => ['symfony/mailer-send-mailer', 'mailer.webhook.request_parser.mailersend'],
                 MailerBridge\Mailchimp\Webhook\MailchimpRequestParser::class => ['symfony/mailchimp-mailer', 'mailer.webhook.request_parser.mailchimp'],
@@ -3141,6 +3160,7 @@ class FrameworkExtension extends Extension
                 MailerBridge\Resend\Webhook\ResendRequestParser::class => ['symfony/resend-mailer', 'mailer.webhook.request_parser.resend'],
                 MailerBridge\Sendgrid\Webhook\SendgridRequestParser::class => ['symfony/sendgrid-mailer', 'mailer.webhook.request_parser.sendgrid'],
                 MailerBridge\Sweego\Webhook\SweegoRequestParser::class => ['symfony/sweego-mailer', 'mailer.webhook.request_parser.sweego'],
+                MailerBridge\TurboSmtp\Webhook\TurboSmtpRequestParser::class => ['symfony/turbo-smtp-mailer', 'mailer.webhook.request_parser.turbosmtp'],
             ];
 
             foreach ($webhookRequestParsers as $class => [$package, $service]) {
@@ -3295,6 +3315,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\Twitter\TwitterTransportFactory::class => ['symfony/twitter-notifier', 'notifier.transport_factory.twitter'],
             NotifierBridge\Unifonic\UnifonicTransportFactory::class => ['symfony/unifonic-notifier', 'notifier.transport_factory.unifonic'],
             NotifierBridge\Vonage\VonageTransportFactory::class => ['symfony/vonage-notifier', 'notifier.transport_factory.vonage'],
+            NotifierBridge\WhatsApp\WhatsAppTransportFactory::class => ['symfony/whats-app-notifier', 'notifier.transport_factory.whats-app'],
             NotifierBridge\Yunpian\YunpianTransportFactory::class => ['symfony/yunpian-notifier', 'notifier.transport_factory.yunpian'],
             NotifierBridge\Zendesk\ZendeskTransportFactory::class => ['symfony/zendesk-notifier', 'notifier.transport_factory.zendesk'],
             NotifierBridge\Zulip\ZulipTransportFactory::class => ['symfony/zulip-notifier', 'notifier.transport_factory.zulip'],

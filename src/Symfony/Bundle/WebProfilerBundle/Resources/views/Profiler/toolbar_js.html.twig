@@ -1,4 +1,9 @@
 <!-- START of Symfony Web Debug Toolbar -->
+{# The stylesheet is loaded before the toolbar markup, and the empty script below makes
+   the parser wait for it, so the toolbar is never painted unstyled. #}
+<link rel="stylesheet"{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %} href="{{ url('_wdt_stylesheet') }}" />
+<script{% if csp_script_nonce is defined and csp_script_nonce %} nonce="{{ csp_script_nonce }}"{% endif %}> </script>
+
 <div class="sf-toolbar sf-toolbar-opened" role="toolbar" aria-label="Symfony Web Debug Toolbar" data-frankenphp-hot-reload-preserve>
     <div id="sfwdt{{ token }}">
         {{ include('@WebProfiler/Profiler/toolbar.html.twig', {
@@ -10,8 +15,6 @@
             profiler_markup_version: 3,
         }) }}
     </div>
-
-    <link rel="stylesheet"{% if csp_style_nonce %} nonce="{{ csp_style_nonce }}"{% endif %} href="{{ url('_wdt_stylesheet') }}" />
 
     {# CAUTION: the contents of this file are processed by Twig before loading
                 them as JavaScript source code. Always use '/*' comments instead

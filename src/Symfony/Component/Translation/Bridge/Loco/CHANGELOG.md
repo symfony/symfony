@@ -5,6 +5,9 @@ CHANGELOG
 ---
 
  * Calling `LocoProvider::read()` without locale now fetch them all
+ * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument: it has no effect and can be removed
+ * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
+ * Allow to map a tag filter to a domain
 
 7.2
 ---

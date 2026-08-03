@@ -526,6 +526,67 @@ class EmailTest extends TestCase
         $this->assertStringNotContainsString('name='.$inlinePart->getContentId(), $headers);
     }
 
+    public function testGenerateBodyWithInlinedImagesWhoseCidNamesArePrefixesOfEachOther()
+    {
+        // "logo" is a strict prefix of "logo_2", the shorter one is added first
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:logo"> <img src="cid:logo_2">');
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo'))->asInline());
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo_2'))->asInline());
+        $this->assertInlinedImagesAreReferencedViaTheirContentId($e, 2);
+
+        // same pair, the longer one is added first
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:logo"> <img src="cid:logo_2">');
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo_2'))->asInline());
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo'))->asInline());
+        $this->assertInlinedImagesAreReferencedViaTheirContentId($e, 2);
+    }
+
+    public function testGenerateBodyWithInlinedImagesWhoseCidNamesAreNested()
+    {
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:logo"> <img src="cid:logo_2"> <img src="cid:logo_2_3">');
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo'))->asInline());
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo_2'))->asInline());
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo_2_3'))->asInline());
+        $this->assertInlinedImagesAreReferencedViaTheirContentId($e, 3);
+    }
+
+    public function testGenerateBodyWithInlinedImagesWhoseCidNamesDoNotCollide()
+    {
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:one.gif"> <img src="cid:two.gif">');
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'one.gif'))->asInline());
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'two.gif'))->asInline());
+        $this->assertInlinedImagesAreReferencedViaTheirContentId($e, 2);
+    }
+
+    public function testGenerateBodyWithInlinedImageReferencedByAContentIdPrefixedByAnotherName()
+    {
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:logo"> <img src="cid:logo@example.com">');
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'), 'logo'))->asInline());
+        $e->addPart((new DataPart(fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r')))->setContentId('logo@example.com')->asInline());
+        $this->assertInlinedImagesAreReferencedViaTheirContentId($e, 2);
+    }
+
+    private function assertInlinedImagesAreReferencedViaTheirContentId(Email $e, int $expectedImages): void
+    {
+        $body = $e->getBody();
+        $this->assertInstanceOf(RelatedPart::class, $body);
+        $parts = $body->getParts();
+        $htmlPart = array_shift($parts);
+        $this->assertCount($expectedImages, $parts);
+
+        $contentIds = array_map(static fn (DataPart $part) => $part->getContentId(), $parts);
+        $this->assertSame($expectedImages, preg_match_all('/cid:([^"\s>]++)/', $htmlPart->getBody(), $matches));
+        foreach ($matches[1] as $contentId) {
+            $this->assertContains($contentId, $contentIds, \sprintf('"cid:%s" does not reference any related part.', $contentId));
+        }
+        $this->assertCount($expectedImages, array_unique($matches[1]), 'Several references point to the same related part.');
+    }
+
     private function generateSomeParts(): array
     {
         $text = new TextPart('text content');

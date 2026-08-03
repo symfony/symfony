@@ -1,0 +1,19 @@
+[{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "topic": "/subscriptions/{subscription-id}/resourceGroups/{group-name}/providers/microsoft.communication/communicationservices/{communication-services-resource-name}",
+  "subject": "sender/test@azure.com/message/00000000-0000-0000-0000-000000000001",
+  "data": {
+    "sender": "test@azure.com",
+    "recipient": "receiver@example.com",
+    "messageId": "00000000-0000-0000-0000-000000000001",
+    "status": "Suppressed",
+    "deliveryStatusDetails": {
+      "statusMessage": "Status Suppressed"
+    },
+    "deliveryAttemptTimeStamp": "2026-03-18T00:22:20.2855741+00:00"
+  },
+  "eventType": "Microsoft.Communication.EmailDeliveryReportReceived",
+  "dataVersion": "1.0",
+  "metadataVersion": "1",
+  "eventTime": "2026-03-18T00:22:20.822Z"
+}]

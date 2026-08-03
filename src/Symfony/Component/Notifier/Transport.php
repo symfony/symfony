@@ -106,6 +106,7 @@ final class Transport
         Bridge\Twitter\TwitterTransportFactory::class,
         Bridge\Unifonic\UnifonicTransportFactory::class,
         Bridge\Vonage\VonageTransportFactory::class,
+        Bridge\WhatsApp\WhatsAppTransportFactory::class,
         Bridge\Yunpian\YunpianTransportFactory::class,
         Bridge\Zendesk\ZendeskTransportFactory::class,
         Bridge\Zulip\ZulipTransportFactory::class,

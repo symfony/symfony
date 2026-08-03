@@ -34,6 +34,7 @@ use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sweego\Transport\SweegoTransportFactory;
+use Symfony\Component\Mailer\Bridge\TurboSmtp\Transport\TurboSmtpTransportFactory;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
 
@@ -63,6 +64,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             SendgridTransportFactory::class => false,
             SesTransportFactory::class => false,
             SweegoTransportFactory::class => false,
+            TurboSmtpTransportFactory::class => false,
         ]);
     }
 
@@ -98,6 +100,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['sendgrid', 'symfony/sendgrid-mailer'];
         yield ['ses', 'symfony/amazon-mailer'];
         yield ['sweego', 'symfony/sweego-mailer'];
+        yield ['turbosmtp', 'symfony/turbo-smtp-mailer'];
     }
 
     #[DataProvider('messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider')]

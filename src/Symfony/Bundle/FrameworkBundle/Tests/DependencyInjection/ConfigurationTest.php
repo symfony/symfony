@@ -52,6 +52,27 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(self::getBundleDefaultConfig(), $config);
     }
 
+    public function testTranslatorProviderDomainsCanBeKeyed()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'translator' => [
+                'providers' => [
+                    'loco' => [
+                        'dsn' => 'loco://API_KEY@default',
+                        // as an XML configuration is converted
+                        'domains' => [
+                            ['key' => 'foo', 'value' => 'bar'],
+                            ['key' => '', 'value' => '*'],
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $this->assertSame(['foo' => 'bar', '' => '*'], $config['translator']['providers']['loco']['domains']);
+    }
+
     public function getTestValidSessionName()
     {
         return [
@@ -60,6 +81,53 @@ class ConfigurationTest extends TestCase
             ['a&b'],
             [',_-!@#$%^*(){}:<>/?'],
         ];
+    }
+
+    public function testCacheAppAndDefaultProviderCannotBeCombined()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "framework.cache.app" and "framework.cache.default_provider" options cannot be used together, the adapter is deduced from the DSN.');
+
+        (new Processor())->processConfiguration(new Configuration(true), [[
+            'cache' => ['app' => 'cache.adapter.redis', 'default_provider' => 'redis://localhost'],
+        ]]);
+    }
+
+    public function testCacheAppAndDefaultProviderCannotBeCombinedAcrossFiles()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        (new Processor())->processConfiguration(new Configuration(true), [
+            ['cache' => ['app' => 'cache.adapter.redis']],
+            ['cache' => ['default_provider' => 'redis://localhost']],
+        ]);
+    }
+
+    public function testCacheAppSetToItsDefaultValueStillConflictsWithDefaultProvider()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        (new Processor())->processConfiguration(new Configuration(true), [[
+            'cache' => ['app' => 'cache.adapter.filesystem', 'default_provider' => 'redis://localhost'],
+        ]]);
+    }
+
+    public function testCacheDefaultProviderAloneIsAllowed()
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+            'cache' => ['default_provider' => 'redis://localhost'],
+        ]]);
+
+        $this->assertSame('redis://localhost', $config['cache']['default_provider']);
+    }
+
+    public function testCacheAppAloneIsAllowed()
+    {
+        $config = (new Processor())->processConfiguration(new Configuration(true), [[
+            'cache' => ['app' => 'cache.adapter.redis'],
+        ]]);
+
+        $this->assertSame('cache.adapter.redis', $config['cache']['app']);
     }
 
     #[DataProvider('getTestInvalidSessionName')]

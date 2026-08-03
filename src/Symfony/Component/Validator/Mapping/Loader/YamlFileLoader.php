@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser as YamlParser;
@@ -154,7 +155,17 @@ class YamlFileLoader extends FileLoader
         }
 
         if (isset($classDescription['group_sequence'])) {
-            $metadata->setGroupSequence($classDescription['group_sequence']);
+            $groupSequence = $classDescription['group_sequence'];
+
+            // a mapping with a "groups" key carries options on top of the sequence itself
+            if (\is_array($groupSequence) && !array_is_list($groupSequence)) {
+                $metadata->setGroupSequence(new GroupSequence(
+                    $groupSequence['groups'],
+                    $groupSequence['cascade_current_group'] ?? false,
+                ));
+            } else {
+                $metadata->setGroupSequence($groupSequence);
+            }
         }
 
         if (isset($classDescription['constraints']) && \is_array($classDescription['constraints'])) {

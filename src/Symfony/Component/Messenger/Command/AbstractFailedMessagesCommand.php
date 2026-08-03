@@ -14,7 +14,9 @@ namespace Symfony\Component\Messenger\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\Dumper;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
@@ -137,6 +139,63 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
     }
 
+    /**
+     * @param bool $hasIds Whether explicit message ids were given, which the filters cannot be combined with
+     *
+     * @return array{?string, ?\DateTimeImmutable, ?\DateTimeImmutable} The class name, the earliest and the latest failure time to select
+     */
+    protected function getFilters(InputInterface $input, bool $hasIds): array
+    {
+        $classFilter = $input->getOption('class-filter');
+        $failedAfter = $this->getDateOption($input, 'failed-after');
+        $failedBefore = $this->getDateOption($input, 'failed-before');
+
+        if ($hasIds && (null !== $classFilter || null !== $failedAfter || null !== $failedBefore)) {
+            throw new RuntimeException('You cannot specify message ids when using the "--class-filter", "--failed-after" or "--failed-before" options.');
+        }
+
+        return [$classFilter, $failedAfter, $failedBefore];
+    }
+
+    /**
+     * @return list<mixed> The ids of the messages matching every given filter
+     */
+    protected function getMessageIdsByFilter(ListableReceiverInterface $receiver, ?string $classFilter, ?\DateTimeImmutable $failedAfter, ?\DateTimeImmutable $failedBefore): array
+    {
+        $ids = [];
+
+        $this->phpSerializer?->acceptPhpIncompleteClass();
+        try {
+            foreach ($receiver->all() as $envelope) {
+                if ($this->matchesFilter($envelope, $classFilter, $failedAfter, $failedBefore)) {
+                    $ids[] = $this->getMessageId($envelope);
+                }
+            }
+        } finally {
+            $this->phpSerializer?->rejectPhpIncompleteClass();
+        }
+
+        return $ids;
+    }
+
+    protected function matchesFilter(Envelope $envelope, ?string $classFilter, ?\DateTimeImmutable $failedAfter, ?\DateTimeImmutable $failedBefore): bool
+    {
+        if (null !== $classFilter && $classFilter !== $envelope->getMessage()::class) {
+            return false;
+        }
+
+        if (null === $failedAfter && null === $failedBefore) {
+            return true;
+        }
+
+        // messages that were never redelivered have no known failure time, so no time window can select them
+        if (null === $failedAt = $envelope->last(RedeliveryStamp::class)?->getRedeliveredAt()) {
+            return false;
+        }
+
+        return (null === $failedAfter || $failedAt >= $failedAfter) && (null === $failedBefore || $failedAt <= $failedBefore);
+    }
+
     protected function getReceiver(?string $name = null): ReceiverInterface
     {
         if (null === $name ??= $this->globalFailureReceiverName) {
@@ -148,6 +207,19 @@ abstract class AbstractFailedMessagesCommand extends Command
         }
 
         return $this->failureTransports->get($name);
+    }
+
+    private function getDateOption(InputInterface $input, string $option): ?\DateTimeImmutable
+    {
+        if (null === $value = $input->getOption($option)) {
+            return null;
+        }
+
+        try {
+            return new \DateTimeImmutable($value);
+        } catch (\DateMalformedStringException $e) {
+            throw new InvalidArgumentException(\sprintf('The value of the "--%s" option is not a valid date: "%s".', $option, $value), previous: $e);
+        }
     }
 
     private function createCloner(): ?ClonerInterface

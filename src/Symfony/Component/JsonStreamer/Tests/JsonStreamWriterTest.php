@@ -37,6 +37,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummi
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSelfReferencingDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSpecialCharacterNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUids;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
@@ -91,6 +92,39 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('[{"foo":1,"bar":2},{"foo":3}]', [['foo' => 1, 'bar' => 2], ['foo' => 3]], Type::list());
         $this->assertWritten('{"foo":"bar"}', (object) ['foo' => 'bar'], Type::object());
         $this->assertWritten('1', DummyBackedEnum::ONE, Type::enum(DummyBackedEnum::class));
+    }
+
+    public function testWriteReadableJsonByDefault()
+    {
+        $this->assertWritten('{"url":"https://symfony.com/école","ratio":1.0}', ['url' => 'https://symfony.com/école', 'ratio' => 1.0], Type::dict());
+    }
+
+    public function testWriteReadableDictionaryKeysByDefault()
+    {
+        $this->assertWritten(
+            '{"https://symfony.com/école":{"id":1,"name":"dummy"}}',
+            ['https://symfony.com/école' => new ClassicDummy()],
+            Type::dict(Type::object(ClassicDummy::class)),
+        );
+    }
+
+    public function testWriteReadablePropertyNamesByDefault()
+    {
+        $this->assertWritten(
+            '{"https://symfony.com/école":1,"line\\u2028separator":2}',
+            new DummyWithSpecialCharacterNamedProperties(),
+            Type::object(DummyWithSpecialCharacterNamedProperties::class),
+        );
+    }
+
+    public function testThrowWhenDictionaryKeyCannotBeEncoded()
+    {
+        $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
+
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Malformed UTF-8 characters, possibly incorrectly encoded');
+
+        (string) $writer->write(["invalid\xB1key" => new ClassicDummy()], Type::dict(Type::object(ClassicDummy::class)));
     }
 
     public function testWriteUnion()
@@ -380,7 +414,7 @@ class JsonStreamWriterTest extends TestCase
         $dummy->timezone = new \DateTimeZone('Asia/Tokyo');
 
         $this->assertWritten(
-            '{"timezone":"Asia\/Tokyo"}',
+            '{"timezone":"Asia/Tokyo"}',
             $dummy,
             Type::object(DummyWithDateTimeZones::class),
         );

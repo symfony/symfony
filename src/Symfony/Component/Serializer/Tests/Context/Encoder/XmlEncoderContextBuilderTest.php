@@ -47,6 +47,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             ->withCdataWrapping($values[XmlEncoder::CDATA_WRAPPING])
             ->withCdataWrappingPattern($values[XmlEncoder::CDATA_WRAPPING_PATTERN])
             ->withIgnoreEmptyAttributes($values[XmlEncoder::IGNORE_EMPTY_ATTRIBUTES])
+            ->withBooleanRepr($values[XmlEncoder::BOOLEAN_REPR])
             ->toArray();
 
         $this->assertSame($values, $context);
@@ -70,6 +71,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::CDATA_WRAPPING => false,
             XmlEncoder::CDATA_WRAPPING_PATTERN => '/[<>&"\']/',
             XmlEncoder::IGNORE_EMPTY_ATTRIBUTES => true,
+            XmlEncoder::BOOLEAN_REPR => ['true', 'false'],
         ]];
 
         yield 'With null values' => [[
@@ -88,6 +90,7 @@ class XmlEncoderContextBuilderTest extends TestCase
             XmlEncoder::CDATA_WRAPPING => null,
             XmlEncoder::CDATA_WRAPPING_PATTERN => null,
             XmlEncoder::IGNORE_EMPTY_ATTRIBUTES => null,
+            XmlEncoder::BOOLEAN_REPR => null,
         ]];
     }
 }

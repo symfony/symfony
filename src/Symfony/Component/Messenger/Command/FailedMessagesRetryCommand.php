@@ -65,6 +65,9 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Force action without confirmation'),
                 new InputOption('transport', null, InputOption::VALUE_REQUIRED, 'Use a specific failure transport', self::DEFAULT_TRANSPORT_OPTION),
                 new InputOption('keepalive', null, InputOption::VALUE_REQUIRED, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
+                new InputOption('class-filter', null, InputOption::VALUE_REQUIRED, 'Filter by a specific class name'),
+                new InputOption('failed-after', null, InputOption::VALUE_REQUIRED, 'Only select messages that failed at or after this date; messages with no known failure time are never selected'),
+                new InputOption('failed-before', null, InputOption::VALUE_REQUIRED, 'Only select messages that failed at or before this date; messages with no known failure time are never selected'),
             ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> retries message in the failure transport.
@@ -83,6 +86,19 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
 
                 <info>php %command.full_name% {id1} {id2} {id3}</info>
 
+                Instead of ids, messages can be selected by class name, by failure time, or by both:
+
+                    <info>php %command.full_name% --class-filter='App\Message\SendEmail'</info>
+                    <info>php %command.full_name% --failed-after='-1 hour'</info>
+                    <info>php %command.full_name% --failed-after='2024-05-01 08:00' --failed-before='2024-05-01 09:30'</info>
+
+                The "--failed-after" and "--failed-before" options accept any expression supported by
+                DateTimeImmutable and both bounds are inclusive. The failure time comes from the message
+                history, so messages that were never redelivered are never selected by these options.
+
+                Filters cannot be combined with message ids. Add "--force" to retry every matching message
+                without being asked about each of them.
+
                 EOF
             )
         ;
@@ -97,6 +113,9 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $ids = $input->getArgument('id');
+        [$classFilter, $failedAfter, $failedBefore] = $this->getFilters($input, (bool) $ids);
+
         $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
         $io = new SymfonyStyle($input, $output);
@@ -121,7 +140,19 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
         $io->writeln(\sprintf('To retry all the messages, run <comment>messenger:consume %s</comment>', $failureTransportName));
 
         $shouldForce = $input->getOption('force');
-        $ids = $input->getArgument('id');
+
+        if (null !== $classFilter || null !== $failedAfter || null !== $failedBefore) {
+            if (!$receiver instanceof ListableReceiverInterface) {
+                throw new RuntimeException(\sprintf('The "%s" receiver does not support filtering messages.', $failureTransportName));
+            }
+
+            $ids = $this->getMessageIdsByFilter($receiver, $classFilter, $failedAfter, $failedBefore);
+
+            if (!$ids) {
+                throw new RuntimeException('No failed messages were found with this filter.');
+            }
+        }
+
         if (0 === \count($ids)) {
             if (!$input->isInteractive()) {
                 throw new RuntimeException('Message id must be passed when in non-interactive mode.');

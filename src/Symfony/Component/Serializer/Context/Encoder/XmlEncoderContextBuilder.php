@@ -176,4 +176,14 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::PRESERVE_NUMERIC_KEYS, $preserveNumericKeys);
     }
+
+    /**
+     * Configures the strings representing true and false when encoding, e.g. ['true', 'false'] or ['yes', 'no'].
+     *
+     * @param array{0: string, 1: string}|null $booleanRepr
+     */
+    public function withBooleanRepr(?array $booleanRepr): static
+    {
+        return $this->with(XmlEncoder::BOOLEAN_REPR, $booleanRepr);
+    }
 }

@@ -17,7 +17,13 @@ use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceiver;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
+use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Worker;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -72,11 +78,11 @@ class PostgreSqlConnectionTest extends TestCase
         $driverConnection->method('executeStatement')->willReturn(1);
 
         $wrappedConnection = new class {
-            public int $notifyCalls = 0;
+            public array $notifyTimeouts = [];
 
-            public function getNotify()
+            public function getNotify(int $fetchMode = \PDO::FETCH_ASSOC, int|float $timeoutMs = 0)
             {
-                ++$this->notifyCalls;
+                $this->notifyTimeouts[] = $timeoutMs;
 
                 return false;
             }
@@ -89,16 +95,83 @@ class PostgreSqlConnectionTest extends TestCase
 
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
 
-        $result = $connection->waitForNotify(1000);
+        $result = $connection->waitForNotify(60000);
 
         $this->assertFalse($result);
         $this->assertTrue($connection->isListening());
-        $this->assertSame(1, $wrappedConnection->notifyCalls);
+        $this->assertSame([60000], $wrappedConnection->notifyTimeouts);
     }
 
-    public function testGetBlocksOnNotifyWhenNoExternalListenerIsActive()
+    public function testGetCollectsNotificationsWithoutWaitingWhenNoExternalListenerIsActive()
     {
-        $driverConnection = $this->createMock(Connection::class);
+        [$connection, $wrappedConnection] = $this->createConnectionWithNotifyTimeoutCapture([
+            'table_name' => 'queue_table',
+        ]);
+
+        // first get(): queueEmptiedAt === null -> parent::get(), sets queueEmptiedAt
+        $connection->get();
+        // second/third get(): queueEmptiedAt !== null -> collects pending notifications
+        $connection->get();
+        $connection->get();
+
+        $this->assertTrue($connection->isListening());
+        $this->assertSame([0, 0], $wrappedConnection->notifyTimeouts);
+    }
+
+    public function testGetDoesNotWaitForNotifyWhenTimeoutIsSetToZero()
+    {
+        [$connection, $wrappedConnection] = $this->createConnectionWithNotifyTimeoutCapture([
+            'table_name' => 'queue_table',
+            'get_notify_timeout' => 0,
+        ]);
+
+        $connection->get();
+        $connection->get();
+
+        $this->assertSame([0], $wrappedConnection->notifyTimeouts);
+    }
+
+    public function testWorkerKeepsPollingItsOtherReceiversWhileThePostgreSqlQueueIsEmpty()
+    {
+        $clock = new MockClock();
+        $startedAt = $clock->now()->getTimestamp();
+
+        // a blocking getNotify() would move the clock forward
+        [$connection] = $this->createConnectionWithNotifyTimeoutCapture(['table_name' => 'queue_table'], $clock);
+
+        $otherReceiver = new class implements ReceiverInterface {
+            public int $calls = 0;
+
+            public function get(): iterable
+            {
+                ++$this->calls;
+
+                return [];
+            }
+
+            public function ack(Envelope $envelope): void
+            {
+            }
+
+            public function reject(Envelope $envelope): void
+            {
+            }
+        };
+
+        $worker = new Worker([
+            'pgsql' => new DoctrineReceiver($connection),
+            'other' => $otherReceiver,
+        ], $this->createStub(MessageBusInterface::class), clock: $clock);
+
+        $worker->run(['sleep' => 1000000, 'time_limit' => 5]);
+
+        $this->assertSame(5, $otherReceiver->calls);
+        $this->assertSame(5, $clock->now()->getTimestamp() - $startedAt);
+    }
+
+    private function createConnectionWithNotifyTimeoutCapture(array $configuration, ?MockClock $clock = null): array
+    {
+        $driverConnection = $this->createStub(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
 
         $driverConnection
@@ -109,19 +182,23 @@ class PostgreSqlConnectionTest extends TestCase
             ->method('createQueryBuilder')
             ->willReturn(new QueryBuilder($driverConnection));
 
-        $wrappedConnection = new class {
-            public int $notifyCalls = 0;
+        $wrappedConnection = new class($clock) {
+            public array $notifyTimeouts = [];
 
-            public function getNotify()
+            public function __construct(private ?MockClock $clock)
             {
-                ++$this->notifyCalls;
+            }
+
+            public function getNotify(int $fetchMode = \PDO::FETCH_ASSOC, int|float $timeoutMs = 0)
+            {
+                $this->notifyTimeouts[] = $timeoutMs;
+                $this->clock?->sleep($timeoutMs / 1000);
 
                 return false;
             }
         };
 
         $driverConnection
-            ->expects(self::exactly(2))
             ->method('getNativeConnection')
             ->willReturn($wrappedConnection);
 
@@ -132,16 +209,7 @@ class PostgreSqlConnectionTest extends TestCase
             ->method('executeQuery')
             ->willReturn(new Result($driverResult, $driverConnection));
 
-        $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);
-
-        // first get(): queueEmptiedAt === null -> parent::get(), sets queueEmptiedAt
-        $connection->get();
-        // second/third get(): queueEmptiedAt !== null -> blocks on getNotify
-        $connection->get();
-        $connection->get();
-
-        $this->assertTrue($connection->isListening());
-        $this->assertSame(2, $wrappedConnection->notifyCalls);
+        return [new PostgreSqlConnection($configuration, $driverConnection), $wrappedConnection];
     }
 
     public function testGetSkipsBlockingWhenListenCalledExternally()

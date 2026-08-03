@@ -13,6 +13,7 @@ namespace Symfony\Component\Translation\Bridge\Loco;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\CatalogueMetadataAwareInterface;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -31,15 +32,34 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class LocoProvider implements ProviderInterface
 {
+    private string $endpoint;
+    private ?TranslatorBagInterface $translatorBag;
+    private ?string $restrictToStatus;
+    private XliffFileDumper $dumper;
+
     public function __construct(
         private HttpClientInterface $client,
         private LoaderInterface $loader,
         private LoggerInterface $logger,
-        private string $defaultLocale,
-        private string $endpoint,
-        private ?TranslatorBagInterface $translatorBag = null,
-        private ?string $restrictToStatus = null,
+        string $endpoint,
+        TranslatorBagInterface|string|null $translatorBag = null,
+        TranslatorBagInterface|string|null $restrictToStatus = null,
+        XliffFileDumper|string|null $dumper = null,
     ) {
+        if (\is_string($translatorBag)) {
+            trigger_deprecation('symfony/loco-translation-provider', '8.2', '"%s" constructor "$defaultLocale" parameter has no effect and will be removed in version 9.0.', __CLASS__);
+
+            $this->endpoint = $translatorBag;
+            $this->translatorBag = $restrictToStatus;
+            $this->restrictToStatus = $dumper;
+            $dumper = \func_get_args()[7] ?? null;
+        } else {
+            $this->endpoint = $endpoint;
+            $this->translatorBag = $translatorBag;
+            $this->restrictToStatus = $restrictToStatus;
+        }
+
+        $this->dumper = $dumper ?? new XliffFileDumper();
     }
 
     public function __toString(): string
@@ -53,86 +73,114 @@ final class LocoProvider implements ProviderInterface
 
     public function write(TranslatorBagInterface $translatorBag): void
     {
-        $catalogue = $translatorBag->getCatalogue($this->defaultLocale);
+        $this->createMissingLocales($translatorBag);
 
-        $assetsToTag = [];
-        foreach ($catalogue->all() as $domain => $messages) {
-            if ($createdIds = $this->createAssets(array_keys($messages), $domain)) {
-                $assetsToTag[$domain] = $createdIds;
-            }
-        }
-        if ($assetsToTag) {
-            $this->tagsAssets($assetsToTag);
-        }
+        $responses = [];
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             $locale = $catalogue->getLocale();
 
-            if (!\in_array($locale, $this->getLocales(), true)) {
-                $this->createLocale($locale);
+            foreach ($catalogue->all() as $domain => $messages) {
+                $reindexedCatalog = new MessageCatalogue($locale);
+
+                foreach ($messages as $key => $message) {
+                    $reindexedCatalog->set("{$domain}__{$key}", $message, $domain);
+                }
+
+                $responses[] = $this->client->request('POST', 'import/xlf', [
+                    'body' => $this->dumper->formatCatalogue($reindexedCatalog, $domain, ['default_locale' => $locale]),
+                    'query' => [
+                        'locale' => $locale,
+                        'tag-new' => $domain,
+                    ],
+                    'user_data' => [
+                        'locale' => $locale,
+                        'domain' => $domain,
+                    ],
+                ]);
+            }
+        }
+
+        foreach ($this->client->stream($responses) as $response => $chunk) {
+            if ($chunk->isFirst() && 200 === $response->getStatusCode()) {
+                $response->cancel();
+            }
+            if (!$chunk->isLast()) {
+                continue;
             }
 
-            foreach ($catalogue->all() as $domain => $messages) {
-                $keysIdsMap = [];
+            ['locale' => $locale, 'domain' => $domain] = $response->getInfo('user_data');
 
-                foreach ($this->getAssetsIds($domain) as $id) {
-                    $keysIdsMap[$this->retrieveKeyFromId($id, $domain)] = $id;
-                }
+            $this->logger->error(\sprintf('Unable to import domain "%s" for locale "%s" to Loco: "%s".', $domain, $locale, $response->getContent(false)));
 
-                $assets = [];
-                foreach ($keysIdsMap as $key => $id) {
-                    if (isset($messages[$key])) {
-                        $assets[$id] = $messages[$key];
-                    }
-                }
-
-                $this->translateAssets($assets, $locale);
+            if (500 <= $response->getStatusCode()) {
+                throw new ProviderException(\sprintf('Unable to import domain "%s" for locale "%s" to Loco.', $domain, $locale), $response);
             }
         }
     }
 
     public function read(array $domains, array $locales): TranslatorBag
     {
-        $domains = $domains ?: ['*'];
+        if (!$domains || ['*'] === $domains) {
+            trigger_deprecation('symfony/loco-translation-provider', '8.2', 'Passing no domains or "*" to "%s" is deprecated, configure your loco provider domains as an associative array with an empty string key and "*" as value.', __METHOD__);
+
+            $domains = ['' => '*'];
+        } else {
+            $filters = [];
+            foreach ($domains as $filter => $domain) {
+                $filters[\is_int($filter) ? $domain : $filter] = $domain;
+            }
+            $domains = $filters;
+        }
         $locales = $locales ?: $this->getLocales();
+
         $translatorBag = new TranslatorBag();
-        $responses = new \SplObjectStorage();
+        $responses = [];
 
         foreach ($locales as $locale) {
-            foreach ($domains as $domain) {
-                $previousCatalogue = $this->translatorBag?->getCatalogue($locale);
+            $previousCatalogue = $this->translatorBag?->getCatalogue($locale);
 
-                $response = $this->client->request('GET', \sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
+            foreach ($domains as $filter => $domain) {
+                $responses[] = $this->client->request('GET', \sprintf('export/locale/%s.xlf', rawurlencode($locale)), [
                     'query' => [
-                        'filter' => '*' !== $domain ? $domain : '',
+                        'filter' => $filter,
                         'status' => $this->restrictToStatus ?? 'translated,blank-translation',
                     ],
                     'headers' => [
                         'If-Modified-Since' => $previousCatalogue instanceof CatalogueMetadataAwareInterface ? $previousCatalogue->getCatalogueMetadata('last-modified', $domain) : null,
                     ],
+                    'user_data' => [
+                        'locale' => $locale,
+                        'filter' => $filter,
+                        'domain' => $domain,
+                        'previousCatalogue' => $previousCatalogue,
+                    ],
                 ]);
-                $responses[$response] = [
-                    'locale' => $locale,
-                    'domain' => $domain,
-                    'previousCatalogue' => $previousCatalogue,
-                ];
             }
         }
 
         foreach ($this->client->stream($responses) as $response => $chunk) {
-            ['locale' => $locale, 'domain' => $domain, 'previousCatalogue' => $previousCatalogue] = $responses[$response];
+            if ($response->getInfo('canceled')) {
+                continue;
+            }
+
+            ['locale' => $locale, 'filter' => $filter, 'domain' => $domain, 'previousCatalogue' => $previousCatalogue] = $response->getInfo('user_data');
 
             if ($chunk->isFirst()) {
                 if (404 === $response->getStatusCode()) {
-                    $this->logger->warning(\sprintf('Locale "%s" for domain "%s" does not exist in Loco.', $locale, $domain));
+                    $this->logger->warning(\sprintf('Locale "%s" does not exist in your Loco project.', $locale));
 
-                    $response->cancel();
+                    foreach ($responses as $localeResponse) {
+                        if ($locale === $localeResponse->getInfo('user_data')['locale']) {
+                            $localeResponse->cancel();
+                        }
+                    }
 
                     continue;
                 }
 
                 if (304 === $response->getStatusCode()) {
-                    $this->logger->info(\sprintf('No modifications found for locale "%s" and domain "%s" in Loco.', $locale, $domain));
+                    $this->logger->info(\sprintf('No modifications found in Loco for locale "%s" and domain "%s".', $locale, $domain));
 
                     $catalogue = new MessageCatalogue($locale);
                     $previousMessages = $previousCatalogue->all($domain);
@@ -163,7 +211,7 @@ final class LocoProvider implements ProviderInterface
                 $catalogue = new MessageCatalogue($locale);
 
                 foreach ($locoCatalogue->all($domain) as $key => $message) {
-                    $catalogue->set($this->retrieveKeyFromId($key, $domain), $message, $domain);
+                    $catalogue->set($this->retrieveKeyFromId($key, $filter), $message, $domain);
                 }
 
                 if ($previousCatalogue instanceof CatalogueMetadataAwareInterface) {
@@ -226,191 +274,32 @@ final class LocoProvider implements ProviderInterface
         }
     }
 
-    /**
-     * Returns array of internal Loco's unique ids.
-     */
-    private function getAssetsIds(string $domain): array
+    private function createMissingLocales(TranslatorBagInterface $translatorBag): void
     {
-        $response = $this->client->request('GET', 'assets', ['query' => ['filter' => $domain]]);
-
-        if (200 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(\sprintf('Unable to get assets from Loco: "%s".', $response->getContent(false)));
-
-            if (500 <= $statusCode) {
-                throw new ProviderException('Unable to get assets from Loco.', $response);
-            }
+        $locales = [];
+        foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $locales[] = $catalogue->getLocale();
         }
 
-        return array_map(static fn ($asset) => $asset['id'], $response->toArray(false));
-    }
-
-    private function createAssets(array $keys, string $domain): array
-    {
-        $responses = $createdIds = [];
-
-        foreach ($keys as $key) {
-            $responses[$key] = $this->client->request('POST', 'assets', [
-                'body' => [
-                    'id' => $domain.'__'.$key, // must be globally unique, not only per domain
-                    'text' => $key,
-                    'type' => 'text',
-                    'default' => 'untranslated',
-                ],
-            ]);
+        if (!$missingLocales = array_diff($locales, $this->getLocales())) {
+            return;
         }
 
-        foreach ($responses as $key => $response) {
-            if (201 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(\sprintf('Unable to add new translation key "%s" to Loco: (status code: "%s") "%s".', $key, $statusCode, $response->getContent(false)));
-
-                if (500 <= $statusCode) {
-                    throw new ProviderException(\sprintf('Unable to add new translation key "%s" to Loco: (status code: "%s").', $key, $statusCode), $response);
-                }
-            } else {
-                $createdIds[] = $response->toArray(false)['id'];
-            }
-        }
-
-        return $createdIds;
-    }
-
-    private function translateAssets(array $translations, string $locale): void
-    {
         $responses = [];
 
-        foreach ($translations as $id => $message) {
-            $responses[$id] = $this->client->request('POST', \sprintf('translations/%s/%s', rawurlencode($id), rawurlencode($locale)), [
-                'body' => $message,
-                'headers' => ['Content-Type' => 'text/plain'],
+        foreach (array_unique($missingLocales) as $locale) {
+            $responses[] = $this->client->request('POST', 'locales', [
+                'body' => ['code' => $locale],
+                'user_data' => $locale,
             ]);
-        }
-
-        foreach ($responses as $id => $response) {
-            if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(\sprintf('Unable to add translation for key "%s" in locale "%s" to Loco: "%s".', $id, $locale, $response->getContent(false)));
-
-                if (500 <= $statusCode) {
-                    throw new ProviderException(\sprintf('Unable to add translation for key "%s" in locale "%s" to Loco.', $id, $locale), $response);
-                }
-            }
-        }
-    }
-
-    private function tagsAssets(array $idsByTags): void
-    {
-        if ($newTags = array_diff(array_keys($idsByTags), $this->getTags())) {
-            $this->createTags($newTags);
-        }
-
-        $responses = new \SplObjectStorage();
-
-        // Loco API allows to tag multiple assets at once by joining their IDs with commas.
-        // That means IDs containing commas must be tagged individually.
-        foreach ($idsByTags as $tag => $ids) {
-            foreach ($ids as $i => $id) {
-                if (!str_contains($id, ',')) {
-                    continue;
-                }
-
-                $response = $this->client->request('POST', \sprintf('assets/%s/tags', rawurlencode($id)), [
-                    'body' => ['name' => $tag],
-                ]);
-                $responses[$response] = [
-                    'tag' => $tag,
-                    'assetId' => $id,
-                ];
-
-                unset($idsByTags[$tag][$i]);
-            }
-        }
-
-        foreach ($idsByTags as $tag => $ids) {
-            if (!$ids) {
-                continue;
-            }
-
-            $response = $this->client->request('POST', \sprintf('tags/%s.json', rawurlencode($tag)), [
-                'body' => implode(',', $ids),
-            ]);
-            $responses[$response] = [
-                'tag' => $tag,
-                'assetId' => null,
-            ];
         }
 
         foreach ($this->client->stream($responses) as $response => $chunk) {
-            if ($chunk->isFirst() && 200 === $response->getStatusCode()) {
-                $response->cancel();
-            }
-            if (!$chunk->isLast()) {
-                continue;
+            if (201 !== $response->getStatusCode()) {
+                throw new ProviderException(\sprintf('Unable to create locale "%s" on Loco.', $response->getInfo('user_data')), $response);
             }
 
-            ['tag' => $tag, 'assetId' => $assetId] = $responses[$response];
-
-            $this->logger->error(\sprintf('Unable to tag asset%s with "%s" on Loco: "%s".', $assetId ? ' "'.$assetId.'"' : 's', $tag, $response->getContent(false)));
-
-            if (500 <= $response->getStatusCode()) {
-                throw new ProviderException(\sprintf('Unable to tag asset%s with "%s" on Loco.', $assetId ? ' "'.$assetId.'"' : 's', $tag), $response);
-            }
-        }
-    }
-
-    private function createTags(array $tags): void
-    {
-        $responses = new \SplObjectStorage();
-        foreach ($tags as $tag) {
-            $response = $this->client->request('POST', 'tags.json', [
-                'body' => [
-                    'name' => $tag,
-                ],
-            ]);
-            $responses[$response] = $tag;
-        }
-
-        foreach ($this->client->stream($responses) as $response => $chunk) {
-            if ($chunk->isFirst() && 201 === $response->getStatusCode()) {
-                $response->cancel();
-            }
-            if (!$chunk->isLast()) {
-                continue;
-            }
-
-            $tag = $responses[$response];
-            $this->logger->error(\sprintf('Unable to create tag "%s" on Loco: "%s".', $tag, $response->getContent(false)));
-
-            if (500 <= $response->getStatusCode()) {
-                throw new ProviderException(\sprintf('Unable to create tag "%s" on Loco.', $tag), $response);
-            }
-        }
-    }
-
-    private function getTags(): array
-    {
-        $response = $this->client->request('GET', 'tags.json');
-        $content = $response->toArray(false);
-
-        if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(\sprintf('Unable to get tags on Loco: "%s".', $response->getContent(false)), $response);
-        }
-
-        return $content ?: [];
-    }
-
-    private function createLocale(string $locale): void
-    {
-        $response = $this->client->request('POST', 'locales', [
-            'body' => [
-                'code' => $locale,
-            ],
-        ]);
-
-        if (201 !== $statusCode = $response->getStatusCode()) {
-            $this->logger->error(\sprintf('Unable to create locale "%s" on Loco: "%s".', $locale, $response->getContent(false)));
-
-            if (500 <= $statusCode) {
-                throw new ProviderException(\sprintf('Unable to create locale "%s" on Loco.', $locale), $response);
-            }
+            $response->cancel();
         }
     }
 
@@ -422,7 +311,12 @@ final class LocoProvider implements ProviderInterface
             throw new ProviderException('Unable to get locales on Loco.', $response);
         }
 
-        return array_column($response->toArray(), 'code');
+        $locales = [];
+        foreach ($response->toArray() as $locale) {
+            $locales[] = str_replace('-', '_', $locale['code']);
+        }
+
+        return $locales;
     }
 
     private function retrieveKeyFromId(string $id, string $domain): string

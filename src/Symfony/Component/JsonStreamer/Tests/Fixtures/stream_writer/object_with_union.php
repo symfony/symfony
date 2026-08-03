@@ -13,9 +13,9 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $transfor
         if (null !== $data->value) {
             yield "{$prefix1}\"value\":";
             if ($data->value instanceof \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum) {
-                yield \json_encode($data->value->value, \JSON_THROW_ON_ERROR, 511);
+                yield \json_encode($data->value->value, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
             } elseif (\is_string($data->value)) {
-                yield \json_encode($data->value, \JSON_THROW_ON_ERROR, 511);
+                yield \json_encode($data->value, \JSON_THROW_ON_ERROR | \JSON_PRESERVE_ZERO_FRACTION | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE, 511);
             } else {
                 throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value.', \get_debug_type($data->value)));
             }

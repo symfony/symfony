@@ -1,0 +1,27 @@
+imports:
+- { resource: ./../config/framework.yml }
+
+services:
+    app.logout_csrf_token_manager:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\FixedCsrfTokenManager
+
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\InMemoryUser: plaintext
+
+    providers:
+        in_memory:
+            memory:
+                users:
+                    johannes: { password: test, roles: [ROLE_USER] }
+
+    firewalls:
+        default:
+            form_login:
+                check_path: login
+            logout:
+                csrf_token_manager: app.logout_csrf_token_manager
+
+    access_control:
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: .*, roles: IS_AUTHENTICATED_FULLY }

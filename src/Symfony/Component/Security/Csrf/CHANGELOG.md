@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `DelegatingCsrfTokenManager` to hand each token id over to the manager dedicated to it
+
 8.1
 ---
 

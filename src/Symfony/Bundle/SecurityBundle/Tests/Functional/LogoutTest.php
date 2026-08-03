@@ -78,6 +78,37 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
+    public function testTheCsrfTokenManagerOfTheFirewallMintsTheLogoutToken()
+    {
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_csrf_custom_manager.yml']);
+
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
+
+        // this is what csrf_token('logout') does in a template
+        $csrfToken = static::getContainer()->get('security.csrf.token_manager')->getToken('logout')->getValue();
+
+        $this->assertSame(FixedCsrfTokenManager::VALUE, $csrfToken);
+
+        $client->request('GET', '/logout?_csrf_token='.$csrfToken);
+
+        $this->assertRedirect($client->getResponse(), '/');
+    }
+
+    public function testTheCsrfTokenManagerOfTheFirewallWinsOverStatelessTokenIds()
+    {
+        $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_csrf_custom_manager_stateless.yml']);
+
+        $client->request('POST', '/login', ['_username' => 'johannes', '_password' => 'test']);
+
+        $csrfToken = static::getContainer()->get('security.csrf.token_manager')->getToken('logout')->getValue();
+
+        $this->assertSame(FixedCsrfTokenManager::VALUE, $csrfToken);
+
+        $client->request('GET', '/logout?_csrf_token='.$csrfToken);
+
+        $this->assertRedirect($client->getResponse(), '/');
+    }
+
     private function callInRequestContext(KernelBrowser $client, callable $callable): void
     {
         /** @var EventDispatcherInterface $eventDispatcher */

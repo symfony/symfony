@@ -20,6 +20,7 @@
         "psr/container": "^2.0"
     },
     "require-dev": {
+        "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/var-exporter": "^7.4|^8.0"
     },

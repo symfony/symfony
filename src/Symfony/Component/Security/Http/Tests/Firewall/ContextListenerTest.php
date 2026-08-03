@@ -38,6 +38,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
 use Symfony\Component\Security\Http\Tests\Fixtures\CustomUser;
 use Symfony\Component\Security\Http\Tests\Fixtures\LazyDoctrinePersistenceUser;
@@ -294,6 +295,42 @@ class ContextListenerTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
+    public function testDeauthenticatedEventCarriesTheReasonAndProviderWhenTheUserChanged()
+    {
+        $event = $this->dispatchTokenDeauthenticatedEvent([new NotSupportingUserProvider(true), new SupportingUserProvider(new InMemoryUser('foobar', 'baz'))]);
+
+        $this->assertSame('the user has changed', $event->getReason());
+        $this->assertSame([SupportingUserProvider::class], $event->getProviderClasses());
+    }
+
+    public function testDeauthenticatedEventAggregatesEveryProviderThatSawAChange()
+    {
+        $event = $this->dispatchTokenDeauthenticatedEvent([
+            new SupportingUserProvider(new InMemoryUser('foobar', 'baz')),
+            new SupportingUserProvider(new InMemoryUser('foobar', 'qux')),
+        ]);
+
+        $this->assertSame('the user has changed', $event->getReason());
+        $this->assertSame([SupportingUserProvider::class, SupportingUserProvider::class], $event->getProviderClasses());
+    }
+
+    public function testDeauthenticatedEventCarriesTheReasonAndProvidersWhenTheUserWasNotFound()
+    {
+        $event = $this->dispatchTokenDeauthenticatedEvent([new SupportingUserProvider(), new SupportingUserProvider()]);
+
+        $this->assertSame('the user could not be found by any user provider', $event->getReason());
+        $this->assertSame([SupportingUserProvider::class, SupportingUserProvider::class], $event->getProviderClasses());
+    }
+
+    public function testUserChangedTakesPrecedenceOverUserNotFoundInTheDeauthenticatedEvent()
+    {
+        $event = $this->dispatchTokenDeauthenticatedEvent([new SupportingUserProvider(), new SupportingUserProvider(new InMemoryUser('foobar', 'baz'))]);
+
+        // only the provider that detected the change is reported, not the one that did not find the user
+        $this->assertSame('the user has changed', $event->getReason());
+        $this->assertSame([SupportingUserProvider::class], $event->getProviderClasses());
+    }
+
     public function testTokenIsNotDeauthenticatedOnUserChangeIfNotAnInstanceOfAbstractToken()
     {
         $tokenStorage = new TokenStorage();
@@ -530,6 +567,29 @@ class ContextListenerTest extends TestCase
         }
 
         return $session;
+    }
+
+    private function dispatchTokenDeauthenticatedEvent(array $userProviders): TokenDeauthenticatedEvent
+    {
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize(new UsernamePasswordToken(new InMemoryUser('foo', 'bar'), 'context_key', ['ROLE_USER'])));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $deauthenticatedEvent = null;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(TokenDeauthenticatedEvent::class, static function (TokenDeauthenticatedEvent $event) use (&$deauthenticatedEvent) {
+            $deauthenticatedEvent = $event;
+        });
+
+        $listener = new ContextListener(new TokenStorage(), $userProviders, 'context_key', null, $dispatcher);
+        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertInstanceOf(TokenDeauthenticatedEvent::class, $deauthenticatedEvent);
+
+        return $deauthenticatedEvent;
     }
 
     private function handleEventWithPreviousSession($userProviders, ?UserInterface $user = null)

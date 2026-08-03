@@ -24,6 +24,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
+use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 use Symfony\Component\Security\Http\FirewallMapInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
@@ -38,6 +39,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 class SecurityDataCollector extends DataCollector implements LateDataCollectorInterface
 {
     private bool $hasVarDumper;
+    private ?array $deauthentication = null;
 
     public function __construct(
         private ?TokenStorageInterface $tokenStorage = null,
@@ -48,6 +50,15 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         private ?TraceableFirewallListener $firewall = null,
     ) {
         $this->hasVarDumper = class_exists(ClassStub::class);
+    }
+
+    public function collectDeauthentication(TokenDeauthenticatedEvent $event): void
+    {
+        $this->deauthentication = [
+            'reason' => $event->getReason(),
+            'providers' => $event->getProviderClasses(),
+            'user' => $event->getOriginalToken()->getUserIdentifier(),
+        ];
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
@@ -201,6 +212,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
         $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
 
+        // kept until reset(), which runs before the next main request: sub-requests of the
+        // same request must report it too, the main profile is not always collected first
+        $this->data['deauthentication'] = $this->deauthentication;
+
         if ($this->data['listeners'] && !($this->data['firewall']['stateless'] ?? true)) {
             $authCookieName = "{$this->data['firewall']['name']}_auth_profile_token";
             $deauthCookieName = "{$this->data['firewall']['name']}_deauth_profile_token";
@@ -226,6 +241,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function reset(): void
     {
         $this->data = [];
+        $this->deauthentication = null;
     }
 
     public function lateCollect(): void
@@ -373,6 +389,16 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getDeauthProfileToken(): string|Data|null
     {
         return $this->data['deauth_profile_token'] ?? null;
+    }
+
+    /**
+     * Returns information about why the user was deauthenticated, if applicable.
+     *
+     * @return array{reason: ?string, providers: list<class-string>, user: string}|Data|null
+     */
+    public function getDeauthentication(): array|Data|null
+    {
+        return $this->data['deauthentication'] ?? null;
     }
 
     public function getName(): string

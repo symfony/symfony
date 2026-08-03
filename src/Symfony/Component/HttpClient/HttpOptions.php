@@ -156,9 +156,12 @@ class HttpOptions
     }
 
     /**
+     * @param bool|resource|\Closure $buffer Whether to buffer the response, or a stream to write it to,
+     *                                       or a closure deciding it from the response headers
+     *
      * @return $this
      */
-    public function buffer(bool $buffer): static
+    public function buffer(mixed $buffer): static
     {
         $this->options['buffer'] = $buffer;
 

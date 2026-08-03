@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-08-03T14:40:44Z
+
+> it is skipped otherwise, since holding the body is the caller's decision to make.
+
+Should it be skipped or should it throw to make the dev aware that `tagFromBody` is not compatible with non-buffered responses ? Skipping silently would be hard to debug ? If we don't want to fail, can we at least produce some logs ?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2026-08-03T14:55:27Z
+
+I like the cleaner API but I think we lost a way to dynamically decide wheter to `buffer` or not. You want to buffer only if the response `Content-Type` is e.g. `application/json`. I know that normally you know this ahead of time but we all know that the reality is sometimes different and weird APIs exist that will send different formats no matter your `Accept` header and you end up buffering a 500MB file faster than you know it 😟
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T14:57:36Z
+
+The "buffer" option already allows deciding that, isn't it, when set to a callback?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-08-03T14:59:01Z
+
+@nicolas-grekas shouldn't you mark the commit as co-authored by @Amoifr to properly give the credit ?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2026-08-03T15:00:13Z
+
+> The "buffer" option already allows deciding that, isn't it, when set to a callback?
+
+Ah right, I only did a quick check on https://github.com/symfony/symfony/blob/8.2/src/Symfony/Component/HttpClient/HttpOptions.php#L161 where the type hint is `bool` - maybe that's wrong then according to https://github.com/symfony/symfony/blob/8.2/src/Symfony/Contracts/HttpClient/HttpClientInterface.php#L56 😊
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T16:21:23Z
+
+Thanks @stof, all four addressed.
+
+The empty lines were mine: I moved the tag tests over from #64177 with a script and it left 19 blank lines behind. Collapsed.
+
+`@return list<string>` added on `getTags()`.
+
+On `treatPhpDocTypesAsCertain`: agreed, and thanks for #65126. I am keeping the runtime guard in `tag()` either way, since the phpdoc is a promise to readers and to the analyser, not something the engine enforces, and the option is public API that people will call with whatever they have.
+
+On the buffering question from your other comment, I tried throwing first and it turns out worse than it reads. Anything raised inside the passthru generator is wrapped by `AsyncResponse`:
+
+```
+Failed asserting that exception of type "TransportException" matches expected "InvalidArgumentException".
+Message was: "The "extra.cache_policy" option calls "tagFromBody()", which requires the "buffer" option to be true."
+```
+
+So a configuration mistake would arrive as a transport failure, and be swallowed by any `catch (TransportExceptionInterface)` around the call, which is how people wrap HTTP calls. A config error looking like a flaky network is worse than a missing tag. I went with your second suggestion instead: the tags are dropped and a warning is logged through the logger the client already carries, with a test asserting the record.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T16:40:01Z
+
+@Toflar could you give this one a try please?

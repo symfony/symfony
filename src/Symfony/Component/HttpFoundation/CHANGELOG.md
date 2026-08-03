@@ -7,6 +7,12 @@ CHANGELOG
  * Deprecate not passing an expiry to `UriSigner::sign()`
  * Add the `$defaultExpiration` argument to `UriSigner::__construct()`
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()` to bind a signed URI to a state token, folded into the signature
+ * Add `IpUtils::normalize()` to canonicalise IP literals (decimal / hex / octal
+   integers, short and mixed dotted forms, IPv4-mapped IPv6, bracketed literals)
+   before classification — useful when defending against SSRF bypass via obfuscated addresses
+ * Expand `IpUtils::PRIVATE_SUBNETS` to cover IPv4 multicast (`224.0.0.0/4`),
+   IPv6 multicast (`ff00::/8`), IPv6 discard prefix (`100::/64`), IETF protocol
+   assignments (`192.0.0.0/29`), and 6to4 relay anycast (`192.88.99.0/24`)
 
 8.1
 ---

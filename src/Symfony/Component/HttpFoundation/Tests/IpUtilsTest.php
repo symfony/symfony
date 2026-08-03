@@ -233,15 +233,19 @@ class IpUtilsTest extends TestCase
             ['127.0.0.1',       true],
             ['10.0.0.1',        true],
             ['192.168.0.1',     true],
+            ['192.0.0.1',       true],   // IETF Protocol Assignments (RFC 6890)
             ['192.0.2.1',       true],
             ['198.51.100.1',    true],
             ['203.0.113.1',     true],
             ['172.16.0.1',      true],
             ['169.254.0.1',     true],
+            ['192.88.99.1',     true],   // 6to4 Relay Anycast (RFC 7526)
             ['198.18.0.1',      true],
             ['0.0.0.1',         true],
             ['240.0.0.1',       true],
             ['100.64.0.1',      true],
+            ['224.0.0.1',       true],   // IPv4 multicast (RFC 5771)
+            ['239.255.255.250', true],   // SSDP / mDNS / LLMNR range
             ['::1',             true],
             ['fc00::1',         true],
             ['fe80::1',         true],
@@ -254,6 +258,9 @@ class IpUtilsTest extends TestCase
             ['2001:0002::1',       true],
             ['64:ff9b::7f00:1',    true],
             ['64:ff9b:1::7f00:1',  true],
+            ['100::1',         true],   // Discard prefix (RFC 6666)
+            ['ff02::1',        true],   // IPv6 multicast (RFC 4291)
+            ['ff05::1',        true],   // site-local multicast
 
             // public
             ['104.26.14.6',             false],
@@ -300,5 +307,139 @@ class IpUtilsTest extends TestCase
         }
 
         $this->assertLessThan($maxCheckedIps, \count($checkedIps));
+    }
+
+    #[DataProvider('getNormalizeData')]
+    public function testNormalize(string $input, ?string $expected)
+    {
+        $this->assertSame($expected, IpUtils::normalize($input));
+    }
+
+    public static function getNormalizeData(): array
+    {
+        return [
+            // canonical IPv4 passes through
+            'canonical ipv4' => ['127.0.0.1',         '127.0.0.1'],
+            'canonical ipv4 public' => ['1.1.1.1',           '1.1.1.1'],
+            'zero ipv4' => ['0.0.0.0',           '0.0.0.0'],
+
+            // canonical IPv6 passes through
+            'canonical ipv6 loopback' => ['::1',               '::1'],
+            'canonical ipv6 public' => ['2606:4700::1111',   '2606:4700::1111'],
+
+            // IPv4-mapped IPv6 collapses to the embedded IPv4
+            'ipv4-mapped dotted' => ['::ffff:127.0.0.1',  '127.0.0.1'],
+            'ipv4-mapped hex' => ['::ffff:7f00:1',     '127.0.0.1'],
+
+            // bracketed IPv6 (e.g. from URL host parsing)
+            'bracketed ipv6' => ['[::1]',             '::1'],
+            'bracketed ipv4-mapped' => ['[::ffff:127.0.0.1]', '127.0.0.1'],
+
+            // numeric integer forms (common SSRF bypass)
+            'decimal int' => ['2130706433',        '127.0.0.1'],
+            'hex int' => ['0x7f000001',        '127.0.0.1'],
+            'octal int' => ['017700000001',      '127.0.0.1'],
+
+            // short dotted form
+            'short form 127.1' => ['127.1',             '127.0.0.1'],
+            'short form 192.168.1' => ['192.168.1',         '192.168.0.1'],
+            'short form 10.0.1' => ['10.0.1',            '10.0.0.1'],
+
+            // mixed dotted with octal/hex components
+            'mixed hex/dot' => ['0x7f.0.0.1',        '127.0.0.1'],
+            'mixed octal/dot' => ['0177.0.0.01',       '127.0.0.1'],
+            'mixed hex mid' => ['127.0x0.0.1',       '127.0.0.1'],
+            'octal-leading' => ['0177.0.0.1',        '127.0.0.1'],
+
+            // hex-leading dotted (each component hex)
+            'all hex dotted' => ['0x7f.0x0.0x0.0x1',  '127.0.0.1'],
+
+            // IPv6 with zone identifier is normalised without the zone
+            'ipv6 with zone' => ['fe80::1%eth0',      'fe80::1'],
+
+            // out of range / malformed inputs return null
+            'octet out of range' => ['256.0.0.0',         null],
+            'all octets out of range' => ['256.256.256.256',   null],
+            'too many octets' => ['127.0.0.1.1',       null],
+            'integer out of range' => ['4294967296',        null], // > 0xFFFFFFFF
+
+            // non-IP inputs return null
+            'hostname' => ['example.com',       null],
+            'garbage' => ['not-an-ip',         null],
+            'empty string' => ['',                  null],
+            'mixed with letters' => ['127.foo.0.1',       null],
+        ];
+    }
+
+    public function testNormalizeClassifiesObfuscatedPrivateIps()
+    {
+        // Common SSRF bypasses: every form below is accepted by cURL
+        // as 127.0.0.1 at the network layer, but the unnormalised
+        // forms fail filter_var(FILTER_VALIDATE_IP). Normalising them
+        // makes them route through isPrivateIp() correctly.
+        $bypasses = [
+            '2130706433',
+            '0x7f000001',
+            '017700000001',
+            '127.1',
+            '0x7f.0.0.1',
+            '0177.0.0.01',
+        ];
+
+        foreach ($bypasses as $bypass) {
+            $canonical = IpUtils::normalize($bypass);
+            $this->assertNotNull($canonical, "normalize() should accept {$bypass}");
+            $this->assertTrue(
+                IpUtils::isPrivateIp($canonical),
+                "Normalised form of {$bypass} should be classified as private."
+            );
+        }
+    }
+
+    public function testNormalizeAcceptsObfuscatedPublicIps()
+    {
+        // The same normalisation that prevents SSRF bypass must not
+        // break legitimate use of obfuscated public addresses. Each
+        // input below is a well-known public IP rendered in a form
+        // filter_var(FILTER_VALIDATE_IP) rejects; after normalisation
+        // it must round-trip to the canonical form and be classified
+        // as public.
+        //
+        // The shape mirrors testNormalizeClassifiesObfuscatedPrivateIps
+        // — one test for the bypass-blocking direction, one for the
+        // legitimate-use direction.
+        $publicAddresses = [
+            // 1.1.1.1 — Cloudflare DNS
+            ['1.1.1.1',         '1.1.1.1'],
+            ['16843009',        '1.1.1.1'],   // decimal of 1.1.1.1
+            ['0x01010101',      '1.1.1.1'],   // hex of 1.1.1.1
+            ['0x1.0x1.0x1.0x1', '1.1.1.1'],   // all-hex dotted
+            // 8.8.8.8 — Google DNS
+            ['8.8.8.8',         '8.8.8.8'],
+            ['134744072',       '8.8.8.8'],   // decimal of 8.8.8.8
+            // 9.9.9.9 — Quad9 DNS
+            ['9.9.9.9',         '9.9.9.9'],
+            // 104.26.14.6 — public IP explicitly listed in getIsPrivateIpData
+            ['104.26.14.6',     '104.26.14.6'],
+            // Public IPv6 addresses
+            ['2606:4700:20::681a:e06',  '2606:4700:20::681a:e06'],
+            ['2001:4860:4860::8888',    '2001:4860:4860::8888'],
+            // IPv4-mapped IPv6 wrapping a public IPv4
+            ['::ffff:1.1.1.1',  '1.1.1.1'],
+            ['::ffff:8.8.8.8',  '8.8.8.8'],
+        ];
+
+        foreach ($publicAddresses as [$input, $expectedCanonical]) {
+            $canonical = IpUtils::normalize($input);
+            $this->assertSame(
+                $expectedCanonical,
+                $canonical,
+                "normalize() should canonicalise {$input} to {$expectedCanonical}"
+            );
+            $this->assertFalse(
+                IpUtils::isPrivateIp($canonical),
+                "Normalised form of {$input} ({$canonical}) should be classified as public."
+            );
+        }
     }
 }

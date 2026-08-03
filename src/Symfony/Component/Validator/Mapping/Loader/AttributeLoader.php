@@ -75,9 +75,10 @@ class AttributeLoader implements LoaderInterface
 
         foreach ($this->getAttributes($reflClass) as $constraint) {
             if ($constraint instanceof GroupSequence) {
-                $metadata->setGroupSequence($constraint->groups);
+                $metadata->setGroupSequence($constraint);
             } elseif ($constraint instanceof GroupSequenceProvider) {
                 $metadata->setGroupProvider($constraint->provider);
+                $metadata->setCascadeCurrentGroup($constraint->cascadeCurrentGroup);
                 $metadata->setGroupSequenceProvider(true);
             } elseif ($constraint instanceof Constraint) {
                 $metadata->addConstraint($constraint);

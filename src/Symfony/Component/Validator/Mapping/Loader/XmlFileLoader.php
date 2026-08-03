@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -209,7 +210,10 @@ class XmlFileLoader extends FileLoader
 
         foreach ($classDescription->{'group-sequence'} as $groupSequence) {
             if (\count($groupSequence->value) > 0) {
-                $metadata->setGroupSequence($this->parseValues($groupSequence[0]->value));
+                $groups = $this->parseValues($groupSequence[0]->value);
+                $cascadeCurrentGroup = XmlUtils::phpize($groupSequence['cascade-current-group'] ?? false);
+
+                $metadata->setGroupSequence($cascadeCurrentGroup ? new GroupSequence($groups, true) : $groups);
             }
         }
 

@@ -73,6 +73,11 @@ Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity:
     permissions:
       - "IsTrue": ~
 
+Symfony\Component\Validator\Tests\Fixtures\GroupSequenceCascadeEntity:
+  group_sequence:
+    groups: [Foo, GroupSequenceCascadeEntity]
+    cascade_current_group: true
+
 Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity:
   group_sequence_provider: true
 

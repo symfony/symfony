@@ -19,7 +19,13 @@ namespace Symfony\Component\Validator\Constraints;
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class GroupSequenceProvider
 {
-    public function __construct(public ?string $provider = null)
-    {
+    /**
+     * @param bool $cascadeCurrentGroup Whether the group being stepped through must be cascaded to referenced
+     *                                  objects on top of "Default"; see {@see GroupSequence::$cascadeCurrentGroup}
+     */
+    public function __construct(
+        public ?string $provider = null,
+        public bool $cascadeCurrentGroup = false,
+    ) {
     }
 }

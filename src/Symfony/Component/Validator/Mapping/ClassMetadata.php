@@ -52,6 +52,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     private ?GroupSequence $groupSequence = null;
     private bool $groupSequenceProvider = false;
     private ?string $groupProvider = null;
+    private bool $cascadeCurrentGroup = false;
 
     /**
      * The strategy for cascading objects.
@@ -94,6 +95,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             'groupSequence' => $this->groupSequence,
             'groupSequenceProvider' => $this->groupSequenceProvider,
             'groupProvider' => $this->groupProvider,
+            'cascadeCurrentGroup' => $this->cascadeCurrentGroup,
             'members' => $this->members,
             'name' => $this->name,
             'properties' => $this->properties,
@@ -423,6 +425,20 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
     public function getGroupProvider(): ?string
     {
         return $this->groupProvider;
+    }
+
+    /**
+     * Sets whether the group being stepped through is cascaded to referenced objects,
+     * for a sequence returned by the group sequence provider as a plain array.
+     */
+    public function setCascadeCurrentGroup(bool $cascadeCurrentGroup): void
+    {
+        $this->cascadeCurrentGroup = $cascadeCurrentGroup;
+    }
+
+    public function getCascadeCurrentGroup(): bool
+    {
+        return $this->cascadeCurrentGroup;
     }
 
     public function getCascadingStrategy(): int

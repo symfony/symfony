@@ -139,6 +139,15 @@
     </getter>
   </class>
 
+  <class name="Symfony\Component\Validator\Tests\Fixtures\GroupSequenceCascadeEntity">
+
+    <group-sequence cascade-current-group="true">
+       <value>Foo</value>
+       <value>GroupSequenceCascadeEntity</value>
+    </group-sequence>
+
+  </class>
+
   <class name="Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity">
 
     <!-- GROUP SEQUENCE PROVIDER -->

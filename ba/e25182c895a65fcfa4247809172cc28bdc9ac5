@@ -1,0 +1,86 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-28T14:41:37Z
+
+Thanks for the batch review, both blockers were spot on (the attribute path failing on the very form the description advertises is a bit embarrassing, the tests now make sure I never do that again 🙂).
+
+Pushed:
+
+* `AttributeLoader` now passes the whole `GroupSequence` object to `setGroupSequence()` instead of just its groups, so the attribute form works. Covered by a new test in `AttributeLoaderTest` with a dedicated fixture.
+* `$cascadeCurrentGroup` now defaults to `false`, so a `validator.mapping.cache` entry written before the upgrade unserializes safely. Covered by a test unserializing a pre-flag payload in `GroupSequenceTest`.
+* Added a BC lock test in `RecursiveValidatorTest`: with the flag left at `false`, the referenced object is still only validated in `Default`.
+* Documented in the property docblock that the flag only applies to class-declared sequences (when a sequence is passed explicitly, the stepped group is already the cascaded one), fixed the `{@see}` links, and trimmed the redundant comment in `RecursiveContextualValidator`.
+* Rebased onto 8.2, CHANGELOG conflict resolved.
+
+Two things I left out on purpose, happy to add if you want them here rather than as a follow-up:
+
+* XML/YAML mapping support for the flag: XML needs an XSD addition and YAML needs to pick a shape for `group_sequence` with options, so I did not want to design that unilaterally.
+* A provider returning a plain array cannot opt in; returning a `GroupSequence` object is the way (that is one line in user code, and the description shows it).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T10:44:15Z
+
+Thanks Amoifr, both blockers were properly fixed. Rebased on 8.2, with two additions before merging.
+
+XML and YAML can set the flag now. They both built a `GroupSequence` from a plain array, so a mapping in either format silently ignored it, which is the same class of problem as the attribute no-op you had already fixed. XML takes a `cascade-current-group` attribute on `<group-sequence>`, declared in the XSD, and YAML takes a mapping form with `groups` and `cascade_current_group`, distinguished from the plain list with `array_is_list()`. One test each, both failing when the loader change is reverted.
+
+The issue reference is now `Refs #64365` rather than `Fix`. The reproducer there returns a plain array from a `GroupSequenceProviderInterface`, and an array cannot carry the flag, so that user still has to return a `GroupSequence` object. Worth stating rather than implying the issue closes.
+
+On the naming question you raised: it is settled, and you can stop waiting. #65104 took the `Valid` half of this and called its option `restrictGroups`, which does not collide with `cascadeCurrentGroup`. The two are complementary, and I checked they compose rather than assumed it, by cherry-picking this branch onto #65104:
+
+```
+plain #[Valid] + cascadeCurrentGroup                        => 2 violations: child.a, child.b
+#[Valid(groups: ['G1'], restrictGroups: false)] + the same  => 2 violations: child.a, child.b
+trigger group never validated                               => 0 violations
+```
+
+The second row is the one that matters: this flag decides what gets cascaded, `restrictGroups` decides whether the cascade fires at all, and they meet in `validateGenericNode()`. Under the earlier design in #63805 the property never reached that method, so this flag was bypassed silently. That PR is closed in favour of #65104.
+
+One thing I left alone, since it predates you: `GroupSequence` now carries `$cascadedGroup` (a `string|GroupSequence`, existing) and `$cascadeCurrentGroup` (your bool) side by side. Two names that read almost alike for unrelated things. Renaming the old one is a separate BC discussion, not this PR's job.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T07:33:15Z
+
+Follow-up: `GroupSequence::$cascadedGroup` is removed in this PR, since we ended up looking at it while settling the naming.
+
+It was introduced on 2014-02-17 in `a6ed4cae5da`, the node-traverser prototype, where it was really used:
+
+```php
+// NodeTraverser
+$node->groups[$key]->cascadedGroup = Constraint::DEFAULT_GROUP;
+
+// NodeValidator
+array($groupInSequence),
+array($groupSequence->cascadedGroup ?: $groupInSequence)
+```
+
+That architecture was replaced before 2.5 shipped, and `RecursiveContextualValidator` has passed the same value as a method parameter ever since, computing it itself as `$defaultOverridden ? DEFAULT_GROUP : null`. The property has not been read since. It survived because the local variable kept the same name, so nothing ever flagged it as dead.
+
+No deprecation: since 7.4 typed it without a default, reading it throws `must not be accessed before initialization`, so nothing that works today can be relying on the value. `UPGRADE-8.2.md` records it as a BC break anyway, because assigning to it does not throw and someone could be doing that to no effect.
+
+This also removes the reason I raised naming: `cascadeCurrentGroup` no longer sits next to a near-identical `cascadedGroup`, and it is the only such option on the class now. Nothing to rename on either side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T08:09:01Z
+
+Last change: the flag can now be declared at class level, so a provider returning a plain array opts in too.
+
+```php
+#[Assert\GroupSequenceProvider(cascadeCurrentGroup: true)]
+class MyClass implements GroupSequenceProviderInterface
+{
+    public function getGroupSequence(): array|GroupSequence
+    {
+        return ['MyClass', 'my_group'];
+    }
+}
+```
+
+That is the shape reported in #64365. Until now the flag lived only on the `GroupSequence` object, and `RecursiveContextualValidator` wraps an array return with `new GroupSequence($group)`, so the reporter would have had to restructure the method to benefit. The wrap now carries the class-level flag, and the reproducer from the issue is a test.
+
+`GroupSequenceProvider` takes the argument, `ClassMetadata` carries it through serialization, and the attribute loader wires it. The issue reference goes back to `Fix #64365`.
+
+No runtime deprecation for flipping the default in 9.0, to answer your open question: not now.

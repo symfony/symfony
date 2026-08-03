@@ -1,0 +1,198 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2026-03-22T07:49:03Z
+
+I'd prefer an approach that doesn't modify `ObjectMapper.php` at all. We already have `ReverseClassObjectMapperMetadataFactory` (introduced in d1d3454509) which solves a similar problem — mapping classes that don't declare `#[Map]` on the source side — via a `$classMap` and a metadata factory decorator.
+
+We could easily enhance `ReverseClassObjectMapperMetadataFactory::create()` so that when it resolves a class from the `$classMap`, it also inspects the target class's property types. If a property is typed to a class that has `#[Map(source: ...)]`, it automatically adds that to the classMap (cached at runtime). This way nested mappings are discovered transitively.
+
+For example, if the classMap has `Product => ProductResource` and `ProductResource` has a property `?CategoryResource $category` where `CategoryResource` has `#[Map(source: Category::class)]`, then the factory would auto-add `Category => CategoryResource` to its internal classMap.
+
+This keeps ObjectMapper clean, follows the existing pattern, and the test would use `ReverseClassObjectMapperMetadataFactory` with a classMap — same as the existing `testClassMap` tests.
+
+(comment mostly generated)
+
+<details>
+<summary>
+raw prompt/answer</summary>
+
+We checked out https://github.com/symfony/symfony/pull/63705 gather also https://github.com/symfony/symfony/issues/63678
+
+  I don't like the code generated, I'd prefer that we found an easier solution like in commit "d1d3454509ef6313b8cfd0387cf79ed614372b7b"
+
+  Analyze the need, the functional tests and come up with different solutions that don't involve that many modification in the ObjectMapper code.
+
+Answer:
+
+  ---
+  Problem
+
+  When Category (source) has no #[Map] attribute but CategoryResource (target) declares #[Map(source: Category::class)], the nested mapping doesn't trigger because
+  getSourceValue only checks the source object's metadata.
+
+  Current PR approach (what you dislike)
+
+  The PR modifies getSourceValue to accept $targetRefl and $targetPropertyName, then introspects the target property type via reflection, instantiates it with
+  newInstanceWithoutConstructor(), reads its metadata, and checks for a matching source. This adds complexity to ObjectMapper.php itself — reflection introspection,
+  instantiation, and a new lookup path inside a core method.
+
+  Preferred approach style (commit d1d3454509)
+
+  That commit solved a similar problem (reverse mapping without #[Map] on source) by introducing ReverseClassObjectMapperMetadataFactory — a metadata factory decorator that
+   uses a pre-built $classMap to inject Mapping objects. The ObjectMapper itself was untouched.
+
+  ---
+  Alternative solutions
+
+  Option A: Extend ReverseClassObjectMapperMetadataFactory to auto-discover nested mappings
+
+  The ReverseClassObjectMapperMetadataFactory already exists. The ReverseMappingPass compiler pass already scans object_mapper.map tags. The pass could be extended to also
+  scan target class properties: when a target property's type has #[Map(source: X)], add X => PropertyType to the classMap.
+
+  Zero changes to ObjectMapper.php. The compiler pass does the work at container build time. For standalone usage (no container), the user passes the classMap manually —
+  same as today.
+
+  Pros: Follows existing pattern, no runtime reflection, ObjectMapper stays clean.
+  Cons: Only works with the DI container (or manual classMap). Runtime discovery without container would need manual setup.
+
+  Option B: A new metadata factory decorator that does runtime target-type introspection
+
+  Create a new TargetTypeObjectMapperMetadataFactory decorator. When create($object, null) returns no mappings, it checks if any known target class has properties typed to
+  a class with #[Map(source: $object::class)]. This keeps the logic out of ObjectMapper and in the metadata layer.
+
+  Pros: ObjectMapper untouched, works at runtime.
+  Cons: Needs to know the "current target" somehow — metadata factories don't have this context today. This would likely require passing target info through the $context
+  array.
+
+  Option C: Simplest — just make ReverseClassObjectMapperMetadataFactory recursively discover nested targets from the classMap
+
+  When the classMap says Product => ProductResource, the factory can inspect ProductResource's property types. If it finds CategoryResource with #[Map(source:
+  Category::class)], it auto-adds Category => CategoryResource to the classMap at runtime (cached).
+
+  Zero changes to ObjectMapper.php. No compiler pass changes needed either — just enhance the existing decorator's create() method.
+
+  Pros: Simplest change, contained in one file, follows existing pattern.
+  Cons: Still limited to cases where a parent mapping exists in the classMap. But that's the expected setup.
+
+  ---
+  My recommendation: Option C is the most aligned with your preference. It's a small enhancement to ReverseClassObjectMapperMetadataFactory — the exact class from the
+  commit you referenced — and requires zero changes to ObjectMapper.php. The test fixtures would be similar (though the test would use
+  ReverseClassObjectMapperMetadataFactory with a classMap instead of a bare ObjectMapper).
+
+  Want me to implement one of these options?
+
+</details>
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-22T11:22:27Z
+
+  Hi @soyuka,
+
+Thanks for the detailed feedback and for taking the time to explain the preferred approach! You're right — keeping ObjectMapper.php clean and leveraging the existing  ReverseClassObjectMapperMetadataFactory pattern makes much more sense.
+
+ I'll update the PR with the following changes:
+
+1. Revert all modifications to ObjectMapper.php
+2.  Enhance ReverseClassObjectMapperMetadataFactory with:
+  - A $runtimeClassMap to store dynamically discovered mappings
+  - A new discoverNestedMappings() method that inspects target class property types
+  - When a property is typed to a class with #[Map(source: ...)], it automatically adds the mapping to the runtime class map
+  - Recursive discovery for deeply nested mappings
+
+3. Update the test to use ReverseClassObjectMapperMetadataFactory with a $classMap, following the same pattern as testClassMap.
+
+This way, when the $classMap contains Product => ProductResource and ProductResource has a ?CategoryResource $category property where CategoryResource declares #[Map(source:
+  Category::class)], the factory will auto-discover and register Category => CategoryResource at runtime.
+
+I'll push the updated version shortly!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-25T17:33:15Z
+
+Hi @soyuka,
+
+Thanks for the feedback! You're absolutely right — making the CPU sweat at runtime for something we can figure out once at compile-time is like reheating coffee in the microwave every sip instead of just using a thermos. ☕
+
+I've refactored the approach as you suggested:
+
+- **ReverseMappingPass** now discovers nested mappings at compile-time by inspecting target class property types
+- **ReverseClassObjectMapperMetadataFactory** is back to its original, lean self — no more `runtimeClassMap` or reflection gymnastics
+- Added a dedicated test for the compiler pass to validate the discovery logic
+
+This keeps the pattern consistent with how Symfony handles attribute collection elsewhere, and the `$classMap` is now fully populated before the first request even hits.
+
+Let me know if this aligns better with what you had in mind!
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-03-25T19:13:32Z
+
+Nice implementation looks fine now, maybe just check out the CI?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-26T16:19:22Z
+
+Hey @soyuka
+
+The remaining CI failure (Integration (8.4)) appears to be an infrastructure issue rather than something related to this PR:
+
+  - The same job is also failing on the main 8.1 branch (since March 24th)
+  - Several other open PRs targeting 8.1 have the same failure (#63776, #63775, #63774...)
+
+All the other checks are green, so this should be ready for review when the CI gods decide to cooperate again 🙏
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-13T11:56:22Z
+
+Thanks again for the review here @soyuka — and sorry for the long silence on my side!
+
+I've rebased onto `8.2` and squashed everything into a single commit. One thing worth flagging, since it changes the code you approved: in the meantime `ReverseMappingPass` landed upstream, and its `process()` builds a **list** of targets per source. My nested-discovery code was still treating those values as plain strings, which blew up with a `TypeError`. The docblock cheerfully lied about the shape, so PHPStan never caught it either — that turned out to be the real cause of the red CI all along. 🙈
+
+Shape and docblocks fixed, plus the CHANGELOG entry I'd forgotten. All green now (114 tests, PHPStan level 5, CS).
+
+Whenever you have a moment for another look — no rush. Thanks for the patience!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-28T06:36:37Z
+
+Thanks for this thorough review, a rework with a map this detailed feels less like a restart and more like an upgrade. 🙂
+
+Fully agreed on the design concern: a nested type reference in one class should not change what an unrelated `map($category)` call does. I'd rework this at map time as you suggest, extending the resolution from 0407026084e: in `getSourceValue()`, when the metadata factory returns no candidate for a nested object, derive the mapping from the declared type of the destination property, guarded by that class declaring a matching `#[Map(source: ...)]`. The global class map stays untouched, and `map($category)` with no explicit target keeps throwing.
+
+@soyuka does that direction work for you?
+
+Once agreed, the pass changes go away (which settles the reflection, recursion and require-dev points with them), I'll keep the pass tests with their bugs fixed, add a functional test in FrameworkBundle proving the feature through a compiled container, state the collections/unions limitation, rebase, and refresh the stale description.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-28T14:03:19Z
+
+Rework pushed, following the direction discussed above. Thanks @nicolas-grekas for the detailed map: with a review that precise, the rework felt less like coding and more like following a GPS. 🙂
+
+* `ReverseMappingPass` is back to its upstream state, which settles the reflection, private/static properties, transitive recursion and cache-invalidation points all at once.
+* The resolution now happens at map time in `getSourceValue()`: when the metadata factory returns no candidate for a nested object, the mapping is derived from the declared type of the destination property, guarded by a matching `#[Map(source: ...)]` on that class (same synthesis as `ReverseClassObjectMapperMetadataFactory`). Nothing is registered globally, and a dedicated test locks that `map($category)` without a target keeps throwing.
+* Nice side effect: the feature now works with a bare `new ObjectMapper()`, no class map or container needed, which is closer to what #63678 asked for.
+* The pass tests are kept with their bugs fixed: `final` class, real assertions, and the tag simulation now matches what the `#[Map]` autoconfiguration actually does (a single `addResourceTag('object_mapper.map', ...)`).
+* Added a functional test in FrameworkBundle through a compiled container, plus `symfony/dependency-injection` in `require-dev` so the pass tests run in the split repository.
+* Rebased onto 8.2, description and branch row refreshed, collections/unions limitation stated there.
+
+@soyuka the approach has moved quite a bit since your approval, so a fresh look would be very welcome whenever you get a chance. Thanks both for your time!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T17:10:54Z
+
+Reworked to your lead @soyuka: `ObjectMapper.php` untouched, collection stays at container build.
+
+Turns out there is nothing left to implement. `registerAttributeForAutoconfiguration(Map::class, ...)` already emits an `object_mapper.map` resource tag for every scanned class carrying the attribute, so `#[Map(source: NestedEntity::class)]` on the resource already puts `NestedEntity => NestedEntityResource` in the class map, and the nested property is filled. The functional test @Amoifr wrote fails on 8.2 only because the test app registers its fixtures one by one and the two resource classes were not among them. Adding them makes it pass with no source change. Standalone, `testClassMap` already covers the same shape through an explicit class map.
+
+So the PR becomes tests: `ReverseMappingPass` had none, and the functional test now walks the whole chain.
+
+My concern with the runtime version, for the record: it read `#[Map]` off the target property type at map time, which is the work you asked to keep out of the runtime, measured at +12% on mappings that do not use the feature and uncached. It also resolved only for nested values, so `map($category)` alone kept throwing, while the container path maps it. Two rules for the same attributes depending on whether there is a container seemed worse than the gap it closed.
+
+The gap that remains is discoverability: a resource class excluded from the `App\` loader gets no tag and the nested mapping silently does not happen. Worth a docs note, maybe more.

@@ -22,6 +22,7 @@ final class SerializerExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
+            new TwigFilter('normalize', [SerializerRuntime::class, 'normalize']),
             new TwigFilter('serialize', [SerializerRuntime::class, 'serialize']),
         ];
     }

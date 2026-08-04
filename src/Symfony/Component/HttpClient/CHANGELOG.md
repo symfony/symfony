@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `extra.cache_policy` option to `CachingHttpClient` to tag cached responses and force their lifetime
+ * Allow passing a stream or a closure to `HttpOptions::buffer()`
 
 8.1
 ---

@@ -17,7 +17,6 @@
     ],
     "require": {
         "php": ">=8.4.1",
-        "psr/clock": "^1.0",
         "symfony/options-resolver": "^7.4|^8.0"
     },
     "require-dev": {

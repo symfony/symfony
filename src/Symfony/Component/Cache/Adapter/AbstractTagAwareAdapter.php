@@ -31,7 +31,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
  *
  * @internal
  */
-abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, AdapterInterface, NamespacedPoolInterface, LoggerAwareInterface, ResettableInterface
+abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterface, NamespacedPoolInterface, LoggerAwareInterface, ResettableInterface
 {
     use AbstractAdapterTrait;
     use ContractsTrait;

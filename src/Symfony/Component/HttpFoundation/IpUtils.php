@@ -32,7 +32,7 @@ class IpUtils
         '127.0.0.0/8',     // RFC1700 (Loopback)
         '10.0.0.0/8',      // RFC1918
         '192.168.0.0/16',  // RFC1918
-        '192.0.0.0/29',    // IETF Protocol Assignments (RFC 6890)
+        '192.0.0.0/24',    // IETF Protocol Assignments (RFC 6890)
         '192.0.2.0/24',    // Documentation Ranges TEST-NET-1 (RFC 5737)
         '198.51.100.0/24', // Documentation Ranges TEST-NET-2 (RFC 5737)
         '203.0.113.0/24',  // Documentation Ranges TEST-NET-3 (RFC 5737)

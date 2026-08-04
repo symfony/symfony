@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-28T18:46:10Z
+
+Thanks for the review! The flags finding was a great catch, and honestly the best sales pitch for the method: if even the person adding the wrapper trips over the `flags`/`FILTER_REQUIRE_ARRAY` interplay, hiding it behind a method seems worth one slot of API surface. 🙂
+
+All applied:
+
+* Parity restored: `flags` is only forwarded when set, so array values and array defaults behave exactly like a raw `filter()` call without flags. Tests cover both, plus an explicit `FILTER_REQUIRE_ARRAY` case and a throwing callback.
+* Argument order changed as you suggested: `filterCallback(string $key, \Closure $callback, mixed $default = null, int $flags = 0)`.
+* Psalm: `filter()`'s `$options` docblock widened to `array{flags?: int, options?: array|callable}`.
+* Fabbot: the test closures are `static` now.
+* The string-casting behavior (`42` arrives as `'42'`, missing key with `null` default as `''`) is documented on the method and pinned by a test.
+* Rebased onto 8.2, CHANGELOG entry moved under the 8.2 heading, description refreshed.
+
+On whether the method earns its place at all: the parity trap above is my best argument in favor, but that call is yours to make. If you feel it does not pull its weight, no hard feelings, the alternative in #63531 stays available.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-04T09:17:11Z
+
+Rebased on 8.2 and pushed, with two additions on top of your revision @Amoifr.
+
+The `$options` docblock on `filter()` was widened to `options?: array|callable`, but the guard right below it rejects everything that is not a `Closure`, so `['options' => 'strtoupper']` throws. Changed to `array|\Closure`.
+
+Added `testFilterCallbackMethodDoesNotMapAnArrayValueWhenFlagsOmitRequireArray`. Nothing pinned the case where a flag is passed on an array value, which is the one place the method does something the reader does not expect: the implicit `FILTER_REQUIRE_ARRAY` goes away and the result is `null` rather than a mapped array. It matches raw `filter()` exactly, so the test guards the parity rather than the surprise, and a later attempt to smooth it over would now fail. Documented on the method too.
+
+Verified by mutation: restoring the always-forwarded `flags` fails the two array tests with the original `UnexpectedValueException`, and forcing array mapping regardless of flags fails only the new test.
+
+CHANGELOG trimmed to name the method. Component suite green, 1893 tests. The remaining CI red is `Cache/RedisProxiesTest` relay failures and a Windows `testCurlCommandWithCookies` from base, neither related.
+
+Still needs a maintainer call on whether the method earns its place next to `filter()`, and a docs PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-04T10:04:42Z
+
+Both applied @stof, thanks.
+
+```php
+ * @param \Closure(string): mixed                                                                               $callback
+ * @param int-mask<\FILTER_REQUIRE_SCALAR, \FILTER_REQUIRE_ARRAY, \FILTER_FORCE_ARRAY, \FILTER_NULL_ON_FAILURE> $flags
+```
+
+Your caveat was worth raising, and the answer is that neither the wildcard nor the union works here.
+
+The wildcard form is class-constant only, so `int-mask-of<FILTER_*>` and `int-mask-of<\FILTER_*>` are both parse errors, in PHPStan (`Unexpected token "*", expected '>'`) and in Psalm (`Invalid type 'FILTER_*'`). Every existing use in the repo is `self::PARSE_*` or `Yaml::DUMP_*`, which is why they work. And the constants would have been wrong anyway: `FILTER_*` covers the filter ids too, `FILTER_CALLBACK` at 1024 and `FILTER_SANITIZE_*` at 513 to 523, not just the flags.
+
+Spelling the union out as `int-mask-of<A|B|C>` parses in PHPStan but Psalm rejects it with `Union types are not allowed in value-of type`. `int-mask<A, B, C>` is understood by both, so that is what is in there.
+
+It enforces what you would want: `flags: \FILTER_CALLBACK` and `flags: \FILTER_SANITIZE_EMAIL` are both reported, while `\FILTER_REQUIRE_ARRAY | \FILTER_NULL_ON_FAILURE` passes. `FILTER_THROW_ON_FAILURE` is left out on purpose, `filter()` sets `FILTER_NULL_ON_FAILURE` itself and turns the failure into an exception, so the two would fight.

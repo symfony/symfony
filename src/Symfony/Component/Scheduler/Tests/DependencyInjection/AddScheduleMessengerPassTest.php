@@ -16,10 +16,62 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
+use Symfony\Component\Scheduler\Messenger\ServiceCallMessage;
 
 class AddScheduleMessengerPassTest extends TestCase
 {
+    public function testMessageIsNotWrappedByDefault()
+    {
+        $messageDefinition = $this->processTask([]);
+
+        $this->assertSame(ServiceCallMessage::class, $messageDefinition->getClass());
+    }
+
+    public function testMessageIsNotWrappedWhenUseMessengerRoutingIsDisabled()
+    {
+        $messageDefinition = $this->processTask([], false);
+
+        $this->assertSame(ServiceCallMessage::class, $messageDefinition->getClass());
+    }
+
+    public function testMessageIsWrappedInRedispatchMessageWhenUseMessengerRoutingIsEnabled()
+    {
+        $messageDefinition = $this->processTask([], true);
+
+        $this->assertSame(RedispatchMessage::class, $messageDefinition->getClass());
+        $this->assertCount(1, $messageDefinition->getArguments());
+        $this->assertSame(ServiceCallMessage::class, $messageDefinition->getArgument(0)->getClass());
+    }
+
+    public function testExplicitTransportsTakePrecedenceOverUseMessengerRouting()
+    {
+        $messageDefinition = $this->processTask(['transports' => ['async']], true);
+
+        $this->assertSame(RedispatchMessage::class, $messageDefinition->getClass());
+        $this->assertSame(['async'], $messageDefinition->getArgument(1));
+    }
+
+    private function processTask(array $extraTagAttributes, ?bool $useMessengerRouting = null): Definition
+    {
+        $container = new ContainerBuilder();
+        if (null !== $useMessengerRouting) {
+            $container->setParameter('scheduler.use_messenger_routing', $useMessengerRouting);
+        }
+
+        $definition = new Definition(\stdClass::class);
+        $definition->addTag('scheduler.task', ['trigger' => 'every', 'frequency' => '1 hour'] + $extraTagAttributes);
+        $container->setDefinition('task', $definition);
+
+        (new AddScheduleMessengerPass())->process($container);
+
+        $schedulerProvider = $container->getDefinition('scheduler.provider.default');
+        $calls = $schedulerProvider->getMethodCalls();
+
+        return $calls[0][1][0]->getArgument('$message');
+    }
+
     #[DataProvider('processSchedulerTaskCommandProvider')]
     public function testProcessSchedulerTaskCommand(array $arguments, string $expectedCommand, string $commandClass = SchedulableCommand::class)
     {

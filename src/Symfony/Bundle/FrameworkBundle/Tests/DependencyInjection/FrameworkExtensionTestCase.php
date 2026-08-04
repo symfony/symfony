@@ -1260,6 +1260,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacySchedulerUseMessengerRoutingNotSet()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+
+        $container = $this->createContainerFromFile('scheduler_use_messenger_routing_legacy');
+
+        $this->assertFalse($container->getParameter('scheduler.use_messenger_routing'));
+    }
+
     public function testMessengerMultipleFailureTransports()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports');

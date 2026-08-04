@@ -20,6 +20,8 @@ CHANGELOG
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
  * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
+ * Add `framework.scheduler.use_messenger_routing` to automatically wrap scheduled messages in a `RedispatchMessage` so they go through the Messenger senders configured for their class instead of being handled synchronously by the scheduler worker
+ * Deprecate not setting the `framework.scheduler.use_messenger_routing` config option; it will default to `true` in 9.0
  * Report `.env` variables that the container never uses in `debug:container --env-vars`
  * Add `service_id` and `advisory` options to lock stores to use advisory locks on an existing `\PDO` or Doctrine DBAL connection service
  * Add `framework.webhook.signature_format`, `framework.webhook.timestamp_header_name` and `framework.webhook.timestamp_tolerance` options

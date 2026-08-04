@@ -3,7 +3,8 @@ imports:
 
 framework:
     lock: ~
-    scheduler: ~
+    scheduler:
+        use_messenger_routing: false
     messenger: ~
 
 services:

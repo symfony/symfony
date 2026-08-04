@@ -400,6 +400,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      *
      * A nested class declaring several #[Map] targets yields one Mapping per target. When the
      * destination property is typed, only one of them can be assigned to it, so the mapping is not ambiguous.
+     * When none of them can be assigned to it, no mapping applies and the value is written as it is.
+     * Mappings carrying a transform are kept: what lands in the property is the transform's return value,
+     * not the declared target.
      *
      * @param Mapping[] $metadata
      *
@@ -407,7 +410,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      */
     private function filterMetadataByPropertyType(array $metadata, object $target, ?string $targetPropertyName): array
     {
-        if (null === $targetPropertyName || 2 > \count($metadata)) {
+        if (null === $targetPropertyName || !$metadata) {
             return $metadata;
         }
 
@@ -421,12 +424,12 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         $propertyClass = $type->getName();
-        $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => \is_string($m->target)
+        $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => $m->transform || (\is_string($m->target)
             && class_exists($m->target)
-            && is_a($m->target, $propertyClass, true)
+            && is_a($m->target, $propertyClass, true))
         ));
 
-        return 1 === \count($filtered) ? $filtered : $metadata;
+        return 1 < \count($filtered) ? $metadata : $filtered;
     }
 
     private function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed

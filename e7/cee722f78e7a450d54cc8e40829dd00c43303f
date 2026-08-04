@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T19:23:58Z
+
+Rebased on 6.4 and amended. The diagnosis was right; two things changed.
+
+The fix moved from `saveRead()` to `delete()`. Guarding the read of `readLocks[$resource]` stops the wrong read lock from being granted, but `delete()` is the only thing that ever creates an empty entry, so the entry was still left behind on every release. Removing it there fixes both, and matches what the promotion path in `save()` already does. `$readLocks` is private and `delete()` is its only producer of empty entries, so the invariant "the entry exists only while it has readers" holds again and `isset()` in `saveRead()` becomes correct as written.
+
+Checked exhaustively over every 5 operation sequence across 3 keys on one resource, asserting both that a write lock excludes every reader and that no empty entry is left behind:
+
+| state | conflict violations | sequences leaking an empty entry |
+| --- | --- | --- |
+| base | 657 | 4911 |
+| guard in `saveRead()` | 0 | 5343 |
+| entry removed in `delete()` | 0 | 0 |
+
+The test needed a release. It took a write lock at step 3 and never let it go, under the fixed resource name `static::class.__METHOD__`. On Redis the write lock lives for the default 300s `initialTtl`, so a second run inside that window failed on the very first line of the test:
+
+```
+run 1: OK (1 test, 6 assertions)
+run 2: LockConflictedException
+         RedisStore.php:132
+         SharedLockStoreTestTrait.php:122
+```
+
+It now releases at the end and asserts the resulting state, like `testSharedLockPromoteAllowed` does, and uses `uniqid(__METHOD__, true)` for the resource, which is what every other test in this trait uses on 6.4. The `static::class.__METHOD__` form only exists on 8.x, from `1b3d6bf4d75` and `785c3664d44`, neither of which was merged down.
+
+Three consecutive full Lock suite runs: 405 tests, 689 assertions, 123 skipped, no failures. Revert-verify fails with `The store shouldn't save the second key` at the `fail()` after `saveRead($key2)`.
+
+Both red checks were unrelated and pre-existing on the 6.4 tip. Psalm fails on `LazyServiceDumper.php:143 UndefinedMethod: ReflectionClass::isReadOnly`, in a file this PR does not touch, and red on the other open 6.4 PR too. The low-deps job hit a 0 byte corrupted zip installing `symfony/event-dispatcher`.
+
+For the merge up: the `delete()` body is identical on 6.4 through 8.2, only the signature gained `: void`, so the hunk applies unchanged.

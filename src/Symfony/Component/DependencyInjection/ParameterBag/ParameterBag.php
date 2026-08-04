@@ -37,6 +37,8 @@ class ParameterBag implements ParameterBagInterface
     public function clear()
     {
         $this->parameters = [];
+        $this->deprecatedParameters = [];
+        $this->resolved = false;
     }
 
     /**

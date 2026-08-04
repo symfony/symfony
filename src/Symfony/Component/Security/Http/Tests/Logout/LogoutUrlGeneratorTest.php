@@ -14,9 +14,12 @@ namespace Symfony\Component\Security\Http\Tests\Logout;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 /**
@@ -119,5 +122,60 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('This request is not behind a firewall, pass the firewall name manually to generate a logout URL.');
         $this->generator->getLogoutPath();
+    }
+
+    public function testGetLogoutFormWithoutCsrfProtection()
+    {
+        $this->generator->registerListener('secured_area', '/logout', null, null);
+
+        $this->assertSame(['action' => '/logout', 'fields' => []], $this->generator->getLogoutForm('secured_area'));
+    }
+
+    public function testGetLogoutFormCarriesTheCsrfTokenUnderTheConfiguredParameter()
+    {
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->once())
+            ->method('getToken')->with('logout_id')
+            ->willReturn(new CsrfToken('logout_id', 'T0K3N'));
+
+        $this->generator->registerListener('secured_area', '/logout', 'logout_id', '_token', $csrfTokenManager);
+
+        $this->assertSame([
+            'action' => '/logout',
+            'fields' => ['_token' => 'T0K3N'],
+        ], $this->generator->getLogoutForm('secured_area'));
+    }
+
+    public function testGetLogoutFormFromARouteName()
+    {
+        $router = $this->createStub(UrlGeneratorInterface::class);
+        $router->method('generate')->willReturnCallback(
+            static fn (string $name, array $parameters) => '/logout'.($parameters ? '?'.http_build_query($parameters, '', '&') : '')
+        );
+
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('getToken')->willReturn(new CsrfToken('logout', 'T0K3N'));
+
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
+        $generator = new LogoutUrlGenerator($requestStack, $router, $this->tokenStorage);
+        $generator->registerListener('secured_area', 'app_logout', 'logout', '_csrf_token', $csrfTokenManager);
+
+        $this->assertSame([
+            'action' => '/logout',
+            'fields' => ['_csrf_token' => 'T0K3N'],
+        ], $generator->getLogoutForm('secured_area'));
+    }
+
+    public function testTheLogoutFormAndTheLogoutPathCarryTheSameParameters()
+    {
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('getToken')->willReturn(new CsrfToken('logout', 'T0K3N'));
+
+        $this->generator->registerListener('secured_area', '/logout', 'logout', '_csrf_token', $csrfTokenManager);
+
+        ['action' => $action, 'fields' => $fields] = $this->generator->getLogoutForm('secured_area');
+
+        $this->assertSame($this->generator->getLogoutPath('secured_area'), $action.'?'.http_build_query($fields, '', '&'));
     }
 }

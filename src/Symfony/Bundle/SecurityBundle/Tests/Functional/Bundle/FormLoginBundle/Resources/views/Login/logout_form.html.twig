@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% set logout = logout_form() %}
+    <form method="post" action="{{ logout.action }}">
+        {% for name, value in logout.fields %}
+            <input type="hidden" name="{{ name }}" value="{{ value }}" />
+        {% endfor %}
+
+        <input type="submit" name="logout" />
+    </form>
+{% endblock %}

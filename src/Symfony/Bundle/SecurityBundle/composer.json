@@ -49,7 +49,7 @@
         "symfony/serializer": "^7.4|^8.0",
         "symfony/translation": "^7.4|^8.0",
         "symfony/twig-bundle": "^7.4|^8.0",
-        "symfony/twig-bridge": "^7.4|^8.0",
+        "symfony/twig-bridge": "^8.2",
         "symfony/validator": "^7.4|^8.0",
         "symfony/yaml": "^7.4|^8.0",
         "web-token/jwt-library": "^3.3.2|^4.0"

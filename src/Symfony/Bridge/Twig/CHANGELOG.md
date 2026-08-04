@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `logout_form()` function to build a form that logs the user out with a POST
+
 8.1
 ---
 

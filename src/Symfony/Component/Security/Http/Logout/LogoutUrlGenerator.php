@@ -66,6 +66,21 @@ class LogoutUrlGenerator implements ResetInterface
         return $this->generateLogoutUrl($key, UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
+    /**
+     * Returns the action and the hidden fields of a form triggering the logout.
+     *
+     * Unlike the URLs, this keeps the CSRF token out of the address bar and suits a
+     * logout endpoint restricted to POST requests.
+     *
+     * @return array{action: string, fields: array<string, string>}
+     */
+    public function getLogoutForm(?string $key = null): array
+    {
+        [$action, $fields] = $this->buildParts($key, UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        return ['action' => $action, 'fields' => $fields];
+    }
+
     public function setCurrentFirewall(?string $key, ?string $context = null): void
     {
         $this->currentFirewallName = $key;
@@ -77,6 +92,20 @@ class LogoutUrlGenerator implements ResetInterface
      */
     private function generateLogoutUrl(?string $key, int $referenceType): string
     {
+        [$url, $parameters] = $this->buildParts($key, $referenceType);
+
+        if (!$parameters) {
+            return $url;
+        }
+
+        return $url.(str_contains($url, '?') ? '&' : '?').http_build_query($parameters, '', '&');
+    }
+
+    /**
+     * @return array{0: string, 1: array<string, string>}
+     */
+    private function buildParts(?string $key, int $referenceType): array
+    {
         [$logoutPath, $csrfTokenId, $csrfParameter, $csrfTokenManager] = $this->getListener($key);
 
         if (null === $logoutPath) {
@@ -85,31 +114,45 @@ class LogoutUrlGenerator implements ResetInterface
 
         $parameters = null !== $csrfTokenManager ? [$csrfParameter => (string) $csrfTokenManager->getToken($csrfTokenId)] : [];
 
-        if ('/' === $logoutPath[0]) {
-            if (!$this->requestStack) {
-                throw new \LogicException('Unable to generate the logout URL without a RequestStack.');
-            }
-
-            $request = $this->requestStack->getCurrentRequest();
-
-            if (!$request) {
-                throw new \LogicException('Unable to generate the logout URL without a Request.');
-            }
-
-            $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBaseUrl().$logoutPath;
-
-            if ($parameters) {
-                $url .= '?'.http_build_query($parameters, '', '&');
-            }
-        } else {
+        if ('/' !== $logoutPath[0]) {
             if (!$this->router) {
                 throw new \LogicException('Unable to generate the logout URL without a Router.');
             }
 
-            $url = $this->router->generate($logoutPath, $parameters, $referenceType);
+            // the route may take the parameters as placeholders, only the others are left over
+            return self::splitQuery($this->router->generate($logoutPath, $parameters, $referenceType));
         }
 
-        return $url;
+        if (!$this->requestStack) {
+            throw new \LogicException('Unable to generate the logout URL without a RequestStack.');
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (!$request) {
+            throw new \LogicException('Unable to generate the logout URL without a Request.');
+        }
+
+        $url = UrlGeneratorInterface::ABSOLUTE_URL === $referenceType ? $request->getUriForPath($logoutPath) : $request->getBaseUrl().$logoutPath;
+
+        return [$url, $parameters];
+    }
+
+    /**
+     * @return array{0: string, 1: array<string, string>}
+     */
+    private static function splitQuery(string $url): array
+    {
+        [$url, $query] = explode('?', $url, 2) + ['', ''];
+        $parameters = [];
+
+        // parse_str() cannot be used here as it turns dots and spaces in parameter names into underscores
+        foreach ('' === $query ? [] : explode('&', $query) as $pair) {
+            [$name, $value] = explode('=', $pair, 2) + ['', ''];
+            $parameters[urldecode($name)] = urldecode($value);
+        }
+
+        return [$url, $parameters];
     }
 
     /**

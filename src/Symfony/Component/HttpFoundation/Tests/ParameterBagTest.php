@@ -294,6 +294,84 @@ class ParameterBagTest extends TestCase
         $this->assertSame('BAR', $result);
     }
 
+    public function testFilterCallbackMethod()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $this->assertSame('BAR', $bag->filterCallback('foo', strtoupper(...)));
+    }
+
+    public function testFilterCallbackMethodCastsTheValueToString()
+    {
+        $bag = new ParameterBag(['foo' => 42]);
+
+        $this->assertSame('42', $bag->filterCallback('foo', static fn (string $value): string => $value));
+        $this->assertSame('', $bag->filterCallback('missing', static fn (string $value): string => $value), 'a missing key with a null default arrives as an empty string');
+    }
+
+    public function testFilterCallbackMethodAppliesTheCallbackToEachEntryOfAnArrayValue()
+    {
+        $bag = new ParameterBag(['foo' => ['a', 'b']]);
+
+        $this->assertSame(['A', 'B'], $bag->filterCallback('foo', strtoupper(...)));
+    }
+
+    public function testFilterCallbackMethodAppliesTheCallbackToAnArrayDefault()
+    {
+        $bag = new ParameterBag([]);
+
+        $this->assertSame(['A'], $bag->filterCallback('missing', strtoupper(...), ['a']));
+    }
+
+    public function testFilterCallbackMethodWithRequireArrayFlag()
+    {
+        $bag = new ParameterBag(['foo' => ['a'], 'bar' => 'scalar']);
+
+        $this->assertSame(['A'], $bag->filterCallback('foo', strtoupper(...), flags: \FILTER_REQUIRE_ARRAY));
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter value "bar" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->filterCallback('bar', strtoupper(...), flags: \FILTER_REQUIRE_ARRAY);
+    }
+
+    public function testFilterCallbackMethodDoesNotMapAnArrayValueWhenFlagsOmitRequireArray()
+    {
+        $bag = new ParameterBag(['foo' => ['a', 'b']]);
+
+        $this->assertNull($bag->filterCallback('foo', strtoupper(...), flags: \FILTER_NULL_ON_FAILURE));
+        $this->assertSame(['A', 'B'], $bag->filterCallback('foo', strtoupper(...), flags: \FILTER_REQUIRE_ARRAY | \FILTER_NULL_ON_FAILURE));
+    }
+
+    public function testFilterCallbackMethodReturnsNullOnFailure()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $this->assertNull($bag->filterCallback('foo', static fn () => null, flags: \FILTER_NULL_ON_FAILURE));
+    }
+
+    public function testFilterCallbackMethodThrowsOnFailureByDefault()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Parameter value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag->filterCallback('foo', static fn () => null);
+    }
+
+    public function testFilterCallbackMethodLetsCallbackExceptionsBubble()
+    {
+        $bag = new ParameterBag(['foo' => 'bar']);
+
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('from the callback');
+
+        $bag->filterCallback('foo', static function (): never {
+            throw new \DomainException('from the callback');
+        });
+    }
+
     public function testGetIterator()
     {
         $parameters = ['foo' => 'bar', 'hello' => 'world'];

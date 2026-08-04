@@ -118,6 +118,22 @@ class InputBagTest extends TestCase
         $this->assertSame('BAR', $result);
     }
 
+    public function testFilterCallbackMethod()
+    {
+        $bag = new InputBag(['foo' => 'bar']);
+
+        $this->assertSame('BAR', $bag->filterCallback('foo', strtoupper(...)));
+    }
+
+    public function testFilterCallbackMethodThrowsBadRequestOnFailure()
+    {
+        $this->expectException(BadRequestException::class);
+        $this->expectExceptionMessage('Input value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+
+        $bag = new InputBag(['foo' => 'bar']);
+        $bag->filterCallback('foo', static fn () => null);
+    }
+
     public function testSetWithNonScalarOrArray()
     {
         $this->expectException(\InvalidArgumentException::class);

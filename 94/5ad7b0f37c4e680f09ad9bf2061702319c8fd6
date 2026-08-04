@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T14:08:37Z
+
+Thank you @ousamabenyounes. I rebased on 8.2 and amended your commit with the following, keeping you as the author.
+
+**The constructor cannot require an intersection type.** `SerializerRuntime` shipped in 6.3 with a `SerializerInterface` parameter, so narrowing it to `SerializerInterface&NormalizerInterface` breaks every project that decorates or replaces the `serializer` service with an implementation of a single interface, and every project instantiating the runtime itself. It is now a union, and each filter checks what it needs:
+
+```
+The "normalize" filter requires a serializer implementing "Symfony\Component\Serializer\Normalizer\NormalizerInterface", but "…" does not.
+The "serialize" filter requires a serializer implementing "Symfony\Component\Serializer\SerializerInterface", but "…" does not.
+```
+
+Both messages are covered by a test, and so is the third change below. On the previous state those three tests error with the `TypeError` the intersection type raises.
+
+**`$format` now defaults to `null`**, as in `NormalizerInterface::normalize()`. Defaulting to `'json'` silently opts into the behaviour of format aware normalizers, while nothing is encoded here.
+
+**The CHANGELOG entry moved to a new `8.2` section**; it was added under `8.1`, which is already released.
+
+I also rewrote the description so it reads as documentation rather than as a test report, and listed the points the symfony-docs pull request should carry. The RED/GREEN notes are kept here instead, since they stop mattering once this is merged.
+
+Local runs: TwigBridge (1989 tests) and TwigBundle (61 tests) are green.

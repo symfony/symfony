@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -143,6 +144,10 @@ abstract class AbstractRecursivePass implements CompilerPassInterface
             }
 
             if ($class instanceof Reference) {
+                if ('service_container' === (string) $class && method_exists(Container::class, $method)) {
+                    return new \ReflectionMethod(Container::class, $method);
+                }
+
                 $factoryDefinition = $this->container->findDefinition((string) $class);
                 while ((null === $class = $factoryDefinition->getClass()) && $factoryDefinition instanceof ChildDefinition) {
                     $factoryDefinition = $this->container->findDefinition($factoryDefinition->getParent());

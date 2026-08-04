@@ -143,15 +143,27 @@ class MarkdownTest extends TestCase
         $this->assertStringContainsString('World', $lines2[0]);
     }
 
-    public function testStripHtmlTags()
+    public function testRenderRawHtmlTags()
     {
-        $md = $this->createMarkdown('Hello <b>world</b> test');
+        $md = $this->createMarkdown('Hello <b>world</b> and <system-reminder> test');
         $lines = $md->render(new RenderContext(60, 24));
 
         $content = implode('', $lines);
-        $this->assertStringNotContainsString('<b>', $content);
-        $this->assertStringNotContainsString('</b>', $content);
+        $this->assertStringContainsString('<b>', $content);
+        $this->assertStringContainsString('</b>', $content);
+        $this->assertStringContainsString('<system-reminder>', $content);
         $this->assertStringContainsString('world', $content);
+    }
+
+    public function testRenderRawHtmlBlocksWithoutDroppingSurroundingText()
+    {
+        $md = $this->createMarkdown("before\n<div>inside</div>\nafter");
+        $lines = $md->render(new RenderContext(60, 24));
+
+        $content = implode("\n", $lines);
+        $this->assertStringContainsString('before', $content);
+        $this->assertStringContainsString('<div>inside</div>', $content);
+        $this->assertStringContainsString('after', $content);
     }
 
     public function testLongLinesAreWrapped()

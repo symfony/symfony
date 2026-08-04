@@ -101,6 +101,10 @@ class InMemoryStore implements SharedLockStoreInterface
         $token = $this->getUniqueToken($key);
 
         unset($this->readLocks[$hashKey][$token]);
+        if (!($this->readLocks[$hashKey] ?? null)) {
+            unset($this->readLocks[$hashKey]);
+        }
+
         if (($this->locks[$hashKey] ?? null) === $token) {
             unset($this->locks[$hashKey]);
         }

@@ -156,8 +156,9 @@ class HttpOptions
     }
 
     /**
-     * @param bool|resource|\Closure $buffer Whether to buffer the response, or a stream to write it to,
-     *                                       or a closure deciding it from the response headers
+     * Whether to buffer the response, or a stream to write it to, or a closure deciding it from the response headers.
+     *
+     * @param bool|resource|\Closure(array<string, list<string>> $headers): (bool|resource) $buffer
      *
      * @return $this
      */

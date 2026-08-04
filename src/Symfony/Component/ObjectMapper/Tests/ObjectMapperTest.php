@@ -85,6 +85,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as Mu
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\A as MultipleTargetsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\C as MultipleTargetsC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetsWithTransform\PlainTarget as MultipleTargetsWithTransformPlainTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetsWithTransform\Source as MultipleTargetsWithTransformSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MyProxy;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\Inner;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\InnerMapped;
@@ -127,6 +129,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLoc
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ChildTarget as SubclassTargetWithTransformChildTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ParentTarget as SubclassTargetWithTransformParentTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\Source as SubclassTargetWithTransformSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\SourceEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\TargetDto as TargetTransformTargetDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionA;
@@ -850,6 +855,27 @@ final class ObjectMapperTest extends TestCase
         $source = new MultipleTargetPropertyA();
         $mapper = new ObjectMapper();
         $mapper->map($source);
+    }
+
+    public function testExplicitTargetIsNotMappedWithTheTransformOfAnotherTarget()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new MultipleTargetsWithTransformSource(), MultipleTargetsWithTransformPlainTarget::class);
+
+        $this->assertInstanceOf(MultipleTargetsWithTransformPlainTarget::class, $target);
+        $this->assertSame('test', $target->name);
+        $this->assertSame('constructed', $target->label);
+    }
+
+    public function testExplicitTargetIsMappedWithTheTransformOfOneOfItsSubclasses()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SubclassTargetWithTransformSource(), SubclassTargetWithTransformParentTarget::class);
+
+        $this->assertInstanceOf(SubclassTargetWithTransformChildTarget::class, $target);
+        $this->assertSame('test', $target->name);
     }
 
     public function testNestedPropertyWithSeveralMapTargetsIsResolvedByItsDeclaredType()

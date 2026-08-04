@@ -95,7 +95,7 @@ class IsGrantedAttributeListener implements EventSubscriberInterface
             $message = $attribute->message ?: $accessDecision->getMessage();
 
             if ($statusCode = $attribute->statusCode) {
-                throw new HttpException($statusCode, $message, code: $attribute->exceptionCode ?? 0);
+                throw HttpException::fromStatusCode($statusCode, $message, code: $attribute->exceptionCode ?? 0);
             }
 
             $e = new AccessDeniedException($message, code: $attribute->exceptionCode ?? 403);

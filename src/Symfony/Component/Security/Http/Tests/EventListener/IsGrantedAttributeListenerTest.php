@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -292,7 +293,7 @@ class IsGrantedAttributeListenerTest extends TestCase
             ->method('isGranted')
             ->willReturn(false);
 
-        $this->expectException(HttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Not found');
 
         $event = new ControllerArgumentsEvent(
@@ -305,7 +306,7 @@ class IsGrantedAttributeListenerTest extends TestCase
 
         $listener = new IsGrantedAttributeListener($authChecker);
 
-        $this->expectException(HttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Not found');
 
         $listener->onKernelControllerArguments($event);

@@ -40,6 +40,16 @@ abstract class AbstractApiTransport extends AbstractHttpTransport
             throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', static::class).$e->getMessage(), 0, $e);
         }
 
+        // SentMessage generates the Message-ID on its own copy of the message, so the
+        // original message used here to build the API payload does not carry it. Stamp
+        // it on the email (without mutating the caller's message) so the API-sent
+        // message includes a Message-ID header, the way the SMTP transport already does
+        // by sending SentMessage::getMessage().
+        if (!$email->getHeaders()->has('Message-ID')) {
+            $email = clone $email;
+            $email->getHeaders()->addIdHeader('Message-ID', $message->getMessageId());
+        }
+
         return $this->doSendApi($message, $email, $message->getEnvelope());
     }
 

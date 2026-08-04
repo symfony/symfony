@@ -18,6 +18,7 @@ $container->loadFromExtension('framework', [
                     'delay' => 7,
                     'multiplier' => 3,
                     'max_delay' => 100,
+                    'jitter' => 0.25,
                 ],
                 'rate_limiter' => 'customised_worker',
             ],

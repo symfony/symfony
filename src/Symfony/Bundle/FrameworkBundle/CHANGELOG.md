@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `framework.cache.default_provider` to configure `cache.app` with a DSN
+ * Default the `messenger.transports.*.retry_strategy.jitter` option to `0` for `amqp` and `amqps` DSNs, as jittered delays make the AMQP transport create a large number of ephemeral delay queues
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
  * Add `--dispatchers` option to `debug:event-dispatcher` command
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead

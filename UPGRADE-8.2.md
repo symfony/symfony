@@ -23,6 +23,9 @@ DoctrineBridge
 FrameworkBundle
 ---------------
 
+ * The `messenger.transports.*.retry_strategy.jitter` option now defaults to `0` instead of `0.1` for `amqp` and `amqps`
+   DSNs, as jittered delays make the AMQP transport create a large number of ephemeral delay queues, which RabbitMQ is
+   not designed to handle; configure the option explicitly to restore the previous behavior
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
 
 HttpClient

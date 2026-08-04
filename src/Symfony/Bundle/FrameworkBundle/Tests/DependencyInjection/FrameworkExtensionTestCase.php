@@ -1268,6 +1268,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(7, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(1));
         $this->assertSame(3, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(2));
         $this->assertSame(100, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(3));
+        $this->assertSame(0.25, $container->getDefinition('messenger.retry.multiplier_retry_strategy.customised')->getArgument(4));
+
+        // AMQP transports default to a jitter of 0 when not explicitly configured, as jittered
+        // delays make the transport create a large number of ephemeral delay queues.
+        $this->assertSame(0.0, $container->getDefinition('messenger.retry.multiplier_retry_strategy.default')->getArgument(4));
+        // non-AMQP transports keep the regular default jitter
+        $this->assertSame(0.1, $container->getDefinition('messenger.retry.multiplier_retry_strategy.redis')->getArgument(4));
 
         $failureTransportsByTransportNameServiceLocator = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArgument(0);
         $failureTransports = $container->getDefinition((string) $failureTransportsByTransportNameServiceLocator)->getArgument(0);

@@ -1833,6 +1833,23 @@ class Configuration implements ConfigurationInterface
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()
                                 ->acceptAndWrap(['string'], 'dsn')
+                                ->beforeNormalization()
+                                    ->ifArray()
+                                    ->then(static function (array $v): array {
+                                        // jittered delays make the AMQP transport create a large number of ephemeral
+                                        // delay queues, which RabbitMQ is not designed to handle; disable jitter by
+                                        // default for this transport, unless the user explicitly configured it.
+                                        if (\is_string($v['dsn'] ?? null)
+                                            && (str_starts_with($v['dsn'], 'amqp://') || str_starts_with($v['dsn'], 'amqps://'))
+                                            && (!isset($v['retry_strategy']) || \is_array($v['retry_strategy']))
+                                            && !isset($v['retry_strategy']['jitter'])
+                                        ) {
+                                            $v['retry_strategy']['jitter'] = 0.0;
+                                        }
+
+                                        return $v;
+                                    })
+                                ->end()
                                 ->children()
                                     ->scalarNode('dsn')->end()
                                     ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
@@ -1866,7 +1883,7 @@ class Configuration implements ConfigurationInterface
                                             ->integerNode('delay')->defaultValue(1000)->min(0)->info('Time in ms to delay (or the initial value when multiplier is used).')->end()
                                             ->floatNode('multiplier')->defaultValue(2)->min(1)->info('If greater than 1, delay will grow exponentially for each retry: this delay = (delay * (multiple ^ retries)).')->end()
                                             ->integerNode('max_delay')->defaultValue(0)->min(0)->info('Max time in ms that a retry should ever be delayed (0 = infinite).')->end()
-                                            ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness to apply to the delay (between 0 and 1).')->end()
+                                            ->floatNode('jitter')->defaultValue(0.1)->min(0)->max(1)->info('Randomness to apply to the delay (between 0 and 1). Defaults to 0 for "amqp" and "amqps" DSNs, as jittered delays make the AMQP transport create a large number of ephemeral delay queues.')->end()
                                         ->end()
                                     ->end()
                                     ->scalarNode('rate_limiter')

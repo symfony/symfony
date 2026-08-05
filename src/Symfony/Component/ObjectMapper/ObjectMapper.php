@@ -190,7 +190,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, null, $propertyName);
+                // when metadata is read from the source, the #[Map] declared on the target property
+                // itself is never surfaced above, so honor its transform for the same-name copy
+                $sameNameMapping = $readMetadataFromTarget ? null : $this->getSameNameTargetMapping($mappedTarget, $propertyName);
+
+                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, $sameNameMapping, $propertyName);
             }
         }
 
@@ -277,6 +281,26 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         return $source->{$propertyName};
+    }
+
+    /**
+     * Returns the unconditional #[Map] declared on the target's own property when it describes a
+     * same-name copy (same source and target property name), so its transform still applies even
+     * when the iteration reads metadata from the source side. Conditional mappings are left to the
+     * regular same-name copy, which does not evaluate conditions.
+     */
+    private function getSameNameTargetMapping(object $target, string $propertyName): ?Mapping
+    {
+        foreach ($this->metadataFactory->create($target, $propertyName) as $mapping) {
+            if (null === $mapping->if
+                && ($mapping->target ?? $propertyName) === $propertyName
+                && ($mapping->source ?? $propertyName) === $propertyName
+            ) {
+                return $mapping;
+            }
+        }
+
+        return null;
     }
 
     private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null, ?string $targetPropertyName = null): mixed

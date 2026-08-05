@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T15:08:48Z
+
+Thanks @ousamabenyounes. The race you found is real and I confirmed it from the code. I simplified the fix before merge, here is why.
+
+The retry loop and a single `remove()` share the same window. The loop removed the directory *after* a failed rename, the new version removes it *before* the rename, but in both cases the gap that matters is between the `remove()` and the `rename()`. Retrying just re-runs the same race, with a window of the same width each time.
+
+That width is set by `remove()`, which is not instant:
+
+```
+remove() of    50 files:    2.6 ms
+remove() of   500 files:   16.2 ms
+remove() of  2000 files:   61.0 ms
+rename() of  2000 files:    0.1 ms
+```
+
+So each attempt leaves several milliseconds during which a request can boot into an empty build directory and start rebuilding again. Four attempts at a 60 ms window is not meaningfully safer than one, while a single concurrent request, which is the reported case, is already handled by one attempt.
+
+The implementation is now:
+
+```php
+$fs->remove($realBuildDir);
+
+$fs->rename($warmupDir, $realBuildDir);
+```
+
+Both branches just above guarantee `$realBuildDir` is gone, so anything present there is by definition a concurrent recreation and removing it unconditionally is safe. `Filesystem::remove()` on a missing path is a sub-millisecond no-op, so the normal case is unaffected.
+
+This also lets the `MAX_PUBLISH_RETRIES` constant go. It sat at the top of the class body, exactly where 7.4 and later have promoted constructor properties, so it conflicted on merge-up. The command now merges cleanly to 7.4, 8.1 and 8.2.
+
+Three smaller changes:
+
+- The comment no longer says the result is published atomically. `Filesystem::rename()` checks the target and then calls `rename()` as two separate steps, and if the target reappears in between it silently falls back to `mirror()`, which merges the stale rebuild into the fresh one file by file. That is pre-existing and out of scope here, but the comment should not promise more than what happens. The commit message and the description now state that this reduces the failure rate rather than removing it.
+- The two `\assert($application instanceof Application)` additions are dropped. They are unrelated to the race, `assert()` is compiled out in production, and every other command in the bundle calls `getApplication()->getKernel()` directly, including line 81 of this same file.
+- The test asserts `assertFileDoesNotExist($realBuildDir.'/concurrent.php')` as well. The previous assertion on `dummy.txt` alone would also have passed if the two directories had been merged rather than the partial rebuild dropped. The issue reference in the test comment is removed, per the contribution rules on comments.
+
+Your test is unchanged in substance and still does the work: on 6.4 without the fix it errors with `Cannot rename because the target ".../var/cache/test" already exists.`, and it passes with the fix. Full FrameworkBundle suite shows no new failure.

@@ -28,7 +28,7 @@ interface WorkflowInterface
      *
      * @throws LogicException
      */
-    public function getMarking(object $subject): Marking;
+    public function getMarking(object $subject, array $context = []): Marking;
 
     /**
      * Returns true if the transition is enabled.

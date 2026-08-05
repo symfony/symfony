@@ -14,6 +14,7 @@ namespace Symfony\Component\Form\ChoiceList;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceAttr;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFieldName;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceFilter;
+use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceHelp;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLabel;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceLoader;
 use Symfony\Component\Form\ChoiceList\Factory\Cache\ChoiceTranslationParameters;
@@ -105,6 +106,17 @@ final class ChoiceList
     public static function attr(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $attr, mixed $vary = null): ChoiceAttr
     {
         return new ChoiceAttr($formType, $attr, $vary);
+    }
+
+    /**
+     * Decorates a "choice_help" option to make it cacheable.
+     *
+     * @param callable|array $help Any pseudo callable or array to create a help from a choice
+     * @param mixed          $vary Dynamic data used to compute a unique hash when caching the option
+     */
+    public static function help(FormTypeInterface|FormTypeExtensionInterface $formType, callable|array $help, mixed $vary = null): ChoiceHelp
+    {
+        return new ChoiceHelp($formType, $help, $vary);
     }
 
     /**

@@ -575,6 +575,21 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessFactoryOnServiceContainer()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', WeakMapConsumer::class)
+            ->addArgument((new Definition(\WeakMap::class))->setFactory([
+                new Reference('service_container'),
+                'getResetMap',
+            ]));
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testProcessPassingBuiltinTypeDoesNotLoadCodeByDefault()
     {
         $container = new ContainerBuilder();
@@ -1078,6 +1093,13 @@ class StringableClass implements \Stringable
 class StringConsumer
 {
     public function __construct(string $value)
+    {
+    }
+}
+
+class WeakMapConsumer
+{
+    public function __construct(\WeakMap $map)
     {
     }
 }

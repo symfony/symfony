@@ -8,6 +8,7 @@ CHANGELOG
  * Add the `$defaultExpiration` argument to `UriSigner::__construct()`
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()` to bind a signed URI to a state token, folded into the signature
  * Add `ParameterBag::filterCallback()` to filter a parameter value through a callback
+ * Reject a `Cookie` whose name uses the `__Secure-`/`__Host-` prefix when its attributes break the prefix contract
 
 8.1
 ---

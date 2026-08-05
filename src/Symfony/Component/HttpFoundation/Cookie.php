@@ -44,7 +44,7 @@ class Cookie
             'expires' => 0,
             'path' => '/',
             'domain' => null,
-            'secure' => false,
+            'secure' => null,
             'httponly' => false,
             'raw' => !$decode,
             'samesite' => null,
@@ -113,6 +113,7 @@ class Cookie
 
         self::validateAttribute('path', $path);
         self::validateAttribute('domain', $domain);
+        self::validateNamePrefix($name, $secure, $domain, $path ?: '/');
 
         $this->expire = self::expiresTimestamp($expire);
         $this->path = $path ?: '/';
@@ -136,6 +137,7 @@ class Cookie
     public function withDomain(?string $domain): static
     {
         self::validateAttribute('domain', $domain);
+        self::validateNamePrefix($this->name, $this->secure, $domain, $this->path);
 
         $cookie = clone $this;
         $cookie->domain = $domain;
@@ -189,6 +191,7 @@ class Cookie
     public function withPath(string $path): static
     {
         self::validateAttribute('path', $path);
+        self::validateNamePrefix($this->name, $this->secure, $this->domain, '' === $path ? '/' : $path);
 
         $cookie = clone $this;
         $cookie->path = '' === $path ? '/' : $path;
@@ -201,6 +204,8 @@ class Cookie
      */
     public function withSecure(bool $secure = true): static
     {
+        self::validateNamePrefix($this->name, $secure, $this->domain, $this->path);
+
         $cookie = clone $this;
         $cookie->secure = $secure;
 
@@ -421,5 +426,29 @@ class Cookie
     public function setSecureDefault(bool $default): void
     {
         $this->secureDefault = $default;
+    }
+
+    /**
+     * Rejects a "__Host-" prefixed name combined with attributes that make browsers discard the cookie.
+     *
+     * @see https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-rfc6265bis#section-4.1.3
+     */
+    private static function validateNamePrefix(string $name, ?bool $secure, ?string $domain, string $path): void
+    {
+        if (false === $secure && (str_starts_with($name, '__Secure-') || str_starts_with($name, '__Host-'))) {
+            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "secure" flag to be enabled.', $name));
+        }
+
+        if (!str_starts_with($name, '__Host-')) {
+            return;
+        }
+
+        if ('' !== (string) $domain) {
+            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" uses the "__Host-" prefix, which requires the cookie to have no "domain" attribute.', $name));
+        }
+
+        if ('/' !== $path) {
+            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" uses the "__Host-" prefix, which requires the cookie path to be "/".', $name));
+        }
     }
 }

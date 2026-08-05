@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T14:48:08Z
+
+Thanks @lazerg. I reviewed this and pushed a small change on top, here is what moved.
+
+The filter was one-directional: it kept a mapping only when the requested target was an instance of the mapping's target. That silently dropped a case that works today. With a single class-level mapping declaring a subclass of what the caller asks for:
+
+```php
+#[Map(target: ChildTarget::class, transform: [ChildTarget::class, 'transform'])]
+class Source
+{
+    public string $name = 'test';
+}
+
+$mapper->map(new Source(), ParentTarget::class);
+```
+
+on 7.4 this returns a `ChildTarget` built by the transform, and `is_a()` at `ObjectMapper.php:99` accepts it because a `ChildTarget` is a `ParentTarget`. With the first version of the patch it returned a bare `ParentTarget` and the transform never ran.
+
+So the filter now keeps a mapping when its target is a subclass of the requested one as well. A test pinning that case is added; it fails with the previous version of the patch and passes on 7.4 without the patch, so it guards existing behavior rather than the fix.
+
+Two smaller things: `!\is_string($m->target)` became `null === $m->target`, since `Map::$target` is declared `?string`; and `$target` is now reduced to a class name before `is_a()`, because it can be an object.
+
+Everything else is unchanged. Unrelated targets are still filtered out, which is what fixes #65140, and passing no target still behaves exactly as before, ambiguity exception included. `ObjectMapper` runs green at 77 tests, and the description now carries the contribution header that fabbot was asking for.

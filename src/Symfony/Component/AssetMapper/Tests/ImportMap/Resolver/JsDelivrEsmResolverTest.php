@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap\Resolver;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -52,6 +53,16 @@ class JsDelivrEsmResolverTest extends TestCase
         }
 
         $this->assertSame(\count($expectedRequests), $httpClient->getRequestsCount());
+    }
+
+    public function testResolveRawPackageWithoutFilePath()
+    {
+        $resolver = new JsDelivrEsmResolver(new MockHttpClient());
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The package "fullcalendar" must be required with the path to the file to download, e.g. "fullcalendar/dist/index.js", when the jsDelivr ESM build is not used.');
+
+        $resolver->resolvePackages([new PackageRequireOptions('fullcalendar', useEsm: false)]);
     }
 
     public static function provideResolvePackagesTests(): iterable
@@ -262,6 +273,24 @@ class JsDelivrEsmResolverTest extends TestCase
                 ],
             ],
         ];
+
+        yield 'require raw ESM package' => [
+            'packages' => [new PackageRequireOptions('fullcalendar/index.js', '^7', 'fullcalendar', useEsm: false)],
+            'expectedRequests' => [
+                [
+                    'url' => '/v1/packages/npm/fullcalendar/resolved?specifier=%5E7',
+                    'response' => ['body' => ['version' => '7.0.0']],
+                ],
+                [
+                    'url' => '/fullcalendar@7.0.0/index.js',
+                ],
+            ],
+            'expectedResolvedPackages' => [
+                'fullcalendar' => [
+                    'version' => '7.0.0',
+                ],
+            ],
+        ];
     }
 
     #[DataProvider('provideDownloadPackagesTests')]
@@ -387,6 +416,52 @@ class JsDelivrEsmResolverTest extends TestCase
                     'content' => 'import{Color as t}from"@kurkle/color";function e(){}const i=(()=',
                     'dependencies' => ['@kurkle/color'],
                     'extraFiles' => [],
+                ],
+            ],
+        ];
+
+        yield 'raw ESM package downloads relative imports' => [
+            ['fullcalendar' => self::createRemoteEntry('fullcalendar', version: '7.0.0', packageSpecifier: 'fullcalendar/index.js', useEsm: false)],
+            [
+                [
+                    'url' => '/fullcalendar@7.0.0/index.js',
+                    'body' => 'import { Calendar } from "./chunk/calendar.js"; export { Calendar };',
+                ],
+                [
+                    'url' => '/fullcalendar@7.0.0/chunk/calendar.js',
+                    'body' => 'export class Calendar {}',
+                ],
+            ],
+            [
+                'fullcalendar' => [
+                    'content' => 'import { Calendar } from "./chunk/calendar.js"; export { Calendar };',
+                    'dependencies' => [],
+                    'extraFiles' => [
+                        '/chunk/calendar.js' => 'export class Calendar {}',
+                    ],
+                ],
+            ],
+        ];
+
+        yield 'extra file that is neither JS nor CSS is downloaded untouched' => [
+            ['bootstrap/dist/bootstrap.css' => self::createRemoteEntry('bootstrap/dist/bootstrap.css', version: '5.3.3', type: ImportMapType::CSS)],
+            [
+                [
+                    'url' => '/bootstrap@5.3.3/dist/bootstrap.css',
+                    'body' => '@font-face { src: url("./icons.svg"); }',
+                ],
+                [
+                    'url' => '/bootstrap@5.3.3/dist/icons.svg',
+                    'body' => "<svg></svg>\n//# sourceMappingURL=icons.svg.map\n",
+                ],
+            ],
+            [
+                'bootstrap/dist/bootstrap.css' => [
+                    'content' => '@font-face { src: url("./icons.svg"); }',
+                    'dependencies' => [],
+                    'extraFiles' => [
+                        '/dist/icons.svg' => "<svg></svg>\n//# sourceMappingURL=icons.svg.map\n",
+                    ],
                 ],
             ],
         ];
@@ -696,10 +771,10 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
     }
 
-    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null, bool $useEsm = true): ImportMapEntry
     {
         $packageSpecifier ??= $importName;
 
-        return ImportMapEntry::createRemote($importName, $type, 'does not matter', $version, $packageSpecifier, false);
+        return ImportMapEntry::createRemote($importName, $type, 'does not matter', $version, $packageSpecifier, false, $useEsm);
     }
 }

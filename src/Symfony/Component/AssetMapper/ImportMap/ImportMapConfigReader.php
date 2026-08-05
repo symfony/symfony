@@ -48,7 +48,7 @@ class ImportMapConfigReader
 
         $entries = new ImportMapEntries();
         foreach ($importMapConfig as $importName => $data) {
-            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
+            $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier', 'esm'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(\sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
@@ -76,7 +76,7 @@ class ImportMapConfigReader
             }
 
             $packageModuleSpecifier = $data['package_specifier'] ?? $importName;
-            $entries->add($this->createRemoteEntry($importName, $type, $version, $packageModuleSpecifier, $isEntrypoint));
+            $entries->add($this->createRemoteEntry($importName, $type, $version, $packageModuleSpecifier, $isEntrypoint, $data['esm'] ?? true));
         }
 
         return $this->rootImportMapEntries = $entries;
@@ -93,6 +93,9 @@ class ImportMapConfigReader
                 $config['version'] = $entry->version;
                 if ($entry->packageModuleSpecifier !== $entry->importName) {
                     $config['package_specifier'] = $entry->packageModuleSpecifier;
+                }
+                if (!$entry->useEsm) {
+                    $config['esm'] = false;
                 }
             } else {
                 $config['path'] = $entry->path;
@@ -131,6 +134,7 @@ class ImportMapConfigReader
              *     package_specifier?: string, // Remote "package-name/path" specifier, defaults to the import name
              *     type?: 'js'|'css'|'json',
              *     entrypoint?: bool,
+             *     esm?: bool,                 // Whether jsDelivr's ESM build is used, defaults to true
              * }>
              */
             return $map;
@@ -145,11 +149,15 @@ class ImportMapConfigReader
         return $entries->has($moduleName) ? $entries->get($moduleName) : null;
     }
 
-    public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint): ImportMapEntry
+    /**
+     * @param bool $useEsm Whether jsDelivr's ESM build is used instead of the raw package files
+     */
+    public function createRemoteEntry(string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint /* , bool $useEsm = true */): ImportMapEntry
     {
+        $useEsm = 5 < \func_num_args() ? func_get_arg(5) : true;
         $path = $this->remotePackageStorage->getDownloadPath($packageModuleSpecifier, $type);
 
-        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
+        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint, $useEsm);
     }
 
     /**

@@ -15,11 +15,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\AssetMapper\Command\ImportMapRequireCommand;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapVersionChecker;
+use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
 use Symfony\Component\AssetMapper\Tests\Fixtures\ImportMapTestAppKernel;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
@@ -202,6 +205,61 @@ class ImportMapRequireCommandTest extends KernelTestCase
         $fs->remove($projectDir.'/var');
 
         static::$kernel->shutdown();
+    }
+
+    public function testNoEsmOptionRequiresRawPackage()
+    {
+        $importMapManager = $this->createMock(ImportMapManager::class);
+        $importMapManager
+            ->expects($this->once())
+            ->method('requirePackages')
+            ->with($this->callback(function (array $packages) {
+                $this->assertCount(1, $packages);
+                $this->assertInstanceOf(PackageRequireOptions::class, $packages[0]);
+                $this->assertSame('fullcalendar/index.js', $packages[0]->packageModuleSpecifier);
+                $this->assertSame('fullcalendar', $packages[0]->importName);
+                $this->assertFalse($packages[0]->useEsm);
+
+                return true;
+            }), $this->isInstanceOf(ImportMapEntries::class))
+            ->willReturn([self::createRemoteEntry('fullcalendar', '7.0.0', 'assets/vendor/fullcalendar/fullcalendar.js')]);
+
+        $command = new ImportMapRequireCommand(
+            $importMapManager,
+            $this->createStub(ImportMapVersionChecker::class),
+            '/path/to/project/dir',
+        );
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'packages' => ['fullcalendar/index.js=fullcalendar'],
+            '--dry-run' => true,
+            '--no-esm' => true,
+        ]);
+
+        $commandTester->assertCommandIsSuccessful();
+    }
+
+    public function testNoEsmOptionCannotBeUsedWithPath()
+    {
+        $importMapManager = $this->createMock(ImportMapManager::class);
+        $importMapManager->expects($this->never())->method('requirePackages');
+
+        $command = new ImportMapRequireCommand(
+            $importMapManager,
+            $this->createStub(ImportMapVersionChecker::class),
+            '/path/to/project/dir',
+        );
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'packages' => ['any_module_name'],
+            '--path' => './assets/some_file.js',
+            '--no-esm' => true,
+        ]);
+
+        $this->assertSame(Command::FAILURE, $commandTester->getStatusCode());
+        $this->assertStringContainsString('The "--no-esm" option cannot be used with "--path"', $commandTester->getDisplay());
     }
 
     private static function createRemoteEntry(string $importName, string $version, ?string $path = null): ImportMapEntry

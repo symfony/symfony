@@ -114,6 +114,7 @@ class ImportMapManager
                     $importName,
                     null,
                     $entry->isEntrypoint,
+                    $entry->useEsm,
                 );
 
                 // remove it: then it will be re-added
@@ -185,6 +186,7 @@ class ImportMapManager
                 $resolvedPackage->version,
                 $resolvedPackage->requireOptions->packageModuleSpecifier,
                 $resolvedPackage->requireOptions->entrypoint,
+                $resolvedPackage->requireOptions->useEsm,
             );
             $importMapEntries->add($newEntry);
             $addedEntries[] = $newEntry;

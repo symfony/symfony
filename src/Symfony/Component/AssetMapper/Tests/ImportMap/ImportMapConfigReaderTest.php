@@ -60,6 +60,10 @@ class ImportMapConfigReaderTest extends TestCase
                 'package/with_file.js' => [
                     'version' => '1.0.0',
                 ],
+                'raw_esm_package' => [
+                    'version' => '2.0.0',
+                    'esm' => false,
+                ],
             ];
             EOF;
         file_put_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php', $importMap);
@@ -76,7 +80,7 @@ class ImportMapConfigReaderTest extends TestCase
         $this->assertInstanceOf(ImportMapEntries::class, $entries);
         /** @var ImportMapEntry[] $allEntries */
         $allEntries = iterator_to_array($entries);
-        $this->assertCount(5, $allEntries);
+        $this->assertCount(6, $allEntries);
 
         $remotePackageEntry = $allEntries[0];
         $this->assertSame('remote_package', $remotePackageEntry->importName);
@@ -95,6 +99,9 @@ class ImportMapConfigReaderTest extends TestCase
 
         $packageWithFileEntry = $allEntries[4];
         $this->assertSame('package/with_file.js', $packageWithFileEntry->packageModuleSpecifier);
+
+        $rawEsmEntry = $allEntries[5];
+        $this->assertFalse($rawEsmEntry->useEsm);
 
         // now save the original raw data from importmap.php and delete the file
         $originalImportMapData = (static fn () => eval('?>'.file_get_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php')))();
@@ -209,5 +216,16 @@ class ImportMapConfigReaderTest extends TestCase
 
         $this->assertCount(1, $entries);
         $this->assertSame('no-scope', $entries[0]->path);
+    }
+
+    public function testCreateRemoteEntryUsesEsmByDefault()
+    {
+        $reader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', new RemotePackageStorage(sys_get_temp_dir()));
+
+        $this->assertTrue($reader->createRemoteEntry('lodash', ImportMapType::JS, '1.2.3', 'lodash', false)->useEsm);
+        $this->assertFalse($reader->createRemoteEntry('lodash', ImportMapType::JS, '1.2.3', 'lodash', false, false)->useEsm);
+
+        // the class is not final, so declaring the extra parameter would break every child that overrides the method
+        $this->assertSame(5, (new \ReflectionMethod(ImportMapConfigReader::class, 'createRemoteEntry'))->getNumberOfParameters());
     }
 }

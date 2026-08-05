@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T06:19:10Z
+
+Thanks for the review, no argument from me: injecting `data-help` through `choice_attr` was a shortcut, and it shows. Before rebuilding, here is the direction I would take, so we agree first this time. 🙂
+
+**Mechanism: mirror `choice_label` end to end.**
+
+* `ChoiceView` gains a `help` property (`string|TranslatableInterface|null`), filled by `DefaultChoiceListFactory::createView()` with the same per-choice resolution as `$label` (callable, property path via `PropertyAccessDecorator`, or the `ChoiceList::help()` wrapper, which becomes live API instead of dead code).
+* A `Cache\ChoiceHelp` static-option wrapper joins the ten existing ones, so `CachingFactoryDecorator` keeps caching the view (no more cache bypass).
+* `choice_attr` is never touched anymore: no rewriting, no `data-help`, no BC concern for apps using that attribute today.
+* Interface-wise, `ChoiceListFactoryInterface::createView()` gets the `$help` parameter as a docblock-only addition read via `func_get_args()` in implementations, the same path previous parameters took, with the native signature change left for 9.0.
+
+**The two design points:**
+
+* Translation: `choice_help` gets translated with `choice_translation_domain`, exactly like `choice_label`. Anything else would be surprising.
+* No `choice_help_html` option: expanded sub-forms reuse the existing `help_html`, the same way they already reuse `label_html`.
+
+**Rendering:**
+
+* Expanded: `choice_widget_expanded` renders `form_help()` for each child in `form_div_layout`, `bootstrap_5_layout`, `foundation_5_layout` and `tailwind_2_layout`, with Twig bridge tests asserting the rendered output this time (not the child config).
+* Collapsed: a `<select>` has no sane place for per-option help, so nothing is rendered there; the data stays available on `ChoiceView::$help` for custom themes, and the docs will state the limitation.
+
+If that direction works for you, I will rebuild the PR on top of 8.2 accordingly (the `configureOptions()` conflict with `$placeholderAttr` gets absorbed in the process).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T11:38:16Z
+
+Rebuilt on your plan @Amoifr and pushed, rebased on 8.2. Thanks for stopping to agree the direction first, it was the right call.
+
+What landed follows your write-up: `ChoiceView::$help` filled by `DefaultChoiceListFactory` with the same per-choice resolution as `$label`, `ChoiceList::help()` plus a `Cache\ChoiceHelp` wrapper so the view stays cached, `$help` added to `ChoiceListFactoryInterface::createView()` as a commented parameter read through `func_get_args()`, `choice_attr` untouched, translation through `choice_translation_domain`, and no `choice_help_html`.
+
+Three things on top:
+
+The parameter goes last in the `ChoiceView` constructor, after `$labelTranslationParameters`, so positional construction keeps working. Symfony's own implementations repeat `@param array|callable|null $help` in their docblocks: `DebugClassLoader` reads the `@param` on the interface and deprecates every implementation that declares neither, which would otherwise have added three self-deprecations to a suite that runs with `max[total]=0`.
+
+Rendering covers all seven themes that define `choice_widget_expanded`, not four. `bootstrap_base`, `bootstrap_4` and `daisyui_5` override the block too, so leaving them out would have made the option silently do nothing there.
+
+Each child gets `aria-describedby` pointing at its help element. That is the part `choice_attr` cannot do today, and it is the argument for the option existing, so it is worth keeping in whatever the docs end up saying.
+
+Tests assert on rendered output this time: three in `FormExtensionDivLayoutTest`, four in `ChoiceTypeTest`, three in `CachingFactoryDecoratorTest`. Verified by mutation, each fails alone when its piece is reverted, including the caching one and the `aria-describedby` wiring. Form 4945 green, Twig bridge 1992 green, no new deprecations.
+
+Collapsed selects render nothing, by construction rather than as a shortcut, and the description says so. Still needs a docs PR.

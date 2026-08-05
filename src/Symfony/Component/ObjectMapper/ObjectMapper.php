@@ -63,7 +63,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     private function doMap(object $source, object|string|null $target, \WeakMap $objectMap, bool $constructTarget = false): object
     {
         $metadata = $this->metadataFactory->create($source);
-        $map = $this->getMapTarget($metadata, null, $source, null, null === $target);
+        $map = $this->getMapTarget($this->filterMetadataByTarget($metadata, $target), null, $source, null, null === $target);
         $target ??= $map?->target;
         $mappingToObject = \is_object($target);
 
@@ -372,6 +372,27 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         return $mapTo;
+    }
+
+    /**
+     * Narrows the class-level mappings of a source to the ones related to the target the caller asked for.
+     *
+     * A mapping declaring a subclass of that target is kept: its transform can still produce an
+     * instance the caller accepts.
+     *
+     * @param Mapping[] $metadata
+     *
+     * @return Mapping[]
+     */
+    private function filterMetadataByTarget(array $metadata, object|string|null $target): array
+    {
+        if (null === $target) {
+            return $metadata;
+        }
+
+        $targetClass = \is_object($target) ? $target::class : $target;
+
+        return array_filter($metadata, static fn (Mapping $m): bool => null === $m->target || is_a($targetClass, $m->target, true) || is_a($m->target, $targetClass, true));
     }
 
     /**

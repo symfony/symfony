@@ -1,0 +1,67 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-02-15T19:58:59Z
+
+Please add a line in the changelog, thanks
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-02-28T13:11:36Z
+
+friendly ping @romainneutron and can you also add an entry to the CHANGELOG? Thanks
+
+---------------------------------------------------------------------------
+
+by fonto at 2026-08-02T13:35:46Z
+
+Hi,
+
+Not the author but interested in getting this patch integrated in the next version of Symfony :)
+
+> Regarding URLs (and tags), this is already the default behavior when not using facets. Any benefits in doing it via facets
+
+To referr to the protocol reference, : Bluesky has no markup language. Facets are the sole mechanism by which a post declares that a byte range is a link, a mention or a hashtag, and the docs are explicit that producing them is the client's job: _"Clients to Bluesky should produce facets using parsers."_
+
+URLs are readable as-is even if not parsed, however this does not work for tags: with no app.bsky.richtext.facet#tag entry, #symfony is inert text — not clickable, and not attached to the tag feed, hence not appearing when searching for #symfony. I was hit first-hand by this problem after posting automatically a few messages for one of my websites.
+
+This patch therefore creates consistency with the other facets types (mentions and links) and strengthens the quality of the implementation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T15:11:18Z
+
+Rebased on 8.2 (the branch had not moved since February 2025, and `parseFacets()` is byte identical to its state then, so the rebase was clean) and amended.
+
+The offsets were the problem, not the regex. `getMatchAndPosition()` threw away the regex match position and re-located each captured string with `indexOf()` from byte 0, so a tag that is a byte prefix of a longer one was also found inside it:
+
+```
+#php #php8 #php84
+  [ 0, 4) php    [ 5, 9) php    [11,15) php
+  [ 5,10) php8   [11,16) php8   [11,17) php84
+```
+
+Six facets for three tags, three overlapping. The protocol says facets cannot overlap and tells renderers to sort and discard overlaps, so `#php8` and `#php84` would have rendered as `#php` plus stray characters. Tag families like this are the normal way people tag posts.
+
+The same re-scan defeated the `(?:^|\s)` anchor: the regex correctly refuses `#fragment` inside `http://bsky.app#fragment`, but the search then found it anyway and produced a tag facet overlapping the link facet. That is the case @javiereguiluz asked about; the regex passed his test, the implementation did not.
+
+`getMatchAndPosition()` now uses `preg_match_all` with `PREG_OFFSET_CAPTURE`. preg works on bytes, so the captured offsets already are the byte offsets facets are indexed by, and no re-scan is needed. That also fixes the same latent flaw on links, which was reachable before this PR with two URLs sharing a prefix:
+
+```
+a https://ex.com b https://ex.com/x
+  base: [19,33) and [19,35), overlapping
+  now:  [ 2,16) and [19,35)
+```
+
+Three other things came out of the review:
+
+* No length cap. The lexicon caps a tag at 640 bytes and 64 graphemes, and the reference client skips longer ones. A 65 character hashtag produced a facet that `createRecord` rejects, so a post that works today would have started failing. Over-long tags are now skipped and the text posts as before. The grapheme count uses `\X`, so a hashtag made of combining sequences is measured the way the lexicon measures it.
+* `[\p{L}\p{N}]+` was too narrow. `#foo_bar` became the tag `foo`, `#ab😀cd` became `ab`, and the fullwidth `＃tag` that Bluesky accepts produced nothing.
+* `#123` produced a facet that bsky.app never produces, and the test asserted it. A tag now needs at least one character that is neither a digit nor punctuation, matching the reference regex, and the test says so.
+
+Facets are also sorted by `byteStart` now, and the copy pasted "partial/naive URL regex" comment above the tag pass was corrected.
+
+Added the 8.2 CHANGELOG entry @OskarStark asked for twice.
+
+Dropping `ByteString` left `symfony/string` unused, so it is removed from the bridge `composer.json`. Verified with an isolated `composer update` of the bridge alone: `symfony/string` is absent from the resulting `vendor/`, and the bridge needs nothing beyond core PCRE. Note this is also why the tag length check uses `preg_match_all('/\X/u', ...)` rather than `mb_strlen()`: `symfony/polyfill-mbstring` only reaches the bridge through `symfony/mime`, which is a dev dependency, so `mb_*` is not guaranteed in a production install.
+
+Tests: 37 in the bridge, 71 assertions, plus the full Notifier suite at 185. Seven of the tests fail on 8.2, including the two overlap ones. @fabpot, the question about the benefit of facets is answered in the description: without a `#tag` facet the hashtag is inert and never enters the tag feed.

@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T15:32:15Z
+
+Thanks @lazerg. Both defects you found are real and I confirmed them from the code. I rebased on 7.4 (which now carries #65142) and pushed one fix on top, because the filter dropped a case that works today.
+
+The filter looked only at `Mapping::$target`, never at `Mapping::$transform`. So a class-level `#[Map(target: X, transform: T)]` on a nested value was discarded whenever `X` could not be assigned to the destination property, even though the transform's return value is what actually lands there. That silently disabled what bbe24a1064e added.
+
+Reproduced on the current 7.4 tip against your branch:
+
+```
+                                            7.4               your branch
+class transform -> subclass of target       Dog name=rex      TypeError: Cannot assign Pet
+                                                              to property KennelTarget::$pet of type Dog
+class transform -> interface destination    MarkedImpl        TypeError: Cannot assign MarkSrc
+                                                              to property HolderBTarget::$v of type Marker
+```
+
+The fixture is `#[Map(target: Animal::class, transform: [Dog::class, 'transform'])]` where the transform returns a `Dog`, mapped into a property typed `Dog`. The declared target is the parent class, the transform returns the child, and only the child satisfies the property.
+
+The existing `NestedMappingWithClassTransformer` fixtures do not catch this because there the transform returns exactly the declared target, so `is_a()` happens to pass.
+
+Mappings carrying a transform are now kept regardless of their declared target:
+
+```php
+$filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => $m->transform || (\is_string($m->target)
+    && class_exists($m->target)
+    && is_a($m->target, $propertyClass, true))
+));
+```
+
+A test for that shape is added under `Tests/Fixtures/NestedClassTransform/`. It passes on 7.4 without the patch and fails with the first version of the patch, so it guards existing behavior rather than the fix. Your two tests are unchanged and still fail on 7.4 with their original errors, the ambiguity exception and the `TypeError`.
+
+Two other things:
+
+- The docblock said "the value is already of the expected type and is left alone", which the code does not verify. It checks whether any declared target is assignable to the property, not whether the value is. When the value does not fit either, the mapping is still skipped and the failure just moves to the property write with a different message. The wording now describes the actual rule, and the title changed to match.
+- Worth knowing for whoever reads this later: when the filter empties, `getSourceValue()` returns before the recursion guards, so a self-referencing or cyclic source now writes the raw source objects into the target where it previously threw. That is consistent with what the destination type declares, so I left it, but it means a mapped target can hold live references into the source graph.
+
+`ObjectMapper` is green at 80 tests, and the FrameworkBundle functional test passes. The description now carries the contribution header that fabbot was asking for.

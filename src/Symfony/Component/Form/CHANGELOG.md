@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `inputmode="numeric"` to `IntegerType` when the `grouping` option is enabled
+ * Add the `choice_help` option to `ChoiceType`
+ * Add `$help` parameter to `ChoiceListFactoryInterface::createView()`
 
 8.1
 ---

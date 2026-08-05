@@ -392,6 +392,44 @@ class CachingFactoryDecoratorTest extends TestCase
         $this->assertEquals(new ChoiceListView(), $view2);
     }
 
+    public function testCreateViewSameHelpClosure()
+    {
+        $helps = static function () {};
+        $list = new ArrayChoiceList([]);
+        $view1 = $this->factory->createView($list, null, null, null, null, null, [], true, $helps);
+        $view2 = $this->factory->createView($list, null, null, null, null, null, [], true, $helps);
+
+        $this->assertNotSame($view1, $view2);
+        $this->assertEquals(new ChoiceListView(), $view1);
+        $this->assertEquals(new ChoiceListView(), $view2);
+    }
+
+    public function testCreateViewSameHelpClosureUseCache()
+    {
+        $helpCallback = static function () {};
+        $type = new FormType();
+        $list = new ArrayChoiceList([]);
+        $view1 = $this->factory->createView($list, null, null, null, null, null, [], true, ChoiceList::help($type, $helpCallback));
+        $view2 = $this->factory->createView($list, null, null, null, null, null, [], true, ChoiceList::help($type, static function () {}));
+
+        $this->assertSame($view1, $view2);
+        $this->assertEquals(new ChoiceListView(), $view1);
+        $this->assertEquals(new ChoiceListView(), $view2);
+    }
+
+    public function testCreateViewDifferentHelpClosure()
+    {
+        $helps1 = static function () {};
+        $helps2 = static function () {};
+        $list = new ArrayChoiceList([]);
+        $view1 = $this->factory->createView($list, null, null, null, null, null, [], true, $helps1);
+        $view2 = $this->factory->createView($list, null, null, null, null, null, [], true, $helps2);
+
+        $this->assertNotSame($view1, $view2);
+        $this->assertEquals(new ChoiceListView(), $view1);
+        $this->assertEquals(new ChoiceListView(), $view2);
+    }
+
     public function testCreateViewSameIndexClosure()
     {
         $index = static function () {};

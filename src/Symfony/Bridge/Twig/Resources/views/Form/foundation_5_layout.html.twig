@@ -180,17 +180,22 @@
     {% if '-inline' in label_attr.class|default('') %}
         <ul class="inline-list">
             {% for child in form %}
+                {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
                 <li>{{ form_widget(child, {
                         parent_label_class: label_attr.class|default(''),
-                    }) }}</li>
+                        attr: child_attr,
+                    }) }}{{ form_help(child) }}</li>
             {% endfor %}
         </ul>
     {% else %}
         <div {{ block('widget_container_attributes') }}>
             {% for child in form %}
+                {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
                 {{ form_widget(child, {
                     parent_label_class: label_attr.class|default(''),
+                    attr: child_attr,
                 }) }}
+                {{ form_help(child) }}
             {% endfor %}
         </div>
     {% endif %}

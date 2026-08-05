@@ -143,8 +143,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
         return $this->lists[$hash];
     }
 
-    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView
+    /**
+     * @param array|callable|null $help
+     */
+    public function createView(ChoiceListInterface $list, mixed $preferredChoices = null, mixed $label = null, mixed $index = null, mixed $groupBy = null, mixed $attr = null, mixed $labelTranslationParameters = [], bool $duplicatePreferredChoices = true/* , array|callable|null $help = null */): ChoiceListView
     {
+        $help = \func_num_args() > 8 ? func_get_arg(8) : null;
         $cache = true;
 
         if ($preferredChoices instanceof Cache\PreferredChoice) {
@@ -183,6 +187,12 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
             $cache = false;
         }
 
+        if ($help instanceof Cache\ChoiceHelp) {
+            $help = $help->getOption();
+        } elseif ($help) {
+            $cache = false;
+        }
+
         if (!$cache) {
             return $this->decoratedFactory->createView(
                 $list,
@@ -193,10 +203,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $attr,
                 $labelTranslationParameters,
                 $duplicatePreferredChoices,
+                $help,
             );
         }
 
-        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters, $duplicatePreferredChoices]);
+        $hash = self::generateHash([$list, $preferredChoices, $label, $index, $groupBy, $attr, $labelTranslationParameters, $duplicatePreferredChoices, $help]);
 
         if (!isset($this->views[$hash])) {
             $this->views[$hash] = $this->decoratedFactory->createView(
@@ -208,6 +219,7 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
                 $attr,
                 $labelTranslationParameters,
                 $duplicatePreferredChoices,
+                $help,
             );
         }
 

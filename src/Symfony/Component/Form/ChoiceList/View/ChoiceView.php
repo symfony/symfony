@@ -28,6 +28,7 @@ class ChoiceView
      * @param string|TranslatableInterface|false $label                      The label displayed to humans; pass false to discard the label
      * @param array                              $attr                       Additional attributes for the HTML tag
      * @param array                              $labelTranslationParameters Additional parameters used to translate the label
+     * @param string|TranslatableInterface|null  $help                       The help displayed to humans next to the choice
      */
     public function __construct(
         public mixed $data,
@@ -35,6 +36,7 @@ class ChoiceView
         public string|TranslatableInterface|false $label,
         public array $attr = [],
         public array $labelTranslationParameters = [],
+        public string|TranslatableInterface|null $help = null,
     ) {
     }
 }

@@ -1876,6 +1876,62 @@ class ChoiceTypeTest extends BaseTypeTestCase
         ], $view->vars['choices']);
     }
 
+    public function testPassChoiceHelpToView()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => ['A' => 'a', 'B' => 'b'],
+            'choice_attr' => ['A' => ['class' => 'x']],
+            'choice_help' => ['A' => 'Help of A'],
+        ])
+            ->createView();
+
+        $this->assertEquals([
+            new ChoiceView('a', 'a', 'A', ['class' => 'x'], [], 'Help of A'),
+            new ChoiceView('b', 'b', 'B'),
+        ], $view->vars['choices']);
+    }
+
+    public function testChoiceHelpFromACallable()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => ['A' => 'a'],
+            'choice_help' => static fn ($choice, $key, $value) => $key.'/'.$value,
+        ])
+            ->createView();
+
+        $this->assertSame('A/a', $view->vars['choices'][0]->help);
+    }
+
+    public function testChoiceHelpFromAPropertyPath()
+    {
+        $obj = (object) ['value' => 'a', 'label' => 'A', 'description' => 'Help of A'];
+
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => [$obj],
+            'choice_label' => 'label',
+            'choice_value' => 'value',
+            'choice_help' => 'description',
+        ])
+            ->createView();
+
+        $this->assertSame('Help of A', $view->vars['choices'][0]->help);
+    }
+
+    public function testExpandedChoiceHelpIsPassedToTheChildren()
+    {
+        $view = $this->factory->create(static::TESTED_TYPE, null, [
+            'choices' => ['A' => 'a', 'B' => 'b'],
+            'choice_help' => ['A' => 'Help of A'],
+            'choice_translation_domain' => 'choices',
+            'expanded' => true,
+        ])
+            ->createView();
+
+        $this->assertSame('Help of A', $view->children[0]->vars['help']);
+        $this->assertNull($view->children[1]->vars['help']);
+        $this->assertSame('choices', $view->children[0]->vars['translation_domain']);
+    }
+
     public function testAdjustFullNameForMultipleNonExpanded()
     {
         $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [

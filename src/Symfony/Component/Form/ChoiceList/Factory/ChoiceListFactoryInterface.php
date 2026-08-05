@@ -80,6 +80,7 @@ interface ChoiceListFactoryInterface
      * @param bool                $duplicatePreferredChoices  Whether the preferred choices should be duplicated
      *                                                        on top of the list and in their original position
      *                                                        or only in the top of the list
+     * @param array|callable|null $help                       The callable generating the choice helps
      */
-    public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = [], bool $duplicatePreferredChoices = true): ChoiceListView;
+    public function createView(ChoiceListInterface $list, array|callable|null $preferredChoices = null, callable|false|null $label = null, ?callable $index = null, ?callable $groupBy = null, array|callable|null $attr = null, array|callable $labelTranslationParameters = [], bool $duplicatePreferredChoices = true/* , array|callable|null $help = null */): ChoiceListView;
 }

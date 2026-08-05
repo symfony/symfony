@@ -418,6 +418,45 @@ class ImportMapManagerTest extends TestCase
         $manager->update();
     }
 
+    public function testUpdatePreservesUseEsm()
+    {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $manager = $this->createImportMapManager();
+
+        $this->mockImportMap([
+            self::createRemoteEntry('esm_lib', version: '1.0.0'),
+            self::createRemoteEntry('raw_lib', version: '2.0.0', useEsm: false),
+        ]);
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->with($this->callback(function (array $packages) {
+                $useEsmByName = [];
+                foreach ($packages as $package) {
+                    $useEsmByName[$package->importName] = $package->useEsm;
+                }
+                $this->assertTrue($useEsmByName['esm_lib']);
+                $this->assertFalse($useEsmByName['raw_lib'], 'useEsm=false lost when rebuilding options for importmap:update');
+
+                return true;
+            }))
+            ->willReturn([
+                self::resolvedPackage('esm_lib', '1.0.1'),
+                self::resolvedPackage('raw_lib', '2.1.0', useEsm: false),
+            ]);
+
+        $this->configReader->expects($this->once())
+            ->method('writeEntries')
+            ->with($this->callback(function (ImportMapEntries $entries) {
+                $this->assertTrue($entries->get('esm_lib')->useEsm);
+                $this->assertFalse($entries->get('raw_lib')->useEsm, 'useEsm=false lost when re-creating the entry during importmap:update');
+
+                return true;
+            }));
+
+        $manager->update();
+    }
+
     private function createImportMapManager(): ImportMapManager
     {
         $this->assetMapper = $this->createStub(AssetMapperInterface::class);
@@ -428,10 +467,10 @@ class ImportMapManagerTest extends TestCase
         // mock this to behave like normal
         $this->configReader
             ->method('createRemoteEntry')
-            ->willReturnCallback(static function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
+            ->willReturnCallback(static function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint, bool $useEsm = true) {
                 $path = '/path/to/vendor/'.$packageModuleSpecifier.'.js';
 
-                return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
+                return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint, $useEsm);
             });
 
         return new ImportMapManager(
@@ -442,10 +481,10 @@ class ImportMapManagerTest extends TestCase
         );
     }
 
-    private static function resolvedPackage(string $packageName, string $version, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false)
+    private static function resolvedPackage(string $packageName, string $version, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false, bool $useEsm = true)
     {
         return new ResolvedImportMapPackage(
-            new PackageRequireOptions($packageName, entrypoint: $isEntrypoint),
+            new PackageRequireOptions($packageName, entrypoint: $isEntrypoint, useEsm: $useEsm),
             $version,
             $type,
         );
@@ -469,11 +508,11 @@ class ImportMapManagerTest extends TestCase
         return ImportMapEntry::createLocal($importName, $type, $path, $isEntrypoint);
     }
 
-    private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null, bool $isEntrypoint = false): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null, bool $isEntrypoint = false, bool $useEsm = true): ImportMapEntry
     {
         $packageSpecifier ??= $importName;
         $path ??= '/vendor/any-path.js';
 
-        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageSpecifier, $isEntrypoint);
+        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageSpecifier, $isEntrypoint, $useEsm);
     }
 }

@@ -29,6 +29,7 @@ final class PackageRequireOptions
         ?string $importName = null,
         public readonly ?string $path = null,
         public readonly bool $entrypoint = false,
+        public readonly bool $useEsm = true,
     ) {
         $this->importName = $importName ?: $packageModuleSpecifier;
     }

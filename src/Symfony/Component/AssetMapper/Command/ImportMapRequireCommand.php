@@ -47,6 +47,7 @@ final class ImportMapRequireCommand extends Command
             ->addArgument('packages', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The packages to add')
             ->addOption('entrypoint', null, InputOption::VALUE_NONE, 'Make the packages an entrypoint?')
             ->addOption('path', null, InputOption::VALUE_REQUIRED, 'The local path where the package lives relative to the project root')
+            ->addOption('no-esm', null, InputOption::VALUE_NONE, 'Download raw package files instead of using jsDelivr\'s ESM resolver?')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Simulate the installation of the packages')
             ->setHelp(<<<'EOT'
                 The <info>%command.name%</info> command adds packages to <comment>importmap.php</comment> usually
@@ -76,6 +77,12 @@ final class ImportMapRequireCommand extends Command
 
                     <info>php %command.full_name% "any_module_name" --path=./assets/some_file.js</info>
 
+                Remote packages are downloaded as the ESM build jsDelivr generates for them. When that build
+                is broken for a package, use the <info>--no-esm</info> option to download the files the package
+                publishes instead. The path to the file is then required:
+
+                    <info>php %command.full_name% "fullcalendar/index.global.js=fullcalendar" --no-esm</info>
+
                 To simulate the installation, use the <info>--dry-run</info> option:
 
                     <info>php %command.full_name% "any_module_name" --dry-run -v</info>
@@ -100,6 +107,12 @@ final class ImportMapRequireCommand extends Command
             }
 
             $path = $input->getOption('path');
+
+            if ($input->getOption('no-esm')) {
+                $io->error('The "--no-esm" option cannot be used with "--path": a local package is never downloaded from jsDelivr.');
+
+                return Command::FAILURE;
+            }
         }
 
         if ($input->getOption('dry-run')) {
@@ -121,6 +134,7 @@ final class ImportMapRequireCommand extends Command
                 $parts['alias'] ?? null,
                 $path,
                 $input->getOption('entrypoint'),
+                !$input->getOption('no-esm'),
             );
         }
 

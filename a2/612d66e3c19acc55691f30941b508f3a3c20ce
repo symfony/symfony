@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by smnandre at 2026-08-01T16:59:21Z
+
+Nice one!
+
+Tested locally: `--no-esm` downloads the raw file and resolves its relative imports as extra files.
+`useEsm` defaults to `true` everywhere so current behaviour does not change 👍
+
+`ImportMapManager::updateImportMapConfig()` now keeps `$entry->useEsm` when it rebuilds the options for `importmap:update`. But this case is not covered by tests (`require` case is).
+
+Maybe let's add one test that runs `update()` on a `useEsm: false` entry and checks it's still `false` after.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-08-02T08:40:28Z
+
+Thanks for testing it @smnandre! Added a manager-level regression test in e0bb7c3 for the `useEsm` preservation path you flagged.
+
+`ImportMapManagerTest::testUpdatePreservesUseEsm` asserts that `importmap:update`:
+- keeps `$entry->useEsm` when `updateImportMapConfig()` rebuilds the `PackageRequireOptions` passed to the resolver, and
+- preserves it on the re-created entry written back.
+
+Reverting the `$entry->useEsm` passthrough makes only this test fail (`useEsm=false lost when rebuilding options for importmap:update`); the full AssetMapper suite stays green otherwise.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T15:35:24Z
+
+Rebased on 8.2, squashed into one commit and amended. The feature works as submitted; I checked the whole path end to end, including the rendered import map, and `importmap:update` really does preserve the flag. Six things changed.
+
+**BC break.** `ImportMapConfigReader::createRemoteEntry()` gained a parameter, but the class carries neither `@final` nor `@internal`, unlike `ImportMapManager`, `RemotePackageDownloader` and `ImportMapRenderer` next to it. A child overriding the method with the 8.1 signature fatals:
+
+```
+Declaration of MyReader::createRemoteEntry(string $importName, ImportMapType $type, string $version,
+string $packageModuleSpecifier, bool $isEntrypoint): ImportMapEntry must be compatible with
+ImportMapConfigReader::createRemoteEntry(..., bool $useEsm = true): ImportMapEntry
+```
+
+Switched to the `func_num_args()` pattern, with the parameter in a trailing comment, a `@param` line and an `UPGRADE-8.2.md` entry. A test asserts the declared signature still has five parameters.
+
+**Behavior change for packages that do not use the option.** The `str_ends_with($extraFile, '.css')` guard around the extra file rewriting became unconditional, so fonts, images and source maps downloaded alongside a normal `/+esm` package started going through the JS branch, which strips their trailing `//# sourceMappingURL=` line:
+
+```
+IN            : '<svg></svg>\n//# sourceMappingURL=icons.svg.map\n'
+before this PR: unchanged
+with this PR  : '<svg></svg>\n\n'
+```
+
+Now gated on `.css` and on `.js`/`.mjs`, with a test.
+
+**`--no-esm` without a file path was accepted and produced 404s.** `getPackagePathString()` is then empty, so relative imports resolve against the package root rather than the directory of whatever file jsDelivr picked from `main`:
+
+```
+src='/dist/index.js'  imp=./chunk/x.js  => '/dist/chunk/x.js'   correct
+src=''                imp=./chunk/x.js  => '/chunk/x.js'        wrong
+```
+
+It now fails early with a message naming the fix. That also made the `&& $options->useEsm` condition on the CSS entrypoint lookup unnecessary, so it is reverted: a raw package keeps the automatic companion CSS discovery, which has nothing to do with the `/+esm` transform.
+
+**`--no-esm` with `--path`** was silently ignored. It now errors, since a local file is never downloaded from jsDelivr.
+
+**Command help** did not mention the new option while documenting every other one. Added, with an example.
+
+**Two commits with two different author identities** for the same person, the second being a test for the same feature. Squashed.
+
+Smaller: dropped the `FRAGMENT_SEPARATOR`/`QUERY_SEPARATOR` constants in favour of `strcspn($path, '?#')`, and realigned the comment written into every user's `importmap.php`.
+
+Four new tests, each verified to fail when its fix is reverted:
+
+```
+extra file that is neither JS nor CSS   -> -//# sourceMappingURL=icons.svg.map\n
+testResolveRawPackageWithoutFilePath    -> no exception, request goes out
+testNoEsmOptionCannotBeUsedWithPath     -> Failed asserting that 0 is identical to 1
+testCreateRemoteEntryUsesEsmByDefault   -> Failed asserting that 6 is identical to 5
+```
+
+Suite: 407 tests, 1165 assertions, 2 skipped, green.
+
+Left alone deliberately: bare imports inside a raw file are not resolved and produce no warning. That is inherent to taking the published file as it is, and it is now stated in the description rather than worked around.
+
+The one red check, "Unit Tests (8.4, low-deps)", was `Failed to download symfony/runtime from dist: ... does not exist and could not be created` in `PsrHttpMessage`, which this PR does not touch.

@@ -239,6 +239,136 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertEquals($expected, $output);
     }
 
+    public function testParseFacetsHashTags()
+    {
+        // "#123" gets no facet: a tag needs at least one character that is neither a digit nor punctuation
+        $input = 'Salut #test #123 #テスト http://bsky.app';
+        $expected = [
+            [
+                'index' => ['byteStart' => 6, 'byteEnd' => 11],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'test'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 17, 'byteEnd' => 27],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'テスト'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 28, 'byteEnd' => 43],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'http://bsky.app'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsHashTagWithEmoji()
+    {
+        $input = '💩💩💩 #tag';
+        $expected = [
+            [
+                'index' => ['byteStart' => 13, 'byteEnd' => 17],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'tag'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsHashTagsSharingAPrefixDoNotOverlap()
+    {
+        $input = '#php #php8 #php84';
+        $expected = [
+            [
+                'index' => ['byteStart' => 0, 'byteEnd' => 4],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'php'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 5, 'byteEnd' => 10],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'php8'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 11, 'byteEnd' => 17],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'php84'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsHashTagInsideUrlIsNotATag()
+    {
+        $input = 'go http://bsky.app#fragment #fragment';
+        $expected = [
+            [
+                'index' => ['byteStart' => 3, 'byteEnd' => 27],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'http://bsky.app#fragment'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 28, 'byteEnd' => 37],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#tag', 'tag' => 'fragment'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsUrlsSharingAPrefixDoNotOverlap()
+    {
+        $input = 'a https://ex.com b https://ex.com/x';
+        $expected = [
+            [
+                'index' => ['byteStart' => 2, 'byteEnd' => 16],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'https://ex.com'],
+                ],
+            ],
+            [
+                'index' => ['byteStart' => 19, 'byteEnd' => 35],
+                'features' => [
+                    ['$type' => 'app.bsky.richtext.facet#link', 'uri' => 'https://ex.com/x'],
+                ],
+            ],
+        ];
+        $output = $this->parseFacets($input);
+        $this->assertEquals($expected, $output);
+    }
+
+    public function testParseFacetsHashTagBoundaries()
+    {
+        $input = '#foo_bar #foo-bar ＃fullwidth #tag. #ab😀cd';
+        $output = $this->parseFacets($input);
+
+        $this->assertSame(
+            ['foo_bar', 'foo-bar', 'fullwidth', 'tag', 'ab😀cd'],
+            array_map(static fn (array $facet) => $facet['features'][0]['tag'], $output),
+        );
+    }
+
+    public function testParseFacetsHashTagTooLongIsSkipped()
+    {
+        $this->assertSame([], $this->parseFacets('ok #'.str_repeat('a', 641)));
+        $this->assertSame([], $this->parseFacets('ok #'.str_repeat('é', 65)));
+        $this->assertNotSame([], $this->parseFacets('ok #'.str_repeat('a', 64)));
+    }
+
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */

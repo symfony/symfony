@@ -88,6 +88,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\C as MultipleT
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetsWithTransform\PlainTarget as MultipleTargetsWithTransformPlainTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetsWithTransform\Source as MultipleTargetsWithTransformSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MyProxy;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedClassTransform\Dog;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedClassTransform\KennelSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedClassTransform\KennelTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\Inner;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\InnerMapped;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedConstructedTarget\Outer;
@@ -99,9 +102,12 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\InnerTargetA
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSource as MultiTargetOuterSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSourceWithRenamedProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTarget as MultiTargetOuterTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithInnerSourceProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithInterfaceProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithRenamedProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithUntypedProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedValueOfPropertyType\OuterSource as PropertyTypeOuterSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedValueOfPropertyType\OuterTarget as PropertyTypeOuterTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\FinalInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\PartialInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PrivateParentProperty\ChildEntity;
@@ -917,6 +923,36 @@ final class ObjectMapperTest extends TestCase
         $this->expectExceptionMessage('Ambiguous mapping');
 
         $mapper->map(new MultiTargetOuterSource(), OuterTargetWithInterfaceProperty::class);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsIsLeftAloneWhenNoneMatchesItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new MultiTargetOuterSource();
+        $target = $mapper->map($source, OuterTargetWithInnerSourceProperty::class);
+
+        $this->assertSame($source->inner, $target->inner);
+    }
+
+    public function testNestedPropertyWithASingleMapTargetIsLeftAloneWhenItDoesNotMatchItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new PropertyTypeOuterSource();
+        $target = $mapper->map($source, PropertyTypeOuterTarget::class);
+
+        $this->assertSame($source->inner, $target->inner);
+    }
+
+    public function testNestedPropertyWithAClassTransformIsMappedWhenOnlyTheTransformMatchesItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new KennelSource(), KennelTarget::class);
+
+        $this->assertInstanceOf(Dog::class, $target->pet);
+        $this->assertSame('rex', $target->pet->name);
     }
 
     public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()

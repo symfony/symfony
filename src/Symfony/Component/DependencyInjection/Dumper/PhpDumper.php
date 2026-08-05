@@ -86,6 +86,7 @@ class PhpDumper extends Dumper
     private array $inlinedRequires = [];
     private array $circularReferences = [];
     private array $singleUsePrivateIds = [];
+    private array $sortedDefinitions = [];
     private array $preload = [];
     private bool $addGetService = false;
     private array $locatedIds = [];
@@ -187,6 +188,8 @@ class PhpDumper extends Dumper
         }
 
         $this->analyzeReferences();
+        $this->sortedDefinitions = $this->container->getDefinitions();
+        ksort($this->sortedDefinitions);
         $this->docStar = $options['debug'] ? '*' : '';
 
         if (!empty($options['file']) && is_dir($dir = \dirname($options['file']))) {
@@ -393,6 +396,7 @@ class PhpDumper extends Dumper
         $this->exportedVariables = [];
         $this->dynamicParameters = [];
         $this->preload = [];
+        $this->sortedDefinitions = [];
 
         $unusedEnvs = [];
         foreach ($this->container->getEnvCounters() as $env => $use) {
@@ -557,11 +561,9 @@ class PhpDumper extends Dumper
     {
         $proxyClasses = [];
         $alreadyGenerated = [];
-        $definitions = $this->container->getDefinitions();
         $strip = '' === $this->docStar;
         $proxyDumper = $this->getProxyDumper();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if (!$definition = $this->isProxyCandidate($definition, $asGhostObject, $id)) {
                 continue;
             }
@@ -1124,9 +1126,7 @@ class PhpDumper extends Dumper
     private function addServices(?array &$services = null): string
     {
         $publicServices = $privateServices = '';
-        $definitions = $this->container->getDefinitions();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if (!$definition->isSynthetic()) {
                 $services[$id] = $this->addService($id, $definition);
             } elseif ($definition->hasTag($this->hotPathTag) || !$definition->hasTag($this->preloadTags[1])) {
@@ -1138,7 +1138,7 @@ class PhpDumper extends Dumper
             }
         }
 
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if (!([$file, $code] = $services[$id]) || null !== $file) {
                 continue;
             }
@@ -1154,9 +1154,7 @@ class PhpDumper extends Dumper
 
     private function generateServiceFiles(array $services): iterable
     {
-        $definitions = $this->container->getDefinitions();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if (([$file, $code] = $services[$id]) && null !== $file && ($definition->isPublic() || !$this->isTrivialInstance($definition) || isset($this->locatedIds[$id]))) {
                 yield $file => [$code, $definition->hasTag($this->hotPathTag) || !$definition->hasTag($this->preloadTags[1]) && !$definition->isDeprecated() && !$definition->hasErrors()];
             }
@@ -1386,9 +1384,7 @@ class PhpDumper extends Dumper
     private function addSyntheticIds(): string
     {
         $code = '';
-        $definitions = $this->container->getDefinitions();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if ($definition->isSynthetic() && 'service_container' !== $id) {
                 $code .= '            '.$this->doExport($id)." => true,\n";
             }
@@ -1473,9 +1469,7 @@ class PhpDumper extends Dumper
     private function addMethodMap(): string
     {
         $code = '';
-        $definitions = $this->container->getDefinitions();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if (!$definition->isSynthetic() && $definition->isPublic() && (!$this->asFiles || $this->inlineFactories || $this->isHotPath($definition))) {
                 $code .= '            '.$this->doExport($id).' => '.$this->doExport($this->generateMethodName($id)).",\n";
             }
@@ -1495,9 +1489,7 @@ class PhpDumper extends Dumper
     private function addFileMap(): string
     {
         $code = '';
-        $definitions = $this->container->getDefinitions();
-        ksort($definitions);
-        foreach ($definitions as $id => $definition) {
+        foreach ($this->sortedDefinitions as $id => $definition) {
             if (!$definition->isSynthetic() && $definition->isPublic() && !$this->isHotPath($definition)) {
                 $code .= \sprintf("            %s => '%s',\n", $this->doExport($id), $this->generateMethodName($id));
             }

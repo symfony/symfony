@@ -16,12 +16,14 @@ use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\CommonMark\Node\Block\BlockQuote;
 use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
 use League\CommonMark\Extension\CommonMark\Node\Block\Heading;
+use League\CommonMark\Extension\CommonMark\Node\Block\HtmlBlock;
 use League\CommonMark\Extension\CommonMark\Node\Block\IndentedCode;
 use League\CommonMark\Extension\CommonMark\Node\Block\ListBlock;
 use League\CommonMark\Extension\CommonMark\Node\Block\ListItem;
 use League\CommonMark\Extension\CommonMark\Node\Block\ThematicBreak;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Code;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Emphasis;
+use League\CommonMark\Extension\CommonMark\Node\Inline\HtmlInline;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
@@ -188,6 +190,7 @@ class MarkdownWidget extends AbstractWidget
             $node instanceof ListBlock => $this->renderList($node, $columns),
             $node instanceof ThematicBreak => [$this->resolveElement('hr')->apply(str_repeat('─', $columns))],
             $node instanceof Table => $this->renderTable($node, $columns),
+            $node instanceof HtmlBlock => TextWrapper::wrapTextWithAnsi($this->resolveElement('code')->apply($node->getLiteral()).$this->restoreContext, $columns),
             default => $this->renderGenericBlock($node, $columns),
         };
     }
@@ -554,6 +557,7 @@ class MarkdownWidget extends AbstractWidget
             $node instanceof Emphasis => $this->resolveElement('italic')->apply($this->renderInlineNodes($node)).$this->restoreContext,
             $node instanceof Strikethrough => $this->resolveElement('strikethrough')->apply($this->renderInlineNodes($node)).$this->restoreContext,
             $node instanceof Code => $this->resolveElement('code')->apply($node->getLiteral()).$this->restoreContext,
+            $node instanceof HtmlInline => $this->resolveElement('code')->apply($node->getLiteral()).$this->restoreContext,
             $node instanceof Link => $this->resolveElement('link')->apply($this->renderInlineNodes($node)).$this->restoreContext.' '.$this->resolveElement('link-url')->apply('('.$node->getUrl().')').$this->restoreContext,
             $node instanceof Newline => "\n",
             default => $this->renderInlineNodes($node), // For nested structures

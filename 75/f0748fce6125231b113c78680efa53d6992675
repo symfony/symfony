@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T15:47:04Z
+
+Thanks @lazerg. Your diagnosis is right. I rebased on 8.1 and extended the fix, because the same defect exists on the block-level node and there it is more damaging.
+
+`renderNode()` has no `HtmlBlock` arm either, and CommonMark groups the lines following an opening tag into the same `HtmlBlock`. So the fallthrough did not only drop the tag, it dropped the user's text with it:
+
+```
+in:  <system-reminder>\nimportant user text\nmore text
+out:                                                     both prose lines gone
+
+in:  Text\n<div>x</div>\nText2
+out: Text                                                Text2 swallowed
+```
+
+That is the reporter's actual use case, rendering arbitrary user input in a transcript, so leaving it while renaming the test to `testRenderRawHtmlTags` would have overstated what the patch delivers. One line fixes it, symmetrical to yours:
+
+```php
+$node instanceof HtmlBlock => TextWrapper::wrapTextWithAnsi($this->resolveElement('code')->apply($node->getLiteral()).$this->restoreContext, $columns),
+```
+
+A second test covers it, asserting that the text before and after a block-level tag survives. Both new tests fail on 8.1 without the patch and pass with it. The Tui suite is green at 1658 tests.
+
+I also checked the escape-sequence angle, since markdown reaching a terminal renderer is an obvious injection surface. Nothing to worry about: `__construct()` and `setText()` are the only writers of the text and both run `StringUtils::stripControlBytes(StringUtils::sanitizeUtf8())`, so an ESC or OSC byte inside a tag attribute never reaches the terminal. I verified it on both the inline and the new block path, with zero stray escapes in the output. Tui has no coupling to symfony/console either, so console markup like `<info>` is inert here.
+
+One thing worth a second opinion, @fabpot: this reverses the assertion in `testStripHtmlTags`, which came in with a81867921ed. The test name says "strip", but there is no stripping code anywhere, only the two missing `match` arms, so I read it as recording what fell out of the implementation rather than an intent. Tui is `@experimental` so the change is allowed on 8.1, but it is a visible output change for 8.1.x users, and HTML comments, CDATA and DOCTYPE declarations become visible too. Say the word if you would rather have these stripped explicitly instead.

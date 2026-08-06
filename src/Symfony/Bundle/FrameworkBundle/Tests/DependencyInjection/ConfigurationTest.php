@@ -200,6 +200,7 @@ class ConfigurationTest extends TestCase
             'importmap_polyfill' => 'es-module-shims',
             'vendor_dir' => '%kernel.project_dir%/assets/vendor',
             'importmap_script_attributes' => [],
+            'importmap_integrity_algorithms' => [],
             'exclude_dotfiles' => true,
             'precompress' => [
                 'enabled' => false,
@@ -231,6 +232,20 @@ class ConfigurationTest extends TestCase
         if ($isValid) {
             $this->assertEquals($expected, $config['asset_mapper']['importmap_polyfill']);
         }
+    }
+
+    public function testAssetMapperImportmapIntegrityAlgorithms()
+    {
+        $processor = new Processor();
+        $configuration = new Configuration(true);
+
+        $config = $processor->processConfiguration($configuration, [[
+            'asset_mapper' => [
+                'importmap_integrity_algorithms' => ['sha384'],
+            ],
+        ]]);
+
+        $this->assertSame(['sha384'], $config['asset_mapper']['importmap_integrity_algorithms']);
     }
 
     public static function provideImportmapPolyfillTests()
@@ -1003,6 +1018,7 @@ class ConfigurationTest extends TestCase
                 'importmap_polyfill' => 'es-module-shims',
                 'vendor_dir' => '%kernel.project_dir%/assets/vendor',
                 'importmap_script_attributes' => [],
+                'importmap_integrity_algorithms' => [],
                 'exclude_dotfiles' => true,
                 'precompress' => [
                     'enabled' => false,

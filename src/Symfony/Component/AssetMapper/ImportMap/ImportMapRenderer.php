@@ -32,7 +32,7 @@ class ImportMapRenderer
     private const DEFAULT_ES_MODULE_SHIMS_POLYFILL_INTEGRITY = 'sha384-ie1x72Xck445i0j4SlNJ5W5iGeL3Dpa0zD48MZopgWsjNB/lt60SuG1iduZGNnJn';
 
     private const LOADER_JSON = "export default (async()=>await(await fetch('%s')).json())()";
-    private const LOADER_CSS = "document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:'%s'}))";
+    private const LOADER_CSS = "document.head.appendChild(Object.assign(document.createElement('link'),{rel:'stylesheet',href:'%s'%s}))";
 
     public function __construct(
         private readonly ImportMapGenerator $importMapGenerator,
@@ -50,9 +50,12 @@ class ImportMapRenderer
 
         $importMapData = $this->importMapGenerator->getImportMapData($entryPoint);
         $importMap = [];
+        $integrity = [];
         $modulePreloads = [];
         $webLinks = [];
         $polyfillPath = null;
+        $polyfillIntegrity = null;
+        $styleIntegrity = [];
         foreach ($importMapData as $importName => $data) {
             $path = $data['path'];
 
@@ -64,6 +67,7 @@ class ImportMapRenderer
             // if this represents the polyfill, hide it from the import map
             if ($importName === $this->polyfillImportName) {
                 $polyfillPath = $path;
+                $polyfillIntegrity = $data['integrity'] ?? null;
                 continue;
             }
 
@@ -80,22 +84,28 @@ class ImportMapRenderer
                 }
             } elseif ('css' !== $data['type']) {
                 $importMap[$importName] = $path;
+                if (isset($data['integrity'])) {
+                    $integrity[$path] = $data['integrity'];
+                }
                 if ($preload) {
-                    $modulePreloads[$path] = $path;
+                    $modulePreloads[$path] = $data['integrity'] ?? null;
                 }
             } elseif ($preload) {
                 $webLinks[$path] = 'style';
+                $styleIntegrity[$path] = $data['integrity'] ?? null;
                 // importmap entry is a noop
                 $importMap[$importName] = 'data:application/javascript,';
             } else {
-                $importMap[$importName] = 'data:application/javascript,'.str_replace('%', '%25', \sprintf(self::LOADER_CSS, addslashes($path)));
+                $cssIntegrity = isset($data['integrity']) ? \sprintf(",integrity:'%s'", addslashes($data['integrity'])) : '';
+                $importMap[$importName] = 'data:application/javascript,'.str_replace('%', '%25', \sprintf(self::LOADER_CSS, addslashes($path), $cssIntegrity));
             }
         }
 
         $output = '';
         foreach ($webLinks as $url => $as) {
             if ('style' === $as) {
-                $output .= "\n<link rel=\"stylesheet\" href=\"{$this->escapeAttributeValue($url)}\">";
+                $styleAttributes = isset($styleIntegrity[$url]) ? " integrity=\"{$this->escapeAttributeValue($styleIntegrity[$url])}\"" : '';
+                $output .= "\n<link rel=\"stylesheet\" href=\"{$this->escapeAttributeValue($url)}\"$styleAttributes>";
             }
         }
 
@@ -104,7 +114,11 @@ class ImportMapRenderer
         }
 
         $scriptAttributes = $attributes || $this->scriptAttributes ? ' '.$this->createAttributesString($attributes) : '';
-        $importMapJson = json_encode(['imports' => $importMap ?: new \stdClass()], \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
+        $importMapConfig = ['imports' => $importMap ?: new \stdClass()];
+        if ($integrity) {
+            $importMapConfig['integrity'] = $integrity;
+        }
+        $importMapJson = json_encode($importMapConfig, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES | \JSON_HEX_TAG);
         $output .= <<<HTML
 
             <script type="importmap"$scriptAttributes>
@@ -125,6 +139,10 @@ class ImportMapRenderer
             $polyfillAttributes = $attributes + $this->scriptAttributes;
 
             // Add security attributes for the default polyfill hosted on jspm.io
+            if (null !== $polyfillIntegrity) {
+                $polyfillAttributes = ['integrity' => $polyfillIntegrity] + $polyfillAttributes;
+            }
+
             if (self::DEFAULT_ES_MODULE_SHIMS_POLYFILL_URL === $polyfillPath) {
                 $polyfillAttributes = [
                     'crossorigin' => 'anonymous',
@@ -151,10 +169,11 @@ class ImportMapRenderer
                 HTML;
         }
 
-        foreach ($modulePreloads as $url) {
+        foreach ($modulePreloads as $url => $integrity) {
             $url = $this->escapeAttributeValue($url);
+            $integrity = null === $integrity ? '' : ' integrity="'.$this->escapeAttributeValue($integrity).'"';
 
-            $output .= "\n<link rel=\"modulepreload\" href=\"$url\">";
+            $output .= "\n<link rel=\"modulepreload\" href=\"$url\"$integrity>";
         }
 
         if (\count($entryPoint) > 0) {

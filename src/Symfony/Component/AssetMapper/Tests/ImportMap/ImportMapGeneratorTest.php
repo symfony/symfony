@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
+use Symfony\Component\AssetMapper\Exception\LogicException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -27,6 +28,8 @@ use Symfony\Component\Filesystem\Path;
 
 class ImportMapGeneratorTest extends TestCase
 {
+    private const FIXTURE_JS = __DIR__.'/../Fixtures/dir1/file2.js';
+
     private AssetMapperInterface $assetMapper;
     private CompiledAssetMapperConfigReader $compiledConfigReader;
     private ImportMapConfigReader $configReader;
@@ -307,6 +310,65 @@ class ImportMapGeneratorTest extends TestCase
             ['app' => ['path' => '/assets/app-live.js', 'type' => 'js']],
             $manager->getRawImportMapData(),
         );
+    }
+
+    public function testGetRawImportMapDataOmitsIntegrityByDefault()
+    {
+        $manager = $this->createImportMapGenerator();
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js')]);
+        $this->mockAssetMapper([new MappedAsset('app.js', self::FIXTURE_JS, publicPath: '/assets/app-d13g35t.js')]);
+
+        $this->assertSame([
+            'app' => ['path' => '/assets/app-d13g35t.js', 'type' => 'js'],
+        ], $manager->getRawImportMapData());
+    }
+
+    public function testGetRawImportMapDataIncludesAssetIntegrity()
+    {
+        $manager = $this->createImportMapGenerator(['sha384']);
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js')]);
+        $this->mockAssetMapper([new MappedAsset('app.js', self::FIXTURE_JS, publicPath: '/assets/app-d13g35t.js')]);
+
+        $this->assertSame([
+            'app' => [
+                'path' => '/assets/app-d13g35t.js',
+                'type' => 'js',
+                'integrity' => 'sha384-'.base64_encode(hash_file('sha384', self::FIXTURE_JS, true)),
+            ],
+        ], $manager->getRawImportMapData());
+    }
+
+    public function testGetRawImportMapDataIncludesEveryConfiguredAlgorithm()
+    {
+        $manager = $this->createImportMapGenerator(['sha256', 'sha384']);
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js')]);
+        $this->mockAssetMapper([new MappedAsset('app.js', self::FIXTURE_JS, publicPath: '/assets/app-d13g35t.js')]);
+
+        $this->assertSame(
+            'sha256-'.base64_encode(hash_file('sha256', self::FIXTURE_JS, true))
+            .' sha384-'.base64_encode(hash_file('sha384', self::FIXTURE_JS, true)),
+            $manager->getRawImportMapData()['app']['integrity'],
+        );
+    }
+
+    public function testGetRawImportMapDataHashesTheCompiledContent()
+    {
+        $manager = $this->createImportMapGenerator(['sha384']);
+        $this->mockImportMap([self::createLocalEntry('app', path: 'app.js')]);
+        $this->mockAssetMapper([new MappedAsset('app.js', self::FIXTURE_JS, publicPath: '/assets/app-d13g35t.js', content: 'compiled();')]);
+
+        $this->assertSame(
+            'sha384-'.base64_encode(hash('sha384', 'compiled();', true)),
+            $manager->getRawImportMapData()['app']['integrity'],
+        );
+    }
+
+    public function testUnsupportedIntegrityAlgorithmThrows()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Unsupported integrity hash algorithm "sha1". Supported ones are "sha256", "sha384", "sha512".');
+
+        $this->createImportMapGenerator(['sha1']);
     }
 
     public static function getRawImportMapDataTests(): iterable
@@ -845,7 +907,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertSame(['app.js' => 1, 'admin.js' => 1], $resolvedAssets);
     }
 
-    private function createImportMapGenerator(): ImportMapGenerator
+    private function createImportMapGenerator(array $integrityHashAlgorithms = []): ImportMapGenerator
     {
         $this->compiledConfigReader ??= $this->createStub(CompiledAssetMapperConfigReader::class);
         $this->assetMapper = $this->createStub(AssetMapperInterface::class);
@@ -864,6 +926,7 @@ class ImportMapGeneratorTest extends TestCase
             $this->assetMapper,
             $this->compiledConfigReader,
             $this->configReader,
+            $integrityHashAlgorithms,
         );
     }
 

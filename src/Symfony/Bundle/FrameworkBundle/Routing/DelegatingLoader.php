@@ -19,9 +19,6 @@ use Symfony\Component\Routing\RouteCollection;
 /**
  * DelegatingLoader delegates route loading to other loaders using a loader resolver.
  *
- * This implementation resolves the _controller attribute from the short notation
- * to the fully-qualified form (from a:b:c to class::method).
- *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @final
@@ -67,22 +64,15 @@ class DelegatingLoader extends BaseDelegatingLoader
             $this->loading = false;
         }
 
-        foreach ($collection->all() as $route) {
-            if ($this->defaultOptions) {
-                $route->setOptions($route->getOptions() + $this->defaultOptions);
+        if ($this->defaultOptions || $this->defaultRequirements) {
+            foreach ($collection->all() as $route) {
+                if ($this->defaultOptions) {
+                    $route->setOptions($route->getOptions() + $this->defaultOptions);
+                }
+                if ($this->defaultRequirements) {
+                    $route->setRequirements($route->getRequirements() + $this->defaultRequirements);
+                }
             }
-            if ($this->defaultRequirements) {
-                $route->setRequirements($route->getRequirements() + $this->defaultRequirements);
-            }
-            if (!\is_string($controller = $route->getDefault('_controller'))) {
-                continue;
-            }
-
-            if (str_contains($controller, '::')) {
-                continue;
-            }
-
-            $route->setDefault('_controller', $controller);
         }
 
         return $collection;

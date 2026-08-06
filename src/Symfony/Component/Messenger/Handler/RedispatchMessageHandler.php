@@ -25,7 +25,10 @@ final class RedispatchMessageHandler
 
     public function __invoke(RedispatchMessage $message): mixed
     {
-        $envelope = $this->bus->dispatch($message->envelope, [new TransportNamesStamp($message->transportNames)]);
+        // no transport name means "use the senders configured for the message" instead of "use no sender"
+        $transportNames = array_values(array_filter((array) $message->transportNames, static fn ($name): bool => '' !== $name));
+
+        $envelope = $this->bus->dispatch($message->envelope, $transportNames ? [new TransportNamesStamp($transportNames)] : []);
 
         return $envelope->last(HandledStamp::class)?->getResult();
     }

@@ -17,7 +17,8 @@ final class RedispatchMessage implements \Stringable
 {
     /**
      * @param object|Envelope $envelope       The message or the message pre-wrapped in an envelope
-     * @param string[]|string $transportNames Transport names to be used for the message
+     * @param string[]|string $transportNames Transport names to be used for the message, or an empty
+     *                                        array/string to use the senders configured for the message
      */
     public function __construct(
         public readonly object $envelope,

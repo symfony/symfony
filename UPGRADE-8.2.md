@@ -51,6 +51,22 @@ Loco Translation Provider
  * Deprecate passing `LocoProvider` and `LocoProviderFactory` constructor a `$defaultLocale` argument. It has no effect and can be removed.
  * Deprecate passing no domains or `*` to `LocoProvider::read()`, configure your loco provider domains as an associative array with an empty string key and `*` as value
 
+Messenger
+---------
+
+ * `RedispatchMessage` now dispatches to the senders configured for the message (via
+   `framework.messenger.routing` or `#[AsMessage]`) when `$transportNames` is empty, instead of sending to no
+   sender at all. Code that relied on `new RedispatchMessage($message)`, or on an empty array or string, to
+   force in-process handling of a message that also has a configured route must now carry an empty
+   `TransportNamesStamp` on the inner envelope:
+
+   ```php
+   new RedispatchMessage(new Envelope($message, [new TransportNamesStamp([])]))
+   ```
+
+   Note that a message sent to a transport is no longer handled in process, so `RedispatchMessageHandler`
+   returns `null` for it instead of the result of the handler
+
 Security
 --------
 

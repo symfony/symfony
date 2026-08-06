@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-13T08:06:35Z
+
+Test failure is related but looks good otherwise!
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-07-16T13:29:20Z
+
+good catch. Thanks. tests should be okay
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T07:14:35Z
+
+Rebased and pushed two changes:
+
+* Renamed the option to `framework.messenger.reject_redelivered_messages`. The neighbouring keys name behaviours rather than implementation classes, and this is free now and impossible after 8.2 ships.
+* Dropped the `removeDefinition()`. Deleting the service made the opt-out irreversible: a bus listing `reject_redelivered_message_middleware` explicitly then failed to compile with `Invalid middleware: service "reject_redelivered_message_middleware" not found`, which reads as a framework bug. It also bought nothing, since the definition is private and `RemoveUnusedDefinitionsPass` collects it once the id leaves the default list. Added a test that compiles a two-bus container through `MessengerPass` and checks the middleware lands only on the bus that asked for it.
+
+Also tightened the `info()`: it now says the option is about AMQP redeliveries, and names the real risk of turning it off, a redelivery loop that blocks the queue, rather than "handled more than once".

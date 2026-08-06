@@ -2425,7 +2425,7 @@ class FrameworkExtension extends Extension
             'before' => [
                 ['id' => 'add_default_stamps_middleware'],
                 ['id' => 'add_bus_name_stamp_middleware'],
-                ['id' => 'reject_redelivered_message_middleware'],
+                ...($config['reject_redelivered_messages'] ? [['id' => 'reject_redelivered_message_middleware']] : []),
                 ['id' => 'dispatch_after_current_bus'],
                 ...(class_exists(DecodeFailedMessageMiddleware::class) ? [['id' => 'decode_failed_message_middleware']] : []),
                 ['id' => 'failed_message_processing_middleware'],

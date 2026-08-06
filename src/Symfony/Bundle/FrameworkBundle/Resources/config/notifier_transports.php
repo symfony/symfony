@@ -45,6 +45,7 @@ return static function (ContainerConfigurator $container) {
         'rocket-chat' => Bridge\RocketChat\RocketChatTransportFactory::class,
         'slack' => Bridge\Slack\SlackTransportFactory::class,
         'telegram' => Bridge\Telegram\TelegramTransportFactory::class,
+        'threads' => Bridge\Threads\ThreadsTransportFactory::class,
         'twitter' => Bridge\Twitter\TwitterTransportFactory::class,
         'whats-app' => Bridge\WhatsApp\WhatsAppTransportFactory::class,
         'zendesk' => Bridge\Zendesk\ZendeskTransportFactory::class,

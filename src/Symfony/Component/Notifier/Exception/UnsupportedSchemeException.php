@@ -320,6 +320,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Termii\TermiiTransportFactory::class,
             'package' => 'symfony/termii-notifier',
         ],
+        'threads' => [
+            'class' => Bridge\Threads\ThreadsTransportFactory::class,
+            'package' => 'symfony/threads-notifier',
+        ],
         'turbosms' => [
             'class' => Bridge\TurboSms\TurboSmsTransportFactory::class,
             'package' => 'symfony/turbo-sms-notifier',

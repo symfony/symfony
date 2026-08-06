@@ -151,6 +151,7 @@
         "telegram-notifier": "src/Symfony/Component/Notifier/Bridge/Telegram",
         "telnyx-notifier": "src/Symfony/Component/Notifier/Bridge/Telnyx",
         "termii-notifier": "src/Symfony/Component/Notifier/Bridge/Termii",
+        "threads-notifier": "src/Symfony/Component/Notifier/Bridge/Threads",
         "turbo-sms-notifier": "src/Symfony/Component/Notifier/Bridge/TurboSms",
         "twilio-notifier": "src/Symfony/Component/Notifier/Bridge/Twilio",
         "twitter-notifier": "src/Symfony/Component/Notifier/Bridge/Twitter",

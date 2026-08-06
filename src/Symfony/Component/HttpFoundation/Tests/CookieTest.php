@@ -155,6 +155,117 @@ class CookieTest extends TestCase
         $this->assertNull($cookie->getDomain());
     }
 
+    public function testInstantiationThrowsExceptionIfHostPrefixedNameHasDomain()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cookie name "__Host-foo" uses the "__Host-" prefix, which requires the cookie to have no "domain" attribute.');
+        Cookie::create('__Host-foo', 'bar', 0, '/', 'example.com');
+    }
+
+    public function testInstantiationThrowsExceptionIfHostPrefixedNameHasNonRootPath()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cookie name "__Host-foo" uses the "__Host-" prefix, which requires the cookie path to be "/".');
+        Cookie::create('__Host-foo', 'bar', 0, '/admin');
+    }
+
+    public function testWithDomainThrowsExceptionIfHostPrefixedNameGetsADomain()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cookie name "__Host-foo" uses the "__Host-" prefix, which requires the cookie to have no "domain" attribute.');
+        Cookie::create('__Host-foo', 'bar')->withDomain('example.com');
+    }
+
+    public function testWithPathThrowsExceptionIfHostPrefixedNameGetsANonRootPath()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The cookie name "__Host-foo" uses the "__Host-" prefix, which requires the cookie path to be "/".');
+        Cookie::create('__Host-foo', 'bar')->withPath('/admin');
+    }
+
+    public function testHostPrefixedNameIsAcceptedWithoutDomainAndOnRootPath()
+    {
+        $cookie = Cookie::create('__Host-foo', 'bar');
+
+        $this->assertNull($cookie->getDomain());
+        $this->assertSame('/', $cookie->getPath());
+
+        $cookie = Cookie::create('__Host-foo', 'bar', 0, '', '');
+
+        $this->assertSame('', $cookie->getDomain());
+        $this->assertSame('/', $cookie->getPath());
+
+        $cookie = Cookie::create('__Host-foo', 'bar')->withDomain('')->withPath('');
+
+        $this->assertSame('', $cookie->getDomain());
+        $this->assertSame('/', $cookie->getPath());
+    }
+
+    public function testSecurePrefixedNameIsNotConstrainedToADomainOrAPath()
+    {
+        $cookie = Cookie::create('__Secure-foo', 'bar', 0, '/admin', 'example.com');
+
+        $this->assertSame('example.com', $cookie->getDomain());
+        $this->assertSame('/admin', $cookie->getPath());
+    }
+
+    public function testInstantiationThrowsExceptionIfPrefixedNameIsExplicitlyInsecure()
+    {
+        foreach (['__Secure-foo', '__Host-foo'] as $name) {
+            try {
+                Cookie::create($name, 'bar', 0, '/', null, false);
+                $this->fail(\sprintf('Expected an exception for "%s".', $name));
+            } catch (\InvalidArgumentException $e) {
+                $this->assertSame(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "secure" flag to be enabled.', $name), $e->getMessage());
+            }
+        }
+    }
+
+    public function testWithSecureThrowsExceptionIfPrefixedNameIsMadeInsecure()
+    {
+        foreach (['__Secure-foo', '__Host-foo'] as $name) {
+            try {
+                Cookie::create($name, 'bar', 0, '/', null, true)->withSecure(false);
+                $this->fail(\sprintf('Expected an exception for "%s".', $name));
+            } catch (\InvalidArgumentException $e) {
+                $this->assertSame(\sprintf('The cookie name "%s" uses a reserved prefix, which requires the "secure" flag to be enabled.', $name), $e->getMessage());
+            }
+        }
+    }
+
+    public function testPrefixedNameWithNullSecureIsAccepted()
+    {
+        foreach (['__Secure-foo', '__Host-foo'] as $name) {
+            $cookie = Cookie::create($name, 'bar', 0, '/', null, null);
+
+            $this->assertFalse($cookie->isSecure());
+
+            $cookie->setSecureDefault(true);
+
+            $this->assertTrue($cookie->isSecure());
+        }
+    }
+
+    public function testHostPrefixedNameIsParsedFromAValidHeader()
+    {
+        $cookie = Cookie::fromString('__Host-foo=bar; path=/; secure');
+
+        $this->assertSame('__Host-foo', $cookie->getName());
+        $this->assertNull($cookie->getDomain());
+        $this->assertSame('/', $cookie->getPath());
+    }
+
+    public function testParsingAHeaderWithoutSecureDefersInsteadOfFailing()
+    {
+        $cookie = Cookie::fromString('__Host-foo=bar');
+
+        $this->assertFalse($cookie->isSecure());
+
+        $cookie->setSecureDefault(true);
+
+        $this->assertTrue($cookie->isSecure());
+    }
+
     public function testInvalidExpiration()
     {
         $this->expectException(\InvalidArgumentException::class);

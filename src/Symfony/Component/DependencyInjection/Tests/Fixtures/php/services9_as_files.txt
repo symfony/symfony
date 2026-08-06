@@ -38,11 +38,11 @@ class getBAR2Service extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->services['BAR'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->bar = ($container->services['bar'] ?? self::getBarService($container));
 
-        return $instance;
+        return $container->services['BAR'] = $instance;
     }
 }
 
@@ -117,17 +117,23 @@ class getBazService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $instance = new \Baz();
+        try {
+            $instance = new \Baz();
 
-        if (isset($container->services['baz'])) {
-            return $container->services['baz'];
+            if (isset($container->services['baz'])) {
+                return $container->services['baz'];
+            }
+
+            $container->services['baz'] = $instance;
+
+            $instance->setFoo(($container->services['foo_with_inline'] ?? $container->load('getFooWithInlineService')));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['baz']);
+
+            throw $e;
         }
-
-        $container->services['baz'] = $instance;
-
-        $instance->setFoo(($container->services['foo_with_inline'] ?? $container->load('getFooWithInlineService')));
-
-        return $instance;
     }
 }
 
@@ -142,14 +148,14 @@ class getConfiguredServiceService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->services['configured_service'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $a = new \ConfClass();
         $a->setFoo(($container->services['baz'] ?? $container->load('getBazService')));
 
         $a->configureStdClass($instance);
 
-        return $instance;
+        return $container->services['configured_service'] = $instance;
     }
 }
 
@@ -164,11 +170,11 @@ class getConfiguredServiceSimpleService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->services['configured_service_simple'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         (new \ConfClass('bar'))->configureStdClass($instance);
 
-        return $instance;
+        return $container->services['configured_service_simple'] = $instance;
     }
 }
 
@@ -283,7 +289,7 @@ class getFooService extends ProjectServiceContainer
     {
         $a = ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
 
-        $container->services['foo'] = $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $container);
+        $instance = \Bar\FooClass::getInstance('foo', $a, ['bar' => 'foo is bar', 'foobar' => 'bar'], true, $container);
 
         $instance->foo = 'bar';
         $instance->moo = $a;
@@ -292,7 +298,7 @@ class getFooService extends ProjectServiceContainer
         $instance->initialize();
         sc_configure($instance);
 
-        return $instance;
+        return $container->services['foo'] = $instance;
     }
 }
 
@@ -307,11 +313,11 @@ class getFoo_BazService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->services['foo.baz'] = $instance = \BazClass::getInstance();
+        $instance = \BazClass::getInstance();
 
         \BazClass::configureStatic1($instance);
 
-        return $instance;
+        return $container->services['foo.baz'] = $instance;
     }
 }
 
@@ -345,21 +351,27 @@ class getFooWithInlineService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $instance = new \Foo();
+        try {
+            $instance = new \Foo();
 
-        if (isset($container->services['foo_with_inline'])) {
-            return $container->services['foo_with_inline'];
+            if (isset($container->services['foo_with_inline'])) {
+                return $container->services['foo_with_inline'];
+            }
+
+            $container->services['foo_with_inline'] = $instance;
+
+            $a = new \Bar();
+            $a->pub = 'pub';
+            $a->setBaz(($container->services['baz'] ?? $container->load('getBazService')));
+
+            $instance->setBar($a);
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['foo_with_inline']);
+
+            throw $e;
         }
-
-        $container->services['foo_with_inline'] = $instance;
-
-        $a = new \Bar();
-        $a->pub = 'pub';
-        $a->setBaz(($container->services['baz'] ?? $container->load('getBazService')));
-
-        $instance->setBar($a);
-
-        return $instance;
     }
 }
 
@@ -411,13 +423,13 @@ class getMethodCall1Service extends ProjectServiceContainer
     {
         include_once $container->targetDir.''.'/Fixtures/includes/foo.php';
 
-        $container->services['method_call1'] = $instance = new \Bar\FooClass();
+        $instance = new \Bar\FooClass();
 
         $instance->setBar(($container->services['foo'] ?? $container->load('getFooService')));
         $instance->setBar(NULL);
         $instance->setBar((($container->services['foo'] ?? $container->load('getFooService'))->foo() . (($container->hasParameter("foo")) ? ($container->getParameter("foo")) : ("default"))));
 
-        return $instance;
+        return $container->services['method_call1'] = $instance;
     }
 }
 
@@ -435,11 +447,11 @@ class getNewFactoryServiceService extends ProjectServiceContainer
         $a = new \FactoryClass();
         $a->foo = 'bar';
 
-        $container->services['new_factory_service'] = $instance = $a->getInstance();
+        $instance = $a->getInstance();
 
         $instance->foo = 'bar';
 
-        return $instance;
+        return $container->services['new_factory_service'] = $instance;
     }
 }
 
@@ -652,11 +664,11 @@ class ProjectServiceContainer extends Container
     {
         $a = ($container->services['foo.baz'] ?? $container->load('getFoo_BazService'));
 
-        $container->services['bar'] = $instance = new \Bar\FooClass('foo', $a, $container->getParameter('foo_bar'));
+        $instance = new \Bar\FooClass('foo', $a, $container->getParameter('foo_bar'));
 
         $a->configure($instance);
 
-        return $instance;
+        return $container->services['bar'] = $instance;
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

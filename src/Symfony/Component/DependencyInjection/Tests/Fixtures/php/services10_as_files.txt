@@ -28,11 +28,11 @@ class getClosureService extends ProjectServiceContainer
      */
     public static function do($container, $lazyLoad = true)
     {
-        $container->services['closure'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->closures = [#[\Closure(name: 'foo', class: 'FooClass')] fn (): ?\stdClass => ($container->services['foo'] ?? null)];
 
-        return $instance;
+        return $container->services['closure'] = $instance;
     }
 }
 

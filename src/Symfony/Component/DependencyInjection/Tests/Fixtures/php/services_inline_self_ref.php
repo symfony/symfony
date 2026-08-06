@@ -48,10 +48,10 @@ class Symfony_DI_PhpDumper_Test_Inline_Self_Ref extends Container
         $b = new \App\Baz($a);
         $b->bar = $a;
 
-        $container->services['App\\Foo'] = $instance = new \App\Foo($b);
+        $instance = new \App\Foo($b);
 
         $a->foo = $instance;
 
-        return $instance;
+        return $container->services['App\\Foo'] = $instance;
     }
 }

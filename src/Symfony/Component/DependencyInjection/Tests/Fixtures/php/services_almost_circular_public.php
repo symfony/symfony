@@ -106,17 +106,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getBarService($container)
     {
-        $instance = new \BarCircular();
+        try {
+            $instance = new \BarCircular();
 
-        if (isset($container->services['bar'])) {
-            return $container->services['bar'];
+            if (isset($container->services['bar'])) {
+                return $container->services['bar'];
+            }
+
+            $container->services['bar'] = $instance;
+
+            $instance->addFoobar(($container->services['foobar'] ?? self::getFoobarService($container)));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['bar']);
+
+            throw $e;
         }
-
-        $container->services['bar'] = $instance;
-
-        $instance->addFoobar(($container->services['foobar'] ?? self::getFoobarService($container)));
-
-        return $instance;
     }
 
     /**
@@ -126,13 +132,13 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getBar3Service($container)
     {
-        $container->services['bar3'] = $instance = new \BarCircular();
+        $instance = new \BarCircular();
 
         $a = ($container->services['foobar3'] ??= new \FoobarCircular());
 
         $instance->addFoobar($a, $a);
 
-        return $instance;
+        return $container->services['bar3'] = $instance;
     }
 
     /**
@@ -142,23 +148,29 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getBar5Service($container)
     {
-        $a = ($container->services['foo5'] ?? self::getFoo5Service($container));
+        try {
+            $a = ($container->services['foo5'] ?? self::getFoo5Service($container));
 
-        if (isset($container->services['bar5'])) {
-            return $container->services['bar5'];
+            if (isset($container->services['bar5'])) {
+                return $container->services['bar5'];
+            }
+
+            $instance = new \stdClass($a);
+
+            if (isset($container->services['bar5'])) {
+                return $container->services['bar5'];
+            }
+
+            $container->services['bar5'] = $instance;
+
+            $instance->foo = $a;
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['bar5']);
+
+            throw $e;
         }
-
-        $instance = new \stdClass($a);
-
-        if (isset($container->services['bar5'])) {
-            return $container->services['bar5'];
-        }
-
-        $container->services['bar5'] = $instance;
-
-        $instance->foo = $a;
-
-        return $instance;
     }
 
     /**
@@ -168,11 +180,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getBaz6Service($container)
     {
-        $container->services['baz6'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->bar6 = ($container->privates['bar6'] ?? self::getBar6Service($container));
 
-        return $instance;
+        return $container->services['baz6'] = $instance;
     }
 
     /**
@@ -182,24 +194,30 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getConnectionService($container)
     {
-        $a = ($container->services['dispatcher'] ?? self::getDispatcherService($container));
+        try {
+            $a = ($container->services['dispatcher'] ?? self::getDispatcherService($container));
 
-        if (isset($container->services['connection'])) {
-            return $container->services['connection'];
+            if (isset($container->services['connection'])) {
+                return $container->services['connection'];
+            }
+            $b = new \stdClass();
+
+            $instance = new \stdClass($a, $b);
+
+            if (isset($container->services['connection'])) {
+                return $container->services['connection'];
+            }
+
+            $container->services['connection'] = $instance;
+
+            $b->logger = ($container->services['logger'] ?? self::getLoggerService($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['connection']);
+
+            throw $e;
         }
-        $b = new \stdClass();
-
-        $instance = new \stdClass($a, $b);
-
-        if (isset($container->services['connection'])) {
-            return $container->services['connection'];
-        }
-
-        $container->services['connection'] = $instance;
-
-        $b->logger = ($container->services['logger'] ?? self::getLoggerService($container));
-
-        return $instance;
     }
 
     /**
@@ -209,27 +227,33 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getConnection2Service($container)
     {
-        $a = ($container->services['dispatcher2'] ?? self::getDispatcher2Service($container));
+        try {
+            $a = ($container->services['dispatcher2'] ?? self::getDispatcher2Service($container));
 
-        if (isset($container->services['connection2'])) {
-            return $container->services['connection2'];
+            if (isset($container->services['connection2'])) {
+                return $container->services['connection2'];
+            }
+            $b = new \stdClass();
+
+            $instance = new \stdClass($a, $b);
+
+            if (isset($container->services['connection2'])) {
+                return $container->services['connection2'];
+            }
+
+            $container->services['connection2'] = $instance;
+
+            $c = new \stdClass($instance);
+            $c->handler2 = new \stdClass(($container->services['manager2'] ?? self::getManager2Service($container)));
+
+            $b->logger2 = $c;
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['connection2']);
+
+            throw $e;
         }
-        $b = new \stdClass();
-
-        $instance = new \stdClass($a, $b);
-
-        if (isset($container->services['connection2'])) {
-            return $container->services['connection2'];
-        }
-
-        $container->services['connection2'] = $instance;
-
-        $c = new \stdClass($instance);
-        $c->handler2 = new \stdClass(($container->services['manager2'] ?? self::getManager2Service($container)));
-
-        $b->logger2 = $c;
-
-        return $instance;
     }
 
     /**
@@ -239,17 +263,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getConnection3Service($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['connection3'])) {
-            return $container->services['connection3'];
+            if (isset($container->services['connection3'])) {
+                return $container->services['connection3'];
+            }
+
+            $container->services['connection3'] = $instance;
+
+            $instance->listener = [($container->services['listener3'] ?? self::getListener3Service($container))];
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['connection3']);
+
+            throw $e;
         }
-
-        $container->services['connection3'] = $instance;
-
-        $instance->listener = [($container->services['listener3'] ?? self::getListener3Service($container))];
-
-        return $instance;
     }
 
     /**
@@ -259,17 +289,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getConnection4Service($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['connection4'])) {
-            return $container->services['connection4'];
+            if (isset($container->services['connection4'])) {
+                return $container->services['connection4'];
+            }
+
+            $container->services['connection4'] = $instance;
+
+            $instance->listener = [($container->services['listener4'] ?? self::getListener4Service($container))];
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['connection4']);
+
+            throw $e;
         }
-
-        $container->services['connection4'] = $instance;
-
-        $instance->listener = [($container->services['listener4'] ?? self::getListener4Service($container))];
-
-        return $instance;
     }
 
     /**
@@ -279,17 +315,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getDispatcherService($container, $lazyLoad = true)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['dispatcher'])) {
-            return $container->services['dispatcher'];
+            if (isset($container->services['dispatcher'])) {
+                return $container->services['dispatcher'];
+            }
+
+            $container->services['dispatcher'] = $instance;
+
+            $instance->subscriber = ($container->services['subscriber'] ?? self::getSubscriberService($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['dispatcher']);
+
+            throw $e;
         }
-
-        $container->services['dispatcher'] = $instance;
-
-        $instance->subscriber = ($container->services['subscriber'] ?? self::getSubscriberService($container));
-
-        return $instance;
     }
 
     /**
@@ -299,17 +341,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getDispatcher2Service($container, $lazyLoad = true)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['dispatcher2'])) {
-            return $container->services['dispatcher2'];
+            if (isset($container->services['dispatcher2'])) {
+                return $container->services['dispatcher2'];
+            }
+
+            $container->services['dispatcher2'] = $instance;
+
+            $instance->subscriber2 = ($container->privates['subscriber2'] ?? self::getSubscriber2Service($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['dispatcher2']);
+
+            throw $e;
         }
-
-        $container->services['dispatcher2'] = $instance;
-
-        $instance->subscriber2 = ($container->privates['subscriber2'] ?? self::getSubscriber2Service($container));
-
-        return $instance;
     }
 
     /**
@@ -406,19 +454,25 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getFoo2Service($container)
     {
-        $a = new \BarCircular();
+        try {
+            $a = new \BarCircular();
 
-        $instance = new \FooCircular($a);
+            $instance = new \FooCircular($a);
 
-        if (isset($container->services['foo2'])) {
-            return $container->services['foo2'];
+            if (isset($container->services['foo2'])) {
+                return $container->services['foo2'];
+            }
+
+            $container->services['foo2'] = $instance;
+
+            $a->addFoobar(($container->services['foobar2'] ?? self::getFoobar2Service($container)));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['foo2']);
+
+            throw $e;
         }
-
-        $container->services['foo2'] = $instance;
-
-        $a->addFoobar(($container->services['foobar2'] ?? self::getFoobar2Service($container)));
-
-        return $instance;
     }
 
     /**
@@ -446,17 +500,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getFoo5Service($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['foo5'])) {
-            return $container->services['foo5'];
+            if (isset($container->services['foo5'])) {
+                return $container->services['foo5'];
+            }
+
+            $container->services['foo5'] = $instance;
+
+            $instance->bar = ($container->services['bar5'] ?? self::getBar5Service($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['foo5']);
+
+            throw $e;
         }
-
-        $container->services['foo5'] = $instance;
-
-        $instance->bar = ($container->services['bar5'] ?? self::getBar5Service($container));
-
-        return $instance;
     }
 
     /**
@@ -466,17 +526,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getFoo6Service($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['foo6'])) {
-            return $container->services['foo6'];
+            if (isset($container->services['foo6'])) {
+                return $container->services['foo6'];
+            }
+
+            $container->services['foo6'] = $instance;
+
+            $instance->bar6 = ($container->privates['bar6'] ?? self::getBar6Service($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['foo6']);
+
+            throw $e;
         }
-
-        $container->services['foo6'] = $instance;
-
-        $instance->bar6 = ($container->privates['bar6'] ?? self::getBar6Service($container));
-
-        return $instance;
     }
 
     /**
@@ -542,11 +608,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $a = new \stdClass();
 
-        $container->services['foobar4'] = $instance = new \stdClass($a);
+        $instance = new \stdClass($a);
 
         $a->foobar = $instance;
 
-        return $instance;
+        return $container->services['foobar4'] = $instance;
     }
 
     /**
@@ -556,17 +622,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getListener3Service($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['listener3'])) {
-            return $container->services['listener3'];
+            if (isset($container->services['listener3'])) {
+                return $container->services['listener3'];
+            }
+
+            $container->services['listener3'] = $instance;
+
+            $instance->manager = ($container->services['manager3'] ?? self::getManager3Service($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['listener3']);
+
+            throw $e;
         }
-
-        $container->services['listener3'] = $instance;
-
-        $instance->manager = ($container->services['manager3'] ?? self::getManager3Service($container));
-
-        return $instance;
     }
 
     /**
@@ -598,23 +670,29 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getLoggerService($container)
     {
-        $a = ($container->services['connection'] ?? self::getConnectionService($container));
+        try {
+            $a = ($container->services['connection'] ?? self::getConnectionService($container));
 
-        if (isset($container->services['logger'])) {
-            return $container->services['logger'];
+            if (isset($container->services['logger'])) {
+                return $container->services['logger'];
+            }
+
+            $instance = new \stdClass($a);
+
+            if (isset($container->services['logger'])) {
+                return $container->services['logger'];
+            }
+
+            $container->services['logger'] = $instance;
+
+            $instance->handler = new \stdClass(($container->services['manager'] ?? self::getManagerService($container)));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['logger']);
+
+            throw $e;
         }
-
-        $instance = new \stdClass($a);
-
-        if (isset($container->services['logger'])) {
-            return $container->services['logger'];
-        }
-
-        $container->services['logger'] = $instance;
-
-        $instance->handler = new \stdClass(($container->services['manager'] ?? self::getManagerService($container)));
-
-        return $instance;
     }
 
     /**
@@ -773,11 +851,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMonolog_LoggerService($container)
     {
-        $container->services['monolog.logger'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->handler = ($container->services['mailer.transport'] ?? self::getMailer_TransportService($container));
 
-        return $instance;
+        return $container->services['monolog.logger'] = $instance;
     }
 
     /**
@@ -787,17 +865,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMonolog_Logger2Service($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['monolog.logger_2'])) {
-            return $container->services['monolog.logger_2'];
+            if (isset($container->services['monolog.logger_2'])) {
+                return $container->services['monolog.logger_2'];
+            }
+
+            $container->services['monolog.logger_2'] = $instance;
+
+            $instance->handler = ($container->services['mailer.transport'] ?? self::getMailer_TransportService($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['monolog.logger_2']);
+
+            throw $e;
         }
-
-        $container->services['monolog.logger_2'] = $instance;
-
-        $instance->handler = ($container->services['mailer.transport'] ?? self::getMailer_TransportService($container));
-
-        return $instance;
     }
 
     /**
@@ -807,11 +891,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMonologInline_LoggerService($container)
     {
-        $container->services['monolog_inline.logger'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->handler = ($container->privates['mailer_inline.mailer'] ?? self::getMailerInline_MailerService($container));
 
-        return $instance;
+        return $container->services['monolog_inline.logger'] = $instance;
     }
 
     /**
@@ -821,11 +905,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getMonologInline_Logger2Service($container)
     {
-        $container->services['monolog_inline.logger_2'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->handler = ($container->privates['mailer_inline.mailer'] ?? self::getMailerInline_MailerService($container));
 
-        return $instance;
+        return $container->services['monolog_inline.logger_2'] = $instance;
     }
 
     /**
@@ -862,17 +946,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getPBService($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['pB'])) {
-            return $container->services['pB'];
+            if (isset($container->services['pB'])) {
+                return $container->services['pB'];
+            }
+
+            $container->services['pB'] = $instance;
+
+            $instance->d = ($container->services['pD'] ?? self::getPDService($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['pB']);
+
+            throw $e;
         }
-
-        $container->services['pB'] = $instance;
-
-        $instance->d = ($container->services['pD'] ?? self::getPDService($container));
-
-        return $instance;
     }
 
     /**
@@ -882,17 +972,23 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
      */
     protected static function getPCService($container, $lazyLoad = true)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['pC'])) {
-            return $container->services['pC'];
+            if (isset($container->services['pC'])) {
+                return $container->services['pC'];
+            }
+
+            $container->services['pC'] = $instance;
+
+            $instance->d = ($container->services['pD'] ?? self::getPDService($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['pC']);
+
+            throw $e;
         }
-
-        $container->services['pC'] = $instance;
-
-        $instance->d = ($container->services['pD'] ?? self::getPDService($container));
-
-        return $instance;
     }
 
     /**
@@ -986,11 +1082,11 @@ class Symfony_DI_PhpDumper_Test_Almost_Circular_Public extends Container
     {
         $a = new \Symfony\Component\DependencyInjection\Tests\Fixtures\FooForCircularWithAddCalls();
 
-        $container->privates['level5'] = $instance = new \stdClass($a);
+        $instance = new \stdClass($a);
 
         $a->call($instance);
 
-        return $instance;
+        return $container->privates['level5'] = $instance;
     }
 
     /**

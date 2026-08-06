@@ -57,7 +57,7 @@ class ProjectServiceContainer extends Container
     {
         $a = ($container->services['App\\Db'] ?? self::getDbService($container));
 
-        $container->services['App\\Bus'] = $instance = new \App\Bus($a);
+        $instance = new \App\Bus($a);
 
         $b = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
         $c = new \App\Registry();
@@ -68,7 +68,7 @@ class ProjectServiceContainer extends Container
         $instance->handler1 = new \App\Handler1($a, $b, $d);
         $instance->handler2 = new \App\Handler2($a, $b, $d);
 
-        return $instance;
+        return $container->services['App\\Bus'] = $instance;
     }
 
     /**
@@ -78,17 +78,23 @@ class ProjectServiceContainer extends Container
      */
     protected static function getDbService($container)
     {
-        $instance = new \App\Db();
+        try {
+            $instance = new \App\Db();
 
-        if (isset($container->services['App\\Db'])) {
-            return $container->services['App\\Db'];
+            if (isset($container->services['App\\Db'])) {
+                return $container->services['App\\Db'];
+            }
+
+            $container->services['App\\Db'] = $instance;
+
+            $instance->schema = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['App\\Db']);
+
+            throw $e;
         }
-
-        $container->services['App\\Db'] = $instance;
-
-        $instance->schema = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
-
-        return $instance;
     }
 
     /**

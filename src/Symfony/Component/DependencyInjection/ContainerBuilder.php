@@ -1159,41 +1159,55 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
         }
 
-        if (null === $lastWitherIndex && (true === $tryProxy || !$definition->isLazy())) {
-            // share only if proxying failed, or if not a proxy, and if no withers are found
-            $this->shareService($definition, $service, $id, $inlineServices);
-        }
-
-        $properties = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())), $inlineServices);
-        foreach ($properties as $name => $value) {
-            $service->$name = $value;
-        }
-
-        foreach ($definition->getMethodCalls() as $k => $call) {
-            $service = $this->callMethod($service, $call, $inlineServices);
-
-            if ($lastWitherIndex === $k && (true === $tryProxy || !$definition->isLazy())) {
-                // share only if proxying failed, or if not a proxy, and this is the last wither
+        try {
+            if (null === $lastWitherIndex && (true === $tryProxy || !$definition->isLazy())) {
+                // share only if proxying failed, or if not a proxy, and if no withers are found
                 $this->shareService($definition, $service, $id, $inlineServices);
             }
-        }
 
-        if ($callable = $definition->getConfigurator()) {
-            if (\is_array($callable)) {
-                $callable[0] = $parameterBag->resolveValue($callable[0]);
+            $properties = $this->doResolveServices($parameterBag->unescapeValue($parameterBag->resolveValue($definition->getProperties())), $inlineServices);
+            foreach ($properties as $name => $value) {
+                $service->$name = $value;
+            }
 
-                if ($callable[0] instanceof Reference) {
-                    $callable[0] = $this->doGet((string) $callable[0], $callable[0]->getInvalidBehavior(), $inlineServices);
-                } elseif ($callable[0] instanceof Definition) {
-                    $callable[0] = $this->createService($callable[0], $inlineServices);
+            foreach ($definition->getMethodCalls() as $k => $call) {
+                $service = $this->callMethod($service, $call, $inlineServices);
+
+                if ($lastWitherIndex === $k && (true === $tryProxy || !$definition->isLazy())) {
+                    // share only if proxying failed, or if not a proxy, and this is the last wither
+                    $this->shareService($definition, $service, $id, $inlineServices);
                 }
             }
 
-            if (!\is_callable($callable)) {
-                throw new InvalidArgumentException(\sprintf('The configure callable for class "%s" is not a callable.', get_debug_type($service)));
+            if ($callable = $definition->getConfigurator()) {
+                if (\is_array($callable)) {
+                    $callable[0] = $parameterBag->resolveValue($callable[0]);
+
+                    if ($callable[0] instanceof Reference) {
+                        $callable[0] = $this->doGet((string) $callable[0], $callable[0]->getInvalidBehavior(), $inlineServices);
+                    } elseif ($callable[0] instanceof Definition) {
+                        $callable[0] = $this->createService($callable[0], $inlineServices);
+                    }
+                }
+
+                if (!\is_callable($callable)) {
+                    throw new InvalidArgumentException(\sprintf('The configure callable for class "%s" is not a callable.', get_debug_type($service)));
+                }
+
+                $callable($service);
+            }
+        } catch (\Throwable $e) {
+            // evict the partially-configured instance, but only if this frame shared it; in the
+            // proxy-initializer frame, the cached proxy must stay so a retry re-runs the initializer
+            if (true === $tryProxy || !$definition->isLazy()) {
+                unset($inlineServices[$id ?? spl_object_hash($definition)]);
+
+                if (null !== $id) {
+                    unset($this->services[$id], $this->privates[$id]);
+                }
             }
 
-            $callable($service);
+            throw $e;
         }
 
         return $service;

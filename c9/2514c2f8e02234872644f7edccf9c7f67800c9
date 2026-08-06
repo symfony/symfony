@@ -1,0 +1,38 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-05T11:24:23Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2026-08-05T12:47:35Z
+
+I would apply this to 8.2. Is is not fixing a bug.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T20:23:41Z
+
+Retargeted to 8.2 as @stof suggested: the rejected input produced a well-formed header that PHP itself accepts, so this is a behavior change rather than a bug fix.
+
+Changes made while rebasing:
+
+- The `secure` check now fires only on an explicitly provided value. A `null` defers to `secureDefault()`, which `Response::prepare()` resolves once the request is known, so it cannot be judged at construction.
+- `Cookie::fromString()` defaults `secure` to `null` instead of `false`. It used to fabricate an explicit `false` for a header that simply omits the attribute, which made parsing a prefixed cookie header fail. This also affected `ResponseHeaderBag::set('Set-Cookie', ...)` and the PSR-7 bridge.
+- Split the `__Host-` message in two, so it says whether the `domain` or the `path` broke the contract.
+- An empty string domain no longer counts as a domain, matching `__toString()`.
+- Moved the CHANGELOG entry to the 8.2 section.
+- Test cases are inline rather than a data provider, so they keep running as PHPUnit versions change across branches.
+
+Two consequences are worth a look before merging, both listed in the description: a `__Host-` session cookie name now throws over plain HTTP instead of being silently dropped, and `clearCookie()` needs `$secure = true` for a prefixed name.
+
+Fabbot is red on an unrelated `sprintf` rewrite in `validateAttribute()` that it wants in a line this PR does not otherwise touch. Ignoring it.

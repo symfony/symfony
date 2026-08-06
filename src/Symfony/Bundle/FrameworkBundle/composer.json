@@ -59,7 +59,7 @@
         "symfony/messenger": "^7.4.10|^8.0.10",
         "symfony/mime": "^7.4.9|^8.0.9",
         "symfony/notifier": "^7.4|^8.0",
-        "symfony/object-mapper": "^7.4.9|^8.0.9",
+        "symfony/object-mapper": "^8.1",
         "symfony/polyfill-intl-icu": "^1.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/property-info": "^7.4|^8.0",

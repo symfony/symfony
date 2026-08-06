@@ -110,6 +110,39 @@ trait SharedLockStoreTestTrait
         $this->assertFalse($store->exists($key2));
     }
 
+    public function testSharedLockReleaseReadLockFirstWriteSecondReadThird()
+    {
+        $store = $this->getStore();
+
+        $resource = uniqid(__METHOD__, true);
+        $key1 = new Key($resource);
+        $key2 = new Key($resource);
+
+        $store->saveRead($key1);
+        $this->assertTrue($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+
+        $store->delete($key1);
+        $this->assertFalse($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+
+        $store->save($key1);
+        $this->assertTrue($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+
+        try {
+            $store->saveRead($key2);
+            $this->fail('The store shouldn\'t save the second key');
+        } catch (LockConflictedException $e) {
+        }
+        $this->assertTrue($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+
+        $store->delete($key1);
+        $this->assertFalse($store->exists($key1));
+        $this->assertFalse($store->exists($key2));
+    }
+
     public function testSharedLockPromote()
     {
         $store = $this->getStore();

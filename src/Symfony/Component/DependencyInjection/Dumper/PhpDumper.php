@@ -84,6 +84,7 @@ class PhpDumper extends Dumper
     private array $inlinedRequires = [];
     private array $circularReferences = [];
     private array $singleUsePrivateIds = [];
+    private bool $sharesBeforeSetup = false;
     private array $preload = [];
     private bool $addGetService = false;
     private array $locatedIds = [];
@@ -695,10 +696,9 @@ class PhpDumper extends Dumper
         }
 
         $shouldShareInline = !$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id]) && null === $lastWitherIndex;
-        $serviceAccessor = \sprintf('$container->%s[%s]', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $this->doExport($id));
+        $serviceAccessor = $this->getServiceAccessor($id);
         $return = match (true) {
             $shouldShareInline && !isset($this->circularReferences[$id]) && $isSimpleInstance => 'return '.$serviceAccessor.' = ',
-            $shouldShareInline && !isset($this->circularReferences[$id]) => $serviceAccessor.' = $instance = ',
             $shouldShareInline || !$isSimpleInstance => '$instance = ',
             default => 'return ',
         };
@@ -706,6 +706,10 @@ class PhpDumper extends Dumper
         $code = $this->addNewInstance($definition, '        '.$return, $id, $asGhostObject);
 
         if ($shouldShareInline && isset($this->circularReferences[$id])) {
+            // sharing before the service is fully configured is required to break the
+            // circular reference, but then a failing setter/configurator must evict it
+            $this->sharesBeforeSetup = !$isSimpleInstance;
+
             $code .= \sprintf(
                 "\n        if (isset(%s)) {\n            return %1\$s;\n        }\n\n        %s%1\$s = \$instance;\n",
                 $serviceAccessor,
@@ -714,6 +718,11 @@ class PhpDumper extends Dumper
         }
 
         return $code;
+    }
+
+    private function getServiceAccessor(string $id): string
+    {
+        return \sprintf('$container->%s[%s]', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $this->doExport($id));
     }
 
     private function isTrivialInstance(Definition $definition): bool
@@ -778,6 +787,7 @@ class PhpDumper extends Dumper
             if ($call[2] ?? false) {
                 if (null !== $sharedNonLazyId && $lastWitherIndex === $k && 'instance' === $variableName) {
                     $witherAssignation = \sprintf('$container->%s[\'%s\'] = ', $definition->isPublic() ? 'services' : 'privates', $sharedNonLazyId);
+                    $this->sharesBeforeSetup = true;
                 }
                 $witherAssignation .= \sprintf('$%s = ', $variableName);
             }
@@ -950,6 +960,13 @@ class PhpDumper extends Dumper
 
             $c = $this->addInlineService($id, $definition);
 
+            if ($this->sharesBeforeSetup) {
+                $this->sharesBeforeSetup = false;
+                $c = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
+
+                $c = \sprintf("        try {\n%s        } catch (\\Throwable \$e) {\n            unset(%s);\n\n            throw \$e;\n        }\n", $c, $this->getServiceAccessor($id));
+            }
+
             if (!$isProxyCandidate && !$definition->isShared()) {
                 $c = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
@@ -1088,7 +1105,7 @@ class PhpDumper extends Dumper
             }
 
             $code .= $this->addServiceProperties($inlineDef, $name);
-            $code .= $this->addServiceMethodCalls($inlineDef, $name, !$isProxyCandidate && $inlineDef->isShared() && !isset($this->singleUsePrivateIds[$id]) ? $id : null);
+            $code .= $this->addServiceMethodCalls($inlineDef, $name, !$isProxyCandidate && $inlineDef->isShared() && !isset($this->singleUsePrivateIds[$id]) && isset($this->circularReferences[$id]) ? $id : null);
             $code .= $this->addServiceConfigurator($inlineDef, $name);
         }
 
@@ -1096,7 +1113,10 @@ class PhpDumper extends Dumper
             return $code;
         }
 
-        return $code."\n        return \$instance;\n";
+        // sharing only once the service is fully configured makes a construction failure atomic
+        $share = !$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id]) && !isset($this->circularReferences[$id]);
+
+        return $code."\n        return ".($share ? $this->getServiceAccessor($id).' = ' : '')."\$instance;\n";
     }
 
     private function addServices(?array &$services = null): string

@@ -98,6 +98,15 @@ class PhpDumperTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
+    public static function assertStringEqualsFile(string $expectedFile, string $actualString, string $message = ''): void
+    {
+        if (getenv('UPDATE_FIXTURES')) {
+            file_put_contents($expectedFile, $actualString);
+        }
+
+        parent::assertStringEqualsFile($expectedFile, $actualString, $message);
+    }
+
     public function testDump()
     {
         $container = new ContainerBuilder();
@@ -2488,6 +2497,184 @@ class PhpDumperTest extends TestCase
         $this->assertStringContainsString(': ?\stdClass', $code);
     }
 
+    public function testDumpedContainerEvictsSharedServiceOnMethodCallFailure()
+    {
+        PhpDumperTest_FailingSetup::$attempts = 0;
+        $container = new ContainerBuilder();
+        $container->register('foo', PhpDumperTest_FailingSetup::class)->setPublic(true)->addMethodCall('fail');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Evict_Method_Call']));
+
+        $dumpedContainer = new $class();
+
+        $first = null;
+        try {
+            $dumpedContainer->get('foo');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Setup failed.', $first?->getMessage(), '->get() should throw when a method call fails');
+
+        $this->assertFalse($dumpedContainer->initialized('foo'));
+
+        $second = null;
+        try {
+            $dumpedContainer->get('foo');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+
+        $this->assertSame(2, PhpDumperTest_FailingSetup::$attempts);
+    }
+
+    public function testDumpedContainerEvictsSharedServiceOnPropertyTypeError()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', PhpDumperTest_FailingSetup::class)->setPublic(true)->setProperty('count', 'not-a-number');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Evict_Property_Type_Error']));
+
+        $dumpedContainer = new $class();
+
+        $first = null;
+        try {
+            $dumpedContainer->get('foo');
+        } catch (\TypeError $first) {
+        }
+        $this->assertNotNull($first, '->get() should throw when injecting a property fails');
+
+        $second = null;
+        try {
+            $dumpedContainer->get('foo');
+        } catch (\TypeError $second) {
+        }
+        $this->assertNotNull($second, '->get() should throw again instead of returning a partially-configured service');
+    }
+
+    public function testDumpedContainerEvictsSharedServiceOnConfiguratorFailure()
+    {
+        PhpDumperTest_FailingSetup::$attempts = 0;
+        $container = new ContainerBuilder();
+        $container->register('foo', 'stdClass')->setPublic(true)->setConfigurator([PhpDumperTest_FailingSetup::class, 'failToConfigure']);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Evict_Configurator']));
+
+        $dumpedContainer = new $class();
+
+        $first = null;
+        try {
+            $dumpedContainer->get('foo');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Configuration failed.', $first?->getMessage(), '->get() should throw when the configurator fails');
+
+        $second = null;
+        try {
+            $dumpedContainer->get('foo');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Configuration failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+
+        $this->assertSame(2, PhpDumperTest_FailingSetup::$attempts);
+    }
+
+    public function testDumpedContainerEvictsPrivateSharedServiceOnFailure()
+    {
+        PhpDumperTest_FailingSetup::$attempts = 0;
+        $container = new ContainerBuilder();
+        $container->register('failer', PhpDumperTest_FailingSetup::class)->addMethodCall('fail');
+        $container->register('consumer1', 'stdClass')->setPublic(true)->setProperty('failer', new Reference('failer'));
+        $container->register('consumer2', 'stdClass')->setPublic(true)->setProperty('failer', new Reference('failer'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Evict_Private']));
+
+        $dumpedContainer = new $class();
+
+        $first = null;
+        try {
+            $dumpedContainer->get('consumer1');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Setup failed.', $first?->getMessage(), '->get() should throw when building a private dependency fails');
+
+        $second = null;
+        try {
+            $dumpedContainer->get('consumer1');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+
+        $this->assertSame(2, PhpDumperTest_FailingSetup::$attempts);
+    }
+
+    public function testDumpedContainerEvictsCircularServicesOnFailure()
+    {
+        PhpDumperTest_FailsOnceConfigurator::$calls = 0;
+        $container = new ContainerBuilder();
+        $container->register('a', PhpDumperTest_CircularSetterA::class)->setPublic(true)->addMethodCall('setB', [new Reference('b')]);
+        $container->register('b', PhpDumperTest_CircularSetterB::class)->setPublic(true)->addMethodCall('setA', [new Reference('a')])->setConfigurator([PhpDumperTest_FailsOnceConfigurator::class, 'configure']);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dumper->setProxyDumper(new NullDumper());
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Evict_Circular']));
+
+        $dumpedContainer = new $class();
+
+        $first = null;
+        try {
+            $dumpedContainer->get('a');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('First attempt fails.', $first?->getMessage(), '->get() should throw when configuring a service of the circular graph fails');
+
+        $this->assertFalse($dumpedContainer->initialized('a'));
+        $this->assertFalse($dumpedContainer->initialized('b'));
+
+        $a = $dumpedContainer->get('a');
+
+        $this->assertInstanceOf(PhpDumperTest_CircularSetterB::class, $a->b);
+        $this->assertSame($a, $a->b->a);
+    }
+
+    public function testDumpedContainerEvictsWitherServiceOnSetupFailure()
+    {
+        $container = new ContainerBuilder();
+        $container->register('wither', PhpDumperTest_WitherFailingSetup::class)
+            ->setPublic(true)
+            ->addMethodCall('withNothing', [], true)
+            ->addMethodCall('fail');
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Evict_Wither']));
+
+        $dumpedContainer = new $class();
+
+        $first = null;
+        try {
+            $dumpedContainer->get('wither');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Setup failed.', $first?->getMessage(), '->get() should throw when a method call fails after the last wither');
+
+        $this->assertFalse($dumpedContainer->initialized('wither'));
+
+        $second = null;
+        try {
+            $dumpedContainer->get('wither');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+    }
+
     private static function assertStringEqualsGeneratedFile(string $expectedFile, string $dumpedCode): void
     {
         $expectedFile = self::$fixturesPath.'/php/'.$expectedFile;
@@ -2666,5 +2853,70 @@ class InlineAdapterConsumer
         #[AutowireInline(MyInlineService::class, calls: [['someMethod1', ['%someParam%']], ['someMethod2', []]])]
         public MyInlineService $inlinedWithCallsWithParamArgument,
     ) {
+    }
+}
+
+class PhpDumperTest_FailingSetup
+{
+    public static int $attempts = 0;
+    public int $count = 0;
+
+    public function fail(): void
+    {
+        ++self::$attempts;
+
+        throw new \RuntimeException('Setup failed.');
+    }
+
+    public static function failToConfigure(object $service): void
+    {
+        ++self::$attempts;
+
+        throw new \RuntimeException('Configuration failed.');
+    }
+}
+
+class PhpDumperTest_WitherFailingSetup
+{
+    public function withNothing(): static
+    {
+        return clone $this;
+    }
+
+    public function fail(): void
+    {
+        throw new \RuntimeException('Setup failed.');
+    }
+}
+
+class PhpDumperTest_CircularSetterA
+{
+    public ?object $b = null;
+
+    public function setB(object $b): void
+    {
+        $this->b = $b;
+    }
+}
+
+class PhpDumperTest_CircularSetterB
+{
+    public ?object $a = null;
+
+    public function setA(object $a): void
+    {
+        $this->a = $a;
+    }
+}
+
+class PhpDumperTest_FailsOnceConfigurator
+{
+    public static int $calls = 0;
+
+    public static function configure(object $service): void
+    {
+        if (1 === ++self::$calls) {
+            throw new \RuntimeException('First attempt fails.');
+        }
     }
 }

@@ -45,11 +45,11 @@ class ProjectServiceContainer extends Container
      */
     protected static function getBarService($container)
     {
-        $container->services['bar'] = $instance = new \BarClass();
+        $instance = new \BarClass();
 
         $instance->setBaz($container->parameters['array_1'], $container->parameters['array_2'], '%array_1%', $container->parameters['array_1']);
 
-        return $instance;
+        return $container->services['bar'] = $instance;
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

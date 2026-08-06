@@ -54,9 +54,9 @@ class Symfony_DI_PhpDumper_Service_WitherStaticReturnType extends Container
 
         $a = new \Symfony\Component\DependencyInjection\Tests\Compiler\Foo();
 
-        $container->services['wither'] = $instance = $instance->withFoo($a);
+        $instance = $instance->withFoo($a);
         $instance->setFoo($a);
 
-        return $instance;
+        return $container->services['wither'] = $instance;
     }
 }

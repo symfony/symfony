@@ -44,17 +44,23 @@ class Symfony_DI_PhpDumper_Test_Deep_Graph extends Container
      */
     protected static function getBarService($container)
     {
-        $instance = new \stdClass();
+        try {
+            $instance = new \stdClass();
 
-        if (isset($container->services['bar'])) {
-            return $container->services['bar'];
+            if (isset($container->services['bar'])) {
+                return $container->services['bar'];
+            }
+
+            $container->services['bar'] = $instance;
+
+            $instance->p5 = new \stdClass(($container->services['foo'] ?? self::getFooService($container)));
+
+            return $instance;
+        } catch (\Throwable $e) {
+            unset($container->services['bar']);
+
+            throw $e;
         }
-
-        $container->services['bar'] = $instance;
-
-        $instance->p5 = new \stdClass(($container->services['foo'] ?? self::getFooService($container)));
-
-        return $instance;
     }
 
     /**

@@ -358,6 +358,160 @@ class ContainerBuilderTest extends TestCase
         $builder->get('foo');
     }
 
+    public function testGetEvictsSharedServiceWhenMethodCallFails()
+    {
+        FailingSetupService::$attempts = 0;
+        $builder = new ContainerBuilder();
+        $builder->register('foo', FailingSetupService::class)->addMethodCall('fail');
+
+        $first = null;
+        try {
+            $builder->get('foo');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Setup failed.', $first?->getMessage(), '->get() should throw when a method call fails');
+
+        $second = null;
+        try {
+            $builder->get('foo');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+
+        $this->assertSame(2, FailingSetupService::$attempts);
+    }
+
+    public function testGetEvictsSharedServiceWhenPropertyInjectionFails()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', FailingSetupService::class)->setProperty('count', 'not-a-number');
+
+        $first = null;
+        try {
+            $builder->get('foo');
+        } catch (\TypeError $first) {
+        }
+        $this->assertNotNull($first, '->get() should throw when injecting a property fails');
+
+        $second = null;
+        try {
+            $builder->get('foo');
+        } catch (\TypeError $second) {
+        }
+        $this->assertNotNull($second, '->get() should throw again instead of returning a partially-configured service');
+    }
+
+    public function testGetEvictsSharedServiceWhenConfiguratorFails()
+    {
+        FailingSetupService::$attempts = 0;
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass')->setConfigurator([FailingSetupService::class, 'failToConfigure']);
+
+        $first = null;
+        try {
+            $builder->get('foo');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Configuration failed.', $first?->getMessage(), '->get() should throw when the configurator fails');
+
+        $second = null;
+        try {
+            $builder->get('foo');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Configuration failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+
+        $this->assertSame(2, FailingSetupService::$attempts);
+    }
+
+    public function testGetEvictsSharedServiceWhenConfiguratorIsNotACallable()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('foo', 'stdClass')->setConfigurator('there_is_no_such_configurator_function');
+
+        $first = null;
+        try {
+            $builder->get('foo');
+        } catch (InvalidArgumentException $first) {
+        }
+        $this->assertNotNull($first, '->get() should throw when the configurator is not a callable');
+
+        $second = null;
+        try {
+            $builder->get('foo');
+        } catch (InvalidArgumentException $second) {
+        }
+        $this->assertNotNull($second, '->get() should throw again instead of returning a partially-configured service');
+    }
+
+    public function testGetEvictsWitherServiceWhenSetupFails()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('wither', WitherFailingSetup::class)
+            ->addMethodCall('withNothing', [], true)
+            ->addMethodCall('fail');
+
+        $first = null;
+        try {
+            $builder->get('wither');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Setup failed.', $first?->getMessage(), '->get() should throw when a method call fails after the last wither');
+
+        $second = null;
+        try {
+            $builder->get('wither');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+    }
+
+    public function testGetEvictsPrivateSharedServiceWhenSetupFails()
+    {
+        FailingSetupService::$attempts = 0;
+        $builder = new ContainerBuilder();
+        $builder->register('failer', FailingSetupService::class)->addMethodCall('fail');
+        $builder->register('consumer1', 'stdClass')->setPublic(true)->setProperty('failer', new Reference('failer'));
+        $builder->register('consumer2', 'stdClass')->setPublic(true)->setProperty('failer', new Reference('failer'));
+        $builder->compile();
+
+        $first = null;
+        try {
+            $builder->get('consumer1');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('Setup failed.', $first?->getMessage(), '->get() should throw when building a private dependency fails');
+
+        $second = null;
+        try {
+            $builder->get('consumer1');
+        } catch (\RuntimeException $second) {
+        }
+        $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
+
+        $this->assertSame(2, FailingSetupService::$attempts);
+    }
+
+    public function testCircularSetterInjectionRetriesAfterFailure()
+    {
+        FailsOnceConfigurator::$calls = 0;
+        $builder = new ContainerBuilder();
+        $builder->register('a', CircularSetterA::class)->setPublic(true)->addMethodCall('setB', [new Reference('b')]);
+        $builder->register('b', CircularSetterB::class)->addMethodCall('setA', [new Reference('a')])->setConfigurator([FailsOnceConfigurator::class, 'configure']);
+
+        $first = null;
+        try {
+            $builder->get('a');
+        } catch (\RuntimeException $first) {
+        }
+        $this->assertSame('First attempt fails.', $first?->getMessage(), '->get() should throw when configuring a service of the circular graph fails');
+
+        $a = $builder->get('a');
+
+        $this->assertInstanceOf(CircularSetterB::class, $a->b);
+        $this->assertSame($a, $a->b->a);
+    }
+
     public function testGetServiceIds()
     {
         $builder = new ContainerBuilder();
@@ -2203,5 +2357,70 @@ class E
     {
         $this->first = $first;
         $this->second = $second;
+    }
+}
+
+class FailingSetupService
+{
+    public static int $attempts = 0;
+    public int $count = 0;
+
+    public function fail(): void
+    {
+        ++self::$attempts;
+
+        throw new \RuntimeException('Setup failed.');
+    }
+
+    public static function failToConfigure(object $service): void
+    {
+        ++self::$attempts;
+
+        throw new \RuntimeException('Configuration failed.');
+    }
+}
+
+class WitherFailingSetup
+{
+    public function withNothing(): static
+    {
+        return clone $this;
+    }
+
+    public function fail(): void
+    {
+        throw new \RuntimeException('Setup failed.');
+    }
+}
+
+class CircularSetterA
+{
+    public ?object $b = null;
+
+    public function setB(object $b): void
+    {
+        $this->b = $b;
+    }
+}
+
+class CircularSetterB
+{
+    public ?object $a = null;
+
+    public function setA(object $a): void
+    {
+        $this->a = $a;
+    }
+}
+
+class FailsOnceConfigurator
+{
+    public static int $calls = 0;
+
+    public static function configure(object $service): void
+    {
+        if (1 === ++self::$calls) {
+            throw new \RuntimeException('First attempt fails.');
+        }
     }
 }

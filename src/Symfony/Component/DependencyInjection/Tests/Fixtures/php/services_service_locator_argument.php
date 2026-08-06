@@ -57,7 +57,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
      */
     protected static function getBarService($container)
     {
-        $container->services['bar'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->locator = new \Symfony\Component\DependencyInjection\Argument\ServiceLocator($container->getService ??= $container->getService(...), [
             'foo1' => ['services', 'foo1', 'getFoo1Service', false],
@@ -73,7 +73,7 @@ class Symfony_DI_PhpDumper_Service_Locator_Argument extends Container
             'foo5' => '?',
         ]);
 
-        return $instance;
+        return $container->services['bar'] = $instance;
     }
 
     /**

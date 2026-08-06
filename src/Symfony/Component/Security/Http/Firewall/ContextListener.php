@@ -129,12 +129,13 @@ class ContextListener extends AbstractListener
             }
 
             $originalToken = $token;
-            $token = $this->refreshUser($token);
+            $refreshResult = $this->refreshUser($token);
+            $token = $refreshResult->token;
 
             if (!$token) {
                 $this->logger?->debug('Token was deauthenticated after trying to refresh it.');
 
-                $this->dispatcher?->dispatch(new TokenDeauthenticatedEvent($originalToken, $request));
+                $this->dispatcher?->dispatch(new TokenDeauthenticatedEvent($originalToken, $request, $refreshResult->deauthenticationReason, $refreshResult->providerClasses));
             }
         } elseif (null !== $token) {
             $this->logger?->warning('Expected a security token from the session, got something else.', ['key' => $this->sessionKey, 'received' => $token]);
@@ -206,13 +207,13 @@ class ContextListener extends AbstractListener
      *
      * @throws \RuntimeException
      */
-    private function refreshUser(TokenInterface $token): ?TokenInterface
+    private function refreshUser(TokenInterface $token): RefreshUserResult
     {
         $user = $token->getUser();
 
-        $userNotFoundByProvider = false;
-        $userDeauthenticated = false;
         $userClass = $user::class;
+        $userChangedBy = [];
+        $userNotFoundBy = [];
 
         foreach ($this->userProviders as $provider) {
             if (!$provider instanceof UserProviderInterface) {
@@ -228,7 +229,7 @@ class ContextListener extends AbstractListener
 
                 // tokens can be deauthenticated if the user has been changed.
                 if ($token instanceof AbstractToken && self::hasUserChanged($token, $user, $refreshedUser)) {
-                    $userDeauthenticated = true;
+                    $userChangedBy[] = $provider::class;
 
                     $this->logger?->debug('Cannot refresh token because user has changed.', ['username' => $refreshedUser->getUserIdentifier(), 'provider' => $provider::class]);
 
@@ -248,22 +249,22 @@ class ContextListener extends AbstractListener
                     $this->logger->debug('User was reloaded from a user provider.', $context);
                 }
 
-                return $token;
+                return new RefreshUserResult($token);
             } catch (UnsupportedUserException) {
                 // let's try the next user provider
             } catch (UserNotFoundException $e) {
                 $this->logger?->info('Username could not be found in the selected user provider.', ['username' => $e->getUserIdentifier(), 'provider' => $provider::class]);
 
-                $userNotFoundByProvider = true;
+                $userNotFoundBy[] = $provider::class;
             }
         }
 
-        if ($userDeauthenticated) {
-            return null;
+        if ($userChangedBy) {
+            return new RefreshUserResult(null, 'the user has changed', $userChangedBy);
         }
 
-        if ($userNotFoundByProvider) {
-            return null;
+        if ($userNotFoundBy) {
+            return new RefreshUserResult(null, 'the user could not be found by any user provider', $userNotFoundBy);
         }
 
         throw new \RuntimeException(\sprintf('There is no user provider for user "%s". Shouldn\'t the "supportsClass()" method of your user provider return true for this classname?', $userClass));

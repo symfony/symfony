@@ -32,6 +32,7 @@ final class LogoutUrlExtension extends AbstractExtension
         return [
             new TwigFunction('logout_url', $this->getLogoutUrl(...)),
             new TwigFunction('logout_path', $this->getLogoutPath(...)),
+            new TwigFunction('logout_form', $this->getLogoutForm(...)),
         ];
     }
 
@@ -53,5 +54,17 @@ final class LogoutUrlExtension extends AbstractExtension
     public function getLogoutUrl(?string $key = null): string
     {
         return $this->generator->getLogoutUrl($key);
+    }
+
+    /**
+     * Returns the action and the hidden fields of a form triggering the logout.
+     *
+     * @param string|null $key The firewall key or null to use the current firewall key
+     *
+     * @return array{action: string, fields: array<string, string>}
+     */
+    public function getLogoutForm(?string $key = null): array
+    {
+        return $this->generator->getLogoutForm($key);
     }
 }

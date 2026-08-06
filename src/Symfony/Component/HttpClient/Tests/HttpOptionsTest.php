@@ -20,6 +20,20 @@ use Symfony\Component\HttpClient\HttpOptions;
  */
 class HttpOptionsTest extends TestCase
 {
+    public function testBufferAcceptsEveryFormOfTheOption()
+    {
+        $stream = fopen('php://temp', 'w+');
+        $closure = static fn (array $headers): bool => true;
+
+        try {
+            $this->assertSame(['buffer' => false], (new HttpOptions())->buffer(false)->toArray());
+            $this->assertSame(['buffer' => $stream], (new HttpOptions())->buffer($stream)->toArray());
+            $this->assertSame(['buffer' => $closure], (new HttpOptions())->buffer($closure)->toArray());
+        } finally {
+            fclose($stream);
+        }
+    }
+
     public static function provideSetAuthBasic(): iterable
     {
         yield ['user:password', 'user', 'password'];

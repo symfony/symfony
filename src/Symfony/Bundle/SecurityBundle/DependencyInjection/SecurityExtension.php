@@ -164,6 +164,11 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         $this->createFirewalls($config, $container);
 
+        if (!$container->getDefinition('security.csrf_token_manager_locator')->getArgument(0)) {
+            $container->removeDefinition('security.delegating_csrf_token_manager');
+            $container->removeDefinition('security.csrf_token_manager_locator');
+        }
+
         if ($container::willBeAvailable('symfony/routing', ContainerLoader::class, ['symfony/security-bundle'])) {
             $this->createLogoutUrisParameter($config['firewalls'] ?? [], $container);
         } else {
@@ -496,6 +501,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                     false === $firewall['stateless'] && isset($firewall['context']) ? $firewall['context'] : null,
                 ])
             ;
+
+            if (isset($firewall['logout']['csrf_token_manager'])) {
+                $this->registerCsrfTokenManager($container, $id, $firewall['logout']['csrf_token_id'], $firewall['logout']['csrf_token_manager']);
+            }
 
             $config->replaceArgument(12, $firewall['logout']);
         }
@@ -1124,5 +1133,22 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         }
 
         $container->setParameter('security.logout_uris', $logoutUris);
+    }
+
+    private function registerCsrfTokenManager(ContainerBuilder $container, string $firewallName, string $tokenId, string $tokenManagerId): void
+    {
+        if ('security.csrf.token_manager' === $tokenManagerId) {
+            // the decorated manager already handles the token ids that have no dedicated manager
+            return;
+        }
+
+        $locator = $container->getDefinition('security.csrf_token_manager_locator');
+        $tokenManagers = $locator->getArgument(0);
+
+        if (isset($tokenManagers[$tokenId]) && $tokenManagerId !== (string) $tokenManagers[$tokenId]->getValues()[0]) {
+            throw new InvalidConfigurationException(\sprintf('The "%s" firewall configures a "csrf_token_manager" for the "%s" token id, but another firewall already configured a different one. Give them distinct "csrf_token_id" values.', $firewallName, $tokenId));
+        }
+
+        $locator->replaceArgument(0, $tokenManagers + [$tokenId => new ServiceClosureArgument(new Reference($tokenManagerId))]);
     }
 }

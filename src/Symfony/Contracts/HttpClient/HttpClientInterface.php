@@ -53,9 +53,10 @@ interface HttpClientInterface
         'http_version' => null,
         // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2
         'base_uri' => null,
-        // bool|resource|\Closure - whether the content of the response should be buffered or not,
-        //   or a stream resource where the response body should be written,
-        //   or a closure telling if/where the response should be buffered based on its headers
+        // bool|resource|\Closure(array<string, list<string>> $headers): (bool|resource) - whether
+        //   the content of the response should be buffered or not, or a stream resource where the
+        //   response body should be written, or a closure telling if/where the response should be
+        //   buffered based on its headers, which are keyed by lowercased header names
         'buffer' => true,
         // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort the
         //   request; it MUST be called on connection, on headers and on completion; it SHOULD be

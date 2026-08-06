@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add a `--no-esm` option to `importmap:require` and an `esm` option to importmap entries
+
 8.0
 ---
 

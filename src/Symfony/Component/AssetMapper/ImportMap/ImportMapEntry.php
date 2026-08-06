@@ -34,17 +34,18 @@ final class ImportMapEntry
          * The full "package-name/path" (remote only).
          */
         public readonly ?string $packageModuleSpecifier,
+        public readonly bool $useEsm,
     ) {
     }
 
     public static function createLocal(string $importName, ImportMapType $importMapType, string $path, bool $isEntrypoint): self
     {
-        return new self($importName, $importMapType, $path, $isEntrypoint, null, null);
+        return new self($importName, $importMapType, $path, $isEntrypoint, null, null, true);
     }
 
-    public static function createRemote(string $importName, ImportMapType $importMapType, string $path, string $version, string $packageModuleSpecifier, bool $isEntrypoint): self
+    public static function createRemote(string $importName, ImportMapType $importMapType, string $path, string $version, string $packageModuleSpecifier, bool $isEntrypoint, bool $useEsm = true): self
     {
-        return new self($importName, $importMapType, $path, $isEntrypoint, $version, $packageModuleSpecifier);
+        return new self($importName, $importMapType, $path, $isEntrypoint, $version, $packageModuleSpecifier, $useEsm);
     }
 
     public function getPackageName(): string

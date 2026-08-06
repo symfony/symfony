@@ -261,10 +261,20 @@
                                 {% endif %}
                             </tbody>
                         </table>
+
+                        {% if collector.deauthentication %}
+                            <p class="help">
+                                <strong>{{ collector.deauthentication.user }}</strong> was deauthenticated during this request{% if collector.deauthentication.reason %} because {{ collector.deauthentication.reason }}{% endif %}, before the current token was set.
+                            </p>
+                        {% endif %}
                     {% elseif collector.enabled %}
                         <div class="empty">
                             <p>
-                                There is no security token.
+                                {% if collector.deauthentication %}
+                                    <strong>{{ collector.deauthentication.user }}</strong> has been deauthenticated{% if collector.deauthentication.reason %} because {{ collector.deauthentication.reason }}{% endif %}.
+                                {% else %}
+                                    There is no security token.
+                                {% endif %}
                                 {% if collector.deauthProfileToken %}
                                     It was removed in
                                     <a href="{{ path('_profiler', {token: collector.deauthProfileToken, panel: 'security'}) }}">
@@ -272,6 +282,15 @@
                                     </a>.
                                 {% endif %}
                             </p>
+
+                            {% if collector.deauthentication and collector.deauthentication.providers is not empty %}
+                                <p class="help">
+                                    User provider{{ collector.deauthentication.providers|length > 1 ? 's' }}:
+                                    {% for providerClass in collector.deauthentication.providers %}
+                                        {{ providerClass|abbr_class }}{{ not loop.last ? ', ' }}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

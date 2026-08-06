@@ -57,26 +57,36 @@ class GroupSequence
     public array $groups;
 
     /**
-     * The group in which cascaded objects are validated when validating
-     * this sequence.
+     * Whether the group currently being stepped through must be cascaded to
+     * referenced objects, in addition to the "Default" group.
      *
-     * By default, cascaded objects are validated in each of the groups of
-     * the sequence.
+     * When a class declares a group sequence (through the {@see GroupSequence}
+     * attribute, {@see \Symfony\Component\Validator\Mapping\ClassMetadata::setGroupSequence()}
+     * or {@see \Symfony\Component\Validator\GroupSequenceProviderInterface}),
+     * referenced objects marked with the {@see Valid} constraint are, by default,
+     * only cascaded in the "Default" group. As a result, constraints registered
+     * on those objects for one of the sequence groups are never validated.
      *
-     * If a class has a group sequence attached, that sequence replaces the
-     * "Default" group. When validating that class in the "Default" group, the
-     * group sequence is used instead, but still the "Default" group should be
-     * cascaded to other objects.
+     * Setting this flag to "true" makes the validator cascade the group of the
+     * sequence currently being stepped through together with the "Default" group,
+     * so that such constraints are validated as well.
+     *
+     * The flag only applies to sequences declared on the class: when a sequence
+     * is passed explicitly to the validator, the group being stepped through is
+     * already the one cascaded to referenced objects.
      */
-    public string|GroupSequence $cascadedGroup;
+    public bool $cascadeCurrentGroup = false;
 
     /**
      * Creates a new group sequence.
      *
-     * @param array<string|string[]|GroupSequence> $groups The groups in the sequence
+     * @param array<string|string[]|GroupSequence> $groups              The groups in the sequence
+     * @param bool                                 $cascadeCurrentGroup Whether to also cascade the current sequence
+     *                                                                  group to referenced objects, on top of "Default"
      */
-    public function __construct(array $groups)
+    public function __construct(array $groups, bool $cascadeCurrentGroup = false)
     {
         $this->groups = $groups;
+        $this->cascadeCurrentGroup = $cascadeCurrentGroup;
     }
 }

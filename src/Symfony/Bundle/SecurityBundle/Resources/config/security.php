@@ -19,6 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Bundle\SecurityBundle\Security\LazyFirewallContext;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as BaseExpressionLanguage;
 use Symfony\Component\Ldap\Security\LdapUserProvider;
@@ -44,6 +45,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\MissingUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
+use Symfony\Component\Security\Csrf\DelegatingCsrfTokenManager;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
@@ -128,6 +130,17 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.user_checker', InMemoryUserChecker::class)
         ->set('security.user_checker_locator', ServiceLocator::class)
+            ->args([[]])
+
+        ->set('security.delegating_csrf_token_manager', DelegatingCsrfTokenManager::class)
+            // outside SameOriginCsrfTokenManager (0), so that the manager a firewall configures for a token id wins
+            ->decorate('security.csrf.token_manager', null, -10, ContainerInterface::IGNORE_ON_INVALID_REFERENCE)
+            ->args([
+                service('.inner'),
+                service('security.csrf_token_manager_locator'),
+            ])
+
+        ->set('security.csrf_token_manager_locator', ServiceLocator::class)
             ->args([[]])
 
         ->set('security.expression_language', ExpressionLanguage::class)

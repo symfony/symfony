@@ -22,6 +22,7 @@ use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProvide
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
@@ -335,6 +336,89 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
+    }
+
+    public function testCsrfTokenManagersAreRegisteredForTheirTokenId()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'custom_manager' => [
+                    'http_basic' => null,
+                    'logout' => ['csrf_token_manager' => 'app.csrf_token_manager'],
+                ],
+                'default_manager' => [
+                    'http_basic' => null,
+                    'logout' => ['enable_csrf' => true, 'csrf_token_id' => 'other_logout'],
+                ],
+                'no_csrf' => [
+                    'http_basic' => null,
+                    'logout' => true,
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertEquals(
+            ['logout' => new ServiceClosureArgument(new Reference('app.csrf_token_manager'))],
+            $container->getDefinition('security.csrf_token_manager_locator')->getArgument(0)
+        );
+    }
+
+    public function testTheDelegatingCsrfTokenManagerIsRemovedWhenNoFirewallNeedsIt()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'some_firewall' => [
+                    'http_basic' => null,
+                    'logout' => ['enable_csrf' => true],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.delegating_csrf_token_manager'));
+        $this->assertFalse($container->hasDefinition('security.csrf_token_manager_locator'));
+    }
+
+    public function testTwoFirewallsCannotMapTheSameTokenIdToDifferentCsrfTokenManagers()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'default' => ['id' => 'foo'],
+            ],
+
+            'firewalls' => [
+                'first' => [
+                    'http_basic' => null,
+                    'logout' => ['csrf_token_manager' => 'app.csrf_token_manager'],
+                ],
+                'second' => [
+                    'http_basic' => null,
+                    'logout' => ['csrf_token_manager' => 'app.other_csrf_token_manager'],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "second" firewall configures a "csrf_token_manager" for the "logout" token id, but another firewall already configured a different one. Give them distinct "csrf_token_id" values.');
+
+        $container->compile();
     }
 
     public function testSwitchUserNotStatelessOnStatelessFirewall()

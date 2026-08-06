@@ -35,9 +35,11 @@
     <div {{ block('widget_container_attributes') }}>
         {%- for child in form %}
             <div class="flex items-center">
-                {{- form_widget(child) -}}
+                {%- set child_attr = child.vars.help ? child.vars.attr|merge({'aria-describedby': child.vars.id ~ '_help'}) : child.vars.attr -%}
+                {{- form_widget(child, {attr: child_attr}) -}}
                 {{- form_label(child, null, {translation_domain: choice_translation_domain}) -}}
             </div>
+            {{- form_help(child) -}}
         {% endfor -%}
     </div>
 {%- endblock choice_widget_expanded -%}

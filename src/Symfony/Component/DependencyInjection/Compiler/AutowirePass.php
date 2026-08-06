@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
@@ -365,41 +366,12 @@ class AutowirePass extends AbstractRecursivePass
                         $value = $attribute->buildDefinition($value, $type, $parameter);
                         $value = $this->doProcessValue($value);
                     } elseif ($lazy = $attribute->lazy) {
+                        if (true === $lazy && str_contains($type, '|')) {
+                            throw new AutowiringFailedException($this->currentId, \sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
+                        }
+
                         $value ??= $getValue();
-
-                        if (!\is_array($lazy)) {
-                            if (str_contains($type, '|')) {
-                                throw new AutowiringFailedException($this->currentId, \sprintf('Cannot use #[Autowire] with option "lazy: true" on union types for service "%s"; set the option to the interface(s) that should be proxied instead.', $this->currentId));
-                            }
-                            $lazy = str_contains($type, '&') ? explode('&', $type) : (\is_string($lazy) ? [$lazy] : []);
-                        }
-
-                        if (!$lazy && $value instanceof Reference && $this->container->has($value) && $this->container->findDefinition($value)->isLazy()) {
-                            $arguments[$index] = $value;
-
-                            continue 2;
-                        }
-
-                        $proxyType = $lazy ? $type : $this->resolveProxyType($type, $value);
-                        $definition = (new Definition($proxyType))
-                            ->setFactory('current')
-                            ->setArguments([[$value]])
-                            ->setLazy(true);
-
-                        if ($lazy) {
-                            if (!$this->container->getReflectionClass($proxyType, false)) {
-                                $definition->setClass('object');
-                            }
-                            foreach ($lazy as $v) {
-                                $definition->addTag('proxy', ['interface' => $v]);
-                            }
-                        }
-
-                        if ($definition->getClass() !== (string) $value || $definition->getTag('proxy')) {
-                            $value .= '.'.$this->container->hash([$definition->getClass(), $definition->getTag('proxy')]);
-                        }
-                        $this->container->setDefinition($value = '.lazy.'.$value, $definition);
-                        $value = new Reference($value);
+                        $value = new LazyProxyArgument(new TypedReference((string) $value, $type, $value->getInvalidBehavior()), true === $lazy ? [] : $lazy);
                     }
                     $arguments[$index] = $value;
 
@@ -778,27 +750,5 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return $alias;
-    }
-
-    /**
-     * Resolves the class name that should be proxied for a lazy service.
-     *
-     * @param string $originalType The original parameter type-hint (e.g., the interface)
-     * @param string $serviceId    The service ID the type-hint resolved to (e.g., the alias)
-     */
-    private function resolveProxyType(string $originalType, string $serviceId): string
-    {
-        if (!$this->container->has($serviceId)) {
-            return $originalType;
-        }
-
-        $resolvedType = $this->container->findDefinition($serviceId)->getClass();
-        $resolvedType = $this->container->getParameterBag()->resolveValue($resolvedType);
-
-        if (!$resolvedType || !$this->container->getReflectionClass($resolvedType, false)) {
-            return $originalType;
-        }
-
-        return $resolvedType;
     }
 }

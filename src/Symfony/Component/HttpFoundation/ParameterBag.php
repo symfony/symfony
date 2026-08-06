@@ -206,8 +206,8 @@ class ParameterBag implements \IteratorAggregate, \Countable
     /**
      * Filter key.
      *
-     * @param int                                     $filter  FILTER_* constant
-     * @param int|array{flags?: int, options?: array} $options Flags from FILTER_* constants
+     * @param int                                              $filter  FILTER_* constant
+     * @param int|array{flags?: int, options?: array|\Closure} $options Flags from FILTER_* constants, and a Closure when using FILTER_CALLBACK
      *
      * @see https://php.net/filter-var
      *
@@ -247,6 +247,28 @@ class ParameterBag implements \IteratorAggregate, \Countable
         }
 
         throw new \UnexpectedValueException(\sprintf('Parameter value "%s" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.', $key));
+    }
+
+    /**
+     * Filters the value of a parameter through a callback.
+     *
+     * Per FILTER_CALLBACK semantics, the callback receives the value cast to a string:
+     * e.g. 42 arrives as "42", and a missing key with a null default arrives as "".
+     *
+     * An array value is mapped entry by entry, unless $flags is passed without FILTER_REQUIRE_ARRAY.
+     *
+     * @param \Closure(string): mixed                                                                               $callback
+     * @param int-mask<\FILTER_REQUIRE_SCALAR, \FILTER_REQUIRE_ARRAY, \FILTER_FORCE_ARRAY, \FILTER_NULL_ON_FAILURE> $flags
+     */
+    public function filterCallback(string $key, \Closure $callback, mixed $default = null, int $flags = 0): mixed
+    {
+        $options = ['options' => $callback];
+
+        if ($flags) {
+            $options['flags'] = $flags;
+        }
+
+        return $this->filter($key, $default, \FILTER_CALLBACK, $options);
     }
 
     /**

@@ -255,6 +255,25 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame('bar ccc', $chunks[2]->getError());
     }
 
+    public function testBufferClosureReceivesLowercasedHeadersAndCanReturnAStream()
+    {
+        $sink = fopen('php://temp', 'w+');
+        $headers = null;
+        $client = new MockHttpClient(new MockResponse('Hello', ['response_headers' => ['Content-Type: text/plain', 'X-Foo: BaR']]));
+
+        $response = $client->request('GET', 'http://example.com', ['buffer' => static function (array $h) use ($sink, &$headers) {
+            $headers = $h;
+
+            return $sink;
+        }]);
+
+        $this->assertSame('Hello', $response->getContent());
+        $this->assertSame(['content-type' => ['text/plain'], 'x-foo' => ['BaR']], $headers);
+
+        rewind($sink);
+        $this->assertSame('Hello', stream_get_contents($sink));
+    }
+
     public function testMergeDefaultOptions()
     {
         $mockHttpClient = new MockHttpClient(null, 'https://example.com');

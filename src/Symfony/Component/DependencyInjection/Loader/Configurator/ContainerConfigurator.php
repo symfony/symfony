@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\UndefinedExtensionHandler;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -117,6 +118,16 @@ function service(string $serviceId): ReferenceConfigurator
 function inline_service(?string $class = null): InlineServiceConfigurator
 {
     return new InlineServiceConfigurator(new Definition($class));
+}
+
+/**
+ * Creates a reference to a service that is injected as a lazy proxy.
+ *
+ * @param string|string[] $interfaces The interface(s) the proxy should implement, or none to proxy the service's own class
+ */
+function lazy_proxy(string $serviceId, string|array $interfaces = []): LazyProxyReferenceConfigurator
+{
+    return new LazyProxyReferenceConfigurator($serviceId, $interfaces);
 }
 
 /**

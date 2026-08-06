@@ -20,6 +20,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
@@ -55,9 +56,11 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\AInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\EInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\EnvAutowireWithMissingArgument;
 use Symfony\Component\DependencyInjection\Tests\Compiler\F;
+use Symfony\Component\DependencyInjection\Tests\Compiler\FinalLazyProxyImplementation;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Foo;
 use Symfony\Component\DependencyInjection\Tests\Compiler\FooVoid;
 use Symfony\Component\DependencyInjection\Tests\Compiler\IInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\LazyProxyTestInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Listener1;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Listener2;
 use Symfony\Component\DependencyInjection\Tests\Compiler\ListenerResolver;
@@ -81,6 +84,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\WitherStaticReturnType;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 require_once __DIR__.'/../Fixtures/includes/classes.php';
@@ -2293,6 +2297,52 @@ class PhpDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('lazy_autowire_attribute_with_intersection.php', $dumper->dump());
     }
 
+    public function testLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic(true);
+        $container->register('bar', LazyProxyArgumentConsumer::class)
+            ->setPublic(true)
+            ->addArgument(new LazyProxyArgument(new Reference('foo')));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Proxy_Argument']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Proxy_Argument();
+
+        $bar = $container->get('bar');
+        $this->assertInstanceOf(Foo::class, $bar->foo);
+
+        $r = new \ReflectionClass(Foo::class);
+        $this->assertTrue($r->isUninitializedLazyObject($bar->foo));
+        $this->assertSame($container->get('foo'), $r->initializeLazyObject($bar->foo));
+    }
+
+    public function testLazyProxyArgumentWithInterface()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', FinalLazyProxyImplementation::class)
+            ->setPublic(true);
+        $container->register('bar', LazyProxyInterfaceArgumentConsumer::class)
+            ->setPublic(true)
+            ->addArgument(new LazyProxyArgument(new Reference('foo'), LazyProxyTestInterface::class));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Proxy_Argument_With_Interface']));
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Proxy_Argument_With_Interface();
+
+        $bar = $container->get('bar');
+        $this->assertInstanceOf(LazyProxyTestInterface::class, $bar->foo);
+        $this->assertNotInstanceOf(FinalLazyProxyImplementation::class, $bar->foo);
+        $this->assertInstanceOf(LazyObjectInterface::class, $bar->foo);
+        $this->assertFalse($bar->foo->isLazyObjectInitialized());
+        $this->assertSame($container->get('foo'), $bar->foo->initializeLazyObject());
+    }
+
     public function testCallableAdapterConsumer()
     {
         $container = new ContainerBuilder();
@@ -2619,6 +2669,22 @@ class LazyServiceConsumer
     public function __construct(
         #[Autowire(lazy: true)]
         public Foo $foo,
+    ) {
+    }
+}
+
+class LazyProxyArgumentConsumer
+{
+    public function __construct(
+        public Foo $foo,
+    ) {
+    }
+}
+
+class LazyProxyInterfaceArgumentConsumer
+{
+    public function __construct(
+        public LazyProxyTestInterface $foo,
     ) {
     }
 }

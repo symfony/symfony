@@ -3,3 +3,11 @@ _form_login_bundle:
 
 _form_login_localized:
     resource: '@FormLoginBundle/Resources/config/localized_routing.yml'
+
+logout_form:
+    path:     /logout-form
+    defaults: { _controller: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\Controller\LoginController::logoutFormAction }
+
+app_logout:
+    path:     /logout
+    methods:  [POST]

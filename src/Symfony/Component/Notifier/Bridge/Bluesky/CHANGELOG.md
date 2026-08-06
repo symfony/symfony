@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for hashtag facets
+
 7.3
 ---
 

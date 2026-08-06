@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `logout_form()` function to build a form that logs the user out with a POST
+ * Add the `normalize` filter to normalize values with the Serializer component
+
 8.1
 ---
 

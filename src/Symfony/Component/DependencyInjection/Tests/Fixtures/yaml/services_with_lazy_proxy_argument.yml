@@ -1,0 +1,15 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo_service:
+        class: Foo
+    bar_service:
+        class: Bar
+        arguments:
+            - !lazy_proxy '@foo_service'
+            - !lazy_proxy { service: '@foo_service', interface: SomeInterface }
+            - !lazy_proxy { service: '@foo_service', interface: [SomeInterface, AnotherInterface] }
+            - !lazy_proxy '@?foo_service'

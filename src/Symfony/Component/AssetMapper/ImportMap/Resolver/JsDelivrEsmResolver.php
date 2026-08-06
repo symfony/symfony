@@ -32,6 +32,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
     public const IMPORT_REGEX = '#(?:import\s*(?:[\w$]+,)?(?:(?:\{[^}]*\}|[\w$]+|\*\s*as\s+[\w$]+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*|await\simport\()("/npm/((?:@[^/]+/)?[^@]+?)(?:@([^/]+))?((?:/[^/]+)*?)/\+esm")(?:\)*)#';
 
+    private const RELATIVE_IMPORT_REGEX = '#(?:import\s*(?:[\w$]+,)?(?:(?:\{[^}]*\}|[\w$]+|\*\s*as\s+[\w$]+)\s*\bfrom\s*)?|export\s*(?:\{[^}]*\}|\*)\s*from\s*|await\simport\()([\'"](\.{1,2}/[^\'"]+)[\'"])(?:\)*)#';
     private const ES_MODULE_SHIMS = 'es-module-shims';
 
     private readonly HttpClientInterface $httpClient;
@@ -60,6 +61,12 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             [$packageName, $filePath] = ImportMapEntry::splitPackageNameAndFilePath($packageSpecifier);
 
+            if (!$options->useEsm && !$filePath) {
+                // relative imports inside the raw file are resolved against its directory, which is unknown
+                // as long as jsDelivr is the one picking the file from the package "main" entry
+                throw new RuntimeException(\sprintf('The package "%s" must be required with the path to the file to download, e.g. "%s/dist/index.js", when the jsDelivr ESM build is not used.', $packageName, $packageName));
+            }
+
             $versionUrl = \sprintf(self::URL_PATTERN_VERSION, $packageName);
             if (null !== $options->versionConstraint) {
                 $versionUrl .= '?specifier='.urlencode($options->versionConstraint);
@@ -82,7 +89,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 throw new RuntimeException(\sprintf('Unable to find the latest version for package "%s" - try specifying the version manually.', $packageName));
             }
 
-            $pattern = $this->resolveUrlPattern($packageName, $filePath);
+            $pattern = $this->resolveUrlPattern($packageName, $filePath, useEsm: $options->useEsm);
             $requiredPackages[$i][1] = $this->httpClient->request('GET', \sprintf($pattern, $packageName, $version, $filePath));
             $requiredPackages[$i][4] = $version;
 
@@ -178,6 +185,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 $entry->getPackageName(),
                 $entry->getPackagePathString(),
                 $entry->type,
+                $entry->useEsm,
             );
             $url = \sprintf($pattern, $entry->getPackageName(), $entry->version, $entry->getPackagePathString());
 
@@ -200,7 +208,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
             $dependencies = [];
             $extraFiles = [];
             $contents[$package] = [
-                'content' => $this->makeImportsBare($response->getContent(), $dependencies, $extraFiles, $entry->type, $entry->getPackagePathString()),
+                'content' => $this->makeImportsBare($response->getContent(), $dependencies, $extraFiles, $entry->type, $entry->getPackagePathString(), $entry->useEsm),
                 'dependencies' => $dependencies,
                 'extraFiles' => [],
             ];
@@ -237,11 +245,15 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                     continue;
                 }
 
+                $dependencies = [];
                 $extraFiles = [];
 
                 $content = $response->getContent();
+                // only rewrite what can carry imports: an extra file can also be a font, an image or a source map
                 if (str_ends_with($extraFile, '.css')) {
-                    $content = $this->makeImportsBare($content, $dependencies, $extraFiles, ImportMapType::CSS, $extraFile);
+                    $content = $this->makeImportsBare($content, $dependencies, $extraFiles, ImportMapType::CSS, $extraFile, false);
+                } elseif (str_ends_with($extraFile, '.js') || str_ends_with($extraFile, '.mjs')) {
+                    $content = $this->makeImportsBare($content, $dependencies, $extraFiles, ImportMapType::JS, $extraFile, false);
                 }
                 $contents[$package]['extraFiles'][$extraFile] = $content;
 
@@ -299,16 +311,23 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
      *
      * Replaces those with normal import "package/name" statements.
      */
-    private function makeImportsBare(string $content, array &$dependencies, array &$extraFiles, ImportMapType $type, string $sourceFilePath): string
+    private function makeImportsBare(string $content, array &$dependencies, array &$extraFiles, ImportMapType $type, string $sourceFilePath, bool $useEsm = true): string
     {
         if (ImportMapType::JS === $type) {
-            $content = preg_replace_callback(self::IMPORT_REGEX, static function ($matches) use (&$dependencies) {
-                $packageName = $matches[2].$matches[4]; // add the path if any
-                $dependencies[] = $packageName;
+            if ($useEsm) {
+                $content = preg_replace_callback(self::IMPORT_REGEX, static function ($matches) use (&$dependencies) {
+                    $packageName = $matches[2].$matches[4]; // add the path if any
+                    $dependencies[] = $packageName;
 
-                // replace the "/npm/package@version/+esm" with "package@version"
-                return str_replace($matches[1], \sprintf('"%s"', $packageName), $matches[0]);
-            }, $content);
+                    // replace the "/npm/package@version/+esm" with "package@version"
+                    return str_replace($matches[1], \sprintf('"%s"', $packageName), $matches[0]);
+                }, $content);
+            } else {
+                preg_match_all(self::RELATIVE_IMPORT_REGEX, $content, $matches);
+                foreach ($matches[2] as $path) {
+                    $extraFiles[] = $this->resolveRelativePackagePath($sourceFilePath, $path);
+                }
+            }
 
             // source maps are not also downloaded - so remove the sourceMappingURL
             // remove the final one only (in case sourceMappingURL is used in the code)
@@ -335,15 +354,22 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         return preg_replace('{/\*# sourceMappingURL=[^ ]*+ \*/}', '', $content);
     }
 
+    private function resolveRelativePackagePath(string $sourceFilePath, string $path): string
+    {
+        $path = substr($path, 0, strcspn($path, '?#'));
+
+        return Path::canonicalize(Path::join(\dirname('/'.$sourceFilePath), $path));
+    }
+
     /**
      * Determine the URL pattern to be used by the HTTP Client.
      */
-    private function resolveUrlPattern(string $packageName, string $path, ?ImportMapType $type = null): string
+    private function resolveUrlPattern(string $packageName, string $path, ?ImportMapType $type = null, bool $useEsm = true): string
     {
         // The URL for the es-module-shims polyfill package uses the CSS pattern to
         // prevent a syntax error in the browser console, so check the package name
         // as part of the condition.
-        if (self::ES_MODULE_SHIMS === $packageName || str_ends_with($path, '.css') || ImportMapType::CSS === $type) {
+        if (!$useEsm || self::ES_MODULE_SHIMS === $packageName || str_ends_with($path, '.css') || ImportMapType::CSS === $type) {
             return self::URL_PATTERN_DIST_CSS;
         }
 

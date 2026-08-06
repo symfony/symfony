@@ -30,9 +30,15 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 final class TokenDeauthenticatedEvent extends Event
 {
+    /**
+     * @param string|null        $reason          A human-readable, free-form sentence explaining the deauthentication
+     * @param list<class-string> $providerClasses The user providers that contributed to the deauthentication decision
+     */
     public function __construct(
         private TokenInterface $originalToken,
         private Request $request,
+        private ?string $reason = null,
+        private array $providerClasses = [],
     ) {
     }
 
@@ -44,5 +50,26 @@ final class TokenDeauthenticatedEvent extends Event
     public function getRequest(): Request
     {
         return $this->request;
+    }
+
+    /**
+     * Returns a human-readable, free-form sentence explaining why the token
+     * was deauthenticated, e.g. for display in the profiler.
+     */
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    /**
+     * Returns the classes of the user providers that contributed to the
+     * deauthentication decision: the providers that detected a change in the
+     * user, or the ones that could not find the user.
+     *
+     * @return list<class-string>
+     */
+    public function getProviderClasses(): array
+    {
+        return $this->providerClasses;
     }
 }

@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Exception\UnsupportedMetadataException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\GroupSequenceProviderInterface;
 use Symfony\Component\Validator\Mapping\CascadingStrategy;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\GenericMetadata;
@@ -473,7 +474,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $defaultOverridden = true;
 
                     if (!$group instanceof GroupSequence) {
-                        $group = new GroupSequence($group);
+                        // a provider returning a plain array carries no flag of its own,
+                        // so the one declared on the class applies
+                        $group = new GroupSequence($group, $metadata instanceof ClassMetadata && $metadata->getCascadeCurrentGroup());
                     }
                 }
             }
@@ -704,6 +707,12 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         foreach ($groupSequence->groups as $groupInSequence) {
             $groups = (array) $groupInSequence;
 
+            // $cascadedGroup is non-null only when the sequence replaced the class's "Default" group
+            $stepCascadedGroups = $cascadedGroups;
+            if (null !== $cascadedGroup && $groupSequence->cascadeCurrentGroup) {
+                $stepCascadedGroups = array_values(array_unique([$cascadedGroup, ...array_filter($groups, \is_string(...))]));
+            }
+
             if ($metadata instanceof ClassMetadataInterface) {
                 $this->validateClassNode(
                     $value,
@@ -711,7 +720,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $metadata,
                     $propertyPath,
                     $groups,
-                    $cascadedGroups,
+                    $stepCascadedGroups,
                     $traversalStrategy,
                     $context
                 );
@@ -723,7 +732,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
                     $metadata,
                     $propertyPath,
                     $groups,
-                    $cascadedGroups,
+                    $stepCascadedGroups,
                     $traversalStrategy,
                     $context
                 );

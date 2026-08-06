@@ -176,6 +176,55 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
+    public function testExpandedChoiceHelpIsRenderedAndDescribesTheChoice()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => ['Apple' => 'a', 'Banana' => 'b'],
+            'choice_help' => ['Apple' => 'A fruit', 'Banana' => 'Yellow'],
+            'expanded' => true,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), [],
+            '/div
+    [
+        ./input[@type="radio"][@id="name_0"][@aria-describedby="name_0_help"]
+        /following-sibling::label[@for="name_0"]
+        /following-sibling::div[@id="name_0_help"][.="[trans]A fruit[/trans]"]
+        /following-sibling::input[@type="radio"][@id="name_1"][@aria-describedby="name_1_help"]
+        /following-sibling::label[@for="name_1"]
+        /following-sibling::div[@id="name_1_help"][.="[trans]Yellow[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testExpandedChoiceWithoutHelpRendersNoHelpElement()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => ['Apple' => 'a'],
+            'choice_help' => ['Banana' => 'Yellow'],
+            'expanded' => true,
+        ]);
+
+        $html = $this->renderWidget($form->createView());
+
+        $this->assertMatchesXpath($html, '//div[@id="name_0_help"]', 0);
+        $this->assertMatchesXpath($html, '//input[@aria-describedby]', 0);
+    }
+
+    public function testCollapsedChoiceHelpIsNotRenderedButStaysOnTheView()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
+            'choices' => ['Apple' => 'a'],
+            'choice_help' => ['Apple' => 'A fruit'],
+        ]);
+
+        $view = $form->createView();
+
+        $this->assertMatchesXpath($this->renderWidget($view), '//div[@class="help-text"]', 0);
+        $this->assertSame('A fruit', $view->vars['choices'][0]->help);
+    }
+
     public function testHelpHtmlDefaultIsFalse()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [

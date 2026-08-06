@@ -13,6 +13,7 @@ CHANGELOG
  * Expand `IpUtils::PRIVATE_SUBNETS` to cover IPv4 multicast (`224.0.0.0/4`),
    IPv6 multicast (`ff00::/8`), IPv6 discard prefix (`100::/64`), IETF protocol
    assignments (`192.0.0.0/29`), and 6to4 relay anycast (`192.88.99.0/24`)
+ * Add `ParameterBag::filterCallback()` to filter a parameter value through a callback
 
 8.1
 ---

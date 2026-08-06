@@ -35,6 +35,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
 use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
+use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupSequenceCascadeEntity;
 use Symfony\Component\Validator\Tests\Fixtures\CallbackClass;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
@@ -199,6 +200,17 @@ class AttributeLoaderTest extends TestCase
         $this->assertCount(2, $otherMetadata);
         $this->assertInstanceOf(Type::class, $otherMetadata[0]->getConstraints()[0]);
         $this->assertInstanceOf(NotNull::class, $otherMetadata[1]->getConstraints()[0]);
+    }
+
+    public function testLoadGroupSequenceCascadeCurrentGroupAttribute()
+    {
+        $loader = new AttributeLoader();
+
+        $metadata = new ClassMetadata(GroupSequenceCascadeEntity::class);
+        $loader->loadClassMetadata($metadata);
+
+        $this->assertSame(['Foo', 'GroupSequenceCascadeEntity'], $metadata->getGroupSequence()->groups);
+        $this->assertTrue($metadata->getGroupSequence()->cascadeCurrentGroup);
     }
 
     public function testLoadGroupSequenceProviderAttribute()

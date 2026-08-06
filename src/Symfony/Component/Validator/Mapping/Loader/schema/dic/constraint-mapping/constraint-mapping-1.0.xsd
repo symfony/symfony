@@ -65,12 +65,14 @@
     <xsd:annotation>
       <xsd:documentation><![CDATA[
         Contains the group sequence of a class. Each group should be written
-        into a "value" tag.
+        into a "value" tag. Set "cascade-current-group" to also cascade the group
+        being stepped through to referenced objects, on top of "Default".
       ]]></xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
       <xsd:element name="value" type="value" minOccurs="1" maxOccurs="unbounded" />
     </xsd:sequence>
+    <xsd:attribute name="cascade-current-group" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="group-sequence-provider">

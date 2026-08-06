@@ -8,6 +8,11 @@ Read more about this in the [Symfony documentation](https://symfony.com/doc/8.2/
 
 If you're upgrading from a version below 8.1, follow the [8.1 upgrade guide](UPGRADE-8.1.md) first.
 
+AssetMapper
+-----------
+
+ * Add argument `$useEsm` to `ImportMapConfigReader::createRemoteEntry()`
+
 Crowdin Translation Provider
 ----------------------------
 
@@ -24,6 +29,11 @@ FrameworkBundle
 ---------------
 
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+
+HttpClient
+----------
+
+ * [BC BREAK] Widen the type of the `$buffer` argument of `HttpOptions::buffer()` from `bool` to `mixed`, so that the stream and closure forms the option accepts can be passed; a class extending `HttpOptions` and overriding that method must widen it too
 
 HttpFoundation
 --------------
@@ -70,3 +80,5 @@ Validator
 ---------
 
  * Add argument `$restrictGroups` to `Valid::__construct()`
+ * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
+ * Add argument `$cascadeCurrentGroup` to `GroupSequenceProvider::__construct()`

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T09:02:50Z
+
+Reworked while rebasing on 8.2:
+
+- The listener no longer takes an event dispatcher. `ControllerAttributesListener` dispatches `ControllerAttributeEvent` through the regular dispatcher, and `EventDispatcher::callListeners()` calls listeners as `$listener($event, $eventName, $this)`, so `onKernelControllerAttribute()` receives it as a third argument. The constructor and the `rate_limiter.attribute_listener` definition are back to what they were, which also removes the overlap with #65077 on `rate_limiter.php`.
+- Guarded the event construction with `class_exists()`. HttpKernel allows `symfony/rate-limiter` from `^7.4` and the class only exists from 8.2, so `Unit Tests (8.4, low-deps)` was failing with `Class "Symfony\Component\RateLimiter\Event\RateLimitExceededEvent" not found`, and a mixed install would have hit that fatal on the first rejection. The matching test skips when the class is absent.
+- `testAcceptedDoesNotDispatchEvent` asserted nothing, it ended on `addToAssertionCount(1)`. It now collects dispatched events and asserts the list is empty.
+- Shortened the HttpKernel changelog entry to the short class name.
+
+Still open for a maintainer: the event class lives in RateLimiter but only the HttpKernel attribute path dispatches it. `RateLimit::ensureAccepted()`, `LoginThrottlingListener`, `Messenger\Worker` and `AbstractRequestRateLimiter` all reject without dispatching.

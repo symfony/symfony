@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-08-05T19:22:33Z
+
+@nicolas-grekas I have a question about the CI. The low-deps job is red from two distinct bugs, and I have a RED→GREEN fix for each:
+
+1. **ObjectMapper** (this PR, now retargeted to 7.4): the target-side `#[Map(transform:)]` is dropped when the source carries metadata, so a raw value reaches a typed constructor argument and throws a `TypeError`.
+2. **Serializer**: `AbstractObjectNormalizerTest::testDenormalizeUnionTypeWithFilterBool` — `FILTER_BOOL` no longer coerces `'on'` → `true` for a `bool|string` union under the lowest deps.
+
+I'd like to open a PR for each. Is that useful, or is the low-deps job red for a known/intentional reason, in which case the PRs wouldn't help?

@@ -120,11 +120,11 @@ class ProjectServiceContainer extends Container
      */
     protected static function getTranslator2Service($container)
     {
-        $container->services['translator_2'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_2' => #[\Closure(name: 'translator.loader_2', class: 'stdClass')] fn () => ($container->services['translator.loader_2'] ??= new \stdClass())]));
+        $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_2' => #[\Closure(name: 'translator.loader_2', class: 'stdClass')] fn () => ($container->services['translator.loader_2'] ??= new \stdClass())]));
 
         $instance->addResource('db', ($container->services['translator.loader_2'] ??= new \stdClass()), 'nl');
 
-        return $instance;
+        return $container->services['translator_2'] = $instance;
     }
 
     /**
@@ -134,13 +134,13 @@ class ProjectServiceContainer extends Container
      */
     protected static function getTranslator3Service($container)
     {
-        $container->services['translator_3'] = $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_3' => #[\Closure(name: 'translator.loader_3', class: 'stdClass')] fn () => ($container->services['translator.loader_3'] ??= new \stdClass())]));
+        $instance = new \Symfony\Component\DependencyInjection\Tests\Fixtures\StubbedTranslator(new \Symfony\Component\DependencyInjection\ServiceLocator(['translator.loader_3' => #[\Closure(name: 'translator.loader_3', class: 'stdClass')] fn () => ($container->services['translator.loader_3'] ??= new \stdClass())]));
 
         $a = ($container->services['translator.loader_3'] ??= new \stdClass());
 
         $instance->addResource('db', $a, 'nl');
         $instance->addResource('db', $a, 'en');
 
-        return $instance;
+        return $container->services['translator_3'] = $instance;
     }
 }

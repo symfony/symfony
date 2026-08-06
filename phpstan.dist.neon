@@ -5,6 +5,7 @@ includes:
 parameters:
     level: 5
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
     tmpDir: .github/sa-tools/phpstan-cache
     paths:
         - src

@@ -64,7 +64,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     private function doMap(object $source, object|string|null $target, \WeakMap $objectMap, bool $constructTarget = false): object
     {
         $metadata = $this->metadataFactory->create($source);
-        $map = $this->getMapTarget($metadata, null, $source, null, null === $target);
+        $map = $this->getMapTarget($this->filterMetadataByTarget($metadata, $target), null, $source, null, null === $target);
         $target ??= $map?->target;
         $mappingToObject = \is_object($target);
 
@@ -198,7 +198,11 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
                     continue;
                 }
 
-                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, null, $propertyName);
+                // when metadata is read from the source, the #[Map] declared on the target property
+                // itself is never surfaced above, so honor its transform for the same-name copy
+                $sameNameMapping = $readMetadataFromTarget ? null : $this->getSameNameTargetMapping($mappedTarget, $propertyName);
+
+                $implicitValues[$propertyName] = $this->getSourceValue($source, $mappedTarget, $this->getRawValue($source, $propertyName), $objectMap, $sameNameMapping, $propertyName);
 
                 continue;
             }
@@ -308,6 +312,28 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         return $source->{$propertyName};
     }
 
+    /**
+     * Returns the unconditional #[Map] declared on the target's own property when it describes a
+     * same-name copy (same source and target property name), so its transform still applies even
+     * when the iteration reads metadata from the source side. Conditional mappings are left to the
+     * regular same-name copy, which does not evaluate conditions. Mappings carrying a target class
+     * are synthesized for another target and must not leak their transform into this one.
+     */
+    private function getSameNameTargetMapping(object $target, string $propertyName): ?Mapping
+    {
+        foreach ($this->metadataFactory->create($target, $propertyName) as $mapping) {
+            if (null === $mapping->if
+                && !$mapping->targetClass
+                && ($mapping->target ?? $propertyName) === $propertyName
+                && ($mapping->source ?? $propertyName) === $propertyName
+            ) {
+                return $mapping;
+            }
+        }
+
+        return null;
+    }
+
     private function getSourceValue(object $source, object $target, mixed $value, \WeakMap $objectMap, ?Mapping $mapping = null, ?string $targetPropertyName = null): mixed
     {
         if ($mapping?->transform) {
@@ -406,10 +432,34 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
     }
 
     /**
+     * Narrows the class-level mappings of a source to the ones related to the target the caller asked for.
+     *
+     * A mapping declaring a subclass of that target is kept: its transform can still produce an
+     * instance the caller accepts.
+     *
+     * @param Mapping[] $metadata
+     *
+     * @return Mapping[]
+     */
+    private function filterMetadataByTarget(array $metadata, object|string|null $target): array
+    {
+        if (null === $target) {
+            return $metadata;
+        }
+
+        $targetClass = \is_object($target) ? $target::class : $target;
+
+        return array_filter($metadata, static fn (Mapping $m): bool => null === $m->target || is_a($targetClass, $m->target, true) || is_a($m->target, $targetClass, true));
+    }
+
+    /**
      * Narrows the mappings of a nested object to the one matching the declared type of the property it is mapped into.
      *
      * A nested class declaring several #[Map] targets yields one Mapping per target. When the
      * destination property is typed, only one of them can be assigned to it, so the mapping is not ambiguous.
+     * When none of them can be assigned to it, no mapping applies and the value is written as it is.
+     * Mappings carrying a transform are kept: what lands in the property is the transform's return value,
+     * not the declared target.
      *
      * @param Mapping[] $metadata
      *
@@ -417,7 +467,7 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
      */
     private function filterMetadataByPropertyType(array $metadata, object $target, ?string $targetPropertyName): array
     {
-        if (null === $targetPropertyName || 2 > \count($metadata)) {
+        if (null === $targetPropertyName || !$metadata) {
             return $metadata;
         }
 
@@ -431,12 +481,12 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         }
 
         $propertyClass = $type->getName();
-        $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => \is_string($m->target)
+        $filtered = array_values(array_filter($metadata, static fn (Mapping $m): bool => $m->transform || (\is_string($m->target)
             && class_exists($m->target)
-            && is_a($m->target, $propertyClass, true)
+            && is_a($m->target, $propertyClass, true))
         ));
 
-        return 1 === \count($filtered) ? $filtered : $metadata;
+        return 1 < \count($filtered) ? $metadata : $filtered;
     }
 
     private function applyTransforms(Mapping $map, mixed $value, object $source, ?object $target): mixed

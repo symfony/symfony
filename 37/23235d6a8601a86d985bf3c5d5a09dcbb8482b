@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-04T13:16:57Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features / 6.4, 7.4, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T17:07:52Z
+
+Rebased and pushed three changes:
+
+* The UPGRADE note told users to pass the transport names explicitly to keep in-process handling. That gives asynchronous sending instead, so it did not produce the behaviour it promised. It now points to an empty `TransportNamesStamp` on the inner envelope, which does work, and mentions that the handler returns `null` once the message is sent.
+* The handler tested `$message->transportNames` for truthiness, so a transport literally named `0` was ignored when passed as a string while `['0']` still worked. Empty strings are filtered now, so both forms behave the same.
+* The tests go through a real `MessageBus` and `SendersLocator` instead of asserting on the stamps passed to a bus mock, so they observe which sender receives the message.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-06T08:59:17Z
+
+I removed the `[BC BREAK]` words from .md files

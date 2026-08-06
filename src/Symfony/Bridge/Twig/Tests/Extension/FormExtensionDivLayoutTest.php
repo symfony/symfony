@@ -178,6 +178,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
     public function testExpandedChoiceHelpIsRenderedAndDescribesTheChoice()
     {
+        if (new \ReflectionClass(ChoiceView::class)->getConstructor()->getNumberOfParameters() < 6) {
+            $this->markTestSkipped('The "choice_help" option requires symfony/form 8.2+');
+        }
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => ['Apple' => 'a', 'Banana' => 'b'],
             'choice_help' => ['Apple' => 'A fruit', 'Banana' => 'Yellow'],
@@ -200,6 +204,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
     public function testExpandedChoiceWithoutHelpRendersNoHelpElement()
     {
+        if (new \ReflectionClass(ChoiceView::class)->getConstructor()->getNumberOfParameters() < 6) {
+            $this->markTestSkipped('The "choice_help" option requires symfony/form 8.2+');
+        }
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => ['Apple' => 'a'],
             'choice_help' => ['Banana' => 'Yellow'],
@@ -214,6 +222,10 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 
     public function testCollapsedChoiceHelpIsNotRenderedButStaysOnTheView()
     {
+        if (new \ReflectionClass(ChoiceView::class)->getConstructor()->getNumberOfParameters() < 6) {
+            $this->markTestSkipped('The "choice_help" option requires symfony/form 8.2+');
+        }
+
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => ['Apple' => 'a'],
             'choice_help' => ['Apple' => 'A fruit'],

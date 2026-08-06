@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-04T09:40:05Z
+
+The low-deps failure in `FrameworkBundle`'s `ObjectMapperTest` also occurs on `8.2` itself ([run 30891207989](https://github.com/symfony/symfony/actions/runs/30891207989)), so this change does not cause it.

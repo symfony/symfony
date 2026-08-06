@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-08-06T08:29:34Z
+
+@MatTheCat FYI, I reverted your changes from #65164 and #65166 here as they are not needed anymore if we skip these tests
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-06T08:34:49Z
+
+@xabbuh I see low-deps pass but #65166 was about FrameworkBundle and ObjectMapper so I don’t understand.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-08-06T08:35:40Z
+
+Ah sorry for the confusion, #65170 complements this.

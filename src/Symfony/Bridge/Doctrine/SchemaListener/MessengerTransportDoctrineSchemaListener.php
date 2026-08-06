@@ -45,7 +45,7 @@ class MessengerTransportDoctrineSchemaListener extends AbstractSchemaListener
             $schema = $this->filterSchemaChanges($schema, $connection, static fn () => $transport->configureSchema($schema, $connection, $isSameDatabaseChecker)) ?? $schema;
         }
 
-        if (method_exists($event, 'setSchema')) {
+        if (method_exists($schema, 'edit') && method_exists($event, 'setSchema')) {
             $event->setSchema($schema);
         }
     }

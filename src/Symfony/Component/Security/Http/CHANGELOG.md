@@ -8,6 +8,7 @@ CHANGELOG
  * Throw a 403 `Symfony\Component\Security\Http\Exception\InvalidCsrfTokenException` instead of the `Security\Core` one when the `#[IsCsrfTokenValid]` attribute fails, so the failure is no longer handled as an authentication failure
  * Add the deauthentication reason and the responsible user providers to `TokenDeauthenticatedEvent`
  * Add `LogoutUrlGenerator::getLogoutForm()` to build a form that logs the user out with a POST
+ * Throw the status-code-specific `HttpException` (e.g. `NotFoundHttpException`, `AccessDeniedHttpException`) instead of a generic one when `#[IsGranted]`'s `statusCode` option is set
 
 8.1
 ---

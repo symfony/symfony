@@ -23,6 +23,9 @@ use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
@@ -1115,5 +1118,17 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('bar', $mapped->inner->name);
         // computed by the constructor, so it can only be set if the constructor ran
         $this->assertSame('slug-of-bar', $mapped->inner->slug);
+    }
+
+    public function testSameNameTargetPropertyMappingIsHonoredWhenSourceCarriesMetadata()
+    {
+        // Lead carries a class-level #[Map] to an unrelated view, so ObjectMapper reads metadata from
+        // the source side. The #[Map(transform)] declared on LeadDto::$type must still be applied to the
+        // same-name copy; otherwise the raw Type reaches the typed constructor argument and throws.
+        $dto = (new ObjectMapper())->map(new SourceCarriesMetadataLead(), SourceCarriesMetadataLeadDto::class);
+
+        $this->assertInstanceOf(SourceCarriesMetadataTypeDto::class, $dto->type);
+        $this->assertSame(7, $dto->type->id);
+        $this->assertSame('moving', $dto->type->name);
     }
 }

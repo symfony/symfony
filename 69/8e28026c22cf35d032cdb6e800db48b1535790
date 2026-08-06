@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T15:05:04Z
+
+Rebased on 8.2. The SRI itself was right: correct algorithms, base64 of the raw hash rather than hex, and the digest covers the compiled content, which is what the browser actually fetches. I checked one by hand against `openssl dgst -sha384 -binary | openssl base64 -A` and against a compiler that rewrites the file, and both matched.
+
+Moved the hashing from `MappedAssetFactory` to `ImportMapGenerator`, which removes three problems at once:
+
+- `MappedAsset::$integrity` was a promoted readonly property, so its `= null` was a constructor default, not a property default. A `MappedAsset` unserialized from an 8.1 `asset_mapper` cache left it uninitialized, and `if (null !== $asset->integrity)` is the throwing form: `Typed property MappedAsset::$integrity must not be accessed before initialization`.
+- `CachedMappedAssetFactory::getCacheFilePath()` keys on `logicalPath:sourcePath` only, and freshness looks at source mtimes. Turning the option on, or moving from sha256 to sha512, on a warm cache silently reused assets whose integrity was null or computed with the old algorithm. Silent, and the page then renders with no integrity map at all.
+- Integrity was computed for every mapped asset, images and fonts included, while only importmap entries ever render one. It is now computed for the entries that need it.
+
+Also:
+
+- `enumPrototype()` instead of a scalar prototype, so a typo fails at container build with the permissible values listed, rather than from a lazy service the first time assets are built.
+- Integrity is now emitted for the stylesheet links, the CSS the loader injects and a self hosted polyfill. The polyfill was `continue`d before the assignment, so the one case where we had a digest for it was the one case that dropped it. The default jspm.io polyfill keeps its hardcoded hash.
+- `testCreateMappedAssetWithoutIntegrity` asserted `null`, which is also what an undefined property yields, so it passed on the unpatched source. Replaced with tests that hash a real fixture.

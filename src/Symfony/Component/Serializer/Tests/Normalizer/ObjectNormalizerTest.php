@@ -579,12 +579,7 @@ class ObjectNormalizerTest extends TestCase
         $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()), null, null, new PropertyInfoExtractor([], [new ReflectionExtractor()]));
 
         $this->expectException(NotNormalizableValueException::class);
-
-        if (class_exists(Type::class) && method_exists(PropertyInfoExtractor::class, 'getType')) {
-            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
-        } else {
-            $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "int", "float" ("string" given).');
-        }
+        $this->expectExceptionMessage('The type of the "value" attribute for class "Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion" must be one of "float", "int" ("string" given).');
 
         $normalizer->denormalize($data, DummyWithUnion::class, 'xml', [
             AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false,

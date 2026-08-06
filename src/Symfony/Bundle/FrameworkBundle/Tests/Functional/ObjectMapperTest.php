@@ -20,6 +20,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectMapped;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectToBeMapped;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ParentEntity;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ParentEntityResource;
+use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
@@ -56,6 +57,10 @@ class ObjectMapperTest extends AbstractWebTestCase
 
     public function testMapNestedObjectWhoseClassDeclaresNoMapping()
     {
+        if (!class_exists(ReverseClassObjectMapperMetadataFactory::class)) {
+            $this->markTestSkipped('Test requires symfony/object-mapper 8.2+');
+        }
+
         static::bootKernel(['test_case' => 'ObjectMapper']);
 
         $objectMapper = static::getContainer()->get('object_mapper.alias');

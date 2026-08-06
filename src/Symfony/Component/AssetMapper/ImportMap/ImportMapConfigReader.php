@@ -110,6 +110,7 @@ class ImportMapConfigReader
             $importMapConfig[$entry->importName] = $config;
         }
 
+        uksort($importMapConfig, strcmp(...));
         $map = class_exists(VarExporter::class) ? VarExporter::export($importMapConfig) : var_export($importMapConfig, true);
         $this->filesystem->dumpFile($this->importMapConfigPath, <<<EOF
             <?php

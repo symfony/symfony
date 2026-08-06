@@ -1660,7 +1660,10 @@ class AbstractObjectNormalizerTest extends TestCase
     #[IgnoreDeprecations]
     public function testDenormalizeUnionTypeWithFilterBoolLegacy()
     {
-        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor();
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor([
+            new LegacyType(LegacyType::BUILTIN_TYPE_BOOL),
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
+        ]);
 
         foreach ([null, XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
             $dummy = $normalizer->denormalize(['foo' => 'publish'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
@@ -1669,6 +1672,72 @@ class AbstractObjectNormalizerTest extends TestCase
             $dummy = $normalizer->denormalize(['foo' => 'on'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
             $this->assertTrue($dummy->foo);
         }
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDenormalizeUnionTypeWithFilterBoolStringFirstLegacy()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor([
+            new LegacyType(LegacyType::BUILTIN_TYPE_STRING),
+            new LegacyType(LegacyType::BUILTIN_TYPE_BOOL),
+        ]);
+
+        foreach ([null, XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize(['foo' => 'publish'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertSame('publish', $dummy->foo);
+
+            $dummy = $normalizer->denormalize(['foo' => 'on'], UnionBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertTrue($dummy->foo);
+        }
+    }
+
+    public function testDenormalizeUnionTypeWithFilterBoolKeepsEmptyArray()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        foreach ([XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize(['foo' => ''], UnionArrayBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertSame([], $dummy->foo);
+        }
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDenormalizeUnionTypeWithFilterBoolKeepsEmptyArrayLegacy()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor([
+            new LegacyType(LegacyType::BUILTIN_TYPE_ARRAY, false, null, true),
+            new LegacyType(LegacyType::BUILTIN_TYPE_BOOL),
+        ]);
+
+        foreach ([XmlEncoder::FORMAT, CsvEncoder::FORMAT] as $format) {
+            $dummy = $normalizer->denormalize(['foo' => ''], UnionArrayBoolPropertyDummy::class, $format, [AbstractNormalizer::FILTER_BOOL => true]);
+            $this->assertSame([], $dummy->foo);
+        }
+    }
+
+    public function testDenormalizeUnionTypeWithFilterBoolKeepsBackedEnum()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+        new Serializer([new BackedEnumNormalizer(), $normalizer]);
+
+        $dummy = $normalizer->denormalize(['foo' => 'on'], UnionEnumBoolPropertyDummy::class, null, [AbstractNormalizer::FILTER_BOOL => true]);
+        $this->assertSame(SwitchEnum::On, $dummy->foo);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testDenormalizeUnionTypeWithFilterBoolKeepsBackedEnumLegacy()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor([
+            new LegacyType(LegacyType::BUILTIN_TYPE_OBJECT, false, SwitchEnum::class),
+            new LegacyType(LegacyType::BUILTIN_TYPE_BOOL),
+        ]);
+        new Serializer([new BackedEnumNormalizer(), $normalizer]);
+
+        $dummy = $normalizer->denormalize(['foo' => 'on'], UnionEnumBoolPropertyDummy::class, null, [AbstractNormalizer::FILTER_BOOL => true]);
+        $this->assertSame(SwitchEnum::On, $dummy->foo);
     }
 
     public static function provideDenormalizeWithFilterBoolData(): array
@@ -2083,6 +2152,16 @@ class UnionBoolPropertyDummy
     public bool|string $foo;
 }
 
+class UnionArrayBoolPropertyDummy
+{
+    public array|bool $foo;
+}
+
+class UnionEnumBoolPropertyDummy
+{
+    public bool|SwitchEnum $foo;
+}
+
 class DummyWithArrayObject
 {
     /** @var \ArrayObject<string, mixed> */
@@ -2225,6 +2304,12 @@ enum EnumB: string
     case B = 'b';
 }
 
+enum SwitchEnum: string
+{
+    case On = 'on';
+    case Off = 'off';
+}
+
 class DummyWithEnumUnion
 {
     public function __construct(
@@ -2355,12 +2440,17 @@ class AbstractObjectNormalizerWithMetadataAndLegacyPropertyTypeExtractor extends
 
 class AbstractObjectNormalizerWithMetadataAndLegacyUnionPropertyTypeExtractor extends AbstractObjectNormalizer
 {
-    public function __construct()
+    public function __construct(array $types)
     {
-        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new class implements PropertyTypeExtractorInterface {
+        parent::__construct(new ClassMetadataFactory(new AttributeLoader()), null, new class($types) implements PropertyTypeExtractorInterface {
+            public function __construct(
+                private readonly array $types,
+            ) {
+            }
+
             public function getTypes(string $class, string $property, array $context = []): ?array
             {
-                return [new LegacyType(LegacyType::BUILTIN_TYPE_BOOL), new LegacyType(LegacyType::BUILTIN_TYPE_STRING)];
+                return $this->types;
             }
         });
     }

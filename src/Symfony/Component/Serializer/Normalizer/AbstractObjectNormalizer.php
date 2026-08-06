@@ -465,6 +465,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $missingConstructorArgumentsException = null;
         $isNullable = false;
         $filterBoolFailed = false;
+
+        // property-info reports union members in the order PHP declares them, which always puts
+        // "bool" last, while TypeInfo sorts them by name. Sorting here the same way makes both
+        // paths try the members in the same order and return the same value.
+        if ($isUnionType) {
+            usort($types, static fn (LegacyType $a, LegacyType $b): int => ($a->getClassName() ?? $a->getBuiltinType()) <=> ($b->getClassName() ?? $b->getBuiltinType()));
+        }
+
         foreach ($types as $type) {
             if (null === $data && $type->isNullable()) {
                 return null;

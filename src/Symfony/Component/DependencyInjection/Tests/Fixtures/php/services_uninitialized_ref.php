@@ -53,7 +53,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      */
     protected static function getBarService($container)
     {
-        $container->services['bar'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->foo1 = ($container->services['foo1'] ?? null);
         $instance->foo2 = null;
@@ -71,7 +71,7 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
             }
         }, fn () => 0 + (int) (isset($container->services['foo1'])) + (int) (false) + (int) (isset($container->privates['foo3'])));
 
-        return $instance;
+        return $container->services['bar'] = $instance;
     }
 
     /**
@@ -81,11 +81,11 @@ class Symfony_DI_PhpDumper_Test_Uninitialized_Reference extends Container
      */
     protected static function getBazService($container)
     {
-        $container->services['baz'] = $instance = new \stdClass();
+        $instance = new \stdClass();
 
         $instance->foo3 = ($container->privates['foo3'] ??= new \stdClass());
 
-        return $instance;
+        return $container->services['baz'] = $instance;
     }
 
     /**

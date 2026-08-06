@@ -56,11 +56,11 @@ class ProjectServiceContainer extends Container
      */
     protected static function getServiceWithMethodCallAndFactoryService($container)
     {
-        $container->services['service_with_method_call_and_factory'] = $instance = new \Bar\FooClass();
+        $instance = new \Bar\FooClass();
 
         $instance->setBar(\Bar\FooClass::getInstance());
 
-        return $instance;
+        return $container->services['service_with_method_call_and_factory'] = $instance;
     }
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null

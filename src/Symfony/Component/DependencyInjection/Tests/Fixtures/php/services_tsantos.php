@@ -57,7 +57,7 @@ class ProjectServiceContainer extends Container
         $c = new \TSantos\Serializer\EventDispatcher\EventDispatcher();
         $c->addSubscriber(new \TSantos\SerializerBundle\EventListener\StopwatchListener(new \Symfony\Component\Stopwatch\Stopwatch(true)));
 
-        $container->services['tsantos_serializer'] = $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $c);
+        $instance = new \TSantos\Serializer\EventEmitterSerializer(new \TSantos\Serializer\Encoder\JsonEncoder(), $a, $c);
 
         $b->setSerializer($instance);
         $d = new \TSantos\Serializer\Normalizer\JsonNormalizer();
@@ -67,6 +67,6 @@ class ProjectServiceContainer extends Container
         $a->add($b);
         $a->add($d);
 
-        return $instance;
+        return $container->services['tsantos_serializer'] = $instance;
     }
 }

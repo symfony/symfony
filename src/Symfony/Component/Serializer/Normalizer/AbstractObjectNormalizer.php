@@ -358,6 +358,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $originalNormalizedData = $normalizedData;
         $object = $this->instantiateObject($normalizedData, $mappedClass, $context, new \ReflectionClass($mappedClass), $allowedAttributes, $format);
         $resolvedClass = ($this->objectClassResolver)($object);
+        $skipInvalidAttributes = $context[self::SKIP_INVALID_ATTRIBUTES] ?? $this->defaultContext[self::SKIP_INVALID_ATTRIBUTES] ?? false;
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
@@ -415,6 +416,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 try {
                     $value = $this->validateAndDenormalize($type, $resolvedClass, $attribute, $value, $format, $attributeContext);
                 } catch (NotNormalizableValueException $exception) {
+                    if ($skipInvalidAttributes) {
+                        continue;
+                    }
                     if (isset($context['not_normalizable_value_exceptions'])) {
                         $context['not_normalizable_value_exceptions'][] = $exception;
                         continue;
@@ -428,6 +432,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             try {
                 $this->setAttributeValue($object, $attribute, $value, $format, $attributeContext);
             } catch (NotNormalizableValueException $exception) {
+                if ($skipInvalidAttributes) {
+                    continue;
+                }
                 if (isset($context['not_normalizable_value_exceptions'])) {
                     $context['not_normalizable_value_exceptions'][] = $exception;
                     continue;

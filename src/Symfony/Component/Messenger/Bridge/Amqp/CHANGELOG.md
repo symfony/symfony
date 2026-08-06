@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Round delays up to two significant digits and add the `delay[granularity]` option to control that rounding
  * Implement the `KeepaliveReceiverInterface` to enable asynchronously notifying AMQP that the job is still being processed, in order to avoid timeouts
 
 8.1

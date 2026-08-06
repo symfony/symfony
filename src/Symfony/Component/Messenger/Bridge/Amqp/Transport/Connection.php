@@ -155,6 +155,13 @@ class Connection
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
      *     * arguments: array of extra delay queue arguments (for example:  ['x-queue-type' => 'classic', 'x-message-deduplication' => true,])
+     *     * granularity: Delays are rounded up to a multiple of this many milliseconds before being used as the
+     *       queue name and the "x-message-ttl" of the delay queue. Since one distinct delay means one delay queue,
+     *       this bounds how many queues randomized delays can create, at the cost of releasing a message slightly
+     *       later than asked. Use a value that is small compared to your delays. By default, delays are rounded up
+     *       to two significant digits (e.g. 5234 becomes 5300 and 52345 becomes 53000), which bounds the number of
+     *       queues whatever the magnitude of the delay is and never delays a message by more than 10%.
+     *       Set it to 1 to publish delays as they are. (Default: 10 ** (floor(log10(delay)) - 1))
      *     * daily_delay_queues: When true, the current date is appended to the delay queue names
      *       (e.g. "delay_messages__5000_delay_2025-04-28") and their "x-expires" argument is increased by 24 hours
      *       (24 * 60 * 60 * 1000 ms), so RabbitMQ deletes them automatically once the day is over. This is useful for
@@ -227,6 +234,14 @@ class Connection
 
         if (isset($amqpOptions['delay']['daily_delay_queues'])) {
             $amqpOptions['delay']['daily_delay_queues'] = filter_var($amqpOptions['delay']['daily_delay_queues'], \FILTER_VALIDATE_BOOL);
+        }
+
+        if (isset($amqpOptions['delay']['granularity'])) {
+            if (false === $granularity = filter_var($amqpOptions['delay']['granularity'], \FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
+                throw new InvalidArgumentException(\sprintf('The "delay.granularity" option of the AMQP Messenger transport must be a positive integer, "%s" given.', $amqpOptions['delay']['granularity']));
+            }
+
+            $amqpOptions['delay']['granularity'] = $granularity;
         }
 
         $queuesOptions = array_map(static function ($queueOptions) {
@@ -340,6 +355,15 @@ class Connection
     {
         $routingKey = $this->getRoutingKeyForMessage($amqpStamp);
         $isRetryAttempt = $amqpStamp && $amqpStamp->isRetryAttempt();
+
+        // the delay is part of the queue name and of its "x-message-ttl", so each distinct value needs its
+        // own queue; rounding up keeps randomized delays spread over a bounded number of queues. The default
+        // keeps two significant digits, which bounds that number whatever the magnitude of the delay is.
+        $granularity = $this->connectionOptions['delay']['granularity'] ?? 10 ** max(0, (int) log10($delay) - 1);
+
+        if (1 < $granularity) {
+            $delay = (int) (ceil($delay / $granularity) * $granularity);
+        }
 
         $this->setupDelay($delay, $routingKey, $isRetryAttempt);
 

@@ -591,6 +591,80 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', ['x-some-headers' => 'foo'], 5000);
     }
 
+    public function testItRoundsTheDelayUpToTheConfiguredGranularity()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__6000_delay', \AMQP_NOPARAM);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__6000_delay', false, 6000, ['granularity' => 1000]);
+
+        $connection->publish('{}', [], 5200);
+    }
+
+    public function testTheDelayGranularityIsNormalizedToAnInteger()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__6000_delay', \AMQP_NOPARAM);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__6000_delay', false, 6000, ['granularity' => '1000']);
+
+        $connection->publish('{}', [], 5200);
+    }
+
+    public function testADelayOnTheGranularityGridIsLeftUnchanged()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__5000_delay', \AMQP_NOPARAM);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__5000_delay', false, 5000, ['granularity' => 1000]);
+
+        $connection->publish('{}', [], 5000);
+    }
+
+    public function testItRoundsTheDelayUpToTwoSignificantDigitsByDefault()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__5300_delay', \AMQP_NOPARAM);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__5300_delay', false, 5300);
+
+        $connection->publish('{}', [], 5234);
+    }
+
+    public function testTheDefaultDelayGranularityScalesWithTheDelay()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__53000_delay', \AMQP_NOPARAM);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__53000_delay', false, 53000);
+
+        $connection->publish('{}', [], 52345);
+    }
+
+    public function testTheDelayRoundingIsDisabledByAGranularityOfOne()
+    {
+        $delayExchange = $this->createMock(\AMQPExchange::class);
+        $delayExchange->expects($this->once())
+            ->method('publish')
+            ->with('{}', 'delay_messages__5234_delay', \AMQP_NOPARAM);
+        $connection = $this->createDelayOrRetryConnection($delayExchange, self::DEFAULT_EXCHANGE_NAME, 'delay_messages__5234_delay', false, 5234, ['granularity' => 1]);
+
+        $connection->publish('{}', [], 5234);
+    }
+
+    public function testItThrowsWhenTheDelayGranularityIsNotPositive()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "delay.granularity" option of the AMQP Messenger transport must be a positive integer, "0" given.');
+
+        Connection::fromDsn('amqp://localhost?delay[granularity]=0');
+    }
+
     public function testItPublishesImmediatelyWithNegativeDelay()
     {
         $factory = new TestAmqpFactory(
@@ -1069,7 +1143,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName, bool|string $dailyDelayQueues = false): Connection
+    private function createDelayOrRetryConnection(\AMQPExchange $delayExchange, string $deadLetterExchangeName, string $delayQueueName, bool|string $dailyDelayQueues = false, int $expectedDelay = 5000, array $delayOptions = []): Connection
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -1084,17 +1158,19 @@ class ConnectionTest extends TestCase
         $baseExpire = filter_var($dailyDelayQueues, \FILTER_VALIDATE_BOOL) ? 86400 * 1000 : 0;
         $delayQueue->expects($this->once())->method('setName')->with($delayQueueName);
         $delayQueue->expects($this->once())->method('setArguments')->with([
-            'x-message-ttl' => 5000,
-            'x-expires' => 5000 + 10000 + $baseExpire,
+            'x-message-ttl' => $expectedDelay,
+            'x-expires' => $expectedDelay + 10000 + $baseExpire,
             'x-dead-letter-exchange' => $deadLetterExchangeName,
             'x-dead-letter-routing-key' => '',
         ]);
 
         $delayQueue->expects($this->once())->method('declareQueue');
         $delayQueue->expects($this->once())->method('bind')->with('delays', $delayQueueName);
-        $options = false === $dailyDelayQueues ? [] : ['delay' => ['daily_delay_queues' => $dailyDelayQueues]];
+        if (false !== $dailyDelayQueues) {
+            $delayOptions['daily_delay_queues'] = $dailyDelayQueues;
+        }
 
-        return Connection::fromDsn('amqp://localhost', $options, $factory);
+        return Connection::fromDsn('amqp://localhost', $delayOptions ? ['delay' => $delayOptions] : [], $factory);
     }
 
     public function testGettingDefaultExchange()

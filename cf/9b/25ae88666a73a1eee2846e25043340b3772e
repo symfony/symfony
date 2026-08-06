@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T12:46:26Z
+
+Rebased on 6.4 and folded in a related fix on the same line: dropped the `u` modifier.
+
+The character class is pure ASCII, so `u` bought nothing, and `preg_replace()` returns `null` on invalid UTF-8, which silently replaced the whole display name with an empty string (and skipped the escaping entirely). Multibyte names are unaffected, since UTF-8 continuation bytes are all >= 0x80 and the class only matches `"` and `\`.
+
+For the record, the escaping bug is worth more than a formatting nit. A display name ending in a backslash leaves the quoted-string unterminated, so `Fabien\" <evil@example.com>, "x` produces a `To:` whose first mailbox parses as `evil@example.com`. That string is what `AbstractTransport::stringifyAddresses()` hands to the API transports (Postmark, Mailgun, MailPace, Sendinblue, SES). SMTP is not affected, and CRLF injection was never possible because the constructor strips `\r` and `\n`.
+
+Thanks for the fix!

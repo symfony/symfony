@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T09:08:48Z
+
+Reworked during review, keeping your commit.
+
+The first version returned early from `validateAndDenormalizeLegacy()` as soon as the union contained a `bool` member and `filter_var()` recognised the value. That makes `FILTER_BOOL` win over *every* other member, not just `string`, and it runs before the empty-string handling further down. Two cases regressed against `7.4`:
+
+* `array|bool` with `''` in the `xml` and `csv` formats returned `false` instead of `[]`.
+* `bool|SomeBackedEnum` with `'on'` returned `true` instead of the enum case.
+
+Both are what the `type-info` path returns, so the early return moved the two paths apart again in those cases while bringing them together for `string|bool`.
+
+Sorting the member list with the same key `UnionType::__construct()` uses fixes the original problem without the collateral, and is shorter. Both regressions now have a test, each with a `type-info` counterpart.
+
+The description was also rewritten: this is not a regression from #65125, the legacy path behaved this way before it too, so the pull request is an alignment of the legacy path onto the `type-info` one.

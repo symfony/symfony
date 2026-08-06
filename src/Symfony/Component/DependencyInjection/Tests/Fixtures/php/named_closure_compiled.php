@@ -61,11 +61,11 @@ class ProjectServiceContainer extends Container
      */
     protected static function getHasConfiguratorService($container)
     {
-        $container->services['has_configurator'] = $instance = new \Testing\NamedClosure\NamedClosureClass();
+        $instance = new \Testing\NamedClosure\NamedClosureClass();
 
         \Testing\NamedClosure\NamedClosureClass::configure($instance);
 
-        return $instance;
+        return $container->services['has_configurator'] = $instance;
     }
 
     /**

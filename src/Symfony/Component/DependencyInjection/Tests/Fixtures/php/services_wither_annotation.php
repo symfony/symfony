@@ -56,9 +56,9 @@ class Symfony_DI_PhpDumper_Service_Wither_Annotation extends Container
         $a = $a->cloneFoo();
 
         $instance = $instance->withFoo1($a);
-        $container->services['wither'] = $instance = $instance->withFoo2($a);
+        $instance = $instance->withFoo2($a);
         $instance->setFoo($a);
 
-        return $instance;
+        return $container->services['wither'] = $instance;
     }
 }

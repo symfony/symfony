@@ -44,7 +44,7 @@ class RememberMeTokenProviderDoctrineSchemaListener extends AbstractSchemaListen
             }
         }
 
-        if (method_exists($event, 'setSchema')) {
+        if (method_exists($schema, 'edit') && method_exists($event, 'setSchema')) {
             $event->setSchema($schema);
         }
     }

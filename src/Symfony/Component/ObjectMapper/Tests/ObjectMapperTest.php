@@ -27,6 +27,12 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactor
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\OtherView as TargetInClassMapOtherView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Source as TargetInClassMapSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Target as TargetInClassMapTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
@@ -127,7 +133,12 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as Mu
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\A as MultipleTargetsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\C as MultipleTargetsC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetsWithTransform\PlainTarget as MultipleTargetsWithTransformPlainTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetsWithTransform\Source as MultipleTargetsWithTransformSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MyProxy;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedClassTransform\Dog;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedClassTransform\KennelSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedClassTransform\KennelTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\LineItemSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\LineItemTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\OrderSource as NestedCollectionOrderSource;
@@ -148,9 +159,12 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\InnerTargetA
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSource as MultiTargetOuterSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterSourceWithRenamedProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTarget as MultiTargetOuterTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithInnerSourceProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithInterfaceProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithRenamedProperty;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMultiTarget\OuterTargetWithUntypedProperty;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedValueOfPropertyType\OuterSource as PropertyTypeOuterSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedValueOfPropertyType\OuterTarget as PropertyTypeOuterTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\FinalInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\PartialInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PrivateParentProperty\ChildEntity;
@@ -180,6 +194,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLoc
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ChildTarget as SubclassTargetWithTransformChildTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ParentTarget as SubclassTargetWithTransformParentTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\Source as SubclassTargetWithTransformSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\SourceEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\TargetDto as TargetTransformTargetDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Transform\TransformToStdClass;
@@ -1215,6 +1232,27 @@ final class ObjectMapperTest extends TestCase
         $mapper->map($source);
     }
 
+    public function testExplicitTargetIsNotMappedWithTheTransformOfAnotherTarget()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new MultipleTargetsWithTransformSource(), MultipleTargetsWithTransformPlainTarget::class);
+
+        $this->assertInstanceOf(MultipleTargetsWithTransformPlainTarget::class, $target);
+        $this->assertSame('test', $target->name);
+        $this->assertSame('constructed', $target->label);
+    }
+
+    public function testExplicitTargetIsMappedWithTheTransformOfOneOfItsSubclasses()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new SubclassTargetWithTransformSource(), SubclassTargetWithTransformParentTarget::class);
+
+        $this->assertInstanceOf(SubclassTargetWithTransformChildTarget::class, $target);
+        $this->assertSame('test', $target->name);
+    }
+
     public function testNestedPropertyWithSeveralMapTargetsIsResolvedByItsDeclaredType()
     {
         $mapper = new ObjectMapper();
@@ -1254,6 +1292,36 @@ final class ObjectMapperTest extends TestCase
         $this->expectExceptionMessage('Ambiguous mapping');
 
         $mapper->map(new MultiTargetOuterSource(), OuterTargetWithInterfaceProperty::class);
+    }
+
+    public function testNestedPropertyWithSeveralMapTargetsIsLeftAloneWhenNoneMatchesItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new MultiTargetOuterSource();
+        $target = $mapper->map($source, OuterTargetWithInnerSourceProperty::class);
+
+        $this->assertSame($source->inner, $target->inner);
+    }
+
+    public function testNestedPropertyWithASingleMapTargetIsLeftAloneWhenItDoesNotMatchItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new PropertyTypeOuterSource();
+        $target = $mapper->map($source, PropertyTypeOuterTarget::class);
+
+        $this->assertSame($source->inner, $target->inner);
+    }
+
+    public function testNestedPropertyWithAClassTransformIsMappedWhenOnlyTheTransformMatchesItsDeclaredType()
+    {
+        $mapper = new ObjectMapper();
+
+        $target = $mapper->map(new KennelSource(), KennelTarget::class);
+
+        $this->assertInstanceOf(Dog::class, $target->pet);
+        $this->assertSame('rex', $target->pet->name);
     }
 
     public function testExplicitMappingTakesPriorityOverImplicitSameNameProperty()
@@ -1602,5 +1670,30 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('bar', $mapped->inner->name);
         // computed by the constructor, so it can only be set if the constructor ran
         $this->assertSame('slug-of-bar', $mapped->inner->slug);
+    }
+
+    public function testSameNameTargetPropertyMappingIsHonoredWhenSourceCarriesMetadata()
+    {
+        // Lead carries a class-level #[Map] to an unrelated view, so ObjectMapper reads metadata from
+        // the source side. The #[Map(transform)] declared on LeadDto::$type must still be applied to the
+        // same-name copy; otherwise the raw Type reaches the typed constructor argument and throws.
+        $dto = (new ObjectMapper())->map(new SourceCarriesMetadataLead(), SourceCarriesMetadataLeadDto::class);
+
+        $this->assertInstanceOf(SourceCarriesMetadataTypeDto::class, $dto->type);
+        $this->assertSame(7, $dto->type->id);
+        $this->assertSame('moving', $dto->type->name);
+    }
+
+    public function testSameNameCopyIgnoresAMappingSynthesizedForAnotherTarget()
+    {
+        // Target is itself a source in the class map, so the reverse factory synthesizes a mapping
+        // for its "label" property carrying OtherView as its target class. That transform belongs to
+        // the Target to OtherView direction and must not be applied when mapping Source to Target.
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(
+            new ReflectionObjectMapperMetadataFactory(),
+            [TargetInClassMapTarget::class => TargetInClassMapOtherView::class],
+        ));
+
+        $this->assertSame('lower', $mapper->map(new TargetInClassMapSource(), TargetInClassMapTarget::class)->label);
     }
 }

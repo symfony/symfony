@@ -188,7 +188,6 @@ abstract class FileLoader extends BaseFileLoader
                 if ($r->isInterface()) {
                     $this->interfaces[] = $class;
                 }
-                $autoconfigureAttributes?->processClass($this->container, $r);
                 $definition->setAbstract(true)
                     ->addTag('container.excluded', ['source' => 'because the class is abstract']);
                 continue;

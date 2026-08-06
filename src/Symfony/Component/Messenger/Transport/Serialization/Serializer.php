@@ -112,7 +112,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $type, $this->format, $context);
         } catch (\Throwable $e) {
-            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode message: '.$e->getMessage(), (int) $e->getCode(), $e);
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode message: '.$e->getMessage(), (int) $e->getCode(), $e)->with(...$stamps);
         }
 
         return new Envelope($message, $stamps);
@@ -134,19 +134,28 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
 
+        // A decode failure keeps the original encoded envelope: re-emit its body as-is
+        // instead of serializing the exception, which cannot be decoded back
+        $decodingFailure = $envelope->getMessage() instanceof MessageDecodingFailedException
+            ? $envelope->getMessage()->encodedEnvelope
+            : [];
+        $decodingFailureBody = \is_string($decodingFailure['body'] ?? null) ? $decodingFailure['body'] : null;
+        // the original headers describe the original body, so they win for "type" and "Content-Type"
+        $decodingFailureHeaders = null !== $decodingFailureBody && \is_array($decodingFailure['headers'] ?? null) ? $decodingFailure['headers'] : [];
+
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 
         $headers = [
-            'type' => $this->getTypeFromEnvelope($envelope),
+            'type' => $decodingFailureHeaders['type'] ?? $this->getTypeFromEnvelope($envelope),
             ...$this->encodeStamps($envelope),
-            ...$this->getContentTypeHeader(),
+            ...(null !== $decodingFailureBody ? [] : $this->getContentTypeHeader()),
         ];
 
         return [
-            'body' => $serializedMessageStamp
-                ? $serializedMessageStamp->getSerializedMessage()
-                : $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
-            'headers' => $headers,
+            'body' => $decodingFailureBody
+                ?? $serializedMessageStamp?->getSerializedMessage()
+                ?? $this->serializer->serialize($envelope->getMessage(), $this->format, $context),
+            'headers' => $headers + $decodingFailureHeaders,
         ];
     }
 

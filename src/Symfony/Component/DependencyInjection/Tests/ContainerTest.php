@@ -141,7 +141,7 @@ class ContainerTest extends TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', new \stdClass());
-        $this->assertEquals(['service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'alias', 'foo'], $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
+        $this->assertEquals(['service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'throws_error_on_service_configuration', 'throws_exception_on_private_service_configuration', 'internal_dependency', 'alias', 'foo'], $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -369,6 +369,50 @@ class ContainerTest extends TestCase
         $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
     }
 
+    public function testGetThrowsErrorOnServiceConfiguration()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throws_error_on_service_configuration');
+            $this->fail('->get() should throw the error raised while configuring the service');
+        } catch (\Error $e) {
+            // Do nothing.
+        }
+
+        $this->assertFalse($c->initialized('throws_error_on_service_configuration'));
+
+        // Retry, to make sure that get*Service() will be called.
+        try {
+            $c->get('throws_error_on_service_configuration');
+            $this->fail('->get() should throw the error again instead of returning a partially-configured service');
+        } catch (\Error $e) {
+            // Do nothing.
+        }
+        $this->assertFalse($c->initialized('throws_error_on_service_configuration'));
+    }
+
+    public function testGetThrowsExceptionOnPrivateServiceConfiguration()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('throws_exception_on_private_service_configuration');
+        } catch (\Exception $e) {
+            // Do nothing.
+        }
+
+        $this->assertArrayNotHasKey('throws_exception_on_private_service_configuration', $this->getField($c, 'privates'));
+
+        // Retry, to make sure that get*Service() will be called.
+        try {
+            $c->get('throws_exception_on_private_service_configuration');
+        } catch (\Exception $e) {
+            // Do nothing.
+        }
+        $this->assertArrayNotHasKey('throws_exception_on_private_service_configuration', $this->getField($c, 'privates'));
+    }
+
     protected function getField($obj, $field)
     {
         $reflection = new \ReflectionProperty($obj, $field);
@@ -458,6 +502,8 @@ class ProjectServiceContainer extends Container
             'circular' => 'getCircularService',
             'throw_exception' => 'getThrowExceptionService',
             'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
+            'throws_error_on_service_configuration' => 'getThrowsErrorOnServiceConfigurationService',
+            'throws_exception_on_private_service_configuration' => 'getThrowsExceptionOnPrivateServiceConfigurationService',
             'internal_dependency' => 'getInternalDependencyService',
         ];
     }
@@ -497,6 +543,20 @@ class ProjectServiceContainer extends Container
         $this->services['throws_exception_on_service_configuration'] = $instance = new \stdClass();
 
         throw new \Exception('Something was terribly wrong while trying to configure the service!');
+    }
+
+    protected function getThrowsErrorOnServiceConfigurationService()
+    {
+        $this->services['throws_error_on_service_configuration'] = $instance = new \stdClass();
+
+        throw new \Error('Something was terribly wrong while trying to configure the service!');
+    }
+
+    protected function getThrowsExceptionOnPrivateServiceConfigurationService()
+    {
+        $this->privates['throws_exception_on_private_service_configuration'] = $instance = new \stdClass();
+
+        throw new \Exception('Something was terribly wrong while trying to configure the private service!');
     }
 
     protected function getInternalDependencyService()

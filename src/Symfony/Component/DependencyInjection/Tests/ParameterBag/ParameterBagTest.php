@@ -35,12 +35,24 @@ class ParameterBagTest extends TestCase
 
     public function testClear()
     {
-        $bag = new ParameterBag($parameters = [
+        $bag = new ParameterBag([
             'foo' => 'foo',
             'bar' => 'bar',
         ]);
+        $bag->deprecate('foo', 'symfony/test', '6.3');
+        $bag->resolve();
         $bag->clear();
         $this->assertEquals([], $bag->all(), '->clear() removes all parameters');
+        $this->assertEquals([], $bag->allDeprecated(), '->clear() removes all deprecated parameters');
+        $this->assertFalse($bag->isResolved(), '->clear() resets the resolved state');
+
+        $bag->set('base', 'value');
+        $bag->set('ref', '%base%');
+        $bag->set('escaped', 'foo %%bar%% baz');
+        $bag->resolve();
+        $this->assertSame('value', $bag->get('ref'), '->resolve() resolves parameters added after clear()');
+        $this->assertSame('foo %bar% baz', $bag->get('escaped'), '->resolve() unescapes parameters added after clear() only once');
+        $this->assertTrue($bag->isResolved());
     }
 
     public function testRemove()

@@ -98,15 +98,6 @@ class PhpDumperTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
-    public static function assertStringEqualsFile(string $expectedFile, string $actualString, string $message = ''): void
-    {
-        if (getenv('UPDATE_FIXTURES')) {
-            file_put_contents($expectedFile, $actualString);
-        }
-
-        parent::assertStringEqualsFile($expectedFile, $actualString, $message);
-    }
-
     public function testDump()
     {
         $container = new ContainerBuilder();

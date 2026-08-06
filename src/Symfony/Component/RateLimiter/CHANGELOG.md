@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `RateLimitExceededEvent`
+
 8.1
 ---
 

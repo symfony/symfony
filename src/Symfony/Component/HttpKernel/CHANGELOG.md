@@ -7,6 +7,7 @@ CHANGELOG
  * Add `#[AsControllerAttributeListener]` attribute to declare event listeners for controller attributes
  * Add the `$expiration` argument to `FragmentUriGenerator::__construct()` and sign fragment URIs with a 5-year expiration by default
  * Add `hasDump()` method to `Profile` to track profiles with dump
+ * Dispatch `RateLimitExceededEvent` from `RateLimitAttributeListener` when the `#[RateLimit]` attribute rejects a request
 
 8.1
 ---

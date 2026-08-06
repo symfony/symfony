@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,7 @@ use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\RateLimiter\LimiterInterface;
 use Symfony\Component\RateLimiter\RateLimit as RateLimitResult;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -130,6 +132,73 @@ class RateLimitAttributeListenerTest extends TestCase
             new RateLimit('api', key: static fn () => 42),
             Request::create('/'),
         ));
+    }
+
+    public function testRejectedDispatchesRateLimitExceededEvent()
+    {
+        if (!class_exists(RateLimitExceededEvent::class)) {
+            $this->markTestSkipped('The installed "symfony/rate-limiter" does not provide RateLimitExceededEvent.');
+        }
+
+        $result = new RateLimitResult(0, new \DateTimeImmutable('+1 minute'), false, 5);
+
+        $limiter = $this->createStub(LimiterInterface::class);
+        $limiter->method('consume')->willReturn($result);
+
+        $factory = $this->createStub(RateLimiterFactoryInterface::class);
+        $factory->method('create')->willReturn($limiter);
+
+        $locator = $this->createStub(ServiceProviderInterface::class);
+        $locator->method('has')->willReturn(true);
+        $locator->method('get')->willReturn($factory);
+        $locator->method('getProvidedServices')->willReturn(['api' => RateLimiterFactoryInterface::class]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatchedEvent = null;
+        $dispatcher->addListener(RateLimitExceededEvent::class, static function (RateLimitExceededEvent $event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
+
+        $listener = new RateLimitAttributeListener($locator);
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '9.9.9.9']);
+
+        try {
+            $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), $request), null, $dispatcher);
+            $this->fail('Expected TooManyRequestsHttpException');
+        } catch (TooManyRequestsHttpException) {
+        }
+
+        $this->assertInstanceOf(RateLimitExceededEvent::class, $dispatchedEvent);
+        $this->assertSame($result, $dispatchedEvent->getRateLimit());
+        $this->assertSame('api', $dispatchedEvent->getLimiterName());
+        $this->assertSame('9.9.9.9~GET~/', $dispatchedEvent->getKey());
+    }
+
+    public function testAcceptedDoesNotDispatchEvent()
+    {
+        $dispatched = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(RateLimitExceededEvent::class, static function ($event) use (&$dispatched) {
+            $dispatched[] = $event;
+        });
+
+        $result = new RateLimitResult(4, new \DateTimeImmutable('+1 minute'), true, 5);
+
+        $limiter = $this->createStub(LimiterInterface::class);
+        $limiter->method('consume')->willReturn($result);
+
+        $factory = $this->createStub(RateLimiterFactoryInterface::class);
+        $factory->method('create')->willReturn($limiter);
+
+        $locator = $this->createStub(ServiceProviderInterface::class);
+        $locator->method('has')->willReturn(true);
+        $locator->method('get')->willReturn($factory);
+        $locator->method('getProvidedServices')->willReturn(['api' => RateLimiterFactoryInterface::class]);
+
+        $listener = new RateLimitAttributeListener($locator);
+        $listener->onKernelControllerAttribute($this->makeEvent(new RateLimit('api'), Request::create('/')), null, $dispatcher);
+
+        $this->assertSame([], $dispatched);
     }
 
     public function testMethodFilterSkipsNonMatchingMethod()

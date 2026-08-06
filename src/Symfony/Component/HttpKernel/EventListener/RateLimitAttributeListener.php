@@ -17,7 +17,9 @@ use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -38,7 +40,7 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
     /**
      * @param ControllerAttributeEvent<RateLimit, ControllerArgumentsEvent> $event
      */
-    public function onKernelControllerAttribute(ControllerAttributeEvent $event): void
+    public function onKernelControllerAttribute(ControllerAttributeEvent $event, ?string $eventName = null, ?EventDispatcherInterface $dispatcher = null): void
     {
         $request = $event->kernelEvent->getRequest();
         $attribute = $event->attribute;
@@ -60,6 +62,10 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
         $rateLimit = $this->limiters->get($attribute->limiter)->create($key)->consume($attribute->tokens);
 
         if (!$rateLimit->isAccepted()) {
+            if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
+                $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $attribute->limiter, $key));
+            }
+
             throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()));
         }
     }

@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">この値は有効なXMLではありません。</target>
+                <target>この値は有効なXMLではありません。</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">この値は期待されるXSDスキーマに準拠していません。</target>
+                <target>この値は期待されるXSDスキーマに準拠していません。</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">このXMLペイロードは大きすぎます（{{ size }}バイト）。{{ limit }}バイトの制限を超えています。</target>
+                <target>このXMLペイロードは大きすぎます（{{ size }}バイト）。{{ limit }}バイトの制限を超えています。</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">この値は有効なcron式ではありません。</target>
+                <target>この値は有効なcron式ではありません。</target>
             </trans-unit>
         </body>
     </file>

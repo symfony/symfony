@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">有効なUUIDを入力してください。</target>
+                <target>有効なUUIDを入力してください。</target>
             </trans-unit>
         </body>
     </file>

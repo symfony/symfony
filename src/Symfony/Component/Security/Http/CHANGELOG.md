@@ -16,6 +16,7 @@ CHANGELOG
  * Configure the decorated handler of `CustomAuthenticationSuccessHandler` and `CustomAuthenticationFailureHandler` when they are called instead of when they are built, so that a single handler can be shared by several authenticators
  * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()` to add extra query parameters covered by the link signature
  * Expose the verified extra parameters via the `_login_link_parameters` request attribute when consuming a login link
+ * Dispatch `RateLimitExceededEvent` from `LoginThrottlingListener` when login throttling rejects an attempt
 
 8.1
 ---

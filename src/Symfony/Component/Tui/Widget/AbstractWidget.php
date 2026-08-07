@@ -388,6 +388,28 @@ abstract class AbstractWidget
     abstract public function render(RenderContext $context): array;
 
     /**
+     * Makes a widget a child of this one, so it takes part in the render tree.
+     *
+     * Call it from a widget that owns other widgets, once the child is stored.
+     * It is safe to call before this widget is attached itself: the child joins
+     * the context along with its parent.
+     */
+    final protected function attachChild(self $child): void
+    {
+        $child->setParent($this);
+        $this->getContext()?->attachChild($this, $child);
+    }
+
+    /**
+     * Releases a widget previously passed to attachChild().
+     */
+    final protected function detachChild(self $child): void
+    {
+        $child->setParent(null);
+        $this->getContext()?->detachChild($child);
+    }
+
+    /**
      * @internal
      */
     final protected function setParent(?self $parent): void

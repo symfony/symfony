@@ -60,7 +60,11 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         $message = '';
-        if (null !== $options->expr) {
+        if ($options->expr instanceof \Closure) {
+            if (null === $object = $this->findViaClosure($manager, $options, $request)) {
+                $message = ' The closure returned null.';
+            }
+        } elseif (null !== $options->expr) {
             $variables = array_merge($request->attributes->all(), ['request' => $request]);
             if (null === $object = $this->findViaExpression($this->expressionLanguage, $manager, $options, $variables)) {
                 $message = \sprintf(' The expression "%s" returned null.', $options->expr);

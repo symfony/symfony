@@ -6,12 +6,13 @@ CHANGELOG
 
  * Add IterableToArrayCollectionTransformer for ObjectMapper
  * Throw a `ConstraintDefinitionException` from `UniqueEntity` when a checked field holds an array or is a to-many association, instead of building a query that cannot match
+ * Allow using closures with the `#[MapEntity]` attribute
 
 8.1
 ---
 
  * Add option `uid_format` to `EntityType`
- * Deprecate setting an `$aliasMap` in `RegisterMappingsPass`. Namespace aliases are no longer supported in Doctrine.
+ * Deprecate setting an `$aliasMap` in `RegisterMappingsPass`; namespace aliases are no longer supported in Doctrine
 
 8.0
 ---

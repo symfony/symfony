@@ -510,6 +510,26 @@ class GuzzleHttpHandlerTest extends TestCase
         }
     }
 
+    public function testMidStreamTransportErrorRejectsWithRequestException()
+    {
+        $client = new MockHttpClient(static fn () => new MockResponse((static function (): \Generator {
+            yield 'partial body';
+            yield new \RuntimeException('Connection reset by peer');
+        })(), ['http_code' => 200]));
+        $handler = new GuzzleHttpHandler($client);
+
+        $promise = $handler(new Request('GET', 'https://example.com/'), []);
+
+        try {
+            $promise->wait();
+            $this->fail('Expected RequestException');
+        } catch (RequestException $e) {
+            $this->assertSame('Connection reset by peer', $e->getMessage());
+            $this->assertNotNull($e->getResponse());
+            $this->assertSame(200, $e->getResponse()->getStatusCode());
+        }
+    }
+
     // -- Async / concurrency --------------------------------------------------
 
     public function testInvokeReturnsPendingPromise()

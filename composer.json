@@ -140,7 +140,7 @@
         "doctrine/orm": "^3.4",
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^2.1.10|^3.1|^4",
-        "guzzlehttp/guzzle": "^7.10",
+        "guzzlehttp/guzzle": "^7.10|^8.0",
         "jolicode/jolinotif": "^2.7.2|^3.0",
         "jsonpath-standard/jsonpath-compliance-test-suite": "*",
         "league/commonmark": "^2.9",

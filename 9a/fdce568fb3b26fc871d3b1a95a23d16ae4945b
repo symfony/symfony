@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T21:12:02Z
+
+Verified against a real Guzzle 8 install (8.0.2 with promises 3.0.1 and psr7 3.0.0). Reflection confirms the three signatures the fix depends on:
+
+```
+RequestException  __construct(string, RequestInterface, int $code, ?Throwable)          getResponse: no
+ResponseException __construct(string, RequestInterface, ResponseInterface, ?Throwable)  getResponse: yes, extends RequestException
+ConnectException  __construct(string, RequestInterface, ?Throwable)
+```
+
+Three-state check on the new test:
+
+```
+base source + guzzle 7 : OK          (the bug is guzzle 8 only)
+base source + guzzle 8 : TypeError: RequestException::__construct(): Argument #3 ($code)
+                         must be of type int, GuzzleHttp\Psr7\Response given
+PR source   + guzzle 8 : OK
+PR source   + guzzle 7 : OK (65 tests)
+```
+
+Guzzle 7 declares `ConnectException::__construct(string, RequestInterface, ?Throwable, array)`, so the new three argument call is right on both majors and no `class_exists()` guard is needed there. Your reading of the old five argument call is correct: PHP dropped the extra argument silently, so `$previous` was never chained.
+
+One thing was missing, and I pushed it: the root `composer.json` still pinned `guzzlehttp/guzzle: ^7.10`. The test suite installs from there, so Guzzle 8 was never installed and the new test could not have exercised the fix in CI, only the Guzzle 7 path it already passes on. `composer why-not guzzlehttp/guzzle 8.0.2` said:
+
+```
+symfony/symfony 8.1.x-dev requires (for development) guzzlehttp/guzzle (^7.10)
+```
+
+Widened it to `^7.10|^8.0` to match the component. With that, `HttpClient` on Guzzle 8 is `Tests: 1188, Assertions: 2796, Skipped: 43` with the only two errors being the vulcain server tests, which need a local server and fail the same way on Guzzle 7.
+
+Also rebased on 8.1. 8.1 is the right target: `GuzzleHttpHandler` does not exist on 7.4 or 6.4.

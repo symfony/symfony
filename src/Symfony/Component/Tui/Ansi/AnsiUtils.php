@@ -362,6 +362,13 @@ final class AnsiUtils
                     if ($j < $lineLen && \ord($line[$j]) >= 0x40 && \ord($line[$j]) <= 0x7E) {
                         $code = substr($line, $i, $j + 1 - $i);
                         if ($currentCol >= $startCol && $currentCol < $endCol) {
+                            // Flush first: pendingAnsi holds codes seen before startCol and must
+                            // stay ahead of any code encountered once we're inside the range, or
+                            // the active state at this column ends up reversed.
+                            if ('' !== $pendingAnsi) {
+                                $result .= $pendingAnsi;
+                                $pendingAnsi = '';
+                            }
                             $result .= $code;
                         } elseif ($currentCol < $startCol) {
                             $pendingAnsi .= $code;
@@ -373,6 +380,10 @@ final class AnsiUtils
                 $ansi = self::extractAnsiCode($line, $i);
                 if (null !== $ansi) {
                     if ($currentCol >= $startCol && $currentCol < $endCol) {
+                        if ('' !== $pendingAnsi) {
+                            $result .= $pendingAnsi;
+                            $pendingAnsi = '';
+                        }
                         $result .= $ansi['code'];
                     } elseif ($currentCol < $startCol) {
                         $pendingAnsi .= $ansi['code'];

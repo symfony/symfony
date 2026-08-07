@@ -212,6 +212,24 @@ class AnsiUtilsTest extends TestCase
         $this->assertSame(3, AnsiUtils::visibleWidth($result));
     }
 
+    public function testSliceByColumnPreservesCodeOrderWhenAColorChangeLandsOnStartColumn()
+    {
+        // "AA" red, "BB" blue: slicing from column 1 crosses into the pending-before-start red
+        // code (column 0) and the in-range blue code (starts exactly at column 1). The pending
+        // code must stay ordered before the in-range one, or the wrong color ends up active.
+        $line = "\x1b[31mA\x1b[34mABB\x1b[0m";
+
+        $result = AnsiUtils::sliceByColumn($line, 1, 1);
+
+        $redPos = strpos($result, "\x1b[31m");
+        $bluePos = strpos($result, "\x1b[34m");
+
+        $this->assertNotFalse($redPos);
+        $this->assertNotFalse($bluePos);
+        $this->assertLessThan($bluePos, $redPos, 'The pending (earlier) color code must appear before the in-range (later) one, so blue is the last -- and therefore active -- code.');
+        $this->assertSame('A', AnsiUtils::stripAnsiCodes($result));
+    }
+
     /**
      * @return iterable<string, array{string, bool}>
      */

@@ -154,6 +154,27 @@ class TokenBucketLimiterTest extends TestCase
         }
     }
 
+    public function testEffectivelyInfiniteBurstSizeIsCapped()
+    {
+        $limiter = $this->createLimiter(\PHP_INT_MAX, new Rate(new \DateInterval('PT10S'), 10));
+
+        $rateLimit = $limiter->consume(1);
+
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertSame(TokenBucket::MAX_BURST_SIZE, $rateLimit->getLimit());
+        $this->assertSame(TokenBucket::MAX_BURST_SIZE - 1, $rateLimit->getRemainingTokens());
+    }
+
+    public function testCappedBurstSizeSurvivesTheStorageRoundTrip()
+    {
+        $limiter = $this->createLimiter(\PHP_INT_MAX, new Rate(new \DateInterval('PT10S'), 10));
+
+        $limiter->consume(1);
+        $rateLimit = $limiter->consume(1);
+
+        $this->assertSame(TokenBucket::MAX_BURST_SIZE - 2, $rateLimit->getRemainingTokens());
+    }
+
     private function createLimiter($initialTokens = 10, ?Rate $rate = null)
     {
         return new TokenBucketLimiter('test', $initialTokens, $rate ?? Rate::perSecond(10), $this->storage);

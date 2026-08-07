@@ -5,6 +5,13 @@ framework:
     lock: ~
     rate_limiter: ~
 
+services:
+    app.rate_limit_exceeded_collector:
+        class: Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\FormLoginBundle\EventListener\RateLimitExceededCollector
+        public: true
+        tags:
+            - { name: kernel.event_listener, event: Symfony\Component\RateLimiter\Event\RateLimitExceededEvent, method: onRateLimitExceeded }
+
 security:
     firewalls:
         default:

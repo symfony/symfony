@@ -13,6 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
@@ -50,6 +51,7 @@ class RegisterGlobalSecurityEventListenersPass implements CompilerPassInterface
         CheckRefreshedUserEvent::class,
         TokenDeauthenticatedEvent::class,
         OidcAuthorizationRequestEvent::class,
+        RateLimitExceededEvent::class,
 
         // When events are registered by their name
         AuthenticationEvents::AUTHENTICATION_SUCCESS,

@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Clock\ClockInterface;
+use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationMethod;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -222,6 +223,30 @@ class FormLoginTest extends AbstractWebTestCase
                     break;
             }
         }
+    }
+
+    #[Group('time-sensitive')]
+    public function testLoginThrottlingDispatchesRateLimitExceededEvent()
+    {
+        if (!class_exists(RateLimitExceededEvent::class)) {
+            $this->markTestSkipped('The installed "symfony/rate-limiter" does not provide RateLimitExceededEvent.');
+        }
+
+        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);
+
+        foreach ([['johannes', 'wrong'], ['johannes', 'also_wrong']] as $attempt) {
+            $form = $client->request('GET', '/login')->selectButton('login')->form();
+            $form['_username'] = $attempt[0];
+            $form['_password'] = $attempt[1];
+            $client->submit($form);
+        }
+
+        $events = $client->getContainer()->get('app.rate_limit_exceeded_collector')->events;
+
+        $this->assertCount(1, $events);
+        $this->assertSame('security.login_throttling.default.limiter', $events[0]->getLimiterName());
+        $this->assertNull($events[0]->getKey());
+        $this->assertFalse($events[0]->getRateLimit()->isAccepted());
     }
 
     public static function provideClientOptions(): iterable

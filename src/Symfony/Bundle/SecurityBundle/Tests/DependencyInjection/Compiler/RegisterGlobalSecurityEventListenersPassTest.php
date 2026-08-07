@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\Security\Core\AuthenticationEvents;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
@@ -80,6 +81,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
             [LogoutEvent::class, LogoutEvent::class],
             [AuthenticationTokenCreatedEvent::class, AuthenticationTokenCreatedEvent::class],
             [OidcAuthorizationRequestEvent::class, OidcAuthorizationRequestEvent::class],
+            [RateLimitExceededEvent::class, RateLimitExceededEvent::class],
             [AuthenticationEvents::AUTHENTICATION_SUCCESS, AuthenticationEvents::AUTHENTICATION_SUCCESS],
             [SecurityEvents::INTERACTIVE_LOGIN, SecurityEvents::INTERACTIVE_LOGIN],
 

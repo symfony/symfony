@@ -78,6 +78,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         // login throttling
         $listener = $container->getDefinition('security.listener.login_throttling.main');
         $this->assertEquals('app.rate_limiter', (string) $listener->getArgument(1));
+        $this->assertSame('app.rate_limiter', $listener->getArgument(2));
     }
 
     public function testRolesHierarchy()

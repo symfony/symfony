@@ -69,6 +69,7 @@ CHANGELOG
  * Add `OidcAuthorizationRequestEvent` and the `$eventDispatcher` argument to `OidcLoginAuthenticator`, so that the extra parameters of the OIDC authorization request can be computed per request
  * Allow keying the clients passed to `OidcTokenHandler::enableDiscovery()` by the issuer their discovery document must announce
  * Add `TlsClientAuth`, `SelfSignedTlsClientAuth`, the `$certificateOptions` argument of `OidcClient` and the `$checkedMtlsAliases` argument of `OidcDiscovery` (RFC 8705)
+ * Add the `$limiterName` argument to `LoginThrottlingListener`, which dispatches `RateLimitExceededEvent` when login throttling rejects an attempt
 
 8.1
 ---

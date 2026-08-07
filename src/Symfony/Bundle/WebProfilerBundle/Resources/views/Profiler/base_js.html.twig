@@ -21,7 +21,10 @@
         #createTabs() {
             /* the accessibility options of this component have been defined according to: */
             /* www.w3.org/WAI/ARIA/apg/example-index/tabs/tabs-manual.html */
-            const tabGroups = document.querySelectorAll('.sf-tabs:not([data-processed=true])');
+            /* skip tab groups whose navigation is server-rendered (e.g. the exception panel
+               markup shipped by ErrorHandler, which is wired by its own exception.js) */
+            const tabGroups = Array.from(document.querySelectorAll('.sf-tabs:not([data-processed=true])'))
+                .filter((tabGroup) => null === tabGroup.querySelector(':scope > .tab-navigation'));
 
             /* create the tab navigation for each group of tabs */
             tabGroups.forEach((tabGroup, i) => {
@@ -217,10 +220,11 @@
                 return;
             }
 
-            const copyToClipboardElements = document.querySelectorAll('[data-clipboard-text]');
+            const copyToClipboardElements = document.querySelectorAll('[data-clipboard-text]:not([data-processed=true])');
 
             copyToClipboardElements.forEach((copyToClipboardElement) => {
                 copyToClipboardElement.classList.remove('hidden');
+                copyToClipboardElement.setAttribute('data-processed', 'true');
 
                 copyToClipboardElement.addEventListener('click', (e) => {
                     /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */

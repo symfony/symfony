@@ -55,4 +55,12 @@ class ExceptionPanelController
     {
         return new Response($this->errorRenderer->getStylesheet(), 200, ['Content-Type' => 'text/css']);
     }
+
+    /**
+     * Renders the exception panel JavaScript.
+     */
+    public function javascript(): Response
+    {
+        return new Response($this->errorRenderer->getJavaScript(), 200, ['Content-Type' => 'text/javascript']);
+    }
 }

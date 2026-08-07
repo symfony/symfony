@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:24:16Z
+
+Rebased on 8.2, resolving the CHANGELOG conflict with the `attachChild()`/`detachChild()` entry, and added the missing `UPGRADE-8.2.md` entry for the constructor argument move (the CHANGELOG documented the BC break, the upgrade guide did not).
+
+@fabpot your change request looks addressed by 487ec73: the `[BC BREAK]` line is in the Tui CHANGELOG. Could you dismiss or re-approve?
+
+Tui suite passes (1669 tests). Reverting `SelectListWidget` while keeping the tests fails with "Unknown named parameter $multiselect", as expected for new API.

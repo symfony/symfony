@@ -32,15 +32,21 @@ final class CombinedOutput implements OutputInterface
 
     public function write(iterable|string $messages, bool $newline = false, int $options = 0): void
     {
+        $args = \func_get_args();
+        $args[0] = $this->buffer($messages, $options);
+
         foreach ($this->outputs as $output) {
-            $output->write(...\func_get_args());
+            $output->write(...$args);
         }
     }
 
     public function writeln(iterable|string $messages, int $options = 0): void
     {
+        $args = \func_get_args();
+        $args[0] = $this->buffer($messages, $options);
+
         foreach ($this->outputs as $output) {
-            $output->writeln(...\func_get_args());
+            $output->writeln(...$args);
         }
     }
 
@@ -103,5 +109,28 @@ final class CombinedOutput implements OutputInterface
     public function getFormatter(): OutputFormatterInterface
     {
         return array_first($this->outputs)->getFormatter();
+    }
+
+    /**
+     * Buffers one-shot iterables, as writing them to the first output would otherwise
+     * leave nothing to write to the next ones. Iterables that no output would write
+     * are not consumed at all.
+     */
+    private function buffer(iterable|string $messages, int $options): iterable|string
+    {
+        if (!$messages instanceof \Traversable) {
+            return $messages;
+        }
+
+        $verbosities = self::VERBOSITY_QUIET | self::VERBOSITY_NORMAL | self::VERBOSITY_VERBOSE | self::VERBOSITY_VERY_VERBOSE | self::VERBOSITY_DEBUG;
+        $verbosity = $verbosities & $options ?: self::VERBOSITY_NORMAL;
+
+        foreach ($this->outputs as $output) {
+            if ($verbosity <= $output->getVerbosity()) {
+                return iterator_to_array($messages, false);
+            }
+        }
+
+        return [];
     }
 }

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T11:43:39Z
+
+Retargeted to 6.4: the flaw is not specific to 8.x. `getMutatorMethod()` has never honoured `$methodReflectionFlags`, on 6.4 and 7.4 through `new \ReflectionMethod($class, ...)` and since 8.1 through `$refClass->getMethod(...)`; both return non-public methods, and `isWritable()` returns true on finding any of them. Verified on 6.4: `isWritable()` reports true for a private and for a protected setter.
+
+The patch is adapted to 6.4's lookup, otherwise identical. Checked on 6.4: PropertyInfo 553 tests green, and the two new cases fail on base with "true is identical to false". PropertyAccess (482), Serializer (1150) and Form (4748) are also green, so nothing in the tree relies on the incorrect true.

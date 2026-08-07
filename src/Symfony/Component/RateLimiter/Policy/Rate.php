@@ -20,6 +20,11 @@ use Symfony\Component\RateLimiter\Util\TimeUtil;
  */
 final class Rate
 {
+    /**
+     * ~68 years, the largest duration that still fits an int on 32-bit platforms.
+     */
+    private const MAX_SECONDS = 2147483647;
+
     public function __construct(
         private \DateInterval $refillTime,
         private int $refillAmount = 1,
@@ -68,12 +73,15 @@ final class Rate
 
     /**
      * Calculates the time needed to free up the provided number of tokens in seconds.
+     *
+     * The result is capped at self::MAX_SECONDS, as the exact value overflows the
+     * integer range for very large numbers of tokens.
      */
     public function calculateTimeForTokens(int $tokens): int
     {
         $cyclesRequired = ceil($tokens / $this->refillAmount);
 
-        return TimeUtil::dateIntervalToSeconds($this->refillTime) * $cyclesRequired;
+        return (int) min(self::MAX_SECONDS, TimeUtil::dateIntervalToSeconds($this->refillTime) * $cyclesRequired);
     }
 
     /**

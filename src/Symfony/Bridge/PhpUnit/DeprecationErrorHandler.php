@@ -366,8 +366,12 @@ class DeprecationErrorHandler
                 $eh = self::$errorHandler = UtilErrorHandler::class;
             } elseif (method_exists(ErrorHandler::class, '__invoke')) {
                 $eh = self::$errorHandler = ErrorHandler::class;
-            } else {
+            } elseif (method_exists(UtilErrorHandler::class, 'handleError')) {
                 return self::$errorHandler = 'PHPUnit\Util\ErrorHandler::handleError';
+            } else {
+                // PHPUnit is not loadable in this process, so there is no handler to
+                // delegate to; leave the error to PHP
+                return static function () { return false; };
             }
         }
 

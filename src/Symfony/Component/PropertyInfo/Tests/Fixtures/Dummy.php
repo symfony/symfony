@@ -287,4 +287,12 @@ class Dummy extends ParentDummy
     public function addNullableTypedCollection(Dummy $dummy): void
     {
     }
+
+    private function setPrivateMutator($privateMutator)
+    {
+    }
+
+    protected function setProtectedMutator($protectedMutator)
+    {
+    }
 }

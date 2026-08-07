@@ -12,7 +12,7 @@
             </trans-unit>
             <trans-unit id="30">
                 <source>The CSRF token is invalid. Please try to resubmit the form.</source>
-                <target state="needs-review-translation">CSRF tokena baliogabea da. Mesedez, saiatu berriro formularioa bidaltzen.</target>
+                <target>CSRF tokena baliogabea da. Mesedez, saiatu berriro formularioa bidaltzen.</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid HTML5 color.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">Mesedez, sartu baliozko UUID bat.</target>
+                <target>Mesedez, sartu baliozko UUID bat.</target>
             </trans-unit>
         </body>
     </file>

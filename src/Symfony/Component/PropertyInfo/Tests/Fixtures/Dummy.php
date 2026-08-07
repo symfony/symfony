@@ -272,4 +272,12 @@ class Dummy extends ParentDummy
     public function hasElement(string $element): bool
     {
     }
+
+    private function setPrivateMutator($privateMutator)
+    {
+    }
+
+    protected function setProtectedMutator($protectedMutator)
+    {
+    }
 }

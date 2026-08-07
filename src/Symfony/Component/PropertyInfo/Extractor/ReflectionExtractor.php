@@ -630,7 +630,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             foreach ($names as $name) {
                 try {
                     $reflectionMethod = $refClass->getMethod($prefix.$name);
-                    if ($reflectionMethod->isStatic()) {
+                    if ($reflectionMethod->isStatic() || !($reflectionMethod->getModifiers() & $this->methodReflectionFlags)) {
                         continue;
                     }
 

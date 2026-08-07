@@ -35,18 +35,24 @@ class ServicesResetter implements ServicesResetterInterface
 
     public function reset(): void
     {
+        $throwable = null;
+
         foreach ($this->resettableServices as $id => $service) {
-            $this->resetInstance($service, (array) $this->resetMethods[$id]);
+            $this->resetInstance($service, (array) $this->resetMethods[$id], $throwable);
         }
 
         if (null !== $this->resetMap) {
             foreach ($this->resetMap as $service => $methods) {
-                $this->resetInstance($service, $methods);
+                $this->resetInstance($service, $methods, $throwable);
             }
+        }
+
+        if (null !== $throwable) {
+            throw $throwable;
         }
     }
 
-    private function resetInstance(object $service, array $methods): void
+    private function resetInstance(object $service, array $methods, ?\Throwable &$throwable = null): void
     {
         if ($this->isUninitializedLazyObject($service)) {
             return;
@@ -57,7 +63,12 @@ class ServicesResetter implements ServicesResetterInterface
                 continue;
             }
 
-            $service->$resetMethod();
+            try {
+                $service->$resetMethod();
+            } catch (\Throwable $e) {
+                // failing to reset one service should not prevent resetting the remaining ones
+                $throwable ??= $e;
+            }
         }
     }
 

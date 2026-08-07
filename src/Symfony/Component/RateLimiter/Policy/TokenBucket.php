@@ -20,13 +20,19 @@ use Symfony\Component\RateLimiter\LimiterStateInterface;
  */
 final class TokenBucket implements LimiterStateInterface
 {
+    /**
+     * __serialize() stores the burst size in a 32-bit field; 2^31-1 is the
+     * largest value that also survives the round trip on 32-bit platforms.
+     */
+    public const MAX_BURST_SIZE = 2147483647;
+
     private int $tokens;
     private int $burstSize;
     private float $timer;
 
     /**
      * @param string     $id            unique identifier for this bucket
-     * @param int        $initialTokens the initial number of tokens in the bucket (i.e. the max burst size)
+     * @param int        $initialTokens the initial number of tokens in the bucket (i.e. the max burst size), capped at self::MAX_BURST_SIZE
      * @param Rate       $rate          the fill rate and time of this bucket
      * @param float|null $timer         the current timer of the bucket, defaulting to microtime(true)
      */
@@ -41,7 +47,7 @@ final class TokenBucket implements LimiterStateInterface
         }
 
         $this->id = $id;
-        $this->tokens = $this->burstSize = $initialTokens;
+        $this->tokens = $this->burstSize = min($initialTokens, self::MAX_BURST_SIZE);
         $this->rate = $rate;
         $this->timer = $timer ?? microtime(true);
     }

@@ -434,6 +434,8 @@ class ReflectionExtractorTest extends TestCase
             ['Id', false],
             ['Guid', true],
             ['guid', false],
+            ['privateMutator', false],
+            ['protectedMutator', false],
         ];
     }
 

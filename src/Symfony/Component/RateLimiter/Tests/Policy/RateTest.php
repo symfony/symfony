@@ -47,7 +47,8 @@ class RateTest extends TestCase
     {
         yield 'product far above the int range' => [Rate::perHour(1), \PHP_INT_MAX];
         yield 'product rounding to exactly the int range bound' => [new Rate(new \DateInterval('PT10S'), 10), \PHP_INT_MAX];
-        yield 'product just above the cap' => [Rate::perSecond(1), 2147483648];
+        // the token count stays within the int range on 32-bit platforms, only the product exceeds the cap
+        yield 'product just above the cap' => [new Rate(new \DateInterval('PT2S'), 1), 1073741824];
     }
 
     public function testCalculateTimeForTokensBelowTheCapIsNotChanged()

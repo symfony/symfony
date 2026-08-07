@@ -19,8 +19,10 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\DoctrineTransport;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Serializer as SerializerComponent;
 
 class DoctrineTransportTest extends TestCase
 {
@@ -51,6 +53,34 @@ class DoctrineTransportTest extends TestCase
 
         $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+    }
+
+    public function testAll()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('findAll')->with(50)->willReturn([
+            $this->createDoctrineEnvelope(),
+            $this->createDoctrineEnvelope(),
+        ]);
+
+        $transport = $this->getTransport($serializer, $connection);
+
+        $envelopes = [...$transport->all(50)];
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+    }
+
+    public function testFind()
+    {
+        $serializer = $this->createSerializer();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('find')->with('5')->willReturn($this->createDoctrineEnvelope());
+
+        $transport = $this->getTransport($serializer, $connection);
+
+        $this->assertEquals(new DummyMessage('Hi'), $transport->find('5')->getMessage());
     }
 
     public function testConfigureSchema()
@@ -93,5 +123,23 @@ class DoctrineTransportTest extends TestCase
         $connection ??= $this->createStub(Connection::class);
 
         return new DoctrineTransport($connection, $serializer);
+    }
+
+    private function createDoctrineEnvelope(): array
+    {
+        return [
+            'id' => 1,
+            'body' => '{"message": "Hi"}',
+            'headers' => [
+                'type' => DummyMessage::class,
+            ],
+        ];
+    }
+
+    private function createSerializer(): Serializer
+    {
+        return new Serializer(
+            new SerializerComponent\Serializer([new SerializerComponent\Normalizer\ObjectNormalizer()], ['json' => new SerializerComponent\Encoder\JsonEncoder()])
+        );
     }
 }

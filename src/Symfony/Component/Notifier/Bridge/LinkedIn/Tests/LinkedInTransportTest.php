@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\LinkedIn\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInAuthorType;
 use Symfony\Component\Notifier\Bridge\LinkedIn\LinkedInTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -27,14 +28,15 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class LinkedInTransportTest extends TransportTestCase
 {
-    public static function createTransport(?HttpClientInterface $client = null): LinkedInTransport
+    public static function createTransport(?HttpClientInterface $client = null, string $authorType = 'person'): LinkedInTransport
     {
-        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? new MockHttpClient()))->setHost('host.test');
+        return (new LinkedInTransport('AuthToken', 'AccountId', $client ?? new MockHttpClient(), null, LinkedInAuthorType::from($authorType)))->setHost('host.test');
     }
 
     public static function toStringProvider(): iterable
     {
         yield ['linkedin://host.test', self::createTransport()];
+        yield ['linkedin://host.test?author=organization', self::createTransport(authorType: 'organization')];
     }
 
     public static function supportedMessagesProvider(): iterable
@@ -139,6 +141,39 @@ final class LinkedInTransportTest extends TransportTestCase
         $transport = self::createTransport($client);
 
         $transport->send($chatMessage);
+    }
+
+    public function testSendWithOrganizationAuthor()
+    {
+        $message = 'testMessage';
+
+        $expectedBody = json_encode([
+            'specificContent' => [
+                'com.linkedin.ugc.ShareContent' => [
+                    'shareCommentary' => [
+                        'attributes' => [],
+                        'text' => 'testMessage',
+                    ],
+                    'shareMediaCategory' => 'NONE',
+                ],
+            ],
+            'visibility' => [
+                'com.linkedin.ugc.MemberNetworkVisibility' => 'PUBLIC',
+            ],
+            'lifecycleState' => 'PUBLISHED',
+            'author' => 'urn:li:organization:AccountId',
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use (
+            $expectedBody
+        ): ResponseInterface {
+            $this->assertSame($expectedBody, $options['body']);
+
+            return new MockResponse(json_encode(['id' => '42']), ['http_code' => 201]);
+        });
+        $transport = self::createTransport($client, 'organization');
+
+        $transport->send(new ChatMessage($message));
     }
 
     public function testSendWithInvalidOptions()

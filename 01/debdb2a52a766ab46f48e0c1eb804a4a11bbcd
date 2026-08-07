@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:40:54Z
+
+Thank you @cs278.
+
+The original `min(\PHP_INT_MAX, ...)` did not clamp in the case you reported: the product rounds to exactly `(float) \PHP_INT_MAX`, the two arguments compare equal, and `min()` returns the float, so `testEffectivelyInfiniteBurstSize` stayed red. I amended the branch to cap at `2147483647` instead, which sidesteps that (the bound is exactly representable as a double), keeps the value in range on 32-bit platforms, and stays acceptable as a Redis TTL.
+
+I also extended `RateTest` to cover the boundary case, turned `testEffectivelyInfiniteBurstSize` into a real assertion, and rebased on 6.4.
+
+---------------------------------------------------------------------------
+
+by cs278 at 2026-08-07T14:45:54Z
+
+:+1: Looks good @nicolas-grekas
+
+> keeps the value in range on 32-bit platforms
+
+Oh yes, those are still a thing. :abacus:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:47:44Z
+
+Also capped the burst size itself at `2147483647`. `TokenBucket::__serialize()` packs it into a 32-bit field, so anything larger wrapped on the first round trip through storage: the second `consume()` reported `4294967294` remaining instead of decrementing. Capping in `TokenBucket` and `TokenBucketLimiter` keeps the reported limit and the stored one in agreement.

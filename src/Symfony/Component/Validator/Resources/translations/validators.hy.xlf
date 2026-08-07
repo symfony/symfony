@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Այս արժեքը վավեր XML չէ։</target>
+                <target>Այս արժեքը վավեր XML չէ։</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Այս արժեքը չի համապատասխանում սպասվող XSD սխեմային։</target>
+                <target>Այս արժեքը չի համապատասխանում սպասվող XSD սխեմային։</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Այս XML բեռնվածքը չափազանց մեծ է ({{ size }} բայթ)՝ այն գերազանցում է {{ limit }} բայթ սահմանը։</target>
+                <target>Այս XML բեռնվածքը չափազանց մեծ է ({{ size }} բայթ)՝ այն գերազանցում է {{ limit }} բայթ սահմանը։</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Այս արժեքը վավեր cron արտահայտություն չէ։</target>
+                <target>Այս արժեքը վավեր cron արտահայտություն չէ։</target>
             </trans-unit>
         </body>
     </file>

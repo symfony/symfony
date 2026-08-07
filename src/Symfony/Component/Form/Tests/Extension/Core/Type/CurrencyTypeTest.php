@@ -106,6 +106,39 @@ class CurrencyTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'tolar slovène'), $choices);
     }
 
+    /**
+     * The choice loader is cached per process on a key built from the options. "active_at" and
+     * "not_active_at" select opposite sets of currencies, so building both in the same process
+     * must not make the second form reuse the choice list of the first one.
+     */
+    #[RequiresPhpExtension('intl')]
+    public function testActiveAtAndNotActiveAtDoNotShareTheirChoiceListForTheSameDate()
+    {
+        // The SIT currency expired on 2007-01-14.
+        $date = new \DateTimeImmutable('2007-01-15', new \DateTimeZone('Etc/UTC'));
+        $sit = new ChoiceView('SIT', 'SIT', 'tolar slovène');
+
+        $activeChoices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'choice_translation_locale' => 'fr',
+                'legal_tender' => true,
+                'active_at' => $date,
+            ])
+            ->createView()->vars['choices'];
+
+        $notActiveChoices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'choice_translation_locale' => 'fr',
+                'legal_tender' => true,
+                'active_at' => null,
+                'not_active_at' => $date,
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertNotContainsEquals($sit, $activeChoices);
+        $this->assertContainsEquals($sit, $notActiveChoices);
+    }
+
     public function testAnExceptionShouldBeThrownWhenTheActiveAtAndNotActiveAtOptionsAreBothSet()
     {
         $this->expectException(InvalidOptionsException::class);

@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">Syötä kelvollinen UUID.</target>
+                <target>Syötä kelvollinen UUID.</target>
             </trans-unit>
         </body>
     </file>

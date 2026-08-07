@@ -556,19 +556,19 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Hierdie waarde is nie geldige XML nie.</target>
+                <target>Hierdie waarde is nie geldige XML nie.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Hierdie waarde voldoen nie aan die verwagte XSD-skema nie.</target>
+                <target>Hierdie waarde voldoen nie aan die verwagte XSD-skema nie.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Hierdie XML-loonvrag is te groot ({{ size }} grepe): dit oorskry die limiet van {{ limit }} grepe.</target>
+                <target>Hierdie XML-loonvrag is te groot ({{ size }} grepe): dit oorskry die limiet van {{ limit }} grepe.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Hierdie waarde is nie 'n geldige cron-uitdrukking nie.</target>
+                <target>Hierdie waarde is nie 'n geldige cron-uitdrukking nie.</target>
             </trans-unit>
         </body>
     </file>

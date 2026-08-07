@@ -15,8 +15,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\CancelEvent;
+use Symfony\Component\Tui\Event\MultiSelectEvent;
 use Symfony\Component\Tui\Event\SelectEvent;
 use Symfony\Component\Tui\Event\SelectionChangeEvent;
+use Symfony\Component\Tui\Event\SelectionToggleEvent;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
@@ -230,7 +232,148 @@ class SelectListTest extends TestCase
         $this->assertTrue($cancelled);
     }
 
-    private function createTestList(): SelectListWidget
+    public function testMultiselectRendersInitialCheckedItems()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'opt1', 'label' => 'Option 1', 'description' => 'First option'],
+            ['value' => 'opt2', 'label' => 'Option 2', 'description' => 'Second option', 'checked' => true],
+        ], multiselect: true);
+
+        $lines = $list->render(new RenderContext(80, 24));
+
+        $this->assertStringContainsString('[ ] Option 1', $lines[0]);
+        $this->assertStringContainsString('[x] Option 2', $lines[1]);
+        $this->assertSame([
+            ['value' => 'opt2', 'label' => 'Option 2', 'description' => 'Second option', 'checked' => true],
+        ], $list->getSelectedItems());
+    }
+
+    public function testMultiselectTogglesCurrentItem()
+    {
+        $list = $this->createTestList(multiselect: true);
+
+        $list->handleInput(' ');
+
+        $this->assertSame([
+            ['value' => 'opt1', 'label' => 'Option 1', 'description' => 'First option', 'checked' => true],
+        ], $list->getSelectedItems());
+        $this->assertStringContainsString('[x] Option 1', $list->render(new RenderContext(80, 24))[0]);
+
+        $list->handleInput(' ');
+
+        $this->assertSame([], $list->getSelectedItems());
+        $this->assertStringContainsString('[ ] Option 1', $list->render(new RenderContext(80, 24))[0]);
+    }
+
+    public function testSingleSelectIgnoresSpaceToggle()
+    {
+        $list = $this->createTestList();
+
+        $list->handleInput(' ');
+        $lines = $list->render(new RenderContext(80, 24));
+
+        $this->assertSame([], $list->getSelectedItems());
+        $this->assertStringNotContainsString('[ ]', $lines[0]);
+        $this->assertStringNotContainsString('[x]', $lines[0]);
+    }
+
+    public function testMultiselectPreservesTogglesAcrossFilter()
+    {
+        $list = $this->createTestList(multiselect: true);
+
+        $list->setFilter('opt2');
+        $list->handleInput(' ');
+        $list->setFilter('');
+
+        $this->assertSame([
+            ['value' => 'opt2', 'label' => 'Option 2', 'description' => 'Second option', 'checked' => true],
+        ], $list->getSelectedItems());
+
+        $lines = $list->render(new RenderContext(80, 24));
+        $this->assertStringContainsString('[ ] Option 1', $lines[0]);
+        $this->assertStringContainsString('[x] Option 2', $lines[1]);
+    }
+
+    public function testOnSelectionToggleCallback()
+    {
+        [$list, $tui] = $this->createTestListWithTui(multiselect: true);
+
+        $toggle = null;
+        $tui->addListener(static function (SelectionToggleEvent $e) use (&$toggle) {
+            $toggle = [
+                'value' => $e->getValue(),
+                'checked' => $e->isChecked(),
+                'selectedItems' => $e->getSelectedItems(),
+                'item' => $e->getItem(),
+            ];
+        });
+
+        $list->handleInput(' ');
+
+        $this->assertSame([
+            'value' => 'opt1',
+            'checked' => true,
+            'selectedItems' => [
+                ['value' => 'opt1', 'label' => 'Option 1', 'description' => 'First option', 'checked' => true],
+            ],
+            'item' => ['value' => 'opt1', 'label' => 'Option 1', 'description' => 'First option', 'checked' => true],
+        ], $toggle);
+    }
+
+    public function testOnMultiSelectCallback()
+    {
+        [$list, $tui] = $this->createTestListWithTui(multiselect: true);
+
+        $event = null;
+        $tui->addListener(static function (MultiSelectEvent $e) use (&$event) {
+            $event = $e;
+        });
+
+        $list->handleInput(' ');
+        $list->handleInput("\r");
+
+        $this->assertInstanceOf(MultiSelectEvent::class, $event);
+        $this->assertFalse($event->isEmpty());
+        $this->assertSame(['opt1'], $event->getValues());
+        $this->assertSame([
+            ['value' => 'opt1', 'label' => 'Option 1', 'description' => 'First option', 'checked' => true],
+        ], $event->getItems());
+    }
+
+    public function testMultiSelectEventDispatchesWhenEmpty()
+    {
+        [$list, $tui] = $this->createTestListWithTui(multiselect: true);
+
+        $event = null;
+        $tui->addListener(static function (MultiSelectEvent $e) use (&$event) {
+            $event = $e;
+        });
+
+        $list->handleInput("\r");
+
+        $this->assertInstanceOf(MultiSelectEvent::class, $event);
+        $this->assertTrue($event->isEmpty());
+        $this->assertSame([], $event->getValues());
+        $this->assertSame([], $event->getItems());
+    }
+
+    public function testMultiselectRendersWithinWidth()
+    {
+        $list = $this->createTestList(multiselect: true);
+        $width = 60;
+        $lines = $list->render(new RenderContext($width, 24));
+
+        foreach ($lines as $i => $line) {
+            $lineWidth = AnsiUtils::visibleWidth($line);
+            $this->assertLessThanOrEqual(
+                $width,
+                $lineWidth,
+                \sprintf('Line %d exceeds width: %d > %d', $i, $lineWidth, $width),
+            );
+        }
+    }
+
+    private function createTestList(bool $multiselect = false): SelectListWidget
     {
         $items = [
             ['value' => 'opt1', 'label' => 'Option 1', 'description' => 'First option'],
@@ -238,17 +381,17 @@ class SelectListTest extends TestCase
             ['value' => 'opt3', 'label' => 'Option 3', 'description' => 'Third option'],
         ];
 
-        return new SelectListWidget($items, 5);
+        return new SelectListWidget($items, 5, multiselect: $multiselect);
     }
 
     /**
      * @return array{SelectListWidget, Tui}
      */
-    private function createTestListWithTui(): array
+    private function createTestListWithTui(bool $multiselect = false): array
     {
         $terminal = new VirtualTerminal(80, 24);
         $tui = new Tui(terminal: $terminal);
-        $list = $this->createTestList();
+        $list = $this->createTestList($multiselect);
         $tui->add($list);
 
         return [$list, $tui];

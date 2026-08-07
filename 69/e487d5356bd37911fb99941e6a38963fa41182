@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-09-30T19:52:30Z
+
+But the security panel default tab is “Token” so it makes sense greying the menu link if there is none. Else that means you click an “active” link and end up on an empty state:
+
+<img width="973" height="189" alt="image" src="https://github.com/user-attachments/assets/2ca6a560-e4d4-49cd-9a4e-7b5509f2552d" />
+
+I think this PR would be better by making the “Firewall” tab the default one, but that is yet another change (and not a bugfix).
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-01T13:05:02Z
+
+I thin the token tab is more useful as default tab when it is enabled, as the firewall tab describes the config of the project, not per-request information.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-11-26T07:44:48Z
+
+What about having two different panels then ? One for Authentication and one for Authorization ? Because I agree it makes sense to have the Security tab always available because of voters that do not require authentications. or even if they do you'll still have some informations about what were the "isGranted" calls.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T07:47:44Z
+
+Per the discussion this is a UX/behaviour change rather than a bug fix, so it targets the development branch: rebased onto 8.2. I kept 8.2's `aria-hidden` attribute on the icon when resolving the menu-label conflict.

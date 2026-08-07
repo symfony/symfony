@@ -159,6 +159,35 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('Etc/UTC', 'Etc/UTC', 'Coordinated Universal Time'), $choices);
     }
 
+    /**
+     * ICU lists an IANA identifier and its legacy alias under one display name, so the
+     * choices must not be keyed by that name: it would drop one of the two at random.
+     */
+    #[RequiresPhpExtension('intl')]
+    public function testIntlTimezonesKeepTheCanonicalIdentifierOfAnAliasPair()
+    {
+        $choices = $this->factory->create(static::TESTED_TYPE, null, ['intl' => true])
+            ->createView()->vars['choices'];
+
+        $values = array_map(static fn (ChoiceView $choice) => $choice->value, $choices);
+
+        $this->assertContains('Asia/Kolkata', $values);
+        $this->assertNotContains('Asia/Calcutta', $values);
+
+        $this->assertContains('Pacific/Chuuk', $values);
+        $this->assertNotContains('Pacific/Truk', $values);
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testIntlTimezonesAreSubmittableWithTheirCanonicalIdentifier()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['intl' => true]);
+        $form->submit('Asia/Kolkata');
+
+        $this->assertSame('Asia/Kolkata', $form->getData());
+        $this->assertTrue($form->isValid());
+    }
+
     #[RequiresPhpExtension('intl')]
     public function testChoiceTranslationLocaleOptionWithIntl()
     {

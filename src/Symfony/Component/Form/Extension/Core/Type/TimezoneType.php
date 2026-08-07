@@ -110,7 +110,15 @@ class TimezoneType extends AbstractType
 
     private static function getIntlTimezones(string $input, ?string $locale = null): array
     {
-        $timezones = array_flip(Timezones::getNames($locale));
+        // an IANA identifier and its legacy alias share one display name, so keep the canonical one
+        $canonical = array_flip(\DateTimeZone::listIdentifiers(\DateTimeZone::ALL));
+        $timezones = [];
+
+        foreach (Timezones::getNames($locale) as $timezone => $name) {
+            if (!isset($timezones[$name]) || isset($canonical[$timezone])) {
+                $timezones[$name] = $timezone;
+            }
+        }
 
         if ('intltimezone' === $input) {
             foreach ($timezones as $name => $timezone) {

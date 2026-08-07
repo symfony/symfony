@@ -29,6 +29,9 @@ Form
 ----
 
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0 and will be removed in 9.0
+ * `TimezoneType` with the `intl` option enabled now offers the timezone identifier that PHP reports as
+   canonical instead of the ICU one, so `Asia/Kolkata` replaces `Asia/Calcutta` and six other legacy aliases.
+   A stored value that came from the previous list is no longer among the choices
 
 FrameworkBundle
 ---------------

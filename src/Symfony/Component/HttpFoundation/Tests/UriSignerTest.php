@@ -39,6 +39,15 @@ class UriSignerTest extends TestCase
         $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar', 1));
     }
 
+    public function testCheckWithExpirationAtTheUnixEpoch()
+    {
+        $signer = new UriSigner('foobar');
+
+        // "0" is a real expiration date, not the absence of one
+        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', 0)));
+        $this->assertFalse($signer->check($signer->sign('http://example.com/foo', new \DateTimeImmutable('@0'))));
+    }
+
     public function testCheck()
     {
         $signer = new UriSigner('foobar');

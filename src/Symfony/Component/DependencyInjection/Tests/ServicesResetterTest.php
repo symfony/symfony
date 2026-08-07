@@ -133,4 +133,71 @@ class ServicesResetterTest extends TestCase
 
         $this->assertCount(0, $resetMap);
     }
+
+    public function testResetThrowingServiceDoesNotPreventLaterServicesReset()
+    {
+        $throwingService = new class {
+            public function reset(): void
+            {
+                throw new \RuntimeException('boom');
+            }
+        };
+
+        $resetter = new ServicesResetter(new \ArrayIterator([
+            'id1' => $throwingService,
+            'id2' => new ResettableService(),
+        ]), [
+            'id1' => ['reset'],
+            'id2' => ['reset'],
+        ]);
+
+        $thrown = null;
+
+        try {
+            $resetter->reset();
+        } catch (\Throwable $e) {
+            $thrown = $e;
+        }
+
+        $this->assertInstanceOf(\RuntimeException::class, $thrown);
+        $this->assertSame('boom', $thrown->getMessage());
+        $this->assertSame(1, ResettableService::$counter);
+    }
+
+    public function testFirstThrowableIsRethrownAfterAllMethodsRun()
+    {
+        $service = new class {
+            public int $secondCounter = 0;
+
+            public function resetFirst(): void
+            {
+                throw new \RuntimeException('first');
+            }
+
+            public function resetSecond(): void
+            {
+                ++$this->secondCounter;
+
+                throw new \RuntimeException('second');
+            }
+        };
+
+        $resetter = new ServicesResetter(new \ArrayIterator([
+            'id1' => $service,
+        ]), [
+            'id1' => ['resetFirst', 'resetSecond'],
+        ]);
+
+        $thrown = null;
+
+        try {
+            $resetter->reset();
+        } catch (\Throwable $e) {
+            $thrown = $e;
+        }
+
+        $this->assertInstanceOf(\RuntimeException::class, $thrown);
+        $this->assertSame('first', $thrown->getMessage());
+        $this->assertSame(1, $service->secondCounter);
+    }
 }

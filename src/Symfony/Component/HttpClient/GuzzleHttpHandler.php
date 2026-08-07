@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient;
 
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ResponseException;
 use GuzzleHttp\Promise\Promise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Promise\Utils as PromiseUtils;
@@ -196,7 +197,7 @@ final class GuzzleHttpHandler
                             [$guzzleRequest, , $promise] = $this->pending[$response];
                             unset($this->pending[$response], $this->psr7Responses[$response]);
                             $this->fireOnStats($guzzleOpts, $guzzleRequest, $psrResponse, $e, $response);
-                            $promise->reject(new RequestException($e->getMessage(), $guzzleRequest, $psrResponse, $e));
+                            $promise->reject($this->createRequestException($e->getMessage(), $guzzleRequest, $psrResponse, $e));
 
                             $response->cancel();
                         }
@@ -275,12 +276,24 @@ final class GuzzleHttpHandler
             }
 
             $this->fireOnStats($options, $guzzleRequest, $psrResponse, $e, $response);
-            $promise->reject(new RequestException($e->getMessage(), $guzzleRequest, $psrResponse, $e));
+            $promise->reject($this->createRequestException($e->getMessage(), $guzzleRequest, $psrResponse, $e));
         } else {
             // No headers received: connection-level failure.
             $this->fireOnStats($options, $guzzleRequest, null, $e, $response);
-            $promise->reject(new ConnectException($e->getMessage(), $guzzleRequest, null, [], $e));
+            $promise->reject(new ConnectException($e->getMessage(), $guzzleRequest, $e));
         }
+    }
+
+    /**
+     * Builds a Guzzle exception carrying a response, bridging the constructor
+     * signature change between Guzzle 7 (response on RequestException) and
+     * Guzzle 8 (response moved to the new ResponseException subclass).
+     */
+    private function createRequestException(string $message, RequestInterface $guzzleRequest, ResponseInterface $psrResponse, \Throwable $previous): RequestException
+    {
+        return class_exists(ResponseException::class)
+            ? new ResponseException($message, $guzzleRequest, $psrResponse, $previous)
+            : new RequestException($message, $guzzleRequest, $psrResponse, $previous);
     }
 
     private function fireOnStats(array $options, RequestInterface $request, ?ResponseInterface $psrResponse, ?\Throwable $error, SymfonyResponseInterface $symfonyResponse): void

@@ -51,13 +51,9 @@ class ContainerWidget extends AbstractWidget implements WidgetContainerInterface
      */
     public function add(AbstractWidget $widget): static
     {
-        $widget->setParent($this);
         $this->children[] = $widget;
+        $this->attachChild($widget);
         $this->invalidate();
-
-        if (null !== $this->getContext()) {
-            $this->getContext()->attachChild($this, $widget);
-        }
 
         return $this;
     }
@@ -68,11 +64,7 @@ class ContainerWidget extends AbstractWidget implements WidgetContainerInterface
     public function remove(AbstractWidget $widget): static
     {
         if (false !== $index = array_search($widget, $this->children, true)) {
-            $child = $this->children[$index];
-            $child->setParent(null);
-            if (null !== $this->getContext()) {
-                $this->getContext()->detachChild($child);
-            }
+            $this->detachChild($this->children[$index]);
             array_splice($this->children, $index, 1);
             $this->invalidate();
         }
@@ -88,10 +80,7 @@ class ContainerWidget extends AbstractWidget implements WidgetContainerInterface
     public function clear(): static
     {
         foreach ($this->children as $child) {
-            $child->setParent(null);
-            if (null !== $this->getContext()) {
-                $this->getContext()->detachChild($child);
-            }
+            $this->detachChild($child);
         }
         if ($this->children) {
             $this->children = [];

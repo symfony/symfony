@@ -60,6 +60,8 @@ class TimezoneType extends AbstractType
             'regions' => \DateTimeZone::ALL,
         ]);
 
+        $resolver->setDeprecated('regions', 'symfony/form', '8.2', 'The "%name%" option is deprecated. It has had no effect since 5.0 and will be removed in 9.0.');
+
         $resolver->setAllowedTypes('intl', ['bool']);
 
         $resolver->setAllowedTypes('choice_translation_locale', ['null', 'string']);

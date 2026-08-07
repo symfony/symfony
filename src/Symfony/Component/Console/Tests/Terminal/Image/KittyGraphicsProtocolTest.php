@@ -58,6 +58,17 @@ class KittyGraphicsProtocolTest extends TestCase
         $this->assertSame($imageData, $result['data']);
     }
 
+    public function testDecodeWithBellTerminatorFollowedByAnEscapeSequence()
+    {
+        $imageData = 'test image data';
+        $base64 = base64_encode($imageData);
+        $data = "\x1b_Ga=T,f=100;{$base64}\x07 and some text\x1b\\";
+
+        $result = (new KittyGraphicsProtocol())->decode($data);
+
+        $this->assertSame($imageData, $result['data']);
+    }
+
     public function testDecodeInvalidBase64()
     {
         $data = "\x1b_Ga=T,f=100;not-valid-base64!!!\x1b\\";
@@ -132,6 +143,51 @@ class KittyGraphicsProtocolTest extends TestCase
         $this->assertSame('', $protocol->encode('GIF89a'.str_repeat("\x00", 4)));
         $this->assertSame('', $protocol->encode('RIFF    WEBP'.str_repeat("\x00", 4)));
         $this->assertSame('', $protocol->encode('not an image'));
+    }
+
+    public function testDecodeChunkedPayload()
+    {
+        $first = base64_encode('chunk one');
+        $second = base64_encode('chunk two');
+        $data = "\x1b_Ga=T,f=100,m=1;{$first}\x1b\\\x1b_Gm=0;{$second}\x1b\\";
+
+        $result = (new KittyGraphicsProtocol())->decode($data);
+
+        $this->assertSame('chunk onechunk two', $result['data']);
+        $this->assertSame('png', $result['format']);
+    }
+
+    public function testDecodeIncompleteChunkedPayload()
+    {
+        $data = "\x1b_Ga=T,f=100,m=1;".base64_encode('chunk one')."\x1b\\";
+
+        $result = (new KittyGraphicsProtocol())->decode($data);
+
+        $this->assertSame('', $result['data']);
+        $this->assertNull($result['format']);
+    }
+
+    public function testDecodeStopsAtTheEndOfTheImage()
+    {
+        $payload = base64_encode('image data');
+        $data = "\x1b_Ga=T,f=100,m=0;{$payload}\x1b\\\x1b_Ga=T,f=100;".base64_encode('another image')."\x1b\\";
+
+        $result = (new KittyGraphicsProtocol())->decode($data);
+
+        $this->assertSame('image data', $result['data']);
+    }
+
+    public function testEncodedChunkedPayloadCanBeDecoded()
+    {
+        $imageData = "\x89PNG\r\n\x1a\n".str_repeat("\x01", 10000);
+        $protocol = new KittyGraphicsProtocol();
+
+        $encoded = $protocol->encode($imageData);
+        $result = $protocol->decode($encoded);
+
+        $this->assertGreaterThan(1, substr_count($encoded, "\x1b_G"));
+        $this->assertSame($imageData, $result['data']);
+        $this->assertSame('png', $result['format']);
     }
 
     public function testDecodeDifferentFormats()

@@ -827,6 +827,30 @@ class CurrenciesTest extends ResourceBundleTestCase
         $this->assertFalse(Currencies::isValidInAnyCountry('ESB', true, null));
     }
 
+    /**
+     * USS is only described by an expiry date: it has a "to" but no "from".
+     * Such a currency is not undated, so its expiry must still be honored.
+     */
+    public function testUssCurrencyIsExpiredAfterItsEndDate()
+    {
+        $this->assertFalse(Currencies::isValidInAnyCountry('USS', null, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testUssCurrencyIsActiveBeforeItsEndDate()
+    {
+        $this->assertTrue(Currencies::isValidInAnyCountry('USS', null, true, new \DateTimeImmutable('2010-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testUssCurrencyIsReportedAsInactiveAfterItsEndDate()
+    {
+        $this->assertTrue(Currencies::isValidInAnyCountry('USS', null, false, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
+    public function testExpiredUndatedStartCurrenciesAreExcludedFromTheirCountry()
+    {
+        $this->assertNotContains('USS', Currencies::forCountry('US', null, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));
+    }
+
     public function testCurrenciesOfSwitzerlandIn2025()
     {
         $this->assertSame(['CHF'], Currencies::forCountry('CH', true, true, new \DateTimeImmutable('2025-01-01', new \DateTimeZone('Etc/UTC'))));

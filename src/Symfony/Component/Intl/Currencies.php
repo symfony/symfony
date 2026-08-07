@@ -219,20 +219,19 @@ final class Currencies extends ResourceBundle
      */
     private static function isDateActive(array $currencyMetadata, \DateTimeInterface $date, bool $includeUndated): bool
     {
-        if (!\array_key_exists('from', $currencyMetadata)) {
+        $hasFrom = \array_key_exists('from', $currencyMetadata);
+        $hasTo = \array_key_exists('to', $currencyMetadata);
+
+        if (!$hasFrom && !$hasTo) {
             // Note: currencies that are not legal tender don't have often validity dates.
             return $includeUndated;
         }
 
-        $from = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $currencyMetadata['from'], new \DateTimeZone('Etc/UTC'));
+        $utc = new \DateTimeZone('Etc/UTC');
+        $from = $hasFrom ? \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $currencyMetadata['from'], $utc) : null;
+        $to = $hasTo ? \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $currencyMetadata['to'], $utc) : null;
 
-        if (\array_key_exists('to', $currencyMetadata)) {
-            $to = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $currencyMetadata['to'], new \DateTimeZone('Etc/UTC'));
-        } else {
-            $to = null;
-        }
-
-        return $from <= $date && (null === $to || $to >= $date);
+        return (null === $from || $from <= $date) && (null === $to || $to >= $date);
     }
 
     /**

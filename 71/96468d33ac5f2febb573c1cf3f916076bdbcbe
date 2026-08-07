@@ -1,0 +1,209 @@
+---------------------------------------------------------------------------
+
+by JoppeDC at 2026-07-01T07:41:35Z
+
+Personally i still prefer the red header. Besides that, i like the idea.
+
+The "after" does not look clearer in my opinion. I'm not saying we need the red banner back, but at least a better visual separation.
+
+<img width="8000" height="4500" alt="image" src="https://github.com/user-attachments/assets/2e3f85e3-091b-4c3a-a4ae-a9acbbf15cf4" />
+
+A simple change, light a slight red bg, makes the page feel more structurized again imo.
+
+<img width="1526" height="1030" alt="image" src="https://github.com/user-attachments/assets/05407bff-65d9-4ded-937b-22b4dd5e7c8c" />
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-01T08:12:03Z
+
+Folks, a problem with the screenshots is that they are 8,000 pixel wide ... so everything might look smaller and lighter than it looks in a real Symfony app. If you can, please try the actual code patch in your app to get the real look of it. Thanks!
+
+---------------------------------------------------------------------------
+
+by BackEndTea at 2026-07-01T09:48:47Z
+
+One minor issue i have is that previously you could expand all exceptions at the same time (in both the exceptions and stack traces tabs). This allows for easier navigation/searching for specific information with `cmd + f`.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-07-01T10:43:26Z
+
+Thanks @javiereguiluz for the redesign, it's looking great! 👏
+
+While watching the screen recording of the log search feature, one thing I was expecting was highlighting the matched text in the results. I think that would make it even easier to scan. No worries though, that could be a nice improvement for a future PR.
+
+I also tend to agree with @JoppeDC about the red (or light red) header, but that might just be because I'm used to it (it has become a familiar visual indicator for these kinds of error pages). That said, the new design also looks good and is still easy to recognize.
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-07-01T13:30:28Z
+
+I really like your suggestion, that's a really nice work, but I have two comments:
+1. I agree with @JoppeDC comment (https://github.com/symfony/symfony/pull/64766#issuecomment-4851588871), I find that a light red background is a really nice touch on a "99% greyish" page,
+2. on the stack trace, I feel like displaying the methods arguments with multiple flashy colors is too much, too heavy. Can we make it "lighter", or "harmonious" with the code block?
+<img width="1108" height="515" alt="image" src="https://github.com/user-attachments/assets/0e48771c-f205-4e78-80b6-045b15ff57d1" />
+
+PS: I'm happy to see little buddy is still here 😮‍💨 😄
+<img width="211" height="120" alt="image" src="https://github.com/user-attachments/assets/f191e5b4-dde0-4e3b-8514-31bfde55c9e8" />
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-02T15:45:11Z
+
+Many folks complained on Symfony Slack too about the non-red header. So, I made some changes to have the read header back. It looks like this:
+
+### Simple exception
+
+<img width="3364" height="2594" alt="simple-exception-updated-header" src="https://github.com/user-attachments/assets/06883f96-0945-4863-9110-6d5b43e10098" />
+
+### Normal exception
+
+<img width="3368" height="2672" alt="normal-exception-updated-header" src="https://github.com/user-attachments/assets/2edd6309-70ee-46db-89fb-569e10682f9b" />
+
+### Long exception
+
+<img width="3320" height="2784" alt="long-exception-updated-header" src="https://github.com/user-attachments/assets/c4c1cab1-91e7-47d7-a214-94b198ec759d" />
+
+### Long exception in dark mode
+
+<img width="3320" height="2784" alt="long-exception-updated-header-dark" src="https://github.com/user-attachments/assets/c0759f09-110e-42ca-9eb3-41253837e2b5" />
+
+### Too many exceptions
+
+<img width="2768" height="760" alt="too-many-exceptions" src="https://github.com/user-attachments/assets/410d40f7-ceb6-4feb-9c07-0752d4cb9cde" />
+
+### In action
+
+https://github.com/user-attachments/assets/ff7ea1a5-9b7f-449d-9f2c-67d8caf2cf20
+
+---------------------------------------------------------------------------
+
+by FluffyDiscord at 2026-07-05T13:42:34Z
+
+I hate this, actually
+
+---------------------------------------------------------------------------
+
+by Kocal at 2026-07-05T14:10:18Z
+
+> I hate this, actually
+
+Any constructive feedback @FluffyDiscord?
+
+---------------------------------------------------------------------------
+
+by FluffyDiscord at 2026-07-05T14:16:24Z
+
+> > I hate this, actually
+>
+> Any constructive feedback @FluffyDiscord?
+
+Exceptions are now seemingly reversed in order? That will make me confused. If animations can be disabled, that would be great.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-07-05T16:25:25Z
+
+Looking great, thanks for this Javier!
+I'd prefer previous exceptions to be shown after the last, most important one though - as it was before - because it's consistent with how we display them elsewhere in Symfony and PHP in general.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2026-07-06T07:32:55Z
+
+IMHO, the last proposal with the red background is too "aggressive". I prefer @JoppeDC's version with the light red background.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-10T07:07:08Z
+
+Fully agree with @FluffyDiscord: I don’t understand the rationale behind the exception order being reversed; the PR description doesn’t mention this change either.
+
+Also agree with @Crovitche-1623 regarding the background. Note that IIUC there is currently no way to see which exception the stack trace and logs belong to, so a light red background could be reserved for the selected exception.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-10T13:59:44Z
+
+I've done further polishing (dark mode, responsive mode) and I also propose a new header, which is "very red" (as requested by some) but "not too much red" (as requested by others):
+
+### Full page of typical exception
+
+<img width="2722" height="2360" alt="full-page" src="https://github.com/user-attachments/assets/430383e9-f0b1-4ec6-a4fb-dd98797ae085" />
+
+### New header - normal length - light mode
+
+<img width="2732" height="1296" alt="chained-light" src="https://github.com/user-attachments/assets/b184b313-9b2b-41b6-acf2-679a9fee7de5" />
+
+### New header - normal length - dark mode
+
+<img width="2732" height="1296" alt="chained-dark" src="https://github.com/user-attachments/assets/1017fbe4-e8c6-4637-8d18-ac695517a231" />
+
+### New header - long length - light mode
+
+<img width="2732" height="1296" alt="long-light" src="https://github.com/user-attachments/assets/dbb9a19c-e170-4580-b723-a906afdbf762" />
+
+### New header - long length - dark mode
+
+<img width="2732" height="1296" alt="long-dark" src="https://github.com/user-attachments/assets/8997f0dc-9b93-43dd-9183-17ccf54b7dab" />
+
+### New header - lots of exceptions
+
+<img width="2658" height="1336" alt="multiple-exceptions" src="https://github.com/user-attachments/assets/de4e57ec-6243-4c7c-95a3-e3b5f16d97a7" />
+
+### New header - responsive
+
+<img width="970" height="1481" alt="responsive" src="https://github.com/user-attachments/assets/c3647d1a-bc23-4ce0-906f-4281df8c2121" />
+
+### New header - in action
+
+https://github.com/user-attachments/assets/c8d0c968-f05b-4254-b9df-a1c86f597152
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-10T14:05:04Z
+
+Regarding the comments about "exceptions are shown in the wrong order", I'm afraid I don't fully understand you. We use the same `array_reverse()` call as before, right? I'm missing something here.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-07-10T15:38:39Z
+
+`array_reverse` currently only affects breadcrumbs, not the exception chain (which I find weird but I actually never noticed there were breadcrumbs).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-22T13:02:07Z
+
+**Update**: I've made some minor tweaks and improvements that I found while using this new design in all my Symfony apps during the past weeks. I also reverted the order of the exceptions as all of you asked for.
+
+**On my side this is now completely finished** and ready for your final reviews. Thanks!
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-23T14:02:46Z
+
+Folks, I forgot to update the Exception panel in the Symfony Profiler. Some CSS things were broken and the needed JavaScript code wasn't loaded. It's now fixed and exceptions look and behave the same when rendering them stand-alone (left) and inside the profiler (right):
+
+<img width="5090" height="2312" alt="exception-standalone-vs-profiler" src="https://github.com/user-attachments/assets/7431f484-eb99-4cde-8a18-08ed89475e05" />
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-30T15:26:54Z
+
+Nicolas shared with me the results of an analysis of this code and I fixed all the reported issues:
+
+* The page was unnecesarily large because each log line duplicated their contents (the second copy was added as an HTML attributeand used when you click on "Copy as text"). We now create that log line dynamically with JavaScript when needed.
+* Fixed an edge-case in `columnFilters` on `exception.js`: the per-column selection set is now `Object.create(null)`, so logging channels named like some reserved keywords in JavaScript (`constructor`, `toString`, `__proto__`) filter correctly.
+* Hide copy buttons when navigator doesn't support the clipboard (`navigator.clipboard` is undefined on non-secure origins, i.e. any http:// dev host that isn't localhost)
+* Fixed: `dumpExceptionProperties()` header suppression was order-dependent. It now runs only after a `Data` value was actually dumped
+* Fixed `createTabs()` in `exception.js` was too greedy claiming tab groups on the page. It now only claims the ones related to the exception contents
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-30T15:55:05Z
+
+Two more changes:
+
+* Per @stof request, `showExceptionProperties()` in HtmlErrorRenderer now excludes HTTP exceptions via `is_a($class, 'Symfony\Component\HttpKernel\Exception\HttpExceptionInterface', true)` instead of just checking a `Symfony\` prefix
+* Added some ignore to `phpstan.dist.neon` instead of making the helpers public. I think it makes more sense if they stay private (because templates aren't really an extension point today)

@@ -23,7 +23,7 @@ class IpUtils
         '10.0.0.0/8',     // RFC1918
         '192.168.0.0/16', // RFC1918
         '192.0.2.0/24',   // Documentation Ranges TEST-NET-1 (RFC 5737)
-        '198.51.100.0/24',// Documentation Ranges TEST-NET-2 (RFC 5737)
+        '198.51.100.0/24', // Documentation Ranges TEST-NET-2 (RFC 5737)
         '203.0.113.0/24', // Documentation Ranges TEST-NET-3 (RFC 5737)
         '172.16.0.0/12',  // RFC1918
         '169.254.0.0/16', // RFC3927
@@ -102,9 +102,11 @@ class IpUtils
                 return self::setCacheResult($cacheKey, false !== filter_var($address, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4));
             }
 
-            if ($netmask < 0 || $netmask > 32) {
+            if (!ctype_digit($netmask) || 32 < (int) $netmask) {
                 return self::setCacheResult($cacheKey, false);
             }
+
+            $netmask = (int) $netmask;
         } else {
             $address = $ip;
             $netmask = 32;
@@ -156,9 +158,11 @@ class IpUtils
                 return (bool) unpack('n*', @inet_pton($address));
             }
 
-            if ($netmask < 1 || $netmask > 128) {
+            if (!ctype_digit($netmask) || 1 > (int) $netmask || 128 < (int) $netmask) {
                 return self::setCacheResult($cacheKey, false);
             }
+
+            $netmask = (int) $netmask;
         } else {
             if (!filter_var($ip, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6)) {
                 return self::setCacheResult($cacheKey, false);

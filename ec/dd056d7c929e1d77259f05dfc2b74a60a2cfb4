@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:04:44Z
+
+Rebased on 8.2 and reworded the commit message: the diff also changes `doSend()`'s error handling, and the message only described the feature.
+
+That change is unrelated to the option. It is a fix (`!$result['id']` and `$result['error']` both raised undefined-key warnings when the API returned neither, instead of the intended `TransportException`), but it also means an `id` of `'0'` no longer throws. Happy either way, though it would be cleaner as its own PR if you prefer to keep this one single-purpose.
+
+Checked while reviewing: `AuthorShare` builds `urn:li:$organisation:$value`, so passing the enum value lines up with `buildPayload()`; `LinkedInTransport` is final, so the new constructor argument is not a BC break; the bridge suite passes (29 tests). The only red job is a Windows `RequestDataCollectorTest` failure, unrelated.

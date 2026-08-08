@@ -194,6 +194,9 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                 $this->getHeaders(true);
             } catch (HttpExceptionInterface $httpException) {
                 // no-op
+            } catch (\LogicException) {
+                // ignore a misbehaving passthru that never replayed a
+                // previously swallowed chunk
             }
         }
 
@@ -206,6 +209,9 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                 }
             } catch (ExceptionInterface) {
                 // ignore any errors when destructing
+            } catch (\LogicException) {
+                // ignore a misbehaving passthru that never replayed a
+                // previously swallowed chunk
             }
         }
 

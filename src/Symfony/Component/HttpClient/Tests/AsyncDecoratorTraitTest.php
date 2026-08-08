@@ -220,6 +220,32 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertTrue($lastChunk->isLast());
     }
 
+    public function testMisbehavingPassthruDoesNotThrowOnDestruct()
+    {
+        // A passthru that conditionally swallows the "isFirst()" chunk (e.g. to
+        // inspect the status code or headers before deciding what to do, as done
+        // by RetryableHttpClient while it still needs the response body to decide
+        // whether to retry) must guarantee it will eventually replay that first
+        // chunk before it yields any content chunk. If it forgets to (a bug in the
+        // passthru itself), AsyncResponse must not let the resulting LogicException
+        // escape uncontrolled from __destruct() when the response is discarded
+        // without ever being read.
+        $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) {
+            if ($chunk->isFirst()) {
+                // swallow the first chunk without ever replaying it
+                return;
+            }
+
+            yield $chunk;
+        });
+
+        $response = $client->request('GET', 'http://localhost:8057/');
+
+        unset($response);
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testBufferPurePassthru()
     {
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) {

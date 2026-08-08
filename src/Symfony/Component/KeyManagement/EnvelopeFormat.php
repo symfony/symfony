@@ -78,6 +78,7 @@ abstract class EnvelopeFormat
     {
         return match ($id) {
             SelfContainedFormat::ID => new SelfContainedFormat(),
+            StoredFormat::ID => new StoredFormat(),
             default => throw new InvalidArgumentException(\sprintf('Unsupported envelope format (id 0x%02x).', $id)),
         };
     }

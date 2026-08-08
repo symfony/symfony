@@ -114,4 +114,12 @@ class EnvelopeTest extends TestCase
         $this->expectExceptionMessage(\sprintf('Envelope "%s" must be', $field));
         Envelope::selfContained('app', 'wrap', $iv, $tag, 'ct');
     }
+
+    #[DataProvider('provideIvAndTagOfTheWrongLength')]
+    public function testReferencingRejectsAnIvOrTagOfTheWrongLength(string $field, string $iv, string $tag)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Envelope "%s" must be', $field));
+        Envelope::referencing('ref', $iv, $tag, 'ct');
+    }
 }

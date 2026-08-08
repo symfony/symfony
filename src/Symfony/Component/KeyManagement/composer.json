@@ -20,7 +20,8 @@
         }
     ],
     "require": {
-        "php": ">=8.4.1"
+        "php": ">=8.4.1",
+        "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
         "psr/container": "^1.1|^2.0",
@@ -30,6 +31,7 @@
         "symfony/process": "^7.4|^8.0",
         "symfony/serializer": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3.0",
+        "symfony/uid": "^7.4|^8.0",
         "symfony/var-dumper": "^7.4|^8.0"
     },
     "conflict": {

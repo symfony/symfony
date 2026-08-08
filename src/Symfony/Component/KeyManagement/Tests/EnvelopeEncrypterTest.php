@@ -18,9 +18,11 @@ use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\SelfContainedFormat;
 use Symfony\Component\KeyManagement\Test\InMemoryKms;
 use Symfony\Component\KeyManagement\Tests\Fixtures\RedactedTraceAssertionsTrait;
+use Symfony\Component\KeyManagement\Tests\Fixtures\WrongLengthDataKeyKms;
 
 #[RequiresPhpExtension('openssl')]
 class EnvelopeEncrypterTest extends TestCase
@@ -83,6 +85,7 @@ class EnvelopeEncrypterTest extends TestCase
 
         $this->assertSame(SelfContainedFormat::ID, $envelope->format->id());
         $this->assertNotNull($envelope->wrappedDek, 'the wrapped key travels with the payload, which is what makes it self-sufficient.');
+        $this->assertNull($envelope->reference);
     }
 
     public function testAadRoundTrip()
@@ -173,5 +176,28 @@ class EnvelopeEncrypterTest extends TestCase
         $this->assertSame(2, $afterEncrypt);
         // decrypt: unwrapDataKey() -> 1 call to decrypt() inside InMemoryKms.
         $this->assertSame(1, $afterDecrypt);
+    }
+
+    /**
+     * The cipher would zero-pad a short key and truncate a long one without a word, so a backend
+     * ignoring the requested length would silently weaken every payload.
+     */
+    public function testADataKeyOfTheWrongLengthIsRefusedAtEncryptTime()
+    {
+        $encrypter = new EnvelopeEncrypter(new WrongLengthDataKeyKms(16));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');
+        $encrypter->encrypt('app-key', 'hello');
+    }
+
+    public function testADataKeyOfTheWrongLengthIsRefusedAtDecryptTime()
+    {
+        $envelope = $this->encrypter->encrypt('app-key', 'hello');
+        $decrypter = new EnvelopeEncrypter(new WrongLengthDataKeyKms(16));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The data key must be 32 bytes long for "aes-256-gcm", 16 given.');
+        $decrypter->decrypt($envelope);
     }
 }

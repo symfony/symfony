@@ -22,8 +22,11 @@ use Symfony\Component\KeyManagement\DecrypterInterface;
 use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
-use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
+use Symfony\Component\KeyManagement\Exception\ExceptionInterface;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
+use Symfony\Component\KeyManagement\Exception\LogicException;
+use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -109,8 +112,16 @@ final class DecryptCommand
 
         try {
             $plaintext = $encrypter->decrypt($parsed, $aad ?? '');
-        } catch (DecryptionFailedException) {
-            $errorIo->error('Decryption failed.');
+        } catch (LogicException) {
+            $errorIo->error('The envelope refers to a data key held in a store, which this command cannot reach. Decrypt it through the application instead.');
+
+            return Command::INVALID;
+        } catch (KeyNotFoundException|UnsupportedOperationException $e) {
+            $errorIo->error($e->getMessage());
+
+            return Command::INVALID;
+        } catch (ExceptionInterface $e) {
+            $errorIo->error($e->getMessage());
 
             return Command::FAILURE;
         }

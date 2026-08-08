@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\KeyManagement\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -19,9 +20,16 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\KeyManagement\Command\DecryptCommand;
+use Symfony\Component\KeyManagement\DecrypterInterface;
+use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Exception\KeyNotFoundException;
+use Symfony\Component\KeyManagement\Exception\RuntimeException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
+use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
+use Symfony\Component\KeyManagement\Tests\Fixtures\UnreachableKms;
 
 #[RequiresPhpExtension('openssl')]
 class DecryptCommandTest extends TestCase
@@ -101,6 +109,36 @@ class DecryptCommandTest extends TestCase
         $this->assertStringContainsString('malformed', $tester->getDisplay());
     }
 
+    public function testAStoredEnvelopeIsRefusedWithAnActionableMessage()
+    {
+        $stored = (new StoredEnvelopeEncrypter(new InMemoryDataKeyStore()))->encrypt('user.email', 'hello');
+
+        $tester = $this->tester(['default' => $this->primary]);
+        $exit = $tester->execute(['envelope' => base64_encode((string) $stored)]);
+
+        $this->assertSame(Command::INVALID, $exit);
+        $this->assertStringContainsString('held in a store', $tester->getDisplay());
+    }
+
+    #[DataProvider('provideBackendFailures')]
+    public function testABackendFailureIsReportedWithoutATrace(\Closure $failure, string $message, int $expectedExit)
+    {
+        $envelope = base64_encode((string) (new EnvelopeEncrypter($this->primary))->encrypt('app', 'hello'));
+
+        $tester = $this->tester(['default' => new UnreachableKms($failure)]);
+        $exit = $tester->execute(['envelope' => $envelope], ['capture_stderr_separately' => true]);
+
+        $this->assertSame($expectedExit, $exit);
+        $this->assertStringContainsString($message, $tester->getErrorOutput());
+        $this->assertSame('', $tester->getDisplay());
+    }
+
+    public static function provideBackendFailures(): iterable
+    {
+        yield 'a key the backend does not have' => [static fn () => new KeyNotFoundException('app'), 'Key "app" was not found in the KMS.', Command::INVALID];
+        yield 'a backend that is down' => [static fn () => new RuntimeException('The backend is down.'), 'The backend is down.', Command::FAILURE];
+    }
+
     public function testEmptyLocatorFailsLoudly()
     {
         $tester = $this->tester([]);
@@ -134,7 +172,7 @@ class DecryptCommandTest extends TestCase
     }
 
     /**
-     * @param array<string, OpenSslKms> $clients
+     * @param array<string, EncrypterInterface&DecrypterInterface> $clients
      */
     private function tester(array $clients): CommandTester
     {
@@ -154,7 +192,7 @@ class DecryptCommandTest extends TestCase
     }
 
     /**
-     * @param array<string, OpenSslKms> $clients
+     * @param array<string, EncrypterInterface&DecrypterInterface> $clients
      */
     private static function locator(array $clients): ServiceLocator
     {

@@ -43,13 +43,14 @@ final class ITerm2Protocol implements ImageProtocolInterface
             return ['data' => '', 'format' => null];
         }
 
-        if (false === $end = strpos($data, self::BEL, $start)) {
-            $end = strpos($data, self::ST, $start);
-        }
+        // OSC accepts either terminator, so the sequence ends at the first one of them
+        $terminators = array_filter([strpos($data, self::BEL, $start), strpos($data, self::ST, $start)], \is_int(...));
 
-        if (false === $end) {
+        if (!$terminators) {
             return ['data' => '', 'format' => null];
         }
+
+        $end = min($terminators);
 
         $content = substr($data, $start + \strlen(self::OSC_START), $end - $start - \strlen(self::OSC_START));
 

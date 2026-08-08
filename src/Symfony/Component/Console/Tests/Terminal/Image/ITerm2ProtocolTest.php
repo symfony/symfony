@@ -57,6 +57,27 @@ class ITerm2ProtocolTest extends TestCase
         $this->assertSame($imageData, $result['data']);
     }
 
+    public function testDecodeWithStTerminatorFollowedByABell()
+    {
+        $imageData = 'test image data';
+        $data = "\x1b]1337;File=inline=1:".base64_encode($imageData)."\x1b\\ trailing \x07";
+
+        $result = (new ITerm2Protocol())->decode($data);
+
+        $this->assertSame($imageData, $result['data']);
+    }
+
+    public function testDecodeStopsAtTheEndOfTheImage()
+    {
+        $imageData = 'test image data';
+        $data = "\x1b]1337;File=inline=1:".base64_encode($imageData)."\x1b\\"
+            ."\x1b]1337;File=inline=1:".base64_encode('another image')."\x07";
+
+        $result = (new ITerm2Protocol())->decode($data);
+
+        $this->assertSame($imageData, $result['data']);
+    }
+
     public function testDecodeInvalidBase64()
     {
         $data = "\x1b]1337;File=inline=1:not-valid-base64!!!\x07";

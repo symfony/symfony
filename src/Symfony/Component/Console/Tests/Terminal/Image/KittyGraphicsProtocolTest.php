@@ -47,26 +47,24 @@ class KittyGraphicsProtocolTest extends TestCase
         $this->assertSame('png', $result['format']);
     }
 
-    public function testDecodeWithBellTerminator()
+    public function testDecodeRejectsABellTerminator()
     {
-        $imageData = 'test image data';
-        $base64 = base64_encode($imageData);
-        $data = "\x1b_Ga=T,f=100;{$base64}\x07";
+        $data = "\x1b_Ga=T,f=100;".base64_encode('test image data')."\x07";
 
         $result = (new KittyGraphicsProtocol())->decode($data);
 
-        $this->assertSame($imageData, $result['data']);
+        $this->assertSame('', $result['data']);
+        $this->assertNull($result['format']);
     }
 
-    public function testDecodeWithBellTerminatorFollowedByAnEscapeSequence()
+    public function testDecodeStopsAtTheStringTerminatorWhenThePayloadHoldsABell()
     {
-        $imageData = 'test image data';
-        $base64 = base64_encode($imageData);
-        $data = "\x1b_Ga=T,f=100;{$base64}\x07 and some text\x1b\\";
+        $data = "\x1b_Ga=T,f=100;".base64_encode('test image data')."\x07junk\x1b\\";
 
         $result = (new KittyGraphicsProtocol())->decode($data);
 
-        $this->assertSame($imageData, $result['data']);
+        $this->assertSame('', $result['data']);
+        $this->assertNull($result['format']);
     }
 
     public function testDecodeInvalidBase64()

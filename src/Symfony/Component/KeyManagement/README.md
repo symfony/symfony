@@ -27,7 +27,9 @@ use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 
 // Local libsodium-backed provider, suitable for tests and development.
 // The component also ships `OpenSslKms` (AES-256-GCM, no ext-sodium
-// requirement) and `SealedBoxKms` (asymmetric).
+// requirement) and `SealedBoxKms` (asymmetric). Cloud and Flysystem
+// backends ship as separate bridges (symfony/aws-key-management,
+// symfony/vault-key-management, symfony/flysystem-key-management, ...).
 $kms = new SodiumKms(new InMemoryKeyLoader([
     'app-key' => sodium_crypto_aead_xchacha20poly1305_ietf_keygen(),
 ]));
@@ -47,6 +49,10 @@ file_put_contents($path, $envelope);
 
 $payload = $envelopeEncrypter->decrypt(Envelope::fromBytes(file_get_contents($path)));
 ```
+
+Each bridge under `Symfony\Component\KeyManagement\Bridge\` is published as its
+own Composer package and documents the DSN schemes it supports in its own
+README.
 
 Resources
 ---------

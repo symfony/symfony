@@ -26,6 +26,9 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  *   - `sodium+dir:///etc/keys?ext=.bin`
  *     keys are read from a local directory through {@see \Symfony\Component\KeyManagement\KeyLoader\FilesystemKeyLoader}.
  *
+ * Reading keys through Flysystem (S3, FTP, Azure Blob, ...) is provided by
+ * `symfony/flysystem-key-management` under the `sodium+fly://` scheme.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental

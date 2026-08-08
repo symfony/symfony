@@ -28,6 +28,9 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  * encoded in base64 (in-memory) or written as raw bytes (filesystem).
  * See {@see SealedBoxKms} for the encrypt-only / full-mode semantics.
  *
+ * Reading keys through Flysystem (S3, FTP, Azure Blob, ...) is provided by
+ * `symfony/flysystem-key-management` under the `sodium-sealed-box+fly://` scheme.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental

@@ -14,7 +14,7 @@
     </php>
 
     <testsuites>
-        <testsuite name="Symfony KeyManagement Component Test Suite">
+        <testsuite name="Symfony Flysystem Kms Bridge Test Suite">
             <directory>./Tests/</directory>
         </testsuite>
     </testsuites>
@@ -29,8 +29,6 @@
             <directory>./</directory>
         </include>
         <exclude>
-            <directory>./Bridge</directory>
-            <directory>./Resources</directory>
             <directory>./Tests</directory>
             <directory>./vendor</directory>
         </exclude>

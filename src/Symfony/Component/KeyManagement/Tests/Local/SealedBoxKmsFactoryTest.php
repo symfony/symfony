@@ -41,6 +41,11 @@ class SealedBoxKmsFactoryTest extends TestCase
         $this->assertFalse((new SealedBoxKmsFactory())->supports(Dsn::fromString('sodium://?keys[a]=AAAA')));
     }
 
+    public function testFlysystemSchemeIsNotHandledByThisFactory()
+    {
+        $this->assertFalse((new SealedBoxKmsFactory())->supports(Dsn::fromString('sodium-sealed-box+fly://service/path')));
+    }
+
     public function testCreateOnUnsupportedSchemeThrows()
     {
         $this->expectException(UnsupportedSchemeException::class);

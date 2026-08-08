@@ -41,6 +41,11 @@ class SodiumKmsFactoryTest extends TestCase
         $this->assertFalse((new SodiumKmsFactory())->supports(Dsn::fromString('vault-transit://x@host')));
     }
 
+    public function testFlysystemSchemeIsNotHandledByThisFactory()
+    {
+        $this->assertFalse((new SodiumKmsFactory())->supports(Dsn::fromString('sodium+fly://service/path')));
+    }
+
     public function testCreateOnUnsupportedSchemeThrows()
     {
         $this->expectException(UnsupportedSchemeException::class);

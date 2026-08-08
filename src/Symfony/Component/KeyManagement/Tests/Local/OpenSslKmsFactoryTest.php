@@ -41,6 +41,11 @@ class OpenSslKmsFactoryTest extends TestCase
         $this->assertFalse((new OpenSslKmsFactory())->supports(Dsn::fromString('sodium://?keys[a]=AAAA')));
     }
 
+    public function testFlysystemSchemeIsNotHandledByThisFactory()
+    {
+        $this->assertFalse((new OpenSslKmsFactory())->supports(Dsn::fromString('openssl+fly://service/path')));
+    }
+
     public function testCreateOnUnsupportedSchemeThrows()
     {
         $this->expectException(UnsupportedSchemeException::class);

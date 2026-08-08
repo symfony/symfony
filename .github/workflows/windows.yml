@@ -58,6 +58,7 @@ jobs:
           "extension=php_openssl.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
           "extension=php_sqlite3.dll" >> php.ini
+          "extension=php_fileinfo.dll" >> php.ini
           "intl.default_locale=en" >> php.ini
           "intl.error_level=0" >> php.ini
           cd ${{ github.workspace }}
@@ -81,8 +82,9 @@ jobs:
 
           php phpunit install
 
-          # curl makes composer fast, but we want to disable it for this job
-          (Get-Content -Raw c:\php\php.ini) -replace 'extension=php_curl\.dll', ';extension=php_curl.dll' | Set-Content c:\php\php.ini
+          # curl makes composer fast and fileinfo is what league/flysystem requires to install,
+          # but we want to disable them for this job
+          (Get-Content -Raw c:\php\php.ini) -replace 'extension=php_(curl|fileinfo)\.dll', ';extension=php_$1.dll' | Set-Content c:\php\php.ini
 
       - name: Run tests
         run: |

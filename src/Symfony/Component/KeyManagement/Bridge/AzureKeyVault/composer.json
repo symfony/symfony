@@ -1,0 +1,30 @@
+{
+    "name": "symfony/azure-keyvault-key-management",
+    "type": "symfony-key-management-bridge",
+    "description": "Symfony Azure Key Vault Key Management Bridge",
+    "keywords": ["kms", "azure", "key vault", "managed hsm", "encryption"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Florent Morselli",
+            "email": "florent.morselli@spomky-labs.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/key-management": "^8.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\KeyManagement\\Bridge\\AzureKeyVault\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

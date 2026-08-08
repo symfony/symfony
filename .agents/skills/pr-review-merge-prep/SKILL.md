@@ -23,9 +23,9 @@ description: Principles for rigorously reviewing a pull request and making it me
 ## Batch review
 
 - To review many PRs (for example a whole milestone), run one subagent per PR, each in its own git worktree. Parallel runs must never share mutable state.
-- Fetch all PR heads first, in one command, into stable refs such as `refs/reviews/pr-<number>`. Agents must not depend on `FETCH_HEAD`.
+- Fetch all PR heads first, in one command, into stable refs outside `refs/heads/`, such as `refs/reviews/pr-<number>`. Agents must not depend on `FETCH_HEAD`.
 - Disable checkout hooks inside worktrees. Share the main checkout's dependency directory only when every PR targets the same branch and agents never write to it; otherwise give each worktree its own install. Prime shared test-runner caches once, before starting the agents.
-- Never let agents touch the main checkout; treat it as owned by the user.
+- Never let agents touch the main checkout; treat it as owned by the user, along with the branch namespace it works in. Worktrees check out detached: a branch checked out in a worktree is locked for the whole repository, so the user can no longer fetch into it or check it out, and the failure surfaces in their session rather than in the agent's. Review and merge-prep need no branch of their own, since commit, amend, rebase, cherry-pick and push all work on a detached HEAD.
 - Give every agent the same brief: the full single-PR standard above plus the batch-wide checks (branch target, composition with sibling PRs), returning a structured report with verdict, root cause, branch conclusion, and findings with evidence.
 - When an agent stalls or dies, resume it with a message restating where it was and which constraints apply; do not restart the review from scratch.
 
@@ -37,7 +37,7 @@ description: Principles for rigorously reviewing a pull request and making it me
 - A conflict-free rebase can still produce broken code: an import the source branch happened to have, a test runner that ignores newer test syntax. The test run decides, not the rebase.
 - Rebase onto the current base tip and confirm the parent commit equals it. Check again just before pushing: active repositories move. Run rebases and merges non-interactively (`GIT_EDITOR=true`).
 - Run scoped tests while iterating and the full suite of each touched component before calling it done; never run the whole monorepo at once. Check static analysis and lowest-dependency jobs when the change can affect them. If an assertion depends on the installed dependency version, use feature detection instead of assuming one version.
-- Keep the PR's metadata true: push to the PR's real head (the fork's repository name can differ from the upstream name; query it), and update base, milestone, title and body together.
+- Keep the PR's metadata true: push to the PR's real head with an explicit `HEAD:<head-branch>` refspec, since the work happens on a detached HEAD (the fork's repository name can differ from the upstream name; query it), and update base, milestone, title and body together.
 - Treat the description as the first draft of the documentation, not as a review log. Write it for someone who never saw the discussion: what the feature does, the public API it adds, the options and their defaults, which choice to make when, and the traps. For a feature, end with the points the documentation must carry, so whoever opens the symfony-docs pull request does not have to reconstruct them from the diff.
 - Put what changed during review in a new comment instead. Those notes matter to the people following the thread and stop mattering once it merges, while the description outlives it.
 - Keep changelog entries to one line each, naming the new public surface and nothing more. Reasoning, comparison tables and usage guidance belong in the documentation. A changelog entry that has to explain itself is a sign the documentation entry is missing.

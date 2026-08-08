@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\LogicException;
@@ -28,6 +30,15 @@ class TimezoneTypeTest extends BaseTypeTestCase
 
         $this->assertContainsEquals(new ChoiceView('Africa/Kinshasa', 'Africa/Kinshasa', 'Africa / Kinshasa'), $choices);
         $this->assertContainsEquals(new ChoiceView('America/New_York', 'America/New_York', 'America / New York'), $choices);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testRegionsOptionIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/form 8.2: The "regions" option is deprecated. It has had no effect since 5.0 and will be removed in 9.0.');
+
+        $this->factory->create(static::TESTED_TYPE, null, ['regions' => \DateTimeZone::EUROPE]);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)

@@ -25,6 +25,11 @@ DoctrineBridge
    association and the default `findBy` repository method is used. Such fields were silently validated against a
    query that could not match. Use the `repositoryMethod` option to provide a method that can query them
 
+Form
+----
+
+ * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0 and will be removed in 9.0
+
 FrameworkBundle
 ---------------
 

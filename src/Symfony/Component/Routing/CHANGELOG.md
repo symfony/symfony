@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow defining default query parameters with the `_query` route default
+
 8.1
 ---
 
@@ -352,7 +357,7 @@ CHANGELOG
    "../parent-file" and "//example.com/dir/file". The third parameter in
    `UrlGeneratorInterface::generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)`
    now accepts more values and you should use the constants defined in `UrlGeneratorInterface` for
-   claritiy. The old method calls with a Boolean parameter will continue to work because they
+   clarity. The old method calls with a Boolean parameter will continue to work because they
    equal the signature using the constants.
 
 2.1.0

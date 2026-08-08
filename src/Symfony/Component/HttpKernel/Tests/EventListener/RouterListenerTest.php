@@ -30,6 +30,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -265,6 +266,72 @@ class RouterListenerTest extends TestCase
 
         $listener = new RouterListener($urlMatcher, new RequestStack());
         $listener->onKernelRequest($event);
+    }
+
+    public function testDefaultQueryParametersSeedTheQueryBag()
+    {
+        $request = $this->dispatchWithMatchedParameters(
+            'http://localhost/user',
+            ['_route' => 'user', '_query' => ['page' => 1, 'sort' => 'name']],
+        );
+
+        $this->assertSame('1', $request->query->get('page'));
+        $this->assertSame('name', $request->query->get('sort'));
+    }
+
+    public function testDefaultQueryParametersDoNotOverrideTheRequestQueryString()
+    {
+        $request = $this->dispatchWithMatchedParameters(
+            'http://localhost/user?page=2',
+            ['_route' => 'user', '_query' => ['page' => 1, 'sort' => 'name']],
+        );
+
+        $this->assertSame('2', $request->query->get('page'));
+        $this->assertSame('name', $request->query->get('sort'));
+    }
+
+    public function testDefaultQueryParametersDoNotConflictWithAQueryParameterNamedQuery()
+    {
+        $request = $this->dispatchWithMatchedParameters(
+            'http://localhost/user?_query[page]=2',
+            ['_route' => 'user', '_query' => ['page' => 1, 'sort' => 'name']],
+        );
+
+        $this->assertSame(['page' => '2'], $request->query->all('_query'));
+        $this->assertSame('1', $request->query->get('page'));
+        $this->assertSame('name', $request->query->get('sort'));
+    }
+
+    public function testDefaultQueryParametersAreNotExposedAsRouteParams()
+    {
+        $request = $this->dispatchWithMatchedParameters(
+            'http://localhost/user',
+            ['_route' => 'user', '_query' => ['page' => 1]],
+        );
+
+        $this->assertSame([], $request->attributes->get('_route_params'));
+    }
+
+    public function testDefaultQueryParametersMustBeAnArray()
+    {
+        $this->expectException(InvalidParameterException::class);
+        $this->expectExceptionMessage('Default "_query" must be an array of query parameters for route "user".');
+
+        $this->dispatchWithMatchedParameters('http://localhost/user', ['_route' => 'user', '_query' => 'page=1']);
+    }
+
+    private function dispatchWithMatchedParameters(string $uri, array $parameters): Request
+    {
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $request = Request::create($uri);
+        $event = new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $requestMatcher = $this->createStub(RequestMatcherInterface::class);
+        $requestMatcher->method('matchRequest')->willReturn($parameters);
+
+        (new RouterListener($requestMatcher, new RequestStack(), new RequestContext()))->onKernelRequest($event);
+
+        return $request;
     }
 
     #[DataProvider('provideRouteMapping')]

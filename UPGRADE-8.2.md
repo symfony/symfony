@@ -29,6 +29,12 @@ Form
 ----
 
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0 and will be removed in 9.0
+ * `TimezoneType` with the `intl` option enabled now offers the identifier PHP reports as canonical when ICU
+   keys a zone and its legacy aliases under one display name, so `Asia/Kolkata` is offered where `Asia/Calcutta`
+   used to be. The aliases stay submittable and are resolved to the offered identifier, so a stored value keeps
+   designating the same choice, but reading it back returns the offered identifier
+ * `TimezoneType` now resolves `UTC` and `Etc/UTC` to each other, the `intl` option deciding which one is
+   offered, where submitting the one the option does not offer used to be rejected
 
 FrameworkBundle
 ---------------

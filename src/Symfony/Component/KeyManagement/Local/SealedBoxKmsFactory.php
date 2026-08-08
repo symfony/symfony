@@ -30,6 +30,9 @@ use Symfony\Component\KeyManagement\KeyLoader\KeyLoaderInterface;
  * string reads `+` as a space.
  * See {@see SealedBoxKms} for the encrypt-only / full-mode semantics.
  *
+ * Reading keys through Flysystem (S3, FTP, Azure Blob, ...) is provided by
+ * `symfony/flysystem-key-management` under the `sodium-sealed-box+fly://` scheme.
+ *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
  * @experimental

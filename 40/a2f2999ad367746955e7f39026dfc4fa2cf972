@@ -1,0 +1,180 @@
+---------------------------------------------------------------------------
+
+by kbond at 2026-07-11T19:29:47Z
+
+A cleaner long-term option could be a new `impersonation` feature (path-only) that deprecates the legacy query-parameter `switch_user` mode entirely. Switching would be a real authenticator (it produces a token, so it gets CSRF and target-path handling for free, plus a new badge to carry the original token), while exiting stays a small logout-style listener that just restores the original token.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-07-12T06:21:06Z
+
+Hi @kbond ,
+
+> Switching would be a real authenticator (it produces a token, so it gets CSRF and target-path handling for free, plus a new badge to carry the original token), while exiting stays a small logout-style listener that just restores the original token.
+
+I really like it!
+
+One remark on the route : it should be possible to declare `path: /switch-user` in the firewall section and let the route be defined automatically (like the [logout](https://symfony.com/blog/new-in-symfony-6-4-simpler-logout) does).
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-07-12T09:15:58Z
+
+> One remark on the route : it should be possible to declare path: /switch-user
+
+Yep, this is already possible. I use the same logic as logout.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-07-31T11:10:34Z
+
+Regarding `impersonation_path()`, `logout_path()` also is broken in the web debug toolbar if you have a path to a controller that only accepts `POST`. I'm ok with it being the same thing here but any objections?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-01T14:13:22Z
+
+@kbond I pushed a commit on top of yours instead of only describing the changes, since points 1 to 4 of my review were entangled. Your commit and authorship are untouched, and I rebased on the current 8.2 to clear the two changelog conflicts. Drop or rework anything you disagree with.
+
+**The URL helpers.** `ImpersonateUrlGenerator::buildPath()` decorated the current request URI, so with `path` configured it produced a link to the current page, which `supports()` no longer matches, and with `enable_csrf` it carried no token and got a 403. It now builds from the configured path or route, carries the current URI as `_target_path` so the user lands back where they were, and appends `csrf_parameter` with a token for `csrf_token_id` when the firewall enables CSRF.
+
+`LogoutUrlGenerator::generateLogoutUrl()` was the model: the same split between a path starting with `/` and a route name, the same `ABSOLUTE_PATH` / `ABSOLUTE_URL` handling, and the same "append the token when a manager is configured". That needed two optional trailing constructor arguments, `?UrlGeneratorInterface` (a route name cannot be resolved without a router) and `?CsrfTokenManagerInterface`. PHP exempts `__construct()` from signature compatibility checks, so a child class that overrides it with the old three-argument signature still loads; I verified that with a probe rather than assuming it.
+
+One gap I left open: the generator receives `security.csrf.token_manager`, so a firewall that sets a custom `switch_user.csrf_token_manager` would get a token minted by the default manager and the link would be rejected. Closing that properly means giving the generator the `registerListener()` treatment `LogoutUrlGenerator` has, which felt like more than this commit should carry. Happy to add it if you prefer.
+
+**The profiler link.** `SecurityDataCollector` had its own copy of the same logic, so it now delegates to the generator and follows the configuration automatically.
+
+**Exiting in `path` mode.** The path branch was missing the `EXIT_VALUE !== $username` guard that the legacy branch still has, so `target_route` was applied when exiting. Added, with a test, plus tests for exiting in `path` mode and exiting with CSRF, which nothing covered.
+
+**The CSRF token in the redirect.** `enable_csrf` without `path` left the token in the rebuilt query string, so it reached the address bar, the history, the logs and the `Referer` of every subresource on the landing page. It is now removed next to the username.
+
+**Smaller ones.** `$httpUtils` was missing from the `Security/Http` changelog entry. `cannotBeEmpty()` on the `path` node, so `path: ''` fails at compile time instead of tripping a warning inside `HttpUtils`. The `info()` text now says declaring the route POST-only is up to the application, and notes that the header form of the parameter is not read in this mode. I did not make the listener refuse GET, since that would conflict with the link-based helpers.
+
+**On your question about `logout_path()`.** I do not think the two are equivalent. `logout_path()` builds from the configured logout path and appends the token, so it produces a URL the logout listener accepts; it only breaks when the application restricts that route to POST. The impersonation helpers pointed at a different URL entirely and carried no token, so they failed on plain GET routes too. Only the POST-only limitation is genuinely shared, and that part is reasonable to accept as-is: a link cannot POST, and the answer there is the Twig helper for the form action that you already listed under Possible Future Scope, not something this PR has to solve.
+
+Suites are green on both commits: `Security/Http` 646 to 650 tests, `SecurityBundle` 391 to 403 tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T17:18:30Z
+
+@kbond I closed the gap I had left open, amended into my existing commit rather than stacked on top, since it is the same "make the helpers produce URLs the listener accepts" change. Yours is still untouched.
+
+**The problem.** `csrf_token_manager` is new in this PR, and the generator received `security.csrf.token_manager` unconditionally. A firewall setting its own manager therefore got links carrying a token minted by the default one, which its listener rejects. The failure is a 403 on a link the framework generated itself, so it is worth closing before the option ships.
+
+**The fix.** `SecurityExtension` now registers each firewall's manager into a `security.impersonate.csrf_token_manager_locator`, keyed by firewall name, and the generator resolves the manager for the firewall it is currently building a URL for. The fifth constructor argument became that locator instead of a single manager. It is new in this PR, so there is nothing to keep compatible.
+
+I did not copy `LogoutUrlGenerator::registerListener()`. That method exists because `LogoutUrlGenerator` has no `FirewallMap` and has to be told the whole configuration. The impersonation generator already reads `parameter`, `csrf_parameter`, `csrf_token_id` and `path` from `FirewallConfig::getSwitchUser()`, so replicating them into a listener map would create a second source of truth to keep in sync. The service instance is the only thing the config array cannot carry, since it holds a service id, so that is the only thing the locator carries. `security.user_checker_locator` a few lines above in the same extension is the precedent.
+
+**One behaviour change.** With CSRF enabled and no manager available for the firewall, the generator now throws instead of silently returning a URL without a token. Silently omitting it produced a link that 403s at click time, which is the harder failure to diagnose. Through the extension the state is unreachable, since the listener takes a hard reference to the same service.
+
+While there, `getFirewallConfig()` is nullable, so the unconditional `->getSwitchUser()` became `?->getSwitchUser()`: a request outside any firewall now hits the existing `LogicException` instead of a "call to a member function on null". And the changelog entry names the argument `$csrfTokenManagers`.
+
+**Tests.** Five added, `SecurityBundle` 403 to 408, `Security/Http` unchanged at 650.
+
+The functional pair is the one that matters. Both render `impersonation_path()` and submit the URL it produced, one against a firewall using the default manager and one against a firewall using a custom one. On the code as it stood before this change the first passes and the second fails with 403, so the failure is specifically the manager mismatch and not the link mechanism. The unit tests cover the selection directly, with a manager registered for another firewall asserting `getToken()` is never called, and the extension test asserts only firewalls that enable CSRF get a locator entry.
+
+I left the description alone. The `impersonation_path()` bullet under Possible Future Scope still stands as written: the helper emits the path plus its query parameters, so it suits a link, and a form action wanting the bare path with the token in a hidden input is still not covered. Worth deciding whether that is in scope here or a follow-up.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-08-02T18:09:50Z
+
+Looks great @nicolas-grekas, thanks for plugging those gaps!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T08:54:42Z
+
+@kbond I took back what I said about the `impersonation_path()` bullet under Possible Future Scope. Looking at it properly, path mode had no usable Twig story at all, in three separate ways:
+
+1. `impersonation_path()` can only be followed with a GET, and your own `testSwitchUserViaPostOnlyRouteRejectsGet` pins that routing rejects one at priority 32, long before the listener runs at 8. In the configuration the `info()` text recommends, the helper is unusable for entering impersonation.
+2. A hand-written form hardcodes `parameter`, `csrf_parameter` and `csrf_token_id`, all three of which are options. The example in the description did exactly that.
+3. `csrf_token('switch_user')` is bound to `security.csrf.token_manager`, so with a custom `switch_user.csrf_token_manager` the template mints a token the listener rejects. That is the same bug I fixed in the generator, reappearing one layer up, and newly reachable because this PR adds the option.
+
+So a third commit adds `generateImpersonationForm()` and `generateExitForm()`, exposed as `impersonation_form()` and `impersonation_exit_form()`. They return `{action, fields}`: names from the configuration, token from the firewall's manager, `_target_path` included. Rendering is three lines of Twig and all three holes close at once. I kept them free of markup, since no security helper in Symfony emits any and the array is just as usable outside Twig.
+
+**Implementation.** `buildUrl()` already computed a URL and a parameter map and then glued them; that split is now a `buildParts()` both APIs consume, so the two can never drift.
+
+Two consequences worth flagging.
+
+Parameters a route takes as **placeholders** stay in the action rather than becoming hidden fields, so `/switch-user/{_switch_user}` produces `action: /switch-user/kuba` with only `_target_path` left over. That is the attributes fallback you listed under RESTful URLs, and it now works through the helper as well, so I amended that bullet rather than removing it. It is also why the split parses the query string by hand instead of with `parse_str()`, which would rewrite dots and spaces in configurable parameter names into underscores.
+
+Route mode and path mode now **encode identically**. Route mode went through the router's query encoder and path mode through `http_build_query()`, so the same configuration produced `_target_path=/profile?page%3D2` in one and `_target_path=%2Fprofile%3Fpage%3D2` in the other. Both are valid, and unifying them is a side effect of the shared code path, not a goal. Three assertions written in this PR moved.
+
+**Description.** I did edit it after all: the form examples now use the helpers, the hand-written one stays as the escape hatch with the `csrf_token()` caveat spelled out, `csrf_token_manager` is documented, and the Twig-helper bullet is gone from Possible Future Scope. Reword freely, it is your text.
+
+**Tests.** `SecurityBundle` 408 to 425, `Security/Http` 654, Twig bridge unchanged at 1985. Seven unit tests on the form parts across all four path shapes including the placeholder route, one on the empty-generator fallback in the bridge, and two functional ones that render `impersonation_form()` and `impersonation_exit_form()` against a POST-only route on a firewall with a **custom** token manager, then submit them. Those two fail before this commit and cover all three holes in one flow.
+
+Rebased on 8.2, which had moved: the two changelogs and the `SecurityDataCollector` imports conflicted with the deauthentication-reason work. Suites are green on all three commits.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-08-03T11:23:42Z
+
+The form stuff is neat.
+
+In a follow-up pr, we should add `logout_form()` also, right?
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-08-03T14:53:15Z
+
+Added an optional `$targetUri` to all the impersonation URL helpers, mirroring the exit helpers which already take one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T16:56:22Z
+
+Rebased on 8.2, which now carries #65124. Your commit fits cleanly, the only conflict was the SecurityBundle changelog. Suites are green on all four commits: `SecurityBundle` 433, `Security/Http` 654, `Security/Csrf` 114, Twig bridge 21.
+
+Your commit needed one thing, amended in rather than stacked on top so it stays yours. `ImpersonateUrlGenerator` is not final and `generateImpersonationPath()` and `generateImpersonationUrl()` both shipped in 6.4, so giving them a trailing optional argument breaks any subclass that overrides them. I checked with a probe rather than assuming:
+
+```
+PHP Fatal error: Declaration of App\MyGenerator::generateImpersonationPath(string $identifier): string
+must be compatible with ImpersonateUrlGenerator::generateImpersonationPath(string $identifier, ?string $targetUri = null): string
+```
+
+They now take the argument through `func_num_args()`, with the real parameter in a trailing comment and a `@param` in the docblock, which is the house pattern for this. Plus an `UPGRADE-8.2.md` entry. `generateImpersonationForm()` is new in this PR so it keeps the argument for real, and the Twig extension is `final`, so nothing to do there either.
+
+Also removed a duplicate `SwitchUserListener` line from the `Security/Http` changelog. That one was mine: an earlier conflict resolution kept both sides, so the entry appeared twice, once without `$httpUtils` and once with. The remaining line is the accurate one, and I folded the removal into my own commit rather than yours.
+
+The `$targetUri` behavior reads well in both modes, which is worth stating since the two branches use it differently. With `path` configured it lands in `_target_path`, so `impersonation_path('kuba', '/dashboard')` switches on the dedicated endpoint and comes back to `/dashboard`. Without `path` it becomes the URL itself, so the same call switches while navigating to `/dashboard`. Your tests pin both.
+
+One follow-up now that #65124 is merged, which I would rather do in a separate PR than grow this one further. The generator carries its own `security.impersonate.csrf_token_manager_locator`, keyed by firewall name, while 8.2 now has `security.csrf_token_manager_locator`, keyed by token id and consulted by `csrf_token()` itself. Registering `switch_user.csrf_token_manager` there would let the generator drop its locator and resolve through the token id like everything else, and would make `csrf_token('switch_user')` correct in a hand-written form too. Happy to open it once this lands.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-03T17:12:36Z
+
+Folded the follow-up in as a fifth commit rather than leaving it for later, since it removes machinery this PR would otherwise ship.
+
+The generator carried its own locator of token managers keyed by firewall name, because at the time nothing else could tell it which manager a firewall had configured. `DelegatingCsrfTokenManager` now serves each token id through the manager registered for it, so registering `switch_user`'s manager there is enough: the generator takes the decorated `security.csrf.token_manager` and asks for the configured `csrf_token_id` like any other caller. Net 62 lines removed against 49 added, and the fifth constructor argument goes back to a plain `?CsrfTokenManagerInterface`.
+
+The part that is not just a simplification: `csrf_token('switch_user')` in a hand-written form now mints a token the listener accepts. The firewall-scoped locator could never reach that, which is why the description still carries a caveat about it. That caveat can go once this lands, and I will update it then rather than churn the text again now.
+
+`psr/container` came out of `symfony/security-http` too. It was only there for the locator type hint.
+
+Verified rather than assumed: with the registration disabled, the two custom-manager functional tests fail with 403, the same failure they had before any of this existed. So the routing is what makes them pass, not the listener sharing a service by luck.
+
+Suites green on all five commits: `SecurityBundle` 433, `Security/Http` 654, `Security/Csrf` 114, Twig bridge 21.
+
+The `switch_user` and `logout` registrations share the conflict check, so a firewall that points both at the same `csrf_token_id` with two different managers is refused at compile time instead of one silently winning. Added a test for that pairing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-04T08:38:25Z
+
+Rebased on 8.2 and removed a duplicate changelog entry.
+
+#65129 landed meanwhile, so 8.2 now carries the logout form helper. That made four conflicts, all additive: both changelog entries, both sets of controller actions and both sets of routes in the `StandardFormLogin` fixture. Nothing had to be chosen between.
+
+The duplicate was in the SecurityBundle changelog: the `switch_user` options entry appeared twice, once saying the options restrict switching to a "dedicated (POST-only) route" and once to a "dedicated route". Mine, from an earlier conflict resolution that kept both sides. I kept the second: `path` scopes switching to an endpoint, but nothing in the option makes that endpoint POST-only, which is what the `info()` text now says too. The same duplicate existed in the `Security/Http` changelog and was removed a couple of pushes ago; this was its twin and I missed it then.
+
+Suites green: `SecurityBundle` 436, `Security/Http` 658, `Security/Csrf` 114, Twig bridge 1985.
+
+Two notes, neither touched here.
+
+You dropped the `@param string|null $targetUri` docblocks from the two `func_num_args()` methods. The house shape for that trick keeps them, since the real signature no longer carries the argument and the docblock is the only place it is declared: `UriSigner::check()`, `StoreFactory::createStore()`, `SymfonyStyle::progressStart()` and `AmqpReceiver::getFromQueues()` all pair the trailing comment with a `@param`. Happy to restore them, but it is your commit now so I left it.
+
+Now that #65129 is in, `splitQuery()` exists in both `ImpersonateUrlGenerator` and `LogoutUrlGenerator`, identical in both. Worth factoring out once this lands rather than in here.

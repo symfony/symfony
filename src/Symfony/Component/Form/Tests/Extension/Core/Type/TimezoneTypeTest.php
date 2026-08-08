@@ -153,6 +153,79 @@ class TimezoneTypeTest extends BaseTypeTestCase
     }
 
     /**
+     * @dataProvider provideEquivalentIdentifiers
+     */
+    public function testEquivalentIdentifiersAreSubmittable(bool $intl, string $timezone)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['intl' => $intl]);
+        $form->submit($timezone);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame($timezone, $form->getData());
+    }
+
+    public static function provideEquivalentIdentifiers()
+    {
+        yield 'canonical identifier sharing an ICU name with its alias' => [true, 'Asia/Kolkata'];
+        yield 'identifier absent from the ICU data' => [true, 'UTC'];
+
+        if (null !== $legacy = self::findLegacyIdentifier()) {
+            yield 'legacy alias, intl' => [true, $legacy];
+            yield 'legacy alias, php' => [false, $legacy];
+        }
+    }
+
+    /**
+     * @dataProvider provideIntlOption
+     */
+    public function testUnknownIdentifierIsNotSubmittable(bool $intl)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, ['intl' => $intl]);
+        $form->submit('Not/AZone');
+
+        $this->assertFalse($form->isValid());
+        $this->assertNull($form->getData());
+    }
+
+    /**
+     * @dataProvider provideIntlOption
+     */
+    public function testEquivalentIdentifiersAreNotOffered(bool $intl)
+    {
+        if (null === $legacy = self::findLegacyIdentifier()) {
+            $this->markTestSkipped('The timezone database carries no backward compatibility identifier.');
+        }
+
+        $values = $this->factory->create(static::TESTED_TYPE, null, ['intl' => $intl])
+            ->getConfig()->getAttribute('choice_list')->getValues();
+
+        $this->assertNotContains($legacy, $values);
+        $this->assertContains('Europe/Paris', $values);
+    }
+
+    public static function provideIntlOption()
+    {
+        yield 'intl' => [true];
+        yield 'php' => [false];
+    }
+
+    private static function findLegacyIdentifier(): ?string
+    {
+        $legacy = array_diff(
+            \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC),
+            \DateTimeZone::listIdentifiers(\DateTimeZone::ALL)
+        );
+
+        foreach ($legacy as $timezone) {
+            if (str_contains($timezone, '/') && !str_starts_with($timezone, 'Etc/')) {
+                return $timezone;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @requires extension intl
      */
     public function testChoiceTranslationLocaleOptionWithIntl()

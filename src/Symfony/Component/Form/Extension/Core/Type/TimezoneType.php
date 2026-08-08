@@ -13,6 +13,9 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
@@ -54,10 +57,16 @@ class TimezoneType extends AbstractType
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static fn () => self::getIntlTimezones($input, $choiceTranslationLocale)), [$input, $choiceTranslationLocale]);
+                    return ChoiceList::loader($this, self::acceptEquivalentIdentifiers(
+                        new IntlCallbackChoiceLoader(static fn () => self::getIntlTimezones($input, $choiceTranslationLocale)),
+                        $input,
+                    ), [$input, $choiceTranslationLocale]);
                 }
 
-                return ChoiceList::lazy($this, static fn () => self::getPhpTimezones($input), $input);
+                return ChoiceList::loader($this, self::acceptEquivalentIdentifiers(
+                    new CallbackChoiceLoader(static fn () => self::getPhpTimezones($input)),
+                    $input,
+                ), $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
@@ -125,5 +134,64 @@ class TimezoneType extends AbstractType
         }
 
         return $timezones;
+    }
+
+    /**
+     * A zone can be designated by several identifiers, of which the choice list can
+     * offer only one: identifiers are unique but the labels they are keyed by are not.
+     * The ones left out still designate an offered zone, so they must stay submittable.
+     *
+     * @return array<string, true>
+     */
+    private static function getSubmittableTimezones(string $input): array
+    {
+        $timezones = [];
+
+        foreach (\DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC) as $timezone) {
+            if ('intltimezone' === $input && 'Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
+                continue;
+            }
+
+            $timezones[$timezone] = true;
+        }
+
+        return $timezones;
+    }
+
+    private static function acceptEquivalentIdentifiers(ChoiceLoaderInterface $loader, string $input): ChoiceLoaderInterface
+    {
+        return new class($loader, static fn () => self::getSubmittableTimezones($input)) implements ChoiceLoaderInterface {
+            private ?array $submittable = null;
+
+            public function __construct(
+                private ChoiceLoaderInterface $loader,
+                private \Closure $timezones,
+            ) {
+            }
+
+            public function loadChoiceList(?callable $value = null): ChoiceListInterface
+            {
+                return $this->loader->loadChoiceList($value);
+            }
+
+            public function loadChoicesForValues(array $values, ?callable $value = null): array
+            {
+                $choices = $this->loader->loadChoicesForValues($values, $value);
+                $this->submittable ??= ($this->timezones)();
+
+                foreach ($values as $i => $submitted) {
+                    if (!isset($choices[$i]) && isset($this->submittable[$submitted])) {
+                        $choices[$i] = $submitted;
+                    }
+                }
+
+                return $choices;
+            }
+
+            public function loadValuesForChoices(array $choices, ?callable $value = null): array
+            {
+                return $this->loader->loadValuesForChoices($choices, $value);
+            }
+        };
     }
 }

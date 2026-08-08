@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-07T11:22:29Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features / 6.4, 7.4, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2026-08-07T12:04:26Z
+
+This removal is a BC break as any form builder passing that option would now break. The option should be trigger a deprecation instead, performing the removal in 9.0
+
+---------------------------------------------------------------------------
+
+by sadiqk2 at 2026-08-07T13:34:04Z
+
+Thanks @stof, you are right. I reworked it accordingly: the default stays and the option now triggers a deprecation, so the removal can land in 9.0 instead of breaking form builders that still pass it.
+
+```
+Since symfony/form 8.2: The "regions" option is deprecated. It has had no effect since 5.0 and will be removed in 9.0.
+```
+
+The deprecation only fires when the option is passed explicitly. Building a `TimezoneType` normally triggers nothing. Added the CHANGELOG and UPGRADE-8.2 entries, and updated `DebugCommandTest::testDebugDeprecatedDefaults` since `TimezoneType` now appears under `--show-deprecated`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T13:37:55Z
+
+Pro-tip for anyone using LLMs to send PR to Symfony: do a self-review using the corresponding skill already in the repo

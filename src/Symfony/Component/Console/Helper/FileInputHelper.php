@@ -159,9 +159,12 @@ final class FileInputHelper
         if ('' !== $pasteBuffer) {
             if (null !== $this->protocol && $this->protocol->detectPastedImage($pasteBuffer)) {
                 $decoded = $this->protocol->decode($pasteBuffer);
-                if ('' !== $decoded['data']) {
-                    return InputFile::fromData($decoded['data'], $decoded['format']);
+
+                if ('' === $decoded['data']) {
+                    throw new InvalidFileException('The pasted image could not be decoded.');
                 }
+
+                return InputFile::fromData($decoded['data'], $decoded['format']);
             }
 
             $path = trim($pasteBuffer);

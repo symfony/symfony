@@ -19,6 +19,8 @@ use Symfony\Component\Console\Helper\TerminalInputHelper;
 use Symfony\Component\Console\Input\File\InputFile;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Question\FileQuestion;
+use Symfony\Component\Console\Terminal\Image\ImageProtocolInterface;
+use Symfony\Component\Console\Terminal\Image\KittyGraphicsProtocol;
 
 class FileInputHelperTest extends TestCase
 {
@@ -188,6 +190,17 @@ class FileInputHelperTest extends TestCase
         }
     }
 
+    public function testReadWithPasteDetectionRejectsAnUndecodablePastedImage()
+    {
+        $truncated = "\x1b_Ga=T,f=100,m=1;".base64_encode('chunk one')."\x1b\\";
+        $input = $this->pasteMarker('PASTE_START').$truncated.$this->pasteMarker('PASTE_END');
+
+        $this->expectException(InvalidFileException::class);
+        $this->expectExceptionMessage('The pasted image could not be decoded.');
+
+        $this->readWithPasteDetection($this->streamOf($input), new KittyGraphicsProtocol());
+    }
+
     public function testReadWithPasteDetectionAbortsBeyondMaxBytes()
     {
         $cap = (new \ReflectionClassConstant(FileInputHelper::class, 'MAX_PASTE_BYTES'))->getValue();
@@ -255,9 +268,10 @@ class FileInputHelperTest extends TestCase
     /**
      * @param resource $stream
      */
-    private function readWithPasteDetection($stream): InputFile
+    private function readWithPasteDetection($stream, ?ImageProtocolInterface $protocol = null): InputFile
     {
-        $method = (new \ReflectionClass(FileInputHelper::class))->getMethod('readWithPasteDetection');
+        $reflection = new \ReflectionClass(FileInputHelper::class);
+        $method = $reflection->getMethod('readWithPasteDetection');
 
         $terminalReflection = new \ReflectionClass(TerminalInputHelper::class);
         $inputHelper = $terminalReflection->newInstanceWithoutConstructor();
@@ -265,6 +279,12 @@ class FileInputHelperTest extends TestCase
             $terminalReflection->getProperty($name)->setValue($inputHelper, $value);
         }
 
-        return $method->invoke(new FileInputHelper(), $stream, new BufferedOutput(), new FileQuestion('?'), $inputHelper);
+        $helper = new FileInputHelper();
+
+        if (null !== $protocol) {
+            $reflection->getProperty('protocol')->setValue($helper, $protocol);
+        }
+
+        return $method->invoke($helper, $stream, new BufferedOutput(), new FileQuestion('?'), $inputHelper);
     }
 }

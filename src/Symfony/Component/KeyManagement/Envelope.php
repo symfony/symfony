@@ -17,10 +17,16 @@ use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
  * Envelope produced by {@see EnvelopeEncrypter}.
  *
  * Carries what is needed to decrypt a payload protected with envelope encryption: the AEAD nonce
- * and tag, the local ciphertext, and the wrapped data key. The bytes are owned by its
+ * and tag, the local ciphertext, and how to obtain the data key. The bytes are owned by its
  * {@see EnvelopeFormat}, so callers persist or transmit the object as opaque bytes through
  * {@see __toString()} and read it back through {@see fromBytes()}, which resolves the format from
  * the leading byte.
+ *
+ * The data key comes in one of two shapes, decided by the format and never mixed. Either the
+ * envelope carries its wrapped data key ({@see selfContained()}, laid out by
+ * {@see SelfContainedFormat}), or it refers to one held by a {@see DataKeyStoreInterface}
+ * ({@see referencing()}, laid out by {@see StoredFormat}). Each factory writes the format that
+ * matches its shape, so the two cannot be crossed.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *
@@ -37,6 +43,7 @@ final class Envelope implements \Stringable
         public readonly string $ciphertext,
         public readonly ?string $keyId = null,
         public readonly ?string $wrappedDek = null,
+        public readonly ?string $reference = null,
     ) {
     }
 
@@ -54,6 +61,21 @@ final class Envelope implements \Stringable
         self::assertLength('tag', $tag, $format->tagBytes());
 
         return new self($format, $iv, $tag, $ciphertext, keyId: $keyId, wrappedDek: $wrappedDek);
+    }
+
+    /**
+     * An envelope referring to a data key held by a {@see DataKeyStoreInterface}.
+     *
+     * @throws InvalidArgumentException If `$reference` overflows its on-the-wire length field, or if `$iv` or `$tag` do not have the length the format frames them at
+     */
+    public static function referencing(string $reference, string $iv, string $tag, string $ciphertext): self
+    {
+        self::assertFits('data key reference', $reference);
+        $format = new StoredFormat();
+        self::assertLength('iv', $iv, $format->ivBytes());
+        self::assertLength('tag', $tag, $format->tagBytes());
+
+        return new self($format, $iv, $tag, $ciphertext, reference: $reference);
     }
 
     public function __toString(): string

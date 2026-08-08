@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\KeyManagement\Ciphertext;
 use Symfony\Component\KeyManagement\DataKey;
+use Symfony\Component\KeyManagement\DataKeyHandle;
 use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -37,6 +38,7 @@ class KeyMaterialTest extends TestCase
     public static function objectsHoldingKeyMaterial(): iterable
     {
         yield 'data key' => [static fn (): object => new DataKey(self::SECRET, new Ciphertext('wrapped', 'kid'))];
+        yield 'data key handle' => [static fn (): object => new DataKeyHandle('ref', new DataKey(self::SECRET, new Ciphertext('wrapped', 'kid')))];
         yield 'in-memory key loader' => [static fn (): object => new InMemoryKeyLoader(['app' => self::SECRET])];
     }
 

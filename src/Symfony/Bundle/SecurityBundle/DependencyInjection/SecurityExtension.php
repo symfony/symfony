@@ -943,6 +943,15 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $listener->replaceArgument(7, $config['role']);
         $listener->replaceArgument(9, $stateless);
         $listener->replaceArgument(11, $config['target_route']);
+        $listener->replaceArgument(13, $config['path']);
+
+        if ($config['enable_csrf'] ?? false) {
+            $listener->replaceArgument(14, new Reference($config['csrf_token_manager']));
+            $listener->replaceArgument(15, $config['csrf_parameter']);
+            $listener->replaceArgument(16, $config['csrf_token_id']);
+
+            $this->registerCsrfTokenManager($container, $id, $config['csrf_token_id'], $config['csrf_token_manager']);
+        }
 
         return $switchUserListenerId;
     }

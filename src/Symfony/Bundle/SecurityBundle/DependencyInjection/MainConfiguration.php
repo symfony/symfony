@@ -267,11 +267,32 @@ class MainConfiguration implements ConfigurationInterface
             ->end()
             ->arrayNode('switch_user')
                 ->canBeUnset()
+                ->beforeNormalization()
+                    ->ifArray()
+                    ->then(static function ($v) {
+                        if (isset($v['csrf_token_manager'])) {
+                            $v['enable_csrf'] ??= true;
+                        } elseif ($v['enable_csrf'] ?? false) {
+                            $v['csrf_token_manager'] = 'security.csrf.token_manager';
+                        }
+
+                        return $v;
+                    })
+                ->end()
                 ->children()
                     ->scalarNode('provider')->end()
                     ->scalarNode('parameter')->defaultValue('_switch_user')->end()
                     ->scalarNode('role')->defaultValue('ROLE_ALLOWED_TO_SWITCH')->end()
                     ->scalarNode('target_route')->defaultValue(null)->end()
+                    ->scalarNode('path')
+                        ->defaultNull()
+                        ->cannotBeEmpty()
+                        ->info('Restrict user switching to this path (a path or route name). Declaring the route POST-only is up to the application. The parameter is no longer read from the request headers in this mode.')
+                    ->end()
+                    ->booleanNode('enable_csrf')->defaultNull()->end()
+                    ->scalarNode('csrf_token_id')->defaultValue('switch_user')->end()
+                    ->scalarNode('csrf_parameter')->defaultValue('_csrf_token')->end()
+                    ->scalarNode('csrf_token_manager')->end()
                 ->end()
             ->end()
             ->arrayNode('required_badges', 'required_badge')

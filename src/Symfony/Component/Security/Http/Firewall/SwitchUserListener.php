@@ -27,7 +27,11 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
+use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -56,19 +60,42 @@ class SwitchUserListener extends AbstractListener
         private bool $stateless = false,
         private ?UrlGeneratorInterface $urlGenerator = null,
         private ?string $targetRoute = null,
+        private ?HttpUtils $httpUtils = null,
+        private ?string $path = null,
+        private ?CsrfTokenManagerInterface $csrfTokenManager = null,
+        private string $csrfParameter = '_csrf_token',
+        private string $csrfTokenId = 'switch_user',
     ) {
         if ('' === $firewallName) {
             throw new \InvalidArgumentException('$firewallName must not be empty.');
+        }
+
+        if (null !== $path && null === $httpUtils) {
+            throw new \InvalidArgumentException(\sprintf('A "%s" instance must be provided when the "path" option is set.', HttpUtils::class));
         }
     }
 
     public function supports(Request $request): ?bool
     {
-        // usernames can be falsy
-        $username = $request->query->get($this->usernameParameter) ?? (!\in_array($request->getMethod(), ['GET', 'HEAD'], true) ? $request->request->get($this->usernameParameter) : null);
+        if (null !== $this->path) {
+            // when scoped to a dedicated path, the parameter carries the target
+            // identity but no longer triggers the listener on every request
+            if (!$this->httpUtils->checkRequestPath($request, $this->path)) {
+                return false;
+            }
 
-        if (null === $username || '' === $username) {
-            $username = $request->headers->get($this->usernameParameter);
+            $username = ParameterBagUtils::getRequestParameterValue($request, $this->usernameParameter);
+
+            if (!\is_string($username)) {
+                $username = null;
+            }
+        } else {
+            // usernames can be falsy
+            $username = $request->query->get($this->usernameParameter) ?? (!\in_array($request->getMethod(), ['GET', 'HEAD'], true) ? $request->request->get($this->usernameParameter) : null);
+
+            if (null === $username || '' === $username) {
+                $username = $request->headers->get($this->usernameParameter);
+            }
         }
 
         // if it's still "empty", nothing to do.
@@ -93,6 +120,14 @@ class SwitchUserListener extends AbstractListener
         $username = $request->attributes->get('_switch_user_username');
         $request->attributes->remove('_switch_user_username');
 
+        if (null !== $this->csrfTokenManager) {
+            $csrfToken = ParameterBagUtils::getRequestParameterValue($request, $this->csrfParameter);
+
+            if (!\is_string($csrfToken) || !$this->csrfTokenManager->isTokenValid(new CsrfToken($this->csrfTokenId, $csrfToken))) {
+                throw new AccessDeniedException('Invalid CSRF token.');
+            }
+        }
+
         if (null === $this->tokenStorage->getToken()) {
             throw new AuthenticationCredentialsNotFoundException('Could not find original Token object.');
         }
@@ -108,13 +143,35 @@ class SwitchUserListener extends AbstractListener
             }
         }
 
-        if (!$this->stateless) {
-            $request->query->remove($this->usernameParameter);
-            $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
-            $response = new RedirectResponse($this->urlGenerator && $this->targetRoute && self::EXIT_VALUE !== $username ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri(), 302);
-
-            $event->setResponse($response);
+        if ($this->stateless) {
+            return;
         }
+
+        if (null !== $this->path) {
+            // on a dedicated endpoint there is no "current page" to return to,
+            // so resolve an explicit target: submitted path, then target_route, then "/"
+            $targetUrl = ParameterBagUtils::getRequestParameterValue($request, '_target_path');
+
+            if (!\is_string($targetUrl) || !str_starts_with($targetUrl, '/')) {
+                $targetUrl = $this->urlGenerator && $this->targetRoute && self::EXIT_VALUE !== $username ? $this->urlGenerator->generate($this->targetRoute) : '/';
+            }
+
+            $event->setResponse($this->httpUtils->createRedirectResponse($request, $targetUrl));
+
+            return;
+        }
+
+        $request->query->remove($this->usernameParameter);
+
+        if (null !== $this->csrfTokenManager) {
+            // keep the token out of the address bar, the history, the logs and the Referer of the landing page
+            $request->query->remove($this->csrfParameter);
+        }
+
+        $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
+        $response = new RedirectResponse($this->urlGenerator && $this->targetRoute && self::EXIT_VALUE !== $username ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri(), 302);
+
+        $event->setResponse($response);
     }
 
     /**

@@ -34,6 +34,14 @@ class SecurityExtensionTest extends TestCase
         ClassExistsMock::withMockedClasses([FieldVote::class => true, AccessDecision::class => true]);
     }
 
+    public function testImpersonationFormsAreEmptyWithoutAnImpersonateUrlGenerator()
+    {
+        $extension = new SecurityExtension();
+
+        $this->assertSame(['action' => '', 'fields' => []], $extension->getImpersonateForm('kuba'));
+        $this->assertSame(['action' => '', 'fields' => []], $extension->getImpersonateExitForm());
+    }
+
     #[DataProvider('provideObjectFieldAclCases')]
     public function testIsGrantedCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject)
     {

@@ -1,0 +1,20 @@
+imports:
+    - { resource: ./base_config.yml }
+
+services:
+    app.switch_user_csrf_token_manager:
+        class: Symfony\Component\Security\Csrf\CsrfTokenManager
+        arguments: [null, '@security.csrf.token_storage', 'impersonation-']
+
+security:
+    providers:
+        in_memory:
+            memory:
+                users:
+                    user_can_switch:      { password: test, roles: [ROLE_USER, ROLE_ALLOWED_TO_SWITCH] }
+                    user_cannot_switch_1: { password: test, roles: [ROLE_USER] }
+    firewalls:
+        default:
+            switch_user:
+                path: switch_user_route
+                csrf_token_manager: app.switch_user_csrf_token_manager

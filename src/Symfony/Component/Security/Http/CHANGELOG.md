@@ -9,6 +9,10 @@ CHANGELOG
  * Add the deauthentication reason and the responsible user providers to `TokenDeauthenticatedEvent`
  * Add `LogoutUrlGenerator::getLogoutForm()` to build a form that logs the user out with a POST
  * Throw the status-code-specific `HttpException` (e.g. `NotFoundHttpException`, `AccessDeniedHttpException`) instead of a generic one when `#[IsGranted]`'s `statusCode` option is set
+ * Add `$httpUtils`, `$path`, `$csrfTokenManager`, `$csrfParameter` and `$csrfTokenId` arguments to `SwitchUserListener` to restrict user switching to a dedicated route protected by a CSRF token
+ * Add `$urlGenerator` and `$csrfTokenManager` arguments to `ImpersonateUrlGenerator` so that the generated URLs follow the `path` and CSRF configuration of the firewall
+ * Add `ImpersonateUrlGenerator::generateImpersonationForm()` and `generateExitForm()` to build a form that switches the user with a POST
+ * Add `$targetUri` argument to `ImpersonateUrlGenerator::generateImpersonationPath()` and `generateImpersonationUrl()`
 
 8.1
 ---

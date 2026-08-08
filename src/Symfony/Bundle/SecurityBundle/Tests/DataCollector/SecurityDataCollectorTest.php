@@ -22,6 +22,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -36,8 +37,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
+use Symfony\Component\Security\Http\Impersonate\ImpersonateUrlGenerator;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -187,6 +191,39 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame(['ROLE_USER'], $collector->getRoles()->getValue(true));
         $this->assertSame([], $collector->getInheritedRoles()->getValue(true));
         $this->assertSame('hhamon', $collector->getUser());
+    }
+
+    public function testCollectImpersonationExitPathFromTheUrlGenerator()
+    {
+        $adminToken = new UsernamePasswordToken(new InMemoryUser('yceruto', 'P4$$w0rD', ['ROLE_ADMIN']), 'provider', ['ROLE_ADMIN']);
+
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER']), 'provider', ['ROLE_USER'], $adminToken));
+
+        $switchUser = [
+            'parameter' => '_switch_user',
+            'path' => '/switch-user',
+            'enable_csrf' => true,
+            'csrf_parameter' => '_csrf_token',
+            'csrf_token_id' => 'switch_user',
+        ];
+
+        $firewallMap = $this->createStub(FirewallMap::class);
+        $firewallMap->method('getFirewallConfig')->willReturn(new FirewallConfig('dummy', 'security.user_checker.dummy', switchUser: $switchUser));
+
+        $request = Request::create('/profile');
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('getToken')->willReturn(new CsrfToken('switch_user', 'T0K3N'));
+
+        $impersonateUrlGenerator = new ImpersonateUrlGenerator($requestStack, $firewallMap, $tokenStorage, null, $csrfTokenManager);
+
+        $collector = new SecurityDataCollector($tokenStorage, null, null, null, $firewallMap, null, $impersonateUrlGenerator);
+        $collector->collect($request, new Response());
+
+        $this->assertSame('/switch-user?_switch_user=_exit&_csrf_token=T0K3N&_target_path=%2Fprofile', $collector->getImpersonationExitPath());
     }
 
     public function testGetFirewall()

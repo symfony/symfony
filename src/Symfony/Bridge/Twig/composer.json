@@ -43,7 +43,7 @@
         "symfony/security-acl": "^2.8|^3.0",
         "symfony/security-core": "^7.4|^8.0",
         "symfony/security-csrf": "^7.4|^8.0",
-        "symfony/security-http": "^7.4|^8.0",
+        "symfony/security-http": "^8.2",
         "symfony/serializer": "^7.4|^8.0",
         "symfony/stopwatch": "^7.4|^8.0",
         "symfony/translation": "^7.4|^8.0",
@@ -59,7 +59,8 @@
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
         "symfony/form": "<7.4.4|>8.0,<8.0.4",
-        "symfony/mime": "<7.4.9|>8.0,<8.0.9"
+        "symfony/mime": "<7.4.9|>8.0,<8.0.9",
+        "symfony/security-http": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Twig\\": "" },

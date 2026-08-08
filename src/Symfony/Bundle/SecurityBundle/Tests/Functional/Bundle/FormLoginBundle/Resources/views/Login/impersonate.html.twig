@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <form action="{{ path('switch_user_route') }}" method="post">
+        <input type="hidden" name="_switch_user" value="" />
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+
+        <input type="submit" name="switch" />
+    </form>
+{% endblock %}

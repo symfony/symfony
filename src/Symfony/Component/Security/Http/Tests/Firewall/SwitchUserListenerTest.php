@@ -28,8 +28,11 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Event\SwitchUserEvent;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
+use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -412,5 +415,261 @@ class SwitchUserListenerTest extends TestCase
         $listener = new SwitchUserListener($this->tokenStorage, $userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, null, '_switch_user', 'ROLE_ALLOWED_TO_SWITCH', $dispatcher);
         $this->assertTrue($listener->supports($this->event->getRequest()));
         $listener->authenticate($this->event);
+    }
+
+    public function testHttpUtilsIsRequiredWhenPathIsSet()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A "Symfony\Component\Security\Http\HttpUtils" instance must be provided when the "path" option is set.');
+
+        new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, path: '/impersonate');
+    }
+
+    public function testSupportsReturnsFalseWhenPathDoesNotMatch()
+    {
+        $this->request->request->set('_switch_user', 'kuba');
+
+        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils->expects($this->once())
+            ->method('checkRequestPath')->with($this->request, '/impersonate')
+            ->willReturn(false);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, httpUtils: $httpUtils, path: '/impersonate');
+
+        $this->assertFalse($listener->supports($this->request));
+    }
+
+    public function testSupportsReadsParameterFromRequestBodyWhenScopedToAPath()
+    {
+        // when scoped to a path, the listener only fires on a path match and reads
+        // the target identity from the request body (as posted by a form)
+        $this->request->setMethod('POST');
+        $this->request->request->set('_switch_user', 'kuba');
+
+        $httpUtils = $this->createMock(HttpUtils::class);
+        $httpUtils->expects($this->once())
+            ->method('checkRequestPath')->with($this->request, '/impersonate')
+            ->willReturn(true);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, httpUtils: $httpUtils, path: '/impersonate');
+
+        $this->assertTrue($listener->supports($this->request));
+        $this->assertSame('kuba', $this->request->attributes->get('_switch_user_username'));
+    }
+
+    public function testSwitchUserViaPathRedirectsToTargetPath()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $this->tokenStorage->setToken($token);
+
+        $this->request->setMethod('POST');
+        $this->request->request->set('_switch_user', 'kuba');
+        $this->request->request->set('_target_path', '/dashboard');
+
+        $httpUtils = $this->createStub(HttpUtils::class);
+        $httpUtils->method('checkRequestPath')->willReturn(true);
+        $httpUtils->method('createRedirectResponse')->willReturnCallback(static fn ($request, $path) => new RedirectResponse($path));
+
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'])
+            ->willReturn(true);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $accessDecisionManager, httpUtils: $httpUtils, path: '/impersonate');
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+
+        $this->assertInstanceOf(SwitchUserToken::class, $this->tokenStorage->getToken());
+        $this->assertInstanceOf(RedirectResponse::class, $this->event->getResponse());
+        $this->assertSame('/dashboard', $this->event->getResponse()->getTargetUrl());
+    }
+
+    public function testSwitchUserViaPathFallsBackToRootWhenNoTarget()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $this->tokenStorage->setToken($token);
+
+        $this->request->setMethod('POST');
+        $this->request->request->set('_switch_user', 'kuba');
+
+        $httpUtils = $this->createStub(HttpUtils::class);
+        $httpUtils->method('checkRequestPath')->willReturn(true);
+        $httpUtils->method('createRedirectResponse')->willReturnCallback(static fn ($request, $path) => new RedirectResponse($path));
+
+        $accessDecisionManager = $this->createStub(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->method('decide')->willReturn(true);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $accessDecisionManager, httpUtils: $httpUtils, path: '/impersonate');
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+
+        $this->assertSame('/', $this->event->getResponse()->getTargetUrl());
+    }
+
+    public function testSwitchUserViaPathNeutralizesOpenRedirectTargetPath()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $this->tokenStorage->setToken($token);
+
+        $request = Request::create('/impersonate', 'POST');
+        $request->request->set('_switch_user', 'kuba');
+        $request->request->set('_target_path', '//attacker.com');
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $accessDecisionManager = $this->createStub(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->method('decide')->willReturn(true);
+
+        // a real HttpUtils routes the target through getUriForPath(), keeping the current host
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $accessDecisionManager, httpUtils: new HttpUtils(), path: '/impersonate');
+        $this->assertTrue($listener->supports($request));
+        $listener->authenticate($event);
+
+        $this->assertSame('http://localhost//attacker.com', $event->getResponse()->getTargetUrl());
+    }
+
+    public function testSwitchUserFailsWithMissingCsrfToken()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_ALLOWED_TO_SWITCH']), 'key', ['ROLE_ALLOWED_TO_SWITCH']);
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->never())->method('isTokenValid');
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, csrfTokenManager: $csrfTokenManager);
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Invalid CSRF token.');
+
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+    }
+
+    public function testSwitchUserFailsWithInvalidCsrfToken()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_ALLOWED_TO_SWITCH']), 'key', ['ROLE_ALLOWED_TO_SWITCH']);
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+        $this->request->query->set('_csrf_token', 'invalid');
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->once())
+            ->method('isTokenValid')->with(new CsrfToken('switch_user', 'invalid'))
+            ->willReturn(false);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, csrfTokenManager: $csrfTokenManager);
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Invalid CSRF token.');
+
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+    }
+
+    public function testSwitchUserSucceedsWithValidCsrfToken()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $this->tokenStorage->setToken($token);
+        $this->request->query->set('_switch_user', 'kuba');
+        $this->request->query->set('_csrf_token', 'valid');
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->once())
+            ->method('isTokenValid')->with(new CsrfToken('switch_user', 'valid'))
+            ->willReturn(true);
+
+        $accessDecisionManager = $this->createMock(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->expects($this->once())
+            ->method('decide')->with($token, ['ROLE_ALLOWED_TO_SWITCH'])
+            ->willReturn(true);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $accessDecisionManager, csrfTokenManager: $csrfTokenManager);
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+
+        $this->assertInstanceOf(SwitchUserToken::class, $this->tokenStorage->getToken());
+    }
+
+    public function testExitUserFailsWithInvalidCsrfToken()
+    {
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('username', '', []), 'key', []);
+        $switchUserToken = new SwitchUserToken(new InMemoryUser('kuba', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken);
+        $this->tokenStorage->setToken($switchUserToken);
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
+
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->never())->method('isTokenValid');
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, csrfTokenManager: $csrfTokenManager);
+
+        $this->expectException(AccessDeniedException::class);
+        $this->expectExceptionMessage('Invalid CSRF token.');
+
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+    }
+
+    public function testCsrfTokenIsRemovedFromTheRedirectUrl()
+    {
+        $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
+        $this->tokenStorage->setToken($token);
+
+        $request = Request::create('/page?_switch_user=kuba&_csrf_token=T0K3N&keep=1');
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->method('isTokenValid')->willReturn(true);
+
+        $accessDecisionManager = $this->createStub(AccessDecisionManagerInterface::class);
+        $accessDecisionManager->method('decide')->willReturn(true);
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $accessDecisionManager, csrfTokenManager: $csrfTokenManager);
+        $this->assertTrue($listener->supports($request));
+        $listener->authenticate($event);
+
+        $this->assertSame(['keep' => '1'], $request->query->all());
+        $this->assertSame('http://localhost/page?keep=1', $event->getResponse()->getTargetUrl());
+    }
+
+    public function testExitUserViaPathDoesNotRedirectToTargetRoute()
+    {
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('username', '', []), 'key', []);
+        $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('kuba', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
+
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
+
+        $httpUtils = $this->createStub(HttpUtils::class);
+        $httpUtils->method('checkRequestPath')->willReturn(true);
+        $httpUtils->method('createRedirectResponse')->willReturnCallback(static fn ($request, $path) => new RedirectResponse($path));
+
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturn('/after-switch');
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, urlGenerator: $urlGenerator, targetRoute: 'whatever', httpUtils: $httpUtils, path: '/impersonate');
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+
+        $this->assertSame('/', $this->event->getResponse()->getTargetUrl());
+        $this->assertSame($originalToken, $this->tokenStorage->getToken());
+    }
+
+    public function testExitUserViaPathRedirectsToTargetPath()
+    {
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('username', '', []), 'key', []);
+        $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('kuba', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
+
+        $this->request->query->set('_switch_user', SwitchUserListener::EXIT_VALUE);
+        $this->request->query->set('_target_path', '/dashboard');
+
+        $httpUtils = $this->createStub(HttpUtils::class);
+        $httpUtils->method('checkRequestPath')->willReturn(true);
+        $httpUtils->method('createRedirectResponse')->willReturnCallback(static fn ($request, $path) => new RedirectResponse($path));
+
+        $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager, httpUtils: $httpUtils, path: '/impersonate');
+        $this->assertTrue($listener->supports($this->request));
+        $listener->authenticate($this->event);
+
+        $this->assertSame('/dashboard', $this->event->getResponse()->getTargetUrl());
+        $this->assertSame($originalToken, $this->tokenStorage->getToken());
     }
 }

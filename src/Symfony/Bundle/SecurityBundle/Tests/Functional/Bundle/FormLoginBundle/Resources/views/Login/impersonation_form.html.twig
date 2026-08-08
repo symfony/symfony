@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% set impersonate = impersonation_form('user_cannot_switch_1') %}
+    <form method="post" action="{{ impersonate.action }}">
+        {% for name, value in impersonate.fields %}
+            <input type="hidden" name="{{ name }}" value="{{ value }}" />
+        {% endfor %}
+
+        <input type="submit" name="switch" />
+    </form>
+
+    {% set exit = impersonation_exit_form() %}
+    {% if exit.action %}
+        <form method="post" action="{{ exit.action }}">
+            {% for name, value in exit.fields %}
+                <input type="hidden" name="{{ name }}" value="{{ value }}" />
+            {% endfor %}
+
+            <input type="submit" name="exit" />
+        </form>
+    {% endif %}
+{% endblock %}

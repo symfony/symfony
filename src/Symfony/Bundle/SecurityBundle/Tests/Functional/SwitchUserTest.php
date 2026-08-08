@@ -50,6 +50,124 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
     }
 
+    public function testSwitchUserViaPostOnlyRouteRejectsGet()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_path.yml']);
+
+        // the route is declared POST-only, so a GET is rejected by routing before
+        // it can ever reach the switch-user listener
+        $client->request('GET', '/switch-user?_switch_user=user_cannot_switch_1');
+
+        $this->assertSame(405, $client->getResponse()->getStatusCode());
+    }
+
+    public function testSwitchUserViaPostOnlyRoute()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_path.yml']);
+
+        $client->request('POST', '/switch-user', ['_switch_user' => 'user_cannot_switch_1']);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testSwitchUserViaPathWithoutCsrfTokenIsDenied()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf.yml']);
+
+        $client->request('POST', '/switch-user', ['_switch_user' => 'user_cannot_switch_1']);
+
+        $this->assertSame(403, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testSwitchUserViaPathWithValidCsrfToken()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf.yml']);
+
+        // render a form carrying a valid session-bound CSRF token, then submit it
+        $crawler = $client->request('GET', '/impersonation-form');
+        $form = $crawler->selectButton('switch')->form();
+        $form['_switch_user'] = 'user_cannot_switch_1';
+        $client->submit($form);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testExitImpersonationPathTargetsTheConfiguredPath()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_path.yml']);
+
+        $client->request('POST', '/switch-user', ['_switch_user' => 'user_cannot_switch_1', '_target_path' => '/profile']);
+
+        $this->assertSame('/switch-user?_switch_user=_exit&_target_path=%2Fprofile', $client->getProfile()->getCollector('security')->getImpersonationExitPath());
+    }
+
+    public function testExitImpersonationPathCarriesACsrfToken()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf.yml']);
+
+        $crawler = $client->request('GET', '/impersonation-form');
+        $form = $crawler->selectButton('switch')->form();
+        $form['_switch_user'] = 'user_cannot_switch_1';
+        $client->submit($form);
+
+        $exitPath = $client->getProfile()->getCollector('security')->getImpersonationExitPath();
+        $this->assertMatchesRegularExpression('#^/switch-user\?_switch_user=_exit&_csrf_token=.+&_target_path=%2F$#', $exitPath);
+
+        // the route is declared POST-only, so the generated URL is submitted as a POST
+        $client->request('POST', $exitPath);
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testImpersonationPathCarriesACsrfToken()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf.yml']);
+
+        $client->request('GET', '/impersonation-link');
+        $client->request('POST', trim($client->getResponse()->getContent()));
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testImpersonationPathCarriesATokenOfTheCsrfTokenManagerOfTheFirewall()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf_custom_manager.yml']);
+
+        $client->request('GET', '/impersonation-link');
+        $client->request('POST', trim($client->getResponse()->getContent()));
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testTheImpersonationFormHelperBuildsAFormTheListenerAccepts()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf_custom_manager.yml']);
+
+        $crawler = $client->request('GET', '/impersonation-form-helper');
+        $client->submit($crawler->selectButton('switch')->form());
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_cannot_switch_1', $client->getProfile()->getCollector('security')->getUser());
+    }
+
+    public function testTheExitFormHelperBuildsAFormTheListenerAccepts()
+    {
+        $client = $this->createAuthenticatedClient('user_can_switch', ['root_config' => 'switchuser_csrf_custom_manager.yml']);
+
+        $crawler = $client->request('GET', '/impersonation-form-helper');
+        $crawler = $client->submit($crawler->selectButton('switch')->form());
+        $client->submit($crawler->selectButton('exit')->form());
+
+        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
+    }
+
     public function testSwitchUserStateless()
     {
         $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml']);
@@ -74,7 +192,7 @@ class SwitchUserTest extends AbstractWebTestCase
 
     protected function createAuthenticatedClient($username, array $options = [])
     {
-        $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'switchuser.yml'] + $options);
+        $client = $this->createClient($options + ['test_case' => 'StandardFormLogin', 'root_config' => 'switchuser.yml']);
         $client->followRedirects(true);
 
         $form = $client->request('GET', '/login')->selectButton('login')->form();

@@ -157,6 +157,11 @@ return static function (ContainerConfigurator $container) {
                 false, // Stateless
                 service('router')->nullOnInvalid(),
                 abstract_arg('Target Route'),
+                service('security.http_utils'),
+                null, // Path
+                null, // CSRF Token Manager
+                '_csrf_token', // CSRF Parameter
+                'switch_user', // CSRF Token ID
             ])
             ->tag('monolog.logger', ['channel' => 'security'])
 

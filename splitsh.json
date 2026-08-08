@@ -35,6 +35,9 @@
         "intl": "src/Symfony/Component/Intl",
         "json-path": "src/Symfony/Component/JsonPath",
         "json-streamer": "src/Symfony/Component/JsonStreamer",
+        "key-management": {
+            "prefixes": [{ "from": "src/Symfony/Component/KeyManagement", "to": "", "excludes": ["Bridge"] }]
+        },
         "ldap": "src/Symfony/Component/Ldap",
         "lock": {
             "prefixes": [{ "from": "src/Symfony/Component/Lock", "to": "", "excludes": ["Bridge"] }]

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T14:10:13Z
+
+Rebased on 8.2, and fixed the precedence while at it.
+
+A route default was winning over an explicitly passed parameter: with `_query: {page: 1}` on the route, `generate("user", ["page" => 2])` returned `?page=1`. Silently wrong URL, and the opposite of what #63280 asks for in its first example. The default and the explicit `_query` were merged into the same bag, which then landed on top of the plain parameters. They are separate now:
+
+```php
+$extra = array_replace($defaultQuery, $extra, $queryParameters);
+```
+
+Also made a non-array `_query` default throw `InvalidParameterException` instead of being ignored. A non-array `_query` parameter has thrown since 8.0 (#60863), so the same key had opposite handling depending on where it came from.
+
+Added tests for both, plus one for `null` removing an inherited key. Verified the compiled generator agrees with the plain one on all six precedence cases.
+
+Two things left for a maintainer to weigh in on, both intentional as it stands:
+
+- The matching side is untouched, so `$request->query` does not get these values and `#[MapQueryParameter]` does not see them. Generation only, now stated in the description.
+- `_query` has been reserved as a generator parameter since 7.3, but an application using it as an ordinary route default today will now get a query string on every generated URL for that route.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T14:33:04Z
+
+Addressed the matching side too, so the feature is symmetric.
+
+`RouterListener` now seeds the query bag from the `_query` route default for every key the request does not already carry, so `#[MapQueryParameter]` and `#[MapQueryString]` see the declared defaults:
+
+```php
+#[Route("/user", defaults: ["_query" => ["page" => 1]])]
+public function list(#[MapQueryParameter] int $page): Response // 1 for /user, 2 for /user?page=2
+```
+
+The values are run through `http_build_query()` and `parse_str()` before being added, so they get the types a real query string would have parsed to. Otherwise `query->all()` would hold an int for a defaulted key and a string for one that came from the URL, which is the kind of difference that only shows up in production. Nested arrays survive, and a `null` value is skipped rather than seeded.
+
+`_query` is also removed from `_route_params` now, since it is not a route parameter.
+
+Three tests added for it: seeding, the request winning over the default, and `_route_params` staying clean.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-08T10:41:57Z
+
+Rebased on 8.2 and fixed the Psalm failure: `$attributes['_query']` typed as `array<never, never>|mixed` made Psalm invalidate the truthy branch, so the array is hoisted to a local and guarded.
+
+That guard also removes a `TypeError` a non-array `_query` default caused on every request to the route. It throws `InvalidParameterException` now, like the generator already did for the same misconfiguration.
+
+Added a test generating from the route default alone, which nothing covered, plus @smnandre's regression test.

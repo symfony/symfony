@@ -24,7 +24,9 @@ use Symfony\Component\KeyManagement\Exception\UnsupportedOperationException;
  *
  * `$key` names whatever selects the data key, which each implementation
  * defines: {@see EnvelopeEncrypter} reads it as the master key that wraps a
- * data key minted for this payload alone.
+ * data key minted for this payload alone, while
+ * {@see StoredEnvelopeEncrypter} reads it as the scope whose stored data key
+ * is shared by every payload of that scope.
  *
  * Most implementations also implement {@see EnvelopeDecrypterInterface};
  * write-only deployments may expose only the encrypting half.

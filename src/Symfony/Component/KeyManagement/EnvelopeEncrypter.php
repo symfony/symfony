@@ -78,6 +78,8 @@ use Symfony\Component\KeyManagement\Exception\RuntimeException;
  */
 final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDecrypterInterface
 {
+    use LocalAead;
+
     private readonly SelfContainedFormat $format;
 
     public function __construct(
@@ -102,43 +104,17 @@ final class EnvelopeEncrypter implements EnvelopeEncrypterInterface, EnvelopeDec
     }
 
     /**
+     * @throws LogicException            If the envelope refers to a stored data key, which this encrypter has no store to resolve
      * @throws DecryptionFailedException If the payload is invalid, tampered, or `$aad` does not match
      */
     public function decrypt(Envelope $envelope, string $aad = ''): string
     {
+        if (!$envelope->format instanceof SelfContainedFormat) {
+            throw new LogicException(\sprintf('The envelope refers to a stored data key, which "%s" cannot resolve.', self::class));
+        }
+
         $dataKey = $this->kms->unwrapDataKey(new Ciphertext($envelope->wrappedDek, $envelope->keyId), $aad);
 
         return $dataKey->use(static fn (#[\SensitiveParameter] string $dek): string => self::open($envelope, $dek, $aad));
-    }
-
-    /**
-     * @return array{string, string} the ciphertext and the AEAD tag
-     *
-     * @throws RuntimeException If the cipher rejects the inputs
-     */
-    private static function seal(EnvelopeFormat $format, #[\SensitiveParameter] string $dataKey, #[\SensitiveParameter] string $plaintext, string $iv, string $aad): array
-    {
-        $tag = '';
-        $ciphertext = openssl_encrypt($plaintext, $format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $iv, $tag, $aad, $format->tagBytes());
-
-        if (false === $ciphertext) {
-            throw new RuntimeException('Local AEAD encryption failed: '.(openssl_error_string() ?: 'unknown error'));
-        }
-
-        return [$ciphertext, $tag];
-    }
-
-    /**
-     * @throws DecryptionFailedException If the payload is invalid, tampered, or the AAD does not match
-     */
-    private static function open(Envelope $envelope, #[\SensitiveParameter] string $dataKey, string $aad): string
-    {
-        $plaintext = openssl_decrypt($envelope->ciphertext, $envelope->format->cipher(), $dataKey, \OPENSSL_RAW_DATA, $envelope->iv, $envelope->tag, $aad);
-
-        if (false === $plaintext) {
-            throw new DecryptionFailedException();
-        }
-
-        return $plaintext;
     }
 }

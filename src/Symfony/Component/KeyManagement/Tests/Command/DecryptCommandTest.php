@@ -22,6 +22,8 @@ use Symfony\Component\KeyManagement\Command\DecryptCommand;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\KeyLoader\InMemoryKeyLoader;
 use Symfony\Component\KeyManagement\Local\OpenSslKms;
+use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Test\InMemoryDataKeyStore;
 
 #[RequiresPhpExtension('openssl')]
 class DecryptCommandTest extends TestCase
@@ -99,6 +101,17 @@ class DecryptCommandTest extends TestCase
 
         $this->assertSame(Command::INVALID, $exit);
         $this->assertStringContainsString('malformed', $tester->getDisplay());
+    }
+
+    public function testAStoredEnvelopeIsRefusedWithAnActionableMessage()
+    {
+        $stored = (new StoredEnvelopeEncrypter(new InMemoryDataKeyStore()))->encrypt('user.email', 'hello');
+
+        $tester = $this->tester(['default' => $this->primary]);
+        $exit = $tester->execute(['envelope' => base64_encode((string) $stored)]);
+
+        $this->assertSame(Command::INVALID, $exit);
+        $this->assertStringContainsString('held in a store', $tester->getDisplay());
     }
 
     public function testEmptyLocatorFailsLoudly()

@@ -24,6 +24,7 @@ use Symfony\Component\KeyManagement\Envelope;
 use Symfony\Component\KeyManagement\EnvelopeEncrypter;
 use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
 use Symfony\Component\KeyManagement\Exception\InvalidArgumentException;
+use Symfony\Component\KeyManagement\Exception\LogicException;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
@@ -113,6 +114,10 @@ final class DecryptCommand
             $errorIo->error('Decryption failed.');
 
             return Command::FAILURE;
+        } catch (LogicException) {
+            $errorIo->error('The envelope refers to a data key held in a store, which this command cannot reach. Decrypt it through the application instead.');
+
+            return Command::INVALID;
         }
 
         $output->write($plaintext, false, OutputInterface::OUTPUT_RAW);

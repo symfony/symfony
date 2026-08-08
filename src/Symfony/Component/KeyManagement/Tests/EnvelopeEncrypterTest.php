@@ -83,6 +83,7 @@ class EnvelopeEncrypterTest extends TestCase
 
         $this->assertSame(SelfContainedFormat::ID, $envelope->format->id());
         $this->assertNotNull($envelope->wrappedDek, 'the wrapped key travels with the payload, which is what makes it self-sufficient.');
+        $this->assertNull($envelope->reference);
     }
 
     public function testAadRoundTrip()

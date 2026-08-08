@@ -35,7 +35,8 @@ use Symfony\Component\KeyManagement\Exception\LogicException;
  *     that returns the plaintext, or keeps it anywhere, leaves the wipe with
  *     nothing to wipe. Pass the parameter straight to the crypto primitives
  *     and let it go. A consumer that genuinely has to outlive the DataKey
- *     must take a buffer of its own first, by writing to an offset.
+ *     must take a buffer of its own first, by writing to an offset, which is
+ *     what {@see DataKeyHandle} does.
  *
  * @author Florent Morselli <florent.morselli@spomky-labs.com>
  *

@@ -30,7 +30,6 @@ final class KittyGraphicsProtocol implements ImageProtocolInterface
 {
     public const APC_START = "\x1b_G";
     public const ST = "\x1b\\";
-    public const BEL = "\x07";
 
     public function detectPastedImage(string $data): bool
     {
@@ -51,19 +50,9 @@ final class KittyGraphicsProtocol implements ImageProtocolInterface
         // larger than the maximum chunk size; all of them but the last one carry
         // "m=1" in their control data.
         while (true) {
-            // the sequence ends at whichever terminator comes first
-            $st = strpos($data, self::ST, $offset);
-            $bel = strpos($data, self::BEL, $offset);
-
-            if (false === $end = match (true) {
-                false === $st => $bel,
-                false === $bel => $st,
-                default => min($st, $bel),
-            }) {
+            if (false === $end = strpos($data, self::ST, $offset)) {
                 return ['data' => '', 'format' => null];
             }
-
-            $terminator = $end === $st ? self::ST : self::BEL;
 
             $content = substr($data, $offset + \strlen(self::APC_START), $end - $offset - \strlen(self::APC_START));
 
@@ -74,7 +63,7 @@ final class KittyGraphicsProtocol implements ImageProtocolInterface
             $controlData = substr($content, 0, $semicolonPos);
             $payload .= substr($content, $semicolonPos + 1);
             $format ??= $this->parseFormat($controlData);
-            $offset = $end + \strlen($terminator);
+            $offset = $end + \strlen(self::ST);
 
             if ('1' !== $this->parseControlValue($controlData, 'm')) {
                 break;

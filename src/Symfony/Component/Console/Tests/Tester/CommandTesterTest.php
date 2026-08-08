@@ -700,6 +700,44 @@ class CommandTesterTest extends TestCase
         $this->assertSame("bar\n", $result->getDisplay());
     }
 
+    public function testItCanTestACommandWritingAGenerator()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output) {
+            $output->writeln((static function () {
+                yield 'bar';
+                yield 'baz';
+            })());
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run();
+
+        $this->assertSame("bar\nbaz\n", $result->getOutput(true));
+        $this->assertSame("bar\nbaz\n", $result->getDisplay());
+    }
+
+    public function testItDoesNotConsumeAGeneratorDiscardedByVerbosity()
+    {
+        $consumed = false;
+        $command = new Command('foo');
+        $command->setCode(static function (OutputInterface $output) use (&$consumed): int {
+            $output->writeln((static function () use (&$consumed) {
+                $consumed = true;
+
+                yield 'bar';
+            })(), OutputInterface::VERBOSITY_VERBOSE);
+
+            return 0;
+        });
+
+        $result = (new CommandTester($command))->run();
+
+        $this->assertFalse($consumed);
+        $this->assertSame('', $result->getDisplay());
+    }
+
     public function testItProvidesUserInputs()
     {
         $questions = [

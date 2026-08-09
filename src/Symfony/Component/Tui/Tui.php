@@ -276,7 +276,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         // Move cursor to end of content
         $state = $this->screenWriter->getState();
         if ($state['line_count'] > 0) {
-            $lineDiff = $state['line_count'] - $state['cursor_row'];
+            // cursor_row is a zero-based index, line_count a count
+            $lineDiff = $state['line_count'] - 1 - $state['cursor_row'];
 
             if ($lineDiff > 0) {
                 $this->terminal->write("\x1b[{$lineDiff}B");

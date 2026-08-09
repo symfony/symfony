@@ -59,4 +59,29 @@ class TerminalTest extends TestCase
         $this->assertFileExists($marker);
         @unlink($marker);
     }
+
+    /**
+     * A pseudo-terminal whose window size was never set makes "stty size"
+     * report "0 0". A zero size means the size is unknown, not that the
+     * terminal is zero cells wide.
+     */
+    public function testZeroDimensionsFallBackToTheDefaultSize()
+    {
+        $terminal = new Terminal();
+        $columns = new \ReflectionProperty($terminal, 'cachedColumns');
+        $rows = new \ReflectionProperty($terminal, 'cachedRows');
+
+        $columns->setValue($terminal, 0);
+        $rows->setValue($terminal, 0);
+
+        $this->assertSame(80, $terminal->getColumns());
+        $this->assertSame(24, $terminal->getRows());
+
+        // Only zero is special-cased: a reported size is returned as is
+        $columns->setValue($terminal, 120);
+        $rows->setValue($terminal, 40);
+
+        $this->assertSame(120, $terminal->getColumns());
+        $this->assertSame(40, $terminal->getRows());
+    }
 }

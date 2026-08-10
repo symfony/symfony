@@ -50,6 +50,10 @@ HttpFoundation
 --------------
 
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()`
+ * Deprecate the `Request::$trustedHosts` property, it is never populated anymore since trusted hosts are
+   matched against a single combined regexp, and will be removed in 9.0. Populating it makes `getHost()`
+   trigger a deprecation; reading it is not reported, since PHP provides no way to intercept access to a
+   static property
 
 Lock
 ----

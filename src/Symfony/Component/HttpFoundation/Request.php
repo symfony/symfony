@@ -246,6 +246,8 @@ class Request
 
     /**
      * @var string[]
+     *
+     * @deprecated since Symfony 8.2, this property is never populated anymore
      */
     protected static array $trustedHosts = [];
 
@@ -1197,6 +1199,10 @@ class Request
 
         if (self::$trustedHostsRegexp) {
             // to avoid host header injection attacks, you should provide a list of trusted host patterns
+
+            if (self::$trustedHosts) {
+                trigger_deprecation('symfony/http-foundation', '8.2', 'Populating the "%s::$trustedHosts" property is deprecated; it has no effect anymore.', self::class);
+            }
 
             if (preg_match(self::$trustedHostsRegexp, $host)) {
                 return $host;

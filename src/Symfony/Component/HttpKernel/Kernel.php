@@ -434,6 +434,8 @@ abstract class Kernel implements KernelInterface, RebootableInterface, Terminabl
 
         $oldContainer = \is_object($this->container) ? new \ReflectionClass($this->container) : $this->container = null;
 
+        $lock = null;
+
         try {
             is_dir($buildDir) ?: mkdir($buildDir, 0o777, true);
 

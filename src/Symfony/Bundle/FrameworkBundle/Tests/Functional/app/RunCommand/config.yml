@@ -7,6 +7,8 @@ services:
     test_service:
         class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TestService
 
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TestService $testService: '@test_service'
+
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\AdvancedCommand:
         autowire: true
         autoconfigure: true

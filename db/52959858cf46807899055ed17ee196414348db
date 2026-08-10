@@ -1,0 +1,76 @@
+---------------------------------------------------------------------------
+
+by matyo91 at 2026-08-06T14:05:21Z
+
+Thanks for the thorough pass, @nicolas-grekas
+
+Ported the same fixes into our local mirror and re-ran the smoke page test — green
+
+```code
+php tools/social/test-facebook-smoke.php --text="Symfony FacebookPage bridge smoke $(date -u +%Y-%m-%dT%H:%MZ)"
+Facebook credentials: OK (page "Darkwood", id 1895547427139786).
+Publishing test post...
+Published successfully.
+Post ID: 1895547427139786_1622421323227893
+URL: https://www.facebook.com/1895547427139786_1622421323227893
+```
+
+Smoke-tested the `FacebookPage` bridge against a real Facebook Page before release.
+
+### Setup
+- Graph API version: **v26.0**
+- Auth: **Page access token** via `Authorization: Bearer` (`auth_bearer`)
+- Endpoint: `POST https://graph.facebook.com/v26.0/{page-id}/feed`
+- Required Page permissions: `pages_manage_posts` + `pages_read_engagement` (and `pages_show_list` to list pages via `me/accounts`)
+- Token must be a **Page** token from `GET /me/accounts`, not a user token
+
+### Success envelope
+Publish succeeded. Graph returned JSON with a string post id:
+
+```json
+{"id": "1895547427139786_1622421323227893"}
+```
+
+Observed shape: `{pageId}_{postId}` (string). The transport correctly maps that to `SentMessage::getMessageId()`.
+
+Example live result:
+- Page: Darkwood (`1895547427139786`)
+- Post ID: `1895547427139786_1622421323227893`
+- URL: `https://www.facebook.com/1895547427139786_1622421323227893`
+
+### Error envelope (invalid / logged-out token)
+Reproduced with a direct Graph call using an invalidated token:
+
+```bash
+curl -sS -X POST \
+  "https://graph.facebook.com/v26.0/{page-id}/feed" \
+  -H "Authorization: Bearer {invalid-page-access-token}" \
+  -d "message=error-shape-check"
+```
+
+Response:
+
+```json
+{
+  "error": {
+    "message": "Error validating access token: The session is invalid because the user logged out.",
+    "type": "OAuthException",
+    "code": 190,
+    "error_subcode": 467,
+    "fbtrace_id": "Af3Ndm8wDPmPkPyTqnyp5xS"
+  }
+}
+```
+
+So live Graph still exposes a string `error.message` under `error` — which is what the transport reads for `TransportException`.
+
+Separately, a Page token missing publish permissions returned **HTTP 403** / `#200` requiring both `pages_read_engagement` and `pages_manage_posts` (also via `error.message`).
+
+### Non-JSON / empty body
+Not easy to force against live Graph (they return JSON errors). Covered by unit tests:
+- HTML / 502-style body → exception uses raw content
+- Successful empty / non-JSON body → `malformed response from the Facebook Graph API`
+
+### Notes
+- `GET /{page-id}?fields=id,name` can succeed even when `POST /feed` fails (read vs publish scopes). Worth documenting for adopters.
+- Short-lived Explorer tokens die after logout; for automation, prefer a Page token derived from a long-lived user token.

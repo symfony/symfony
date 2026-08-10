@@ -39,7 +39,10 @@ class RequestTest extends TestCase
         Request::setTrustedHosts([]);
         Request::setAllowedHttpMethodOverride(null);
         Request::setFactory(null);
-        \Closure::bind(static fn () => self::$formats = null, null, Request::class)();
+        \Closure::bind(static function () {
+            self::$formats = null;
+            self::$trustedHosts = [];
+        }, null, Request::class)();
     }
 
     public function testInitialize()
@@ -3064,6 +3067,21 @@ b'])]
         $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.1: Directly setting property "query" of "Symfony\Component\HttpFoundation\Tests\NewRequest" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.');
 
         $request->query = new InputBag(['k' => 'v']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testPopulatingTrustedHostsIsDeprecated()
+    {
+        Request::setTrustedHosts(['^trusted\.com$']);
+        \Closure::bind(static fn () => self::$trustedHosts = ['untrusted.com'], null, Request::class)();
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'trusted.com');
+
+        $this->expectUserDeprecationMessage('Since symfony/http-foundation 8.2: Populating the "Symfony\Component\HttpFoundation\Request::$trustedHosts" property is deprecated; it has no effect anymore.');
+
+        $this->assertSame('trusted.com', $request->getHost());
     }
 }
 

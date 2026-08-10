@@ -62,6 +62,9 @@ final class CellBuffer
     /** @var int[] Attribute bitmask (bold|dim|italic|underline|blink|reverse|strikethrough) */
     private array $attrs;
 
+    /* Whether a wide character has been placed, so writes have to repair cell pairs */
+    private bool $hasWideChars = false;
+
     /* Row of the cursor marker, or null if not found */
     private ?int $cursorRow = null;
 
@@ -131,17 +134,23 @@ final class CellBuffer
             $i = 0;
             $len = \strlen($line);
             $rowOffset = $row * $width;
+            $hasHighByte = (bool) preg_match('/[\x80-\xFF]/', $line);
 
             while ($i < $len && $col < $width) {
                 $ord = \ord($line[$i]);
 
-                // Fast path: ASCII printable (0x20-0x7E), most common case
-                if ($ord >= 0x20 && $ord <= 0x7E) {
+                // Fast path: ASCII printable (0x20-0x7E), most common case.
+                // A following high byte may be a combining mark that belongs
+                // to this character, so leave that case to grapheme_extract().
+                if ($ord >= 0x20 && $ord <= 0x7E && (!$hasHighByte || !isset($line[$i + 1]) || \ord($line[$i + 1]) < 0x80)) {
                     // In transparent mode, skip fully unstyled spaces (fully transparent cell)
                     if ($transparent && ' ' === $line[$i] && '' === $fgState && '' === $bgState && 0 === $attrState) {
                         ++$col;
                         ++$i;
                         continue;
+                    }
+                    if ($this->hasWideChars) {
+                        $this->blankWideCharAt($rowOffset, $col);
                     }
                     $idx = $rowOffset + $col;
                     $this->chars[$idx] = $line[$i];
@@ -264,11 +273,13 @@ final class CellBuffer
 
                 // Tab
                 if (0x09 === $ord) {
-                    $spaces = 3; // Match AnsiUtils tab width
-                    for ($s = 0; $s < $spaces && $col < $width; ++$s) {
+                    for ($s = 0; $s < AnsiUtils::TAB_WIDTH && $col < $width; ++$s) {
                         if ($transparent && '' === $fgState && '' === $bgState && 0 === $attrState) {
                             ++$col;
                             continue;
+                        }
+                        if ($this->hasWideChars) {
+                            $this->blankWideCharAt($rowOffset, $col);
                         }
                         $idx = $rowOffset + $col;
                         $this->chars[$idx] = ' ';
@@ -301,6 +312,9 @@ final class CellBuffer
                 // Check if it fits
                 if ($col + $charWidth > $width) {
                     while ($col < $width) {
+                        if ($this->hasWideChars) {
+                            $this->blankWideCharAt($rowOffset, $col);
+                        }
                         $idx = $rowOffset + $col;
                         $this->chars[$idx] = ' ';
                         $this->widths[$idx] = 1;
@@ -314,6 +328,12 @@ final class CellBuffer
                 }
 
                 // Place the character
+                if ($this->hasWideChars) {
+                    for ($w = 0; $w < $charWidth && $col + $w < $width; ++$w) {
+                        $this->blankWideCharAt($rowOffset, $col + $w);
+                    }
+                }
+                $this->hasWideChars = $this->hasWideChars || $charWidth > 1;
                 $idx = $rowOffset + $col;
                 $this->chars[$idx] = $grapheme;
                 $this->widths[$idx] = $charWidth;
@@ -336,6 +356,32 @@ final class CellBuffer
                 $col += $charWidth;
                 $i = $nextPos;
             }
+        }
+    }
+
+    /**
+     * Turn the wide character covering the given cell into blanks.
+     *
+     * A wide character owns a lead cell and one continuation cell. Writing
+     * into either of them without clearing the other leaves a lead without
+     * its continuation, or a continuation without its lead, and the row then
+     * renders with the wrong number of columns.
+     */
+    private function blankWideCharAt(int $rowOffset, int $col): void
+    {
+        if (1 === $this->widths[$rowOffset + $col]) {
+            return;
+        }
+
+        $start = $col;
+        while ($start > 0 && 0 === $this->widths[$rowOffset + $start]) {
+            --$start;
+        }
+
+        $end = $start + max(1, $this->widths[$rowOffset + $start]);
+        for ($c = $start; $c < $end && $c < $this->width; ++$c) {
+            $this->chars[$rowOffset + $c] = ' ';
+            $this->widths[$rowOffset + $c] = 1;
         }
     }
 

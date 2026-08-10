@@ -121,8 +121,7 @@ class TextWidget extends AbstractWidget
      */
     private function renderText(RenderContext $context): array
     {
-        // Replace tabs with 3 spaces
-        $normalizedText = str_replace("\t", '   ', $this->text);
+        $normalizedText = str_replace("\t", str_repeat(' ', AnsiUtils::TAB_WIDTH), $this->text);
 
         // Context already has inner dimensions (chrome subtracted by the Renderer)
         $contentColumns = $context->getColumns();

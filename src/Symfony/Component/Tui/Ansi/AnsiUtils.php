@@ -48,6 +48,12 @@ final class AnsiUtils
     private const ALL_ESC_PATTERN = '/\x1b(?:\[[\x30-\x3F]*[\x20-\x2F]*[\x40-\x7E]|[P\]_\^X][^\x07\x1b]*(?:\x07|\x1b\\\\)|[\x20-\x2F]+[\x30-\x7E]|[\x30-\x7E])/';
 
     /**
+     * Columns a tab takes. Every part of the component that measures or
+     * slices text must agree on this value.
+     */
+    public const TAB_WIDTH = 3;
+
+    /**
      * Character set for CSI parameter bytes (0x30-0x3F).
      */
     private const CSI_PARAM_CHARS = '0123456789:;<=>?';
@@ -106,7 +112,7 @@ final class AnsiUtils
                 } elseif (str_contains($segment, "\t")) {
                     // Has tabs
                     $tabCount = substr_count($segment, "\t");
-                    $fastWidth += $segLen - $tabCount + ($tabCount * 3);
+                    $fastWidth += $segLen - $tabCount + ($tabCount * self::TAB_WIDTH);
                     $withoutTabs = str_replace("\t", '', $segment);
                     if ('' !== $withoutTabs && !preg_match('/^[\x20-\x7E]*$/', $withoutTabs)) {
                         $fastPath = false;
@@ -144,7 +150,7 @@ final class AnsiUtils
         $clean = $str;
 
         if (str_contains($clean, "\t")) {
-            $clean = str_replace("\t", '   ', $clean);
+            $clean = str_replace("\t", str_repeat(' ', self::TAB_WIDTH), $clean);
         }
 
         if (str_contains($clean, "\x1b")) {
@@ -161,6 +167,18 @@ final class AnsiUtils
 
         if ('' === $clean) {
             return 0;
+        }
+
+        // mb_strwidth() sums codepoints, so it counts a combining mark as its
+        // own column. Only text that carries marks needs the slower per
+        // grapheme walk.
+        if (preg_match('/\p{M}/u', $clean)) {
+            $width = 0;
+            foreach (grapheme_str_split($clean) ?: [] as $grapheme) {
+                $width += self::graphemeWidth($grapheme);
+            }
+
+            return $width;
         }
 
         return mb_strwidth($clean, 'UTF-8');
@@ -443,7 +461,8 @@ final class AnsiUtils
                 // Fast check: if the entire segment fits within range, use mb_strwidth
                 // to skip expensive grapheme_str_split + per-grapheme iteration.
                 // mb_strwidth may overcount for ZWJ sequences; conservative check.
-                $segWidth = mb_strwidth($textPortion, 'UTF-8');
+                // It also counts a tab as one column, so tabs need visibleWidth().
+                $segWidth = str_contains($textPortion, "\t") ? self::visibleWidth($textPortion) : mb_strwidth($textPortion, 'UTF-8');
                 if ($currentCol >= $startCol && $currentCol + $segWidth <= $endCol) {
                     if ('' !== $pendingAnsi) {
                         $result .= $pendingAnsi;
@@ -457,7 +476,7 @@ final class AnsiUtils
                     $graphemes = grapheme_str_split($textPortion) ?: [];
 
                     foreach ($graphemes as $grapheme) {
-                        $w = self::graphemeWidth($grapheme);
+                        $w = "\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme);
                         $inRange = $currentCol >= $startCol && $currentCol < $endCol;
                         $fits = !$strict || ($currentCol + $w <= $endCol);
 
@@ -612,14 +631,14 @@ final class AnsiUtils
                 $currentCol += $take;
             } else {
                 // Unicode path
-                $segWidth = mb_strwidth($segment, 'UTF-8');
+                $segWidth = str_contains($segment, "\t") ? self::visibleWidth($segment) : mb_strwidth($segment, 'UTF-8');
                 if ($currentCol + $segWidth <= $length) {
                     $result .= $segment;
                     $currentCol += $segWidth;
                 } else {
                     $graphemes = grapheme_str_split($segment) ?: [];
                     foreach ($graphemes as $grapheme) {
-                        $w = self::graphemeWidth($grapheme);
+                        $w = "\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme);
                         if ($currentCol + $w > $length) {
                             break;
                         }

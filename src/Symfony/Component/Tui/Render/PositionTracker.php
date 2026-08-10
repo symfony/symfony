@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Render;
 
 use Symfony\Component\Tui\Widget\AbstractWidget;
+use Symfony\Component\Tui\Widget\ParentInterface;
 
 /**
  * Tracks absolute positions of rendered widgets on screen.
@@ -69,6 +70,26 @@ final class PositionTracker
     public function setWidgetRect(AbstractWidget $widget, WidgetRect $rect): void
     {
         $this->widgetPositions[$widget] = $rect;
+    }
+
+    /**
+     * Move a previously tracked widget and its descendants to a new position.
+     */
+    public function moveSubtree(AbstractWidget $widget, WidgetRect $rect): bool
+    {
+        if (!isset($this->widgetPositions[$widget])) {
+            return false;
+        }
+
+        $previous = $this->widgetPositions[$widget];
+        $rowOffset = $rect->row - $previous->row;
+        $colOffset = $rect->col - $previous->col;
+        if (0 !== $rowOffset || 0 !== $colOffset) {
+            $this->shiftSubtree($widget, $rowOffset, $colOffset);
+        }
+        $this->widgetPositions[$widget] = $rect;
+
+        return true;
     }
 
     /**
@@ -168,6 +189,27 @@ final class PositionTracker
                 $rect->columns,
                 $rect->rows,
             );
+        }
+    }
+
+    private function shiftSubtree(AbstractWidget $widget, int $rowOffset, int $colOffset): void
+    {
+        if (isset($this->widgetPositions[$widget])) {
+            $rect = $this->widgetPositions[$widget];
+            $this->widgetPositions[$widget] = new WidgetRect(
+                $rect->row + $rowOffset,
+                $rect->col + $colOffset,
+                $rect->columns,
+                $rect->rows,
+            );
+        }
+
+        if (!$widget instanceof ParentInterface) {
+            return;
+        }
+
+        foreach ($widget->all() as $child) {
+            $this->shiftSubtree($child, $rowOffset, $colOffset);
         }
     }
 }

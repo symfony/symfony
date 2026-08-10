@@ -1,0 +1,153 @@
+---------------------------------------------------------------------------
+
+by 94noni at 2024-03-30T09:21:23Z
+
+Waw very nice :)
+Passing by, i would just split the PR commits into 2 separated PRs
+Feature addition and cs fix on the other
+
+---------------------------------------------------------------------------
+
+by flkasper at 2024-03-30T16:58:32Z
+
+@94noni I actually only wanted to fix my commit via ecs and had therefore limited ecs to the console bundle only.
+Who would have thought that the code would differ in so many places :)
+
+---------------------------------------------------------------------------
+
+by 94noni at 2024-03-30T19:47:02Z
+
+Got it :)
+Lets wait other reviews 👌🏼
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-30T21:20:31Z
+
+Love the idea... but i feel really agressed by the red, and i feel it makes the option an unwanted point of attention.
+
+Did you try with other colors ? Something muted maybe to get the opposite effect ?
+
+I think we should not rely _only_ on colors (for accessibility reasons but also technical ones),
+
+What about an automatic `[deprecated]` prefix in the description ?
+
+```
+Options:
+    -test-deprecated            [deprecated] Lorem ipsum ...
+
+```
+
+With `[deprecated]` not having to be set in the option description
+
+---------------------------------------------------------------------------
+
+by flkasper at 2024-03-31T13:26:30Z
+
+> Love the idea... but i feel really agressed by the red, and i feel it makes the option an unwanted point of attention.
+> Did you try with other colors ? Something muted maybe to get the opposite effect ?
+
+I had originally thought of yellow (warning), but this is already used in the headings such as "Options:".
+
+I have now simply output in every available style and colour for comparison.
+Personally, I think that yellow, gray and white would suit both in light and dark mode.
+
+![image](https://github.com/symfony/symfony/assets/26827635/a8f9b33a-88b8-421b-a48c-647b986f49f5)
+![image](https://github.com/symfony/symfony/assets/26827635/9384a9fd-b5c5-419b-b08a-fb0f46a7b987)
+
+---------------------------------------------------------------------------
+
+by flkasper at 2024-03-31T13:29:30Z
+
+> What about an automatic [deprecated] prefix in the description ?
+
+I had also thought of this and it is actually a nice idea, but it has the disadvantage that you cannot simply customise this prefix.
+See screenshots for the colours.
+
+You would then have to add something like this (either to set the prefix or the message):
+
+```PHP
+private array $optionDeprecationPrefix = [];
+
+public function setOptionDeprecationPrefix(string $optionName, string $deprecationPrefix) {
+    $this->optionDeprecationPrefix[$optionName] = $deprecationPrefix;
+}
+
+// On output:
+$deprecationPrefix =  $this->optionDeprecationPrefix[$optionName] ??  'deprecated';
+"[$deprecationPrefix] $optionDescription"
+```
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-03-31T18:00:00Z
+
+> [...] grey [...]
+
+Would be my personal choices, but colors are subjective, so let's see what others think about it ? :)
+
+> the disadvantage that you cannot simply customise this prefix.
+
+That was not (in my mind) something configurable so i did not add the constraint.
+
+But if you have commands from your app and bundles, that would be better to not allow a different style per command, no ?
+
+I guess i'd do something like
+
+```console
+sf list
+
+lorem:list            [deprecated] List all lorem from ipsum
+
+sf list -v
+
+lorem:list            [deprecated since 2.0] List all lorem from ipsum
+
+sf list -vv
+
+lorem:list            [deprecated since 2.0] List all lorem from ipsum  [Use foo:bar instead]
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2024-03-31T20:22:08Z
+
+I like the grey too. We want this options to be less visible in the list, not highlight them.
+
+And I don't see any reason for customizing the description prefix either. Consistency across commands is better.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-04-11T14:36:29Z
+
+I haven't checked the current state of the PR yet. But for sure, we cannot rely on color only:
+
+- color blind people won't see them, causing accessibility issues
+- not all terminals support colors
+
+---------------------------------------------------------------------------
+
+by flkasper at 2024-04-11T23:19:22Z
+
+I have added @smnandre's suggestion for "[deprecated] prefix to the option description in the TextDescriptor.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2026-08-09T18:53:05Z
+
+@flkasper 👋🏻 hey, just to know if there is any news on this PR ? can this be taken over if you are not able / willing to advance it ?
+cheers
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T08:51:39Z
+
+Rebased on 8.2 and squashed. What changed since the last review:
+
+ * The mode validation still rejected the new flags (`Option mode "65" is not valid.`), which broke every command using the `help` command. The upper bound now follows `HIDDEN`.
+ * `hasMode()` is gone, as asked by @nicolas-grekas and @stof. The `Descriptor` helper is down to a single `removeHiddenOptions()` that checks `show-hidden-options` before filtering, as @GromNaN suggested.
+ * `is_deprecated` is no longer a conditional key, and the markdown and rst descriptors print `Is deprecated: no`, as asked by @stof. Added `is_hidden` next to it, and a `[hidden]` prefix in the text output, so `--show-hidden-options` says which options were hidden.
+ * `describeInputOption()` no longer skips a hidden option: filtering belongs to the definition level. Describing one option directly now behaves the same in all five formats.
+ * The deprecation warning goes to stderr and no longer needs the `formatter` helper from the helper set, so a command run outside an application does not fail.
+ * Added the `deprecated` and `hidden` arguments to the `#[Option]` attribute, otherwise the feature is unreachable from invokable commands.
+ * Added the missing tests for the deprecation warning, moved the changelog entry to 8.2, and reverted the unrelated changes left in `InputDefinitionTest`.

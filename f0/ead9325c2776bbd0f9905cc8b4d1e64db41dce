@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T13:51:40Z
+
+Reviewed and pushed the fixes. Verified against a real `php-cs-fixer` run and by mutating the transport.
+
+**The poll no longer blocks the process.** It waited through a bare `usleep()`, so a send could hold the request for the full budget. It now goes through the client's pause handler when there is one, the way `TwitterTransport` does:
+
+```php
+($status['response']->getInfo('pause_handler') ?? sleep(...))($this->pollDelay);
+```
+
+The budget is also bounded by two new DSN options, `poll_attempts` and `poll_delay`, so an application can cap how long a send may take, and the tests no longer sleep. The exhaustion test went from 58.6s to 0.4s.
+
+**Container failures now raise `TransportException`.** They raised `Notifier\Exception\RuntimeException`, which does not implement `TransportExceptionInterface`, so `RoundRobinTransport` and `FailoverTransport` never caught it and a failed container aborted the whole send instead of failing over.
+
+**`ThreadsOptions::toArray()` is now the payload.** It was dead code: `doSend()` rebuilt the same keys by hand, so the two could drift.
+
+**The error test asserted a substring.** Disabling the entire non-2xx check left the suite green, because the fall-through exception shares the message prefix. It now asserts the full message including Meta's code, subcode and fbtrace_id, and that mutation fails as it should. Added tests for the retry, the `ERROR` branch and the timeout, which had no coverage.
+
+**`splitsh.json` was misfiled.** `threads-notifier` was out of alphabetical order. CI cannot catch this: `package-tests.yml` skips the new-package check for `component_bridge`, so a wrong entry means the split package silently never publishes.
+
+Also ran `php-cs-fixer` (Fabbot was red), dropped a redundant `is_array()` that PHPStan flagged, and untyped the class constants, which were the only `public const string` in the component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T16:26:17Z
+
+Unquoted the failure prefix in the exception messages. That one is a fabbot false positive: the rule quotes every `%s`, but the prefix is a sentence rather than a value, and the string it is joined with already carries quotes of its own, so it produced:
+
+```
+"Unable to create the media container": "HTTP 400, code 190, subcode n/a, fbtrace_id abc ("bad token")"
+```
+
+The committed `.php-cs-fixer.dist.php` does not ask for this, and `php-cs-fixer --dry-run` is clean without it.
+
+Kept the quoting where the argument really is a value: the container id, the status code, and the option name in the HTTPS URL message.

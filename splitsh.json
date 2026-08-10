@@ -99,6 +99,7 @@
         "go-ip-notifier": "src/Symfony/Component/Notifier/Bridge/GoIp",
         "google-chat-notifier": "src/Symfony/Component/Notifier/Bridge/GoogleChat",
         "infobip-notifier": "src/Symfony/Component/Notifier/Bridge/Infobip",
+        "instagram-notifier": "src/Symfony/Component/Notifier/Bridge/Instagram",
         "iqsms-notifier": "src/Symfony/Component/Notifier/Bridge/Iqsms",
         "isendpro-notifier": "src/Symfony/Component/Notifier/Bridge/Isendpro",
         "joli-notif-notifier": "src/Symfony/Component/Notifier/Bridge/JoliNotif",

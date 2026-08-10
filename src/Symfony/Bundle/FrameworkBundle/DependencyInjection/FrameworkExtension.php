@@ -3268,6 +3268,7 @@ class FrameworkExtension extends Extension
             NotifierBridge\GoIp\GoIpTransportFactory::class => ['symfony/go-ip-notifier', 'notifier.transport_factory.go-ip'],
             NotifierBridge\GoogleChat\GoogleChatTransportFactory::class => ['symfony/google-chat-notifier', 'notifier.transport_factory.google-chat'],
             NotifierBridge\Infobip\InfobipTransportFactory::class => ['symfony/infobip-notifier', 'notifier.transport_factory.infobip'],
+            NotifierBridge\Instagram\InstagramTransportFactory::class => ['symfony/instagram-notifier', 'notifier.transport_factory.instagram'],
             NotifierBridge\Iqsms\IqsmsTransportFactory::class => ['symfony/iqsms-notifier', 'notifier.transport_factory.iqsms'],
             NotifierBridge\Isendpro\IsendproTransportFactory::class => ['symfony/isendpro-notifier', 'notifier.transport_factory.isendpro'],
             NotifierBridge\JoliNotif\JoliNotifTransportFactory::class => ['symfony/joli-notif-notifier', 'notifier.transport_factory.joli-notif'],

@@ -51,6 +51,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Infobip\InfobipTransportFactory::class => false,
             Bridge\Iqsms\IqsmsTransportFactory::class => false,
             Bridge\Isendpro\IsendproTransportFactory::class => false,
+            Bridge\Instagram\InstagramTransportFactory::class => false,
             Bridge\KazInfoTeh\KazInfoTehTransportFactory::class => false,
             Bridge\LightSms\LightSmsTransportFactory::class => false,
             Bridge\LineBot\LineBotTransportFactory::class => false,
@@ -148,6 +149,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['gatewayapi', 'symfony/gateway-api-notifier'];
         yield ['googlechat', 'symfony/google-chat-notifier'];
         yield ['infobip', 'symfony/infobip-notifier'];
+        yield ['instagram', 'symfony/instagram-notifier'];
         yield ['iqsms', 'symfony/iqsms-notifier'];
         yield ['isendpro', 'symfony/isendpro-notifier'];
         yield ['kaz-info-teh', 'symfony/kaz-info-teh-notifier'];

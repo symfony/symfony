@@ -51,6 +51,7 @@ final class Transport
         Bridge\GoIp\GoIpTransportFactory::class,
         Bridge\GoogleChat\GoogleChatTransportFactory::class,
         Bridge\Infobip\InfobipTransportFactory::class,
+        Bridge\Instagram\InstagramTransportFactory::class,
         Bridge\Iqsms\IqsmsTransportFactory::class,
         Bridge\Isendpro\IsendproTransportFactory::class,
         Bridge\JoliNotif\JoliNotifTransportFactory::class,

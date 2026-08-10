@@ -108,6 +108,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Infobip\InfobipTransportFactory::class,
             'package' => 'symfony/infobip-notifier',
         ],
+        'instagram' => [
+            'class' => Bridge\Instagram\InstagramTransportFactory::class,
+            'package' => 'symfony/instagram-notifier',
+        ],
         'iqsms' => [
             'class' => Bridge\Iqsms\IqsmsTransportFactory::class,
             'package' => 'symfony/iqsms-notifier',

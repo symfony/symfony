@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-30T11:21:40Z
+
+Thanks for the review. Addressed the three points in 7089256350d: the SMS constants are now `CLICKED` / `UNSUBSCRIBED`, the Sweego parser uses those constants directly and the constant-value test was removed.
+
+Validation: reran the focused RemoteEvent + Sweego webhook checks via local `./run-ci.sh` on PHP 8.4: OK (4 tests, 4 assertions).
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-30T14:31:12Z
+
+Follow-up pushed in 5393a8d0f01 to keep the Sweego bridge compatible with low-dependency installs: the package now conflicts with `symfony/remote-event <8.2` because the parser uses the new SMS event constants.
+
+All PR checks are green now, including `Unit Tests (8.4, low-deps)` and `x86 / minimal-exts / lowest-php`.

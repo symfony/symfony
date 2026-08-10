@@ -97,6 +97,7 @@
 {%- block choice_widget_options -%}
     {% for group_label, choice in options %}
         {%- if choice is iterable -%}
+            {%- set group_label = choice.label is defined ? choice.label : group_label -%}
             <optgroup label="{{ choice_translation_domain is same as(false) ? group_label : group_label|trans({}, choice_translation_domain) }}">
                 {% set options = choice %}
                 {{- block('choice_widget_options') -}}

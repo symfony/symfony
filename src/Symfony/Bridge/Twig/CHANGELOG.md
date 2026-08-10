@@ -8,6 +8,7 @@ CHANGELOG
  * Add the `normalize` filter to normalize values with the Serializer component
  * Add the `impersonation_form()` and `impersonation_exit_form()` functions to build a form that switches the user with a POST
  * Render an `id` attribute on the `<form>` element when a child uses `form_attr`, so that the reference resolves
+ * Render `<optgroup>` labels from `ChoiceGroupView::$label`, which allows translatable choice group labels
 
 8.1
 ---

@@ -298,17 +298,23 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
             return;
         }
 
-        $groupLabels = \is_array($groupLabels) ? array_map('strval', $groupLabels) : [(string) $groupLabels];
+        $groupLabels = \is_array($groupLabels) ? $groupLabels : [$groupLabels];
 
         foreach ($groupLabels as $groupLabel) {
+            if (!$groupLabel instanceof TranslatableInterface) {
+                $groupLabel = (string) $groupLabel;
+            }
+
+            $groupKey = self::getGroupKey($groupLabel, $preferredViews);
+
             // Initialize the group views if necessary. Unnecessarily built group
             // views will be cleaned up at the end of createView()
-            if (!isset($preferredViews[$groupLabel])) {
-                $preferredViews[$groupLabel] = new ChoiceGroupView($groupLabel);
-                $otherViews[$groupLabel] = new ChoiceGroupView($groupLabel);
+            if (!isset($preferredViews[$groupKey])) {
+                $preferredViews[$groupKey] = new ChoiceGroupView($groupLabel);
+                $otherViews[$groupKey] = new ChoiceGroupView($groupLabel);
             }
-            if (!isset($preferredViewsOrder[$groupLabel])) {
-                $preferredViewsOrder[$groupLabel] = [];
+            if (!isset($preferredViewsOrder[$groupKey])) {
+                $preferredViewsOrder[$groupKey] = [];
             }
 
             self::addChoiceView(
@@ -321,11 +327,39 @@ class DefaultChoiceListFactory implements ChoiceListFactoryInterface
                 $labelTranslationParameters,
                 $help,
                 $isPreferred,
-                $preferredViews[$groupLabel]->choices,
-                $preferredViewsOrder[$groupLabel],
-                $otherViews[$groupLabel]->choices,
+                $preferredViews[$groupKey]->choices,
+                $preferredViewsOrder[$groupKey],
+                $otherViews[$groupKey]->choices,
                 $duplicatePreferredChoices,
             );
         }
+    }
+
+    /**
+     * Translatable group labels cannot be used as array keys. An opaque key is
+     * generated for them instead, reusing the one of an equivalent label so that
+     * choices sharing the same group label end up in the same group view.
+     *
+     * @param array<ChoiceGroupView|ChoiceView> $views
+     */
+    private static function getGroupKey(string|TranslatableInterface $groupLabel, array $views): string
+    {
+        if (!$groupLabel instanceof TranslatableInterface) {
+            return $groupLabel;
+        }
+
+        foreach ($views as $key => $view) {
+            if ($view instanceof ChoiceGroupView && $view->label instanceof TranslatableInterface && $view->label == $groupLabel) {
+                return $key;
+            }
+        }
+
+        // Prefixing with a NUL byte avoids clashing with the integer keys of ungrouped choices
+        $i = \count($views);
+        while (isset($views["\0".$i])) {
+            ++$i;
+        }
+
+        return "\0".$i;
     }
 }

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\ChoiceList\View;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
 /**
  * Represents a group of choices in templates.
  *
@@ -23,10 +25,11 @@ class ChoiceGroupView implements \IteratorAggregate
     /**
      * Creates a new choice group view.
      *
+     * @param string|TranslatableInterface      $label   The label displayed to humans
      * @param array<ChoiceGroupView|ChoiceView> $choices the choice views in the group
      */
     public function __construct(
-        public string $label,
+        public string|TranslatableInterface $label,
         public array $choices = [],
     ) {
     }

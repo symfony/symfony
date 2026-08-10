@@ -932,6 +932,34 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
+    public function testSingleChoiceGroupedWithTranslatableGroupLabels()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
+            'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
+            'group_by' => static fn ($choice) => new TranslatableMessage('&c' === $choice ? 'Group&2' : 'Group&1'),
+            'multiple' => false,
+            'expanded' => false,
+        ]);
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/select
+    [@name="name"]
+    [./optgroup[@label="[trans]Group&1[/trans]"]
+        [
+            ./option[@value="&a"][@selected="selected"][.="[trans]Choice&A[/trans]"]
+            /following-sibling::option[@value="&b"][not(@selected)][.="[trans]Choice&B[/trans]"]
+        ]
+        [count(./option)=2]
+    ]
+    [./optgroup[@label="[trans]Group&2[/trans]"]
+        [./option[@value="&c"][not(@selected)][.="[trans]Choice&C[/trans]"]]
+        [count(./option)=1]
+    ]
+    [count(./optgroup)=2]
+'
+        );
+    }
+
     public function testMultipleChoice()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [

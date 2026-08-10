@@ -163,10 +163,13 @@ class Connection
         }
         unset($query['region']);
 
+        $isAwsHost = false;
         if ('default' !== ($params['host'] ?? 'default')) {
             $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($options['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
-            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.com$;', $params['host'], $matches)) {
+            // Every AWS partition that serves SQS under amazonaws: aws, aws-cn and aws-eusc
+            if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.(?:com(?:\.cn)?|eu)$;', $params['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
+                $isAwsHost = true;
             }
         } elseif (self::DEFAULT_OPTIONS['endpoint'] !== $options['endpoint'] ?? self::DEFAULT_OPTIONS['endpoint']) {
             $clientConfiguration['endpoint'] = $options['endpoint'];
@@ -178,12 +181,12 @@ class Connection
         }
         $configuration['account'] = 2 === \count($parsedPath) ? $parsedPath[0] : $options['account'] ?? self::DEFAULT_OPTIONS['account'];
 
-        // When the DNS looks like a QueueUrl, we can directly inject it in the connection
+        // When the DSN looks like a QueueUrl, we can directly inject it in the connection
         // https://sqs.REGION.amazonaws.com/ACCOUNT/QUEUE
         $queueUrl = null;
         if (
-            'https' === $params['scheme']
-            && ($params['host'] ?? 'default') === "sqs.{$clientConfiguration['region']}.amazonaws.com"
+            $isAwsHost
+            && 'https' === $params['scheme']
             && ($params['path'] ?? '/') === "/{$configuration['account']}/{$configuration['queue_name']}"
         ) {
             $queueUrl = 'https://'.$params['host'].$params['path'];

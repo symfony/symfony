@@ -13,6 +13,9 @@ namespace Symfony\Component\Form\Extension\Core\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\ChoiceList;
+use Symfony\Component\Form\ChoiceList\ChoiceListInterface;
+use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
+use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\ChoiceList\Loader\IntlCallbackChoiceLoader;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTransformer;
@@ -48,10 +51,16 @@ class TimezoneType extends AbstractType
 
                     $choiceTranslationLocale = $options['choice_translation_locale'];
 
-                    return ChoiceList::loader($this, new IntlCallbackChoiceLoader(static fn () => self::getIntlTimezones($input, $choiceTranslationLocale)), [$input, $choiceTranslationLocale]);
+                    return ChoiceList::loader($this, self::resolveIdentifiers(
+                        new IntlCallbackChoiceLoader(static fn () => self::getIntlTimezones($input, $choiceTranslationLocale)),
+                        static fn () => self::getIntlIdentifierAliases($input, $choiceTranslationLocale),
+                    ), [$input, $choiceTranslationLocale]);
                 }
 
-                return ChoiceList::lazy($this, static fn () => self::getPhpTimezones($input), $input);
+                return ChoiceList::loader($this, self::resolveIdentifiers(
+                    new CallbackChoiceLoader(static fn () => self::getPhpTimezones($input)),
+                    static fn () => self::getPhpIdentifierAliases($input),
+                ), $input);
             },
             'choice_translation_domain' => false,
             'choice_translation_locale' => null,
@@ -110,16 +119,142 @@ class TimezoneType extends AbstractType
 
     private static function getIntlTimezones(string $input, ?string $locale = null): array
     {
-        $timezones = array_flip(Timezones::getNames($locale));
+        return self::getOfferedIntlTimezones(self::getIntlZones($locale), $input);
+    }
 
-        if ('intltimezone' === $input) {
-            foreach ($timezones as $name => $timezone) {
-                if ('Etc/Unknown' === \IntlTimeZone::createTimeZone($timezone)->getID()) {
-                    unset($timezones[$name]);
+    /**
+     * @return array<string, list<string>>
+     */
+    private static function getIntlZones(?string $locale = null): array
+    {
+        $zones = [];
+
+        foreach (Timezones::getNames($locale) as $timezone => $name) {
+            $zones[$name][] = $timezone;
+        }
+
+        return $zones;
+    }
+
+    /**
+     * @param array<string, list<string>> $zones
+     *
+     * @return array<string, string>
+     */
+    private static function getOfferedIntlTimezones(array $zones, string $input): array
+    {
+        $canonical = array_flip(\DateTimeZone::listIdentifiers(\DateTimeZone::ALL));
+        $timezones = [];
+
+        foreach ($zones as $name => $identifiers) {
+            $timezone = $identifiers[0];
+
+            foreach ($identifiers as $identifier) {
+                if (isset($canonical[$identifier])) {
+                    $timezone = $identifier;
                 }
+            }
+
+            if ('intltimezone' !== $input || 'Etc/Unknown' !== \IntlTimeZone::createTimeZone($timezone)->getID()) {
+                $timezones[$name] = $timezone;
             }
         }
 
         return $timezones;
+    }
+
+    /**
+     * ICU keys a zone and its legacy aliases under one display name, of which the choice
+     * list can offer only one identifier. The others are mapped to the offered one so that
+     * a value stored before it was picked keeps designating the same choice.
+     *
+     * "UTC" is the only identifier of the PHP list the ICU data does not carry; it lists
+     * "Etc/UTC" for that zone instead, so the pair has to be told apart from the data.
+     *
+     * @return array<string, string>
+     */
+    private static function getIntlIdentifierAliases(string $input, ?string $locale = null): array
+    {
+        $zones = self::getIntlZones($locale);
+        $offered = array_flip(self::getOfferedIntlTimezones($zones, $input));
+
+        $groups = array_values($zones);
+        $groups[] = ['UTC', 'Etc/UTC'];
+
+        return self::mapToOfferedIdentifier($groups, $offered);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function getPhpIdentifierAliases(string $input): array
+    {
+        return self::mapToOfferedIdentifier([['UTC', 'Etc/UTC']], array_flip(self::getPhpTimezones($input)));
+    }
+
+    /**
+     * @param list<list<string>>   $groups
+     * @param array<string, mixed> $offered
+     *
+     * @return array<string, string>
+     */
+    private static function mapToOfferedIdentifier(array $groups, array $offered): array
+    {
+        $aliases = [];
+
+        foreach ($groups as $group) {
+            foreach ($group as $timezone) {
+                if (!isset($offered[$timezone])) {
+                    continue;
+                }
+
+                foreach ($group as $alias) {
+                    if ($alias !== $timezone) {
+                        $aliases[$alias] = $timezone;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        return $aliases;
+    }
+
+    private static function resolveIdentifiers(ChoiceLoaderInterface $loader, \Closure $aliases): ChoiceLoaderInterface
+    {
+        return new class($loader, $aliases) implements ChoiceLoaderInterface {
+            private ?array $aliases = null;
+
+            public function __construct(
+                private ChoiceLoaderInterface $loader,
+                private \Closure $identifiers,
+            ) {
+            }
+
+            public function loadChoiceList(?callable $value = null): ChoiceListInterface
+            {
+                return $this->loader->loadChoiceList($value);
+            }
+
+            public function loadChoicesForValues(array $values, ?callable $value = null): array
+            {
+                return $this->loader->loadChoicesForValues($this->resolve($values), $value);
+            }
+
+            public function loadValuesForChoices(array $choices, ?callable $value = null): array
+            {
+                return $this->loader->loadValuesForChoices($this->resolve($choices), $value);
+            }
+
+            private function resolve(array $timezones): array
+            {
+                if (!$this->aliases ??= ($this->identifiers)()) {
+                    return $timezones;
+                }
+
+                return array_map(fn ($timezone) => \is_string($timezone) ? ($this->aliases[$timezone] ?? $timezone) : $timezone, $timezones);
+            }
+        };
     }
 }

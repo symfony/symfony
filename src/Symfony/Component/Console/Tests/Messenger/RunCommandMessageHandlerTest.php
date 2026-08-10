@@ -117,6 +117,32 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->fail('Exception not thrown.');
     }
 
+    public function testCatchExceptionsIsRestored()
+    {
+        $application = $this->createApplicationWithCommand();
+        $application->setCatchExceptions(true);
+
+        $handler = new RunCommandMessageHandler($application);
+        $handler(new RunCommandMessage('test:command'));
+
+        $this->assertTrue($application->areExceptionsCaught());
+    }
+
+    public function testCatchExceptionsIsRestoredWhenCommandFails()
+    {
+        $application = $this->createApplicationWithCommand();
+        $application->setCatchExceptions(true);
+
+        $handler = new RunCommandMessageHandler($application);
+
+        try {
+            $handler(new RunCommandMessage('test:command --throw'));
+        } catch (RunCommandFailedException) {
+        }
+
+        $this->assertTrue($application->areExceptionsCaught());
+    }
+
     private function createApplicationWithCommand(): Application
     {
         $application = new Application();

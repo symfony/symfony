@@ -85,6 +85,8 @@ class ReStructuredTextDescriptor extends Descriptor
             .'- **Is value required**: '.($option->isValueRequired() ? 'yes' : 'no')."\n"
             .'- **Is multiple**: '.($option->isArray() ? 'yes' : 'no')."\n"
             .'- **Is negatable**: '.($option->isNegatable() ? 'yes' : 'no')."\n"
+            .'- **Is deprecated**: '.($option->isDeprecated() ? 'yes' : 'no')."\n"
+            .'- **Is hidden**: '.($option->isHidden() ? 'yes' : 'no')."\n"
             .'- **Default**: ``'.str_replace("\n", '', var_export($option->getDefault(), true)).'``'."\n"
         );
     }
@@ -95,18 +97,18 @@ class ReStructuredTextDescriptor extends Descriptor
             $this->write("Arguments\n".str_repeat($this->subsubsectionChar, 9));
             foreach ($definition->getArguments() as $argument) {
                 $this->write("\n\n");
-                $this->describeInputArgument($argument);
+                $this->describeInputArgument($argument, $options);
             }
         }
 
-        if ($nonDefaultOptions = $this->getNonDefaultOptions($definition)) {
+        if ($inputOptions = $this->removeHiddenOptions($this->getNonDefaultOptions($definition), $options)) {
             if ($showArguments) {
                 $this->write("\n\n");
             }
 
             $this->write("Options\n".str_repeat($this->subsubsectionChar, 7)."\n\n");
-            foreach ($nonDefaultOptions as $option) {
-                $this->describeInputOption($option);
+            foreach ($inputOptions as $option) {
+                $this->describeInputOption($option, $options);
                 $this->write("\n");
             }
         }
@@ -145,9 +147,9 @@ class ReStructuredTextDescriptor extends Descriptor
         }
 
         $definition = $command->getDefinition();
-        if ($definition->getOptions() || $definition->getArguments()) {
+        if ($this->removeHiddenOptions($definition->getOptions(), $options) || $definition->getArguments()) {
             $this->write("\n\n");
-            $this->describeInputDefinition($definition);
+            $this->describeInputDefinition($definition, $options);
         }
     }
 

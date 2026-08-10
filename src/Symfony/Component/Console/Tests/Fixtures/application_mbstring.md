@@ -40,6 +40,8 @@ Tail the completion debug log
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--help|-h`
@@ -50,6 +52,8 @@ Display help for the given command. When no command is given display help for th
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--silent`
@@ -60,6 +64,8 @@ Do not output any message
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -70,6 +76,8 @@ Only errors are displayed. All other output is suppressed
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -80,6 +88,8 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--version|-V`
@@ -90,6 +100,8 @@ Display this application version
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--ansi|--no-ansi`
@@ -100,6 +112,8 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
+* Is deprecated: no
+* Is hidden: no
 * Default: `NULL`
 
 #### `--no-interaction|-n`
@@ -110,6 +124,8 @@ Do not ask any interactive question
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 `help`
@@ -151,6 +167,8 @@ The output format (txt, xml, json, or md)
 * Is value required: yes
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `'txt'`
 
 #### `--raw`
@@ -161,6 +179,8 @@ To output raw command help
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--help|-h`
@@ -171,6 +191,8 @@ Display help for the given command. When no command is given display help for th
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--silent`
@@ -181,6 +203,8 @@ Do not output any message
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -191,6 +215,8 @@ Only errors are displayed. All other output is suppressed
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -201,6 +227,8 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--version|-V`
@@ -211,6 +239,8 @@ Display this application version
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--ansi|--no-ansi`
@@ -221,6 +251,8 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
+* Is deprecated: no
+* Is hidden: no
 * Default: `NULL`
 
 #### `--no-interaction|-n`
@@ -231,6 +263,8 @@ Do not ask any interactive question
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 `list`
@@ -278,6 +312,8 @@ To output raw command list
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--format`
@@ -288,6 +324,8 @@ The output format (txt, xml, json, or md)
 * Is value required: yes
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `'txt'`
 
 #### `--short`
@@ -298,6 +336,8 @@ To skip describing commands' arguments
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--help|-h`
@@ -308,6 +348,8 @@ Display help for the given command. When no command is given display help for th
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--silent`
@@ -318,6 +360,8 @@ Do not output any message
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -328,6 +372,8 @@ Only errors are displayed. All other output is suppressed
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -338,6 +384,8 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--version|-V`
@@ -348,6 +396,8 @@ Display this application version
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--ansi|--no-ansi`
@@ -358,6 +408,8 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
+* Is deprecated: no
+* Is hidden: no
 * Default: `NULL`
 
 #### `--no-interaction|-n`
@@ -368,6 +420,8 @@ Do not ask any interactive question
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 `descriptor:åèä`
@@ -399,6 +453,8 @@ command åèä help
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--help|-h`
@@ -409,6 +465,8 @@ Display help for the given command. When no command is given display help for th
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--silent`
@@ -419,6 +477,8 @@ Do not output any message
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--quiet|-q`
@@ -429,6 +489,8 @@ Only errors are displayed. All other output is suppressed
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--verbose|-v|-vv|-vvv`
@@ -439,6 +501,8 @@ Increase the verbosity of messages: 1 for normal output, 2 for more verbose outp
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--version|-V`
@@ -449,6 +513,8 @@ Display this application version
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`
 
 #### `--ansi|--no-ansi`
@@ -459,6 +525,8 @@ Force (or disable --no-ansi) ANSI output
 * Is value required: no
 * Is multiple: no
 * Is negatable: yes
+* Is deprecated: no
+* Is hidden: no
 * Default: `NULL`
 
 #### `--no-interaction|-n`
@@ -469,4 +537,6 @@ Do not ask any interactive question
 * Is value required: no
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `false`

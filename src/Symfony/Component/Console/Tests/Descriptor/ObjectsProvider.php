@@ -18,6 +18,7 @@ use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication1;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorApplication2;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand1;
 use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand2;
+use Symfony\Component\Console\Tests\Fixtures\DescriptorCommand5;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -45,6 +46,8 @@ class ObjectsProvider
             'input_option_4' => new InputOption('option_name', 'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL, 'option description', []),
             'input_option_5' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, "multiline\noption description"),
             'input_option_6' => new InputOption('option_name', ['o', 'O'], InputOption::VALUE_REQUIRED, 'option with multiple shortcuts'),
+            'input_option_deprecated' => new InputOption('option_name', 'o', InputOption::DEPRECATED, 'deprecated option description'),
+            'input_option_hidden' => new InputOption('option_name', 'o', InputOption::HIDDEN, 'hidden option description'),
             'input_option_with_style' => new InputOption('option_name', 'o', InputOption::VALUE_REQUIRED, 'option description', '<comment>style</>'),
             'input_option_with_style_array' => new InputOption('option_name', 'o', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'option description', ['<comment>Hello</comment>', '<info>world</info>']),
             'input_option_with_default_inf_value' => new InputOption('option_name', 'o', InputOption::VALUE_OPTIONAL, 'option description', \INF),
@@ -69,6 +72,7 @@ class ObjectsProvider
         return [
             'command_1' => new DescriptorCommand1(),
             'command_2' => new DescriptorCommand2(),
+            'command_5' => new DescriptorCommand5(),
         ];
     }
 

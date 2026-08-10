@@ -384,6 +384,31 @@ class CommandTest extends TestCase
         }
     }
 
+    public function testDeprecatedOptionWritesAMessageOnStdErr()
+    {
+        $tester = new CommandTester($this->createCommandWithDeprecatedOption());
+        $tester->execute(['--deprecated' => true], ['capture_stderr_separately' => true]);
+
+        $this->assertStringContainsString('The option "--deprecated|-d" is deprecated.', $tester->getErrorOutput());
+        $this->assertSame('done'.\PHP_EOL, $tester->getDisplay());
+    }
+
+    public function testDeprecatedOptionWritesAMessageWhenTheShortcutIsUsed()
+    {
+        $tester = new CommandTester($this->createCommandWithDeprecatedOption());
+        $tester->execute(['-d' => true], ['capture_stderr_separately' => true]);
+
+        $this->assertStringContainsString('The option "--deprecated|-d" is deprecated.', $tester->getErrorOutput());
+    }
+
+    public function testDeprecatedOptionWritesNoMessageWhenNotUsed()
+    {
+        $tester = new CommandTester($this->createCommandWithDeprecatedOption());
+        $tester->execute([], ['capture_stderr_separately' => true]);
+
+        $this->assertSame('', $tester->getErrorOutput());
+    }
+
     public function testSetCode()
     {
         $command = new \TestCommand();
@@ -498,6 +523,19 @@ class CommandTest extends TestCase
         $property = new \ReflectionProperty($apl, 'defaultCommand');
 
         $this->assertEquals('foo2', $property->getValue($apl));
+    }
+
+    private function createCommandWithDeprecatedOption(): Command
+    {
+        $command = new Command('foo');
+        $command->addOption('deprecated', 'd', InputOption::DEPRECATED, 'A deprecated option');
+        $command->setCode(static function (InputInterface $input, OutputInterface $output): int {
+            $output->writeln('done');
+
+            return 0;
+        });
+
+        return $command;
     }
 }
 

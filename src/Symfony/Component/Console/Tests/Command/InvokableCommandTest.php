@@ -101,6 +101,8 @@ class InvokableCommandTest extends TestCase
             #[Option(description: 'User groups')] array $groups = [],
             #[Option(suggestedValues: [self::class, 'getSuggestedRoles'])] array $roles = ['ROLE_USER'],
             #[Option] string|bool $opt = false,
+            #[Option(deprecated: true)] bool $old = false,
+            #[Option(hidden: true)] ?string $secret = null,
         ): int {
             \assert(null !== $this); // so PHP CS Fixer knows this callback is actually coupled with `$this` and `static_lambda` rule shall not be applied
 
@@ -153,6 +155,14 @@ class InvokableCommandTest extends TestCase
         self::assertTrue($optInputOption->isValueOptional());
         self::assertFalse($optInputOption->isNegatable());
         self::assertFalse($optInputOption->getDefault());
+
+        $oldInputOption = $command->getDefinition()->getOption('old');
+        self::assertTrue($oldInputOption->isDeprecated());
+        self::assertFalse($oldInputOption->isHidden());
+
+        $secretInputOption = $command->getDefinition()->getOption('secret');
+        self::assertFalse($secretInputOption->isDeprecated());
+        self::assertTrue($secretInputOption->isHidden());
     }
 
     public function testEnumArgument()

@@ -1,0 +1,11 @@
+{
+    "name": "--option_name",
+    "shortcut": "-o",
+    "accept_value": false,
+    "is_value_required": false,
+    "is_multiple": false,
+    "is_deprecated": false,
+    "is_hidden": true,
+    "description": "hidden option description",
+    "default": false
+}

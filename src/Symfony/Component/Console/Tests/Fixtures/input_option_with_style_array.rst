@@ -7,4 +7,6 @@ option description
 - **Is value required**: yes
 - **Is multiple**: yes
 - **Is negatable**: no
+- **Is deprecated**: no
+- **Is hidden**: no
 - **Default**: ``array (  0 => 'Hello',  1 => 'world',)``

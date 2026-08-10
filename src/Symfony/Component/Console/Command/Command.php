@@ -19,12 +19,14 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -233,9 +235,12 @@ class Command implements SignalableCommandInterface
         // add the application arguments and options
         $this->mergeApplicationDefinition();
 
+        $inputDefinition = null;
+
         // bind the input against the command specific arguments/options
         try {
-            $input->bind($this->getDefinition());
+            $inputDefinition = $this->getDefinition();
+            $input->bind($inputDefinition);
         } catch (ExceptionInterface $e) {
             if (!$this->ignoreValidationErrors) {
                 throw $e;
@@ -276,6 +281,10 @@ class Command implements SignalableCommandInterface
         }
 
         $input->validate();
+
+        if ($inputDefinition) {
+            $this->writeDeprecationMessages($inputDefinition, $input, $output);
+        }
 
         if ($this->code) {
             return ($this->code)($input, $output);
@@ -658,6 +667,36 @@ class Command implements SignalableCommandInterface
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
         return $this->code?->handleSignal($signal, $previousExitCode) ?? false;
+    }
+
+    private function writeDeprecationMessages(InputDefinition $definition, InputInterface $input, OutputInterface $output): void
+    {
+        $messages = [];
+
+        foreach ($definition->getOptions() as $option) {
+            if (!$option->isDeprecated()) {
+                continue;
+            }
+
+            $names = ['--'.$option->getName()];
+            if (null !== $option->getShortcut()) {
+                $names[] = '-'.$option->getShortcut();
+            }
+
+            if ($input->hasParameterOption($names, true)) {
+                $messages[] = \sprintf('The option "%s" is deprecated.', implode('|', $names));
+            }
+        }
+
+        if (!$messages) {
+            return;
+        }
+
+        if ($output instanceof ConsoleOutputInterface) {
+            $output = $output->getErrorOutput();
+        }
+
+        $output->writeln(new FormatterHelper()->formatBlock($messages, 'fg=black;bg=yellow', true));
     }
 
     /**

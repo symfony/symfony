@@ -50,6 +50,16 @@ class InputOption
      */
     public const VALUE_NEGATABLE = 16;
 
+    /**
+     * Mark the option as deprecated in help output. A message is printed when the command is executed.
+     */
+    public const DEPRECATED = 32;
+
+    /**
+     * Hide the option from command descriptors.
+     */
+    public const HIDDEN = 64;
+
     private string $name;
     private ?string $shortcut;
     private int $mode;
@@ -98,7 +108,7 @@ class InputOption
 
         // If not explicitly marked as required or optional, we assume the value accepts no input
         $mode = self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $mode) || self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $mode) ? $mode : (self::VALUE_NONE | $mode);
-        if ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
+        if ($mode >= (self::HIDDEN << 1) || $mode < 1) {
             throw new InvalidArgumentException(\sprintf('Option mode "%s" is not valid.', $mode));
         }
 
@@ -177,6 +187,26 @@ class InputOption
     public function isArray(): bool
     {
         return self::VALUE_IS_ARRAY === (self::VALUE_IS_ARRAY & $this->mode);
+    }
+
+    /**
+     * Returns true if the option is deprecated.
+     *
+     * @return bool true if mode is self::DEPRECATED, false otherwise
+     */
+    public function isDeprecated(): bool
+    {
+        return self::DEPRECATED === (self::DEPRECATED & $this->mode);
+    }
+
+    /**
+     * Returns true if the option is hidden.
+     *
+     * @return bool true if mode is self::HIDDEN, false otherwise
+     */
+    public function isHidden(): bool
+    {
+        return self::HIDDEN === (self::HIDDEN & $this->mode);
     }
 
     /**

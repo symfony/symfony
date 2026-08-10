@@ -68,11 +68,13 @@ final class DatePoint extends \DateTimeImmutable
         return parent::createFromTimestamp($timestamp);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function add(\DateInterval $interval): static
     {
         return parent::add($interval);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function sub(\DateInterval $interval): static
     {
         return parent::sub($interval);
@@ -81,31 +83,37 @@ final class DatePoint extends \DateTimeImmutable
     /**
      * @throws \DateMalformedStringException When $modifier is invalid
      */
+    #[\NoDiscard('as DatePoint is immutable')]
     public function modify(string $modifier): static
     {
         return parent::modify($modifier);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function setTimestamp(int $value): static
     {
         return parent::setTimestamp($value);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function setDate(int $year, int $month, int $day): static
     {
         return parent::setDate($year, $month, $day);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function setISODate(int $year, int $week, int $day = 1): static
     {
         return parent::setISODate($year, $week, $day);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function setTime(int $hour, int $minute, int $second = 0, int $microsecond = 0): static
     {
         return parent::setTime($hour, $minute, $second, $microsecond);
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function setTimezone(\DateTimeZone $timezone): static
     {
         return parent::setTimezone($timezone);
@@ -116,6 +124,7 @@ final class DatePoint extends \DateTimeImmutable
         return parent::getTimezone() ?: throw new \DateInvalidTimeZoneException('The DatePoint object has no timezone.');
     }
 
+    #[\NoDiscard('as DatePoint is immutable')]
     public function setMicrosecond(int $microsecond): static
     {
         if ($microsecond < 0 || $microsecond > 999999) {

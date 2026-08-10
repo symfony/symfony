@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `#[\NoDiscard]` to the methods of `DatePoint` that return a new instance
+
 7.1
 ---
 

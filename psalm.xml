@@ -27,6 +27,15 @@
     </projectFiles>
 
     <issueHandlers>
+        <MissingImmutableAnnotation>
+            <errorLevel type="suppress">
+                <!--
+                    DatePoint is immutable, but the class cannot be annotated as
+                    such because its constructor reads the clock.
+                -->
+                <file name="src/Symfony/Component/Clock/DatePoint.php" />
+            </errorLevel>
+        </MissingImmutableAnnotation>
         <UndefinedClass>
             <errorLevel type="suppress">
                 <!-- These classes have been added in PHP 8.4 -->

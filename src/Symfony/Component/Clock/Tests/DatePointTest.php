@@ -94,7 +94,7 @@ class DatePointTest extends TestCase
 
         $this->expectException(\DateMalformedStringException::class);
         $this->expectExceptionMessage('Failed to parse time string (Bad Date)');
-        $date->modify('Bad Date');
+        $_ = $date->modify('Bad Date');
     }
 
     public function testMicrosecond()
@@ -110,7 +110,22 @@ class DatePointTest extends TestCase
 
         $this->expectException(\DateRangeError::class);
         $this->expectExceptionMessage('DatePoint::setMicrosecond(): Argument #1 ($microsecond) must be between 0 and 999999, 1000000 given');
-        $date->setMicrosecond(1000000);
+        $_ = $date->setMicrosecond(1000000);
+    }
+
+    public function testNoDiscard()
+    {
+        $methods = [];
+
+        foreach ((new \ReflectionClass(DatePoint::class))->getMethods() as $method) {
+            if ($method->getAttributes('NoDiscard')) {
+                $methods[] = $method->name;
+            }
+        }
+
+        sort($methods);
+
+        $this->assertSame(['add', 'modify', 'setDate', 'setISODate', 'setMicrosecond', 'setTime', 'setTimestamp', 'setTimezone', 'sub'], $methods);
     }
 
     #[TestWith(['2024-04-01 00:00:00.000000', '2024-04'])]

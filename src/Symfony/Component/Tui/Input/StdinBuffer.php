@@ -77,8 +77,10 @@ final class StdinBuffer
         $this->buffer .= $data;
 
         while ('' !== $this->buffer) {
-            // Check for bracketed paste start
-            if (str_starts_with($this->buffer, "\x1b[200~")) {
+            // Check for bracketed paste start. While a paste is running the
+            // marker is content, not a new paste: the end marker is the only
+            // thing that closes it.
+            if (!$this->inPaste && str_starts_with($this->buffer, "\x1b[200~")) {
                 $this->inPaste = true;
                 $this->pasteBuffer = '';
                 $this->buffer = substr($this->buffer, 6);
@@ -97,7 +99,24 @@ final class StdinBuffer
                     }
                     $this->pasteBuffer = '';
                 } else {
-                    // Still waiting for end marker
+                    // Still waiting for the end marker. A read can split it, so
+                    // hold back a trailing part of it instead of moving it into
+                    // the content, where it can no longer close the paste.
+                    $hold = 0;
+                    for ($n = min(5, \strlen($this->buffer)); $n > 0; --$n) {
+                        if (str_starts_with("\x1b[201~", substr($this->buffer, -$n))) {
+                            $hold = $n;
+                            break;
+                        }
+                    }
+
+                    if (0 < $hold) {
+                        $this->pasteBuffer .= substr($this->buffer, 0, -$hold);
+                        $this->buffer = substr($this->buffer, -$hold);
+
+                        break;
+                    }
+
                     $this->pasteBuffer .= $this->buffer;
                     $this->buffer = '';
 
@@ -285,15 +304,6 @@ final class StdinBuffer
             // CSI terminators: @ through ~
             if ($char >= '@' && $char <= '~') {
                 $sequence = substr($this->buffer, 0, $i + 1);
-                $payload = substr($this->buffer, 2, $i - 1);
-
-                // Special handling for SGR mouse sequences ESC[<B;X;Ym or ESC[<B;X;YM
-                if (str_starts_with($payload, '<')) {
-                    if (!preg_match('/^<\d+;\d+;\d+[Mm]$/', $payload)) {
-                        return null;
-                    }
-                }
-
                 $this->buffer = substr($this->buffer, $i + 1);
 
                 return $sequence;

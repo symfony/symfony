@@ -451,4 +451,85 @@ class StdinBufferTest extends TestCase
         $buffer->process('B');
         $this->assertSame(['B'], $sequences, 'Buffer should accept new input after abort');
     }
+
+    public function testMalformedSgrMouseSequenceDoesNotBlockLaterInput()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+
+        // Four parameters instead of three: the terminator is already there, so
+        // more data can never make this sequence valid.
+        $buffer->process("\x1b[<3;1;1;1M");
+        $buffer->process('ab');
+
+        $this->assertSame(["\x1b[<3;1;1;1M", 'a', 'b'], $sequences);
+        $this->assertSame('', $buffer->getBuffer());
+    }
+
+    public function testNestedPasteStartMarkerIsKeptAsPastedContent()
+    {
+        $buffer = new StdinBuffer();
+        $pastes = [];
+
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        $buffer->process("\x1b[200~AAA");
+        $buffer->process("\x1b[200~BBB\x1b[201~");
+
+        $this->assertSame(["AAA\x1b[200~BBB"], $pastes);
+    }
+
+    public function testNestedPasteStartMarkerInASingleReadIsKeptAsPastedContent()
+    {
+        $buffer = new StdinBuffer();
+        $pastes = [];
+
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        $buffer->process("\x1b[200~AAA\x1b[200~BBB\x1b[201~");
+
+        $this->assertSame(["AAA\x1b[200~BBB"], $pastes);
+    }
+
+    #[DataProvider('provideSplitPasteEndMarkers')]
+    public function testPasteEndMarkerSplitAcrossReadsStillClosesThePaste(string $first, string $second)
+    {
+        $buffer = new StdinBuffer();
+        $pastes = [];
+        $sequences = [];
+
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+
+        $buffer->process($first);
+        $buffer->process($second);
+        $buffer->process('x');
+
+        $this->assertSame(['AABB'], $pastes);
+        $this->assertSame(['x'], $sequences, 'Buffer should accept new input after the paste');
+    }
+
+    public static function provideSplitPasteEndMarkers(): array
+    {
+        return [
+            'split after ESC' => ["\x1b[200~AABB\x1b", '[201~'],
+            'split mid marker' => ["\x1b[200~AABB\x1b[2", '01~'],
+            'split before terminator' => ["\x1b[200~AABB\x1b[201", '~'],
+        ];
+    }
+
+    public function testPasteContentThatLooksLikeAPartialEndMarkerIsKept()
+    {
+        $buffer = new StdinBuffer();
+        $pastes = [];
+
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        $buffer->process("\x1b[200~AA\x1b[2");
+        $buffer->process("XX\x1b[201~");
+
+        $this->assertSame(["AA\x1b[2XX"], $pastes);
+    }
 }

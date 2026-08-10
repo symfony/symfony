@@ -68,6 +68,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Expo\ExpoTransportFactory::class,
             'package' => 'symfony/expo-notifier',
         ],
+        'facebook-page' => [
+            'class' => Bridge\FacebookPage\FacebookPageTransportFactory::class,
+            'package' => 'symfony/facebook-page-notifier',
+        ],
         'fakechat' => [
             'class' => Bridge\FakeChat\FakeChatTransportFactory::class,
             'package' => 'symfony/fake-chat-notifier',

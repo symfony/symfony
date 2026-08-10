@@ -89,6 +89,7 @@
         "engagespot-notifier": "src/Symfony/Component/Notifier/Bridge/Engagespot",
         "esendex-notifier": "src/Symfony/Component/Notifier/Bridge/Esendex",
         "expo-notifier": "src/Symfony/Component/Notifier/Bridge/Expo",
+        "facebook-page-notifier": "src/Symfony/Component/Notifier/Bridge/FacebookPage",
         "fake-chat-notifier": "src/Symfony/Component/Notifier/Bridge/FakeChat",
         "fake-sms-notifier": "src/Symfony/Component/Notifier/Bridge/FakeSms",
         "firebase-notifier": "src/Symfony/Component/Notifier/Bridge/Firebase",

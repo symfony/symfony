@@ -29,6 +29,7 @@ return static function (ContainerConfigurator $container) {
         'bluesky' => Bridge\Bluesky\BlueskyTransportFactory::class,
         'chatwork' => Bridge\Chatwork\ChatworkTransportFactory::class,
         'discord' => Bridge\Discord\DiscordTransportFactory::class,
+        'facebook-page' => Bridge\FacebookPage\FacebookPageTransportFactory::class,
         'fake-chat' => Bridge\FakeChat\FakeChatTransportFactory::class,
         'firebase' => Bridge\Firebase\FirebaseTransportFactory::class,
         'google-chat' => Bridge\GoogleChat\GoogleChatTransportFactory::class,

@@ -103,6 +103,7 @@ final class Transport
         Bridge\Telegram\TelegramTransportFactory::class,
         Bridge\Telnyx\TelnyxTransportFactory::class,
         Bridge\Termii\TermiiTransportFactory::class,
+        Bridge\Threads\ThreadsTransportFactory::class,
         Bridge\TurboSms\TurboSmsTransportFactory::class,
         Bridge\Twilio\TwilioTransportFactory::class,
         Bridge\Twitter\TwitterTransportFactory::class,

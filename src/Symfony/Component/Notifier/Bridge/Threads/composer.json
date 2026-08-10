@@ -1,0 +1,37 @@
+{
+    "name": "symfony/threads-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Threads Notifier Bridge",
+    "keywords": [
+        "threads",
+        "meta",
+        "notifier",
+        "chat"
+    ],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Ledru",
+            "email": "matyo91@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/notifier": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Threads\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

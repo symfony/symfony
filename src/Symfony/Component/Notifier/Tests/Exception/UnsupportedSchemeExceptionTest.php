@@ -102,6 +102,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Telegram\TelegramTransportFactory::class => false,
             Bridge\Telnyx\TelnyxTransportFactory::class => false,
             Bridge\Termii\TermiiTransportFactory::class => false,
+            Bridge\Threads\ThreadsTransportFactory::class => false,
             Bridge\TurboSms\TurboSmsTransportFactory::class => false,
             Bridge\Twilio\TwilioTransportFactory::class => false,
             Bridge\Twitter\TwitterTransportFactory::class => false,
@@ -196,6 +197,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['telegram', 'symfony/telegram-notifier'];
         yield ['telnyx', 'symfony/telnyx-notifier'];
         yield ['termii', 'symfony/termii-notifier'];
+        yield ['threads', 'symfony/threads-notifier'];
         yield ['turbosms', 'symfony/turbo-sms-notifier'];
         yield ['twilio', 'symfony/twilio-notifier'];
         yield ['twitter', 'symfony/twitter-notifier'];

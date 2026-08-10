@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -136,6 +137,32 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertEquals('locally_set_factory', $def->getFactory());
         // tags are merged, the locally set one is first
         $this->assertSame(['local_instanceof_tag' => [[]], 'autoconfigured_tag' => [[]]], $def->getTags());
+    }
+
+    public function testAutoconfigurationOfTheClassWinsOverTheInheritedOne()
+    {
+        $container = new ContainerBuilder();
+        $container->register('normal_service', self::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(self::class)->addTag('some_tag', ['priority' => 100]);
+        $container->registerForAutoconfiguration(parent::class)->addTag('some_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([['priority' => 100], []], $container->getDefinition('normal_service')->getTag('some_tag'));
+    }
+
+    public function testAutoconfiguredTagsAreOrderedFromTheMostSpecificType()
+    {
+        $container = new ContainerBuilder();
+        $container->register('normal_service', TypedReference::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(Reference::class)->addTag('some_tag', ['from' => 'parent']);
+        $container->registerForAutoconfiguration(\Stringable::class)->addTag('some_tag', ['from' => 'interface']);
+        $container->registerForAutoconfiguration(TypedReference::class)->addTag('some_tag', ['from' => 'class']);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $expected = [['from' => 'class'], ['from' => 'parent'], ['from' => 'interface']];
+        $this->assertSame($expected, $container->getDefinition('normal_service')->getTag('some_tag'));
     }
 
     public function testAutoconfigureInstanceofDoesNotDuplicateTags()

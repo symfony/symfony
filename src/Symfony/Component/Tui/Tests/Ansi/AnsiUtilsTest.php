@@ -543,4 +543,27 @@ class AnsiUtilsTest extends TestCase
         // "Hello " (6) + "Gérard" (6) + " from " (6) + "Café" (4) = 22
         $this->assertSame(22, AnsiUtils::visibleWidth($text));
     }
+
+    public function testVisibleWidthCountsACombiningMarkWithItsBaseCharacter()
+    {
+        $this->assertSame(1, AnsiUtils::visibleWidth("e\u{0301}"));
+        $this->assertSame(4, AnsiUtils::visibleWidth("cafe\u{0301}"));
+        $this->assertSame(2, AnsiUtils::visibleWidth("a\u{0301}\u{0308}b"));
+        $this->assertSame(4, AnsiUtils::visibleWidth("cafe\u{0301}\x1b[0m"));
+    }
+
+    public function testSliceByColumnGivesTabsTheSameWidthAsVisibleWidth()
+    {
+        $this->assertSame('a', AnsiUtils::sliceByColumn("a\tb", 0, 2));
+        $this->assertSame("a\t", AnsiUtils::sliceByColumn("a\tb", 0, 4));
+        $this->assertSame("a\tb", AnsiUtils::sliceByColumn("a\tb", 0, 5));
+    }
+
+    public function testTruncateToWidthNeverExceedsTheWidthWithTabs()
+    {
+        $this->assertSame(3, AnsiUtils::visibleWidth(AnsiUtils::truncateToWidth("\t\t\t", 3, '')));
+        $this->assertSame(4, AnsiUtils::visibleWidth(AnsiUtils::truncateToWidth("a\tb\tc", 4, '')));
+        // A tab is never split, so the result stops below the limit here.
+        $this->assertSame(4, AnsiUtils::visibleWidth(AnsiUtils::truncateToWidth("\tx\t\t", 6, '')));
+    }
 }

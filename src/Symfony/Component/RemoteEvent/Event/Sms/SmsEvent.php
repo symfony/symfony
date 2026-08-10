@@ -20,6 +20,8 @@ final class SmsEvent extends RemoteEvent
 {
     public const FAILED = 'failed';
     public const DELIVERED = 'delivered';
+    public const CLICKED = 'clicked';
+    public const UNSUBSCRIBED = 'unsubscribed';
 
     private string $phone = '';
 

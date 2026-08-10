@@ -3,6 +3,8 @@ CHANGELOG
 
 8.2
 ---
+
+ * Add `clicked` and `unsubscribed` SMS event names
  * Allow repeating `AsRemoteEventConsumer` attribute
 
 6.4

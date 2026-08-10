@@ -49,7 +49,9 @@ final class SweegoRequestParser extends AbstractRequestParser
 
         $name = match ($payload['event_type']) {
             'sms_sent' => SmsEvent::DELIVERED,
-            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['event'])),
+            'sms_clicked' => SmsEvent::CLICKED,
+            'sms_stop' => SmsEvent::UNSUBSCRIBED,
+            default => throw new RejectWebhookException(406, \sprintf('Unsupported event "%s".', $payload['event_type'])),
         };
 
         $event = new SmsEvent($name, $payload['swg_uid'], $payload);

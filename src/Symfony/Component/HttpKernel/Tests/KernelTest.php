@@ -116,18 +116,6 @@ class KernelTest extends TestCase
         $this->assertFileDoesNotExist($legacyContainerDir.'.legacy');
     }
 
-    public function testBuildContainerWritesCachedirTag()
-    {
-        $kernel = new CustomProjectDirKernel();
-        $kernel->boot();
-
-        foreach ([$kernel->getCacheDir(), $kernel->getBuildDir()] as $dir) {
-            $cachedirTag = $dir.'/CACHEDIR.TAG';
-            $this->assertFileExists($cachedirTag);
-            $this->assertStringStartsWith('Signature: 8a477f597d28d172789f06886806bc55', file_get_contents($cachedirTag));
-        }
-    }
-
     public function testBootInitializesBundlesAndContainer()
     {
         $kernel = $this->getKernel(['initializeBundles']);

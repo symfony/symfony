@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by bhavin-nakrani at 2026-08-10T16:30:38Z
+
+Hi @nicolas-grekas , I saw failed tests errors. Its showing in ```DummyHub implements HubInterface``` . `getProtocolVersion()` and `getCookieName()` function implementation are missing in `Symfony\Component\Notifier\Bridge\Mercure\Tests\Fixtures\DummyHub`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T16:32:16Z
+
+yep, unrelated failures

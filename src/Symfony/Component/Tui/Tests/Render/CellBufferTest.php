@@ -13,6 +13,7 @@ namespace Symfony\Component\Tui\Tests\Render;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Render\CellBuffer;
 
@@ -393,5 +394,48 @@ class CellBufferTest extends TestCase
         $lines = $buf->toLines();
         $plain = preg_replace('/\x1b\[[0-9;]*m/', '', $lines[0]);
         $this->assertSame('ABCD ', $plain);
+    }
+
+    public function testCombiningMarkStaysInTheCellOfItsBaseCharacter()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(["e\u{0301}x"]);
+
+        $this->assertSame("e\u{0301}x  ", $buf->toLines()[0]);
+    }
+
+    public function testWritingOverTheSecondCellOfAWideCharKeepsTheLineWidth()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(['漢字']);
+        $buf->writeAnsiLines(['x'], 0, 1);
+
+        $this->assertSame(' x字', $buf->toLines()[0]);
+    }
+
+    public function testWritingOverTheFirstCellOfAWideCharKeepsTheLineWidth()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(['漢字']);
+        $buf->writeAnsiLines(['x'], 0, 0);
+
+        $this->assertSame('x 字', $buf->toLines()[0]);
+    }
+
+    public function testTabTakesTheSameWidthAsInAnsiUtils()
+    {
+        $buf = new CellBuffer(10, 1);
+        $buf->writeAnsiLines(["a\tb"]);
+
+        $this->assertSame(AnsiUtils::visibleWidth("a\tb"), AnsiUtils::visibleWidth(rtrim($buf->toLines()[0])));
+    }
+
+    public function testWritingAWideCharAcrossTwoWideCharsKeepsTheLineWidth()
+    {
+        $buf = new CellBuffer(4, 1);
+        $buf->writeAnsiLines(['漢字']);
+        $buf->writeAnsiLines(['漢'], 0, 1);
+
+        $this->assertSame(' 漢 ', $buf->toLines()[0]);
     }
 }

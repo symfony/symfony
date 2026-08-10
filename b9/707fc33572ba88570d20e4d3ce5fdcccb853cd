@@ -1,0 +1,200 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-04-17T16:44:35Z
+
+It seems weird to me you’d want an `xlsx` file with a `text/plain` mime type; did you see https://github.com/symfony/symfony/issues/61713#issuecomment-3381381834?
+
+Maybe what should be done instead is to prevent setting both `extensions` and `mimeTypes`, unless it has use-cases I don’t see?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-17T16:50:11Z
+
+If the extensions are now ignored when mime types are provided, a better way to go would be to deprecate setting both instead of changing the existing behavior directly.
+This would allow projects to figure out whether their intended validation rule is the one defined by the mime types or by the extensions, and removing the other one (instead of automatically ignoring the extensions without warning them).
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-17T19:47:10Z
+
+Thanks @MatTheCat and @stof — agreed, I'll follow stof's approach.
+
+Pivoting this PR to:
+
+- Retarget to `8.1` (deprecations don't go on the LTS, so the behavior on `6.4` will stay as-is).
+- Revert the behavior change — no more silent flip of which list wins.
+- Call `trigger_deprecation('symfony/validator', '8.1', …)` at `File` constraint construction time when both the list form of `extensions` and `mimeTypes` are set, pointing users to either keep one of the two, or use the keyed form of `extensions` to pair them explicitly (as documented).
+- Update `src/Symfony/Component/Validator/CHANGELOG.md` (DEPRECATED) and `UPGRADE-8.1.md`.
+- Add a `@group legacy` test asserting the deprecation fires for the conflicting combo, plus ensure the keyed form does **not** trigger it.
+
+One open point before I push the rework: do you want the deprecation to fire **only** for the list form of `extensions` (the one that conflicts with `mimeTypes`), and **not** when users use the keyed `extensions: ['csv' => ['text/plain', 'text/csv']]` form alongside `mimeTypes`? I'd lean that way since the keyed form is the documented pairing, but happy to go either way.
+
+Will update the PR title and base branch once the rework lands.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-18T13:41:53Z
+
+@ousamabenyounes did you maybe forgot to push / hit "save" ? I don't see any of your last comments items.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T14:19:44Z
+
+Sorry for the delay @nicolas-grekas — force-pushed now with the full rework as outlined above:
+
+- Reverted the silent behavior change; `FileValidator` is untouched.
+- `File::__construct()` now calls `trigger_deprecation('symfony/validator', '8.1', …)` when `mimeTypes` is set alongside at least one list-form entry in `extensions`. The keyed form (`['csv' => ['text/csv', 'text/plain']]`) does not trigger the deprecation, since it is the documented pairing.
+- CHANGELOG and `UPGRADE-8.1.md` updated.
+- Two `#[Group('legacy')]` tests assert the deprecation fires (list + bare-string extensions), plus three non-legacy tests assert it does **not** fire for the keyed form or when only one of the two options is set.
+
+Full `File*` test suite green locally on PHP 8.4. Retargeted title + body to match the new approach.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T14:40:34Z
+
+Force-pushed with CI fixes:
+
+- **Verify Packages** ✓ — added `symfony/deprecation-contracts: ^2.5|^3` to `symfony/validator` `require` (was missing; the new `trigger_deprecation()` call needs it).
+- **Fabbot** ✓ — moved the new `#[Group('legacy')]` and constructor tests out of `FileTest.php` into a new `FileDeprecationTest.php`. Recent codespell versions flag the literal class name `FileTest` as a typo (`FileTest` → `file test`); by not modifying `FileTest.php`, fabbot's diff-only codespell run no longer touches it. `FileTest.php` is now untouched by this PR.
+- **Unit Tests (8.6)** — this job is the known flaky failure in `Serializer/Tests/Fixtures/test.txt` loading that hits most PRs on 6.4/8.1 right now; unrelated to this change.
+- **minimal-exts / lowest-php** — the single failure is `HttpClient\AmpHttpClientTest::testResolve`, pre-existing and unrelated; `Validator` reports `OK` in that same run.
+
+Full `File*` test suite (FileTest + FileDeprecationTest + FileValidatorObject/PathTest) still green locally on PHP 8.4: 254 tests, 456 assertions.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-04-18T15:44:24Z
+
+Since passing `extensions` as a list is equivalent to pass them as keys with their mime types as values I don't get how only one of those two possibilities would make sense with `mimeTypes`?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T15:55:25Z
+
+Good catch @MatTheCat — you're right. Walking the `FileValidator::validate()` loop confirms that list-form (`['csv']`) and keyed-form-with-`null` (`['csv' => null]`) are semantically identical: both go through the `null === $v` branch and end up calling `MimeTypes::getDefault()->getMimeTypes($k)` to derive the mime types, which then get silently `array_intersect()`'d with the caller's `mimeTypes`. The only form that actually *is* unambiguous alongside `mimeTypes` is the keyed form with **explicit** mime-type values.
+
+Force-pushed to address this:
+
+- Deprecation condition widened from `!\is_string($k)` to `!\is_string($k) || null === $v` — now covers both list-form and keyed-form-with-null.
+- Deprecation message + CHANGELOG + `UPGRADE-8.1.md` reworded accordingly ("relies on auto-derived mime types" instead of "as a list"), with both deprecated forms shown in the before/after example.
+- New `@group legacy` tests for the keyed-null form and for a mixed entry (one explicit + one null → still deprecated because at least one relies on auto-derivation).
+- Non-legacy tests updated: `testConfiguringOnlyExtensionsWithNullValuesDoesNotTriggerDeprecation` asserts the null-valued keyed form is fine on its own (only the combination with `mimeTypes` is problematic).
+
+Full `File*` suite green locally on PHP 8.4: **252 tests, 453 assertions**.
+
+Commit: `0d6494f`.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-04-18T16:27:28Z
+
+I don't think there is any form of `extensions` which makes sense to use with `mimeTypes`.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T16:36:37Z
+
+You're right @MatTheCat — tracing the validator end to end, all three forms of `extensions` end up hitting the same `array_intersect`, which is the actual source of the ambiguity. None of them has a legitimate use alongside `mimeTypes`.
+
+Force-pushed `1835b0f`: deprecation now fires whenever both options are set, regardless of form. Title / body / CHANGELOG / UPGRADE / tests rewritten without the "list form" framing. Suite green locally (67 tests).
+
+@stof's original "deprecate setting both" was the right scope from day one — my bad for narrowing it.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-22T16:39:44Z
+
+Thanks for the review @stof — agreed, those tests belong with the `File` constraint's canonical coverage.
+
+Pushed `eec47b9`: the 8 tests (4 `#[Group('legacy')]` covering each `extensions` + `mimeTypes` combination that now triggers the deprecation, plus 4 non-legacy tests asserting the deprecation does not fire when only one option is set) are back in `FileTest.php`, with their bodies unchanged. `FileDeprecationTest.php` dropped.
+
+As you suggested, I'm ignoring the codespell false-positive on the `FileTest` class name — no need to route around it.
+
+Let me know if anything else needs tweaking.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T13:56:56Z
+
+Honestly, I'd rather simplify and get back closer to the original proposal, aka not intersect.
+It's dev responsibilities to declare something that works for them, eg text/plain + text/csv and extension csv only, when they know mime detection can yield any of the two types.
+Then if dev declare absurd combinations, their problem IMHO.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T14:01:31Z
+
+I tried both on 6.4 to compare. Dropping the intersection is one line:
+
+```php
+$mimeTypes = $mimeTypes ?: (array) $v;
+```
+
+and against current behavior it changes exactly two cases, with the full Validator suite still green and no fixture to update:
+
+```
+- gif file, extensions: ['gif'], mimeTypes: ['application/pdf']   => VALID
++ gif file, extensions: ['gif'], mimeTypes: ['application/pdf']   => INVALID
+
+- csv file, extensions: ['csv'], mimeTypes: ['text/csv', 'text/plain']   => INVALID
++ csv file, extensions: ['csv'], mimeTypes: ['text/csv', 'text/plain']   => VALID
+```
+
+The second one is #61713: mime detection returns `text/plain` for that file, the intersection narrows the allowed list to `text/csv`, and the file is rejected. So not intersecting fixes the reported issue rather than deprecating around it, and the two options become two independent checks, which is what people expect when they set both.
+
+So let's go that way, and this PR can become that change. Two points on scope:
+
+The second case accepts files that are rejected today, so it cannot go to a maintained branch. Please retarget this PR to 8.2 and replace the deprecation with the one-line change above. The `File` constructor goes back to how it was, and `UPGRADE-8.2.md` gets an entry saying the two options no longer narrow each other.
+
+The first case is a separate bug that exists on every maintained branch: when the two lists are disjoint the intersection is empty, and an empty list makes the mime type check be skipped entirely, so adding an extension allow-list removes a check that was passing. I opened #65041 on 6.4 for that, which only tightens and merges up into your change.
+
+Thanks for the patience on this one, the analysis in your description is what made the right answer visible.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-07-29T15:33:46Z
+
+@nicolas-grekas your proposal is basically to **silently** ignore `extensions` when `mimeTypes` is configured. The proposal here is to deprecate passing both (and make it an error in 9.0) instead of having a setting that is silently ignored. In 9.0, the intersect will also be gone.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T15:47:20Z
+
+`extensions` is not ignored, it is still enforced. Only the mime types derived from the matched extension stop narrowing the list you configured.
+
+On 6.4 with `$mimeTypes = $mimeTypes ?: (array) $v;`, file `s.csv` detected as `text/plain`:
+
+```
+extensions:[txt] + mimeTypes:[text/plain]  => EXTENSION_ERROR | extension is invalid ("csv"). Allowed are "txt".
+extensions:[csv] + mimeTypes:[text/plain]  => VALID
+extensions:[csv] + mimeTypes:[image/gif]   => MIME_TYPE_ERROR | mime type is invalid ("text/plain"). Allowed are "image/gif".
+extensions:[txt] + mimeTypes:[image/gif]   => EXTENSION_ERROR + MIME_TYPE_ERROR
+```
+
+First row: the mime type matches and the file is still rejected, on the extension. Last row raises both. Two options, two independent checks, nothing silently dropped.
+
+What goes away is `extensions: ['csv']` also implying its own mime types, since you provided that list yourself.
+
+So the remaining question is only whether passing both should be an error in 9.0. I don't think it should: `extensions: ['csv']` with `mimeTypes: ['text/csv', 'text/plain']` is a reasonable thing to declare when detection can return either.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-30T14:37:34Z
+
+Thanks for the detailed analysis. I reworked the PR in e90f97ce514 to follow Nicolas’ direction: no deprecation anymore, the `File` constructor is back to upstream behavior, and `FileValidator` now keeps configured `mimeTypes` as-is while still enforcing `extensions` separately.
+
+I also added a regression test for `extensions: ["csv"]` + `mimeTypes: ["text/csv", "text/plain"]` with a file detected as `text/plain`.
+
+Validation: reverting the validator line to the old intersection makes the new test fail in both object/path variants (`0 violation expected. Got 1`). Local `./run-ci.sh` is green on PHP 8.4: `OK (248 tests, 450 assertions)`.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-08-03T17:19:07Z
+
+Rebased onto the latest `8.2` in `6765d46` to clear the merge conflict.
+
+The only conflict was in `UPGRADE-8.2.md`, where `8.2` had since added new `Serializer`, `Translation` and `Validator` entries. Resolved by keeping all of those and appending this PR's `File` note under the existing `Validator` section. The `CHANGELOG.md` entry auto-merged into the `8.2` section.
+
+Validation (RED → GREEN, PHP 8.4): reverting the `FileValidator` change makes `testExtensionsAndMimeTypesAreCheckedIndependently` fail (`0 violation expected. Got 1.` — the `text/plain` CSV is wrongly rejected); with the fix it passes (`OK, 1 assertion`).

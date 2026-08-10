@@ -34,6 +34,7 @@ final class RunCommandMessageHandler
         $input = new StringInput($message->input);
         $output = new BufferedOutput();
 
+        $originalCatchExceptions = $this->application->areExceptionsCaught();
         $this->application->setCatchExceptions($message->catchExceptions);
 
         try {
@@ -42,6 +43,8 @@ final class RunCommandMessageHandler
             throw $e;
         } catch (\Throwable $e) {
             throw new RunCommandFailedException($e, new RunCommandContext($message, Command::FAILURE, $output->fetch()));
+        } finally {
+            $this->application->setCatchExceptions($originalCatchExceptions);
         }
 
         if ($message->throwOnFailure && Command::SUCCESS !== $exitCode) {

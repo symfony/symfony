@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAs
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasProdEnv;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithCustomAsAlias;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAutoconfigure\AutoconfiguredService;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeTagPriority\Collector;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\NotAService;
 
 class FileLoaderTest extends TestCase
@@ -247,6 +248,22 @@ class FileLoaderTest extends TestCase
 
         $this->assertCount(1, $container->getDefinition(AutoconfiguredService::class)->getMethodCalls());
         $this->assertSame(['from_interface'], $container->get(AutoconfiguredService::class)->calls);
+    }
+
+    public function testRegisterClassesKeepsClassLevelTagPriorityOverInterfaceDeclaration()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true)->setAutowired(true)->setPublic(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeTagPriority\\',
+            'PrototypeTagPriority/*'
+        );
+
+        $container->compile();
+
+        $this->assertSame(['first', 'second', 'third'], $container->get(Collector::class)->order());
     }
 
     public function testMissingParentClass()

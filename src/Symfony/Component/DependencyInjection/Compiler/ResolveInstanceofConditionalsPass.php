@@ -120,6 +120,13 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $definition->setShared($shared);
             }
 
+            // Tags declared on the concrete class take precedence over the same tags
+            // inherited from an interface/parent (e.g. a class-level tag "priority" must
+            // win over a priority-less interface declaration). Since the loop below merges
+            // tags in reverse and the first-merged attributes win, apply the class-level
+            // conditional last so its ordering is not left to registration order.
+            usort($instanceofTags, static fn ($a, $b) => ($a[0] === $class) <=> ($b[0] === $class));
+
             // Don't add tags to service decorators
             $i = \count($instanceofTags);
             while (0 <= --$i) {

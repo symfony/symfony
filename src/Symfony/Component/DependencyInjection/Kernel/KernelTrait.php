@@ -297,6 +297,11 @@ trait KernelTrait
             } elseif (!is_writable($dir)) {
                 throw new \RuntimeException(\sprintf('Unable to write in the "%s" directory (%s).', $name, $dir));
             }
+
+            // Tag the directory so backup tools can skip it; see https://bford.info/cachedir/
+            if (!is_file($tag = $dir.'/CACHEDIR.TAG')) {
+                @file_put_contents($tag, "Signature: 8a477f597d28d172789f06886806bc55\n# This file is a cache directory tag created by Symfony.\n# For information about cache directory tags, see https://bford.info/cachedir/\n");
+            }
         }
 
         $container = $this->getContainerBuilder();

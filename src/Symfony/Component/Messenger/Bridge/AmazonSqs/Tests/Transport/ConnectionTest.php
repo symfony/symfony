@@ -133,6 +133,24 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithNonComPartitionDetectsRegionAutomatically()
+    {
+        $httpClient = new MockHttpClient();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], new SqsClient(['region' => 'eusc-de-east-1', 'endpoint' => 'https://sqs.eusc-de-east-1.amazonaws.eu', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient), 'https://sqs.eusc-de-east-1.amazonaws.eu/123456789012/ab1-MyQueue-A2BCDEF3GHI4'),
+            Connection::fromDsn('https://sqs.eusc-de-east-1.amazonaws.eu/123456789012/ab1-MyQueue-A2BCDEF3GHI4', [], $httpClient)
+        );
+    }
+
+    public function testFromDsnWithChinaPartitionDetectsRegionAutomatically()
+    {
+        $httpClient = new MockHttpClient();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], new SqsClient(['region' => 'cn-north-1', 'endpoint' => 'https://sqs.cn-north-1.amazonaws.com.cn', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient), 'https://sqs.cn-north-1.amazonaws.com.cn/123456789012/ab1-MyQueue-A2BCDEF3GHI4'),
+            Connection::fromDsn('https://sqs.cn-north-1.amazonaws.com.cn/123456789012/ab1-MyQueue-A2BCDEF3GHI4', [], $httpClient)
+        );
+    }
+
     public function testFromDsnWithCustomEndpoint()
     {
         $httpClient = new MockHttpClient();
@@ -412,6 +430,8 @@ class ConnectionTest extends TestCase
         yield ['https://sqs.us-east-2.amazonaws.com/123456/queue', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
         yield ['https://KEY:SECRET@sqs.us-east-2.amazonaws.com/123456/queue', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
         yield ['https://sqs.us-east-2.amazonaws.com/123456/queue?auto_setup=1', 'https://sqs.us-east-2.amazonaws.com/123456/queue'];
+        yield ['https://sqs.eusc-de-east-1.amazonaws.eu/123456/queue', 'https://sqs.eusc-de-east-1.amazonaws.eu/123456/queue'];
+        yield ['https://sqs.cn-north-1.amazonaws.com.cn/123456/queue', 'https://sqs.cn-north-1.amazonaws.com.cn/123456/queue'];
     }
 
     /**
@@ -432,6 +452,8 @@ class ConnectionTest extends TestCase
         yield ['https://sqs.us-east-2.amazonaws.com/queue'];
         yield ['https://us-east-2/123456/ab1-MyQueue-A2BCDEF3GHI4'];
         yield ['sqs://default/queue'];
+        yield ['https://sqs.us-east-2.amazonaws.evil.com/123456/queue'];
+        yield ['https://sqs.us-east-2.amazonaws.co.uk/123456/queue'];
     }
 
     public function testGetQueueUrlNotCalled()

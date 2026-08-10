@@ -39,6 +39,6 @@ class AmazonSqsTransportFactory implements TransportFactoryInterface
 
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool
     {
-        return str_starts_with($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.com/.+#', $dsn);
+        return str_starts_with($dsn, 'sqs://') || preg_match('#^https://sqs\.[\w\-]+\.amazonaws\.(?:com(?:\.cn)?|eu)/.+#', $dsn);
     }
 }

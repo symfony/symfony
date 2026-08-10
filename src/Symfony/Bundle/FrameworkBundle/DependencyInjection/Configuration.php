@@ -1666,27 +1666,42 @@ class Configuration implements ConfigurationInterface
                                 ->ifArray()
                                 ->then(static function ($v) {
                                     if (!array_is_list($v)) {
-                                        return $v;
+                                        return isset($v['service_id']) ? ['default' => $v] : $v;
                                     }
 
                                     $resources = [];
                                     foreach ($v as $resource) {
-                                        $resources[] = \is_array($resource) && isset($resource['name'])
-                                            ? [$resource['name'] => $resource['value']]
-                                            : ['default' => $resource]
+                                        [$name, $store] = \is_array($resource) && isset($resource['name'])
+                                            ? [$resource['name'], $resource['value']]
+                                            : ['default', $resource]
                                         ;
+                                        $resources[] = [$name => \is_array($store) && !array_is_list($store) ? [$store] : $store];
                                     }
 
                                     return array_merge_recursive([], ...$resources);
                                 })
                             ->end()
                             ->prototype('array')
+                                ->info('Each store is a DSN, a store keyword, the id of a service holding a connection, or an array with a "service_id" key and an "advisory" key.')
                                 ->performNoDeepMerging()
                                 ->acceptAndWrap(['string'])
                                 // acceptAndWrap() doesn't list null as an accepted value on purpose,
                                 // yet the XML loader can yield some and we should convert them to 'null'
                                 ->beforeNormalization()->ifNull()->then(static fn () => ['null'])->end()
-                                ->prototype('scalar')->end()
+                                ->beforeNormalization()
+                                    ->ifTrue(static fn ($v) => \is_array($v) && (isset($v['service_id']) || isset($v['advisory'])))
+                                    ->then(static fn ($v) => [$v])
+                                ->end()
+                                ->variablePrototype()
+                                    ->beforeNormalization()
+                                        ->ifArray()
+                                        ->then(static fn ($v) => ['service_id' => $v['service_id'] ?? null, 'advisory' => $v['advisory'] ?? false] + $v)
+                                    ->end()
+                                    ->validate()
+                                        ->ifTrue(static fn ($v) => \is_array($v) && (2 !== \count($v) || !\is_string($v['service_id']) || !\is_bool($v['advisory'])))
+                                        ->thenInvalid('A lock store must be a string or an array with a "service_id" string and an optional "advisory" boolean, got %s.')
+                                    ->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

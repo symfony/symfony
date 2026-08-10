@@ -3151,6 +3151,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals(new Reference('my_service'), $storeDef->getArgument(0));
     }
 
+    public function testLockWithAdvisoryService()
+    {
+        $container = $this->createContainerFromFile('lock_advisory', [], true, false);
+        $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveChildDefinitionsPass()]);
+        $container->compile();
+
+        $storeDef = $container->getDefinition($container->getDefinition('lock.foo.factory')->getArgument(0));
+        $this->assertEquals([new Reference('my_connection'), true], $storeDef->getArguments());
+
+        $storeDef = $container->getDefinition($container->getDefinition('lock.bar.factory')->getArgument(0));
+        $this->assertEquals([new Reference('my_connection')], $storeDef->getArguments());
+
+        $combinedDef = $container->getDefinition($container->getDefinition('lock.baz.factory')->getArgument(0));
+        $this->assertIsArray($storeRefs = $combinedDef->getArgument(0));
+        $this->assertCount(2, $storeRefs);
+        $this->assertSame('.lock.flock.store', (string) $storeRefs[0]);
+        $this->assertEquals([new Reference('my_connection'), true], $container->getDefinition((string) $storeRefs[1])->getArguments());
+    }
+
     public function testLockWithServiceAndEnv()
     {
         $container = $this->createContainerFromFile('lock_service_and_env', [], true, false);

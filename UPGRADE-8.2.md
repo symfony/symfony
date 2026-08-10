@@ -115,3 +115,16 @@ Validator
  * Add argument `$restrictGroups` to `Valid::__construct()`
  * [BC BREAK] Remove the `GroupSequence::$cascadedGroup` property, it has had no effect since the validator stopped reading it in 2014, and reading it has thrown since 7.4 typed it without a default
  * Add argument `$cascadeCurrentGroup` to `GroupSequenceProvider::__construct()`
+ * The `File` constraint no longer narrows the configured `mimeTypes` option with mime types auto-derived from the matched extension when `extensions` is also configured.
+   The two options are now checked independently: `extensions` validates the file extension, and `mimeTypes` validates the detected mime type.
+
+   In previous versions, the effective mime-type list was narrowed to the mime types auto-derived from the matching extension. For example, a CSV file detected as `text/plain` could be rejected by this constraint because the `mimeTypes` list was narrowed to the mime types derived from `csv`:
+
+   ```php
+   #[Assert\File(
+       extensions: ['csv'],
+       mimeTypes: ['text/csv', 'text/plain'],
+   )]
+   ```
+
+   In Symfony 8.2, the configured `mimeTypes` list is used as-is, while the `csv` extension is still enforced separately.

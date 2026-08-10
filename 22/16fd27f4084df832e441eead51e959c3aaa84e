@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-25T17:17:20Z
+
+Shopware only adds this file in their cache dir, doesn’t it?
+
+---------------------------------------------------------------------------
+
+by shyim at 2026-06-28T11:58:35Z
+
+@MatTheCat yes we add it directly into `var/cache`. I am not sure where to put this tbh "correctly" inside Symfony.  Just like `var/cache` or even in single components so custom crafted FilesystemCacheAdapter creates that too 🙈

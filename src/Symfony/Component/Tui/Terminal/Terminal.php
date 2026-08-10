@@ -166,7 +166,7 @@ final class Terminal implements TerminalInterface
             $this->refreshDimensions();
         }
 
-        return $this->cachedColumns ?? 80;
+        return $this->cachedColumns ?: 80;
     }
 
     public function getRows(): int
@@ -175,7 +175,7 @@ final class Terminal implements TerminalInterface
             $this->refreshDimensions();
         }
 
-        return $this->cachedRows ?? 24;
+        return $this->cachedRows ?: 24;
     }
 
     public function isKittyProtocolActive(): bool

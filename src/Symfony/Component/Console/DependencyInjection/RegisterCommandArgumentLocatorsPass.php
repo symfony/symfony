@@ -173,8 +173,10 @@ final class RegisterCommandArgumentLocatorsPass implements CompilerPassInterface
                         $arguments[$p->name] = new Reference($erroredId, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE);
                         ++$erroredIds;
                     } else {
+                        $targetAttribute = null;
+                        $name = Target::parseName($p, $targetAttribute);
                         $target = preg_replace('/(^|[(|&])\\\\/', '\1', $target);
-                        $arguments[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, Target::parseName($p)) : new Reference($target, $invalidBehavior);
+                        $arguments[$p->name] = $type ? new TypedReference($target, $type, $invalidBehavior, $name, $targetAttribute ? [$targetAttribute] : []) : new Reference($target, $invalidBehavior);
                     }
                 }
 

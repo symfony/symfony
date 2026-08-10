@@ -14,13 +14,18 @@ namespace Symfony\Component\Console\Tests\DependencyInjection;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\DependencyInjection\RegisterCommandArgumentLocatorsPass;
+use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
+use Symfony\Component\DependencyInjection\TypedReference;
 
 class RegisterCommandArgumentLocatorsPassTest extends TestCase
 {
@@ -190,6 +195,55 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('test:cmd2', $commands);
     }
 
+    public function testProcessForwardsTargetAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.argument_resolver.service')->addArgument(null);
+
+        $command = new Definition(CommandWithTarget::class);
+        $command->setAutowired(true);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+        $pass->process($container);
+
+        $serviceResolverDef = $container->getDefinition('console.argument_resolver.service');
+        $commands = $container->getDefinition((string) $serviceResolverDef->getArgument(0))->getArgument(0);
+        $locator = $container->getDefinition((string) $commands['test:command']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
+
+        $expected = ['logger' => new ServiceClosureArgument(new TypedReference(LoggerInterface::class, LoggerInterface::class, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'requestLogger', [new Target('request.logger')]))];
+        $this->assertEquals($expected, $locator->getArgument(0));
+    }
+
+    public function testProcessTargetedArgumentIsAutowired()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('console.argument_resolver.service', 'stdClass')->addArgument(null);
+
+        $container->register('request.logger', NullLogger::class);
+        $container->registerAliasForArgument('request.logger', LoggerInterface::class);
+
+        $command = new Definition(CommandWithTarget::class);
+        $command->setAutowired(true);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $locator = $container->get($locatorId)->get('test:command');
+        $this->assertInstanceOf(NullLogger::class, $locator->get('logger'));
+    }
+
     public function testProcessThrowsOnMissingArgumentAttribute()
     {
         $container = new ContainerBuilder();
@@ -258,6 +312,15 @@ class CommandWithAutowireAttributeNullableInvalidReference
         #[Autowire(service: 'invalid.id')]
         ?\stdClass $service2 = null,
     ) {
+    }
+}
+
+class CommandWithTarget
+{
+    public function __invoke(
+        #[Target('request.logger')]
+        LoggerInterface $logger,
+    ): void {
     }
 }
 

@@ -226,11 +226,13 @@ final class KeyParser
         $key = $parsed['key'];
         $modifiers = [];
 
-        if (str_contains($key, '+')) {
+        if (str_ends_with($key, '++')) {
+            // The '+' key behind modifiers, so only the modifiers are split off
+            $modifiers = explode('+', substr($key, 0, -2));
+        } elseif ('+' !== $key && str_contains($key, '+')) {
             $parts = explode('+', $key);
-            $keyPart = array_pop($parts);
+            array_pop($parts);
             $modifiers = $parts;
-            $key = $parts ? implode('+', $parts).'+'.$keyPart : $keyPart;
         }
 
         return [
@@ -287,7 +289,9 @@ final class KeyParser
         ) {
             $kitty = $this->parseKittySequence($data);
             if (null !== $kitty && null !== $keyName = $this->keyNameFromCodepoint($kitty['codepoint'])) {
-                $mods = $this->modsFromFlags($kitty['modifier']);
+                if (null === $mods = $this->modsFromFlags($kitty['modifier'])) {
+                    return null;
+                }
                 $key = $mods ? implode('+', $mods).'+'.$keyName : $keyName;
 
                 return ['key' => $key, 'event_type' => $kitty['event_type']];
@@ -504,12 +508,15 @@ final class KeyParser
     }
 
     /**
-     * @return string[]
+     * @return string[]|null Null when a modifier is set that has no key id
      */
-    private function modsFromFlags(int $modifier): array
+    private function modsFromFlags(int $modifier): ?array
     {
         $mods = [];
         $effective = $modifier & ~self::LOCK_MASK;
+        if ($effective & ~(self::MOD_SHIFT | self::MOD_ALT | self::MOD_CTRL)) {
+            return null;
+        }
         if ($effective & self::MOD_SHIFT) {
             $mods[] = 'shift';
         }
@@ -831,7 +838,9 @@ final class KeyParser
             }
 
             if ($shift && !$ctrl && !$alt) {
-                if (strtoupper($key) === $data) {
+                // Only letters have a layout independent shifted byte; the
+                // shifted form of a digit or a symbol depends on the layout.
+                if ($key >= 'a' && $key <= 'z' && strtoupper($key) === $data) {
                     return true;
                 }
 
@@ -937,15 +946,16 @@ final class KeyParser
      */
     private function parseKeyId(string $keyId): ?array
     {
-        // Special case: the '+' key itself
-        if ('+' === $keyId) {
-            return ['key' => '+', 'ctrl' => false, 'shift' => false, 'alt' => false];
-        }
-
-        $parts = explode('+', strtolower($keyId));
-        $key = $parts[\count($parts) - 1] ?? '';
-        if ('' === $key) {
-            return null;
+        // Special case: the '+' key itself, alone or behind modifiers
+        if ('+' === $keyId || str_ends_with($keyId, '++')) {
+            $key = '+';
+            $parts = '+' === $keyId ? [] : explode('+', strtolower(substr($keyId, 0, -2)));
+        } else {
+            $parts = explode('+', strtolower($keyId));
+            $key = $parts[\count($parts) - 1] ?? '';
+            if ('' === $key) {
+                return null;
+            }
         }
 
         return [

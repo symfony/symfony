@@ -2248,6 +2248,28 @@ b'])]
         $this->assertSame('localhost', $request->getHost());
     }
 
+    public function testSetTrustedHostsKeepsPatternsIndependent()
+    {
+        Request::setTrustedHosts(['^(a)\.example\.com$', '^(b)\.\1\.example\.com$']);
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'b.b.example.com');
+        $this->assertSame('b.b.example.com', $request->getHost());
+    }
+
+    public function testTrustedHostsAreNotAccumulated()
+    {
+        Request::setTrustedHosts(['^[a-z]+\.example\.com$']);
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'a.example.com');
+        $this->assertSame('a.example.com', $request->getHost());
+        $request->headers->set('host', 'b.example.com');
+        $this->assertSame('b.example.com', $request->getHost());
+
+        $this->assertSame([], (new \ReflectionProperty(Request::class, 'trustedHosts'))->getValue());
+    }
+
     public function testFactory()
     {
         Request::setFactory(static fn (array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) => new NewRequest());

@@ -41,12 +41,12 @@ class JsonDescriptor extends Descriptor
 
     protected function describeInputDefinition(InputDefinition $definition, array $options = []): void
     {
-        $this->writeData($this->getInputDefinitionData($definition), $options);
+        $this->writeData($this->getInputDefinitionData($definition, $options), $options);
     }
 
     protected function describeCommand(Command $command, array $options = []): void
     {
-        $this->writeData($this->getCommandData($command, $options['short'] ?? false), $options);
+        $this->writeData($this->getCommandData($command, $options), $options);
     }
 
     protected function describeApplication(Application $application, array $options = []): void
@@ -56,7 +56,7 @@ class JsonDescriptor extends Descriptor
         $commands = [];
 
         foreach ($description->getCommands() as $command) {
-            $commands[] = $this->getCommandData($command, $options['short'] ?? false);
+            $commands[] = $this->getCommandData($command, $options);
         }
 
         $data = [];
@@ -107,6 +107,8 @@ class JsonDescriptor extends Descriptor
             'accept_value' => false,
             'is_value_required' => false,
             'is_multiple' => false,
+            'is_deprecated' => $option->isDeprecated(),
+            'is_hidden' => $option->isHidden(),
             'description' => 'Negate the "--'.$option->getName().'" option',
             'default' => null === $option->getDefault() ? null : !$option->getDefault(),
         ] : [
@@ -115,12 +117,14 @@ class JsonDescriptor extends Descriptor
             'accept_value' => $option->acceptValue(),
             'is_value_required' => $option->isValueRequired(),
             'is_multiple' => $option->isArray(),
+            'is_deprecated' => $option->isDeprecated(),
+            'is_hidden' => $option->isHidden(),
             'description' => preg_replace('/\s*[\r\n]\s*/', ' ', $option->getDescription()),
             'default' => \INF === $option->getDefault() ? 'INF' : $option->getDefault(),
         ];
     }
 
-    private function getInputDefinitionData(InputDefinition $definition): array
+    private function getInputDefinitionData(InputDefinition $definition, array $options): array
     {
         $inputArguments = [];
         foreach ($definition->getArguments() as $name => $argument) {
@@ -128,7 +132,7 @@ class JsonDescriptor extends Descriptor
         }
 
         $inputOptions = [];
-        foreach ($definition->getOptions() as $name => $option) {
+        foreach ($this->removeHiddenOptions($definition->getOptions(), $options) as $name => $option) {
             $inputOptions[$name] = $this->getInputOptionData($option);
             if ($option->isNegatable()) {
                 $inputOptions['no-'.$name] = $this->getInputOptionData($option, true);
@@ -138,8 +142,10 @@ class JsonDescriptor extends Descriptor
         return ['arguments' => $inputArguments, 'options' => $inputOptions];
     }
 
-    private function getCommandData(Command $command, bool $short = false): array
+    private function getCommandData(Command $command, array $options = []): array
     {
+        $short = $options['short'] ?? false;
+
         $data = [
             'name' => $command->getName(),
             'description' => $command->getDescription(),
@@ -155,7 +161,7 @@ class JsonDescriptor extends Descriptor
             $data += [
                 'usage' => array_merge([$command->getSynopsis()], $command->getUsages(), $command->getAliases()),
                 'help' => $command->getProcessedHelp(),
-                'definition' => $this->getInputDefinitionData($command->getDefinition()),
+                'definition' => $this->getInputDefinitionData($command->getDefinition(), $options),
             ];
         }
 

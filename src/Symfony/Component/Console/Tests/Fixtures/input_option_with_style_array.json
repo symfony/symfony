@@ -4,6 +4,8 @@
     "accept_value": true,
     "is_value_required": true,
     "is_multiple": true,
+    "is_deprecated": false,
+    "is_hidden": false,
     "description": "option description",
     "default": [
         "<comment>Hello</comment>",

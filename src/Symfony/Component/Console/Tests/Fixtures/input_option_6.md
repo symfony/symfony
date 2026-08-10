@@ -6,4 +6,6 @@ option with multiple shortcuts
 * Is value required: yes
 * Is multiple: no
 * Is negatable: no
+* Is deprecated: no
+* Is hidden: no
 * Default: `NULL`

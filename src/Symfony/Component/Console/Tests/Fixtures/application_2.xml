@@ -9,48 +9,48 @@
       <help>Internal command to provide shell completion suggestions</help>
       <arguments/>
       <options>
-        <option name="--shell" shortcut="-s" accept_value="1" is_value_required="1" is_multiple="0">
+        <option name="--shell" shortcut="-s" accept_value="1" is_value_required="1" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>The shell type ("bash", "fish", "zsh")</description>
           <defaults/>
         </option>
-        <option name="--input" shortcut="-i" accept_value="1" is_value_required="1" is_multiple="1">
+        <option name="--input" shortcut="-i" accept_value="1" is_value_required="1" is_multiple="1" is_deprecated="0" is_hidden="0">
           <description>An array of input tokens (e.g. COMP_WORDS or argv)</description>
           <defaults/>
         </option>
-        <option name="--current" shortcut="-c" accept_value="1" is_value_required="1" is_multiple="0">
+        <option name="--current" shortcut="-c" accept_value="1" is_value_required="1" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>The index of the "input" array that the cursor is in (e.g. COMP_CWORD)</description>
           <defaults/>
         </option>
-        <option name="--api-version" shortcut="-a" accept_value="1" is_value_required="1" is_multiple="0">
+        <option name="--api-version" shortcut="-a" accept_value="1" is_value_required="1" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>The API version of the completion script</description>
           <defaults/>
         </option>
-        <option name="--symfony" shortcut="-S" accept_value="1" is_value_required="1" is_multiple="0">
+        <option name="--symfony" shortcut="-S" accept_value="1" is_value_required="1" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>deprecated</description>
           <defaults/>
         </option>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -68,31 +68,31 @@
         </argument>
       </arguments>
       <options>
-        <option name="--debug" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--debug" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Tail the completion debug log</description>
         </option>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -120,37 +120,37 @@
         </argument>
       </arguments>
       <options>
-        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
+        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>The output format (txt, xml, json, or md)</description>
           <defaults>
             <default>txt</default>
           </defaults>
         </option>
-        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>To output raw command help</description>
         </option>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -182,40 +182,40 @@
         </argument>
       </arguments>
       <options>
-        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--raw" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>To output raw command list</description>
         </option>
-        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0">
+        <option name="--format" shortcut="" accept_value="1" is_value_required="1" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>The output format (txt, xml, json, or md)</description>
           <defaults>
             <default>txt</default>
           </defaults>
         </option>
-        <option name="--short" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--short" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>To skip describing commands' arguments</description>
         </option>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -230,28 +230,28 @@
       <help>command 1 help</help>
       <arguments/>
       <options>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -271,31 +271,31 @@
         </argument>
       </arguments>
       <options>
-        <option name="--option_name" shortcut="-o" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--option_name" shortcut="-o" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description></description>
         </option>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -308,28 +308,28 @@
       <help>command 3 help</help>
       <arguments/>
       <options>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -344,28 +344,65 @@
       <help></help>
       <arguments/>
       <options>
-        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
         </option>
-        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not output any message</description>
         </option>
-        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Only errors are displayed. All other output is suppressed</description>
         </option>
-        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
         </option>
-        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Display this application version</description>
         </option>
-        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Force (or disable --no-ansi) ANSI output</description>
         </option>
-        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Negate the "--ansi" option</description>
         </option>
-        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0">
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Do not ask any interactive question</description>
+        </option>
+      </options>
+    </command>
+    <command id="descriptor:command5" name="descriptor:command5" hidden="0">
+      <usages>
+        <usage>descriptor:command5 [-y|--deprecated_option]</usage>
+      </usages>
+      <description>command 5 description</description>
+      <help>command 5 help</help>
+      <arguments/>
+      <options>
+        <option name="--deprecated_option" shortcut="-y" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="1" is_hidden="0">
+          <description></description>
+        </option>
+        <option name="--help" shortcut="-h" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Display help for the given command. When no command is given display help for the &lt;info&gt;list&lt;/info&gt; command</description>
+        </option>
+        <option name="--silent" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Do not output any message</description>
+        </option>
+        <option name="--quiet" shortcut="-q" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Only errors are displayed. All other output is suppressed</description>
+        </option>
+        <option name="--verbose" shortcut="-v" shortcuts="-v|-vv|-vvv" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug</description>
+        </option>
+        <option name="--version" shortcut="-V" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Display this application version</description>
+        </option>
+        <option name="--ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Force (or disable --no-ansi) ANSI output</description>
+        </option>
+        <option name="--no-ansi" shortcut="" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
+          <description>Negate the "--ansi" option</description>
+        </option>
+        <option name="--no-interaction" shortcut="-n" accept_value="0" is_value_required="0" is_multiple="0" is_deprecated="0" is_hidden="0">
           <description>Do not ask any interactive question</description>
         </option>
       </options>
@@ -389,6 +426,7 @@
       <command>descriptor:command2</command>
       <command>descriptor:command3</command>
       <command>descriptor:command4</command>
+      <command>descriptor:command5</command>
     </namespace>
   </namespaces>
 </symfony>

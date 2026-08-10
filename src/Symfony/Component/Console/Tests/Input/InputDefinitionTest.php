@@ -381,6 +381,16 @@ class InputDefinitionTest extends TestCase
             [new InputDefinition([new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY)]), '<foo>...', 'uses an ellipsis for required array arguments'],
 
             [new InputDefinition([new InputOption('foo'), new InputArgument('foo', InputArgument::REQUIRED)]), '[--foo] [--] <foo>', 'puts [--] between options and arguments'],
+
+            [new InputDefinition([new InputOption('deprecated', null, InputOption::DEPRECATED)]), '[--deprecated]', 'puts deprecated optional options in square brackets'],
+            [
+                new InputDefinition([new InputOption('foo'), new InputOption('deprecated', null, InputOption::DEPRECATED)]),
+                '[--foo] [--deprecated]',
+                'puts deprecated optional options in square brackets',
+            ],
+
+            [new InputDefinition([new InputOption('hidden', null, InputOption::HIDDEN)]), '', 'hidden option is not visible'],
+            [new InputDefinition([new InputOption('foo'), new InputOption('hidden', null, InputOption::HIDDEN)]), '[--foo]', 'hidden option is not visible'],
         ];
     }
 

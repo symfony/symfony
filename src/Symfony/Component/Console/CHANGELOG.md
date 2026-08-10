@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `InputOption::HIDDEN` and `InputOption::DEPRECATED` modes
+
 8.1
 ---
 

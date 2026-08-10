@@ -4,6 +4,8 @@
     "accept_value": false,
     "is_value_required": false,
     "is_multiple": false,
+    "is_deprecated": false,
+    "is_hidden": false,
     "description": "",
     "default": false
 }

@@ -50,6 +50,8 @@ class Option
         public string $name = '',
         public array|string|null $shortcut = null,
         array|callable $suggestedValues = [],
+        public bool $deprecated = false,
+        public bool $hidden = false,
     ) {
         $this->suggestedValues = \is_callable($suggestedValues) ? $suggestedValues(...) : $suggestedValues;
     }
@@ -128,10 +130,13 @@ class Option
      */
     public function toInputOption(): InputOption
     {
-        $default = InputOption::VALUE_NONE === (InputOption::VALUE_NONE & $this->mode) ? null : $this->default;
+        $mode = $this->mode
+            | ($this->deprecated ? InputOption::DEPRECATED : 0)
+            | ($this->hidden ? InputOption::HIDDEN : 0);
+        $default = InputOption::VALUE_NONE === (InputOption::VALUE_NONE & $mode) ? null : $this->default;
         $suggestedValues = \is_callable($this->suggestedValues) ? ($this->suggestedValues)(...) : $this->suggestedValues;
 
-        return new InputOption($this->name, $this->shortcut, $this->mode, $this->description, $default, $suggestedValues);
+        return new InputOption($this->name, $this->shortcut, $mode, $this->description, $default, $suggestedValues);
     }
 
     private function handleUnion(\ReflectionUnionType $type): self

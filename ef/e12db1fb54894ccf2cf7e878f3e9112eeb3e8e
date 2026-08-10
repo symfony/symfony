@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by HypeMC at 2025-02-03T01:12:23Z
+
+> I'm wondering about the added metadata factory infrastructure. Do we really need to provide an API for this? I'm not sure it's a useful extensibility point. Wouldn't the PR be way simpler without? What's the real world use case of these interfaces if you think we should add them?
+
+@nicolas-grekas I think it really depends on whether XML and/or YAML support should or will be added. If supporting multiple formats is desired, then the current infrastructure makes sense to me. Otherwise, I'd simplify it by keeping only an attribute loader, possibly with a cached loader.
+
+Personally, I never use XML/YAML for any kind of mapping (validator, serializer, etc.), so I'd be fine with removing it.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-02-09T15:01:46Z
+
+@nicolas-grekas Yes, that sounds good. This has been on my todo for a while now. I'll try finishing it up sometime this week.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-03-26T01:19:05Z
+
+@nicolas-grekas Finally got around to this one 🙂
+
+I extracted some refactoring into a separate PR to make the review easier, see #63775. This PR is probably best reviewed with whitespace changes ignored.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T17:17:09Z
+
+Applied the review and reworked the extractor integration.
+
+The attribute path is now a dedicated branch: `getType()` dispatches directly on `$accessors->adder`/`setter`/`getter`, and `getAccessorMethod()`/`getMutatorMethod()` are back to their original discovery-only shape. `isWritable()` gets the same early return `getReadInfo()`/`getWriteInfo()` already had.
+
+That removes the three `array_first()` calls, and with them the `symfony/polyfill-php85` requirement, so `composer.json` is untouched now. They existed only to invent a prefix for a `[$method, $prefix]` contract meant for discovery, and inventing it was not harmless:
+
+```php
+#[WithAccessors(getter: 'isEnabled')]
+private ?string $enabled = null;
+public function isEnabled(): bool {}
+```
+
+`getType()` returned `bool` with the default prefixes but `null|string` with `accessorPrefixes: ['is', 'get']`. The fabricated prefix came from `accessorPrefixes` and was then tested against `array_diff($accessorPrefixes, ['is','can','has'])`, a different set, so an explicitly named getter still depended on prefix ordering. Covered by `testAttributeAccessorWinsWhateverThePrefixesAre`.
+
+The inflector no longer arbitrates either. `Bar::$tags` and `Bar::$mailbox` declare the same four accessors, yet `tags` resolved to `array` and `mailbox` to `list<int>`, purely because `singularize()` treats "mailbox" as already singular. The adder now wins whenever it is named, so both give `list<int>`; the expectation for `tags` moved accordingly.
+
+I did not add the rule rejecting `setter` combined with `adder`. `Bar` uses that combination deliberately and it mirrors what PropertyAccess supports natively (`setTags()` alongside `addTag()`/`removeTag()`), so forbidding it would drop a real case rather than tighten one.
+
+Also applied: both exception message suggestions, and the attribute is no longer iterated as an object, so a future public property cannot silently become a method name.
+
+Verified: PropertyInfo 613 tests, PropertyAccess 487, Serializer 1426, Form 4904, Validator 5124, no failures. Reverting the extractor while keeping the new tests fails them.
+
+One more thing while rebasing: the CHANGELOG line was in the released `8.1` section although this targets 8.2, so it moved to a new `8.2` section.

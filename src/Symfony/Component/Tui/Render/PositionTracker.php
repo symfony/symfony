@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Render;
 
 use Symfony\Component\Tui\Widget\AbstractWidget;
+use Symfony\Component\Tui\Widget\ParentInterface;
 
 /**
  * Tracks absolute positions of rendered widgets on screen.
@@ -69,6 +70,26 @@ final class PositionTracker
     public function setWidgetRect(AbstractWidget $widget, WidgetRect $rect): void
     {
         $this->widgetPositions[$widget] = $rect;
+    }
+
+    /**
+     * Move a previously tracked widget and its descendants to a new position.
+     */
+    public function moveSubtree(AbstractWidget $widget, WidgetRect $rect): bool
+    {
+        if (!isset($this->widgetPositions[$widget])) {
+            return false;
+        }
+
+        $previous = $this->widgetPositions[$widget];
+        $rowOffset = $rect->row - $previous->row;
+        $colOffset = $rect->col - $previous->col;
+        if (0 !== $rowOffset || 0 !== $colOffset) {
+            $this->shiftSubtree($widget, $rowOffset, $colOffset);
+        }
+        $this->widgetPositions[$widget] = $rect;
+
+        return true;
     }
 
     /**
@@ -133,41 +154,42 @@ final class PositionTracker
     }
 
     /**
-     * Snapshot the set of widgets currently tracked.
+     * Shift the tracked positions of laid-out content by the given offsets.
      *
-     * @return array<int, true>
-     */
-    public function snapshotKeys(): array
-    {
-        $snapshot = [];
-        foreach ($this->widgetPositions as $widget => $_) {
-            $snapshot[spl_object_id($widget)] = true;
-        }
-
-        return $snapshot;
-    }
-
-    /**
-     * Shift positions for all widgets added since the snapshot.
+     * Called when alignment moves a container's content after layout, so the
+     * children and their descendants keep matching where they are drawn.
      *
-     * @param array<int, true>|null $before
+     * @param AbstractWidget[] $children
      */
-    public function shiftDescendantPositions(?array $before, int $colOffset, int $rowOffset = 0): void
+    public function shiftContentPositions(array $children, int $colOffset, int $rowOffset = 0): void
     {
-        if (null === $before) {
+        if (0 === $colOffset && 0 === $rowOffset) {
             return;
         }
 
-        foreach ($this->widgetPositions as $widget => $rect) {
-            if (isset($before[spl_object_id($widget)])) {
-                continue;
-            }
+        foreach ($children as $child) {
+            $this->shiftSubtree($child, $rowOffset, $colOffset);
+        }
+    }
+
+    private function shiftSubtree(AbstractWidget $widget, int $rowOffset, int $colOffset): void
+    {
+        if (isset($this->widgetPositions[$widget])) {
+            $rect = $this->widgetPositions[$widget];
             $this->widgetPositions[$widget] = new WidgetRect(
                 $rect->row + $rowOffset,
                 $rect->col + $colOffset,
                 $rect->columns,
                 $rect->rows,
             );
+        }
+
+        if (!$widget instanceof ParentInterface) {
+            return;
+        }
+
+        foreach ($widget->all() as $child) {
+            $this->shiftSubtree($child, $rowOffset, $colOffset);
         }
     }
 }

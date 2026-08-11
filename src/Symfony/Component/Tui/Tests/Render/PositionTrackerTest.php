@@ -14,6 +14,7 @@ namespace Symfony\Component\Tui\Tests\Render;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Render\PositionTracker;
 use Symfony\Component\Tui\Render\WidgetRect;
+use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\TextWidget;
 
 /**
@@ -115,43 +116,71 @@ final class PositionTrackerTest extends TestCase
     }
 
     // ---------------------------------------------------------------
-    // shiftDescendantPositions
+    // shiftContentPositions
     // ---------------------------------------------------------------
 
-    public function testShiftDescendantPositions()
+    public function testShiftContentPositionsShiftsChildrenAndTheirDescendants()
     {
         $tracker = new PositionTracker();
-        $widgetOld = new TextWidget('old');
-        $widgetNew = new TextWidget('new');
+        $outsider = new TextWidget('outsider');
+        $child = new ContainerWidget();
+        $leaf = new TextWidget('leaf');
+        $child->add($leaf);
 
-        $tracker->setWidgetRect($widgetOld, new WidgetRect(0, 0, 10, 1));
-        $snapshot = $tracker->snapshotKeys();
+        $tracker->setWidgetRect($outsider, new WidgetRect(0, 0, 10, 1));
+        $tracker->setWidgetRect($child, new WidgetRect(2, 3, 10, 1));
+        $tracker->setWidgetRect($leaf, new WidgetRect(2, 3, 10, 1));
 
-        $tracker->setWidgetRect($widgetNew, new WidgetRect(2, 3, 10, 1));
+        $tracker->shiftContentPositions([$child], 5, 10);
 
-        $tracker->shiftDescendantPositions($snapshot, 5, 10);
-
-        // Old widget should be unchanged
-        $oldRect = $tracker->getWidgetRect($widgetOld);
-        $this->assertSame(0, $oldRect->row);
-        $this->assertSame(0, $oldRect->col);
-
-        // New widget should be shifted
-        $newRect = $tracker->getWidgetRect($widgetNew);
-        $this->assertSame(12, $newRect->row);  // 2 + 10
-        $this->assertSame(8, $newRect->col);    // 3 + 5
+        $outsiderRect = $tracker->getWidgetRect($outsider);
+        $this->assertSame([0, 0], [$outsiderRect->row, $outsiderRect->col]);
+        $childRect = $tracker->getWidgetRect($child);
+        $this->assertSame([12, 8], [$childRect->row, $childRect->col]);
+        $leafRect = $tracker->getWidgetRect($leaf);
+        $this->assertSame([12, 8], [$leafRect->row, $leafRect->col]);
     }
 
-    public function testShiftDescendantPositionsWithNullSnapshotIsNoop()
+    public function testShiftContentPositionsWithoutOffsetIsNoop()
     {
         $tracker = new PositionTracker();
         $widget = new TextWidget('a');
         $tracker->setWidgetRect($widget, new WidgetRect(2, 3, 10, 1));
 
-        $tracker->shiftDescendantPositions(null, 5, 10);
+        $tracker->shiftContentPositions([$widget], 0, 0);
 
         $rect = $tracker->getWidgetRect($widget);
-        $this->assertSame(2, $rect->row);
-        $this->assertSame(3, $rect->col);
+        $this->assertSame([2, 3], [$rect->row, $rect->col]);
+    }
+
+    public function testMoveSubtreeShiftsTrackedDescendants()
+    {
+        $tracker = new PositionTracker();
+        $root = new ContainerWidget();
+        $inner = new ContainerWidget();
+        $leaf = new TextWidget('leaf');
+        $inner->add($leaf);
+        $root->add($inner);
+
+        $tracker->setWidgetRect($root, new WidgetRect(1, 2, 20, 4));
+        $tracker->setWidgetRect($inner, new WidgetRect(2, 3, 18, 2));
+        $tracker->setWidgetRect($leaf, new WidgetRect(3, 4, 16, 1));
+
+        $this->assertTrue($tracker->moveSubtree($root, new WidgetRect(5, 7, 20, 4)));
+
+        $rootRect = $tracker->getWidgetRect($root);
+        $this->assertSame([5, 7, 20, 4], [$rootRect->row, $rootRect->col, $rootRect->columns, $rootRect->rows]);
+        $innerRect = $tracker->getWidgetRect($inner);
+        $this->assertSame([6, 8, 18, 2], [$innerRect->row, $innerRect->col, $innerRect->columns, $innerRect->rows]);
+        $leafRect = $tracker->getWidgetRect($leaf);
+        $this->assertSame([7, 9, 16, 1], [$leafRect->row, $leafRect->col, $leafRect->columns, $leafRect->rows]);
+    }
+
+    public function testMoveUntrackedSubtreeReturnsFalse()
+    {
+        $tracker = new PositionTracker();
+        $root = new ContainerWidget();
+
+        $this->assertFalse($tracker->moveSubtree($root, new WidgetRect(5, 7, 20, 4)));
     }
 }

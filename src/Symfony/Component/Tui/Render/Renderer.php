@@ -173,7 +173,7 @@ final class Renderer implements WidgetRendererInterface
 
             $lineWidth = AnsiUtils::visibleWidth($line);
             if ($lineWidth > $availableColumns) {
-                throw new RenderException(\sprintf("Widget \"%s\" rendered line %d with width %d, exceeding the available %d columns.\nLine preview: %s.", $widget::class, $i, $lineWidth, $availableColumns, mb_substr(AnsiUtils::stripAnsiCodes($line), 0, 100)), $i, $lineWidth, $availableColumns);
+                throw new RenderException(\sprintf("Widget \"%s\" rendered line %d with width %d, exceeding the available %d columns.\nLine preview: \"%s\".", $widget::class, $i, $lineWidth, $availableColumns, mb_substr(AnsiUtils::stripAnsiCodes($line), 0, 100)), $i, $lineWidth, $availableColumns);
             }
         }
 
@@ -287,12 +287,10 @@ final class Renderer implements WidgetRendererInterface
             $this->positionTracker->push($parentRow + $chromeTop, $parentCol + $chromeLeft);
         }
 
-        // Snapshot positions before layout so we can adjust them if alignment shifts content
         $align = $resolvedStyle->getAlign();
         $hasAlign = null !== $align && Align::Left !== $align;
         $verticalAlign = $resolvedStyle->getVerticalAlign();
         $hasVerticalAlign = null !== $verticalAlign;
-        $positionsBeforeLayout = ($hasAlign || $hasVerticalAlign) ? $this->positionTracker->snapshotKeys() : null;
 
         // Render children using layout engine.
         // For horizontal containers, pass verticalAlign so layoutHorizontal can
@@ -317,7 +315,7 @@ final class Renderer implements WidgetRendererInterface
             if (0 < $verticalOffset = $this->layoutEngine->computeVerticalAlignOffset(\count($childLines), $innerRows, $verticalAlign)) {
                 $topPad = array_fill(0, $verticalOffset, '');
                 array_unshift($childLines, ...$topPad);
-                $this->positionTracker->shiftDescendantPositions($positionsBeforeLayout, 0, $verticalOffset);
+                $this->positionTracker->shiftContentPositions($children, 0, $verticalOffset);
             }
         }
 
@@ -341,7 +339,7 @@ final class Renderer implements WidgetRendererInterface
         // Apply horizontal alignment for child widgets and adjust tracked positions
         if ($hasAlign && 0 < $alignOffset = $this->layoutEngine->computeAlignOffset($childLines, $innerColumns, $align)) {
             $childLines = $this->layoutEngine->shiftLines($childLines, $alignOffset);
-            $this->positionTracker->shiftDescendantPositions($positionsBeforeLayout, $alignOffset);
+            $this->positionTracker->shiftContentPositions($children, $alignOffset);
         }
 
         // Apply chrome (padding, border, background)

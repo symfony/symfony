@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T12:59:16Z
+
+Reworked while reviewing: the fix now adds `ServiceReferenceGraphEdge::isFromExpression()` and applies the condition at the single `PhpDumper::collectCircularReferences()` call site that needs it, instead of overriding `isLazy()`, which also feeds `InlineServiceDefinitionsPass`, `isSingleUsePrivateNode()` and `CheckCircularReferencesPass`. Tests moved into `PhpDumperTest` next to `testDumpedContainerEvictsCircularServicesOnFailure`, and the first one now also runs the dumped container instead of only checking the dump. Squashed and rebased on 6.4.

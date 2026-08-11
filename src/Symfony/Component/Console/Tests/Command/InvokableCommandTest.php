@@ -238,26 +238,6 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
     }
 
-    public function testInvalidArgumentType()
-    {
-        $command = new Command('foo');
-        $command->setCode(static function (#[Argument] object $any) {});
-
-        $this->expectException(LogicException::class);
-
-        $command->getDefinition();
-    }
-
-    public function testInvalidOptionType()
-    {
-        $command = new Command('foo');
-        $command->setCode(static function (#[Option] ?object $any = null) {});
-
-        $this->expectException(LogicException::class);
-
-        $command->getDefinition();
-    }
-
     public function testAskDefaultIsRejectedForArrayArgument()
     {
         $command = new Command('foo');

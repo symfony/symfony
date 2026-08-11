@@ -389,12 +389,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisibilityForMethod($m), $m->isStatic(), false);
         }
 
-        if ($allowMagicGet && $reflClass->hasMethod('__get') && (($r = $reflClass->getMethod('__get'))->getModifiers() & $this->methodReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $r->returnsReference());
+        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisibilityForProperty($r), $r->isStatic(), true, $this->propertyHasHook($r, 'get'), $this->propertyIsVirtual($r));
         }
 
-        if ($hasProperty && (($r = $reflClass->getProperty($property))->getModifiers() & $this->propertyReflectionFlags)) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, $this->getReadVisibilityForProperty($r), $r->isStatic(), true);
+        if ($allowMagicGet && $reflClass->hasMethod('__get') && (($r = $reflClass->getMethod('__get'))->getModifiers() & $this->methodReflectionFlags)) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_PROPERTY, $property, PropertyReadInfo::VISIBILITY_PUBLIC, false, $r->returnsReference(), false, false);
         }
 
         if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
@@ -532,7 +532,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         if ($reflClass->hasProperty($property) && ($reflClass->getProperty($property)->getModifiers() & $this->propertyReflectionFlags)) {
             $reflProperty = $reflClass->getProperty($property);
             if (!$reflProperty->isReadOnly()) {
-                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisibilityForProperty($reflProperty), $reflProperty->isStatic());
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, $this->getWriteVisibilityForProperty($reflProperty), $reflProperty->isStatic(), $this->propertyHasHook($reflProperty, 'set'));
             }
 
             $errors[] = [\sprintf('The property "%s" in class "%s" is a promoted readonly property.', $property, $reflClass->getName())];
@@ -542,7 +542,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         if ($allowMagicSet) {
             [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, '__set', 2);
             if ($accessible) {
-                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false);
+                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_PROPERTY, $property, PropertyWriteInfo::VISIBILITY_PUBLIC, false, false);
             }
 
             $errors[] = $methodAccessibleErrors;
@@ -816,6 +816,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         }
 
         return [false, $errors];
+    }
+
+    private function propertyHasHook(\ReflectionProperty $property, string $hookType): bool
+    {
+        return $property->hasHook(\PropertyHookType::from($hookType));
+    }
+
+    private function propertyIsVirtual(\ReflectionProperty $property): bool
+    {
+        return $property->isVirtual();
     }
 
     /**

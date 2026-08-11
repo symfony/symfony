@@ -31,6 +31,8 @@ final class PropertyReadInfo
         private readonly string $visibility,
         private readonly bool $static,
         private readonly bool $byRef,
+        private readonly ?bool $hasHook = null,
+        private readonly ?bool $isVirtual = null,
     ) {
     }
 
@@ -66,5 +68,15 @@ final class PropertyReadInfo
     public function canBeReference(): bool
     {
         return $this->byRef;
+    }
+
+    public function hasHook(): ?bool
+    {
+        return $this->hasHook;
+    }
+
+    public function isVirtual(): ?bool
+    {
+        return $this->isVirtual;
     }
 }

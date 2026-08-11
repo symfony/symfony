@@ -64,14 +64,14 @@ final class CrowdinProvider implements ProviderInterface
 
     public function write(TranslatorBagInterface $translatorBag): void
     {
-        $fileList = $this->getFileList();
+        $fileIds = $this->getFileIds();
         [$languageIds, $sourceLanguageId] = $this->getLanguageIds();
 
         $defaultLocaleCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
         foreach ($defaultLocaleCatalogue->getDomains() as $domain) {
             $content = $this->xliffFileDumper->formatCatalogue($defaultLocaleCatalogue, $domain, ['default_locale' => $this->defaultLocale]);
 
-            if ($fileId = $this->getFileIdByDomain($fileList, $domain)) {
+            if ($fileId = $fileIds[$domain] ?? null) {
                 $sourceFileInfo = $this->downloadSourceFile($fileId);
                 $sourceFile = $this->client->request('GET', $sourceFileInfo->toArray()['data']['url']);
 
@@ -88,7 +88,7 @@ final class CrowdinProvider implements ProviderInterface
             } else {
                 $file = $this->addFile($domain, $content);
 
-                $fileList[$file['name']] = $file['id'];
+                $fileIds[$domain] = $file['id'];
             }
         }
 
@@ -114,7 +114,7 @@ final class CrowdinProvider implements ProviderInterface
                     continue;
                 }
 
-                if ($fileId = $this->getFileIdByDomain($fileList, $domain)) {
+                if ($fileId = $fileIds[$domain] ?? null) {
                     $responses[] = $this->importTranslations(
                         $fileId,
                         $domain,
@@ -195,11 +195,13 @@ final class CrowdinProvider implements ProviderInterface
 
     public function read(array $domains, array $locales): TranslatorBag
     {
-        $fileList = $this->getFileList();
+        $fileIds = $this->getFileIds();
         [$languageIds, $sourceLanguageId] = $this->getLanguageIds();
 
+        $domains = $domains ?: array_keys($fileIds);
+
         // flipping keeps one locale per language, the mapped one when there is a mapping
-        $locales = $locales ?: array_values(array_flip($languageIds));
+        $locales = $locales ?: array_flip($languageIds);
         foreach ($locales as $i => $locale) {
             if (!isset($languageIds[$locale])) {
                 $this->logger->warning(\sprintf('Ignored "%s" locale because it is not configured or mapped in the project.', $locale));
@@ -212,9 +214,7 @@ final class CrowdinProvider implements ProviderInterface
         $responses = [];
 
         foreach ($domains as $domain) {
-            $fileId = $this->getFileIdByDomain($fileList, $domain);
-
-            if (!$fileId) {
+            if (!$fileId = $fileIds[$domain] ?? null) {
                 continue;
             }
 
@@ -271,13 +271,11 @@ final class CrowdinProvider implements ProviderInterface
 
     public function delete(TranslatorBagInterface $translatorBag): void
     {
-        $fileList = $this->getFileList();
+        $fileIds = $this->getFileIds();
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
         foreach ($defaultCatalogue->all() as $domain => $messages) {
-            $fileId = $this->getFileIdByDomain($fileList, $domain);
-
-            if (!$fileId) {
+            if (!$fileId = $fileIds[$domain] ?? null) {
                 continue;
             }
 
@@ -305,11 +303,6 @@ final class CrowdinProvider implements ProviderInterface
                 throw new ProviderException(\sprintf('Unable to update file "%d" and domain "%s": "%s".', $fileId, $domain, $e->getMessage()), $e->getResponse(), previous: $e);
             }
         }
-    }
-
-    private function getFileIdByDomain(array $filesMap, string $domain): ?int
-    {
-        return $filesMap[\sprintf('%s.%s', $domain, 'xlf')] ?? null;
     }
 
     /**
@@ -435,7 +428,7 @@ final class CrowdinProvider implements ProviderInterface
      * @see https://support.crowdin.com/developer/api/v2/#tag/Source-Files/operation/api.projects.files.getMany (Crowdin API)
      * @see https://support.crowdin.com/developer/enterprise/api/v2/#tag/Source-Files/operation/api.projects.files.getMany (Crowdin Enterprise API)
      */
-    private function getFileList(): array
+    private function getFileIds(): array
     {
         $response = $this->client->request('GET', $this->getProjectEndpoint('files'));
 
@@ -446,7 +439,9 @@ final class CrowdinProvider implements ProviderInterface
         $fileList = $response->toArray()['data'];
         $result = [];
         foreach ($fileList as $file) {
-            $result[$file['data']['name']] = $file['data']['id'];
+            if (str_ends_with($file['data']['name'], '.xlf')) {
+                $result[substr($file['data']['name'], 0, -4)] = $file['data']['id'];
+            }
         }
 
         return $result;

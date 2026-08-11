@@ -1363,6 +1363,88 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
     }
 
+    public function testReadWithoutDomains()
+    {
+        $responses = [
+            'listFiles' => new JsonMockResponse(['data' => [
+                ['data' => [
+                    'id' => 12,
+                    'name' => 'messages.xlf',
+                ]],
+                ['data' => [
+                    'id' => 13,
+                    'name' => 'validators.xlf',
+                ]],
+            ]]),
+            'getProject' => new JsonMockResponse(['data' => [
+                'sourceLanguageId' => 'en',
+                'targetLanguageIds' => [],
+                'languageMapping' => [],
+            ]]),
+            'exportMessagesSource' => new JsonMockResponse(['data' => ['url' => 'https://messages.en']]),
+            'exportValidatorsSource' => new JsonMockResponse(['data' => ['url' => 'https://validators.en']]),
+            'downloadFirstSource' => new MockResponse(<<<'XLIFF'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+                  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                    <body>
+                        <trans-unit id="crowdin:5fd89b853ee27904dd6c5f67" resname="index.hello" datatype="plaintext">
+                            <source>index.hello</source>
+                            <target state="translated">Hello</target>
+                        </trans-unit>
+                    </body>
+                  </file>
+                </xliff>
+                XLIFF),
+            'downloadSecondSource' => new MockResponse(<<<'XLIFF'
+                <?xml version="1.0" encoding="UTF-8"?>
+                <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+                  <file source-language="en" target-language="en" datatype="plaintext" original="file.ext">
+                    <body>
+                        <trans-unit id="%s" resname="post.num_comments">
+                            <source>post.num_comments</source>
+                            <target>{count, plural, one {# comment} other {# comments}}</target>
+                        </trans-unit>
+                    </body>
+                  </file>
+                </xliff>
+                XLIFF),
+        ];
+
+        $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $translatorBag = $crowdinProvider->read([], ['en']);
+
+        $this->assertEqualsCanonicalizing(['messages', 'validators'], $translatorBag->getCatalogue('en')->getDomains());
+    }
+
+    public function testReadUnknownDomain()
+    {
+        $responses = [
+            'listFiles' => new JsonMockResponse(['data' => [
+                ['data' => [
+                    'id' => 12,
+                    'name' => 'messages.xlf',
+                ]],
+            ]]),
+            'getProject' => new JsonMockResponse(['data' => [
+                'sourceLanguageId' => 'en',
+                'targetLanguageIds' => [],
+                'languageMapping' => [],
+            ]]),
+        ];
+
+        $crowdinProvider = self::createProvider((new MockHttpClient($responses))->withOptions([
+            'base_uri' => 'https://api.crowdin.com/api/v2/',
+            'auth_bearer' => 'API_TOKEN',
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.crowdin.com', '1');
+
+        $this->assertSame([], $crowdinProvider->read(['unknown'], ['en'])->getCatalogues());
+    }
+
     public function testReadWithoutLocales()
     {
         $responses = [

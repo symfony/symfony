@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-11T04:59:07Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.2" but it seems your PR description refers to branch "8.2 for features / 6.4, 7.4, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T12:14:02Z
+
+Reverted the fabbot exception-message tweak as requested, and added a guard: a non-null `$default` on an array member is now a `LogicException`, since an empty answer is the terminator and the helper turns it back into the default. Rebased on 7.4.

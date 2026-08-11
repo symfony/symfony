@@ -1203,6 +1203,11 @@ class ObjectNormalizerTest extends TestCase
     {
         // an extractor written against PropertyInfoExtractorInterface before getProperty() was added to it
         $extractor = new class implements PropertyInfoExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return null;
+            }
+
             public function getType(string $class, string $property, array $context = []): ?Type
             {
                 return null;

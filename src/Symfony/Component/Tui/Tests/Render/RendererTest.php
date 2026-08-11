@@ -908,18 +908,26 @@ class RendererTest extends TestCase
         $this->assertSame(1, $second->renderCount);
     }
 
-    public function testVerticalLayoutStillRerendersNonFillParentChildrenInSecondPass()
+    public function testVerticalLayoutReusesCachedParentChildrenWhenSiblingChanges()
     {
         $renderer = new Renderer();
         $root = new ContainerWidget();
 
+        $prefix = new TextWidget('Prefix');
         $childParent = new CountingParentWidget();
         $childParent->add(new TextWidget('Leaf'));
+        $root->add($prefix);
         $root->add($childParent);
 
         $renderer->render($root, 40, 10);
+        $this->assertSame(2, $childParent->renderCount);
+        $this->assertSame(1, $renderer->getWidgetRect($childParent)->row);
+
+        $prefix->setText("First line\nSecond line");
+        $renderer->render($root, 40, 10);
 
         $this->assertSame(2, $childParent->renderCount);
+        $this->assertSame(2, $renderer->getWidgetRect($childParent)->row);
     }
 
     // ---------------------------------------------------------------
@@ -1034,6 +1042,57 @@ class RendererTest extends TestCase
         $this->assertNotNull($leafRect2);
         $this->assertSame(1, $leafRect2->row);
         $this->assertSame(2, $leafRect2->col);
+    }
+
+    public function testCachedDescendantPositionsMoveWithTheirParent()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $prefix = new TextWidget('Prefix');
+        $inner = new ContainerWidget();
+        $inner->setStyle(new Style(padding: new Padding(1, 0, 0, 2)));
+        $leaf = new TextWidget('Nested');
+        $inner->add($leaf);
+        $root->add($prefix);
+        $root->add($inner);
+
+        $renderer->render($root, 40, 20);
+        $leafRect = $renderer->getWidgetRect($leaf);
+        $this->assertSame(2, $leafRect->row);
+        $this->assertSame(2, $leafRect->col);
+
+        $prefix->setText("First line\nSecond line");
+        $renderer->render($root, 40, 20);
+        $leafRect = $renderer->getWidgetRect($leaf);
+        $this->assertSame(3, $leafRect->row);
+        $this->assertSame(2, $leafRect->col);
+    }
+
+    public function testCachedFillChildDescendantPositionsMoveWithTheirParent()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $prefix = new TextWidget('Prefix');
+        $fill = new ContainerWidget()->expandVertically(true);
+        $leaf = new CountingLeafWidget();
+        $fill->add($leaf);
+        $second = new ContainerWidget()->expandVertically(true);
+        $second->add(new TextWidget('Other'));
+        $root->add($prefix);
+        $root->add($fill);
+        $root->add($second);
+
+        // 8 remaining rows split 4/4; after the prefix grows, 7 rows split
+        // 4/3, so the first fill child keeps its rows (cache hit) but shifts.
+        $renderer->render($root, 40, 9);
+        $this->assertSame(1, $leaf->renderCount);
+        $this->assertSame(1, $renderer->getWidgetRect($leaf)->row);
+
+        $prefix->setText("First line\nSecond line");
+        $renderer->render($root, 40, 9);
+
+        $this->assertSame(1, $leaf->renderCount);
+        $this->assertSame(2, $renderer->getWidgetRect($leaf)->row);
     }
 
     // ---------------------------------------------------------------

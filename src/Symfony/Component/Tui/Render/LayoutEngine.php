@@ -141,7 +141,7 @@ final class LayoutEngine
         // we don't yet know each child's final absolute row offset.
         $fillChildren = [];
         $nonFillRenders = [];
-        $nonFillNeedsDescendantTracking = [];
+        $nonFillCacheHits = [];
         $savedStack = $this->positionTracker->suppressStack();
 
         foreach ($children as $index => $child) {
@@ -149,12 +149,14 @@ final class LayoutEngine
                 $fillChildren[$index] = $child;
             } else {
                 // Suppress descendant position tracking during measurement.
-                // Children that can have descendants must be re-rendered later
-                // with the final absolute offset to populate descendant rects.
+                // Uncached parent widgets are re-rendered later with their final
+                // absolute offset to populate descendant rects.
                 $context = new RenderContext($columns, $rows, null, $this->fontRegistry);
+                $revision = $child->getRenderRevision();
+                $hadCachedRender = null !== $child->getRenderCache($columns, $rows);
                 $childLines = $this->widgetRenderer->renderWidget($child, $context);
                 $nonFillRenders[$index] = $childLines;
-                $nonFillNeedsDescendantTracking[$index] = $child instanceof ParentInterface;
+                $nonFillCacheHits[$index] = $hadCachedRender && $revision === $child->getRenderRevision();
 
                 $remainingRows -= \count($childLines);
             }
@@ -172,6 +174,7 @@ final class LayoutEngine
         $fillIndex = 0;
         $hasPositionStack = $this->positionTracker->isActive();
         foreach ($children as $index => $child) {
+            $cacheHit = false;
             if (isset($fillChildren[$index])) {
                 // Fill child gets calculated rows, distributing remainder to first children
                 $childFillRows = $baseFillRows + ($fillIndex < $extraRows ? 1 : 0);
@@ -183,6 +186,8 @@ final class LayoutEngine
                 }
 
                 $context = new RenderContext($columns, $childFillRows, null, $this->fontRegistry);
+                $revision = $child->getRenderRevision();
+                $hadCachedRender = null !== $child->getRenderCache($columns, $childFillRows);
 
                 // Push correct absolute position so descendants get proper coordinates
                 if ($hasPositionStack) {
@@ -190,6 +195,7 @@ final class LayoutEngine
                     $this->positionTracker->push($parentAbsRow + \count($lines), $parentAbsCol);
                 }
                 $childLines = $this->widgetRenderer->renderWidget($child, $context);
+                $cacheHit = $hadCachedRender && $revision === $child->getRenderRevision();
                 if ($hasPositionStack) {
                     $this->positionTracker->pop();
                 }
@@ -199,7 +205,9 @@ final class LayoutEngine
                     $childLines[] = '';
                 }
             } else {
-                $childLines = $nonFillRenders[$index] ?? $this->widgetRenderer->renderWidget($child, new RenderContext($columns, $rows, null, $this->fontRegistry));
+                $context = new RenderContext($columns, $rows, null, $this->fontRegistry);
+                $childLines = $nonFillRenders[$index] ?? $this->widgetRenderer->renderWidget($child, $context);
+                $cacheHit = $nonFillCacheHits[$index] ?? false;
 
                 // Skip gap for children that render nothing
                 if (!$childLines) {
@@ -217,22 +225,26 @@ final class LayoutEngine
                 $childAbsRow = $parentAbsRow + \count($lines);
                 $childAbsCol = $parentAbsCol;
 
-                $this->positionTracker->setWidgetRect($child, new WidgetRect(
+                $rect = new WidgetRect(
                     $childAbsRow,
                     $childAbsCol,
                     $columns,
                     \count($childLines),
-                ));
+                );
+                $positionsTracked = isset($fillChildren[$index]) && !$cacheHit;
+                if ($cacheHit && $child instanceof ParentInterface) {
+                    $positionsTracked = $this->positionTracker->moveSubtree($child, $rect);
+                }
 
-                // For non-fill parent widgets rendered during measurement,
-                // re-render to track descendant positions with the correct
-                // absolute offset. Leaf widgets don't need this extra pass.
-                // Clear the render cache first so the re-render walks the
-                // subtree instead of returning the cached measurement output.
-                if (($nonFillNeedsDescendantTracking[$index] ?? false) && !isset($fillChildren[$index])) {
+                $this->positionTracker->setWidgetRect($child, $rect);
+
+                if ($child instanceof ParentInterface && !$positionsTracked) {
+                    // Clear the render cache first so the re-render walks the
+                    // subtree and records descendant rects, instead of
+                    // returning the cached measurement output.
                     $child->clearRenderCache();
                     $this->positionTracker->push($childAbsRow, $childAbsCol);
-                    $this->widgetRenderer->renderWidget($child, new RenderContext($columns, $rows, null, $this->fontRegistry));
+                    $this->widgetRenderer->renderWidget($child, $context);
                     $this->positionTracker->pop();
                 }
             }

@@ -14,6 +14,7 @@ namespace Symfony\Component\Tui\Tests\Render;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Render\PositionTracker;
 use Symfony\Component\Tui\Render\WidgetRect;
+use Symfony\Component\Tui\Widget\ContainerWidget;
 use Symfony\Component\Tui\Widget\TextWidget;
 
 /**
@@ -153,5 +154,36 @@ final class PositionTrackerTest extends TestCase
         $rect = $tracker->getWidgetRect($widget);
         $this->assertSame(2, $rect->row);
         $this->assertSame(3, $rect->col);
+    }
+
+    public function testMoveSubtreeShiftsTrackedDescendants()
+    {
+        $tracker = new PositionTracker();
+        $root = new ContainerWidget();
+        $inner = new ContainerWidget();
+        $leaf = new TextWidget('leaf');
+        $inner->add($leaf);
+        $root->add($inner);
+
+        $tracker->setWidgetRect($root, new WidgetRect(1, 2, 20, 4));
+        $tracker->setWidgetRect($inner, new WidgetRect(2, 3, 18, 2));
+        $tracker->setWidgetRect($leaf, new WidgetRect(3, 4, 16, 1));
+
+        $this->assertTrue($tracker->moveSubtree($root, new WidgetRect(5, 7, 20, 4)));
+
+        $rootRect = $tracker->getWidgetRect($root);
+        $this->assertSame([5, 7, 20, 4], [$rootRect->row, $rootRect->col, $rootRect->columns, $rootRect->rows]);
+        $innerRect = $tracker->getWidgetRect($inner);
+        $this->assertSame([6, 8, 18, 2], [$innerRect->row, $innerRect->col, $innerRect->columns, $innerRect->rows]);
+        $leafRect = $tracker->getWidgetRect($leaf);
+        $this->assertSame([7, 9, 16, 1], [$leafRect->row, $leafRect->col, $leafRect->columns, $leafRect->rows]);
+    }
+
+    public function testMoveUntrackedSubtreeReturnsFalse()
+    {
+        $tracker = new PositionTracker();
+        $root = new ContainerWidget();
+
+        $this->assertFalse($tracker->moveSubtree($root, new WidgetRect(5, 7, 20, 4)));
     }
 }

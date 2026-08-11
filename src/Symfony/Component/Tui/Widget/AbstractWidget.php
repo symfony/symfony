@@ -355,10 +355,14 @@ abstract class AbstractWidget
     /**
      * Lifecycle hook: override to sync state before rendering.
      *
-     * Called by the Renderer on every frame, even when the render cache is
-     * valid. Use it to update child widget content, manage overlays, or
-     * perform other pre-render state updates. Keep it lightweight; heavy
-     * work should be guarded by dirty checks.
+     * Called before the Renderer renders this widget, including when its own
+     * render cache is valid. Use it to update child widget content, manage
+     * overlays, or perform other pre-render state updates. Keep it lightweight;
+     * heavy work should be guarded by dirty checks.
+     *
+     * This is not a per-frame tick: when an ancestor's cached subtree is reused,
+     * this widget is not visited at all. Use {@see ScheduledTickTrait} for work
+     * that must run on every frame.
      */
     public function beforeRender(): void
     {

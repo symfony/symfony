@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow auto-setup to create the queue when the DSN names the account the client already authenticates as
+
 7.4
 ---
 

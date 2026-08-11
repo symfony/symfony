@@ -13,6 +13,8 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\Core\Exception\Http\NetworkException;
+use AsyncAws\Core\Sts\Result\GetCallerIdentityResponse;
+use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\Core\Test\ResultMockFactory;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
@@ -29,6 +31,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -603,6 +606,54 @@ class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('SQS visibility_timeout (1s) cannot be smaller than the keepalive interval (2s).');
         $connection->keepalive('123', 2);
+    }
+
+    public function testSetupDoesNotAskStsWhenNoAccountIsConfigured()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->method('queueExists')->willReturn(ResultMockFactory::waiter(QueueExistsWaiter::class, QueueExistsWaiter::STATE_FAILURE));
+        $client->expects($this->once())->method('createQueue');
+
+        $stsClient = $this->createMock(StsClient::class);
+        $stsClient->expects($this->never())->method('getCallerIdentity');
+
+        $connection = new Connection(['queue_name' => 'queue'], $client, null, $stsClient);
+
+        $this->expectException(TransportException::class);
+        $connection->setup();
+    }
+
+    public function testSetupCreatesTheQueueWhenTheConfiguredAccountIsTheCallerOne()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->method('queueExists')->willReturn(ResultMockFactory::waiter(QueueExistsWaiter::class, QueueExistsWaiter::STATE_FAILURE));
+        $client->expects($this->once())->method('createQueue');
+
+        $stsClient = $this->createMock(StsClient::class);
+        $stsClient->expects($this->once())->method('getCallerIdentity')
+            ->willReturn(ResultMockFactory::create(GetCallerIdentityResponse::class, ['Account' => '123']));
+
+        $connection = new Connection(['queue_name' => 'queue', 'account' => '123'], $client, null, $stsClient);
+
+        $this->expectException(TransportException::class);
+        $connection->setup();
+    }
+
+    public function testSetupThrowsWhenTheConfiguredAccountIsAnotherOne()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client->method('queueExists')->willReturn(ResultMockFactory::waiter(QueueExistsWaiter::class, QueueExistsWaiter::STATE_FAILURE));
+        $client->expects($this->never())->method('createQueue');
+
+        $stsClient = $this->createMock(StsClient::class);
+        $stsClient->expects($this->once())->method('getCallerIdentity')
+            ->willReturn(ResultMockFactory::create(GetCallerIdentityResponse::class, ['Account' => '999']));
+
+        $connection = new Connection(['queue_name' => 'queue', 'account' => '123'], $client, null, $stsClient);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('can\'t be created when another account is provided');
+        $connection->setup();
     }
 
     public function testQueueAttributesAndTags()

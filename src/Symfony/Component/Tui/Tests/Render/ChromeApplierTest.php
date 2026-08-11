@@ -226,6 +226,30 @@ final class ChromeApplierTest extends TestCase
         $this->assertCount(2, $result);
     }
 
+    #[DataProvider('borderWiderThanBoxProvider')]
+    public function testApplyClampsBorderToTheAvailableWidth(int $width, Style $style)
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+
+        $result = $applier->apply(['Hello'], $width, $style, $widget);
+
+        foreach ($result as $line) {
+            $this->assertSame($width, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    /**
+     * @return iterable<string, array{int, Style}>
+     */
+    public static function borderWiderThanBoxProvider(): iterable
+    {
+        yield 'border leaves no room for content' => [2, new Style(border: Border::all(1, 'none'))];
+        yield 'border wider than the box' => [1, new Style(border: Border::all(1, 'none'))];
+        yield 'thick border wider than the box' => [3, new Style(border: Border::all(2, 'none'))];
+        yield 'border and padding wider than the box' => [2, new Style(padding: Padding::all(1), border: Border::all(1, 'none'))];
+    }
+
     // ---------------------------------------------------------------
     // apply: background
     // ---------------------------------------------------------------

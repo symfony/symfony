@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Render;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Widget\AbstractWidget;
@@ -70,6 +71,16 @@ final class ChromeApplier
         }
 
         $outerStyle = $this->resolveOuterStyle($widget);
+
+        // Clamp the border the same way, before the padding: a border alone can be
+        // wider than the box (e.g. 1 column each side in a 2-column container, which
+        // a horizontal layout hands out as soon as there are enough children).
+        $maxHorizontalBorder = max(0, $width - 1);
+        if ($borderLeft + $borderRight > $maxHorizontalBorder) {
+            $borderLeft = min($borderLeft, $maxHorizontalBorder);
+            $borderRight = min($borderRight, max(0, $maxHorizontalBorder - $borderLeft));
+            $border = new Border($borderTop, $borderRight, $borderBottom, $borderLeft, $border->pattern, $border->color);
+        }
 
         $innerWidth = max(1, $width - $borderLeft - $borderRight);
 

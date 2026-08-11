@@ -1259,6 +1259,30 @@ class RendererTest extends TestCase
         $result = $renderer->render($root, $columns, 10);
         $this->assertSame($expectedWidth, AnsiUtils::visibleWidth($result[0]));
     }
+
+    public function testBorderedChildrenNarrowerThanTheirBorderStayWithinTheirColumns()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $row = new ContainerWidget();
+        $row->setStyle(new Style(direction: Direction::Horizontal));
+
+        // 20 children in 40 columns leaves 2 columns each, which a left and a
+        // right border alone would already exceed
+        for ($i = 0; $i < 20; ++$i) {
+            $cell = new ContainerWidget();
+            $cell->setStyle(new Style(border: Border::all(1, 'none')));
+            $cell->add(new TextWidget('x'));
+            $row->add($cell);
+        }
+        $root->add($row);
+
+        $result = $renderer->render($root, 40, 6);
+
+        foreach ($result as $line) {
+            $this->assertLessThanOrEqual(40, AnsiUtils::visibleWidth($line));
+        }
+    }
 }
 
 /**

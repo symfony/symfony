@@ -2785,6 +2785,30 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->has('assets._default_package'));
     }
 
+    /**
+     * @testWith [true, "/assets_path/"]
+     *           [false, null]
+     */
+    public function testAssetMapperDevServerPrefix(bool $server, ?string $expectedPrefix)
+    {
+        $container = $this->createContainerFromClosure(static function ($container) use ($server) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => null,
+                'asset_mapper' => [
+                    'server' => $server,
+                    'public_prefix' => '/assets_path/',
+                    'paths' => ['assets/'],
+                ],
+            ]);
+        });
+
+        $this->assertSame($expectedPrefix, $container->getDefinition('asset_mapper.asset_package')->getArgument(3));
+    }
+
     public function testDefaultLock()
     {
         $container = $this->createContainerFromFile('lock');

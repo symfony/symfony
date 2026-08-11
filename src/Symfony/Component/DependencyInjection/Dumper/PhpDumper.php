@@ -443,7 +443,13 @@ class PhpDumper extends Dumper
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if (($sourceId === $id && !$edge->isLazy()) || !$node->getValue() instanceof Definition || $edge->isWeak()) {
+
+            // A direct self-reference is dumped as the local $instance, unless it comes from
+            // an expression: that compiles to a container lookup, which re-enters the factory
+            // unless the service is shared before its setup runs.
+            $selfReferenceIsInlined = !$edge->isFromExpression() || $edge->isReferencedByConstructor();
+
+            if (($sourceId === $id && !$edge->isLazy() && $selfReferenceIsInlined) || !$node->getValue() instanceof Definition || $edge->isWeak()) {
                 continue;
             }
 

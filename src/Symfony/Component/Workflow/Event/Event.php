@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Carlos Pereira De Amorim <carlos@shauri.fr>
  *
- * @template T of object
+ * @template T of object = object
  */
 class Event extends BaseEvent
 {

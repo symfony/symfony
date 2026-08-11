@@ -21,7 +21,7 @@ use Symfony\Component\Workflow\WorkflowInterface;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  *
- * @template T of object
+ * @template T of object = object
  *
  * @extends Event<T>
  */

@@ -114,6 +114,7 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Webhook\Client\RequestParser;
 use Symfony\Component\Webhook\Controller\WebhookController;
+use Symfony\Component\Webhook\Server\SignatureFormat;
 use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
@@ -3051,8 +3052,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame('Webhook-Event', $container->getDefinition('webhook.headers_configurator')->getArgument(0));
         $this->assertSame('Webhook-Id', $container->getDefinition('webhook.headers_configurator')->getArgument(1));
+        $this->assertSame('Webhook-Timestamp', $container->getDefinition('webhook.headers_configurator')->getArgument(2));
         $this->assertSame('sha256', $container->getDefinition('webhook.signer')->getArgument(0));
         $this->assertSame('Webhook-Signature', $container->getDefinition('webhook.signer')->getArgument(1));
+
+        if (class_exists(SignatureFormat::class)) {
+            foreach (['webhook.headers_configurator' => 4, 'webhook.body_configurator.json' => 1, 'webhook.signer' => 2, 'webhook.request_parser' => 5] as $id => $index) {
+                $this->assertSame(SignatureFormat::Legacy, $container->getDefinition($id)->getArgument($index));
+            }
+        }
     }
 
     public function testWebhookRequestParserIsWiredWithTheConfiguredHeaderNames()
@@ -3074,10 +3082,57 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ]);
         });
 
+        $arguments = $container->getDefinition('webhook.request_parser')->getArguments();
+        $this->assertSame(['sha512', 'X-Signature', 'X-Event', 'X-Id'], \array_slice($arguments, 0, 4));
+    }
+
+    public function testWebhookStandardWebhooksOptions()
+    {
+        if (!class_exists(SignatureFormat::class)) {
+            $this->markTestSkipped('The installed symfony/webhook has no signature format.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => [
+                    'enabled' => true,
+                    'timestamp_header_name' => 'X-Timestamp',
+                    'signature_format' => 'transitional',
+                    'timestamp_tolerance' => 60,
+                ],
+            ]);
+        });
+
+        $arguments = $container->getDefinition('webhook.request_parser')->getArguments();
+        $this->assertEquals(new Reference('clock', ContainerInterface::NULL_ON_INVALID_REFERENCE), array_pop($arguments));
         $this->assertSame(
-            ['sha512', 'X-Signature', 'X-Event', 'X-Id'],
-            $container->getDefinition('webhook.request_parser')->getArguments()
+            ['sha256', 'Webhook-Signature', 'Webhook-Event', 'Webhook-Id', 'X-Timestamp', SignatureFormat::Transitional, 60],
+            $arguments
         );
+
+        $this->assertSame('X-Timestamp', $container->getDefinition('webhook.headers_configurator')->getArgument(2));
+        $this->assertSame(SignatureFormat::Transitional, $container->getDefinition('webhook.headers_configurator')->getArgument(4));
+        $this->assertSame(SignatureFormat::Transitional, $container->getDefinition('webhook.body_configurator.json')->getArgument(1));
+        $this->assertSame(SignatureFormat::Transitional, $container->getDefinition('webhook.signer')->getArgument(2));
+        $this->assertSame('X-Timestamp', $container->getDefinition('webhook.signer')->getArgument(3));
+    }
+
+    public function testWebhookSignatureFormatNeedsANewEnoughComponent()
+    {
+        if (class_exists(SignatureFormat::class)) {
+            $this->markTestSkipped('The installed symfony/webhook supports every signature format.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Configuring "framework.webhook.signature_format" requires symfony/webhook 8.2 or higher.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => ['enabled' => true, 'signature_format' => 'standard'],
+            ]);
+        });
     }
 
     public function testWebhookWithoutSerializer()

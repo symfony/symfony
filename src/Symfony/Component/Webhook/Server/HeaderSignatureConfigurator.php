@@ -15,6 +15,7 @@ use Symfony\Component\HttpClient\HttpOptions;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Exception\LogicException;
+use Symfony\Component\Webhook\StandardWebhooksSignature;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -24,6 +25,8 @@ final class HeaderSignatureConfigurator implements RequestConfiguratorInterface
     public function __construct(
         private readonly string $algo = 'sha256',
         private readonly string $signatureHeaderName = 'Webhook-Signature',
+        private readonly SignatureFormat $format = SignatureFormat::Legacy,
+        private readonly string $timestampHeaderName = 'Webhook-Timestamp',
     ) {
     }
 
@@ -34,12 +37,25 @@ final class HeaderSignatureConfigurator implements RequestConfiguratorInterface
         }
 
         $opts = $options->toArray();
-        $headers = $opts['headers'];
+        $headers = $opts['headers'] ?? [];
         if (!isset($opts['body'])) {
             throw new LogicException('The body must be set.');
         }
         $body = $opts['body'];
-        $headers[$this->signatureHeaderName] = $this->algo.'='.hash_hmac($this->algo, $event->getName().$event->getId().$body, $secret);
+
+        $signatures = [];
+        if (SignatureFormat::Standard !== $this->format) {
+            $signatures[] = $this->algo.'='.hash_hmac($this->algo, $event->getName().$event->getId().$body, $secret);
+        }
+        if (SignatureFormat::Legacy !== $this->format) {
+            if (!isset($headers[$this->timestampHeaderName])) {
+                throw new LogicException(\sprintf('The "%s" header must be set when emitting a Standard Webhooks signature; ensure "HeadersConfigurator" runs before this configurator.', $this->timestampHeaderName));
+            }
+
+            $signatures[] = StandardWebhooksSignature::sign($event->getId(), $headers[$this->timestampHeaderName], $body, $secret);
+        }
+
+        $headers[$this->signatureHeaderName] = implode(' ', $signatures);
         $options->setHeaders($headers);
     }
 }

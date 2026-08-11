@@ -22,16 +22,25 @@ final class JsonBodyConfigurator implements RequestConfiguratorInterface
 {
     private PayloadSerializerInterface $payloadSerializer;
 
-    public function __construct(SerializerInterface|PayloadSerializerInterface $payloadSerializer)
-    {
+    public function __construct(
+        SerializerInterface|PayloadSerializerInterface $payloadSerializer,
+        private readonly SignatureFormat $format = SignatureFormat::Legacy,
+    ) {
         $this->payloadSerializer = $payloadSerializer instanceof SerializerInterface ? new SerializerPayloadSerializer($payloadSerializer) : $payloadSerializer;
     }
 
     public function configure(RemoteEvent $event, #[\SensitiveParameter] string $secret, HttpOptions $options): void
     {
-        $body = $this->payloadSerializer->serialize($event->getPayload());
-        $options->setBody($body);
-        $headers = $options->toArray()['headers'];
+        $payload = $event->getPayload();
+
+        // the Standard Webhooks signature covers the body, so the event name is carried there,
+        // under the key the specification reserves for it
+        if (SignatureFormat::Legacy !== $this->format) {
+            $payload['type'] ??= $event->getName();
+        }
+
+        $options->setBody($this->payloadSerializer->serialize($payload));
+        $headers = $options->toArray()['headers'] ?? [];
         $headers['Content-Type'] = 'application/json';
         $options->setHeaders($headers);
     }

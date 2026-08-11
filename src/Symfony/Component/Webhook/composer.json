@@ -23,6 +23,7 @@
         "symfony/remote-event": "^7.4|^8.0"
     },
     "require-dev": {
+        "symfony/clock": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/serializer": "^7.4|^8.0"
     },

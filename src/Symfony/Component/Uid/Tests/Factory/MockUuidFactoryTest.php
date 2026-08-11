@@ -206,6 +206,16 @@ class MockUuidFactoryTest extends TestCase
         $timeFactory->create();
     }
 
+    public function testTimeBasedAcceptsMatchingTime()
+    {
+        $uuid = UuidV1::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
+        $factory = new MockUuidFactory([$uuid, $uuid]);
+        $timeFactory = $factory->timeBased();
+
+        $this->assertSame($uuid, $timeFactory->create($uuid->getDateTime()));
+        $this->assertSame($uuid, $timeFactory->create(\DateTime::createFromInterface($uuid->getDateTime())));
+    }
+
     public function testTimeBasedThrowsExceptionOnMismatchedTime()
     {
         $factory = new MockUuidFactory([

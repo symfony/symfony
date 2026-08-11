@@ -89,6 +89,15 @@ class RawMessageTest extends TestCase
         $this->assertSame("line1\nline2\nline3\n", implode('', iterator_to_array($message->toIterable())));
     }
 
+    public function testToIterableOnResourceYieldsAFinalFalsyLine()
+    {
+        $handle = fopen('php://memory', 'r+');
+        fwrite($handle, "line1\n0");
+
+        $message = new RawMessage($handle);
+        $this->assertSame("line1\n0", implode('', iterator_to_array($message->toIterable())));
+    }
+
     public function testDestructClosesResource()
     {
         $handle = fopen('php://memory', 'r+');

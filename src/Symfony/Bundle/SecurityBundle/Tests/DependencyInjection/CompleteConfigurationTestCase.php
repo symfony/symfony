@@ -331,8 +331,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
                 $this->assertSame(PathRequestMatcher::class, $def->getClass());
                 $this->assertSame('/blog/.*', $def->getArgument(0));
             } elseif (3 === $i) {
-                $this->assertEquals('IS_AUTHENTICATED_ANONYMOUSLY', $attributes[0]);
-                $expression = $container->getDefinition((string) $attributes[1])->getArgument(0);
+                $expression = $container->getDefinition((string) $attributes[0])->getArgument(0);
                 $this->assertEquals("token.getUserIdentifier() matches '/^admin/'", $expression);
             } elseif (4 === $i) {
                 $this->assertEquals(['ROLE_ADMIN'], $attributes);

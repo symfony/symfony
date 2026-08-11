@@ -96,6 +96,8 @@ SecurityBundle
 --------------
 
  * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect
+ * Deprecate configuring an access control rule with many `roles`, use `allow_if` or role hierarchy instead
+ * Deprecate configuring both an access control rule `allow_if` and `roles`, update `allow_if` instead
 
 Serializer
 ----------

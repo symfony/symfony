@@ -17,6 +17,7 @@ use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Exception\RenderException;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\Renderer;
+use Symfony\Component\Tui\Style\Align;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\Direction;
 use Symfony\Component\Tui\Style\Padding;
@@ -831,6 +832,80 @@ class RendererTest extends TestCase
         $this->assertSame(22, $rightLeafRect->col);
     }
 
+    public function testWidgetPositionTrackingForDescendantsOfHorizontalChildrenInVerticalLayout()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $prefix = new TextWidget('Prefix');
+        $row = new ContainerWidget();
+        $row->setStyle(new Style(direction: Direction::Horizontal));
+
+        $leftPane = new ContainerWidget();
+        $leftLeaf = new TextWidget('Left');
+        $leftCounter = new CountingLeafWidget();
+        $leftPane->add($leftLeaf);
+        $leftPane->add($leftCounter);
+        $rightPane = new ContainerWidget();
+        $rightLeaf = new TextWidget('Right');
+        $rightPane->add($rightLeaf);
+        $row->add($leftPane);
+        $row->add($rightPane);
+
+        $root->add($prefix);
+        $root->add($row);
+
+        $renderer->render($root, 40, 10);
+
+        $leftLeafRect = $renderer->getWidgetRect($leftLeaf);
+        $this->assertNotNull($leftLeafRect);
+        $this->assertSame(1, $leftLeafRect->row);
+        $this->assertSame(0, $leftLeafRect->col);
+        $rightLeafRect = $renderer->getWidgetRect($rightLeaf);
+        $this->assertNotNull($rightLeafRect);
+        $this->assertSame(1, $rightLeafRect->row);
+        $this->assertSame(20, $rightLeafRect->col);
+
+        // Shift the row down while the left pane stays cached
+        $prefix->setText("First line\nSecond line");
+        $rightLeaf->setText('Changed');
+        $renderer->render($root, 40, 10);
+
+        $this->assertSame(1, $leftCounter->renderCount);
+        $this->assertSame(2, $renderer->getWidgetRect($leftLeaf)->row);
+        $this->assertSame(2, $renderer->getWidgetRect($rightLeaf)->row);
+    }
+
+    public function testWidgetPositionTrackingForDescendantsOfVerticallyAlignedHorizontalChildren()
+    {
+        $renderer = new Renderer(new StyleSheet([
+            '.row' => new Style(direction: Direction::Horizontal, verticalAlign: VerticalAlign::Center),
+        ]));
+
+        $root = new ContainerWidget();
+        $row = new ContainerWidget();
+        $row->addStyleClass('row');
+
+        $tall = new ContainerWidget();
+        $tall->add(new TextWidget('top'));
+        $tall->add(new TextWidget('mid'));
+        $tall->add(new TextWidget('bot'));
+
+        $shortPane = new ContainerWidget();
+        $shortLeaf = new TextWidget('url');
+        $shortPane->add($shortLeaf);
+
+        $row->add($tall);
+        $row->add($shortPane);
+        $root->add($row);
+
+        $renderer->render($root, 40, 10);
+
+        // shortPane is 1 line centered in 3: floor((3-1)/2) = 1, and its
+        // descendant must carry the same cross-axis offset.
+        $this->assertSame(1, $renderer->getWidgetRect($shortPane)->row);
+        $this->assertSame(1, $renderer->getWidgetRect($shortLeaf)->row);
+    }
+
     public function testWidgetPositionTrackingForHorizontalChildrenWithVerticalAlignCenter()
     {
         // Shorter children in a horizontal container with VerticalAlign::Center must have their
@@ -1093,6 +1168,50 @@ class RendererTest extends TestCase
 
         $this->assertSame(1, $leaf->renderCount);
         $this->assertSame(2, $renderer->getWidgetRect($leaf)->row);
+    }
+
+    public function testAlignedPositionsAreShiftedOnEveryFrame()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->setStyle(new Style(align: Align::Right));
+        $prefix = new TextWidget('tick 0');
+        $leaf = new TextWidget('abc');
+        $root->add($prefix);
+        $root->add($leaf);
+
+        $renderer->render($root, 20, 5);
+        $this->assertSame(14, $renderer->getWidgetRect($leaf)->col);
+
+        $prefix->setText('tick 1');
+        $renderer->render($root, 20, 5);
+
+        $this->assertSame(14, $renderer->getWidgetRect($leaf)->col);
+    }
+
+    public function testAlignedPositionsFollowCachedChildrenThatStartUnshifted()
+    {
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->setStyle(new Style(align: Align::Right));
+        $prefix = new TextWidget(str_repeat('x', 20));
+        $inner = new ContainerWidget();
+        $leaf = new TextWidget('ab');
+        $inner->add($leaf);
+        $root->add($prefix);
+        $root->add($inner);
+
+        // The prefix fills the width, so nothing is shifted on the first frame.
+        $renderer->render($root, 20, 5);
+        $this->assertSame(0, $renderer->getWidgetRect($inner)->col);
+        $this->assertSame(0, $renderer->getWidgetRect($leaf)->col);
+
+        // Shrinking it introduces an offset while the inner container stays cached.
+        $prefix->setText('x');
+        $renderer->render($root, 20, 5);
+
+        $this->assertSame(18, $renderer->getWidgetRect($inner)->col);
+        $this->assertSame(18, $renderer->getWidgetRect($leaf)->col);
     }
 
     // ---------------------------------------------------------------

@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T08:34:30Z
+
+Reworked and pushed, thanks for the patch. What changed:
+
+- the front controller is now added to any path below the asset mapper public prefix, so `importmap()` is fixed too. Only `asset()` worked before: `ImportMapRenderer` passes paths that the asset mapper already resolved, and `getPublicPath()` returns null for those.
+- the package takes that prefix instead of the `AssetMapperDevServerSubscriber` service, which was injected only to be null-checked and dragged the profiler and every data collector into the asset package graph.
+- tests use real `Request`/`RequestStack`/`PathPackage` and cover the import map, absolute paths, no front controller and no request; plus a DI test for the new argument.

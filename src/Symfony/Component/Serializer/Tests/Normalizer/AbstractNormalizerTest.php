@@ -70,6 +70,7 @@ class AbstractNormalizerTest extends TestCase
         $a4 = new AttributeMetadata('a4');
         $a4->addGroup('test');
         $a4->addGroup('other');
+        $a4->addGroup('ignore');
         $classMetadata->addAttributeMetadata($a4);
 
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
@@ -82,6 +83,15 @@ class AbstractNormalizerTest extends TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], true);
         $this->assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['test'], AbstractNormalizer::IGNORED_GROUPS => ['ignore']], true);
+        $this->assertEquals(['a2'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*'], AbstractNormalizer::IGNORED_GROUPS => ['ignore']], true);
+        $this->assertEquals(['a1', 'a2', 'a3'], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::IGNORED_GROUPS => ['ignore']], true);
+        $this->assertEquals(['a1', 'a2', 'a3'], $result);
     }
 
     public function testGetAllowedAttributesWithWildcardGroupAndNoMetadata()
@@ -112,6 +122,7 @@ class AbstractNormalizerTest extends TestCase
         $a4 = new AttributeMetadata('a4');
         $a4->addGroup('test');
         $a4->addGroup('other');
+        $a4->addGroup('ignore');
         $classMetadata->addAttributeMetadata($a4);
 
         $this->classMetadata->method('getMetadataFor')->willReturn($classMetadata);
@@ -127,6 +138,9 @@ class AbstractNormalizerTest extends TestCase
 
         $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::GROUPS => ['*']], false);
         $this->assertEquals([$a1, $a2, $a3, $a4], $result);
+
+        $result = $this->normalizer->getAllowedAttributes('c', [AbstractNormalizer::IGNORED_GROUPS => ['ignore']], false);
+        $this->assertEquals([$a1, $a2, $a3], $result);
     }
 
     public function testObjectWithStaticConstructor()

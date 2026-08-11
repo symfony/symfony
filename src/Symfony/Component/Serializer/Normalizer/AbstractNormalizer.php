@@ -61,6 +61,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const GROUPS = 'groups';
 
     /**
+     * Exclude the attributes belonging to the specified groups, whichever groups are allowed.
+     */
+    public const IGNORED_GROUPS = 'ignored_groups';
+
+    /**
      * Limit (de)normalize to the specified names.
      *
      * For nested structures, this list needs to reflect the object tree.
@@ -237,6 +242,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         $groups = $this->getGroups($context);
+        $ignoredGroups = $this->getIgnoredGroups($context);
 
         $allowedAttributes = [];
         $ignoreUsed = false;
@@ -250,13 +256,15 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             if (
                 !$ignore
                 && ([] === $groups || \in_array('*', $groups, true) || array_intersect($attributeMetadata->getGroups(), $groups))
+                && ([] === $ignoredGroups || !array_intersect($attributeMetadata->getGroups(), $ignoredGroups))
                 && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }
 
-        if (!$ignoreUsed && $allowExtraAttributes) {
+        // returning false means "no restriction", which would defeat the exclusion
+        if (!$ignoreUsed && [] === $ignoredGroups && $allowExtraAttributes) {
             if ([] === $groups) {
                 return false;
             }
@@ -272,6 +280,13 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     protected function getGroups(array $context): array
     {
         $groups = $context[self::GROUPS] ?? $this->defaultContext[self::GROUPS] ?? [];
+
+        return \is_scalar($groups) ? (array) $groups : $groups;
+    }
+
+    protected function getIgnoredGroups(array $context): array
+    {
+        $groups = $context[self::IGNORED_GROUPS] ?? $this->defaultContext[self::IGNORED_GROUPS] ?? [];
 
         return \is_scalar($groups) ? (array) $groups : $groups;
     }

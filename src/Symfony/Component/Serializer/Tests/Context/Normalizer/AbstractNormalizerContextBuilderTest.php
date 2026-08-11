@@ -88,6 +88,13 @@ class AbstractNormalizerContextBuilderTest extends TestCase
         $this->assertSame([AbstractNormalizer::GROUPS => ['group']], $this->contextBuilder->withGroups('group')->toArray());
     }
 
+    public function testWithIgnoredGroups()
+    {
+        $this->assertSame([AbstractNormalizer::IGNORED_GROUPS => ['internal']], $this->contextBuilder->withIgnoredGroups('internal')->toArray());
+        $this->assertSame([AbstractNormalizer::IGNORED_GROUPS => ['a', 'b']], $this->contextBuilder->withIgnoredGroups(['a', 'b'])->toArray());
+        $this->assertSame([AbstractNormalizer::IGNORED_GROUPS => null], $this->contextBuilder->withIgnoredGroups(null)->toArray());
+    }
+
     public function testCannotSetNonStringAttributes()
     {
         $this->expectException(InvalidArgumentException::class);

@@ -99,6 +99,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertResponseRedirects('http://localhost/firewall1/test');
         $this->assertResponseHeaderSame('X-Decorated-Handler', DefaultAuthenticationSuccessHandler::class);
         $this->assertResponseHeaderSame('X-Decorating-Handler', DecoratingAuthenticationSuccessHandler::class);
+        $this->assertResponseHeaderSame('X-Firewall-Name', 'firewall1');
 
         $client->request('POST', '/firewall1/dummy_login', [
             '_username' => 'jane@example.org',
@@ -107,6 +108,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertResponseRedirects('http://localhost/firewall1/dummy');
         $this->assertResponseHeaderSame('X-Decorated-Handler', DefaultAuthenticationSuccessHandler::class);
         $this->assertResponseHeaderSame('X-Decorating-Handler', DecoratingAuthenticationSuccessHandler::class);
+        $this->assertResponseHeaderSame('X-Firewall-Name', 'firewall1');
     }
 
     public function testCustomFailureHandler()

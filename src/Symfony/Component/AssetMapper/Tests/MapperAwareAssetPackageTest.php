@@ -63,9 +63,7 @@ class MapperAwareAssetPackageTest extends TestCase
         $this->assertSame('/'.$expectedPathSentToInner, $assetMapperPackage->getUrl($path));
     }
 
-    /**
-     * @dataProvider getDevServerUrlTests
-     */
+    #[DataProvider('getDevServerUrlTests')]
     public function testGetUrlWithDevServer(string $requestUri, string $scriptName, string $path, string $expectedUrl)
     {
         $requestStack = $this->createRequestStack($requestUri, $scriptName);

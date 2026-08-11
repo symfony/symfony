@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LogLevel;
@@ -2785,10 +2786,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->has('assets._default_package'));
     }
 
-    /**
-     * @testWith [true, "/assets_path/"]
-     *           [false, null]
-     */
+    #[TestWith([true, '/assets_path/'])]
+    #[TestWith([false, null])]
     public function testAssetMapperDevServerPrefix(bool $server, ?string $expectedPrefix)
     {
         $container = $this->createContainerFromClosure(static function ($container) use ($server) {

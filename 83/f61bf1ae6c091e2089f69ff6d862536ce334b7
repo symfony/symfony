@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-11T11:36:12Z
+
+PR updated: it only deprecates having many `roles` or both `roles` and `allow_if` in an access control rule.

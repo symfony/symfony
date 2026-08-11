@@ -136,6 +136,10 @@ class ContainerAwareEventManager extends EventManager
         $hash = $this->getHash($listener);
 
         foreach ((array) $events as $event) {
+            if (\is_object($listener) && isset($this->listeners[$event]) && !isset($this->listeners[$event][$hash]) && !isset($this->initialized[$event])) {
+                $this->initializeListeners($event);
+            }
+
             if (isset($this->initializedHashMapping[$event][$hash])) {
                 $hash = $this->initializedHashMapping[$event][$hash];
                 unset($this->initializedHashMapping[$event][$hash]);

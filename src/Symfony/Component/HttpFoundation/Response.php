@@ -581,6 +581,27 @@ class Response
     }
 
     /**
+     * Returns the cache directives addressed to one cache, as defined by RFC 9213.
+     *
+     * The cache identifying itself as the given target reads them instead of
+     * "Cache-Control", so it can be told to keep the response much longer than
+     * the browser is:
+     *
+     *     $response->setMaxAge(0)->setPrivate();
+     *     $response->cacheControl('CDN')->setMaxAge(3600);
+     *
+     * @param string $target The cache the directives are addressed to, e.g. "CDN"
+     *
+     * @throws \InvalidArgumentException When the target is not a valid token
+     *
+     * @final
+     */
+    public function cacheControl(string $target): TargetedCacheControl
+    {
+        return new TargetedCacheControl($this->headers, $target);
+    }
+
+    /**
      * Marks the response as "private".
      *
      * It makes the response ineligible for serving other clients.

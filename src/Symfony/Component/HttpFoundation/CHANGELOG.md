@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `Response::cacheControl()` to set the targeted cache directives defined by RFC 9213, e.g. `CDN-Cache-Control`
  * Deprecate not passing an expiry to `UriSigner::sign()`
  * Add the `$defaultExpiration` argument to `UriSigner::__construct()`
  * Add argument `$version` to `UriSigner::sign()`, `UriSigner::check()`, `UriSigner::checkRequest()`, and `UriSigner::verify()` to bind a signed URI to a state token, folded into the signature

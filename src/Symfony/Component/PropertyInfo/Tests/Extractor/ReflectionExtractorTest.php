@@ -28,6 +28,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderValue;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\NotAnAccessorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
@@ -185,6 +186,11 @@ class ReflectionExtractorTest extends TestCase
             ],
             $customExtractor->getProperties('Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy')
         );
+    }
+
+    public function testGetPropertiesIgnoresMethodsThatOnlyLookLikeAccessors()
+    {
+        $this->assertSame(['real'], $this->extractor->getProperties(NotAnAccessorDummy::class));
     }
 
     public function testGetPropertiesWithNoPrefixes()

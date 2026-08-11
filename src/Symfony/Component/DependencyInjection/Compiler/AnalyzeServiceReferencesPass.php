@@ -110,7 +110,8 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                 $this->lazy || ($this->hasProxyDumper && $targetDefinition?->isLazy()),
                 ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior(),
                 $this->byConstructor,
-                $this->byMultiUseArgument
+                $this->byMultiUseArgument,
+                $inExpression
             );
 
             if ($inExpression) {
@@ -123,7 +124,8 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                     $this->lazy || $targetDefinition?->isLazy(),
                     true,
                     $this->byConstructor,
-                    $this->byMultiUseArgument
+                    $this->byMultiUseArgument,
+                    true
                 );
             }
 

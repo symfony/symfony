@@ -95,7 +95,7 @@ class MockUuidFactory extends UuidFactory
                     throw new InvalidArgumentException(\sprintf('Next UUID in sequence is not a Uuid and TimeBasedUidInterface: "%s" given.', get_debug_type($uuid)));
                 }
 
-                if (null !== $time && $uuid->getDateTime() !== $time) {
+                if (null !== $time && $uuid->getDateTime() != $time) {
                     throw new InvalidArgumentException(\sprintf('Next UUID in sequence does not match the expected time: "%s" != "%s".', $uuid->getDateTime()->format('@U.uT'), $time->format('@U.uT')));
                 }
 

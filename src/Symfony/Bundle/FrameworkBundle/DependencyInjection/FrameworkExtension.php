@@ -1416,6 +1416,9 @@ class FrameworkExtension extends Extension
 
         if (!$assetEnabled) {
             $container->removeDefinition('asset_mapper.asset_package');
+        } else {
+            $container->getDefinition('asset_mapper.asset_package')
+                ->replaceArgument(3, $config['server'] ? $config['public_prefix'] : null);
         }
 
         if (!$httpClientEnabled) {

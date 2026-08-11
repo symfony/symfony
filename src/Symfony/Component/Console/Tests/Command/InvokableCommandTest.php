@@ -18,6 +18,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\Ask;
 use Symfony\Component\Console\Attribute\MapDateTime;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
@@ -245,6 +246,17 @@ class InvokableCommandTest extends TestCase
         self::expectExceptionMessage('The value "incorrect" is not valid for the "enum" option. Supported values are "image", "video".');
 
         $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
+    }
+
+    public function testAskDefaultIsRejectedForArrayArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Argument] #[Ask('Add a value', default: 0)] array $values) {});
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Console\Attribute\Ask::$default" value is not supported for the array "$values"');
+
+        $command->getDefinition();
     }
 
     public function testExecuteHasPriorityOverInvokeMethod()

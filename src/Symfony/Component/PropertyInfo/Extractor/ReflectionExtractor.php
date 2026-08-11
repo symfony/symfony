@@ -701,6 +701,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
         if ('' !== $pattern && preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
+            // a lowercase first letter means the prefix is part of a longer word rather than a
+            // prefix, e.g. "hash" or "cancel", so the method is not an accessor at all
+            if (ctype_lower($matches[2][0])) {
+                return null;
+            }
+
             if (!\in_array($matches[1], $this->arrayMutatorPrefixes, true)) {
                 return $matches[2];
             }

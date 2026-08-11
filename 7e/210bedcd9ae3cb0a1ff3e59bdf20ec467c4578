@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-11T11:46:36Z
+
+The PHP 8.6 job fails on `FFICasterTest::testCastNonTrailingCharPointer`, which also fails on the 8.2 branch itself. It is not caused by this change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T13:00:22Z
+
+Added the same fix to the `sms77` bridge, which carries the byte-identical check: sms77 is the former name of seven.io and the API is the same. It is deprecated but still shipped on 7.4, and it does not exist on 8.0, so a merge-up would never fix it there.
+
+Also added an error-code test on both sides, so the strictness that was intended is still covered. Verified 7.2 and 7.3 use the loose comparison and are unaffected, and the Sevenio bridge does not exist on 6.4, so 7.4 is the right target.
+
+Both success tests fail on the current 7.4 with `Unable to send the SMS: "100".`; the error-code tests pass there, as guards should. Bridge suites 36 tests, Notifier component 184, all green.

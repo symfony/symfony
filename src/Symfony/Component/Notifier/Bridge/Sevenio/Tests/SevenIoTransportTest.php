@@ -12,7 +12,9 @@
 namespace Symfony\Component\Notifier\Bridge\Sevenio\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Sevenio\SevenIoTransport;
+use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
@@ -41,5 +43,30 @@ final class SevenIoTransportTest extends TransportTestCase
     {
         yield [new ChatMessage('Hello!')];
         yield [new DummyMessage()];
+    }
+
+    public function testSendWithSuccessCodeReturnedAsString()
+    {
+        $response = new MockResponse(json_encode([
+            'success' => '100',
+            'messages' => [['id' => '1234567890']],
+        ]));
+
+        $transport = self::createTransport(new MockHttpClient($response));
+        $sentMessage = $transport->send(new SmsMessage('0611223344', 'Hello!'));
+
+        $this->assertSame('1234567890', $sentMessage->getMessageId());
+    }
+
+    public function testSendWithErrorCodeThrows()
+    {
+        $response = new MockResponse(json_encode(['success' => '900']));
+
+        $transport = self::createTransport(new MockHttpClient($response));
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Unable to send the SMS: "900".');
+
+        $transport->send(new SmsMessage('0611223344', 'Hello!'));
     }
 }

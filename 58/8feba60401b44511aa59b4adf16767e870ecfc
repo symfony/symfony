@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-02-06T08:33:58Z
+
+> Note that this PR is not enough to make Symfony compatible with this "Standard webhook" standard. The signature is not generated with the same algorithm.
+
+The signature header is indeed not compliant. Additionally, I noticed that different signatures may be generated depending on the cipher algorithm used.
+To achieve full compliance, several issues need to be addressed:
+* use `v1` or `v1a` instead of the algorithm name in the header
+* use the binary result (raw bytes) rather than the hex representation.
+* hash the concatenation of `id+timestamp+body` instead of `name+id+body`
+* allow the support of multiple algotihms
+
+The `HeaderSignatureConfigurator` should receive the timestamp.
+
+> is this something we can improve?
+
+To me fixing the signature here is a good idea.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-07-27T16:21:54Z
+
+Changing the signature algorithm requires an opt-in (with a deprecation for projects using the old way probably, unless we keep it non-deprecated for a while). We cannot simply change it in Symfony as the algorithm is part of the public API of projects using this component to implement webhooks (the webhook consumer must use the same algorithm to verify the signature)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-27T16:53:06Z
+
+Thanks @stof, please have another look, I should have addressed your feedback.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-28T04:58:05Z
+
+Notes on what changed during review, moved out of the description so that it reads as documentation.
+
+* **the event name was taken from an unsigned header.** The parser used to build the `RemoteEvent` from `Webhook-Event` whichever scheme had verified, so someone able to change a request in flight could relabel `payment.authorized` as `payment.refunded` and still pass. `transitional` made it worse rather than better: the parser returned on the first match, so dropping the legacy entry left only the scheme that does not cover the name. Both are closed, and a single matching entry still accepts, so rotation keeps working. Covered by a test;
+
+* **the expected signatures are computed once instead of once per entry.** Neither expectation depends on the candidate, but both were built inside the loop, so the header size drove the CPU cost. An 8 KB `Webhook-Signature`, inside the default limits of Apache and nginx, holds about 1638 entries, and over a 512 KB body that cost 1133.7 ms per request on an unauthenticated endpoint. It is now 3.7 ms;
+
+* entries are split on any whitespace with empty ones discarded, so a stray double space no longer costs a full HMAC each;
+
+* **replays are bounded.** The reason the specification carries a timestamp is to limit replays, and the value was only ever used as signature input, so a captured request replayed forever. Hence `timestamp_tolerance`;
+
+* **`whsec_` secrets interoperate.** Symfony used the configured string verbatim, so pasting a provider's `whsec_...` secret produced silent verification failures in both directions. The prefix is stripped and decoded for the Standard entry only, since decoding it for the legacy scheme would change the key for any existing deployment whose secret happens to start with those characters;
+
+* **the format is a `SignatureFormat` enum** rather than a string with `FORMAT_*` constants, as @stof suggested. It is self-validating, so the constructor no longer has to check the value and throw, and `framework.webhook.signature_format` is mapped onto it once in the extension;
+
+* **the receiver is wired with the configured header names.** `webhook.request_parser` was registered with no arguments, so none of `event_header_name`, `id_header_name`, `signature_header_name` or the new options reached Symfony's own receiver; renaming one made an application fail to verify its own webhooks;
+
+* the changelog entry moved from an `8.1` heading to `8.2` and is down to two lines, with the detail listed in the description for the documentation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T15:07:15Z
+
+Reworked. The receiving half did not hold up, so the scheme is now an explicit contract on both ends rather than something auto-detected per entry.
+
+* **`timestamp_tolerance` never fired.** `HeaderSignatureConfigurator` emits the legacy entry first in `transitional`, and the parser broke out of its loop on the first legacy match, so a request signed an hour earlier was accepted. `testRejectsAReplayedStandardSignature` passed only because it hand-wrote `standard legacy`, an order the sender never produces. And since a `v1,`-only request was always rejected for not covering the event name, there was no reachable configuration in which the window had any effect;
+
+* **the receiver could not accept a Standard Webhooks request at all.** It now can, because the event name comes from the payload's `type` key when a `v1,` entry is what authenticated, which is where the specification puts it. `JsonBodyConfigurator` fills it in on the sending side;
+
+* **`Webhook-Event` is no longer sent in `standard`.** It was travelling unsigned. Symfony's own receiver guarded against that with an extra check; every third-party subscriber got the hole. Not sending it removes the class of bug instead of detecting it, and `nameIsSigned` along with its error message are gone;
+
+* **the format is required, not detected.** Order-dependence disappears, `timestamp_tolerance` applies exactly where a signed timestamp exists, and each mode has one meaning on both sides;
+
+* **`transitional` is documented for what it is.** It is not readable by a receiver older than 8.2: the pre-8.2 parser compares the whole header value with `hash_equals`, so a second entry makes it mismatch. The description no longer recommends it between Symfony applications;
+
+* **new options no longer degrade silently.** FrameworkBundle accepts `symfony/webhook` from 7.4, and PHP drops extra constructor arguments without a word, so `signature_format: standard` on webhook 8.1 emitted legacy signatures and ignored the tolerance. Setting any of the three new options on a component older than 8.2 now throws;
+
+* the `whsec_` handling and the Standard Webhooks payload are in one `StandardWebhooksSignature` helper instead of being duplicated in the sender and the receiver, `RequestParser` takes a clock as @andersonamuller suggested, and `symfony/clock` is declared in the component's `composer.json`;
+
+* `Tests/SignatureRoundTripTest.php` sends through the configurators `Transport` chains and parses the result back, per format, so the replay and relabeling cases are covered against what the sender actually emits rather than against hand-built headers.
+
+The DI wiring fix that was part of this PR went in separately as #65280 and is merged up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T15:50:40Z
+
+Corresponding recipes update to opt-in for standard mode by default at https://github.com/symfony/recipes/pull/1556

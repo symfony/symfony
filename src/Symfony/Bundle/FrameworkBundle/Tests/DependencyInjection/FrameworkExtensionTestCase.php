@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresMethod;
+use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
@@ -2964,6 +2965,28 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->has('asset_mapper.asset_package'));
         $this->assertFalse($container->has('assets.packages'));
         $this->assertFalse($container->has('assets._default_package'));
+    }
+
+    #[TestWith([true, '/assets_path/'])]
+    #[TestWith([false, null])]
+    public function testAssetMapperDevServerPrefix(bool $server, ?string $expectedPrefix)
+    {
+        $container = $this->createContainerFromClosure(static function ($container) use ($server) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => null,
+                'asset_mapper' => [
+                    'server' => $server,
+                    'public_prefix' => '/assets_path/',
+                    'paths' => ['assets/'],
+                ],
+            ]);
+        });
+
+        $this->assertSame($expectedPrefix, $container->getDefinition('asset_mapper.asset_package')->getArgument(3));
     }
 
     public function testDefaultLock()

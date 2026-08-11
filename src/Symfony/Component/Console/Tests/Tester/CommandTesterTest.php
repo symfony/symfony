@@ -32,6 +32,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tester\ConsoleAssertionsTrait;
 use Symfony\Component\Console\Tests\Fixtures\InvokableExtendingCommandTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithAskArrayCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveAttributesTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInteractiveChoiceAttributeTestCommand;
@@ -519,6 +520,16 @@ class CommandTesterTest extends TestCase
 
                 TXT,
         ];
+    }
+
+    public function testInvokableWithFalsyAnswerInArrayQuestion()
+    {
+        $tester = new CommandTester(new InvokableWithAskArrayCommand());
+        $tester->setInputs(['v1', '0', 'v2', '']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Values: v1,0,v2', $tester->getDisplay());
     }
 
     public function testInvokableWithInteractiveQuestionParameter()

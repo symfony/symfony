@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T13:38:53Z
+
+Reworked to avoid the BC break. We do not ship those in a stable minor, and the trait rewrite was one: `MailerAssertionsTrait` sits on `KernelTestCase`, so reading the test client and its profile breaks kernel tests that have no request, and the message advising `$client->enableProfiler()` is unactionable there. It was also broken as pushed: `test.client` is `->share(false)`, so `$container->get("test.client")` returns a fresh browser with no response and `getProfile()` always returns false. That is why `MailerTest::testMailerAssertions` and one of the new tests failed on all eight unit-test legs.
+
+The `$disabled` closure was the root of it. `collect: false` is what makes `Profiler::isEnabled()` false, so with the standard `when@test` recipe the gate drops every message and the trait sees nothing, which is the same breakage #61873 reported.
+
+So instead of adapting the trait to the gate, the gate is now skipped in test mode. `mailer.php`, `mailer_debug.php` and `MailerAssertionsTrait` are back to their 7.4 state and the wiring moved to `FrameworkExtension`: drop the listener when neither the profiler nor test mode is configured, gate it when the profiler is configured without test mode, leave it collecting in test mode. #50580 is about long-running production processes, so the leak is still fixed where it was reported, and no test suite changes behaviour.
+
+Also added the coverage that was missing: the DI gating for all four profiler/test combinations, and unit tests for `MessageLoggerListener` itself, which had none. Made `$disabled` private. Dropped the two functional fixtures, since test mode now always registers the listener so they could not exercise the gating; the DI tests do.
+
+Worth a separate look: `notifier.notification_logger_listener` is registered unconditionally in `notifier.php` with the same shape, and `NotificationAssertionsTrait` reads it directly, so the identical leak is still there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T13:46:11Z
+
+Folded in the Notifier half, since `notifier.notification_logger_listener` had the identical unconditional registration and `NotificationAssertionsTrait` reads it directly too. Same shape for both, with the gating factored into one loop.
+
+Also fixed a real fabbot finding of mine from the previous push: php-cs-fixer wanted `static` on a closure that does not use `$this`. That one was legitimate, unlike the exception-message check.
+
+One thing I did not change, worth a look separately: `NotificationLoggerListener` implements `ResetInterface` but `notifier.php` never tags it `kernel.reset`, while the mailer listener is tagged. So even with the profiler it accumulates across requests in a worker-mode process. Adding the tag would make notifier assertions see only the last request, matching mailer, so it is a behaviour change rather than a plain fix.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T13:57:14Z
+
+Dropped the `empty()` construct: the `test` node is a `booleanNode` with no default so the key can be absent, which is why the surrounding code reaches for `empty()`. Used `!($config["test"] ?? false)` instead.
+
+Left the missing `kernel.reset` on the notifier listener out of this PR after checking: it is present from 6.4 up, so it belongs on 6.4 rather than here. Opened #65278 for it.

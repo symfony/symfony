@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T12:33:31Z
+
+Retargeted to 8.1: `PositionTracker` is `@internal` + `@experimental`, and the cached-fill-child fix is a real bug fix that 8.1 wants (its test fails on base). Dropped the `Renderer.php` width-validation change: `renderContainer()` composes its own output via `shiftLines()` and `chromeApplier`, so container lines are not just validated child output, and skipping the check loses a real diagnostic. A `maxColumns: 10` horizontal container with two `flex: 0` children throws `RenderException` on 8.1 but rendered a silent 20-column line with that change (`computeFlexColumnWidths()` caps each child but not their sum); `ScreenWriter` does not catch it since it only validates the full terminal width. That hunk was also the whole `Renderer.php` diff, so dropping it clears the red fabbot, whose suggested patch does not compile anyway. Restored the comment explaining the remaining `clearRenderCache()` call.
+
+Two things left for you to decide: `shiftSubtree()` has no visited set, so a widget instance appearing twice under one parent gets shifted twice; and `AbstractWidget::beforeRender()` is documented as running every frame even on a cache hit, which is now less true for descendants of a reused subtree (already false on base when an ancestor hits).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T12:40:13Z
+
+Also amended the `beforeRender()` docblock, which claimed the hook runs "on every frame, even when the render cache is valid". Nothing in the component overrides it, so the audience is userland, and reusing a cached subtree means descendants are not visited at all. That was already true on base when an ancestor cache hit; this makes it the common case, so the wording had to go. `ScheduledTickTrait` (LoaderWidget, ProgressBarWidget) stays the mechanism for work that must run every frame.
+
+Left `shiftSubtree()` without a visited set on purpose: `AbstractWidget` has a single `$parent` pointer and `PositionTracker` keys a `WeakMap` by instance, so a widget added twice can only hold one rect anyway, and on base the second `setWidgetRect()` already won. Guarding here would only make this one recursion consistent about a topology that invalidation does not support either, at the cost of an allocation on the per-frame path. `ContainerWidget::add()` would be the place if you want to reject it.

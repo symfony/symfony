@@ -211,6 +211,7 @@ use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Webhook\Controller\WebhookController;
+use Symfony\Component\Webhook\Server\SignatureFormat;
 use Symfony\Component\WebLink\HttpHeaderSerializer;
 use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Arc;
@@ -3432,19 +3433,37 @@ class FrameworkExtension extends Extension
         $jsonBodyConfigurator = $container->getDefinition('webhook.body_configurator.json');
         $jsonBodyConfigurator->replaceArgument(0, new Reference($serializerEnabled ? 'webhook.payload_serializer.serializer' : 'webhook.payload_serializer.json'));
 
+        if (!class_exists(SignatureFormat::class)) {
+            foreach (['signature_format' => 'legacy', 'timestamp_header_name' => 'Webhook-Timestamp', 'timestamp_tolerance' => 300] as $option => $default) {
+                if ($default !== $config[$option]) {
+                    throw new LogicException(\sprintf('Configuring "framework.webhook.%s" requires symfony/webhook 8.2 or higher. Try running "composer update symfony/webhook".', $option));
+                }
+            }
+        }
+        $signatureFormat = class_exists(SignatureFormat::class) ? SignatureFormat::from($config['signature_format']) : null;
+
+        $jsonBodyConfigurator->replaceArgument(1, $signatureFormat);
+
         $container->getDefinition('webhook.headers_configurator')
             ->replaceArgument(0, $config['event_header_name'])
-            ->replaceArgument(1, $config['id_header_name']);
+            ->replaceArgument(1, $config['id_header_name'])
+            ->replaceArgument(2, $config['timestamp_header_name'])
+            ->replaceArgument(4, $signatureFormat);
 
         $container->getDefinition('webhook.signer')
             ->replaceArgument(0, $config['signing_algorithm'])
-            ->replaceArgument(1, $config['signature_header_name']);
+            ->replaceArgument(1, $config['signature_header_name'])
+            ->replaceArgument(2, $signatureFormat)
+            ->replaceArgument(3, $config['timestamp_header_name']);
 
         $container->getDefinition('webhook.request_parser')
             ->replaceArgument(0, $config['signing_algorithm'])
             ->replaceArgument(1, $config['signature_header_name'])
             ->replaceArgument(2, $config['event_header_name'])
-            ->replaceArgument(3, $config['id_header_name']);
+            ->replaceArgument(3, $config['id_header_name'])
+            ->replaceArgument(4, $config['timestamp_header_name'])
+            ->replaceArgument(5, $signatureFormat)
+            ->replaceArgument(6, $config['timestamp_tolerance']);
     }
 
     private function registerRemoteEventConfiguration(PhpFileLoader $loader): void

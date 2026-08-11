@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add a `Webhook-Timestamp` header to webhook requests
+ * Add support for the [Standard Webhooks](https://www.standardwebhooks.com/) signature scheme with the `SignatureFormat` enum
+
 8.0
 ---
 

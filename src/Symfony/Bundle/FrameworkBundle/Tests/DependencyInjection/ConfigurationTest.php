@@ -1207,8 +1207,11 @@ class ConfigurationTest extends TestCase
                 'message_bus' => 'messenger.default_bus',
                 'event_header_name' => 'Webhook-Event',
                 'id_header_name' => 'Webhook-Id',
+                'timestamp_header_name' => 'Webhook-Timestamp',
                 'signature_header_name' => 'Webhook-Signature',
                 'signing_algorithm' => 'sha256',
+                'signature_format' => 'legacy',
+                'timestamp_tolerance' => 300,
             ],
             'remote-event' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(RemoteEvent::class),

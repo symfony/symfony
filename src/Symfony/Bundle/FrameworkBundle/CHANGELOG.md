@@ -14,6 +14,7 @@ CHANGELOG
  * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
  * Report `.env` variables that the container never uses in `debug:container --env-vars`
  * Add `service_id` and `advisory` options to lock stores to use advisory locks on an existing `\PDO` or Doctrine DBAL connection service
+ * Add `framework.webhook.signature_format`, `framework.webhook.timestamp_header_name` and `framework.webhook.timestamp_tolerance` options
 
 8.1
 ---

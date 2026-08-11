@@ -35,11 +35,15 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('event header name'),
                 abstract_arg('id header name'),
+                abstract_arg('timestamp header name'),
+                service('clock')->nullOnInvalid(),
+                abstract_arg('signature format'),
             ])
 
         ->set('webhook.body_configurator.json', JsonBodyConfigurator::class)
             ->args([
                 abstract_arg('payload serializer'),
+                abstract_arg('signature format'),
             ])
 
         ->set('webhook.payload_serializer.json', NativeJsonPayloadSerializer::class)
@@ -53,6 +57,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('signing algorithm'),
                 abstract_arg('signature header name'),
+                abstract_arg('signature format'),
+                abstract_arg('timestamp header name'),
             ])
 
         ->set('webhook.messenger.send_handler', SendWebhookHandler::class)
@@ -67,6 +73,10 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('signature header name'),
                 abstract_arg('event header name'),
                 abstract_arg('id header name'),
+                abstract_arg('timestamp header name'),
+                abstract_arg('signature format'),
+                abstract_arg('timestamp tolerance'),
+                service('clock')->nullOnInvalid(),
             ])
         ->alias(RequestParser::class, 'webhook.request_parser')
 

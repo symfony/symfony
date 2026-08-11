@@ -25,20 +25,21 @@ class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler
      */
     public function __construct(
         private AuthenticationSuccessHandlerInterface $handler,
-        array $options,
-        string $firewallName,
+        private array $options,
+        private string $firewallName,
     ) {
-        if (method_exists($handler, 'setOptions')) {
-            $this->handler->setOptions($options);
-        }
-
-        if (method_exists($handler, 'setFirewallName')) {
-            $this->handler->setFirewallName($firewallName);
-        }
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): ?Response
     {
+        if (method_exists($this->handler, 'setOptions')) {
+            $this->handler->setOptions($this->options);
+        }
+
+        if (method_exists($this->handler, 'setFirewallName')) {
+            $this->handler->setFirewallName($this->firewallName);
+        }
+
         return $this->handler->onAuthenticationSuccess($request, $token);
     }
 }

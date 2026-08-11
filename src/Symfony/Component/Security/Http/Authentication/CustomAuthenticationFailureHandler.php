@@ -25,15 +25,16 @@ class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler
      */
     public function __construct(
         private AuthenticationFailureHandlerInterface $handler,
-        array $options,
+        private array $options,
     ) {
-        if (method_exists($handler, 'setOptions')) {
-            $this->handler->setOptions($options);
-        }
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
+        if (method_exists($this->handler, 'setOptions')) {
+            $this->handler->setOptions($this->options);
+        }
+
         return $this->handler->onAuthenticationFailure($request, $exception);
     }
 }

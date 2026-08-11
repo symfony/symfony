@@ -12,6 +12,10 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bundle\SecurityBundle\Tests\Fixtures\DecoratingAuthenticationFailureHandler;
+use Symfony\Bundle\SecurityBundle\Tests\Fixtures\DecoratingAuthenticationSuccessHandler;
+use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler;
+use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
 
 class AuthenticatorTest extends AbstractWebTestCase
 {
@@ -93,12 +97,18 @@ class AuthenticatorTest extends AbstractWebTestCase
             '_password' => 'test',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/test');
+        $this->assertResponseHeaderSame('X-Decorated-Handler', DefaultAuthenticationSuccessHandler::class);
+        $this->assertResponseHeaderSame('X-Decorating-Handler', DecoratingAuthenticationSuccessHandler::class);
+        $this->assertResponseHeaderSame('X-Firewall-Name', 'firewall1');
 
         $client->request('POST', '/firewall1/dummy_login', [
             '_username' => 'jane@example.org',
             '_password' => 'test',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/dummy');
+        $this->assertResponseHeaderSame('X-Decorated-Handler', DefaultAuthenticationSuccessHandler::class);
+        $this->assertResponseHeaderSame('X-Decorating-Handler', DecoratingAuthenticationSuccessHandler::class);
+        $this->assertResponseHeaderSame('X-Firewall-Name', 'firewall1');
     }
 
     public function testCustomFailureHandler()
@@ -110,11 +120,15 @@ class AuthenticatorTest extends AbstractWebTestCase
             '_password' => 'wrong',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/login');
+        $this->assertResponseHeaderSame('X-Decorated-Handler', DefaultAuthenticationFailureHandler::class);
+        $this->assertResponseHeaderSame('X-Decorating-Handler', DecoratingAuthenticationFailureHandler::class);
 
         $client->request('POST', '/firewall1/dummy_login', [
             '_username' => 'jane@example.org',
             '_password' => 'wrong',
         ]);
         $this->assertResponseRedirects('http://localhost/firewall1/dummy_login');
+        $this->assertResponseHeaderSame('X-Decorated-Handler', DefaultAuthenticationFailureHandler::class);
+        $this->assertResponseHeaderSame('X-Decorating-Handler', DecoratingAuthenticationFailureHandler::class);
     }
 }

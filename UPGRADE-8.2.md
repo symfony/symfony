@@ -98,6 +98,11 @@ SecurityBundle
  * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect
  * Deprecate configuring an access control rule with many `roles`, use `allow_if` or role hierarchy instead
  * Deprecate configuring both an access control rule `allow_if` and `roles`, update `allow_if` instead
+ * A service used as a firewall `success_handler` or `failure_handler` is now wired as-is, so decorating it
+   takes effect where it used to be silently ignored. Such a decorator must forward `setOptions()`, and
+   `setFirewallName()` for success handlers, to the service it decorates whenever that service relies on them,
+   as `DefaultAuthenticationSuccessHandler` and `DefaultAuthenticationFailureHandler` do. Without forwarding,
+   the authenticator options and the session target path are lost, and a successful login redirects to `/`
 
 Serializer
 ----------

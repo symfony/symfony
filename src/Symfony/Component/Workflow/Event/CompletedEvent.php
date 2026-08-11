@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 /**
- * @template T of object
+ * @template T of object= object
  *
  * @extends Event<T>
  */

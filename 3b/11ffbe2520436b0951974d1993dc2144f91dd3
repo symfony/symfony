@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by kevinrudde at 2024-10-29T09:49:19Z
+
+Any chance this could land in 7.2?
+It seems like the Unit Test is failing, because of some corrupted composer zip?
+Edit: Got it working by rebasing!

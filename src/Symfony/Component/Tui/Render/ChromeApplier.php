@@ -39,13 +39,13 @@ final class ChromeApplier
 
     /**
      * Apply chrome (padding, border, background) to rendered lines.
-     *
-     * @param string[] $lines
-     *
-     * @return string[]
      */
-    public function apply(array $lines, int $width, Style $style, AbstractWidget $widget): array
+    public function apply(LineBufferInterface $lines, int $width, Style $style, AbstractWidget $widget): LineBufferInterface
     {
+        if ($this->isIdentity($style)) {
+            return $lines;
+        }
+
         $border = $style->getBorder();
         $padding = $style->getPadding();
 
@@ -59,15 +59,9 @@ final class ChromeApplier
         $paddingBottom = $padding?->bottom ?? 0;
 
         $hasVerticalPadding = $paddingTop || $paddingBottom;
-        $hasHorizontalPadding = $paddingLeft || $paddingRight;
-        $hasBorder = $borderTop || $borderBottom || $borderLeft || $borderRight;
 
-        if (!$hasBorder && !$hasHorizontalPadding && !$hasVerticalPadding && $style->isPlain() && null === $style->getTextAlign()) {
-            return $lines;
-        }
-
-        if (!$lines && !$hasVerticalPadding && !$borderTop && !$borderBottom) {
-            return [];
+        if (0 === \count($lines) && !$hasVerticalPadding && !$borderTop && !$borderBottom) {
+            return new ArrayLineBuffer([]);
         }
 
         $outerStyle = $this->resolveOuterStyle($widget);
@@ -103,7 +97,7 @@ final class ChromeApplier
         // If no content and no padding/border, return empty
         if (!$processedLines && !$paddingTop && !$paddingBottom
             && !$borderTop && !$borderBottom) {
-            return [];
+            return new ArrayLineBuffer([]);
         }
 
         $styledEmptyLine = $style->apply(str_repeat(' ', $innerWidth));
@@ -137,12 +131,29 @@ final class ChromeApplier
 
         $innerLines = [...$topPadding, ...$contentLines, ...$bottomPadding];
 
-        return $border?->wrapLines(
+        return new ArrayLineBuffer($border?->wrapLines(
             $innerLines,
             $innerWidth,
             $style,
             $outerStyle,
-        ) ?? $innerLines;
+        ) ?? $innerLines);
+    }
+
+    private function isIdentity(Style $style): bool
+    {
+        $border = $style->getBorder();
+        $padding = $style->getPadding();
+
+        return !($border?->top ?? 0)
+            && !($border?->right ?? 0)
+            && !($border?->bottom ?? 0)
+            && !($border?->left ?? 0)
+            && !($padding?->top ?? 0)
+            && !($padding?->right ?? 0)
+            && !($padding?->bottom ?? 0)
+            && !($padding?->left ?? 0)
+            && null === $style->getTextAlign()
+            && $style->isPlain();
     }
 
     /**

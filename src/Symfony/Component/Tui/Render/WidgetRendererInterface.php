@@ -29,11 +29,9 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
 interface WidgetRendererInterface
 {
     /**
-     * Render a single widget through the full pipeline.
-     *
-     * @return string[]
+     * Render a widget without flattening cached child buffers.
      */
-    public function renderWidget(AbstractWidget $widget, RenderContext $context): array;
+    public function renderWidgetLines(AbstractWidget $widget, RenderContext $context): LineBufferInterface;
 
     /**
      * Resolve the style for a widget by merging cascade layers.
@@ -43,7 +41,7 @@ interface WidgetRendererInterface
     /**
      * Measure the intrinsic width of a widget: content width + chrome (border/padding).
      *
-     * Unlike renderWidget(), this does not pad lines to the allocated width.
+     * Unlike renderWidgetLines(), this does not pad lines to the allocated width.
      * Used by the layout engine to measure flex: 0 children.
      */
     public function measureIntrinsicWidth(AbstractWidget $widget, int $maxColumns, int $rows): int;

@@ -230,6 +230,6 @@ class TextTest extends TestCase
     {
         $renderer = new Renderer();
 
-        return $renderer->renderWidget($widget, new RenderContext($columns, $rows));
+        return $renderer->renderWidgetLines($widget, new RenderContext($columns, $rows))->toArray();
     }
 }

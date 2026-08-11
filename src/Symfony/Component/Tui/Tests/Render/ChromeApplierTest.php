@@ -14,6 +14,7 @@ namespace Symfony\Component\Tui\Tests\Render;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Render\ArrayLineBuffer;
 use Symfony\Component\Tui\Render\ChromeApplier;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\WidgetRendererInterface;
@@ -128,7 +129,7 @@ final class ChromeApplierTest extends TestCase
     {
         $applier = $this->createApplier();
         $widget = new TextWidget('test');
-        $lines = ['Hello', 'World'];
+        $lines = new ArrayLineBuffer(['Hello', 'World']);
 
         $result = $applier->apply($lines, 20, new Style(), $widget);
 
@@ -140,7 +141,7 @@ final class ChromeApplierTest extends TestCase
         $applier = $this->createApplier();
         $widget = new TextWidget('test');
 
-        $result = $applier->apply([], 20, new Style(), $widget);
+        $result = $applier->apply(new ArrayLineBuffer([]), 20, new Style(), $widget)->toArray();
 
         $this->assertSame([], $result);
     }
@@ -155,7 +156,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(padding: new Padding(1, 0, 1, 0));
 
-        $result = $applier->apply(['Content'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Content']), 20, $style, $widget)->toArray();
 
         // 1 top padding + 1 content + 1 bottom padding = 3 lines
         $this->assertCount(3, $result);
@@ -172,7 +173,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(padding: new Padding(0, 3, 0, 5));
 
-        $result = $applier->apply(['Hi'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Hi']), 20, $style, $widget)->toArray();
 
         $this->assertCount(1, $result);
         // The content line should be padded to full width
@@ -188,7 +189,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(padding: new Padding(2, 0, 1, 0));
 
-        $result = $applier->apply([], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer([]), 20, $style, $widget)->toArray();
 
         // 2 top padding + 1 bottom padding = 3 lines (even with no content)
         $this->assertCount(3, $result);
@@ -204,7 +205,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(border: Border::all(1, 'none'));
 
-        $result = $applier->apply(['Hello'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), 20, $style, $widget)->toArray();
 
         // 1 border-top + 1 content + 1 border-bottom = 3 lines
         $this->assertCount(3, $result);
@@ -220,7 +221,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(border: Border::all(1, 'none'));
 
-        $result = $applier->apply([], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer([]), 20, $style, $widget)->toArray();
 
         // 1 border-top + 1 border-bottom = 2 lines
         $this->assertCount(2, $result);
@@ -232,7 +233,7 @@ final class ChromeApplierTest extends TestCase
         $applier = $this->createApplier();
         $widget = new TextWidget('test');
 
-        $result = $applier->apply(['Hello'], $width, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), $width, $style, $widget)->toArray();
 
         foreach ($result as $line) {
             $this->assertSame($width, AnsiUtils::visibleWidth($line));
@@ -260,7 +261,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(background: 'red');
 
-        $result = $applier->apply(['Hi'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Hi']), 20, $style, $widget)->toArray();
 
         $this->assertCount(1, $result);
         // Red background ANSI code should be present
@@ -278,7 +279,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(textAlign: TextAlign::Center);
 
-        $result = $applier->apply(['Hi'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Hi']), 20, $style, $widget)->toArray();
 
         // "Hi" is 2 chars wide, centered in 20 = 9 spaces + "Hi" + 9 spaces
         $plain = AnsiUtils::stripAnsiCodes($result[0]);
@@ -293,7 +294,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(textAlign: TextAlign::Right);
 
-        $result = $applier->apply(['Hi'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Hi']), 20, $style, $widget)->toArray();
 
         // "Hi" is 2 chars wide, right-aligned in 20 = 18 spaces + "Hi"
         $plain = AnsiUtils::stripAnsiCodes($result[0]);
@@ -310,7 +311,7 @@ final class ChromeApplierTest extends TestCase
 
         // Two lines of different length: both should shift by the same offset
         // (based on the widest line, not per-line)
-        $result = $applier->apply(['Long line', 'Hi'], 30, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Long line', 'Hi']), 30, $style, $widget)->toArray();
 
         $plain0 = AnsiUtils::stripAnsiCodes($result[0]);
         $plain1 = AnsiUtils::stripAnsiCodes($result[1]);
@@ -332,26 +333,10 @@ final class ChromeApplierTest extends TestCase
         $style = new Style(padding: new Padding(0, 5, 0, 5));
         $longLine = str_repeat('X', 30);
 
-        $result = $applier->apply([$longLine], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer([$longLine]), 20, $style, $widget)->toArray();
 
         $this->assertCount(1, $result);
         $this->assertSame(20, AnsiUtils::visibleWidth($result[0]));
-    }
-
-    // ---------------------------------------------------------------
-    // apply: caching
-    // ---------------------------------------------------------------
-
-    public function testApplyReturnsCachedResult()
-    {
-        $applier = $this->createApplier();
-        $widget = new TextWidget('test');
-        $style = new Style(padding: Padding::all(1));
-
-        $result1 = $applier->apply(['Hello'], 20, $style, $widget);
-        $result2 = $applier->apply(['Hello'], 20, $style, $widget);
-
-        $this->assertSame($result1, $result2);
     }
 
     // ---------------------------------------------------------------
@@ -364,7 +349,7 @@ final class ChromeApplierTest extends TestCase
         $widget = new TextWidget('test');
         $style = new Style(padding: Padding::all(1), border: Border::all(1, 'none'));
 
-        $result = $applier->apply(['Text'], 20, $style, $widget);
+        $result = $applier->apply(new ArrayLineBuffer(['Text']), 20, $style, $widget)->toArray();
 
         // 1 border-top + 1 padding-top + 1 content + 1 padding-bottom + 1 border-bottom = 5
         $this->assertCount(5, $result);

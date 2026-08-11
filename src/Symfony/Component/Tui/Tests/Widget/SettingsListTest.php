@@ -146,7 +146,7 @@ class SettingsListTest extends TestCase
 
         // Render through the Renderer (which applies chrome)
         $renderer = new Renderer();
-        $lines = $renderer->renderWidget($widget, new RenderContext(60, 20));
+        $lines = $renderer->renderWidgetLines($widget, new RenderContext(60, 20))->toArray();
 
         // The submenu's padding should have been applied by the Renderer.
         // Without the fix, render() would call submenu->render() directly,

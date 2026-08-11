@@ -473,7 +473,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
             $this->renderRequested = false;
             $columns = $this->terminal->getColumns();
             $rows = $this->terminal->getRows();
-            $this->screenWriter->writeLines($this->renderer->render($this->root, $columns, $rows));
+            $this->screenWriter->writeFrame($this->renderer->renderFrame($this->root, $columns, $rows));
         }
     }
 

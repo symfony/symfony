@@ -41,7 +41,7 @@ final class AlignTest extends TestCase
         $child->addStyleClass('child');
         $root->add($child);
 
-        $lines = $renderer->render($root, 30, 5);
+        $lines = $renderer->renderFrame($root, 30, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -62,7 +62,7 @@ final class AlignTest extends TestCase
         $child->addStyleClass('child');
         $root->add($child);
 
-        $lines = $renderer->render($root, 30, 5);
+        $lines = $renderer->renderFrame($root, 30, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -86,7 +86,7 @@ final class AlignTest extends TestCase
         $root->add($child1);
         $root->add($child2);
 
-        $lines = $renderer->render($root, 30, 5);
+        $lines = $renderer->renderFrame($root, 30, 5)->toArray();
 
         $this->assertCount(2, $lines);
         $line1 = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -108,7 +108,7 @@ final class AlignTest extends TestCase
         // Text fills the full 10-column width
         $root->add(new TextWidget('0123456789'));
 
-        $lines = $renderer->render($root, 10, 5);
+        $lines = $renderer->renderFrame($root, 10, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -136,7 +136,7 @@ final class AlignTest extends TestCase
         $child->setStyle(new Style(maxColumns: 10));
         $root->add($child);
 
-        $lines = $renderer->render($root, 30, 5);
+        $lines = $renderer->renderFrame($root, 30, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -155,7 +155,7 @@ final class AlignTest extends TestCase
         $root->addStyleClass('parent');
         $root->add(new TextWidget('Hello'));
 
-        $lines = $renderer->render($root, 10, 10);
+        $lines = $renderer->renderFrame($root, 10, 10)->toArray();
 
         // 1 content line + centering: floor((10-1)/2) = 4 empty lines top, 5 bottom
         $this->assertCount(10, $lines);
@@ -178,7 +178,7 @@ final class AlignTest extends TestCase
         $root->addStyleClass('parent');
         $root->add(new TextWidget('Hello'));
 
-        $lines = $renderer->render($root, 10, 10);
+        $lines = $renderer->renderFrame($root, 10, 10)->toArray();
 
         // Content at top, all remaining rows are empty at bottom
         $this->assertCount(10, $lines);
@@ -196,7 +196,7 @@ final class AlignTest extends TestCase
         $root->addStyleClass('valign-center');
         $root->add(new TextWidget('Hi'));
 
-        $lines = $renderer->render($root, 10, 10);
+        $lines = $renderer->renderFrame($root, 10, 10)->toArray();
 
         // 1 content line centered in 10 rows: 4 empty top, content, 5 empty bottom
         $this->assertCount(10, $lines);
@@ -217,7 +217,7 @@ final class AlignTest extends TestCase
         $root->add(new TextWidget('Line1'));
         $root->add(new TextWidget('Line2'));
 
-        $lines = $renderer->render($root, 10, 10);
+        $lines = $renderer->renderFrame($root, 10, 10)->toArray();
 
         // 2 content lines centered in 10 rows: floor((10-2)/2) = 4 empty top
         $this->assertCount(10, $lines);
@@ -241,7 +241,7 @@ final class AlignTest extends TestCase
         $child->addStyleClass('child');
         $root->add($child);
 
-        $lines = $renderer->render($root, 30, 10);
+        $lines = $renderer->renderFrame($root, 30, 10)->toArray();
 
         // 1 content line centered both ways
         // Vertical: floor((10-1)/2) = 4 empty top
@@ -277,7 +277,7 @@ final class AlignTest extends TestCase
         $root->add($inner);
         $root->add(new TextWidget('After'));
 
-        $lines = $renderer->render($root, 10, 10);
+        $lines = $renderer->renderFrame($root, 10, 10)->toArray();
 
         // inner renders 2 lines (A + B), After renders 1 line — total 3 lines.
         // If inner incorrectly expands to 10 rows, After is pushed off and total is > 3.
@@ -313,7 +313,7 @@ final class AlignTest extends TestCase
         $row->add($short);
         $root->add($row);
 
-        $lines = $renderer->render($root, 30, 10);
+        $lines = $renderer->renderFrame($root, 30, 10)->toArray();
 
         // $row is a non-expanded nested container — it renders exactly 3 lines (tallest child height).
         // 'url' must appear on line 1 (center of 3), not line 0 (top).

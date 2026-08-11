@@ -13,6 +13,7 @@ namespace Symfony\Component\Tui\Widget;
 
 use Symfony\Component\Tui\Event\AbstractEvent;
 use Symfony\Component\Tui\Exception\RenderException;
+use Symfony\Component\Tui\Render\LineBufferInterface;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Style\DefaultStyleSheet;
 use Symfony\Component\Tui\Style\Style;
@@ -42,12 +43,11 @@ abstract class AbstractWidget
     /** @var array<class-string<AbstractEvent>, list<callable>> */
     private array $listeners = [];
 
-    // Render cache: stores the last output of Renderer::renderWidget()
+    // Render cache: stores the last output of Renderer::renderWidgetLines()
     // keyed on (renderRevision, columns, rows) so unchanged widgets
     // skip style resolution, layout, chrome, and content rendering.
 
-    /** @var string[]|null */
-    private ?array $renderCacheLines = null;
+    private ?LineBufferInterface $renderCacheLines = null;
     private int $renderCacheRevision = -1;
     private int $renderCacheColumns = -1;
     private int $renderCacheRows = -1;
@@ -310,9 +310,9 @@ abstract class AbstractWidget
      *
      * @internal Used by the Renderer
      *
-     * @return string[]|null Cached lines, or null on miss
+     * @return LineBufferInterface|null Cached lines, or null on miss
      */
-    final public function getRenderCache(int $columns, int $rows): ?array
+    final public function getRenderCache(int $columns, int $rows): ?LineBufferInterface
     {
         if ($this->renderCacheRevision === $this->getRenderRevision()
             && $this->renderCacheColumns === $columns
@@ -328,10 +328,8 @@ abstract class AbstractWidget
      * Store the render output for future cache lookups.
      *
      * @internal Used by the Renderer
-     *
-     * @param string[] $lines
      */
-    final public function setRenderCache(array $lines, int $columns, int $rows): void
+    final public function setRenderCache(LineBufferInterface $lines, int $columns, int $rows): void
     {
         $this->renderCacheLines = $lines;
         $this->renderCacheRevision = $this->getRenderRevision();

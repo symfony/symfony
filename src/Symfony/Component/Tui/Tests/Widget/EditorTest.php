@@ -1428,7 +1428,7 @@ class EditorTest extends TestCase
         $root = new ContainerWidget();
         $root->add($editor);
         $editor->invalidate();
-        $result = $renderer->render($root, 50, 15);
+        $result = $renderer->renderFrame($root, 50, 15)->toArray();
         $allContent = implode("\n", $result);
         $this->assertStringNotContainsString('Line 0:', $allContent, 'Scroll offset should advance when cursor moves past visible area with wrapping lines');
 

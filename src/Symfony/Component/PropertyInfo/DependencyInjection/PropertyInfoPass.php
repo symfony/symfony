@@ -47,5 +47,8 @@ class PropertyInfoPass implements CompilerPassInterface
 
         $initializableExtractors = $this->findAndSortTaggedServices('property_info.initializable_extractor', $container);
         $definition->setArgument(4, new IteratorArgument($initializableExtractors));
+
+        $nameExtractors = $this->findAndSortTaggedServices('property_info.name_extractor', $container);
+        $definition->setArgument(5, new IteratorArgument($nameExtractors));
     }
 }

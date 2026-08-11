@@ -19,6 +19,7 @@ CHANGELOG
  * Add `AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION` for scalar type transformation
  * Add `COLLECT_EXTRA_ATTRIBUTES_ERRORS` option to `Serializer` to collect extra-attributes errors during denormalization
  * Deprecate `PartialDenormalizationException::getErrors()`, use `getNotNormalizableValueErrors()` instead
+ * Enable using `#[WithAccessors]` from the PropertyInfo component with the serializer
 
 8.0
 ---

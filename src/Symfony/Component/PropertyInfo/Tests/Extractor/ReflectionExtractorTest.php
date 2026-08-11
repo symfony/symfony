@@ -25,6 +25,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProperty;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\FalseAccessorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderValue;
@@ -257,6 +258,67 @@ class ReflectionExtractorTest extends TestCase
         $extractor = new ReflectionExtractor();
 
         self::assertSame(['priority', 'tags', 'mailbox', 'active', 'name'], $extractor->getProperties(Bar::class));
+    }
+
+    // Standard "get" prefix
+    #[TestWith([Dummy::class, 'getA', 'a'])]
+    #[TestWith([Dummy::class, 'getDOB', 'DOB'])]
+    #[TestWith([Dummy::class, 'getId', 'Id'])]
+    #[TestWith([Dummy::class, 'get123', '123'])]
+    #[TestWith([Dummy::class, 'getXTotals', 'xTotals'])]
+    // Standard "set" prefix
+    #[TestWith([Dummy::class, 'setB', 'B'])]
+    #[TestWith([Dummy::class, 'setSelf', 'self'])]
+    #[TestWith([Dummy::class, 'setRealParent', 'realParent'])]
+    #[TestWith([Dummy::class, 'setDate', 'date'])]
+    // "is" / "has" / "can" prefixes
+    #[TestWith([Dummy::class, 'isC', 'c'])]
+    #[TestWith([Dummy::class, 'canD', 'd'])]
+    #[TestWith([Dummy::class, 'hasElement', 'element'])]
+    #[TestWith([DummyWithHasser::class, 'hasUrl', 'url'])]
+    #[TestWith([DummyWithHasser::class, 'isEnabled', 'enabled'])]
+    #[TestWith([DummyWithAccessorWithoutProperty::class, 'canView', 'view'])]
+    #[TestWith([DummyWithAccessorWithoutProperty::class, 'isActive', 'active'])]
+    #[TestWith([DummyWithAccessorWithoutProperty::class, 'hasFromConstructor', 'fromConstructor'])]
+    // Array mutators with singularization
+    #[TestWith([AdderRemoverDummy::class, 'addAnalyse', 'analyses'])]
+    #[TestWith([AdderRemoverDummy::class, 'removeFoot', 'feet'])]
+    #[TestWith([Dummy::class, 'addDate', 'date'])]
+    // False accessors (ctype_lower filter)
+    #[TestWith([FalseAccessorDummy::class, 'hash', null])]
+    #[TestWith([FalseAccessorDummy::class, 'cancel', null])]
+    #[TestWith([FalseAccessorDummy::class, 'gettings', null])]
+    #[TestWith([FalseAccessorDummy::class, 'settings', null])]
+    #[TestWith([FalseAccessorDummy::class, 'isolate', null])]
+    #[TestWith([FalseAccessorDummy::class, 'getValid', 'valid'])]
+    // Uppercase property name
+    #[TestWith([FalseAccessorDummy::class, 'getFoo', 'Foo'])]
+    // Underscore after prefix
+    #[TestWith([FalseAccessorDummy::class, 'get_foo', '_foo'])]
+    // Static methods
+    #[TestWith([Dummy::class, 'getStatic', null])]
+    #[TestWith([Dummy::class, 'staticGetter', null])]
+    #[TestWith([Dummy::class, 'staticSetter', null])]
+    // Non-existent methods
+    #[TestWith([Dummy::class, 'nonExistentMethod', null])]
+    #[TestWith(['NonExistent\\ClassName', 'someMethod', null])]
+    // #[WithAccessors] attribute
+    #[TestWith([Bar::class, 'currentPriority', 'priority'])]
+    #[TestWith([Bar::class, 'changePriority', 'priority'])]
+    #[TestWith([Bar::class, 'allTags', 'tags'])]
+    #[TestWith([Bar::class, 'replaceTags', 'tags'])]
+    #[TestWith([Bar::class, 'attachTag', 'tags'])]
+    #[TestWith([Bar::class, 'detachTag', 'tags'])]
+    #[TestWith([Bar::class, 'isEnabled', 'active'])]
+    #[TestWith([Bar::class, 'retrieveName', 'name'])]
+    #[TestWith([Bar::class, 'renameTo', 'name'])]
+    #[TestWith([JustGetterOrSetter::class, 'checkVisibility', 'visible'])]
+    #[TestWith([JustGetterOrSetter::class, 'updateStatus', 'status'])]
+    #[TestWith([JustAdderAndRemover::class, 'enqueue', 'items'])]
+    #[TestWith([JustAdderAndRemover::class, 'dequeue', 'items'])]
+    public function testGetPropertyName(string $class, string $method, ?string $expectedProperty)
+    {
+        $this->assertSame($expectedProperty, $this->extractor->getPropertyName($class, $method));
     }
 
     public function testReadonlyPropertiesAreNotWriteable()

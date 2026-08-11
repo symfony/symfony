@@ -20,6 +20,7 @@ use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfoExtractorInterface;
@@ -35,6 +36,7 @@ return static function (ContainerConfigurator $container) {
         ->alias(PropertyTypeExtractorInterface::class, 'property_info')
         ->alias(PropertyListExtractorInterface::class, 'property_info')
         ->alias(PropertyInitializableExtractorInterface::class, 'property_info')
+        ->alias(PropertyNameExtractorInterface::class, 'property_info')
 
         ->set('property_info.cache', PropertyInfoCacheExtractor::class)
             ->decorate('property_info')
@@ -47,6 +49,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('property_info.constructor_extractor', ['priority' => -1002])
             ->tag('property_info.access_extractor', ['priority' => -1000])
             ->tag('property_info.initializable_extractor', ['priority' => -1000])
+            ->tag('property_info.name_extractor', ['priority' => -1000])
 
         ->alias(PropertyReadInfoExtractorInterface::class, 'property_info.reflection_extractor')
         ->alias(PropertyWriteInfoExtractorInterface::class, 'property_info.reflection_extractor')

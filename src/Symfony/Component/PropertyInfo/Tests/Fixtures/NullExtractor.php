@@ -15,6 +15,7 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\TypeInfo\Type;
 
@@ -23,7 +24,7 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface
+class NullExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyNameExtractorInterface, PropertyInitializableExtractorInterface
 {
     public function getShortDescription($class, $property, array $context = []): ?string
     {
@@ -77,6 +78,11 @@ class NullExtractor implements PropertyListExtractorInterface, PropertyDescripti
     {
         $this->assertIsString($class);
 
+        return null;
+    }
+
+    public function getPropertyName(string $class, string $method, array $context = []): ?string
+    {
         return null;
     }
 

@@ -16,6 +16,7 @@ use Symfony\Component\PropertyInfo\Exception\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyReadInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
@@ -42,7 +43,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
  *
  * @final
  */
-class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
+class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNameExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, PropertyReadInfoExtractorInterface, PropertyWriteInfoExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     /**
      * @internal
@@ -133,7 +134,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
-        $reflectionProperties = $reflectionClass->getProperties();
+        $reflectionProperties = array_column($reflectionClass->getProperties(), null, 'name');
 
         $properties = [];
         foreach ($reflectionProperties as $reflectionProperty) {
@@ -147,17 +148,33 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 continue;
             }
 
-            $propertyName = $this->getPropertyName($reflectionClass, $reflectionMethod->name, $reflectionProperties);
+            $propertyName = $this->extractPropertyNameFromMethod($reflectionClass, $reflectionMethod->name, $reflectionProperties);
             if (!$propertyName || isset($properties[$propertyName])) {
                 continue;
             }
-            if ($reflectionClass->hasProperty($lowerCasedPropertyName = lcfirst($propertyName)) || (!$reflectionClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName))) {
-                $propertyName = $lowerCasedPropertyName;
-            }
+
             $properties[$propertyName] = $propertyName;
         }
 
         return $properties ? array_values($properties) : null;
+    }
+
+    public function getPropertyName(string $class, string $method, array $context = []): ?string
+    {
+        try {
+            $reflectionMethod = new \ReflectionMethod($class, $method);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        if ($reflectionMethod->isStatic()) {
+            return null;
+        }
+
+        $reflectionClass = $reflectionMethod->getDeclaringClass();
+        $reflectionProperties = array_column($reflectionClass->getProperties(), null, 'name');
+
+        return $this->extractPropertyNameFromMethod($reflectionClass, $method, $reflectionProperties);
     }
 
     public function getType(string $class, string $property, array $context = []): ?Type
@@ -692,7 +709,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    private function getPropertyName(\ReflectionClass $refClass, string $methodName, array $reflectionProperties): ?string
+    /**
+     * @param array<string, \ReflectionProperty> $reflectionProperties
+     */
+    private function extractPropertyNameFromMethod(\ReflectionClass $refClass, string $methodName, array $reflectionProperties): ?string
     {
         if (null !== $propertyName = $this->getAccessorMethodFromAttribute($refClass, $reflectionProperties, $methodName)) {
             return $propertyName;
@@ -700,6 +720,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
+        $propertyName = null;
         if ('' !== $pattern && preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
             // a lowercase first letter means the prefix is part of a longer word rather than a
             // prefix, e.g. "hash" or "cancel", so the method is not an accessor at all
@@ -707,22 +728,32 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 return null;
             }
 
-            if (!\in_array($matches[1], $this->arrayMutatorPrefixes, true)) {
-                return $matches[2];
-            }
+            $propertyName = $matches[2];
 
-            foreach ($reflectionProperties as $reflectionProperty) {
-                foreach ($this->inflector->singularize($reflectionProperty->name) as $name) {
-                    if (strtolower($name) === strtolower($matches[2])) {
-                        return $reflectionProperty->name;
+            if (\in_array($matches[1], $this->arrayMutatorPrefixes, true)) {
+                foreach ($reflectionProperties as $reflectionProperty) {
+                    foreach ($this->inflector->singularize($reflectionProperty->name) as $name) {
+                        if (strtolower($name) === strtolower($matches[2])) {
+                            return $reflectionProperty->name;
+                        }
                     }
                 }
             }
-
-            return $matches[2];
         }
 
-        return null;
+        if (!$propertyName) {
+            return null;
+        }
+
+        if (isset($reflectionProperties[$propertyName])) {
+            return $propertyName;
+        }
+
+        if ($refClass->hasProperty($lowerCasedPropertyName = lcfirst($propertyName)) || (!$refClass->hasProperty($propertyName) && !preg_match('/^[A-Z]{2,}/', $propertyName))) {
+            $propertyName = $lowerCasedPropertyName;
+        }
+
+        return $propertyName;
     }
 
     /**

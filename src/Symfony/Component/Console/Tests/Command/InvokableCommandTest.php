@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\Ask;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
@@ -246,6 +247,17 @@ class InvokableCommandTest extends TestCase
         $command->setCode(static function (#[Option] ?object $any = null) {});
 
         $this->expectException(LogicException::class);
+
+        $command->getDefinition();
+    }
+
+    public function testAskDefaultIsRejectedForArrayArgument()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (#[Argument] #[Ask('Add a value', default: 0)] array $values) {});
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Console\Attribute\Ask::$default" value is not supported for the array "$values"');
 
         $command->getDefinition();
     }

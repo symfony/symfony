@@ -130,6 +130,16 @@ class MainConfiguration implements ConfigurationInterface
                 ->arrayNode('access_control', 'rule')
                     ->cannotBeOverwritten()
                     ->prototype('array')
+                        ->beforeNormalization()
+                            ->ifArray()
+                            ->then(static function (array $v) {
+                                if (isset($v['roles'], $v['allow_if']) || isset($v['role'], $v['allow_if'])) {
+                                    trigger_deprecation('symfony/security-bundle', '8.2', 'Configuring both an access control rule "allow_if" and "roles" is deprecated, update "allow_if" instead.');
+                                }
+
+                                return $v;
+                            })
+                        ->end()
                         ->children()
                             ->scalarNode('request_matcher')->defaultNull()->end()
                             ->scalarNode('requires_channel')->defaultNull()->end()
@@ -154,11 +164,17 @@ class MainConfiguration implements ConfigurationInterface
                                 ->prototype('scalar')->end()
                             ->end()
                             ->scalarNode('allow_if')->defaultNull()->end()
-                        ->end()
-                        ->children()
                             ->arrayNode('roles', 'role')
                                 ->beforeNormalization()->ifString()->then(static fn ($v) => preg_split('/\s*,\s*/', $v))->end()
                                 ->prototype('scalar')->end()
+                                ->validate()
+                                    ->ifTrue(static fn (array $v) => \count($v) > 1)
+                                    ->then(static function (array $v) {
+                                        trigger_deprecation('symfony/security-bundle', '8.2', 'Configuring an access control rule with many "roles" is deprecated, use "allow_if" or role hierarchy instead.');
+
+                                        return $v;
+                                    })
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

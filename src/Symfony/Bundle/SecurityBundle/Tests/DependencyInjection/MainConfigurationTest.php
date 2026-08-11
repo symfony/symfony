@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -23,6 +24,8 @@ use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 
 class MainConfigurationTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     /**
      * The minimal, required config needed to not have any required validation
      * issues.
@@ -340,6 +343,51 @@ class MainConfigurationTest extends TestCase
         $configuration = new MainConfiguration([], []);
 
         $this->expectException(InvalidConfigurationException::class);
+
+        $processor->processConfiguration($configuration, [$config]);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideAccessControlRuleRoles')]
+    public function testConfiguringManyAccessControlRuleRolesIsDeprecated(array|string $roles, array $resultingRoles)
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [['path' => '/', 'roles' => $roles]],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: Configuring an access control rule with many "roles" is deprecated, use "allow_if" or role hierarchy instead.');
+
+        $processedConfig = $processor->processConfiguration($configuration, [$config]);
+
+        $this->assertEqualsCanonicalizing($resultingRoles, $processedConfig['access_control'][0]['roles']);
+    }
+
+    public static function provideAccessControlRuleRoles(): iterable
+    {
+        yield [['ROLE_ADMIN', 'ROLE_USER'], ['ROLE_ADMIN', 'ROLE_USER']];
+        yield ['ROLE_ADMIN, ROLE_USER', ['ROLE_ADMIN', 'ROLE_USER']];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testConfiguringAccessControlRuleRolesAndAllowIfIsDeprecated()
+    {
+        $config = array_merge(static::$minimalConfig, [
+            'access_control' => [[
+                'path' => '/',
+                'roles' => 'ROLE_USER',
+                'allow_if' => 'is_granted("ROLE_ADMIN")',
+            ]],
+        ]);
+
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.2: Configuring both an access control rule "allow_if" and "roles" is deprecated, update "allow_if" instead.');
 
         $processor->processConfiguration($configuration, [$config]);
     }

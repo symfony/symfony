@@ -22,7 +22,11 @@ use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Exclude;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -134,11 +138,17 @@ abstract class FileLoader extends BaseFileLoader
         $getPrototype = (new DeepCloner($prototype))->clone(...);
 
         foreach ($classes as $class => $errorMessage) {
+            $whenConditions = [];
             if (null === $errorMessage && $autoconfigureAttributes) {
                 $r = $this->container->getReflectionClass($class);
                 if ($r->getAttributes(Exclude::class)[0] ?? null) {
                     $this->addContainerExcludedTag($class, $source);
                     continue;
+                }
+                foreach ([WhenClassExists::class, WhenClassMissing::class, WhenMissingService::class, WhenParameter::class] as $conditionAttribute) {
+                    foreach ($r->getAttributes($conditionAttribute, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+                        $whenConditions[] = $attribute->newInstance();
+                    }
                 }
                 if ($this->env) {
                     $excluded = true;
@@ -191,6 +201,10 @@ abstract class FileLoader extends BaseFileLoader
                 $definition->setAbstract(true)
                     ->addTag('container.excluded', ['source' => 'because the class is abstract']);
                 continue;
+            }
+
+            if ($whenConditions) {
+                $definition->setWhenConditions(array_merge($definition->getWhenConditions(), $whenConditions));
             }
 
             $interfaces = [];

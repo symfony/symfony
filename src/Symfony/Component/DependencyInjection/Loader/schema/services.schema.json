@@ -121,6 +121,71 @@
         { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } }
       ]
     },
+    "when": {
+      "$comment": "Compile-time conditions that must all match for the service to be registered. YAML example:\n- when: { class_exists: 'Redis', missing_service: 'App\\CacheManagerInterface', parameter: { name: 'app.cache.enabled', value: true } }.",
+      "type": "object",
+      "properties": {
+        "class_exists": {
+          "oneOf": [
+            { "$ref": "#/$defs/whenClassExists" },
+            { "type": "array", "items": { "$ref": "#/$defs/whenClassExists" } }
+          ]
+        },
+        "class_missing": {
+          "oneOf": [
+            { "$ref": "#/$defs/whenClassExists" },
+            { "type": "array", "items": { "$ref": "#/$defs/whenClassExists" } }
+          ]
+        },
+        "missing_service": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } }
+          ]
+        },
+        "parameter": {
+          "oneOf": [
+            { "$ref": "#/$defs/whenParameter" },
+            { "type": "array", "items": { "$ref": "#/$defs/whenParameter" } }
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "whenClassExists": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "class": { "type": "string" },
+            "package": { "type": "string" },
+            "parent_packages": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "array", "items": { "type": "string" } }
+              ]
+            }
+          },
+          "required": ["class"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "whenParameter": {
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "value": { "$ref": "#/$defs/parameterValue" }
+          },
+          "required": ["name"],
+          "additionalProperties": false
+        }
+      ]
+    },
     "tags": {
       "$comment": "YAML examples:\n- ['kernel.event_subscriber', { name: 'kernel.event_listener', event: 'kernel.request' }, { my_tag: { attr: 1 } }].",
       "type": "array",
@@ -264,6 +329,7 @@
         "autoconfigure": { "type": "boolean" },
         "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
         "constructor": { "type": "string" },
+        "when": { "$ref": "#/$defs/when" },
         "from_callable": { "$ref": "#/$defs/parameterValue", "$comment": "Will be wrapped by factory ['Closure','fromCallable'] and sets lazy=true unless class is 'Closure'." }
       },
       "additionalProperties": false
@@ -296,7 +362,8 @@
         "autowire": { "type": "boolean" },
         "autoconfigure": { "type": "boolean" },
         "bind": { "type": "object", "additionalProperties": { "$ref": "#/$defs/parameterValue" } },
-        "constructor": { "type": "string" }
+        "constructor": { "type": "string" },
+        "when": { "$ref": "#/$defs/when" }
       },
       "required": ["resource"],
       "allOf": [
@@ -311,10 +378,15 @@
         "stack": {
           "type": "array",
           "items": {
-            "oneOf": [
-              { "$ref": "#/$defs/serviceConcrete" },
-              { "$ref": "#/$defs/serviceAliasObject" },
-              { "$ref": "#/$defs/servicePrototype" }
+            "allOf": [
+              {
+                "oneOf": [
+                  { "$ref": "#/$defs/serviceConcrete" },
+                  { "$ref": "#/$defs/serviceAliasObject" },
+                  { "$ref": "#/$defs/servicePrototype" }
+                ]
+              },
+              { "not": { "required": ["when"] }, "$comment": "Conditions are only supported on top-level service definitions." }
             ]
           }
         },

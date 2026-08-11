@@ -28,6 +28,10 @@ use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\TagDecoratorPass;
@@ -1417,5 +1421,83 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($container->hasAlias('bar'));
 
         $this->assertStringContainsString('.decorator.foo.', (string) $container->getAlias('foo'));
+    }
+
+    public function testWhenConditions()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_when.yml');
+
+        $fooConditions = $container->getDefinition('foo')->getWhenConditions();
+        $this->assertCount(4, $fooConditions);
+        $this->assertInstanceOf(WhenClassExists::class, $fooConditions[0]);
+        $this->assertSame('Redis', $fooConditions[0]->class);
+        $this->assertNull($fooConditions[0]->package);
+        $this->assertInstanceOf(WhenClassMissing::class, $fooConditions[1]);
+        $this->assertSame('Memcached', $fooConditions[1]->class);
+        $this->assertInstanceOf(WhenMissingService::class, $fooConditions[2]);
+        $this->assertSame('bar', $fooConditions[2]->id);
+        $this->assertInstanceOf(WhenParameter::class, $fooConditions[3]);
+        $this->assertSame('app.enabled', $fooConditions[3]->name);
+        $this->assertTrue($fooConditions[3]->value);
+
+        $bazConditions = $container->getDefinition('baz')->getWhenConditions();
+        $this->assertCount(5, $bazConditions);
+        $this->assertSame('PDO', $bazConditions[0]->class);
+        $this->assertSame('Redis', $bazConditions[1]->class);
+        $this->assertSame('ext-redis', $bazConditions[1]->package);
+        $this->assertSame(['acme/my-bundle'], $bazConditions[1]->parentPackages);
+        $this->assertSame('service_a', $bazConditions[2]->id);
+        $this->assertSame('service_b', $bazConditions[3]->id);
+        $this->assertSame('app.flag', $bazConditions[4]->name);
+        $this->assertTrue($bazConditions[4]->value);
+    }
+
+    public function testWhenConditionsWithInvalidKey()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "when" key "unknown_condition" is unsupported for service "foo"');
+
+        $loader->load('services_when_invalid.yml');
+    }
+
+    public function testWhenConditionsAreNotAllowedInStackFrames()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "when" option is only supported on top-level service definitions');
+
+        $loader->load('services_when_in_stack.yml');
+    }
+
+    #[DataProvider('provideMalformedWhenConditions')]
+    public function testMalformedWhenConditions(array $when, string $expectedMessage)
+    {
+        $loader = new YamlFileLoader(new ContainerBuilder(), new FileLocator());
+        $reflectionMethod = new \ReflectionMethod($loader, 'parseDefinition');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $reflectionMethod->invoke($loader, 'my_service', ['class' => 'stdClass', 'when' => $when], 'services.yaml', []);
+    }
+
+    public static function provideMalformedWhenConditions(): iterable
+    {
+        yield 'empty class' => [['class_exists' => ''], 'must be a non-empty class name'];
+        yield 'empty class in map' => [['class_missing' => ['class' => '']], 'must be a non-empty class name'];
+        yield 'array package' => [['class_exists' => ['class' => 'Redis', 'package' => []]], 'The "package" of a "when.class_exists" entry must be a non-empty string'];
+        yield 'empty package' => [['class_exists' => ['class' => 'Redis', 'package' => '']], 'The "package" of a "when.class_exists" entry must be a non-empty string'];
+        yield 'non-string parent packages' => [['class_missing' => ['class' => 'Redis', 'parent_packages' => [42]]], 'must be a list of non-empty strings'];
+        yield 'empty parameter name' => [['parameter' => ''], 'must be a non-empty parameter name'];
+        yield 'empty missing_service' => [['missing_service' => ''], 'must be a non-empty service id'];
+        yield 'map as parent packages' => [['class_exists' => ['class' => 'Redis', 'parent_packages' => ['named' => 'acme/pkg']]], 'must be a list of non-empty strings'];
+        yield 'map as missing_service' => [['missing_service' => ['named' => 'override']], 'must be a service id or a list of service ids'];
     }
 }

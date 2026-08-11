@@ -1,0 +1,5 @@
+services:
+    foo:
+        class: stdClass
+        when:
+            unknown_condition: bar

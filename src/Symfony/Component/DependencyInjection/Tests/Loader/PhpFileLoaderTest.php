@@ -19,6 +19,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -151,6 +154,39 @@ class PhpFileLoaderTest extends TestCase
         yield ['array_config_tagged_iterator'];
         yield ['object_array_config'];
         yield ['return_when_env'];
+    }
+
+    public function testWhenConditionAttributesAreNotAllowedOnConfigClosures()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The #[WhenClassExists] attribute cannot be used on the closure');
+
+        $loader->load($fixtures.'/config/when_attribute_on_closure.php');
+    }
+
+    public function testWhenConditionsInArrayConfig()
+    {
+        $fixtures = realpath(__DIR__.'/../Fixtures');
+        $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
+        $loader->load($fixtures.'/config/array_config_when.php');
+
+        $conditions = $container->getDefinition('my_conditional_service')->getWhenConditions();
+        $this->assertCount(3, $conditions);
+        $this->assertInstanceOf(WhenClassExists::class, $conditions[0]);
+        $this->assertSame('Redis', $conditions[0]->class);
+        $this->assertInstanceOf(WhenMissingService::class, $conditions[1]);
+        $this->assertSame('bar', $conditions[1]->id);
+        $this->assertInstanceOf(WhenParameter::class, $conditions[2]);
+        $this->assertSame('app.enabled', $conditions[2]->name);
+        $this->assertTrue($conditions[2]->value);
+
+        $prototypeConditions = $container->getDefinition('Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Sub\Bar')->getWhenConditions();
+        $this->assertCount(1, $prototypeConditions);
+        $this->assertInstanceOf(WhenMissingService::class, $prototypeConditions[0]);
+        $this->assertSame('app.manager', $prototypeConditions[0]->id);
     }
 
     public function testConfigLazyProxyArgument()

@@ -1,0 +1,6 @@
+services:
+    my_stack:
+        stack:
+            - class: stdClass
+              when:
+                  class_exists: Redis

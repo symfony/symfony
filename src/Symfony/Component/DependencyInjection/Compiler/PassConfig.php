@@ -41,6 +41,9 @@ class PassConfig
         $this->mergePass = new MergeExtensionConfigurationPass();
 
         $this->beforeOptimizationPasses = [
+            150 => [
+                new ResolveConditionalDefinitionsPass(pureConditionsOnly: true),
+            ],
             100 => [
                 new ResolveClassPass(),
                 new RegisterAutoconfigureAttributesPass(),
@@ -53,6 +56,7 @@ class PassConfig
         ];
 
         $this->optimizationPasses = [[
+            new ResolveConditionalDefinitionsPass(),
             new AutoAliasServicePass(),
             new ValidateEnvPlaceholdersPass(),
             new ResolveDecoratorStackPass(),

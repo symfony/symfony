@@ -21,6 +21,10 @@ use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -299,6 +303,34 @@ class YamlDumperTest extends TestCase
         $dumper = new YamlDumper($container);
 
         $this->assertStringEqualsGeneratedFile('container_with_env_placeholders.yml', $dumper->dump());
+    }
+
+    public function testDumpWhenConditionsRoundTrip()
+    {
+        $container = new ContainerBuilder();
+        $conditions = [
+            new WhenClassExists('Redis'),
+            new WhenClassExists('Redis', 'ext-redis', ['acme/my-bundle']),
+            new WhenClassExists('Redis', null, ['acme/parent']),
+            new WhenClassMissing('Memcached'),
+            new WhenMissingService('app.manager'),
+            new WhenParameter('app.enabled'),
+            new WhenParameter('app.locales', ['es', 'en']),
+        ];
+        $container->register('conditional', 'stdClass')->setWhenConditions($conditions);
+
+        $yaml = (new YamlDumper($container))->dump();
+
+        $reloadedContainer = new ContainerBuilder();
+        $file = tempnam(sys_get_temp_dir(), 'sf_dumped_when').'.yml';
+        file_put_contents($file, $yaml);
+        try {
+            (new YamlFileLoader($reloadedContainer, new FileLocator()))->load($file);
+        } finally {
+            unlink($file);
+        }
+
+        $this->assertEquals($conditions, $reloadedContainer->getDefinition('conditional')->getWhenConditions());
     }
 
     private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')

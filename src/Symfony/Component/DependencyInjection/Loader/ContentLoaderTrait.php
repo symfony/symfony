@@ -20,6 +20,10 @@ use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -64,6 +68,7 @@ trait ContentLoaderTrait
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
         'constructor' => 'constructor',
+        'when' => 'when',
     ];
 
     private const PROTOTYPE_KEYWORDS = [
@@ -87,6 +92,7 @@ trait ContentLoaderTrait
         'autoconfigure' => 'autoconfigure',
         'bind' => 'bind',
         'constructor' => 'constructor',
+        'when' => 'when',
     ];
 
     private const INSTANCEOF_KEYWORDS = [
@@ -679,6 +685,17 @@ trait ContentLoaderTrait
             $definition->setAutoconfigured($service['autoconfigure']);
         }
 
+        if (isset($service['when'])) {
+            if ($return) {
+                throw new InvalidArgumentException(\sprintf('The "when" option is only supported on top-level service definitions; it cannot be used on the inline definition "%s" in "%s".', $id, $file));
+            }
+            if (!\is_array($service['when'])) {
+                throw new InvalidArgumentException(\sprintf('Parameter "when" must be an array for service "%s" in "%s".', $id, $file));
+            }
+
+            $definition->setWhenConditions($this->parseWhenConditions($service['when'], $id, $file));
+        }
+
         if (\array_key_exists('namespace', $service) && !\array_key_exists('resource', $service)) {
             throw new InvalidArgumentException(\sprintf('A "resource" attribute must be set when the "namespace" attribute is set for service "%s" in "%s".', $id, $file));
         }
@@ -976,6 +993,78 @@ trait ContentLoaderTrait
                 throw new InvalidArgumentException(\sprintf('The configuration key "%s" is unsupported for definition "%s" in "%s". Allowed configuration keys are "%s".', $key, $id, $file, implode('", "', $keywords)));
             }
         }
+    }
+
+    /**
+     * @return list<WhenClassExists|WhenClassMissing|WhenMissingService|WhenParameter>
+     */
+    private function parseWhenConditions(array $when, string $id, string $file): array
+    {
+        $conditions = [];
+
+        foreach ($when as $type => $config) {
+            switch ($type) {
+                case 'class_exists':
+                case 'class_missing':
+                    foreach (\is_array($config) && array_is_list($config) ? $config : [$config] as $classCondition) {
+                        if (\is_string($classCondition)) {
+                            $classCondition = ['class' => $classCondition];
+                        }
+                        if (!\is_array($classCondition) || !isset($classCondition['class']) || !\is_string($classCondition['class']) || '' === $classCondition['class']) {
+                            throw new InvalidArgumentException(\sprintf('A "when.%s" entry must be a non-empty class name or a map with a "class" key for service "%s" in "%s".', $type, $id, $file));
+                        }
+                        if ($extraKeys = array_diff_key($classCondition, ['class' => true, 'package' => true, 'parent_packages' => true])) {
+                            throw new InvalidArgumentException(\sprintf('Invalid key%s "%s" in "when.%s" for service "%s" in "%s". Allowed keys are "class", "package" and "parent_packages".', 1 < \count($extraKeys) ? 's' : '', implode('", "', array_keys($extraKeys)), $type, $id, $file));
+                        }
+                        if (isset($classCondition['package']) && (!\is_string($classCondition['package']) || '' === $classCondition['package'])) {
+                            throw new InvalidArgumentException(\sprintf('The "package" of a "when.%s" entry must be a non-empty string for service "%s" in "%s".', $type, $id, $file));
+                        }
+                        $parentPackages = $classCondition['parent_packages'] ?? [];
+                        $parentPackages = \is_array($parentPackages) ? $parentPackages : [$parentPackages];
+                        if (!array_is_list($parentPackages)) {
+                            throw new InvalidArgumentException(\sprintf('The "parent_packages" of a "when.%s" entry must be a list of non-empty strings for service "%s" in "%s".', $type, $id, $file));
+                        }
+                        foreach ($parentPackages as $parentPackage) {
+                            if (!\is_string($parentPackage) || '' === $parentPackage) {
+                                throw new InvalidArgumentException(\sprintf('The "parent_packages" of a "when.%s" entry must be a list of non-empty strings for service "%s" in "%s".', $type, $id, $file));
+                            }
+                        }
+                        $conditionClass = 'class_exists' === $type ? WhenClassExists::class : WhenClassMissing::class;
+                        $conditions[] = new $conditionClass($classCondition['class'], $classCondition['package'] ?? null, $parentPackages);
+                    }
+                    break;
+                case 'missing_service':
+                    $missingIds = \is_array($config) ? $config : [$config];
+                    if (!array_is_list($missingIds)) {
+                        throw new InvalidArgumentException(\sprintf('The "when.missing_service" option must be a service id or a list of service ids for service "%s" in "%s".', $id, $file));
+                    }
+                    foreach ($missingIds as $missingId) {
+                        if (!\is_string($missingId) || '' === $missingId) {
+                            throw new InvalidArgumentException(\sprintf('A "when.missing_service" entry must be a non-empty service id for service "%s" in "%s".', $id, $file));
+                        }
+                        $conditions[] = new WhenMissingService($missingId);
+                    }
+                    break;
+                case 'parameter':
+                    foreach (\is_array($config) && array_is_list($config) ? $config : [$config] as $parameter) {
+                        if (\is_string($parameter)) {
+                            $parameter = ['name' => $parameter];
+                        }
+                        if (!\is_array($parameter) || !isset($parameter['name']) || !\is_string($parameter['name']) || '' === $parameter['name']) {
+                            throw new InvalidArgumentException(\sprintf('A "when.parameter" entry must be a non-empty parameter name or a map with a "name" key for service "%s" in "%s".', $id, $file));
+                        }
+                        if ($extraKeys = array_diff_key($parameter, ['name' => true, 'value' => true])) {
+                            throw new InvalidArgumentException(\sprintf('Invalid key%s "%s" in "when.parameter" for service "%s" in "%s". Allowed keys are "name" and "value".', 1 < \count($extraKeys) ? 's' : '', implode('", "', array_keys($extraKeys)), $id, $file));
+                        }
+                        $conditions[] = new WhenParameter($parameter['name'], \array_key_exists('value', $parameter) ? $parameter['value'] : true);
+                    }
+                    break;
+                default:
+                    throw new InvalidArgumentException(\sprintf('The "when" key "%s" is unsupported for service "%s" in "%s". Allowed keys are "class_exists", "class_missing", "missing_service" and "parameter".', $type, $id, $file));
+            }
+        }
+
+        return $conditions;
     }
 
     private function validateAttributes(string $message, array $attributes, array $path = []): void

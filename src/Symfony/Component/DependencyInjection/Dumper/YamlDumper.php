@@ -20,6 +20,10 @@ use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -115,6 +119,34 @@ class YamlDumper extends Dumper
 
         if ($definition->isAbstract()) {
             $code .= "        abstract: true\n";
+        }
+
+        if ($whenConditions = $definition->getWhenConditions()) {
+            $when = [];
+            foreach ($whenConditions as $condition) {
+                if ($condition instanceof WhenClassExists || $condition instanceof WhenClassMissing) {
+                    $key = $condition instanceof WhenClassExists ? 'class_exists' : 'class_missing';
+                    if ($condition->package || $condition->parentPackages) {
+                        $entry = ['class' => $condition->class];
+                        if ($condition->package) {
+                            $entry['package'] = $condition->package;
+                        }
+                        if ($condition->parentPackages) {
+                            $entry['parent_packages'] = $condition->parentPackages;
+                        }
+                        $when[$key][] = $entry;
+                    } else {
+                        $when[$key][] = $condition->class;
+                    }
+                } elseif ($condition instanceof WhenMissingService) {
+                    $when['missing_service'][] = $condition->id;
+                } elseif ($condition instanceof WhenParameter) {
+                    $when['parameter'][] = ['name' => $condition->name, 'value' => $condition->value];
+                } else {
+                    throw new RuntimeException(\sprintf('Unable to dump a service container if a "when" condition is of type "%s".', get_debug_type($condition)));
+                }
+            }
+            $code .= \sprintf("        when: %s\n", $this->dumper->dump($when, 0));
         }
 
         if ($definition->isLazy()) {

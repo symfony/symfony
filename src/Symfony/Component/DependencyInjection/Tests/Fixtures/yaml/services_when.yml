@@ -1,0 +1,17 @@
+services:
+    foo:
+        class: stdClass
+        when:
+            class_exists: Redis
+            class_missing: Memcached
+            missing_service: bar
+            parameter: { name: app.enabled, value: true }
+
+    baz:
+        class: stdClass
+        when:
+            class_exists:
+                - PDO
+                - { class: Redis, package: ext-redis, parent_packages: [acme/my-bundle] }
+            missing_service: [service_a, service_b]
+            parameter: app.flag

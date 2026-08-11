@@ -12,6 +12,10 @@
 namespace Symfony\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 
@@ -32,6 +36,7 @@ class Definition
     private array $properties = [];
     private array $calls = [];
     private array $instanceof = [];
+    private array $whenConditions = [];
     private bool $autoconfigured = false;
     private string|array|null $configurator = null;
     private array $tags = [];
@@ -401,6 +406,33 @@ class Definition
     public function getInstanceofConditionals(): array
     {
         return $this->instanceof;
+    }
+
+    /**
+     * Sets the conditions that must all match for this definition to be kept in the container.
+     *
+     * Conditions only apply to this very definition: they are not inherited by
+     * child definitions that use it as their parent.
+     *
+     * @param list<WhenClassExists|WhenClassMissing|WhenMissingService|WhenParameter> $whenConditions
+     *
+     * @return $this
+     */
+    public function setWhenConditions(array $whenConditions): static
+    {
+        $this->whenConditions = $whenConditions;
+
+        return $this;
+    }
+
+    /**
+     * Gets the conditions that must all match for this definition to be kept in the container.
+     *
+     * @return list<WhenClassExists|WhenClassMissing|WhenMissingService|WhenParameter>
+     */
+    public function getWhenConditions(): array
+    {
+        return $this->whenConditions;
     }
 
     /**

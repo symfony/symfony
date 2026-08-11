@@ -18,6 +18,9 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\RegisterAutoconfigureAttributesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,6 +30,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Conditional\ConditionalService;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\AbstractClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
@@ -525,6 +529,29 @@ class FileLoaderTest extends TestCase
         $loader->registerClasses($prototype, 'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\StaticConstructor\\', 'Prototype/StaticConstructor');
 
         $this->assertTrue($container->has(PrototypeStaticConstructor::class));
+    }
+
+    public function testRegisterClassesWithWhenConditionAttributes()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Conditional\\',
+            'Conditional/*'
+        );
+
+        $conditions = $container->getDefinition(ConditionalService::class)->getWhenConditions();
+
+        $this->assertCount(3, $conditions);
+        $this->assertInstanceOf(WhenClassExists::class, $conditions[0]);
+        $this->assertSame(\stdClass::class, $conditions[0]->class);
+        $this->assertInstanceOf(WhenMissingService::class, $conditions[1]);
+        $this->assertSame('app.manager', $conditions[1]->id);
+        $this->assertInstanceOf(WhenParameter::class, $conditions[2]);
+        $this->assertSame('app.enabled', $conditions[2]->name);
+        $this->assertTrue($conditions[2]->value);
     }
 }
 

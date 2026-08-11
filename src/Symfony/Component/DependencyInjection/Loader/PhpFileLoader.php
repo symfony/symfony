@@ -12,7 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Loader;
 
 use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassExists;
+use Symfony\Component\DependencyInjection\Attribute\WhenClassMissing;
+use Symfony\Component\DependencyInjection\Attribute\WhenMissingService;
 use Symfony\Component\DependencyInjection\Attribute\WhenNot;
+use Symfony\Component\DependencyInjection\Attribute\WhenParameter;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -149,6 +153,12 @@ class PhpFileLoader extends FileLoader
         $callback = $callback(...);
         $arguments = [];
         $r = new \ReflectionFunction($callback);
+
+        foreach ([WhenClassExists::class, WhenClassMissing::class, WhenMissingService::class, WhenParameter::class] as $conditionAttribute) {
+            if ($r->getAttributes($conditionAttribute, \ReflectionAttribute::IS_INSTANCEOF)) {
+                throw new LogicException(\sprintf('The #[%s] attribute cannot be used on the closure of the "%s" config file; it can only condition service classes. Use the "when" key on a service definition instead.', substr($conditionAttribute, strrpos($conditionAttribute, '\\') + 1), $path));
+            }
+        }
 
         $excluded = true;
         $whenAttributes = $r->getAttributes(When::class, \ReflectionAttribute::IS_INSTANCEOF);

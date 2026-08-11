@@ -2540,6 +2540,49 @@ class PhpDumperTest extends TestCase
         }
         $this->assertSame('Setup failed.', $second?->getMessage(), '->get() should throw again instead of returning a partially-configured service');
     }
+
+    public function testDumpedContainerSharesBeforeSetupOnExpressionSelfReference()
+    {
+        $container = new ContainerBuilder();
+        $container->register('configuration', PhpDumperTest_ExpressionSelfReference::class)
+            ->setPublic(true)
+            ->addMethodCall('setStrategy', [new Reference('strategy')]);
+        $container->register('strategy', PhpDumperTest_ExpressionSelfReferenceStrategy::class)
+            ->addArgument(new Reference('locator'));
+        $container->register('locator', PhpDumperTest_ExpressionSelfReferenceLocator::class)
+            ->addArgument(new Expression('service("configuration").getDirectory()'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => $class = 'Symfony_DI_PhpDumper_Test_Expression_Self_Reference']);
+
+        // the expression dumps to a container lookup rather than to the local $instance,
+        // so the service has to be shared before its setup runs
+        $sharePosition = strpos($dump, '$container->services[\'configuration\'] = $instance;');
+        $setupPosition = strpos($dump, '$instance->setStrategy(');
+
+        $this->assertNotFalse($sharePosition);
+        $this->assertNotFalse($setupPosition);
+        $this->assertLessThan($setupPosition, $sharePosition);
+
+        eval('?>'.$dump);
+
+        $configuration = (new $class())->get('configuration');
+
+        $this->assertInstanceOf(PhpDumperTest_ExpressionSelfReferenceStrategy::class, $configuration->strategy);
+    }
+
+    public function testConstructorExpressionSelfReferenceRemainsCircular()
+    {
+        $container = new ContainerBuilder();
+        $container->register('configuration', PhpDumperTest_ExpressionSelfReference::class)
+            ->setPublic(true)
+            ->addArgument(new Expression('service("configuration").getDirectory()'));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+
+        $container->compile();
+    }
 }
 
 class Rot13EnvVarProcessor implements EnvVarProcessorInterface
@@ -2725,5 +2768,34 @@ class PhpDumperTest_FailsOnceConfigurator
         if (1 === ++self::$calls) {
             throw new \RuntimeException('First attempt fails.');
         }
+    }
+}
+
+class PhpDumperTest_ExpressionSelfReference
+{
+    public $strategy;
+
+    public function setStrategy(PhpDumperTest_ExpressionSelfReferenceStrategy $strategy): void
+    {
+        $this->strategy = $strategy;
+    }
+
+    public function getDirectory(): string
+    {
+        return '/tmp/proxies';
+    }
+}
+
+class PhpDumperTest_ExpressionSelfReferenceStrategy
+{
+    public function __construct(public PhpDumperTest_ExpressionSelfReferenceLocator $locator)
+    {
+    }
+}
+
+class PhpDumperTest_ExpressionSelfReferenceLocator
+{
+    public function __construct(public string $directory)
+    {
     }
 }

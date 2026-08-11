@@ -27,8 +27,9 @@ class ServiceReferenceGraphEdge
     private bool $weak;
     private bool $byConstructor;
     private bool $byMultiUseArgument;
+    private bool $fromExpression;
 
-    public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, mixed $value = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false, bool $byMultiUseArgument = false)
+    public function __construct(ServiceReferenceGraphNode $sourceNode, ServiceReferenceGraphNode $destNode, mixed $value = null, bool $lazy = false, bool $weak = false, bool $byConstructor = false, bool $byMultiUseArgument = false, bool $fromExpression = false)
     {
         $this->sourceNode = $sourceNode;
         $this->destNode = $destNode;
@@ -37,6 +38,7 @@ class ServiceReferenceGraphEdge
         $this->weak = $weak;
         $this->byConstructor = $byConstructor;
         $this->byMultiUseArgument = $byMultiUseArgument;
+        $this->fromExpression = $fromExpression;
     }
 
     /**
@@ -90,5 +92,13 @@ class ServiceReferenceGraphEdge
     public function isFromMultiUseArgument(): bool
     {
         return $this->byMultiUseArgument;
+    }
+
+    /**
+     * Returns true if the edge comes from an expression, which compiles to a container lookup.
+     */
+    public function isFromExpression(): bool
+    {
+        return $this->fromExpression;
     }
 }

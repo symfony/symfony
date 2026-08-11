@@ -2944,6 +2944,31 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('Webhook-Signature', $container->getDefinition('webhook.signer')->getArgument(1));
     }
 
+    public function testWebhookRequestParserIsWiredWithTheConfiguredHeaderNames()
+    {
+        if (!class_exists(WebhookController::class)) {
+            $this->markTestSkipped('Webhook not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => [
+                    'enabled' => true,
+                    'signing_algorithm' => 'sha512',
+                    'signature_header_name' => 'X-Signature',
+                    'event_header_name' => 'X-Event',
+                    'id_header_name' => 'X-Id',
+                ],
+            ]);
+        });
+
+        $this->assertSame(
+            ['sha512', 'X-Signature', 'X-Event', 'X-Id'],
+            $container->getDefinition('webhook.request_parser')->getArguments()
+        );
+    }
+
     public function testWebhookWithoutSerializer()
     {
         if (!class_exists(WebhookController::class)) {

@@ -62,6 +62,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('messenger.message_handler')
 
         ->set('webhook.request_parser', RequestParser::class)
+            ->args([
+                abstract_arg('signing algorithm'),
+                abstract_arg('signature header name'),
+                abstract_arg('event header name'),
+                abstract_arg('id header name'),
+            ])
         ->alias(RequestParser::class, 'webhook.request_parser')
 
         ->set('webhook.controller', WebhookController::class)

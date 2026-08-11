@@ -2300,6 +2300,15 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
     }
 
+    public function testNotificationLoggerListenerIsResettable()
+    {
+        $container = $this->createContainerFromFile('notifier');
+
+        // Otherwise a worker keeps every notification it ever sent, and the
+        // collector reports the ones from previous messages.
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('notifier.notification_logger_listener')->getTag('kernel.reset'));
+    }
+
     public function testNotifierWithMailerAndMessenger()
     {
         $container = $this->createContainerFromFile('notifier');

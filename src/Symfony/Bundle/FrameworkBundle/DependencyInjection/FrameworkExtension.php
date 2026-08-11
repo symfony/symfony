@@ -3439,6 +3439,12 @@ class FrameworkExtension extends Extension
         $container->getDefinition('webhook.signer')
             ->replaceArgument(0, $config['signing_algorithm'])
             ->replaceArgument(1, $config['signature_header_name']);
+
+        $container->getDefinition('webhook.request_parser')
+            ->replaceArgument(0, $config['signing_algorithm'])
+            ->replaceArgument(1, $config['signature_header_name'])
+            ->replaceArgument(2, $config['event_header_name'])
+            ->replaceArgument(3, $config['id_header_name']);
     }
 
     private function registerRemoteEventConfiguration(PhpFileLoader $loader): void

@@ -2613,7 +2613,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testNotificationLoggerListenerIsResettable()
     {
-        $container = $this->createContainerFromFile('notifier');
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'secret' => 's3cr3t',
+                'test' => true,
+                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
+            ]);
+        });
 
         // Otherwise a worker keeps every notification it ever sent, and the
         // collector reports the ones from previous messages.

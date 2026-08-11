@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T17:41:22Z
+
+Rebased on 8.2 now that #59529 is merged, dropping the bundled parent commit so this is just the serializer half.
+
+Found one thing while doing it. `getProperty()` is advertised on `PropertyInfoExtractorInterface` through `@method`, which keeps existing implementations valid, but `ObjectNormalizer` called it unconditionally on the extractor passed to its constructor. Any third-party `PropertyInfoExtractorInterface` written before this fatals:
+
+```
+Error: Call to undefined method LegacyExtractor::getProperty()
+```
+
+`$propertyInfoExtractor` is a public constructor argument, so that is reachable without touching internals. The call is now guarded by `instanceof PropertyNameExtractorInterface` and falls back to `getAttributeNameFromAccessor()`, which the class still has through `AccessorCollisionResolverTrait`. Covered by `testNormalizeWithAnExtractorThatDoesNotExtractPropertyNames`, which errors with that exact message without the guard.
+
+Conflicts from the rebase were the two CHANGELOGs and two import lists. The `#[WithAccessors]` CHANGELOG line came with the parent, so only the `PropertyNameExtractorInterface` line is new here, and it moved to the 8.2 section.
+
+Checked: PropertyInfo 661 tests, Serializer 1429, PropertyAccess 493, FrameworkBundle 1442, no failures. Reverting `ObjectNormalizer` while keeping the tests fails the attribute test.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T12:22:58Z
+
+Two of the three points from the review are applied; the third turned out to be wrong and I did not split it.
+
+**Renamed `getProperty()` to `getPropertyName()`** across the interface, the two composites, `ReflectionExtractor` and the fixtures. It returns a name and the interface is `PropertyNameExtractorInterface`, so this is easier to fix now than after release. The pre-existing private `getPropertyName()` became `extractPropertyNameFromMethod()` to make room. Watch out for the composites: they dispatch by method-name string (`$this->extract($this->propertyNameExtractors, 'getProperty', ...)`), so those literals had to move too. Only FrameworkBundle's functional tests caught that, the unit suites did not.
+
+**Dropped the `@method` line from `PropertyInfoExtractorInterface`.** It advertised a method implementations are not required to have, which is what produced the fatal fixed in the previous push. Consumers now check `instanceof PropertyNameExtractorInterface`, which is honest about it being optional.
+
+**I did not split out the `getProperties()` change.** I suggested that before checking, and it was wrong: the `ctype_lower` guard is not an incidental bugfix, it is required for this PR to preserve serializer behaviour. `AccessorCollisionResolverTrait` has always applied the same rule with the same comment, so without the guard `ObjectNormalizer` starts emitting an `h` attribute for a class with a `hash()` method:
+
+```
+with the guard:    ['real']
+without the guard: ['h', 'real']
+```
+
+The two are one change and belong together.
+
+What it does mean is that `ReflectionExtractor::getProperties()` moves as a consequence, dropping phantom properties like `h` from `hash()` and `cel` from `cancel()`, and that was undocumented. Added a CHANGELOG line and an `UPGRADE-8.2.md` entry, since `getProperties()` also feeds form type guessing and validation auto-mapping, not just the serializer.
+
+Checked: PropertyInfo 661, Serializer 1429, PropertyAccess 493, Form 4955, Validator 5272, FrameworkBundle 1442, no failures.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T12:30:10Z
+
+Correcting myself on the `getProperties()` question: it should be a bugfix on 6.4, and it is now #65275.
+
+I argued earlier that it could not be separated because the `ctype_lower` guard is required for this PR to preserve serializer behaviour. That part is true, but it does not follow that the guard has to be introduced here. It can arrive by merge-up, which is the consistent place for it: the behaviour is wrong on every maintained branch, verified on 6.4 where `getProperties()` returns `['real', 'h', 'cel']` for a class whose only real property is `real`, with `h` coming from `hash()` and `cel` from `cancel()`.
+
+So #65275 fixes it on 6.4 with its own test, and the LTS gets it too. The `UPGRADE-8.2.md` and CHANGELOG entries I added here for that behaviour are removed, since a bugfix does not carry them and attributing the change to 8.2 would be wrong.
+
+The guard stays in this PR for now, otherwise the serializer half regresses if this merges first. Once #65275 reaches 8.2 the two hunks are the same rule and the merge-up dedupes them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T13:49:34Z
+
+Rebased on 8.2 now that #65275 has merged up, and deduplicated the guard as expected.
+
+The two versions expressed the same rule in different places: the one from #65275 returns early right after the prefix match, mine sat later, after the existing-property check. Kept the earlier one, so the only change left here to that method is the restructure the reverse lookup needs. A class with both a real `$h` property and a `hash()` method still lists `h`, since the property loop finds it independently of the method loop.
+
+This PR is now just the serializer integration: `PropertyNameExtractorInterface` with `getPropertyName()`, the composites forwarding it, `ObjectNormalizer` using it behind an `instanceof` check, and the `#[WithAccessors]` fixtures and tests.
+
+Checked: PropertyInfo 662, Serializer 1429, PropertyAccess 493, FrameworkBundle 1446, no failures.

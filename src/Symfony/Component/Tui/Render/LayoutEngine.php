@@ -311,6 +311,8 @@ final class LayoutEngine
         );
 
         $childRenders = [];
+        $childContexts = [];
+        $cacheHits = [];
         $maxRows = 0;
         $hasPositionStack = $this->positionTracker->isActive();
 
@@ -326,7 +328,11 @@ final class LayoutEngine
             }
 
             $context = new RenderContext($childColumns, $rows, null, $this->fontRegistry);
+            $revision = $child->getRenderRevision();
+            $hadCachedRender = null !== $child->getRenderCache($childColumns, $rows);
             $childLines = $this->widgetRenderer->renderWidget($child, $context);
+            $cacheHits[$index] = $hadCachedRender && $revision === $child->getRenderRevision();
+            $childContexts[$index] = $context;
             $childRenders[$index] = $childLines;
             $maxRows = max($maxRows, \count($childLines));
 
@@ -359,12 +365,36 @@ final class LayoutEngine
             [$absRow, $absCol] = $this->positionTracker->currentOffset();
             $colOffset = 0;
             foreach ($children as $index => $child) {
-                $this->positionTracker->setWidgetRect($child, new WidgetRect(
-                    $absRow + $childOffsets[$index],
-                    $absCol + $colOffset,
+                $childAbsRow = $absRow + $childOffsets[$index];
+                $childAbsCol = $absCol + $colOffset;
+                $rect = new WidgetRect(
+                    $childAbsRow,
+                    $childAbsCol,
                     $childColumnCounts[$index],
                     \count($childRenders[$index]),
-                ));
+                );
+
+                if ($child instanceof ParentInterface) {
+                    $positionsTracked = true;
+                    if ($cacheHits[$index]) {
+                        // A cached child was not walked, so its descendants still
+                        // carry the previous frame's rects: move them as a block.
+                        $positionsTracked = $this->positionTracker->moveSubtree($child, $rect);
+                    } else {
+                        // They were tracked during the render, before the
+                        // cross-axis offset was known, so only that offset is due.
+                        $this->positionTracker->shiftContentPositions([$child], 0, $childOffsets[$index]);
+                    }
+
+                    if (!$positionsTracked) {
+                        $child->clearRenderCache();
+                        $this->positionTracker->push($childAbsRow, $childAbsCol);
+                        $this->widgetRenderer->renderWidget($child, $childContexts[$index]);
+                        $this->positionTracker->pop();
+                    }
+                }
+
+                $this->positionTracker->setWidgetRect($child, $rect);
                 $colOffset += $childColumnCounts[$index] + $gap;
             }
         }

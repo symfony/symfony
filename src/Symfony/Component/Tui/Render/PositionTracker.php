@@ -154,41 +154,21 @@ final class PositionTracker
     }
 
     /**
-     * Snapshot the set of widgets currently tracked.
+     * Shift the tracked positions of laid-out content by the given offsets.
      *
-     * @return array<int, true>
-     */
-    public function snapshotKeys(): array
-    {
-        $snapshot = [];
-        foreach ($this->widgetPositions as $widget => $_) {
-            $snapshot[spl_object_id($widget)] = true;
-        }
-
-        return $snapshot;
-    }
-
-    /**
-     * Shift positions for all widgets added since the snapshot.
+     * Called when alignment moves a container's content after layout, so the
+     * children and their descendants keep matching where they are drawn.
      *
-     * @param array<int, true>|null $before
+     * @param AbstractWidget[] $children
      */
-    public function shiftDescendantPositions(?array $before, int $colOffset, int $rowOffset = 0): void
+    public function shiftContentPositions(array $children, int $colOffset, int $rowOffset = 0): void
     {
-        if (null === $before) {
+        if (0 === $colOffset && 0 === $rowOffset) {
             return;
         }
 
-        foreach ($this->widgetPositions as $widget => $rect) {
-            if (isset($before[spl_object_id($widget)])) {
-                continue;
-            }
-            $this->widgetPositions[$widget] = new WidgetRect(
-                $rect->row + $rowOffset,
-                $rect->col + $colOffset,
-                $rect->columns,
-                $rect->rows,
-            );
+        foreach ($children as $child) {
+            $this->shiftSubtree($child, $rowOffset, $colOffset);
         }
     }
 

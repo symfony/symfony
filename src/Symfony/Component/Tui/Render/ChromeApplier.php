@@ -90,8 +90,15 @@ final class ChromeApplier
         $contentWidth = max(1, $innerWidth - $paddingLeft - $paddingRight);
 
         $processedLines = [];
+        $processedWidths = [];
         foreach ($lines as $line) {
-            $processedLines[] = AnsiUtils::truncateToWidth($line, $contentWidth);
+            $lineWidth = AnsiUtils::visibleWidth($line);
+            if ($lineWidth > $contentWidth) {
+                $line = AnsiUtils::truncateToWidth($line, $contentWidth);
+                $lineWidth = AnsiUtils::visibleWidth($line);
+            }
+            $processedLines[] = $line;
+            $processedWidths[] = $lineWidth;
         }
 
         // If no content and no padding/border, return empty
@@ -110,10 +117,7 @@ final class ChromeApplier
         // multi-line content like FIGlet).
         $alignPadLeft = 0;
         if (TextAlign::Left !== $textAlign) {
-            $maxContentWidth = 0;
-            foreach ($processedLines as $line) {
-                $maxContentWidth = max($maxContentWidth, AnsiUtils::visibleWidth($line));
-            }
+            $maxContentWidth = $processedWidths ? max($processedWidths) : 0;
             $availableSpace = max(0, $contentWidth - $maxContentWidth);
             $alignPadLeft = match ($textAlign) {
                 TextAlign::Center => (int) floor($availableSpace / 2),
@@ -122,10 +126,11 @@ final class ChromeApplier
         }
 
         $contentLines = [];
-        foreach ($processedLines as $line) {
-            $lineWithPad = str_repeat(' ', $paddingLeft + $alignPadLeft).$line;
-            $visibleWidth = AnsiUtils::visibleWidth($lineWithPad);
-            $rightPad = str_repeat(' ', max(0, $innerWidth - $visibleWidth));
+        $padLen = $paddingLeft + $alignPadLeft;
+        $leftPad = str_repeat(' ', $padLen);
+        foreach ($processedLines as $i => $line) {
+            $lineWithPad = $leftPad.$line;
+            $rightPad = str_repeat(' ', max(0, $innerWidth - $padLen - $processedWidths[$i]));
             $contentLines[] = $style->apply($lineWithPad.$rightPad);
         }
 

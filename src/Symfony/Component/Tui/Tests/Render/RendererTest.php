@@ -25,6 +25,7 @@ use Symfony\Component\Tui\Style\Direction;
 use Symfony\Component\Tui\Style\Padding;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\StyleSheet;
+use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Style\VerticalAlign;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 use Symfony\Component\Tui\Widget\ContainerWidget;
@@ -1341,6 +1342,20 @@ class RendererTest extends TestCase
 
         return false;
     }
+
+    public function testStyleChangedDuringBeforeRenderIsApplied()
+    {
+        $styleSheet = new StyleSheet();
+        $styleSheet->addRule('.highlighted', new Style()->withTextAlign(TextAlign::Right));
+
+        $root = new ContainerWidget();
+        $root->add($widget = new RestylingWidget());
+
+        $lines = new Renderer($styleSheet)->renderFrame($root, 10, 3)->toArray();
+
+        $this->assertSame('        hi', $lines[0]);
+        $this->assertTrue($widget->beforeRenderRan);
+    }
 }
 
 /**
@@ -1372,6 +1387,27 @@ class CountingLeafWidget extends AbstractWidget
         ++$this->renderCount;
 
         return ['leaf'];
+    }
+}
+
+/**
+ * Adds a style class from beforeRender(), which the Renderer must observe even
+ * though the container already resolved this widget's style when filtering out
+ * hidden children.
+ */
+class RestylingWidget extends AbstractWidget
+{
+    public bool $beforeRenderRan = false;
+
+    public function beforeRender(): void
+    {
+        $this->beforeRenderRan = true;
+        $this->addStyleClass('highlighted');
+    }
+
+    public function render(RenderContext $context): array
+    {
+        return ['hi'];
     }
 }
 

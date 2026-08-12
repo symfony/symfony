@@ -22,6 +22,11 @@ final class ConcatenatedLineBuffer implements LineBufferInterface
 {
     /** @var list<LineBufferInterface> */
     private array $buffers;
+    /** @var list<int> */
+    private array $offsets = [];
+    /** @var list<int> */
+    private array $counts = [];
+    private int $lastBuffer = 0;
     private int $lineCount = 0;
     private int $maxVisibleWidth = 0;
 
@@ -37,6 +42,8 @@ final class ConcatenatedLineBuffer implements LineBufferInterface
                 continue;
             }
 
+            $this->offsets[] = $this->lineCount;
+            $this->counts[] = $bufferCount;
             $this->buffers[] = $buffer;
             $this->lineCount += $bufferCount;
             $this->maxVisibleWidth = max($this->maxVisibleWidth, $buffer->getMaxVisibleWidth());
@@ -54,15 +61,22 @@ final class ConcatenatedLineBuffer implements LineBufferInterface
             throw new OutOfBoundsException(\sprintf('Line index %d is out of bounds.', $index));
         }
 
-        foreach ($this->buffers as $buffer) {
-            $bufferCount = \count($buffer);
-            if ($index < $bufferCount) {
-                return $buffer->getLine($index);
+        $i = $this->lastBuffer;
+        if ($index < $this->offsets[$i] || $index >= $this->offsets[$i] + $this->counts[$i]) {
+            $low = 0;
+            $high = \count($this->offsets) - 1;
+            while ($low < $high) {
+                $mid = intdiv($low + $high + 1, 2);
+                if ($this->offsets[$mid] <= $index) {
+                    $low = $mid;
+                } else {
+                    $high = $mid - 1;
+                }
             }
-            $index -= $bufferCount;
+            $i = $this->lastBuffer = $low;
         }
 
-        throw new OutOfBoundsException('Line index is out of bounds.');
+        return $this->buffers[$i]->getLine($index - $this->offsets[$i]);
     }
 
     public function slice(int $offset, int $length): array

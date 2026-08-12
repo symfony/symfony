@@ -51,9 +51,18 @@ final class Renderer implements WidgetRendererInterface
     /** Current terminal columns, set during render() for breakpoint resolution */
     private ?int $currentColumns = null;
 
+    /**
+     * Resolved styles for the current frame, keyed on the widget's render
+     * revision so that a style changed from beforeRender() is picked up.
+     *
+     * @var \WeakMap<AbstractWidget, array{int, Style}>
+     */
+    private \WeakMap $styleCache;
+
     public function __construct(?StyleSheet $styleSheet = null, ?FontRegistry $fontRegistry = null)
     {
         $this->fontRegistry = $fontRegistry ?? new FontRegistry();
+        $this->styleCache = new \WeakMap();
         $this->positionTracker = new PositionTracker();
         $this->layoutEngine = new LayoutEngine($this, $this->positionTracker, $this->fontRegistry);
         $this->chromeApplier = new ChromeApplier($this);
@@ -103,6 +112,7 @@ final class Renderer implements WidgetRendererInterface
     {
         $context = new RenderContext($columns, $rows, null, $this->fontRegistry, fillRows: true);
         $this->currentColumns = $columns;
+        $this->styleCache = new \WeakMap();
         $this->positionTracker->reset();
 
         $result = $this->renderWidgetLines($root, $context);
@@ -154,7 +164,16 @@ final class Renderer implements WidgetRendererInterface
 
     public function resolveStyle(AbstractWidget $widget): Style
     {
-        return $this->styleSheet->resolve($widget, $this->currentColumns);
+        $revision = $widget->getRenderRevision();
+        $cached = $this->styleCache[$widget] ?? null;
+
+        if (null !== $cached && $cached[0] === $revision) {
+            return $cached[1];
+        }
+
+        $this->styleCache[$widget] = [$revision, $style = $this->styleSheet->resolve($widget, $this->currentColumns)];
+
+        return $style;
     }
 
     public function measureIntrinsicWidth(AbstractWidget $widget, int $maxColumns, int $rows): int

@@ -283,11 +283,9 @@ class Inline
      */
     public static function parseScalar(string $scalar, int $flags = 0, ?array $delimiters = null, int &$i = 0, bool $evaluate = true, array &$references = [], ?bool &$isQuoted = null, ?ParserState $state = null): mixed
     {
-        if (\in_array($scalar[$i], ['"', "'"], true)) {
-            // quoted scalar
-            $isQuoted = true;
-            $output = self::parseQuotedScalar($scalar, $i);
+        $output = self::parseQuotedScalar($scalar, $i, $isQuoted);
 
+        if (null !== $output) {
             if (null !== $delimiters) {
                 $tmp = ltrim(substr($scalar, $i), " \n");
                 if ('' === $tmp) {
@@ -336,8 +334,14 @@ class Inline
      *
      * @throws ParseException When malformed inline YAML string is parsed
      */
-    private static function parseQuotedScalar(string $scalar, int &$i = 0): string
+    private static function parseQuotedScalar(string $scalar, int &$i = 0, ?bool &$isQuoted = null): ?string
     {
+        if (!\in_array($scalar[$i] ?? '', ['"', "'"], true)) {
+            $isQuoted = false;
+
+            return null;
+        }
+
         if (!Parser::preg_match('/'.self::REGEX_QUOTED_STRING.'/A', substr($scalar, $i), $match)) {
             throw new ParseException(\sprintf('Malformed inline YAML string: "%s".', substr($scalar, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
         }
@@ -345,13 +349,14 @@ class Inline
         $output = substr($match[0], 1, -1);
 
         $unescaper = new Unescaper();
-        if ('"' == $scalar[$i]) {
+        if ('"' === $scalar[$i]) {
             $output = $unescaper->unescapeDoubleQuotedString($output);
         } else {
             $output = $unescaper->unescapeSingleQuotedString($output);
         }
 
         $i += \strlen($match[0]);
+        $isQuoted = true;
 
         return $output;
     }
@@ -691,13 +696,10 @@ class Inline
                 switch (true) {
                     case str_starts_with($scalar, '!!str '):
                         $s = substr($scalar, 6);
+                        $i = 0;
+                        $parsed = self::parseQuotedScalar($s, $i, $isQuotedString);
 
-                        if (\in_array($s[0] ?? '', ['"', "'"], true)) {
-                            $isQuotedString = true;
-                            $s = self::parseQuotedScalar($s);
-                        }
-
-                        return $s;
+                        return $parsed ?? $s;
                     case str_starts_with($scalar, '! '):
                         return substr($scalar, 2);
                     case str_starts_with($scalar, '!php/object'):
@@ -793,8 +795,16 @@ class Inline
                         }
 
                         return null;
+                    case '!!null' === $scalar:
+                        return null;
+                    case str_starts_with($scalar, '!!null '):
+                        return self::resolveTaggedNull(self::parseTaggedValue($scalar, 7));
+                    case str_starts_with($scalar, '!!bool '):
+                        return self::resolveTaggedBool(self::parseTaggedValue($scalar, 7));
+                    case str_starts_with($scalar, '!!int '):
+                        return self::resolveTaggedInt(self::parseTaggedValue($scalar, 6));
                     case str_starts_with($scalar, '!!float '):
-                        return (float) substr($scalar, 8);
+                        return self::resolveTaggedFloat(self::parseTaggedValue($scalar, 8));
                     case str_starts_with($scalar, '!!binary '):
                         return self::evaluateBinaryScalar(substr($scalar, 9));
                 }
@@ -982,5 +992,97 @@ class Inline
     private static function getHexRegex(): string
     {
         return '~^0x[0-9a-f_]++$~i';
+    }
+
+    /**
+     * Strips a built-in tag and unquotes the value it applies to.
+     *
+     * A tag applies to the content of the scalar, so "!!int 1" and "!!int \"1\"" both give the integer 1.
+     *
+     * @throws ParseException When anything follows the closing quote
+     */
+    private static function parseTaggedValue(string $scalar, int $offset): string
+    {
+        $value = substr($scalar, $offset);
+        $i = 0;
+
+        if (null === $unquoted = self::parseQuotedScalar($value, $i)) {
+            return $value;
+        }
+
+        if ($i !== \strlen($value)) {
+            throw new ParseException(\sprintf('Unexpected characters near "%s".', substr($value, $i)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
+        }
+
+        return $unquoted;
+    }
+
+    /**
+     * @see https://yaml.org/spec/1.2.2/#10211-null
+     */
+    private static function resolveTaggedNull(string $value): null
+    {
+        if (\in_array($value, ['', '~', 'null', 'Null', 'NULL'], true)) {
+            return null;
+        }
+
+        throw self::createInvalidTagValueException('!!null', $value);
+    }
+
+    /**
+     * @see https://yaml.org/spec/1.2.2/#10212-boolean
+     */
+    private static function resolveTaggedBool(string $value): bool
+    {
+        return match ($value) {
+            'true', 'True', 'TRUE' => true,
+            'false', 'False', 'FALSE' => false,
+            default => throw self::createInvalidTagValueException('!!bool', $value),
+        };
+    }
+
+    /**
+     * @see https://yaml.org/spec/1.2.2/#10213-integer
+     */
+    private static function resolveTaggedInt(string $value): int
+    {
+        if (Parser::preg_match('~^0o[0-7]++$~', $value)) {
+            $int = octdec(substr($value, 2));
+        } elseif (Parser::preg_match('~^0x[0-9a-fA-F]++$~', $value)) {
+            $int = hexdec(substr($value, 2));
+        } elseif (Parser::preg_match('~^[+-]?[0-9]++$~', $value)) {
+            $int = $value < \PHP_INT_MIN || \PHP_INT_MAX < $value ? \INF : (int) $value;
+        } else {
+            throw self::createInvalidTagValueException('!!int', $value);
+        }
+
+        // octdec() and hexdec() return a float when the value overflows
+        if (!\is_int($int)) {
+            throw new ParseException(\sprintf('The integer "%s" is out of range.', $value), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
+        }
+
+        return $int;
+    }
+
+    /**
+     * @see https://yaml.org/spec/1.2.2/#10214-floating-point
+     */
+    private static function resolveTaggedFloat(string $value): float
+    {
+        if (Parser::preg_match('~^[+-]?(?:\.[0-9]++|[0-9]++(?:\.[0-9]*+)?)(?:[eE][+-]?[0-9]++)?$~', $value)) {
+            return (float) $value;
+        }
+
+        return match ($value) {
+            '.inf', '.Inf', '.INF', '+.inf', '+.Inf', '+.INF' => \INF,
+            '-.inf', '-.Inf', '-.INF' => -\INF,
+            '.nan', '.NaN', '.NAN' => \NAN,
+            default => throw self::createInvalidTagValueException('!!float', $value),
+        };
+    }
+
+    private static function createInvalidTagValueException(string $tag, string $value): ParseException
+    {
+        return new ParseException(\sprintf('The value "%s" is not a valid "%s" value.', $value, $tag), self::$parsedLineNumber + 1, $value, self::$parsedFilename);
     }
 }

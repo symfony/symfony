@@ -1111,14 +1111,85 @@ class InlineTest extends TestCase
         ];
     }
 
-    public function testParseSingleQuotedTaggedString()
+    #[DataProvider('parseYamlProvider')]
+    public function testParseYaml(string $yaml, mixed $expected)
     {
-        $this->assertSame('foo', Inline::parse("!!str 'foo'"));
+        $this->assertSame($expected, Inline::parse($yaml));
     }
 
-    public function testParseDoubleQuotedTaggedString()
+    public static function parseYamlProvider(): iterable
     {
-        $this->assertSame('foo', Inline::parse('!!str "foo"'));
+        yield 'single quoted tagged string' => ["!!str 'foo'", 'foo'];
+        yield 'double quoted tagged string' => ['!!str "foo"', 'foo'];
+        yield 'plain tagged string' => ['!!str foo', 'foo'];
+        yield 'tagged string from a number' => ['!!str 1', '1'];
+
+        yield 'empty null' => ['!!null', null];
+        yield 'canonical null' => ['!!null null', null];
+        yield 'capitalized null' => ['!!null Null', null];
+        yield 'uppercase null' => ['!!null NULL', null];
+        yield 'tilde null' => ['!!null ~', null];
+        yield 'quoted null' => ['!!null "null"', null];
+
+        yield 'canonical true' => ['!!bool true', true];
+        yield 'capitalized true' => ['!!bool True', true];
+        yield 'uppercase true' => ['!!bool TRUE', true];
+        yield 'canonical false' => ['!!bool false', false];
+        yield 'capitalized false' => ['!!bool False', false];
+        yield 'uppercase false' => ['!!bool FALSE', false];
+        yield 'quoted bool' => ['!!bool "true"', true];
+
+        yield 'int' => ['!!int 1', 1];
+        yield 'quoted int' => ['!!int "1"', 1];
+        yield 'signed int' => ['!!int -42', -42];
+        yield 'explicitly positive int' => ['!!int +42', 42];
+        yield 'octal int' => ['!!int 0o17', 15];
+        yield 'hexadecimal int' => ['!!int 0x1F', 31];
+
+        yield 'float' => ['!!float 0.01', 0.01];
+        yield 'quoted float' => ['!!float "0.01"', 0.01];
+        yield 'float without fractional part' => ['!!float 1', 1.0];
+        yield 'float without integer part' => ['!!float .5', 0.5];
+        yield 'float with exponent' => ['!!float 1.2e3', 1200.0];
+        yield 'positive infinity' => ['!!float .inf', \INF];
+        yield 'negative infinity' => ['!!float -.INF', -\INF];
+    }
+
+    #[DataProvider('parseInvalidTaggedValueProvider')]
+    public function testParseInvalidTaggedValue(string $yaml, string $message)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($message);
+
+        Inline::parse($yaml);
+    }
+
+    public static function parseInvalidTaggedValueProvider(): iterable
+    {
+        // the core schema resolves booleans from "true" and "false" only, not from
+        // the integers or the YAML 1.1 spellings that PHP would happily cast
+        yield 'bool from int' => ['!!bool 1', 'The value "1" is not a valid "!!bool" value'];
+        yield 'bool from negative int' => ['!!bool -1', 'The value "-1" is not a valid "!!bool" value'];
+        yield 'bool from yes' => ['!!bool yes', 'The value "yes" is not a valid "!!bool" value'];
+        yield 'bool from on' => ['!!bool on', 'The value "on" is not a valid "!!bool" value'];
+        yield 'bool with mixed case' => ['!!bool tRue', 'The value "tRue" is not a valid "!!bool" value'];
+
+        yield 'null from a word' => ['!!null foo', 'The value "foo" is not a valid "!!null" value'];
+
+        yield 'int from a word' => ['!!int foo', 'The value "foo" is not a valid "!!int" value'];
+        yield 'int from a float' => ['!!int 1.22', 'The value "1.22" is not a valid "!!int" value'];
+        yield 'int with underscores' => ['!!int 1_000', 'The value "1_000" is not a valid "!!int" value'];
+        yield 'out of range int' => ['!!int 99999999999999999999', 'The integer "99999999999999999999" is out of range'];
+
+        yield 'float from a word' => ['!!float foo', 'The value "foo" is not a valid "!!float" value'];
+        yield 'float from an empty value' => ['!!float ""', 'The value "" is not a valid "!!float" value'];
+
+        yield 'trailing characters after a quoted value' => ['!!int "1" 2', 'Unexpected characters near " 2"'];
+    }
+
+    public function testParseNanTaggedValue()
+    {
+        $this->assertNan(Inline::parse('!!float .NaN'));
     }
 
     public function testParseQuotedReferenceLikeStringsInMapping()

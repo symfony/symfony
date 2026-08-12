@@ -22,6 +22,7 @@ use Symfony\Component\String\UnicodeString;
 class Option
 {
     public const ALLOWED_UNION_TYPES = ['bool|string', 'bool|int', 'bool|float'];
+    public string $description;
     public mixed $default = null;
     public array|\Closure $suggestedValues;
 
@@ -42,17 +43,19 @@ class Option
      *
      * If unset, the `name` value will be inferred from the parameter definition.
      *
+     * @param string|(callable():string)                                                 $description     The description of the option, displayed with the help page
      * @param array|string|null                                                          $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function __construct(
-        public string $description = '',
+        string|callable $description = '',
         public string $name = '',
         public array|string|null $shortcut = null,
         array|callable $suggestedValues = [],
         public bool $deprecated = false,
         public bool $hidden = false,
     ) {
+        $this->description = \is_string($description) ? $description : $description();
         $this->suggestedValues = \is_callable($suggestedValues) ? $suggestedValues(...) : $suggestedValues;
     }
 

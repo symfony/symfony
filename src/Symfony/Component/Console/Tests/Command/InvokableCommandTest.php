@@ -92,6 +92,35 @@ class InvokableCommandTest extends TestCase
         self::assertSame(['ROLE_ADMIN', 'ROLE_USER'], array_map(static fn (Suggestion $s) => $s->getValue(), $suggestions->getValueSuggestions()));
     }
 
+    public function testCommandInputDescriptionFromCallable()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            #[Argument(description: [self::class, 'generateBioDescription'])] string $bio = '',
+            #[Option(description: [self::class, 'generateBioDescription'])] string $summary = '',
+        ): int {
+            return 0;
+        });
+
+        self::assertSame('Generated bio description', $command->getDefinition()->getArgument('bio')->getDescription());
+        self::assertSame('Generated bio description', $command->getDefinition()->getOption('summary')->getDescription());
+    }
+
+    public function testCommandInputDescriptionIsNeverResolvedAsCallable()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            // "define" is the name of a PHP function, it must still be taken as a plain description
+            #[Argument(description: 'define')] string $bio = '',
+            #[Option(description: 'define')] string $summary = '',
+        ): int {
+            return 0;
+        });
+
+        self::assertSame('define', $command->getDefinition()->getArgument('bio')->getDescription());
+        self::assertSame('define', $command->getDefinition()->getOption('summary')->getDescription());
+    }
+
     public function testCommandInputOptionDefinition()
     {
         $command = new Command('foo');
@@ -598,6 +627,11 @@ class InvokableCommandTest extends TestCase
     public function getSuggestedRoles(CompletionInput $input): array
     {
         return ['ROLE_ADMIN', 'ROLE_USER'];
+    }
+
+    public static function generateBioDescription(): string
+    {
+        return 'Generated bio description';
     }
 
     public function testAskWithInputFileAndConstraints()

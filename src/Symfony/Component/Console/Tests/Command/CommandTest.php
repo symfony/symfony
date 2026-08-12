@@ -511,6 +511,23 @@ class CommandTest extends TestCase
         $this->assertNull($command->getCode());
     }
 
+    public function testCommandAttributeWithCallables()
+    {
+        $command = new Php8CommandWithCallables();
+
+        $this->assertSame('Generated description', $command->getDescription());
+        $this->assertSame('Generated help', $command->getHelp());
+    }
+
+    public function testCommandAttributeDescriptionIsNeverResolvedAsCallable()
+    {
+        // "define" is the name of a PHP function, it must still be taken as a plain description
+        $command = new #[AsCommand(name: 'foo', description: 'define', help: 'define')] class extends Command {};
+
+        $this->assertSame('define', $command->getDescription());
+        $this->assertSame('define', $command->getHelp());
+    }
+
     public function testDefaultCommand()
     {
         $apl = new Application();
@@ -558,4 +575,22 @@ class Php8Command extends Command
 #[AsCommand(name: 'foo2', description: 'desc2', hidden: true)]
 class Php8Command2 extends Command
 {
+}
+
+#[AsCommand(
+    name: 'foo3',
+    description: [Php8CommandWithCallables::class, 'generateDescription'],
+    help: [Php8CommandWithCallables::class, 'generateHelp'],
+)]
+class Php8CommandWithCallables extends Command
+{
+    public static function generateDescription(): string
+    {
+        return 'Generated description';
+    }
+
+    public static function generateHelp(): string
+    {
+        return 'Generated help';
+    }
 }

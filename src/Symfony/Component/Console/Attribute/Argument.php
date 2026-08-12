@@ -21,6 +21,7 @@ use Symfony\Component\String\UnicodeString;
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Argument
 {
+    public string $description;
     public mixed $default = null;
     public array|\Closure $suggestedValues;
 
@@ -38,13 +39,15 @@ class Argument
      *
      * If unset, the `name` value will be inferred from the parameter definition.
      *
+     * @param string|(callable():string)                                                 $description     The description of the argument, displayed with the help page
      * @param array<string|Suggestion>|callable(CompletionInput):list<string|Suggestion> $suggestedValues The values used for input completion
      */
     public function __construct(
-        public string $description = '',
+        string|callable $description = '',
         public string $name = '',
         array|callable $suggestedValues = [],
     ) {
+        $this->description = \is_string($description) ? $description : $description();
         $this->suggestedValues = \is_callable($suggestedValues) ? $suggestedValues(...) : $suggestedValues;
     }
 

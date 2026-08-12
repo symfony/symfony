@@ -14,7 +14,9 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Bridge\Twig\Test\FormLayoutTestCase;
+use Symfony\Component\Form\EntryTypeProviderInterface;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
+use Symfony\Component\Form\Extension\Core\Type\PolymorphicCollectionType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormError;
@@ -2309,6 +2311,48 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
             '//div[@id="name_items"][@data-prototype]
             |
             //table[@id="name_items"][@data-prototype]'
+        );
+    }
+
+    public function testPolymorphicCollectionPrototypes()
+    {
+        if (!class_exists(PolymorphicCollectionType::class)) {
+            $this->markTestSkipped('Requires symfony/form 8.2+.');
+        }
+
+        $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', ['items' => ['one', 'two', 'three']])
+            ->add('items', PolymorphicCollectionType::class, [
+                'entry_types' => [
+                    'text' => 'Symfony\Component\Form\Extension\Core\Type\TextType',
+                    'number' => 'Symfony\Component\Form\Extension\Core\Type\NumberType',
+                ],
+                'entry_type_provider' => new class implements EntryTypeProviderInterface {
+                    public function forModelData(mixed $data): int|string
+                    {
+                        return is_numeric($data) ? 'number' : 'text';
+                    }
+
+                    public function forSubmittedData(mixed $data): int|string
+                    {
+                        return is_numeric($data) ? 'number' : 'text';
+                    }
+                },
+                'allow_add' => true,
+            ])
+            ->getForm()
+            ->createView();
+
+        $html = $this->renderWidget($form);
+
+        $this->assertMatchesXpath($html,
+            '//div[@id="name_items"][@data-prototype-text]
+            |
+            //table[@id="name_items"][@data-prototype-text]'
+        );
+        $this->assertMatchesXpath($html,
+            '//div[@id="name_items"][@data-prototype-number]
+            |
+            //table[@id="name_items"][@data-prototype-number]'
         );
     }
 

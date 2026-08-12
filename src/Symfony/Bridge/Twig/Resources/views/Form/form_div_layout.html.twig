@@ -34,6 +34,17 @@
     {{- block('form_widget') -}}
 {%- endblock collection_widget -%}
 
+{%- block polymorphic_collection_widget -%}
+    {% if prototypes is defined %}
+        {%- for name, prototype in prototypes -%}
+            {%- if not prototype.rendered -%}
+                {%- set attr = attr|merge({('data-prototype-' ~ name): form_row(prototype)}) -%}
+            {%- endif -%}
+        {%- endfor -%}
+    {% endif %}
+    {{- block('form_widget') -}}
+{%- endblock polymorphic_collection_widget -%}
+
 {%- block textarea_widget -%}
     <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
 {%- endblock textarea_widget -%}

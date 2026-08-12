@@ -578,6 +578,38 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         $class = $collectionValueBaseType->getClassName().'[]';
                         $context['key_type'] = $collectionKeyType;
                         $context['value_type'] = $collectionValueType;
+                    } elseif (\is_array($data) && $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
+                        // elements of a scalar collection are converted with the very same rules as any other value
+                        $result = [];
+                        $childContext = null;
+                        $valueTypeIdentifier = $collectionValueBaseType->getTypeIdentifier();
+                        $valueIsNullable = $collectionValueType->isNullable();
+
+                        foreach ($data as $key => $value) {
+                            // values that already have the expected type are the common case, keep them as is
+                            if (null === $value ? $valueIsNullable : match ($valueTypeIdentifier) {
+                                TypeIdentifier::BOOL => \is_bool($value),
+                                TypeIdentifier::FLOAT => \is_float($value),
+                                TypeIdentifier::INT => \is_int($value),
+                                default => \is_string($value),
+                            }) {
+                                $result[$key] = $value;
+                                continue;
+                            }
+
+                            $childContext ??= $this->createChildContext($context, $attribute, $format);
+                            $childContext['deserialization_path'] = ($context['deserialization_path'] ?? false) ? \sprintf('%s[%s]', $context['deserialization_path'], $key) : "[$key]";
+
+                            try {
+                                // the wrapped type is passed on so that a nullable element type keeps accepting null
+                                $result[$key] = $this->validateAndDenormalize($collectionValueType, $currentClass, $attribute, $value, $format, $childContext);
+                            } catch (NotNormalizableValueException) {
+                                // elements that cannot be converted are left untouched, as they have always been
+                                $result[$key] = $value;
+                            }
+                        }
+
+                        return $result;
                     } elseif ($collectionValueBaseType instanceof BuiltinType && TypeIdentifier::ARRAY === $collectionValueBaseType->getTypeIdentifier()) {
                         // get inner type for any nested array
                         $innerType = $collectionValueType;

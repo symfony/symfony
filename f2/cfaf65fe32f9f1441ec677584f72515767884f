@@ -1,0 +1,104 @@
+---------------------------------------------------------------------------
+
+by zolex at 2025-05-30T04:14:47Z
+
+I like the feature and I know the `As` prefix for these attributes is common in symfony, but I wonder a bit about the semantics. Usually if I see a `AsSomething` attribute on a class, it means that the class with the attribute now is a Something. When `null` is passed as the class to the factory argument, the semantics are fine. But if you provide another classname, a service or even expression language, the `As` prefix seems semantically incorrect to me, because now it is not the class with the attribute that becomes the factory, but something else. So in the first place I would suggest to rename the Attribute to just `Factory`.
+
+But thinking about it a bit more: I believe it would be a better option to reuse the existing `Autoconfigure` attribute, which has a `constrcutor` argument, that can be used for factories in the same class. At the moment it only allows a string, referencing a static method inside the same class. You could simply apply your logic on the existing attribute argument if it is an array.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-05-30T14:09:56Z
+
+Hi @zolex, thanks for your comment ❤️ I really appreciate it 😄
+You're absolutely right, the semantics of the `As` prefix can be misleading, especially when an external factory is used. Renaming the attribute to just `Factory` makes a lot more sense.
+I also really like your suggestion about reusing the existing `Autoconfigure` attribute. I’ll work on updating it to support arrays and apply the logic there as well.
+I’ll make these changes as soon as possible. Thanks again for the valuable feedback! 🙏
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-07T17:31:48Z
+
+I was thinking a bit about this, and I have a question 🤔
+If we change the `constructor` argument to accept `string|array|null`, I believe we would end up with the same behavior as the `factory`.
+So, my question is: maybe we can leave the `constructor` argument as it is today, and instead, add the `factory` argument to the `AutoConfigure`?
+
+I’m asking this from a place of curiosity and ignorance, totally open to discussion if I’m missing something 🙂
+Thanks! ❤️
+
+---------------------------------------------------------------------------
+
+by zolex at 2025-06-07T18:25:44Z
+
+> I was thinking a bit about this, and I have a question 🤔 If we change the `constructor` argument to accept `string|array|null`, I believe we would end up with the same behavior as the `factory`. So, my question is: maybe we can leave the `constructor` argument as it is today, and instead, add the `factory` argument to the `AutoConfigure`?
+
+I would definitely prefer the argument to be called factory. If you introduce a factory argument, maybe also support a string for a method in the same class like constructor does and at the same time deprecate the constructor argument to prepare the people to migrate to the factory argument. It was a bad naming anyway.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-07T18:49:49Z
+
+I like that idea 😄 If others agree, I can go ahead and make that change:
+
+* Add a new argument called factory
+* Deprecate the constructor argument to help people migrate smoothly
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-06-18T23:21:31Z
+
+Hi 👋 I hope you're all doing well ❤️
+
+I've updated the PR description and made the necessary code changes. Please let me know if there's anything else you'd like me to adjust 😊
+
+P.S. I haven’t deprecated the constructor argument yet but if you all agree that it should be deprecated, I’m happy to make that change as well.
+
+P.P.S. The test failure doesn’t seem related to this PR, it looks like a flaky test.
+
+Thanks! 😄
+
+---------------------------------------------------------------------------
+
+by norkunas at 2025-06-19T05:20:33Z
+
+PR/commit title does not reflect your code here :)
+
+---------------------------------------------------------------------------
+
+by santysisi at 2025-07-08T22:50:27Z
+
+status: needs review
+
+I updated the status, sorry if I wasn’t supposed to do that! :pray:
+
+---------------------------------------------------------------------------
+
+by santysisi at 2026-08-12T04:22:42Z
+
+Thanks to all the people that commented in this PR I appreciated it
+Said that I will close this PR because inactivity
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T14:04:56Z
+
+Reopening this: it was closed for inactivity, not rejected. I compared it with #63845, which proposed an `#[AsFactory]` attribute on the factory side, and I prefer this shape, so I closed that one in favour of this. Putting `factory` next to `constructor` on the existing attribute means no new attribute, no new compiler pass, the whole factory syntax including expressions, and the attribute stays on the class being built, so it never has to register a service that was not declared.
+
+I rebased onto 8.2 and pushed. What changed:
+
+ * XML config support was removed from the component in the meantime (af1f0305c6b), so the XSD change, `XmlFileLoaderTest` and the XML fixture are gone.
+ * The keyword lists moved to `ContentLoaderTrait`, so `'factory'` was added to `INSTANCEOF_KEYWORDS` there.
+ * `factory` is now also declared under `_instanceof` in `services.schema.json` and in the `InstanceofType` shape of `AppReference`, which are what the array-shape PHP config format is checked against. The generated `reference.php` fixture follows.
+ * The `instanceof_factory.php` fixture is written with the array shape rather than the fluent PHP-DSL, and the `InstanceofConfigurator::factory()` change is dropped: the DSL is on its way out, so it is not worth extending.
+ * The CHANGELOG entry moved from 7.4 to 8.2, and the two lines are merged into one.
+ * `$factory` goes last in the constructor, after `$resourceTags` which landed since.
+ * `testServiceWithSameNameAsInterfaceAndFactoryIsNotTagged()` keeps `#[IgnoreDeprecations]` and `#[Group('legacy')]` alongside your data provider: both fixtures use `!tagged_iterator`, which is what those markers are for.
+ * `AutoconfigureWithStaticSelfFactory::create()` returns `new static()` rather than `new self()`, since it is declared `: static`.
+
+The DependencyInjection suite is green (1807 tests), as are FrameworkBundle's and Routing's. I also checked that an explicit `factory` on a definition still wins over one coming from `_instanceof`.
+
+Rebased again now that #65290 is merged up, so the `reference.php` fixture is untouched here: it tolerates the shape difference on its own, which matters because FrameworkBundle's low-deps and high-deps jobs install `symfony/dependency-injection` from packagist and generate the file from a released `AppReference`. I also checked that an explicit `factory` on a definition still wins over one coming from `_instanceof`.
+
+On @zolex's suggestion to deprecate `constructor` in favour of `factory`: not in this PR. `constructor` and `factory` already coexist in the config formats, so this only brings the attribute in line with them rather than adding new overlap. Worth a separate discussion.
+
+Thanks for the work, and for coming back to it after so long a wait.

@@ -2561,7 +2561,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($extraConfig) {
             $container->loadFromExtension('framework', array_merge([
-                'annotations' => false,
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],
@@ -2588,7 +2587,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public static function provideLoggerListenerRegistration(): iterable
     {
-        $profiler = ['profiler' => ['enabled' => true, 'collect_serializer_data' => true]];
+        $profiler = ['profiler' => ['enabled' => true]];
 
         foreach (['mailer.message_logger_listener', 'notifier.notification_logger_listener'] as $serviceId) {
             $name = substr($serviceId, 0, strpos($serviceId, '.'));
@@ -2790,7 +2789,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
                 'http_method_override' => false,
                 'handle_all_throwables' => true,
                 'php_errors' => ['log' => true],

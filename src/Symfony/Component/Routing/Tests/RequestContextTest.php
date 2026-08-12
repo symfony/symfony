@@ -240,4 +240,107 @@ class RequestContextTest extends TestCase
         $this->assertSame($requestContext, $requestContext->setParameters([]));
         $this->assertSame($requestContext, $requestContext->setParameter('foo', 'bar'));
     }
+
+    public function testRunWithAppliesValuesAndRestoresThem()
+    {
+        $context = self::createFullContext();
+
+        $returned = $context->runWith(function () use ($context) {
+            $this->assertSame('acme.example.com', $context->getHost());
+            $this->assertSame('https', $context->getScheme());
+            $this->assertSame('/other.php', $context->getBaseUrl());
+
+            return 'from the callback';
+        }, baseUrl: '/other.php', host: 'acme.example.com', scheme: 'https');
+
+        $this->assertSame('from the callback', $returned);
+        self::assertIsFullContext($context);
+    }
+
+    public function testRunWithLeavesNullArgumentsUnchanged()
+    {
+        $context = self::createFullContext();
+
+        $context->runWith(function () use ($context) {
+            $this->assertSame('acme.example.com', $context->getHost());
+            $this->assertSame('http', $context->getScheme());
+            $this->assertSame('POST', $context->getMethod());
+            $this->assertSame('foo=bar', $context->getQueryString());
+            $this->assertSame(['_locale' => 'en'], $context->getParameters());
+        }, host: 'acme.example.com');
+
+        self::assertIsFullContext($context);
+    }
+
+    public function testRunWithAcceptsEmptyValues()
+    {
+        $context = self::createFullContext();
+
+        $context->runWith(function () use ($context) {
+            $this->assertSame('', $context->getQueryString());
+            $this->assertSame([], $context->getParameters());
+        }, queryString: '', parameters: []);
+
+        self::assertIsFullContext($context);
+    }
+
+    public function testRunWithRestoresOnException()
+    {
+        $context = self::createFullContext();
+
+        try {
+            $context->runWith(static fn () => throw new \RuntimeException('Something went wrong.'), host: 'acme.example.com');
+            $this->fail('The exception should have bubbled up.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Something went wrong.', $e->getMessage());
+        }
+
+        self::assertIsFullContext($context);
+    }
+
+    public function testRunWithNests()
+    {
+        $context = self::createFullContext();
+
+        $context->runWith(function () use ($context) {
+            $this->assertSame('a.example.com', $context->getHost());
+
+            $context->runWith(function () use ($context) {
+                $this->assertSame('b.example.com', $context->getHost());
+            }, host: 'b.example.com');
+
+            $this->assertSame('a.example.com', $context->getHost());
+        }, host: 'a.example.com');
+
+        self::assertIsFullContext($context);
+    }
+
+    public function testRunWithDoesNotKeepChangesMadeByTheCallback()
+    {
+        $context = self::createFullContext();
+
+        $context->runWith(static function () use ($context) {
+            $context->setParameter('_locale', 'fr');
+        }, host: 'acme.example.com');
+
+        self::assertIsFullContext($context);
+    }
+
+    private static function createFullContext(): RequestContext
+    {
+        return new RequestContext('/app.php', 'POST', 'localhost', 'http', 8080, 8443, '/index', 'foo=bar', ['_locale' => 'en']);
+    }
+
+    private static function assertIsFullContext(RequestContext $context): void
+    {
+        self::assertSame('/app.php', $context->getBaseUrl());
+        self::assertSame('POST', $context->getMethod());
+        self::assertSame('localhost', $context->getHost());
+        self::assertSame('http', $context->getScheme());
+        self::assertSame(8080, $context->getHttpPort());
+        self::assertSame(8443, $context->getHttpsPort());
+        self::assertSame('/index', $context->getPathInfo());
+        self::assertSame('foo=bar', $context->getQueryString());
+        self::assertSame(['_locale' => 'en'], $context->getParameters());
+    }
 }

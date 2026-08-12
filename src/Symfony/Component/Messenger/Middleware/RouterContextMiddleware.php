@@ -47,39 +47,16 @@ class RouterContextMiddleware implements MiddlewareInterface
             return $stack->next()->handle($envelope, $stack);
         }
 
-        $currentBaseUrl = $context->getBaseUrl();
-        $currentMethod = $context->getMethod();
-        $currentHost = $context->getHost();
-        $currentScheme = $context->getScheme();
-        $currentHttpPort = $context->getHttpPort();
-        $currentHttpsPort = $context->getHttpsPort();
-        $currentPathInfo = $context->getPathInfo();
-        $currentQueryString = $context->getQueryString();
-
-        $context
-            ->setBaseUrl($contextStamp->getBaseUrl())
-            ->setMethod($contextStamp->getMethod())
-            ->setHost($contextStamp->getHost())
-            ->setScheme($contextStamp->getScheme())
-            ->setHttpPort($contextStamp->getHttpPort())
-            ->setHttpsPort($contextStamp->getHttpsPort())
-            ->setPathInfo($contextStamp->getPathInfo())
-            ->setQueryString($contextStamp->getQueryString())
-        ;
-
-        try {
-            return $stack->next()->handle($envelope, $stack);
-        } finally {
-            $context
-                ->setBaseUrl($currentBaseUrl)
-                ->setMethod($currentMethod)
-                ->setHost($currentHost)
-                ->setScheme($currentScheme)
-                ->setHttpPort($currentHttpPort)
-                ->setHttpsPort($currentHttpsPort)
-                ->setPathInfo($currentPathInfo)
-                ->setQueryString($currentQueryString)
-            ;
-        }
+        return $context->runWith(
+            static fn () => $stack->next()->handle($envelope, $stack),
+            baseUrl: $contextStamp->getBaseUrl(),
+            method: $contextStamp->getMethod(),
+            host: $contextStamp->getHost(),
+            scheme: $contextStamp->getScheme(),
+            httpPort: $contextStamp->getHttpPort(),
+            httpsPort: $contextStamp->getHttpsPort(),
+            pathInfo: $contextStamp->getPathInfo(),
+            queryString: $contextStamp->getQueryString(),
+        );
     }
 }

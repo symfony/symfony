@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-06T08:47:41Z
+
+I just tested the feature, and out of the box, it does not box
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T09:14:30Z
+
+Right, the rounding was opt-in. It now applies by default: delays are rounded up to two significant digits, so the queue count is bounded at any delay magnitude (1403 -> 26 queues for the default retry strategy) and a message is never released more than 10% late. `delay[granularity]` still overrides it, and `1` turns it off. Can you give it another try?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-06T10:01:12Z
+
+It's better. But I still have too many queues IMHO
+
+<img width="1153" height="404" alt="image" src="https://github.com/user-attachments/assets/06a2f2b6-c876-4f20-93b8-d3134d20bbb1" />
+
+And logs are not correct :
+
+<img width="1709" height="668" alt="image" src="https://github.com/user-attachments/assets/d1589dd3-21aa-4ff8-8d17-b517218bb7bc" />
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T10:32:16Z
+
+What is not too many for a good default? Can't you then use the new configuration option if you need another set of queues?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-06T12:31:02Z
+
+Interesting approach! In my experience, 1 queue per delay has always done the job perfectly, so I'm not fully convinced jitter is necessary here like it is for caches. Do you find that adding a small 10ms retry delay really helps upstream/downstream services in production?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-06T12:48:52Z
+
+I can't answer your question myself. I just want to preserve the benefits of the existing defaults (the jitter) - it must have been done for a reason ;)
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-08-06T13:14:12Z
+
+I think the **default** should be zero, it's safer. And people could override it. It's better to break others system, than our system (no kidding :D)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T12:56:38Z
+
+> I think the default should be zero
+
+that's a different call, worth another PR, with history on the current design
+
+let me merge this one vs the other for now

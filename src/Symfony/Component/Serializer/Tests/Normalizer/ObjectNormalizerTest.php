@@ -23,6 +23,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -1254,6 +1255,10 @@ class ObjectNormalizerTest extends TestCase
 
     public function testNormalizeContainingWithAccessorsAttribute()
     {
+        if (!interface_exists(PropertyNameExtractorInterface::class)) {
+            $this->markTestSkipped('Test requires symfony/property-info 8.2+');
+        }
+
         $normalizer = $this->getNormalizerForAccessors();
 
         $object = new ContainingWithAccessorsDummy('Alice', 5, true);

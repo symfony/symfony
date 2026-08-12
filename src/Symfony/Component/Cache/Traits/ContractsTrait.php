@@ -41,13 +41,7 @@ trait ContractsTrait
      */
     public function setCallbackWrapper(?callable $callbackWrapper): callable
     {
-        if (!isset($this->callbackWrapper)) {
-            $this->callbackWrapper = LockRegistry::compute(...);
-
-            if (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
-                $this->setCallbackWrapper(null);
-            }
-        }
+        $this->callbackWrapper ??= LockRegistry::compute(...);
 
         if (null !== $callbackWrapper && !$callbackWrapper instanceof \Closure) {
             $callbackWrapper = $callbackWrapper(...);
@@ -93,10 +87,6 @@ trait ContractsTrait
 
             $this->computing[$key] = $key;
             $startTime = microtime(true);
-
-            if (!isset($this->callbackWrapper)) {
-                $this->setCallbackWrapper($this->setCallbackWrapper(null));
-            }
 
             try {
                 $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {

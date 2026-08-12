@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `AbstractAdapter::createAdapter()` to create the adapter matching a connection
+ * Skip stampede protection when not running in web mode, as told by the `APP_RUNTIME_MODE` env var
+ * Add `LockRegistry::setEnabled()` and `LockRegistry::isEnabled()` to control stampede protection
 
 8.0
 ---

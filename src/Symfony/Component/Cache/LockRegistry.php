@@ -28,6 +28,7 @@ final class LockRegistry
 {
     private static array $openedFiles = [];
     private static ?array $lockedFiles = null;
+    private static ?bool $enabled = null;
     private static \Exception $signalingException;
     private static \Closure $signalingCallback;
 
@@ -85,11 +86,55 @@ final class LockRegistry
     }
 
     /**
+     * Turns the stampede protection on or off.
+     *
+     * @param bool|null $enabled Null to restore the runtime-mode based behavior
+     *
+     * @return bool The previously effective state
+     */
+    public static function setEnabled(?bool $enabled): bool
+    {
+        $previousState = self::isEnabled();
+        self::$enabled = $enabled;
+
+        return $previousState;
+    }
+
+    /**
+     * Tells whether the stampede protection applies to the running process.
+     *
+     * Unless set explicitly, the protection applies in web mode only, as told by
+     * the "APP_RUNTIME_MODE" env var, defaulting to the current SAPI. Locking in
+     * CLI mode would let long-running commands hold slots of the shared pool and
+     * stall the web requests that hash to the same slots.
+     */
+    public static function isEnabled(): bool
+    {
+        if (null !== self::$enabled) {
+            return self::$enabled;
+        }
+
+        $runtimeMode = $_SERVER['APP_RUNTIME_MODE'] ?? $_ENV['APP_RUNTIME_MODE'] ?? getenv('APP_RUNTIME_MODE');
+
+        if (!\is_string($runtimeMode) || '' === $runtimeMode) {
+            return !\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true);
+        }
+
+        parse_str($runtimeMode, $mode);
+
+        return filter_var($mode['web'] ?? false, \FILTER_VALIDATE_BOOL);
+    }
+
+    /**
      * @param-immediately-invoked-callable $callback
      * @param-immediately-invoked-callable $setMetadata
      */
     public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, ?\Closure $setMetadata = null, ?LoggerInterface $logger = null, ?float $beta = null): mixed
     {
+        if (!self::isEnabled()) {
+            return $callback($item, $save);
+        }
+
         if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedFiles) {
             // disable locking on Windows by default
             self::$files = self::$lockedFiles = [];

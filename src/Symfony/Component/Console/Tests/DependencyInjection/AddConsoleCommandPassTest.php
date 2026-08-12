@@ -402,6 +402,21 @@ class AddConsoleCommandPassTest extends TestCase
         self::assertSame('The command description', $command->getDescription());
         self::assertSame('The %command.name% command help content.', $command->getHelp());
     }
+
+    public function testListedAtFromTagAndAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('my-command.class', 'Symfony\\Component\\Console\\Tests\\DependencyInjection\\MyCommand');
+        $definition = new Definition('%my-command.class%');
+        $definition->addTag('console.command', ['command' => 'my:command', 'listed_at' => 64]);
+        $container->setDefinition('my-command', $definition);
+        $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->compile();
+
+        $calls = $container->getDefinition('my-command')->getMethodCalls();
+        $this->assertContains(['setListedAt', [64]], $calls);
+    }
+
 }
 
 class MyCommand extends Command

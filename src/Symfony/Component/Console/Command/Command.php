@@ -47,6 +47,8 @@ class Command implements SignalableCommandInterface
     private array $aliases = [];
     private InputDefinition $definition;
     private bool $hidden = false;
+    /** @var OutputInterface::VERBOSITY_*|null */
+    private ?int $listedAt = null;
     private string $help = '';
     private string $description = '';
     private ?InputDefinition $fullDefinition = null;
@@ -510,6 +512,30 @@ class Command implements SignalableCommandInterface
     public function isHidden(): bool
     {
         return $this->hidden;
+    }
+
+    /**
+     * Sets the verbosity from which "list" shows the command.
+     *
+     * @param OutputInterface::VERBOSITY_*|null $listedAt Null to always show it
+     *
+     * @return $this
+     */
+    public function setListedAt(?int $listedAt): static
+    {
+        $this->listedAt = $listedAt;
+
+        return $this;
+    }
+
+    /**
+     * Returns the verbosity from which "list" shows the command, null when it is always shown.
+     *
+     * @return OutputInterface::VERBOSITY_*|null
+     */
+    public function getListedAt(): ?int
+    {
+        return $this->listedAt;
     }
 
     /**

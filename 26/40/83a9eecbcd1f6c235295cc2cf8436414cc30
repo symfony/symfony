@@ -1,0 +1,82 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T06:14:07Z
+
+Alternative idea: add `withRequestContext()` to the router. I feel like this would make everything simpler.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2026-06-15T13:44:32Z
+
+> Alternative idea: add withRequestContext() to the router. I feel like this would make everything simpler.
+
+`withRequestContext` implies that users will get a new instance of `Router` but we will have to also clone the generator and the matcher since they share the same context.
+
+So, we can add this method in `UrlGenerator` instead :
+
+````php
+$newContext = $router->getContext()->withScheme('https')->withHost('acme.example.com');
+$url = $router
+    ->getUrlGenerator()
+    ->withContext($newContext)
+    ->generate('my_route', [], UrlGeneratorInterface::ABSOLUTE_URL)
+;
+```
+
+An other solution could be to add an argument to the `UrlGeneratorInterface::generate()` and `Route::generate()` methods but it will imply to add it using a comment to avoid BC breaks.
+
+WDYT ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-15T16:30:08Z
+
+> withRequestContext implies that users will get a new instance of Router but we will have to also clone the generator and the matcher since they share the same context.
+
+right, would that be a problem?
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2026-06-22T11:50:35Z
+
+> > withRequestContext implies that users will get a new instance of Router but we will have to also clone the generator and the matcher since they share the same context.
+>
+> right, would that be a problem?
+
+Not specially :sweat_smile:
+
+The `Router` is now cloned with its dependencies which share the same `RequestContext`.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-06-22T12:17:33Z
+
+As this `withContext` method is not part of any of the routing interfaces, this won't play well with service decorators.
+
+the RequestContextSwitcher was compatible with them without requiring any change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T16:04:20Z
+
+@stof is right, and the earlier steer towards a wither was mine, so let me correct it. I checked both objections against your branch rather than reasoning about them:
+
+```
+inside the clone:  router=https://acme.example.com/home   urlHelper=http://localhost/logo.png   <- did not follow
+decorator:         Error: Call to undefined method RouterInterface@anonymous::withContext()
+```
+
+The second one is the one I had missed. `UrlHelper`, `LoginLinkHandler` and `LocaleSwitcher` each hold the `RequestContext` directly, so a cloned router only fixes half of the motivating use case: the links in the e-mail would switch host and the absolute asset URLs in it would not. Putting `withContext()` on the routing interfaces would not have fixed the decorator case either, since every decorator would still have to implement a clone-and-forward.
+
+So this goes back to swapping the shared context, as your first version did, but as a method on `RequestContext` rather than a separate service: no service to inject, reachable from `$router->getContext()`, and it sits where the state lives.
+
+I pushed it. What changed from your branch:
+
+ * `Router::withContext()` and `Router::__clone()` are gone.
+ * The `with*()` methods are gone too. They were sugar over `(clone $context)->setX()`, since the setters are already fluent, and immutability on `RequestContext` deserves its own PR rather than riding along in this one.
+ * `RequestContext::runWith()` takes the values as named arguments, in the same order as the constructor. `null` means unchanged, while `''` and `[]` still clear the query string and the parameters.
+ * `Messenger`'s `RouterContextMiddleware` now uses it and loses 34 lines. It was the in-tree proof that this primitive was missing.
+
+Tests cover the swap, the restore, the exception path, nesting, empty values, and that a change made inside the callback does not survive it. Routing and Messenger are green, so is FrameworkBundle. Removing the `finally` restore fails 8 tests.
+
+Thanks for your patience through the back and forth.

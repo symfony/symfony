@@ -31,7 +31,7 @@
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/rate-limiter": "^7.4|^8.0",
-        "symfony/routing": "^7.4|^8.0",
+        "symfony/routing": "^8.2",
         "symfony/serializer": "^7.4.4|^8.0.4",
         "symfony/service-contracts": "^2.5|^3",
         "symfony/stopwatch": "^7.4|^8.0",
@@ -43,6 +43,7 @@
         "symfony/dependency-injection": "<8.1",
         "symfony/event-dispatcher-contracts": "<2.5",
         "symfony/lock": "<7.4",
+        "symfony/routing": "<8.2",
         "symfony/serializer": "<7.4.4|>=8.0,<8.0.4"
     },
     "autoload": {

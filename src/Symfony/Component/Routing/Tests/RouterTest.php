@@ -20,6 +20,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Router;
 
@@ -211,6 +213,29 @@ class RouterTest extends TestCase
         $p = new \ReflectionProperty($generator, 'defaultLocale');
 
         $this->assertSame('hr', $p->getValue($generator));
+    }
+
+    public function testGenerateWithinRunWithUsesTheGivenContext()
+    {
+        $routes = new RouteCollection();
+        $routes->add('home', new Route('/home'));
+
+        $loader = $this->createStub(LoaderInterface::class);
+        $loader->method('load')->willReturn($routes);
+
+        $context = new RequestContext('', 'GET', 'localhost', 'http');
+        $router = new Router($loader, 'routing.yml', [], $context);
+
+        $this->assertSame('http://localhost/home', $router->generate('home', [], UrlGeneratorInterface::ABSOLUTE_URL));
+
+        $url = $context->runWith(
+            static fn () => $router->generate('home', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            host: 'acme.example.com',
+            scheme: 'https',
+        );
+
+        $this->assertSame('https://acme.example.com/home', $url);
+        $this->assertSame('http://localhost/home', $router->generate('home', [], UrlGeneratorInterface::ABSOLUTE_URL));
     }
 
     private function getRouter(?LoaderInterface $loader = null): Router

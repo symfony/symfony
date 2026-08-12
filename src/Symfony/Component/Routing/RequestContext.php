@@ -308,4 +308,46 @@ class RequestContext
     {
         return 'https' === $this->scheme;
     }
+
+    /**
+     * Runs the given callback with the given values temporarily applied to this context.
+     *
+     * Arguments left to null keep their current value. The values are applied to this very
+     * instance, so that every service sharing it generates and matches URLs accordingly, and
+     * they are restored afterwards, including when the callback throws.
+     *
+     * @template T
+     *
+     * @param callable():T $callback
+     *
+     * @return T
+     */
+    public function runWith(callable $callback, ?string $baseUrl = null, ?string $method = null, ?string $host = null, ?string $scheme = null, ?int $httpPort = null, ?int $httpsPort = null, ?string $pathInfo = null, ?string $queryString = null, ?array $parameters = null): mixed
+    {
+        $original = clone $this;
+
+        null === $baseUrl || $this->setBaseUrl($baseUrl);
+        null === $method || $this->setMethod($method);
+        null === $host || $this->setHost($host);
+        null === $scheme || $this->setScheme($scheme);
+        null === $httpPort || $this->setHttpPort($httpPort);
+        null === $httpsPort || $this->setHttpsPort($httpsPort);
+        null === $pathInfo || $this->setPathInfo($pathInfo);
+        null === $queryString || $this->setQueryString($queryString);
+        null === $parameters || $this->setParameters($parameters);
+
+        try {
+            return $callback();
+        } finally {
+            $this->baseUrl = $original->baseUrl;
+            $this->pathInfo = $original->pathInfo;
+            $this->method = $original->method;
+            $this->host = $original->host;
+            $this->scheme = $original->scheme;
+            $this->httpPort = $original->httpPort;
+            $this->httpsPort = $original->httpsPort;
+            $this->queryString = $original->queryString;
+            $this->parameters = $original->parameters;
+        }
+    }
 }

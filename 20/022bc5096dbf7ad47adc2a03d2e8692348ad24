@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-28T12:51:36Z
+
+`CommandVerbosity` reads as “what is the verbosity of the command”; I don’t think this matches the feature implemented here.
+
+---------------------------------------------------------------------------
+
+by jprivet-dev at 2026-06-29T09:27:08Z
+
+Agreed, `CommandVerbosity` is misleading. `CommandVisibility` would better describe the intent: it's about when the command is visible, not about the command's own verbosity.
+
+@MatTheCat would that work for you, or do you have something else in mind?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T10:41:03Z
+
+Reworked to drop the separate attribute, @MatTheCat's naming point being part of it.
+
+`hidden` already lives on `#[AsCommand]`, and "when does this command show up in `list`" is the same concern, so this is now an option there rather than a second attribute you have to remember to write alongside:
+
+```php
+#[AsCommand(name: 'app:debug:dump', listedAt: OutputInterface::VERBOSITY_VERBOSE)]
+```
+
+`listedAt` says what it controls without claiming anything about the command's own verbosity, and without borrowing PHP's meaning of "visibility".
+
+The other reason for folding it in: `AddConsoleCommandPass` reads `command`, `description`, `help` and `usages` from the `console.command` tag, so commands registered in YAML or XML get those without attributes. The separate attribute could never reach them. There is now a `listed_at` tag attribute alongside the option, following `description` and `help`.
+
+`hidden` is left alone. Mapping it onto `VERBOSITY_QUIET` worked only because `isHidden()` was still checked separately, and it read backwards: quiet is a lower level, yet it meant "never shown".
+
+@stof, the lazy-loading concern from #64142 is respected: the value is read at compile time and set on both the command definition and the `LazyCommand` wrapper, so `list` still renders without initializing anything.
+
+Console tests pass (Command 131, DependencyInjection 36, Descriptor 147, Application 157). Two tests added, one for the filtering and one for the tag path.
+
+What is left is the feature itself rather than its shape, and it is @MatTheCat's question from #64142 that deserves an answer: commands you use daily are typically run without listing them first, so is a cluttered `list` a real problem worth an option for? @jprivet-dev, a concrete case would help here.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T11:06:25Z
+
+It did not, so I added one: when `list` leaves commands out, it now ends with
+
+```
+ Run with "-vvv" to list more commands.
+```
+
+naming the lowest verbosity that would show them (`-v`/`-vv`/`-vvv`). Nothing is printed when nothing is filtered, so existing output is unchanged.
+
+Without it the option trades a cluttered `list` for commands nobody can find, which is the worse failure of the two.

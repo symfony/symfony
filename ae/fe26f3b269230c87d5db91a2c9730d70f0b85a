@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T12:10:47Z
+
+For the record, how the wrapper gets picked.
+
+`setCallbackWrapper()` returns the previous wrapper and installs the new one, so `setCallbackWrapper(null)` reads the current one while disabling it. The double call is read-then-restore: the inner call reads the SAPI-dependent default, the outer writes it back.
+
+The SAPI is consulted only in the `if (!isset(...))` block, which installs `LockRegistry::compute` and then recurses with `null` on CLI-ish SAPIs, swapping in the no-op:
+
+```
+cli       install compute, recursion swaps to no-op, returns no-op  ->  holds no-op
+fpm-fcgi  install compute, returns compute                          ->  holds compute
+```
+
+The removed line initialized the property first, so `!isset($this->callbackWrapper)` was never true and that block never ran. Web SAPIs end up holding `LockRegistry::compute` either way, so this changes CLI only.

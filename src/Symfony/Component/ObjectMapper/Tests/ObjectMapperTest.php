@@ -27,12 +27,6 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactor
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\OtherView as TargetInClassMapOtherView;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Source as TargetInClassMapSource;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Target as TargetInClassMapTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
@@ -184,6 +178,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadO
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadOnlyPromotedPropertyBMapped;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Recursion\AB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Recursion\Dto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ChildSource as RecursionCacheChildSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ItemSource as RecursionCacheItemSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ItemSummaryTarget as RecursionCacheItemSummaryTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ItemTarget as RecursionCacheItemTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfSource as RecursionCacheSelfSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfSummaryTarget as RecursionCacheSelfSummaryTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfTarget as RecursionCacheSelfTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\Category;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\CategoryDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\LoadedValueService;
@@ -194,9 +195,15 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLoc
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ChildTarget as SubclassTargetWithTransformChildTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ParentTarget as SubclassTargetWithTransformParentTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\Source as SubclassTargetWithTransformSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\OtherView as TargetInClassMapOtherView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Source as TargetInClassMapSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Target as TargetInClassMapTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\SourceEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\TargetDto as TargetTransformTargetDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Transform\TransformToStdClass;
@@ -1695,5 +1702,31 @@ final class ObjectMapperTest extends TestCase
         ));
 
         $this->assertSame('lower', $mapper->map(new TargetInClassMapSource(), TargetInClassMapTarget::class)->label);
+    }
+
+    public function testRecursionCacheIsNotReusedForADifferentTarget()
+    {
+        // mapping to ItemSummaryTarget caches it for $item, while the back-reference
+        // ChildTarget::$item resolves to the other target ItemSource declares
+        $item = new RecursionCacheItemSource();
+        $child = new RecursionCacheChildSource();
+        $child->label = 'child';
+        $child->item = $item;
+        $item->children = [$child];
+
+        $mapped = (new ObjectMapper())->map($item, RecursionCacheItemSummaryTarget::class);
+
+        $this->assertInstanceOf(RecursionCacheItemTarget::class, $mapped->children[0]->item);
+    }
+
+    public function testSelfReferenceIsNotReusedForADifferentTarget()
+    {
+        $source = new RecursionCacheSelfSource();
+        $source->self = $source;
+
+        $mapped = (new ObjectMapper())->map($source, RecursionCacheSelfTarget::class);
+
+        $this->assertInstanceOf(RecursionCacheSelfSummaryTarget::class, $mapped->self);
+        $this->assertSame(1, $mapped->self->id);
     }
 }

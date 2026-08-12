@@ -50,6 +50,9 @@ class PoFileDumper extends FileDumper
             if (isset($metadata['sources'])) {
                 $output .= $this->formatComments(implode(' ', (array) $metadata['sources']), ':');
             }
+            if (isset($metadata['context'])) {
+                $output .= \sprintf('msgctxt "%s"'."\n", $this->escape($metadata['context']));
+            }
 
             // in an ICU domain the pipe is an ordinary character, pluralization is expressed by the message itself
             $sourceRules = $isIntlDomain ? [] : $this->getStandardRules($source);

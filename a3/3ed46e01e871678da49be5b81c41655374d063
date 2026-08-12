@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by SamuilovAD at 2025-11-09T17:51:58Z
+
+@nicolas-grekas
+WIP. Pls review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-12T13:48:01Z
+
+Could #58473 help instead?
+
+---------------------------------------------------------------------------
+
+by SamuilovAD at 2025-11-12T17:50:02Z
+
+> Could #58473 help instead?
+
+No, It doesn't work with values inside arrays.
+
+---------------------------------------------------------------------------
+
+by SamuilovAD at 2025-12-01T15:24:09Z
+
+@nicolas-grekas, could you please assist me? I am waiting for resolving lowest-php check and it always fails several weeks. What could I do from my side?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T13:40:07Z
+
+I reworked this and pushed on your branch, @SamuilovAD. Thanks for reporting the problem and for the patch, the diagnosis was right.
+
+I took a different route: instead of a new `CAST_SCALAR_COLLECTIONS` option with its own casting rules, scalar collections now recurse into their elements the way object and union-typed collections already do. Each element goes through `validateAndDenormalize()`, so `ENABLE_TYPE_CONVERSION`, `FILTER_BOOL`, `DISABLE_TYPE_ENFORCEMENT`, nullability, the deserialization path in errors and `COLLECT_DENORMALIZATION_ERRORS` all apply with the single set of rules the rest of the component uses. Two options for the same conversion, with rules that differ in the details, would have been hard to keep in sync.
+
+This also enforces the element type, which the previous behaviour did not: `int[]` receiving `'nope'` now throws, like the same value on a plain `int` property already did. That is why it targets 8.2 and not a patch branch.
+
+Your commit is still in the branch history. Description and title updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T13:54:20Z
+
+Reworked again and pushed, @SamuilovAD, sorry for the churn.
+
+Two changes since my previous comment. The patch now targets 8.1 rather than 8.2, since it is a plain bug fix and 8.1 is the lowest maintained branch where `ENABLE_TYPE_CONVERSION` exists. And it no longer enforces the element type: elements that cannot be converted are left untouched exactly as they are today, with a test pinning that. Rejecting them would break payloads applications accept today, and deprecating it first is awkward because there would be nothing to opt into. That question is now #65289.
+
+So what is left is only the conversion, which is what #53490 asked for.

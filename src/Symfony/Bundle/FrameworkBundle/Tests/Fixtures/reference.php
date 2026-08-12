@@ -51,7 +51,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     shared?: bool,
  *     lazy?: bool|string,
  *     public?: bool,
- *     properties?: array<string, mixed>,
+ *%A   properties?: array<string, mixed>,
  *     configurator?: CallbackType,
  *     calls?: list<CallType>,
  *     tags?: TagsType,

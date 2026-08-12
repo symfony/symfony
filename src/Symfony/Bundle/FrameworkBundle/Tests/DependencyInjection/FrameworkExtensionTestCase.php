@@ -2553,6 +2553,58 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNull($container->getDefinition('mailer.mailer')->getArgument(1));
     }
 
+    /**
+     * @param array{profiler?: bool|array<string, mixed>, test?: bool} $extraConfig
+     */
+    #[DataProvider('provideLoggerListenerRegistration')]
+    public function testLoggerListenerRegistration(string $serviceId, array $extraConfig, bool $expectedRegistered, bool $expectedGated)
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($extraConfig) {
+            $container->loadFromExtension('framework', array_merge([
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'secret' => 's3cr3t',
+                'mailer' => ['dsn' => 'smtp://null'],
+                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
+            ], $extraConfig));
+        });
+
+        $this->assertSame($expectedRegistered, $container->hasDefinition($serviceId));
+
+        if (!$expectedRegistered) {
+            return;
+        }
+
+        $arguments = $container->getDefinition($serviceId)->getArguments();
+
+        if ($expectedGated) {
+            $this->assertEquals(new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE), $arguments[0]);
+        } else {
+            $this->assertSame([], $arguments);
+        }
+    }
+
+    public static function provideLoggerListenerRegistration(): iterable
+    {
+        $profiler = ['profiler' => ['enabled' => true, 'collect_serializer_data' => true]];
+
+        foreach (['mailer.message_logger_listener', 'notifier.notification_logger_listener'] as $serviceId) {
+            $name = substr($serviceId, 0, strpos($serviceId, '.'));
+
+            // Nothing consumes the retained messages, so the listener is dropped.
+            yield $name.': neither profiler nor test' => [$serviceId, [], false, false];
+
+            // The profiler consumes them, but only while it is collecting.
+            yield $name.': profiler only' => [$serviceId, $profiler, true, true];
+
+            // The assertions read the listener directly, so it must always collect.
+            yield $name.': test only' => [$serviceId, ['test' => true], true, false];
+            yield $name.': profiler and test' => [$serviceId, $profiler + ['test' => true], true, false];
+        }
+    }
+
     public function testMailerWithSpecificMessageBus()
     {
         $container = $this->createContainerFromFile('mailer_with_specific_message_bus');
@@ -2732,6 +2784,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $container = $this->createContainerFromFile('notifier_without_messenger');
 
         $this->assertFalse($container->getDefinition('notifier.failed_message_listener')->hasTag('kernel.event_subscriber'));
+    }
+
+    public function testNotificationLoggerListenerIsResettable()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'annotations' => false,
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'secret' => 's3cr3t',
+                'test' => true,
+                'notifier' => ['texter_transports' => ['twilio' => 'twilio://ACCOUNT:TOKEN@default?from=FROM']],
+            ]);
+        });
+
+        // Otherwise a worker keeps every notification it ever sent, and the
+        // collector reports the ones from previous messages.
+        $this->assertSame([['method' => 'reset']], $container->getDefinition('notifier.notification_logger_listener')->getTag('kernel.reset'));
     }
 
     public function testNotifierWithMailerAndMessenger()

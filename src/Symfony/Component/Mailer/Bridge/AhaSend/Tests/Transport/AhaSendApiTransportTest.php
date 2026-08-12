@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\Bridge\AhaSend\Event\AhaSendDeliveryEvent;
 use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -301,5 +302,26 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertArrayHasKey('base64', $payload['content']['attachments'][0]);
 
         $this->assertFalse($payload['content']['attachments'][0]['base64']);
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new AhaSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertTrue($enabledPayload['tracking']['open']);
+        $this->assertTrue($enabledPayload['tracking']['click']);
+        $this->assertArrayNotHasKey('headers', $enabledPayload['content']);
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertFalse($disabledPayload['tracking']['open']);
+        $this->assertFalse($disabledPayload['tracking']['click']);
+        $this->assertArrayNotHasKey('headers', $disabledPayload['content']);
     }
 }

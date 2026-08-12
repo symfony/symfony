@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillSmtpTransport;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Email;
 
 class MandrillSmtpTransportTest extends TestCase
@@ -36,5 +37,21 @@ class MandrillSmtpTransportTest extends TestCase
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
         $this->assertSame('X-MC-Tags: password-reset,user,another', $email->getHeaders()->get('X-MC-Tags')->toString());
         $this->assertSame('X-MC-Metadata: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-MC-Metadata')->toString());
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new MandrillSmtpTransport('user', 'password');
+        $method = new \ReflectionMethod(MandrillSmtpTransport::class, 'addMandrillHeaders');
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $method->invoke($transport, $enabled);
+        $this->assertSame('X-MC-Track: opens,clicks', $enabled->getHeaders()->get('X-MC-Track')->toString());
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $method->invoke($transport, $disabled);
+        $this->assertSame('X-MC-Track: none', $disabled->getHeaders()->get('X-MC-Track')->toString());
     }
 }

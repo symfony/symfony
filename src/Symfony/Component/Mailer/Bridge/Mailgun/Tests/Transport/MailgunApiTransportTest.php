@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -305,5 +306,36 @@ class MailgunApiTransportTest extends TestCase
 
         $this->assertArrayHasKey('h:Sender', $payload);
         $this->assertSame('=?utf-8?Q?=C5=BDlu=C5=A5ou=C4=8Dk=C3=BD_K=C5=AF=C5=88?= <alice@system.com>', $payload['h:Sender']);
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertSame('true', $enabledPayload['o:tracking']);
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertSame('false', $disabledPayload['o:tracking']);
+    }
+
+    public function testExplicitMailgunTrackingHeaderOverridesTrackingHeader()
+    {
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(true));
+        $email->getHeaders()->addTextHeader('o:tracking', 'false');
+
+        $payload = $method->invoke($transport, $email, $envelope);
+        $this->assertSame('false', $payload['o:tracking']);
     }
 }

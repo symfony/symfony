@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Message;
@@ -65,6 +66,14 @@ class PostmarkSmtpTransport extends EsmtpTransport
 
             if ($header instanceof MetadataHeader) {
                 $headers->addTextHeader('X-PM-Metadata-'.$header->getKey(), $header->getValue());
+                $headers->remove($name);
+            }
+
+            if ($header instanceof TrackingHeader) {
+                $track = 'true' === $header->getValue();
+
+                $headers->addTextHeader('X-PM-TrackOpens', $track ? 'true' : 'false');
+                $headers->addTextHeader('X-PM-TrackLinks', $track ? 'HtmlAndText' : 'None');
                 $headers->remove($name);
             }
         }

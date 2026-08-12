@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -138,6 +139,13 @@ final class InfobipApiTransport extends AbstractApiTransport
         foreach ($email->getHeaders()->all() as $header) {
             if ($convertConf = self::HEADER_TO_MESSAGE[$header->getName()] ?? false) {
                 $fields[$convertConf] = $header->getBodyAsString();
+            }
+
+            if ($header instanceof TrackingHeader) {
+                $track = 'true' === $header->getValue();
+
+                $fields['trackOpens'] = $track ? 'true' : 'false';
+                $fields['trackClicks'] = $track ? 'true' : 'false';
             }
         }
 

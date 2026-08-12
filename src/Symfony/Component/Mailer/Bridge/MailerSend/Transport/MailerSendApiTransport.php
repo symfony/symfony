@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -116,6 +117,17 @@ final class MailerSendApiTransport extends AbstractApiTransport
 
         if ($email->getHtmlBody()) {
             $payload['html'] = $email->getHtmlBody();
+        }
+
+        foreach ($email->getHeaders()->all() as $header) {
+            if ($header instanceof TrackingHeader) {
+                $track = 'true' === $header->getValue();
+
+                $payload['settings'] = [
+                    'track_opens' => $track,
+                    'track_clicks' => $track,
+                ];
+            }
         }
 
         return $payload;

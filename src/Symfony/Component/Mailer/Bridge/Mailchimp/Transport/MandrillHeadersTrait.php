@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
@@ -45,6 +46,11 @@ trait MandrillHeadersTrait
                 $headers->remove($name);
             } elseif ($header instanceof MetadataHeader) {
                 $metadata[$header->getKey()] = $header->getValue();
+                $headers->remove($name);
+            } elseif ($header instanceof TrackingHeader) {
+                $track = 'true' === $header->getValue();
+
+                $headers->addTextHeader('X-MC-Track', $track ? 'opens,clicks' : 'none');
                 $headers->remove($name);
             }
         }

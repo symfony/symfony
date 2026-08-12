@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -129,6 +130,14 @@ class MailgunApiTransport extends AbstractApiTransport
 
             if ($header instanceof MetadataHeader) {
                 $payload['v:'.$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+
+            if ($header instanceof TrackingHeader) {
+                $track = 'true' === $header->getValue();
+
+                $payload['o:tracking'] = $track ? 'true' : 'false';
 
                 continue;
             }

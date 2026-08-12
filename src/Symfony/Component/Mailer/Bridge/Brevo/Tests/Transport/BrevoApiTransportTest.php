@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -180,5 +181,45 @@ class BrevoApiTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com'), new Address('cc@example.com'), new Address('bcc@example.com')]);
+
+        $enabled = new Email();
+        $enabled->cc('cc@example.com');
+        $enabled->bcc('bcc@example.com');
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertTrue($enabledPayload['to'][0]['contactPixelTrackingConsent']);
+        $this->assertTrue($enabledPayload['cc'][0]['contactPixelTrackingConsent']);
+        $this->assertTrue($enabledPayload['bcc'][0]['contactPixelTrackingConsent']);
+        $this->assertArrayNotHasKey('contactPixelTrackingConsent', $enabledPayload['sender']);
+
+        $disabled = new Email();
+        $disabled->cc('cc@example.com');
+        $disabled->bcc('bcc@example.com');
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertFalse($disabledPayload['to'][0]['contactPixelTrackingConsent']);
+        $this->assertFalse($disabledPayload['cc'][0]['contactPixelTrackingConsent']);
+        $this->assertFalse($disabledPayload['bcc'][0]['contactPixelTrackingConsent']);
+        $this->assertArrayNotHasKey('contactPixelTrackingConsent', $disabledPayload['sender']);
+    }
+
+    public function testTrackingHeaderIsNotForwardedAsCustomHeader()
+    {
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(true));
+
+        $payload = $method->invoke($transport, $email, $envelope);
+        $this->assertArrayNotHasKey('headers', $payload);
     }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Bridge\AhaSend\Event\AhaSendDeliveryEvent;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -102,6 +103,17 @@ final class AhaSendApiTransport extends AbstractApiTransport
             ],
         ];
 
+        foreach ($email->getHeaders()->all() as $name => $header) {
+            if ($header instanceof TrackingHeader) {
+                $track = 'true' === $header->getValue();
+
+                $payload['tracking'] = [
+                    'open' => $track,
+                    'click' => $track,
+                ];
+            }
+        }
+
         $text = $email->getTextBody();
         if (!empty($text)) {
             $payload['content']['text_body'] = $text;
@@ -142,6 +154,10 @@ final class AhaSendApiTransport extends AbstractApiTransport
 
             if ($header instanceof TagHeader) {
                 $tags[] = $header->getValue();
+                continue;
+            }
+
+            if ($header instanceof TrackingHeader) {
                 continue;
             }
 

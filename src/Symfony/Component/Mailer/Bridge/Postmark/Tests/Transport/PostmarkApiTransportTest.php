@@ -24,6 +24,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -240,5 +241,24 @@ class PostmarkApiTransportTest extends TestCase
         $this->expectException(TransportException::class);
 
         $method->invoke($transport, $email, $envelope);
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new PostmarkApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertTrue($enabledPayload['TrackOpens']);
+        $this->assertSame('HtmlAndText', $enabledPayload['TrackLinks']);
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertFalse($disabledPayload['TrackOpens']);
+        $this->assertSame('None', $disabledPayload['TrackLinks']);
     }
 }

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunSmtpTransport;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Email;
 
 /**
@@ -38,5 +39,21 @@ class MailgunSmtpTransportTest extends TestCase
         $this->assertSame('foo: bar', $email->getHeaders()->get('foo')->toString());
         $this->assertSame('X-Mailgun-Tag: password-reset', $email->getHeaders()->get('X-Mailgun-Tag')->toString());
         $this->assertSame('X-Mailgun-Variables: '.json_encode(['Color' => 'blue', 'Client-ID' => '12345']), $email->getHeaders()->get('X-Mailgun-Variables')->toString());
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new MailgunSmtpTransport('user', 'password');
+        $method = new \ReflectionMethod(MailgunSmtpTransport::class, 'addMailgunHeaders');
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $method->invoke($transport, $enabled);
+        $this->assertSame('X-Mailgun-Track: yes', $enabled->getHeaders()->get('X-Mailgun-Track')->toString());
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $method->invoke($transport, $disabled);
+        $this->assertSame('X-Mailgun-Track: no', $disabled->getHeaders()->get('X-Mailgun-Track')->toString());
     }
 }

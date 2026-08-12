@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\AhaSend\Tests\Transport;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendSmtpTransport;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Email;
 
 class AhaSendSmtpTransportTest extends TestCase
@@ -43,5 +44,23 @@ class AhaSendSmtpTransportTest extends TestCase
         $method->invoke($transport, $email);
         $headers = $email->getHeaders();
         $this->assertSame('AhaSend-Tags: tag1,tag2', $email->getHeaders()->get('AhaSend-Tags')->toString());
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new AhaSendSmtpTransport('USERNAME', 'PASSWORD');
+        $method = new \ReflectionMethod(AhaSendSmtpTransport::class, 'addAhaSendHeaders');
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $method->invoke($transport, $enabled);
+        $this->assertSame('AhaSend-Track-Opens: true', $enabled->getHeaders()->get('AhaSend-Track-Opens')->toString());
+        $this->assertSame('AhaSend-Track-Clicks: true', $enabled->getHeaders()->get('AhaSend-Track-Clicks')->toString());
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $method->invoke($transport, $disabled);
+        $this->assertSame('AhaSend-Track-Opens: false', $disabled->getHeaders()->get('AhaSend-Track-Opens')->toString());
+        $this->assertSame('AhaSend-Track-Clicks: false', $disabled->getHeaders()->get('AhaSend-Track-Clicks')->toString());
     }
 }

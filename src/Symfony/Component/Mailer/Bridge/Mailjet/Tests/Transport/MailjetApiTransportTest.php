@@ -18,6 +18,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -514,5 +515,39 @@ class MailjetApiTransportTest extends TestCase
         $this->assertSame('text.txt', $contentId ?? null);
         $this->assertCount(1, $payload['Messages']);
         $this->assertCount(1, $payload['Messages'][0]['InlinedAttachments']);
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertSame('enabled', $enabledPayload['Messages'][0]['TrackClicks']);
+        $this->assertSame('enabled', $enabledPayload['Messages'][0]['TrackOpens']);
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertSame('disabled', $disabledPayload['Messages'][0]['TrackClicks']);
+        $this->assertSame('disabled', $disabledPayload['Messages'][0]['TrackOpens']);
+    }
+
+    public function testExplicitMailjetTrackingHeadersOverrideTrackingHeader()
+    {
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(false));
+        $email->getHeaders()->addTextHeader('X-Mailjet-TrackClick', 'account_default');
+
+        $payload = $method->invoke($transport, $email, $envelope);
+        $this->assertSame('account_default', $payload['Messages'][0]['TrackClicks']);
+        $this->assertSame('disabled', $payload['Messages'][0]['TrackOpens']);
     }
 }

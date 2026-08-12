@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add automatic conversion between `BackedEnum` and scalar types (both ways)
+ * Add a `MappingAwareTransformCallableInterface` to pass the `Map` attribute being applied to transformers
 
 8.1
 ---

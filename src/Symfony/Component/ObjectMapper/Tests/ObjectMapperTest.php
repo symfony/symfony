@@ -27,12 +27,6 @@ use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactor
 use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\OtherView as TargetInClassMapOtherView;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Source as TargetInClassMapSource;
-use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Target as TargetInClassMapTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
@@ -118,6 +112,11 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\NestedExisti
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\Post as MapExistingObjectPost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\PostDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapExistingObject\Tag;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\A as MappingAwareA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\B as MappingAwareB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\C as MappingAwareC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\D as MappingAwareD;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MappingAware\MappingAwareTransformer;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
@@ -194,9 +193,15 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLoc
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\Lead as SourceCarriesMetadataLead;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\LeadDto as SourceCarriesMetadataLeadDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\SourceCarriesMetadata\TypeDto as SourceCarriesMetadataTypeDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ChildTarget as SubclassTargetWithTransformChildTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\ParentTarget as SubclassTargetWithTransformParentTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SubclassTargetWithTransform\Source as SubclassTargetWithTransformSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\OtherView as TargetInClassMapOtherView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Source as TargetInClassMapSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetInClassMap\Target as TargetInClassMapTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\SourceEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\TargetDto as TargetTransformTargetDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Transform\TransformToStdClass;
@@ -740,6 +745,28 @@ final class ObjectMapperTest extends TestCase
 
         $b = $myMapper->map($a);
         $this->assertSame('got decorated', $b->relation->baz);
+    }
+
+    public function testMappingAwareTransformCallable()
+    {
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([MappingAwareTransformer::class => new MappingAwareTransformer()]),
+        );
+        $b = $mapper->map(new MappingAwareA());
+
+        $this->assertInstanceOf(MappingAwareB::class, $b);
+        $this->assertSame('bar', $b->bar);
+    }
+
+    public function testMappingAwareTransformCallableWithTargetSideMapping()
+    {
+        $mapper = new ObjectMapper(
+            transformCallableLocator: $this->getServiceLocator([MappingAwareTransformer::class => new MappingAwareTransformer()]),
+        );
+        $d = $mapper->map(new MappingAwareC());
+
+        $this->assertInstanceOf(MappingAwareD::class, $d);
+        $this->assertSame('source:foo', $d->foo);
     }
 
     #[DataProvider('validPartialInputProvider')]

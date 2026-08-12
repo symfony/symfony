@@ -94,11 +94,14 @@ class ProjectServiceContainer extends Container
 
     protected function getDefaultParameters(): array
     {
+        $dir2 = \dirname(__DIR__, 2);
+
         return [
             'foo' => ('file://'.\dirname(__DIR__, 1)),
             'bar' => __DIR__,
             'baz' => (__DIR__.'/PhpDumperTest.php'),
-            'buz' => \dirname(__DIR__, 2),
+            'buz' => $dir2,
+            'bux' => ($dir2.'/foo'),
         ];
     }
 }

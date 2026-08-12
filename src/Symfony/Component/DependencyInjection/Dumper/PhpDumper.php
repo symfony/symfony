@@ -1661,6 +1661,22 @@ class PhpDumper extends Dumper
         }
         $parameters = \sprintf("[\n%s\n%s]", implode("\n", $php), str_repeat(' ', 8));
 
+        $hoistedDirnames = '';
+        if (preg_match_all('/(?<!\\\\)\\\\dirname\(__DIR__, (\d+)\)/', $parameters, $matches)) {
+            $levels = array_count_values($matches[1]);
+            ksort($levels);
+            foreach ($levels as $level => $count) {
+                if (2 > $count) {
+                    continue;
+                }
+                $hoistedDirnames .= \sprintf("        \$dir%d = \\dirname(__DIR__, %d);\n", $level, $level);
+                $parameters = preg_replace(\sprintf('/(?<!\\\\)\\\\dirname\(__DIR__, %d\)/', $level), '\$dir'.$level, $parameters);
+            }
+            if ($hoistedDirnames) {
+                $hoistedDirnames .= "\n";
+            }
+        }
+
         $code = <<<'EOF'
 
                 public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
@@ -1765,7 +1781,7 @@ class PhpDumper extends Dumper
 
                 protected function getDefaultParameters(): array
                 {
-                    return $parameters;
+            {$hoistedDirnames}        return $parameters;
                 }
 
             EOF;

@@ -27,6 +27,12 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedOv
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedProperties;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureRepeatedTag;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureResourceTagsAttributed;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureWithExpressionFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureWithInstanceExternalFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureWithInvokableFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureWithStaticExternalFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\AutoconfigureWithStaticSelfFactory;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LazyAutoconfigured;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\LazyLoaded;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\MultipleAutoconfigureAttributed;
@@ -207,6 +213,88 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
             ->setBindings(['$foo' => $argument])
         ;
         $this->assertEquals([StaticConstructorAutoconfigure::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testAutoconfigureWithStaticSelfFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AutoconfigureWithStaticSelfFactory::class)
+            ->setAutoconfigured(true);
+
+        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/AutoconfigureWithStaticSelfFactory.php'));
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->setFactory([null, 'create'])
+            ->setBindings(['$foo' => $argument])
+        ;
+        $this->assertEquals([AutoconfigureWithStaticSelfFactory::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testAutoconfigureWithStaticExternalFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AutoconfigureWithStaticExternalFactory::class)
+            ->setAutoconfigured(true);
+
+        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/AutoconfigureWithStaticExternalFactory.php'));
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->setFactory([FactoryDummy::class, 'create'])
+            ->setBindings(['$foo' => $argument])
+        ;
+        $this->assertEquals([AutoconfigureWithStaticExternalFactory::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testAutoconfigureWithInstanceExternalFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AutoconfigureWithInstanceExternalFactory::class)
+            ->setAutoconfigured(true);
+
+        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/AutoconfigureWithInstanceExternalFactory.php'));
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->setFactory([new Reference('factory_for_autoconfigure'), 'createStatic'])
+            ->setBindings(['$foo' => $argument])
+        ;
+        $this->assertEquals([AutoconfigureWithInstanceExternalFactory::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testAutoconfigureWithInvokableFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AutoconfigureWithInvokableFactory::class)
+            ->setAutoconfigured(true);
+
+        $argument = new BoundArgument('foo', false, BoundArgument::INSTANCEOF_BINDING, realpath(__DIR__.'/../Fixtures/AutoconfigureWithInvokableFactory.php'));
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->setFactory([new Reference('factory_for_autoconfigure'), '__invoke'])
+            ->setBindings(['$foo' => $argument])
+        ;
+        $this->assertEquals([AutoconfigureWithInvokableFactory::class => $expected], $container->getAutoconfiguredInstanceof());
+    }
+
+    public function testAutoconfigureWithExpressionFactory()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', AutoconfigureWithExpressionFactory::class)
+            ->setAutoconfigured(true);
+
+        (new RegisterAutoconfigureAttributesPass())->process($container);
+
+        $expected = (new ChildDefinition(''))
+            ->setFactory('@=service("factory_for_autoconfigure").create()')
+        ;
+        $this->assertEquals([AutoconfigureWithExpressionFactory::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
     public function testLazyServiceAttribute()

@@ -144,6 +144,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['static_constructor'];
         yield ['inline_static_constructor'];
         yield ['instanceof_static_constructor'];
+        yield ['instanceof_factory'];
         yield ['closure'];
         yield ['from_callable'];
         yield ['env_param'];

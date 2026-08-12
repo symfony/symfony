@@ -1100,15 +1100,24 @@ class YamlFileLoaderTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testServiceWithSameNameAsInterfaceAndFactoryIsNotTagged()
+    #[DataProvider('provideServiceInstanceOfFactoryFiles')]
+    public function testServiceWithSameNameAsInterfaceAndFactoryIsNotTagged(string $fileName)
     {
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
-        $loader->load('service_instanceof_factory.yml');
+        $loader->load($fileName);
         $container->compile();
 
         $tagged = $container->findTaggedServiceIds('bar');
         $this->assertCount(1, $tagged);
+    }
+
+    public static function provideServiceInstanceOfFactoryFiles(): iterable
+    {
+        return [
+            ['service_instanceof_factory.yml'],
+            ['service_instanceof_factory2.yml'],
+        ];
     }
 
     /**

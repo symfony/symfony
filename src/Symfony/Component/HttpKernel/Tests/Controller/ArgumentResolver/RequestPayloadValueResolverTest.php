@@ -28,6 +28,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -597,6 +598,91 @@ class RequestPayloadValueResolverTest extends TestCase
             $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
             $this->assertSame('This value should be of type float.', $validationFailedException->getViolations()[0]->getMessage());
         }
+    }
+
+    public function testQueryStringKeyDeserializesJsonPayload()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new ReflectionExtractor())], ['json' => new JsonEncoder()]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('valid', NestedQueryPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(key: 'foo'),
+        ]);
+
+        $request = Request::create('/', 'GET', ['foo' => '{"poo":1}']);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $resolved = $event->getArguments()[0];
+        $this->assertInstanceOf(NestedQueryPayload::class, $resolved);
+        $this->assertSame(1, $resolved->poo);
+    }
+
+    public function testQueryStringKeyJsonAndBracketNotationAreEquivalent()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new ReflectionExtractor())], ['json' => new JsonEncoder()]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('valid', NestedQueryPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(key: 'foo'),
+        ]);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $resolve = static function (array $query) use ($resolver, $argument, $kernel) {
+            $request = Request::create('/', 'GET', $query);
+            $event = new ControllerArgumentsEvent($kernel, static fn () => null, $resolver->resolve($request, $argument), $request, HttpKernelInterface::MAIN_REQUEST);
+            $resolver->onKernelControllerArguments($event);
+
+            return $event->getArguments();
+        };
+
+        $this->assertEquals($resolve(['foo' => ['poo' => '1']]), $resolve(['foo' => '{"poo":1}']));
+    }
+
+    public function testQueryStringKeyWithInvalidJson()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new ReflectionExtractor())], ['json' => new JsonEncoder()]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('valid', NestedQueryPayload::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(key: 'foo'),
+        ]);
+
+        $request = Request::create('/', 'GET', ['foo' => '{"poo":1']);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('Query parameter "foo" contains invalid "json" data.');
+
+        $resolver->onKernelControllerArguments($event);
+    }
+
+    public function testQueryStringWithoutKeyIgnoresJsonLookingValues()
+    {
+        $serializer = new Serializer([new ObjectNormalizer(null, null, null, new ReflectionExtractor())], ['json' => new JsonEncoder()]);
+        $resolver = new RequestPayloadValueResolver($serializer);
+
+        $argument = new ArgumentMetadata('valid', QueryPayloadWithStringProperty::class, false, false, null, false, [
+            MapQueryString::class => new MapQueryString(),
+        ]);
+
+        $request = Request::create('/', 'GET', ['foo' => '{"poo":1}']);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static fn () => null, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertSame('{"poo":1}', $event->getArguments()[0]->foo);
     }
 
     public function testRequestInputValidationPassed()
@@ -1526,6 +1612,20 @@ interface SerializerDenormalizer extends SerializerInterface, DenormalizerInterf
 class QueryPayload
 {
     public function __construct(public readonly float $page)
+    {
+    }
+}
+
+class NestedQueryPayload
+{
+    public function __construct(public readonly int $poo)
+    {
+    }
+}
+
+class QueryPayloadWithStringProperty
+{
+    public function __construct(public readonly string $foo)
     {
     }
 }

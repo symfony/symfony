@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T10:59:57Z
+
+All three fixed with tests: `D` modifier on the target regex, directive names lowercased on read and write (with `false` removing the directive), and `all()` now reads every field line. Thanks @alexandre-daubois.

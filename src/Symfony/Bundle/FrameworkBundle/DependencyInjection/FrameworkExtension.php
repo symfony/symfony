@@ -594,6 +594,31 @@ class FrameworkExtension extends Extension
         // profiler depends on form, validation, translation, messenger, mailer, http-client, notifier, serializer being registered. console is optional
         $this->registerProfilerConfiguration($config['profiler'], $container, $loader);
 
+        // These listeners keep every message, attachments included, for the
+        // lifetime of the process. Only the profiler and the test assertions
+        // consume them, so drop them when neither is around, and let them skip
+        // messages nobody will collect otherwise. Test mode keeps collecting
+        // unconditionally because the assertions read the listeners directly.
+        if (!($config['test'] ?? false)) {
+            $loggerListeners = [
+                'mailer' => 'mailer.message_logger_listener',
+                'notifier' => 'notifier.notification_logger_listener',
+            ];
+
+            foreach ($loggerListeners as $extension => $id) {
+                if (!$this->isInitializedConfigEnabled($extension)) {
+                    continue;
+                }
+
+                if ($this->isInitializedConfigEnabled('profiler')) {
+                    $container->getDefinition($id)
+                        ->setArgument(0, new Reference('profiler.is_disabled_state_checker', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+                } else {
+                    $container->removeDefinition($id);
+                }
+            }
+        }
+
         if ($this->readConfigEnabled('webhook', $container, $config['webhook'])) {
             $this->registerWebhookConfiguration($config['webhook'], $container, $loader, $this->readConfigEnabled('serializer', $container, $config['serializer']));
 

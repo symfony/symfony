@@ -140,6 +140,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('notifier.notification_logger_listener', NotificationLoggerListener::class)
             ->tag('kernel.event_subscriber')
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('texter.messenger.desktop_handler', MessageHandler::class)
             ->args([service('texter.transports')])

@@ -80,8 +80,6 @@ trait ContractsTrait
             CacheItem::class
         );
 
-        $this->callbackWrapper ??= LockRegistry::compute(...);
-
         return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key, $beta) {
             // don't wrap nor save recursive calls
             if (isset($this->computing[$key])) {

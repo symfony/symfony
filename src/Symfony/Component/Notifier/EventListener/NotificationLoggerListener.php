@@ -23,8 +23,9 @@ class NotificationLoggerListener implements EventSubscriberInterface, ResetInter
 {
     private NotificationEvents $events;
 
-    public function __construct()
-    {
+    public function __construct(
+        private ?\Closure $disabled = null,
+    ) {
         $this->events = new NotificationEvents();
     }
 
@@ -35,6 +36,10 @@ class NotificationLoggerListener implements EventSubscriberInterface, ResetInter
 
     public function onNotification(MessageEvent $event): void
     {
+        if ($this->disabled?->__invoke()) {
+            return;
+        }
+
         $this->events->add($event);
     }
 

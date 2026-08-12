@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by soyuka at 2026-06-09T13:35:32Z
+
+I understand the need, I think that ideally we should've a new argument directly in the `TransformCallableInterface` not sure how to handle the BC over this.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-10T08:13:19Z
+
+Thanks for the review @soyuka — agreed that adding a `Map` parameter directly to `TransformCallableInterface::__invoke` would be cleaner, but that's a BC break on every existing transformer. The separate `MappingAwareTransformCallableInterface` mirrors the existing `ObjectMapperAwareInterface` pattern already in this component — same enrichment hook, same opt-in contract, same discoverability. When the next major version opens the door we can merge both into `TransformCallableInterface` if wanted.
+
+---------------------------------------------------------------------------
+
+by soyuka at 2026-06-12T07:14:10Z
+
+Sure but then lets use a new interface that enriched the TransformCallableInterface one instead of using a `withMapping` method.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-06-14T22:46:58Z
+
+Done @soyuka — `MappingAwareTransformCallableInterface` now **extends `TransformCallableInterface`** and receives the `Map` as a fourth `__invoke()` argument, so the `withMapping()` wither is gone and a transformer implements a single interface and stays stateless.
+
+```php
+interface MappingAwareTransformCallableInterface extends TransformCallableInterface
+{
+    public function __invoke(mixed $value, object $source, ?object $target, ?Map $map = null): mixed;
+}
+```
+
+The fourth parameter is optional (`?Map $map = null`) so the child signature stays LSP-compatible with the parent (PHP rejects an extra *required* parameter when extending an interface); `ObjectMapper::applyTransforms()` always forwards the real mapping.
+
+Full ObjectMapper suite green (68 tests, 192 assertions); the description carries the RED→GREEN excerpts. Pushed in 6d28c7a.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-09T12:50:13Z
+
+Rebased this PR onto current `8.2` and pushed `74ddd42c286a`.
+
+It is up to date with the target branch again and waiting for review.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-30T15:15:37Z
+
+Thanks Nicolas. I updated the independent cleanup items in `2b4b683a214`:
+
+- moved the CHANGELOG entry to `8.2`;
+- added a docblock note that `Mapping::$target` can be null for target-side `#[Map(source: ...)]` declarations;
+- updated the PR description so it matches the current `withMapping()` branch instead of the earlier `extends __invoke()` version.
+
+I left the design point unchanged for now because your review explicitly asks for Soyuka to settle whether this should remain the wither-style interface or go back to the `MappingAwareTransformCallableInterface extends TransformCallableInterface` version. Once that direction is confirmed, I can rework the branch in that shape.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T09:37:23Z
+
+Restored the design @soyuka asked for on 12 June, which a later force-push had reverted to the `withMapping()` wither. The interface now extends `TransformCallableInterface` and takes the mapping as a fourth `__invoke()` argument, so a transformer stays stateless and can be used as a service:
+
+```php
+public function __invoke(mixed $value, object $source, ?object $target, ?Map $mapping = null): mixed;
+```
+
+The argument is optional because PHP rejects an interface that adds a required parameter to an inherited signature; making it required is a fatal, not a style choice.
+
+It is typed `Attribute\Map`, not `Metadata\Mapping`, which answers the other point from that review: `Mapping` is `@internal`, so a public contract could not reference it. `Mapping` extends `Map`, so implementers still receive the same object and read `target`, `source`, `if` and `transform` from it, while `targetClass` stays internal.
+
+The test fixture is stateless now, and the CHANGELOG entry and the `Mapping::$target` docblock note you added are kept. ObjectMapper suite passes (138 tests); reverting `ObjectMapper.php` while keeping the tests fails the new one.

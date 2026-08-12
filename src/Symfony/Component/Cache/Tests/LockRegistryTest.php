@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\LockRegistry;
 
 class LockRegistryTest extends TestCase
@@ -25,5 +27,24 @@ class LockRegistryTest extends TestCase
         LockRegistry::setFiles($lockFiles);
         $expected = array_map('realpath', glob(__DIR__.'/../Adapter/*.php'));
         $this->assertSame($expected, $lockFiles);
+    }
+
+    public function testLockIsDisabledOnCli()
+    {
+        $logger = new class extends AbstractLogger {
+            public array $messages = [];
+
+            public function log($level, $message, array $context = []): void
+            {
+                $this->messages[] = $message;
+            }
+        };
+
+        $pool = new FilesystemAdapter('lock-registry', 0, sys_get_temp_dir().'/symfony-cache-lock-registry');
+        $pool->clear();
+        $pool->setLogger($logger);
+
+        $this->assertSame('bar', $pool->get('foo', static fn () => 'bar'));
+        $this->assertSame([], $logger->messages);
     }
 }

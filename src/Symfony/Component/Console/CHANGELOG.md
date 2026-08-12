@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `InputOption::HIDDEN` and `InputOption::DEPRECATED` modes
+ * Add the `listedAt` option to `#[AsCommand]` and the `listed_at` attribute to the `console.command` tag, to list a command only from the given verbosity
 
 8.1
 ---

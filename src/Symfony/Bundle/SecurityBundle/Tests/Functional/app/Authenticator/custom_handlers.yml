@@ -26,8 +26,16 @@ services:
     class: Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler
     arguments:
       - '@security.http_utils'
+  decorating_success_handler:
+    class: Symfony\Bundle\SecurityBundle\Tests\Fixtures\DecoratingAuthenticationSuccessHandler
+    decorates: success_handler
+    arguments: ['@.inner']
   failure_handler:
     class: Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler
     arguments:
       - '@http_kernel'
       - '@security.http_utils'
+  decorating_failure_handler:
+    class: Symfony\Bundle\SecurityBundle\Tests\Fixtures\DecoratingAuthenticationFailureHandler
+    decorates: failure_handler
+    arguments: ['@.inner']

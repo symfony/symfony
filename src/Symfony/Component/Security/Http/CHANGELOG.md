@@ -13,6 +13,7 @@ CHANGELOG
  * Add `$urlGenerator` and `$csrfTokenManager` arguments to `ImpersonateUrlGenerator` so that the generated URLs follow the `path` and CSRF configuration of the firewall
  * Add `ImpersonateUrlGenerator::generateImpersonationForm()` and `generateExitForm()` to build a form that switches the user with a POST
  * Add `$targetUri` argument to `ImpersonateUrlGenerator::generateImpersonationPath()` and `generateImpersonationUrl()`
+ * Configure the decorated handler of `CustomAuthenticationSuccessHandler` and `CustomAuthenticationFailureHandler` when they are called instead of when they are built, so that a single handler can be shared by several authenticators
 
 8.1
 ---

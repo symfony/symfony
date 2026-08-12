@@ -1,0 +1,124 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-09-07T17:57:16Z
+
+An interesting option that allows the definition to be made more dynamic.
+
+Then we should probably do the same for `#[AsCommand]`: `description`, `help` and `usages`.
+
+With PHP 8.5, the named closure syntax can be used:
+```php
+public function __invoke(
+    SymfonyStyle $io,
+    #[Argument(description: self::generateTheArgumentDescription(...))]
+    string $theArgument,
+)
+```
+
+---------------------------------------------------------------------------
+
+by MacDada at 2025-09-07T18:14:30Z
+
+> Then we should probably do the same for `#[AsCommand]`: `description`, `help` and `usages`.
+
+Not required in my codebase, but should be simple enough -> I can volunteer a new PR or extend this one if this is the way to go :-)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-08T10:29:31Z
+
+What's the use case? I prefer simple static data. A static call can only return static data anyway.
+
+---------------------------------------------------------------------------
+
+by MacDada at 2025-09-08T13:16:16Z
+
+> What's the use case? I prefer simple static data. A static call can only return static data anyway.
+
+Simple, I want the command to be more "user-friendly" by listing valid values in the argument description.
+
+Yeah, sure, if the user passes an invalid value an error will be shown, but I don't want to encourage user to intentionally type invalid value just to discover what valid values are.
+
+In my particular case, the valid values are from ENUM, so it is statically accessible. It just cannot be passed to `description`, as PHP doesn't allow me that.
+
+---
+
+Given enum:
+
+<img width="526" height="573" alt="Screenshot 2025-09-08 at 15 00 10" src="https://github.com/user-attachments/assets/57d5e38c-80a5-4dd0-95ee-88acaacdafad" />
+
+Right now, with "old style" `configure` – all is dandy:
+
+<img width="1298" height="297" alt="Screenshot 2025-09-08 at 14 54 18" src="https://github.com/user-attachments/assets/0334da70-c512-4898-a0df-e85012af7f80" />
+
+Right now if I use "SymfonyStyle" – I'm missing allowed values list in the description:
+
+<img width="1029" height="184" alt="Screenshot 2025-09-08 at 15 02 30" src="https://github.com/user-attachments/assets/7703e3c9-a03d-443e-8410-7799ee9104d4" />
+
+Right now, if I try to use "SymfonyStyle" – with the allowed values list in the description – error:
+
+<img width="1349" height="297" alt="Screenshot 2025-09-08 at 15 07 48" src="https://github.com/user-attachments/assets/063172ff-fc85-4882-98cb-6661ac4751b3" />
+
+If I move it to a static function – still an error:
+
+<img width="1331" height="411" alt="Screenshot 2025-09-08 at 15 11 09" src="https://github.com/user-attachments/assets/6777989f-90e5-40e7-942a-3b271cc985fa" />
+
+With this PR, it _could_ work – and give me the desired description with allowed values listed:
+
+<img width="537" height="406" alt="Screenshot 2025-09-08 at 15 13 22" src="https://github.com/user-attachments/assets/bfd96cbf-7bed-4534-9dd7-bfdaf05bdea1" />
+
+---
+
+To sum up: this PR would allow me to switch to "SymfonyStyle", instead of using "old style" `configure`, in order to display valid values of an Argument.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-09-29T10:49:10Z
+
+@MacDada any chance you can finish this one soon? The feature freeze period is starting for 7.4.
+
+---------------------------------------------------------------------------
+
+by MacDada at 2025-09-29T13:51:23Z
+
+> any chance you can finish this one soon?
+
+@chalasr As for my own particular needs – this PR is finished.
+
+BUT:
+
+1. ~~There is a conflict on CHANGELOG – should I rebase and fix it?~~ -> EDIT: rebased
+2. Should I squash the PR into one commit instead of it having multiple (with fixes)?
+3. ~~Should I [extend it upon `AsCommand` as well](https://github.com/symfony/symfony/pull/61677#issuecomment-3263940122)?~~ -> EDIT: [done as much as I believe is doable](https://github.com/symfony/symfony/pull/61677#issuecomment-3349089848)
+4. I guess I should skip [making it more dynamic](https://github.com/symfony/symfony/pull/61677#discussion_r2328816183)?
+
+---------------------------------------------------------------------------
+
+by MacDada at 2025-09-29T21:17:09Z
+
+> Then we should probably do the same for `#[AsCommand]`: `description`, `help` and `usages`.
+
+@GromNaN I've done it for `description` and `help`: https://github.com/symfony/symfony/pull/61677/commits/5fd1f2535d54266690ff49440e263143ff31137e
+
+I didn't do it for `usages` as I guess it could be a "conflict" between normal array of strings and an array representing a callable… similar to this one: https://github.com/symfony/symfony/pull/61677#discussion_r2387624195 – but I don't know if there is a way to "fix" it here…
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T13:33:11Z
+
+Thanks for your patience with how long this sat.
+
+I rebased onto 8.2 and squashed. The five commits conflicted with the branch (`#[Argument]` and `#[Option]` gained `suggestedValues`, `#[AsCommand]` gained `listedAt`), so I reapplied the change by hand:
+
+ * `description` on `#[Argument]` and `#[Option]`, `description` and `help` on `#[AsCommand]`, all accept `string|callable` and are resolved in the constructor, so the public properties stay plain strings and nothing downstream changes.
+ * The `is_string()` check comes first, so a description that happens to name a PHP function stays a description. Pinned by a test on all three attributes.
+ * CHANGELOG moved to the 8.2 section, phpdoc updated with `string|(callable():string)`.
+ * Tests are two focused cases per attribute rather than threaded through the existing definition tests, and I left `Php8Command2` alone to keep the diff to the feature.
+
+Verified: the two new callable tests fail on 8.2 with a `TypeError` and pass with the change; the Console suite is at 1862 tests with the same two pre-existing `QuestionHelperTest` failures as on the branch tip.
+
+On the design question I raised back then, your answer holds up. The callable can only return static data, but PHP has no function calls in constant expressions, so building a description out of an enum's cases is not expressible today. And on PHP 8.5 the callable can be an inline `static function () {}` or a `self::generate(...)` reference, both of which are constant expressions there and both of which need exactly this change to be accepted, which is what @GromNaN pointed at from the start.
+
+👍 from me.
+
+I also rewrote the title and description. A doc PR on symfony/symfony-docs is still needed, would you open one?

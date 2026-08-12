@@ -509,7 +509,9 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
             if ($fn instanceof ObjectMapperAwareInterface) {
                 $fn = $fn->withObjectMapper($this->objectMapper ?? $this);
             }
-            $value = $this->call($fn, $value, $source, $target);
+            $value = $fn instanceof MappingAwareTransformCallableInterface
+                ? $fn($value, $source, $target, $map)
+                : $this->call($fn, $value, $source, $target);
         }
 
         return $value;

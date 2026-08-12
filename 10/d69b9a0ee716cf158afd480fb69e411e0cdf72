@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T16:52:57Z
+
+Thanks for this, and sorry it took so long to get a first review. The need in #64366 is real, but I reworked the approach and pushed it, rebased on 8.2.
+
+The original version decoded any query value starting with `{` or `[` in every `#[MapQueryString]`. That changes behaviour for existing applications: a DTO with a `string` property receiving `?filter={"a":1}` gets the string today and would have started getting an array, so a 422. Sniffing the first character also leaves no place to report malformed JSON, and no way to say which parameter is meant to carry it.
+
+Instead this builds on the `key` argument that #59157 added in 7.3. `#[MapQueryString(key: 'search')]` already names a parameter, it just requires that parameter to be an array and throws otherwise. When it holds a string we now hand it to the serializer as `json`, which is the same call `mapRequestPayload()` makes on the request body:
+
+```php
+// both map to the same object now
+// ?search[term]=foo&search[category]=bar
+// ?search={"term":"foo","category":"bar"}
+public function list(#[MapQueryString(key: 'search')] SearchDto $search) { ... }
+```
+
+That way it is explicit rather than guessed, it inherits `serializationContext`, `validationGroups` and the validator, malformed JSON gives a 400 naming the parameter, nesting goes as deep as the DTO does with no recursion of our own, and no application changes behaviour, since the only path it touches throws today.
+
+One thing worth knowing if you look at the diff: `$request->query->get()` cannot be used here, it rejects array values, so the raw bag is read like `QueryParameterValueResolver` does.
+
+Tests cover the JSON payload, both notations giving equal results, the 400 on malformed JSON, and that a JSON-looking value without `key` is still a plain string. HttpKernel is green (1681 tests) and so are FrameworkBundle's functional tests.

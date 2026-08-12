@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-07-27T13:32:13Z
+
+Reading the gettext documentation at https://www.gnu.org/software/gettext/manual/html_node/Entries-with-Context.html, it looks like the context is a way of namespacing keys in the same file. So I don't think we should store it as metadata actually. We should probably rather fail on context saying it is not supported (as we have no way to namespace keys that have the same msgid in different contexts)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-27T15:41:55Z
+
+@stof you are right that context in PO files is namespacing, not just normal metadata.
+
+However, including context is apparently common in many tools used to generate PO files. So, changing the bahvior to throw excepctions when any context is present could be too harsh.
+
+I propose this instead:
+
+* Keep storing (and reloading) the context inside metadata to not lose that information
+* Throw only if two different messages have the same key but different contexts. Nowadays, the later occurrence silently overwrites the first one
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-29T21:21:08Z
+
+Rebased on 8.2 now that #64946 has landed, and added the header line its dumper emits to the `testDumpContext` heredoc:
+
+```
+"Language: en\n"
++"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+```
+
+Amended into "Store and load metadata", the commit that added that test, so the three commits keep their meaning and your authorship. Translation suite is green apart from the pre-existing `TranslationLintCommandTest::testLintMalformedIcuTranslations` ICU failure, which also fails on a clean 8.2 checkout here.
+
+Two things before this can go in.
+
+The fuzzy fix is a bugfix and it belongs on 6.4, not here. The header says "Bug fix? no", but the first half of this PR repairs behaviour that is wrong on every maintained branch. On current 6.4:
+
+```php
+$po = <<<'EOF'
+#, fuzzy
+msgid "stale"
+msgstr "STALE"
+msgid "good"
+msgstr "GOOD"
+EOF;
+
+(new PoFileLoader())->load($f, 'en', 'messages')->all('messages');
+// 6.4 gives ["stale" => "STALE"], i.e. exactly the opposite of gettext
+```
+
+The fuzzy entry is loaded and the valid one that follows is dropped. That is worth fixing for 6.4 users rather than only for 8.2, so I would split it: the flag-reset fix targets 6.4, and the `msgctxt` work stays here.
+
+The context question with @stof is still open. He read the gettext manual as making context a namespacing mechanism rather than metadata, and suggested refusing it instead of storing it. You proposed keeping it in metadata and failing only when two messages share a key with different contexts, which is what the branch now does, but he has not replied. @stof does that work for you? If it does, the remaining piece is a docs note that a PO context is preserved as metadata and does not namespace the key, since two entries differing only by context still cannot coexist.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T10:44:04Z
+
+Opened #65059 on 6.4 with your first commit, cherry-picked as is, your authorship preserved. The fuzzy handling and the multi-line `msgctxt` corruption are both defects that predate every maintained branch, so 6.4 users should get them.
+
+The conflict on 6.4 was trivial: your `saveItem()` extraction against the two inline `in_array('fuzzy', ...)` blocks that are still there. I kept your version. Translation suite is green, 711 tests, and the reproducer now gives `["good" => "GOOD"]`.
+
+This PR keeps the other two commits, which add behaviour and belong on 8.2: storing the context in metadata and dumping `msgctxt`, and refusing a msgid reused with different contexts. That second one throws `InvalidResourceException` where the later entry used to silently win, which is why it cannot ride along to 6.4.
+
+Once #65059 is merged and merged up, please rebase here and drop the duplicated commit. And the context question from @stof is still the one thing blocking the rest.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-30T12:50:37Z
+
+Rebased on 8.2 now that #65059 has merged up. The duplicated commit is gone, so this is down to the two commits that add behaviour, still with your authorship.
+
+One conflict to mention, in `PoFileDumperTest`: #65049 landed a `testDumpIntlDomainKeepsPipes` at the same spot as your `testDumpContext`. I kept both. The Plural-Forms line #64946 added is already in your heredoc from the previous rebase, so the dumper test file is green, 23 tests.
+
+Translation suite is green apart from `TranslationLintCommandTest::testLintMalformedIcuTranslations`, which fails the same way on a clean 8.2 checkout here (local ICU version).
+
+@stof this is the last open point: you suggested refusing a PO context rather than storing it, since it namespaces keys and we cannot honour that. Javier's counter-proposal, which the branch now implements, is to keep it as metadata and throw only when one msgid appears with two different contexts:
+
+```
+The "foo" message is defined twice with different contexts ("menu" and "button"), which is not supported because contexts are ignored in message keys.
+```
+
+Does that settle it for you? If yes, the only thing left is a documentation line saying a context is preserved as metadata and does not namespace the key, so two entries differing only by context still cannot coexist.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T10:46:23Z
+
+Rebased on 8.2, no conflicts this time. MERGEABLE, two commits, authorship unchanged.
+
+@stof this looks settled to me, could you confirm? Your point stands that `msgctxt` namespaces keys and our catalogue has no equivalent, so storing it as metadata alone would let the second entry overwrite the first. What @javiereguiluz implemented keeps the metadata but throws as soon as the ambiguity is real:
+
+* the same `msgid` twice with different contexts;
+* the same `msgid` once with a context and once without.
+
+Both are covered by fixtures (`contexts-ambiguous.po`, `contexts-with-and-without.po`). So a file that would have been silently corrupted now fails to load, while the common case of a context that never collides keeps working, which was the concern about rejecting context outright.
+
+Suite is green apart from `TranslationLintCommandTest::testLintMalformedIcuTranslations`, which fails identically on a bare 8.2 checkout here and is an ICU version difference, not this PR.

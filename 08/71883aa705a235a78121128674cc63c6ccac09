@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T16:08:42Z
+
+Thanks for this. @GromNaN is right and I pushed the strict version on top of your work: we want to follow the YAML spec, not define our own dialect. Rebased on 8.2 as well.
+
+The tags now resolve exactly like the [core schema](https://yaml.org/spec/1.2.2/#103-core-schema) says, and throw a `ParseException` otherwise:
+
+ * `!!null` accepts an empty value, `~`, `null`, `Null` and `NULL`
+ * `!!bool` accepts `true`, `True`, `TRUE`, `false`, `False` and `FALSE`. Not `1`, not `-1`, and not `yes`/`on`, which `filter_var()` would have taken. That mattered beyond the spec argument: we already parse a bare `yes` as the string `'yes'`, so `!!bool yes` giving `true` would have made the tag follow YAML 1.1 while the untagged scalar follows 1.2, in the same parser.
+ * `!!int` accepts `[-+]?[0-9]+`, `0o[0-7]+` and `0x[0-9a-fA-F]+`, and reports out of range values instead of letting them wrap
+ * `!!float` accepts the float production plus `.inf`, `.Inf`, `.INF`, `.nan`, `.NaN`, `.NAN`, with the sign where the spec allows it
+
+To answer your question directly: yes, invalid values throw. An explicit tag is you telling the parser what the value is, so turning a typo into `0` or `false` is the one thing it must not do.
+
+This changes `!!float` too, which used to cast anything to a float, so `!!float "x"` gave `0.0` and now throws. That is in the CHANGELOG.
+
+Two other things:
+
+ * Unquoting is unchanged in spirit but no longer sets `$isQuotedString` for the typed tags. That flag means the result is a quoted string, which is true for `!!str "foo"` and not for `!!int "1"`.
+ * `!!int "1" 2` now throws instead of silently ignoring what follows the closing quote.
+
+Tests are a data provider for the accepted values and one for the rejected ones. The Yaml suite is green, as are DependencyInjection, Config, Routing and Serializer.
+
+I left the untagged resolution alone: it accepts `tRue` and `1_000`, which the 1.2 core schema does not. Changing that is a separate discussion with real BC weight.

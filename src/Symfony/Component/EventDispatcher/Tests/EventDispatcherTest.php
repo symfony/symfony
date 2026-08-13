@@ -368,6 +368,73 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($this->dispatcher->hasListeners('foo'));
     }
 
+    public function testRemoveByObjectKeepsLazyListenersLazy()
+    {
+        $called = 0;
+        $test = new TestWithDispatcher();
+        $factory = static function () use (&$called, $test) {
+            ++$called;
+
+            return $test;
+        };
+
+        $this->dispatcher->addListener('foo', [$factory, 'foo']);
+        $this->dispatcher->addListener('foo', [static function () use (&$called) {
+            ++$called;
+
+            return new TestWithDispatcher();
+        }, 'foo']);
+
+        $this->dispatcher->removeListener('foo', [$test, 'foo']);
+        $this->assertSame(0, $called);
+
+        $this->assertCount(1, $this->dispatcher->getListeners('foo'));
+    }
+
+    public function testDispatchSkipsLazyListenerRemovedByObject()
+    {
+        $test = new TestWithDispatcher();
+        $factory = static fn () => $test;
+
+        $this->dispatcher->addListener('foo', [$factory, 'foo']);
+        $this->dispatcher->removeListener('foo', [$test, 'foo']);
+        $this->dispatcher->dispatch(new Event(), 'foo');
+
+        $this->assertNull($test->name);
+        $this->assertFalse($this->dispatcher->hasListeners('foo'));
+    }
+
+    public function testPriorityKeepsPendingRemovals()
+    {
+        $test = new TestWithDispatcher();
+        $factory = static fn () => $test;
+        $other = static function () {};
+
+        $this->dispatcher->addListener('foo', [$factory, 'foo'], 3);
+        $this->dispatcher->addListener('foo', $other, 5);
+        $this->dispatcher->removeListener('foo', [$test, 'foo']);
+
+        $this->assertSame(5, $this->dispatcher->getListenerPriority('foo', $other));
+        $this->assertSame([$other], $this->dispatcher->getListeners('foo'));
+    }
+
+    public function testRemoveSubscriberKeepsLazyListenersLazy()
+    {
+        $called = 0;
+        $subscriber = new TestEventSubscriber();
+        $factory = static function () use (&$called, $subscriber) {
+            ++$called;
+
+            return $subscriber;
+        };
+
+        $this->dispatcher->addListener('pre.foo', [$factory, 'preFoo']);
+        $this->dispatcher->removeSubscriber($subscriber);
+        $this->assertSame(0, $called);
+
+        $this->assertFalse($this->dispatcher->hasListeners('pre.foo'));
+    }
+
     public function testPriorityKeepsLazyListenersLazy()
     {
         $called = 0;

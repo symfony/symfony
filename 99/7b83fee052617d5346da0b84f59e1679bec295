@@ -1,0 +1,26 @@
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-07-12T10:18:24Z
+
+> Could you please remove the inline comments inside the methods?
+
+Done!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T13:26:24Z
+
+Thanks for the rework. I rebased on 8.2 and pushed, and corrected one test comment, see below.
+
+@Spomky, your four points are all addressed on this head, so the two `CHANGES_REQUESTED` reviews are stale and would need dismissing:
+
+ * the cache key now uses `\strlen($body)."\0".$body`
+ * a `QUERY` without a `Content-Type` is treated as malformed and bypasses the cache, with `testItDoesNotCacheQueryWithoutContentType` covering it
+ * `SAFE_METHODS` is only read by the invalidate-on-write check, so freshness and revalidation are untouched
+ * `content-type` is added to the response-influencing headers for `QUERY`, which is needed since the body's meaning depends on it
+
+One caveat on the fourth point, the null-byte test. I removed the length prefix locally and `testQueryBodiesWithEmbeddedNullByteDoNotCollideInCache` still passes, so it does not actually lock in the property you asked for. It uses `"\0foo"` and `"foo\0"`, and with a plain `"\0"` separator those still hash differently. I could not build a real collision through the public API either: the hashed string is `$method.$fullUrl.SEP.$body.serialize($headers)`, the URL is percent-encoded so it cannot carry a raw null byte, and the body is the last variable-length field before a fixed suffix.
+
+So the length prefix is cheap defence in depth and worth keeping, but the test is a regression test for "different bodies get different cache entries" rather than proof of injectivity. I reworded its comment to say that, since the previous one claimed more than the test shows.
+
+HttpClient's `CachingHttpClientTest` is green at 117 tests.

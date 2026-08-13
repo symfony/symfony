@@ -63,6 +63,129 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame('non-cached response', $response->getContent(), 'Request with body should bypass cache.');
     }
 
+    public function testItCachesQueryResponses()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', [
+                'http_code' => 200,
+                'response_headers' => [
+                    'Cache-Control' => 'max-age=300',
+                ],
+            ]),
+            new MockResponse('should not be served'),
+        ]);
+
+        $options = ['body' => 'query=foo', 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded']];
+        $response = $client->request('QUERY', 'http://example.com/search', $options);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', $options);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('foo', $response->getContent());
+    }
+
+    public function testDifferentQueryBodiesDoNotCollideInCache()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('bar', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('baz', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $headers = ['headers' => ['Content-Type' => 'application/x-www-form-urlencoded']];
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => 'foo'] + $headers);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => 'foo'] + $headers);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => 'bar'] + $headers);
+        $this->assertSame('bar', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/searchfoo', ['body' => ''] + $headers);
+        $this->assertSame('baz', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => 'foo'] + $headers);
+        $this->assertSame('foo', $response->getContent());
+    }
+
+    public function testQueryBodiesWithEmbeddedNullByteDoNotCollideInCache()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('bar', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $headers = ['headers' => ['Content-Type' => 'application/x-www-form-urlencoded']];
+
+        // bodies containing raw null bytes must still map to distinct cache entries
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => "\0foo"] + $headers);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => "foo\0"] + $headers);
+        $this->assertSame('bar', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => "\0foo"] + $headers);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', ['body' => "foo\0"] + $headers);
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testQueryRequestsWithDifferentContentTypeDoNotCollideInCache()
+    {
+        $client = $this->buildClient([
+            new MockResponse('foo', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('bar', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $formEncoded = [
+            'body' => 'query=foo',
+            'headers' => ['Content-Type' => 'application/x-www-form-urlencoded'],
+        ];
+        $json = [
+            'body' => 'query=foo',
+            'headers' => ['Content-Type' => 'application/json'],
+        ];
+
+        $response = $client->request('QUERY', 'http://example.com/search', $formEncoded);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', $formEncoded);
+        $this->assertSame('foo', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', $json);
+        $this->assertSame('bar', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', $json);
+        $this->assertSame('bar', $response->getContent());
+    }
+
+    public function testBypassCacheForQueryWithStreamedBody()
+    {
+        $client = $this->buildClient([
+            new MockResponse('first stream response', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('second stream response', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('string body response', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $streamedOptions = ['body' => static function () { yield 'query=foo'; }];
+        $response = $client->request('QUERY', 'http://example.com/search', $streamedOptions);
+        $this->assertSame('first stream response', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', $streamedOptions);
+        $this->assertSame('second stream response', $response->getContent(), 'Streamed body should bypass cache.');
+
+        $stringOptions = ['body' => 'query=foo', 'headers' => ['Content-Type' => 'application/x-www-form-urlencoded']];
+        $response = $client->request('QUERY', 'http://example.com/search', $stringOptions);
+        $this->assertSame('string body response', $response->getContent());
+
+        $response = $client->request('QUERY', 'http://example.com/search', $stringOptions);
+        $this->assertSame('string body response', $response->getContent(), 'String body should be served from cache.');
+    }
+
     public function testBypassCacheWhenRangeHeaderPresent()
     {
         // If a "range" header is present, caching is bypassed.
@@ -90,6 +213,20 @@ class CachingHttpClientTest extends TestCase
         $client->request('POST', 'http://example.com/foo-bar');
         $response = $client->request('POST', 'http://example.com/foo-bar');
         $this->assertSame('second response', $response->getContent(), 'Non-cacheable method must bypass caching.');
+    }
+
+    public function testItDoesNotCacheQueryWithoutContentType()
+    {
+        // A QUERY request without a Content-Type header is malformed per RFC 10008 §2 and must bypass caching.
+        $client = $this->buildClient([
+            new MockResponse('first response', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('second response', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+        ]);
+
+        $options = ['body' => 'query=foo'];
+        $client->request('QUERY', 'http://example.com/search', $options);
+        $response = $client->request('QUERY', 'http://example.com/search', $options);
+        $this->assertSame('second response', $response->getContent(), 'Missing Content-Type must bypass caching.');
     }
 
     public function testItServesResponseFromCache()

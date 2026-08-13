@@ -12,8 +12,11 @@
 namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\AsyncDecoratorTrait;
+use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\ChunkInterface;
@@ -78,5 +81,44 @@ class AsyncResponseTest extends TestCase
 
         $this->assertSame('body', $response->getContent());
         $this->assertSame('body', $response->getContent());
+    }
+
+    /**
+     * When an error chunk has been yielded and the response is then dropped while a replacement
+     * request is in flight, the replacement is abandoned before anything could check its status:
+     * destructing it must not throw, the app already got the error.
+     */
+    public function testAbandonedReplacementResponseDoesNotThrowOnDestruct()
+    {
+        $client = new class(new MockHttpClient([new MockResponse('', ['http_code' => 302, 'redirect_url' => 'http://example.com/redirected']), new MockResponse('', ['http_code' => 301])])) implements HttpClientInterface {
+            use AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context): \Generator {
+                    if (null !== $chunk->getError() || !$chunk->isFirst()) {
+                        yield $chunk;
+
+                        return;
+                    }
+
+                    $context->replaceRequest('GET', $context->getInfo('redirect_url'), []);
+
+                    yield new ErrorChunk($chunk->getOffset(), 'Simulated timeout');
+                });
+            }
+        };
+
+        $response = $client->request('GET', 'http://example.com/');
+
+        foreach ($client->stream($response) as $chunk) {
+            if ($chunk->isTimeout()) {
+                break;
+            }
+        }
+
+        unset($response);
+
+        $this->addToAssertionCount(1);
     }
 }

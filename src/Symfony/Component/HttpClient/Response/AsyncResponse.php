@@ -275,6 +275,22 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                     }
                 }
 
+                // This "not yet started" guard runs for every chunk, whether or not $r has a passthru:
+                // a response without one (e.g. built with a null $passthru, as NoPrivateNetworkHttpClient
+                // does when max_redirects is 0) still must not silently accept a stray content chunk (see
+                // findInnerPassthru()'s comment further below) before its own isFirst() chunk was ever seen.
+                // $r->yieldedState is null only when $r has genuinely never seen a real isFirst() chunk;
+                // once it's FIRST_CHUNK_YIELDED or LAST_CHUNK_YIELDED, $r has legitimately started (or even
+                // finished, e.g. a second, redundant stream() call on an already fully-consumed response),
+                // and further chunks must not be rejected as "not yet started".
+                if (null !== $chunk->getError()) {
+                    // no-op
+                } elseif ($chunk->isFirst()) {
+                    $r->yieldedState = self::FIRST_CHUNK_YIELDED;
+                } elseif (null === $r->yieldedState && null === $chunk->getInformationalStatus()) {
+                    throw new \LogicException(\sprintf('Instance of "%s" is already consumed and cannot be managed by "%s". A decorated client should not call any of the response\'s methods in its "request()" method.', get_debug_type($response), $class ?? static::class));
+                }
+
                 $innerR = null;
                 if (!$r->passthru && !$innerR = null !== $chunk->getError() ? self::findInnerPassthru($r) : null) {
                     $r->stream = (static fn () => yield $chunk)();
@@ -283,21 +299,30 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                     continue;
                 }
 
-                if (null !== $chunk->getError()) {
-                    // no-op
-                } elseif ($chunk->isFirst()) {
-                    $r->yieldedState = self::FIRST_CHUNK_YIELDED;
-                } elseif (self::FIRST_CHUNK_YIELDED !== $r->yieldedState && null === $chunk->getInformationalStatus()) {
-                    throw new \LogicException(\sprintf('Instance of "%s" is already consumed and cannot be managed by "%s". A decorated client should not call any of the response\'s methods in its "request()" method.', get_debug_type($response), $class ?? static::class));
-                }
-
                 $innerR ??= $r;
                 foreach (self::passthru($innerR->client, $innerR, $chunk, $asyncMap) as $chunk) {
                     yield $r => $chunk;
                 }
 
-                if ($innerR->response !== $response && isset($asyncMap[$response])) {
-                    break;
+                if ($innerR->response !== $response) {
+                    // The response was replaced (e.g. by AsyncContext::replaceRequest()/replaceResponse()
+                    // while following a redirect or a retry). If that happened *before* anything was ever
+                    // yielded for $innerR (its buffer was never opened, see openBuffer()), the new response
+                    // hasn't started yet either: re-arm the "not yet started" guard above for its very first
+                    // chunk, otherwise $innerR->yieldedState would keep reporting FIRST_CHUNK_YIELDED from the
+                    // previous, swapped-out response, and a stray chunk meant for a different response
+                    // entirely (e.g. one reusing the same underlying transport id) could slip through as if
+                    // it belonged to this one. If the buffer was already opened, some content was legitimately
+                    // exposed for $innerR before the swap (e.g. a decorator splicing several responses into
+                    // one, like a JSON transclusion), and the new response's own isFirst() chunk may be
+                    // deliberately swallowed by design, so the guard must stay disarmed.
+                    if (null !== $innerR->shouldBuffer) {
+                        $innerR->yieldedState = null;
+                    }
+
+                    if (isset($asyncMap[$response])) {
+                        break;
+                    }
                 }
             }
 

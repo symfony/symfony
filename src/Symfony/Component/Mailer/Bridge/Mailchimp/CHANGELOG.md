@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for specifying the return path domain using the `X-MC-ReturnPathDomain` header
+
 7.4
 ---
 

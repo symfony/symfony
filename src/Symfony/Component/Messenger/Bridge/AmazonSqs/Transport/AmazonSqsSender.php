@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
 use AsyncAws\Core\Exception\Exception as AsyncAwsException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
@@ -26,6 +27,7 @@ class AmazonSqsSender implements SenderInterface
     public function __construct(
         private Connection $connection,
         private SerializerInterface $serializer,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -46,6 +48,19 @@ class AmazonSqsSender implements SenderInterface
         if (null !== $amazonSqsFifoStamp) {
             $messageGroupId = $amazonSqsFifoStamp->getMessageGroupId();
             $messageDeduplicationId = $amazonSqsFifoStamp->getMessageDeduplicationId();
+        }
+
+        $amazonSqsFairQueueStamp = $envelope->last(AmazonSqsFairQueueStamp::class);
+        if (null !== $amazonSqsFairQueueStamp) {
+            if (null === $amazonSqsFifoStamp) {
+                $messageGroupId = $amazonSqsFairQueueStamp->getMessageGroupId();
+            } else {
+                $this->logger?->debug('Ignoring the "{fair_stamp}" of message "{class}": a "{fifo_stamp}" is also present and takes precedence.', [
+                    'fair_stamp' => AmazonSqsFairQueueStamp::class,
+                    'fifo_stamp' => AmazonSqsFifoStamp::class,
+                    'class' => $envelope->getMessage()::class,
+                ]);
+            }
         }
 
         /** @var AmazonSqsXrayTraceHeaderStamp|null $amazonSqsXrayTraceHeaderStamp */

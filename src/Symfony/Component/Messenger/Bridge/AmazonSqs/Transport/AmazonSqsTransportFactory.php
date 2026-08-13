@@ -34,7 +34,7 @@ class AmazonSqsTransportFactory implements TransportFactoryInterface
     {
         unset($options['transport_name']);
 
-        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, $this->httpClient, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false));
+        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, $this->httpClient, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false), $this->logger);
     }
 
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool

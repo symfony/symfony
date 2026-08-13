@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Yaml\Tests\Command;
 
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\CI\GitlabCiReporter;
@@ -197,17 +196,16 @@ bar';
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
 
-    #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete()
     {
         $tester = new CommandCompletionTester($this->createCommand());
 
-        $this->assertSame($expectedSuggestions, $tester->complete($input));
-    }
+        $expectedSuggestions = ['txt', 'json', 'github'];
+        if (class_exists(GitlabCiReporter::class)) {
+            $expectedSuggestions[] = 'gitlab';
+        }
 
-    public static function provideCompletionSuggestions()
-    {
-        yield 'option' => [['--format', ''], ['txt', 'json', 'github', 'gitlab']];
+        $this->assertSame($expectedSuggestions, $tester->complete(['--format', '']));
     }
 
     private function createFile($content): string

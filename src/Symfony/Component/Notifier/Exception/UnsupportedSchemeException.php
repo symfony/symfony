@@ -292,6 +292,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
             'package' => 'symfony/sms-factor-notifier',
         ],
+        'sms-proxima' => [
+            'class' => Bridge\SmsProxima\SmsProximaTransportFactory::class,
+            'package' => 'symfony/sms-proxima-notifier',
+        ],
         'smsmode' => [
             'class' => Bridge\Smsmode\SmsmodeTransportFactory::class,
             'package' => 'symfony/smsmode-notifier',

@@ -91,6 +91,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             Bridge\Sms77\Sms77TransportFactory::class => false,
             Bridge\SmsBiuras\SmsBiurasTransportFactory::class => false,
             Bridge\SmsFactor\SmsFactorTransportFactory::class => false,
+            Bridge\SmsProxima\SmsProximaTransportFactory::class => false,
             Bridge\Smsapi\SmsapiTransportFactory::class => false,
             Bridge\Smsbox\SmsboxTransportFactory::class => false,
             Bridge\Smsc\SmscTransportFactory::class => false,
@@ -192,6 +193,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['smsbiuras', 'symfony/sms-biuras-notifier'];
         yield ['smsc', 'symfony/smsc-notifier'];
         yield ['sms-factor', 'symfony/sms-factor-notifier'];
+        yield ['sms-proxima', 'symfony/sms-proxima-notifier'];
         yield ['smsmode', 'symfony/smsmode-notifier'];
         yield ['spothit', 'symfony/spot-hit-notifier'];
         yield ['telegram', 'symfony/telegram-notifier'];

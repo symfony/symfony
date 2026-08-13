@@ -106,6 +106,7 @@ return static function (ContainerConfigurator $container) {
         'sinch' => Bridge\Sinch\SinchTransportFactory::class,
         'sms-biuras' => Bridge\SmsBiuras\SmsBiurasTransportFactory::class,
         'sms-factor' => Bridge\SmsFactor\SmsFactorTransportFactory::class,
+        'sms-proxima' => Bridge\SmsProxima\SmsProximaTransportFactory::class,
         'sms-sluzba' => Bridge\SmsSluzba\SmsSluzbaTransportFactory::class,
         'smsapi' => Bridge\Smsapi\SmsapiTransportFactory::class,
         'smsbox' => Bridge\Smsbox\SmsboxTransportFactory::class,

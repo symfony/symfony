@@ -141,6 +141,7 @@
         "slack-notifier": "src/Symfony/Component/Notifier/Bridge/Slack",
         "sms-biuras-notifier": "src/Symfony/Component/Notifier/Bridge/SmsBiuras",
         "sms-factor-notifier": "src/Symfony/Component/Notifier/Bridge/SmsFactor",
+        "sms-proxima-notifier": "src/Symfony/Component/Notifier/Bridge/SmsProxima",
         "sms-sluzba-notifier": "src/Symfony/Component/Notifier/Bridge/SmsSluzba",
         "smsapi-notifier": "src/Symfony/Component/Notifier/Bridge/Smsapi",
         "smsbox-notifier": "src/Symfony/Component/Notifier/Bridge/Smsbox",

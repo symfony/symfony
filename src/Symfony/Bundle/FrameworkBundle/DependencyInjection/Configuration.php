@@ -2910,9 +2910,32 @@ class Configuration implements ConfigurationInterface
                                         ->values(['fixed_window', 'token_bucket', 'sliding_window', 'compound', 'no_limit'])
                                     ->end()
                                     ->arrayNode('limiters', 'limiter')
-                                        ->info('The limiter names to use when using the "compound" policy.')
+                                        ->info('The limiters to use when using the "compound" policy.')
                                         ->acceptAndWrap(['string'])
-                                        ->scalarPrototype()->end()
+                                        ->beforeNormalization()
+                                            ->ifArray()
+                                            ->then(static function (array $v) {
+                                                $limiters = [];
+                                                foreach ($v as $name => $config) {
+                                                    if (\is_int($name) && \is_string($config)) {
+                                                        $limiters[$config] = [];
+                                                    } else {
+                                                        $limiters[$name] = $config ?? [];
+                                                    }
+                                                }
+
+                                                return $limiters;
+                                            })
+                                        ->end()
+                                        ->useAttributeAsKey('name')
+                                        ->arrayPrototype()
+                                            ->children()
+                                                ->scalarNode('key')
+                                                    ->info('The key to pass to this limiter, instead of the one passed to the compound limiter\'s create() method.')
+                                                    ->defaultNull()
+                                                ->end()
+                                            ->end()
+                                        ->end()
                                     ->end()
                                     ->integerNode('limit')
                                         ->info('The maximum allowed hits in a fixed interval or burst.')

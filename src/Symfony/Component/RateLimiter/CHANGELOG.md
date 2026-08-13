@@ -9,6 +9,7 @@ CHANGELOG
  * Add `RateLimiterBuilder`
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`
+ * Add a `$keys` argument to `CompoundRateLimiterFactory` to fix the key of some of its sub-limiters
 
 8.1
 ---

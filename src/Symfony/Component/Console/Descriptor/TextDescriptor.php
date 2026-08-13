@@ -18,7 +18,6 @@ use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Text descriptor.
@@ -167,7 +166,7 @@ class TextDescriptor extends Descriptor
     protected function describeApplication(Application $application, array $options = []): void
     {
         $describedNamespace = $options['namespace'] ?? null;
-        $description = new ApplicationDescription($application, $describedNamespace, false, $this->output->getVerbosity());
+        $description = new ApplicationDescription($application, $describedNamespace);
 
         if (isset($options['raw_text']) && $options['raw_text']) {
             $width = $this->getColumnWidth($description->getCommands());
@@ -230,18 +229,6 @@ class TextDescriptor extends Descriptor
             }
 
             $this->writeText("\n");
-
-            if (null !== $nextVerbosity = $description->getNextVerbosity()) {
-                $option = match (true) {
-                    $nextVerbosity >= OutputInterface::VERBOSITY_DEBUG => '-vvv',
-                    $nextVerbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE => '-vv',
-                    default => '-v',
-                };
-
-                $this->writeText("\n");
-                $this->writeText(\sprintf(' <comment>Run with "%s" to list more commands.</comment>', $option), $options);
-                $this->writeText("\n");
-            }
         }
     }
 

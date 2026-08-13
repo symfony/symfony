@@ -16,7 +16,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Descriptor\ApplicationDescription;
-use Symfony\Component\Console\Output\OutputInterface;
 
 final class ApplicationDescriptionTest extends TestCase
 {
@@ -38,22 +37,6 @@ final class ApplicationDescriptionTest extends TestCase
             [['a', 'b'], ['b:foo', 'a:foo', 'b:bar']],
             [['_global', 22, 33, 'b', 'z'], ['z:foo', '1', '33:foo', 'b:foo', '22:foo:bar']],
         ];
-    }
-
-    public function testCommandsAreFilteredByListedAt()
-    {
-        $application = new Application();
-        $always = (new Command('app:always'))->setCode(static fn () => 0);
-        $verbose = (new Command('app:verbose'))->setCode(static fn () => 0)->setListedAt(OutputInterface::VERBOSITY_VERBOSE);
-        $application->addCommand($always);
-        $application->addCommand($verbose);
-        $normal = new ApplicationDescription($application);
-        $this->assertArrayHasKey('app:always', $normal->getCommands());
-        $this->assertArrayNotHasKey('app:verbose', $normal->getCommands());
-        $this->assertSame(OutputInterface::VERBOSITY_VERBOSE, $normal->getNextVerbosity());
-        $raised = new ApplicationDescription($application, null, false, OutputInterface::VERBOSITY_VERBOSE);
-        $this->assertArrayHasKey('app:verbose', $raised->getCommands());
-        $this->assertNull($raised->getNextVerbosity());
     }
 }
 

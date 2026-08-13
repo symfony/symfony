@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Console\Attribute;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 /**
  * Service tag to autoconfigure commands.
  */
@@ -23,13 +21,12 @@ final class AsCommand
     public ?string $help;
 
     /**
-     * @param string                            $name        The name of the command, used when calling it (i.e. "cache:clear")
-     * @param string|(callable():string)|null   $description The description of the command, displayed with the help page
-     * @param string[]                          $aliases     The list of aliases of the command. The command will be executed when using one of them (i.e. "cache:clean")
-     * @param bool                              $hidden      If true, the command won't be shown when listing all the available commands, but it can still be run as any other command
-     * @param string|(callable():string)|null   $help        The help content of the command, displayed with the help page
-     * @param string[]                          $usages      The list of usage examples, displayed with the help page
-     * @param OutputInterface::VERBOSITY_*|null $listedAt    The verbosity from which the command is listed, null to always list it. It can still be run as any other command
+     * @param string                          $name        The name of the command, used when calling it (i.e. "cache:clear")
+     * @param string|(callable():string)|null $description The description of the command, displayed with the help page
+     * @param string[]                        $aliases     The list of aliases of the command. The command will be executed when using one of them (i.e. "cache:clean")
+     * @param bool                            $hidden      If true, the command won't be shown when listing all the available commands, but it can still be run as any other command
+     * @param string|(callable():string)|null $help        The help content of the command, displayed with the help page
+     * @param string[]                        $usages      The list of usage examples, displayed with the help page
      */
     public function __construct(
         public string $name,
@@ -38,7 +35,6 @@ final class AsCommand
         bool $hidden = false,
         string|callable|null $help = null,
         public array $usages = [],
-        public ?int $listedAt = null,
     ) {
         $this->description = null === $description || \is_string($description) ? $description : $description();
         $this->help = null === $help || \is_string($help) ? $help : $help();

@@ -14,7 +14,6 @@ namespace Symfony\Component\Console\Descriptor;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -37,16 +36,10 @@ class ApplicationDescription
      */
     private array $aliases = [];
 
-    private ?int $nextVerbosity = null;
-
-    /**
-     * @param OutputInterface::VERBOSITY_* $verbosity
-     */
     public function __construct(
         private Application $application,
         private ?string $namespace = null,
         private bool $showHidden = false,
-        private int $verbosity = OutputInterface::VERBOSITY_NORMAL,
     ) {
     }
 
@@ -83,18 +76,6 @@ class ApplicationDescription
         return $this->commands[$name] ?? $this->aliases[$name];
     }
 
-    /**
-     * Returns the lowest verbosity that would list more commands, or null when none is left out.
-     */
-    public function getNextVerbosity(): ?int
-    {
-        if (!isset($this->commands)) {
-            $this->inspectApplication();
-        }
-
-        return $this->nextVerbosity;
-    }
-
     private function inspectApplication(): void
     {
         $this->commands = [];
@@ -105,17 +86,7 @@ class ApplicationDescription
             $names = [];
 
             foreach ($commands as $name => $command) {
-                if (!$command->getName()) {
-                    continue;
-                }
-
-                if (!$this->showHidden && $command->isHidden()) {
-                    continue;
-                }
-
-                if (!$this->showHidden && $command->getListedAt() > $this->verbosity) {
-                    $this->nextVerbosity = min($this->nextVerbosity ?? \PHP_INT_MAX, $command->getListedAt());
-
+                if (!$command->getName() || (!$this->showHidden && $command->isHidden())) {
                     continue;
                 }
 

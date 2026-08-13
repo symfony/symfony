@@ -28,9 +28,6 @@ final class LazyCommand extends Command
 {
     private \Closure|Command $command;
 
-    /**
-     * @param OutputInterface::VERBOSITY_*|null $listedAt
-     */
     public function __construct(
         string $name,
         array $aliases,
@@ -38,12 +35,10 @@ final class LazyCommand extends Command
         bool $isHidden,
         \Closure $commandFactory,
         private ?bool $isEnabled = true,
-        ?int $listedAt = null,
     ) {
         $this->setName($name)
             ->setAliases($aliases)
             ->setHidden($isHidden)
-            ->setListedAt($listedAt)
             ->setDescription($description);
 
         $this->command = $commandFactory;
@@ -201,7 +196,6 @@ final class LazyCommand extends Command
         $command->setName($this->getName())
             ->setAliases($this->getAliases())
             ->setHidden($this->isHidden())
-            ->setListedAt($this->getListedAt())
             ->setDescription($this->getDescription());
 
         // Will throw if the command is not correctly initialized.

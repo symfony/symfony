@@ -14,8 +14,6 @@ namespace Symfony\Component\Console\Tests\Command;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -28,21 +26,6 @@ class ListCommandTest extends TestCase
         $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
 
         $this->assertMatchesRegularExpression('/help\s{2,}Display help for a command/', $commandTester->getDisplay(), '->execute() returns a list of available commands');
-    }
-
-    public function testExecuteHintsAtCommandsListedAtAHigherVerbosity()
-    {
-        $application = new Application();
-        $application->addCommand((new Command('app:verbose'))->setCode(static fn () => 0)->setListedAt(OutputInterface::VERBOSITY_VERY_VERBOSE));
-        $commandTester = new CommandTester($command = $application->get('list'));
-
-        $commandTester->execute(['command' => $command->getName()], ['decorated' => false]);
-        $this->assertStringNotContainsString('app:verbose', $commandTester->getDisplay());
-        $this->assertStringContainsString('Run with "-vv" to list more commands.', $commandTester->getDisplay());
-
-        $commandTester->execute(['command' => $command->getName()], ['decorated' => false, 'verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
-        $this->assertStringContainsString('app:verbose', $commandTester->getDisplay());
-        $this->assertStringNotContainsString('to list more commands', $commandTester->getDisplay());
     }
 
     public function testExecuteListsCommandsWithXmlOption()

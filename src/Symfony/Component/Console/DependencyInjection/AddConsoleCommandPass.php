@@ -126,7 +126,6 @@ class AddConsoleCommandPass implements CompilerPassInterface
         $description = $tags[0]['description'] ?? null;
         $help = $tags[0]['help'] ?? null;
         $usages = $tags[0]['usages'] ?? null;
-        $listedAt = $tags[0]['listed_at'] ?? $attribute?->listedAt;
 
         unset($tags[0]);
         $lazyCommandMap[$commandName] = $id;
@@ -157,10 +156,6 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition->addMethodCall('setHidden', [true]);
         }
 
-        if (null !== $listedAt) {
-            $definition->addMethodCall('setListedAt', [$listedAt]);
-        }
-
         if ($help ??= $attribute?->help) {
             $definition->addMethodCall('setHelp', [str_replace('%', '%%', $help)]);
         }
@@ -176,7 +171,7 @@ class AddConsoleCommandPass implements CompilerPassInterface
             $definition->addMethodCall('setDescription', [$escapedDescription]);
 
             $container->register('.'.$id.'.lazy', LazyCommand::class)
-                ->setArguments([$commandName, $aliases, $escapedDescription, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id]), true, $listedAt]);
+                ->setArguments([$commandName, $aliases, $escapedDescription, $isHidden, new ServiceClosureArgument($lazyCommandRefs[$id])]);
 
             $lazyCommandRefs[$id] = new Reference('.'.$id.'.lazy');
         }

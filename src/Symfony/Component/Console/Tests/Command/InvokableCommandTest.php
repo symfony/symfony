@@ -39,6 +39,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithCustomValidatorTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFileAndConstraintsTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFilesVariadicTestCommand;
 
 class InvokableCommandTest extends TestCase
 {
@@ -95,12 +96,10 @@ class InvokableCommandTest extends TestCase
     public function testCommandInputDescriptionFromCallable()
     {
         $command = new Command('foo');
-        $command->setCode(static function (
+        $command->setCode(static fn (
             #[Argument(description: [self::class, 'generateBioDescription'])] string $bio = '',
             #[Option(description: [self::class, 'generateBioDescription'])] string $summary = '',
-        ): int {
-            return 0;
-        });
+        ): int => 0);
 
         self::assertSame('Generated bio description', $command->getDefinition()->getArgument('bio')->getDescription());
         self::assertSame('Generated bio description', $command->getDefinition()->getOption('summary')->getDescription());
@@ -109,13 +108,11 @@ class InvokableCommandTest extends TestCase
     public function testCommandInputDescriptionIsNeverResolvedAsCallable()
     {
         $command = new Command('foo');
-        $command->setCode(static function (
+        $command->setCode(static fn (
             // "define" is the name of a PHP function, it must still be taken as a plain description
             #[Argument(description: 'define')] string $bio = '',
             #[Option(description: 'define')] string $summary = '',
-        ): int {
-            return 0;
-        });
+        ): int => 0);
 
         self::assertSame('define', $command->getDefinition()->getArgument('bio')->getDescription());
         self::assertSame('define', $command->getDefinition()->getOption('summary')->getDescription());
@@ -711,6 +708,28 @@ class InvokableCommandTest extends TestCase
             self::assertStringContainsString('Valid: yes', $tester->getDisplay());
         } finally {
             @unlink($tempFile);
+        }
+    }
+
+    public function testAskWithVariadicInputFilesCollectsAndStacks()
+    {
+        $a = sys_get_temp_dir().'/sf_input_files_a_'.uniqid().'.txt';
+        $b = sys_get_temp_dir().'/sf_input_files_b_'.uniqid().'.txt';
+        file_put_contents($a, 'a');
+        file_put_contents($b, 'b');
+
+        try {
+            $tester = new CommandTester(new InvokableWithInputFilesVariadicTestCommand());
+            // First answer drops two files at once, the second stacks one more, an empty answer ends.
+            $tester->setInputs(["$a $b", $a, '']);
+            $tester->execute([], ['interactive' => true]);
+            $tester->assertCommandIsSuccessful();
+
+            self::assertStringContainsString('Provide files:', $tester->getDisplay());
+            self::assertStringContainsString('Count: 3', $tester->getDisplay());
+        } finally {
+            @unlink($a);
+            @unlink($b);
         }
     }
 

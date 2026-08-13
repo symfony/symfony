@@ -15,6 +15,7 @@ use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\File\InputFile;
+use Symfony\Component\Console\Input\File\InputFileType;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\FileQuestion;
@@ -88,15 +89,18 @@ class Ask implements InteractiveAttributeInterface
             }
 
             $typeName = $type->getName();
+            $collection = InputFileType::isInputFileCollection($reflection);
 
-            if (InputFile::class === $typeName) {
-                $question = new FileQuestion($self->question);
+            // A collection keeps prompting until an empty answer, so a single call returns every
+            // file dropped at once or stacked across answers.
+            if ($collection || InputFile::class === $typeName) {
+                $question = new FileQuestion($self->question, multiple: $collection);
                 $question->setValidator($self->validator);
                 $question->setMaxAttempts($self->maxAttempts);
                 $question->setConstraints($self->constraints);
                 $value = $io->askQuestion($question);
 
-                if (null === $value && !$reflection->isNullable()) {
+                if (!$collection && null === $value && !$reflection->isNullable()) {
                     return;
                 }
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Helper;
 
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Exception\InvalidFileException;
 use Symfony\Component\Console\Exception\MissingInputException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -40,66 +41,145 @@ final class FileInputHelper
     private ?ImageProtocolInterface $protocol = null;
 
     /**
-     * @param resource $inputStream
+     * @param resource        $inputStream
+     * @param callable():void $writePrompt Renders the prompt of a single-file question
+     *
+     * @return list<InputFile> A single answer may yield several files, e.g. when dragging and
+     *                         dropping multiple files at once on a multiple question
      */
-    public function readFileInput($inputStream, OutputInterface $output, FileQuestion $question): InputFile
+    public function readFileInput($inputStream, OutputInterface $output, FileQuestion $question, callable $writePrompt): array
     {
         if ($canPaste = $question->isPasteAllowed() && Terminal::supportsImageProtocol() && Terminal::hasSttyAvailable()) {
             $this->protocol = $this->detectProtocol();
+        } elseif (!$question->isPathAllowed()) {
+            throw new MissingInputException('Terminal does not support image paste and path input is disabled.');
         }
 
-        $file = null;
         $inputHelper = null;
 
         try {
+            // Configure the terminal once for the whole answer, even when several prompts are
+            // stacked, instead of re-running stty on every round.
             if ($canPaste) {
                 $inputHelper = new TerminalInputHelper($inputStream);
                 $output->write(self::BPM_ENABLE);
                 shell_exec('stty -icanon -echo');
-
-                $file = $this->readWithPasteDetection($inputStream, $output, $question, $inputHelper);
-            } elseif ($question->isPathAllowed()) {
-                $file = $this->readPathInput($inputStream);
-            } else {
-                throw new MissingInputException('Terminal does not support image paste and path input is disabled.');
             }
+
+            $read = fn (): array => $canPaste
+                ? $this->readWithPasteDetection($inputStream, $output, $question, $inputHelper)
+                : $this->readPathInput($inputStream, $question);
+
+            if ($question->isMultiple()) {
+                return $this->collectFiles($output, $question, $read, $canPaste);
+            }
+
+            $writePrompt();
+
+            $files = $read();
+
+            foreach ($files as $file) {
+                $this->assertValid($file);
+                $this->displayFile($output, $file);
+            }
+
+            return $files;
         } finally {
             if ($canPaste) {
                 $output->write(self::BPM_DISABLE);
                 $inputHelper?->finish();
             }
         }
+    }
 
+    /**
+     * Collects several files, keeping the question on a single line and a hint pinned below the
+     * growing list of files instead of repeating the prompt for every answer.
+     *
+     * @param callable():list<InputFile> $read
+     *
+     * @return list<InputFile>
+     */
+    private function collectFiles(OutputInterface $output, FileQuestion $question, callable $read, bool $canPaste): array
+    {
+        $questionLine = ' <info>'.OutputFormatter::escapeTrailingBackslash($question->getQuestion()).'</info>';
+        // A "// ..." note, like SymfonyStyle::comment(), reads as a hint rather than a value.
+        $hint = ' // Hit Enter to finish';
+        $files = [];
+
+        // Redrawing the footer needs a decorated, echo-free (paste) terminal. Otherwise fall back
+        // to a plain listing that neither repeats the question nor moves the cursor.
+        if (!$canPaste || !$output->isDecorated()) {
+            $output->writeln([$questionLine, '', $hint]);
+
+            while ($batch = $read()) {
+                foreach ($batch as $file) {
+                    $this->assertValid($file);
+                    $this->displayFile($output, $file, false, ' ');
+                    $files[] = $file;
+                }
+            }
+
+            return $files;
+        }
+
+        $cursor = new Cursor($output);
+        $output->writeln($questionLine);
+
+        while (true) {
+            // Transient footer, kept one blank line below the files collected so far.
+            $output->writeln(['', $hint]);
+            $output->write(' > ');
+
+            $batch = $read();
+
+            // Erase the footer (the prompt line, the hint line, and the blank line) before appending.
+            $cursor->clearLine()->moveUp()->clearLine()->moveUp()->clearLine()->moveToColumn(1);
+
+            if (!$batch) {
+                break;
+            }
+
+            foreach ($batch as $file) {
+                $this->assertValid($file);
+                $this->displayFile($output, $file, false, ' ');
+                $files[] = $file;
+            }
+        }
+
+        return $files;
+    }
+
+    private function assertValid(InputFile $file): void
+    {
         if (!$file->isValid()) {
             throw new InvalidFileException(\sprintf('File "%s" is not valid or readable.', $file->getPathname()));
         }
-
-        $this->displayFile($output, $file);
-
-        return $file;
     }
 
-    public function displayFile(OutputInterface $output, InputFile $file): void
+    public function displayFile(OutputInterface $output, InputFile $file, bool $thumbnail = true, string $prefix = ''): void
     {
         $path = self::sanitizeForDisplay((string) $file->getRealPath());
         $filename = self::sanitizeForDisplay($file->getFilename());
         $link = \sprintf('<href=file://%s>%s</>', OutputFormatter::escape($path), OutputFormatter::escape($filename));
 
         if ($output->isVeryVerbose()) {
-            $output->writeln(\sprintf('<info>%s</info> %s (<comment>%s, %s</comment>)', "\u{1F4CE}", $link, OutputFormatter::escape(self::sanitizeForDisplay($file->getMimeType() ?? 'unknown')), $file->getHumanReadableSize()));
+            $output->writeln(\sprintf('%s<info>%s</info> %s (<comment>%s, %s</comment>)', $prefix, "\u{1F4CE}", $link, OutputFormatter::escape(self::sanitizeForDisplay($file->getMimeType() ?? 'unknown')), $file->getHumanReadableSize()));
         } else {
-            $output->writeln(\sprintf('<info>%s</info> %s', "\u{1F4CE}", $link));
+            $output->writeln(\sprintf('%s<info>%s</info> %s', $prefix, "\u{1F4CE}", $link));
         }
 
-        if (Terminal::supportsImageProtocol() && $this->isDisplayableImage($file)) {
+        if ($thumbnail && Terminal::supportsImageProtocol() && $this->isDisplayableImage($file)) {
             $this->displayThumbnail($output, $file);
         }
     }
 
     /**
      * @param resource $inputStream
+     *
+     * @return list<InputFile>
      */
-    private function readWithPasteDetection($inputStream, OutputInterface $output, FileQuestion $question, TerminalInputHelper $inputHelper): InputFile
+    private function readWithPasteDetection($inputStream, OutputInterface $output, FileQuestion $question, TerminalInputHelper $inputHelper): array
     {
         $buffer = '';
         $inPaste = false;
@@ -164,18 +244,21 @@ final class FileInputHelper
                     throw new InvalidFileException('The pasted image could not be decoded.');
                 }
 
-                return InputFile::fromData($decoded['data'], $decoded['format']);
+                return [InputFile::fromData($decoded['data'], $decoded['format'])];
             }
 
-            $path = trim($pasteBuffer);
-            if ('' !== $path && $question->isPathAllowed()) {
-                return InputFile::fromPath($path);
+            if ([] !== $files = $this->extractPaths($pasteBuffer, $question)) {
+                return $files;
             }
         }
 
-        $path = trim($buffer);
-        if ('' !== $path && $question->isPathAllowed()) {
-            return InputFile::fromPath($path);
+        if ([] !== $files = $this->extractPaths($buffer, $question)) {
+            return $files;
+        }
+
+        // An empty answer ends the collection of a multiple question.
+        if ($question->isMultiple()) {
+            return [];
         }
 
         throw new MissingInputException('No file input provided.');
@@ -183,8 +266,10 @@ final class FileInputHelper
 
     /**
      * @param resource $inputStream
+     *
+     * @return list<InputFile>
      */
-    private function readPathInput($inputStream): InputFile
+    private function readPathInput($inputStream, FileQuestion $question): array
     {
         if (!$isBlocked = stream_get_meta_data($inputStream)['blocked'] ?? true) {
             stream_set_blocking($inputStream, true);
@@ -200,11 +285,103 @@ final class FileInputHelper
             throw new MissingInputException('Aborted.');
         }
 
-        if ('' === $path = trim($path)) {
-            throw new MissingInputException('No file path provided.');
+        if ([] !== $files = $this->extractPaths($path, $question)) {
+            return $files;
         }
 
-        return InputFile::fromPath($path);
+        // An empty answer ends the collection of a multiple question.
+        if ($question->isMultiple()) {
+            return [];
+        }
+
+        throw new MissingInputException('No file path provided.');
+    }
+
+    /**
+     * Turns a raw answer into the files it references: a single path for a regular question, or
+     * one file per whitespace-separated path for a multiple question.
+     *
+     * @return list<InputFile>
+     */
+    private function extractPaths(string $raw, FileQuestion $question): array
+    {
+        if (!$question->isPathAllowed()) {
+            return [];
+        }
+
+        if (!$question->isMultiple()) {
+            $path = trim($raw);
+
+            return '' === $path ? [] : [InputFile::fromPath($path)];
+        }
+
+        $files = [];
+        foreach (self::tokenizePaths($raw) as $path) {
+            $files[] = InputFile::fromPath($path);
+        }
+
+        return $files;
+    }
+
+    /**
+     * Splits an answer into individual paths, honoring shell-style quoting and escaping so a
+     * single drag&drop of several files - which the terminal inserts as space-separated, quoted
+     * or backslash-escaped paths - yields one entry per file.
+     *
+     * Quotes and escapes are kept in the returned tokens; InputFile::fromPath() normalizes each.
+     *
+     * @return list<string>
+     */
+    private static function tokenizePaths(string $input): array
+    {
+        $tokens = [];
+        $current = '';
+        $inToken = false;
+        $quote = null;
+        $length = \strlen($input);
+
+        for ($i = 0; $i < $length; ++$i) {
+            $char = $input[$i];
+
+            if (null !== $quote) {
+                $current .= $char;
+                if ($char === $quote) {
+                    $quote = null;
+                }
+                continue;
+            }
+
+            if ('\\' === $char && '\\' !== \DIRECTORY_SEPARATOR && $i + 1 < $length) {
+                $current .= $char.$input[++$i];
+                $inToken = true;
+                continue;
+            }
+
+            if ("'" === $char || '"' === $char) {
+                $quote = $char;
+                $current .= $char;
+                $inToken = true;
+                continue;
+            }
+
+            if (' ' === $char || "\t" === $char || "\n" === $char || "\r" === $char) {
+                if ($inToken) {
+                    $tokens[] = $current;
+                    $current = '';
+                    $inToken = false;
+                }
+                continue;
+            }
+
+            $current .= $char;
+            $inToken = true;
+        }
+
+        if ($inToken) {
+            $tokens[] = $current;
+        }
+
+        return $tokens;
     }
 
     private function detectProtocol(): ?ImageProtocolInterface

@@ -24,6 +24,7 @@ class FileQuestion extends Question
         string $question,
         private bool $allowPaste = true,
         private bool $allowPath = true,
+        private bool $multiple = false,
     ) {
         parent::__construct($question);
 
@@ -42,5 +43,14 @@ class FileQuestion extends Question
     public function isPathAllowed(): bool
     {
         return $this->allowPath;
+    }
+
+    /**
+     * Whether a single answer may provide several files at once, e.g. by dragging
+     * and dropping multiple files or by pasting space-separated paths.
+     */
+    public function isMultiple(): bool
+    {
+        return $this->multiple;
     }
 }

@@ -190,6 +190,96 @@ class FileInputHelperTest extends TestCase
         }
     }
 
+    public function testCollectFilesRedrawsTheFooterInPasteMode()
+    {
+        $a = $this->createTempFile();
+        $b = $this->createTempFile();
+
+        // One answer with two files, then an empty answer to finish.
+        $batches = [[InputFile::fromPath($a), InputFile::fromPath($b)], []];
+        $read = static function () use (&$batches): array { return array_shift($batches) ?? []; };
+
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
+        $files = $this->invokeCollectFiles($output, new FileQuestion('Provide files:', multiple: true), $read, true);
+
+        $this->assertSame([$a, $b], array_map(static fn (InputFile $f): string => $f->getPathname(), $files));
+
+        $display = $output->fetch();
+        // The question is printed once, not repeated per answer.
+        $this->assertSame(1, substr_count($display, 'Provide files:'));
+        // The hint is pinned below and the cursor is moved up to redraw it (footer erase).
+        $this->assertStringContainsString('// Hit Enter to finish', $display);
+        $this->assertStringContainsString("\x1b[1A", $display);
+        $this->assertStringContainsString(basename($a), $display);
+        $this->assertStringContainsString(basename($b), $display);
+    }
+
+    public function testCollectFilesListsFilesWithoutCursorControlWhenNotDecorated()
+    {
+        $a = $this->createTempFile();
+
+        $batches = [[InputFile::fromPath($a)], []];
+        $read = static function () use (&$batches): array { return array_shift($batches) ?? []; };
+
+        $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, false);
+        $files = $this->invokeCollectFiles($output, new FileQuestion('Provide files:', multiple: true), $read, false);
+
+        $this->assertCount(1, $files);
+
+        $display = $output->fetch();
+        $this->assertSame(1, substr_count($display, 'Provide files:'));
+        $this->assertStringContainsString('// Hit Enter to finish', $display);
+        $this->assertStringNotContainsString("\x1b[", $display);
+    }
+
+    public function testReadWithPasteDetectionReturnsSeveralPathsFromASinglePaste()
+    {
+        $a = $this->createTempFile();
+        $b = $this->createTempFile();
+
+        // Dropping several files at once inserts them as space-separated, quoted paths.
+        $input = $this->pasteMarker('PASTE_START').\sprintf("'%s' '%s'", $a, $b).$this->pasteMarker('PASTE_END');
+
+        $files = $this->readAllWithPasteDetection($this->streamOf($input), null, true);
+
+        $this->assertSame([$a, $b], array_map(static fn (InputFile $f): string => $f->getPathname(), $files));
+    }
+
+    public function testReadWithPasteDetectionReturnsSeveralPathsFromALine()
+    {
+        $a = $this->createTempFile();
+        $b = $this->createTempFile();
+
+        $files = $this->readAllWithPasteDetection($this->streamOf("$a $b\n"), null, true);
+
+        $this->assertSame([$a, $b], array_map(static fn (InputFile $f): string => $f->getPathname(), $files));
+    }
+
+    public function testReadWithPasteDetectionKeepsQuotedAndEscapedSpacesWithinEachPath()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Backslash escaping of paths is a non-Windows convention.');
+        }
+
+        $a = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'sf console '.bin2hex(random_bytes(4)).'.txt';
+        file_put_contents($a, 'x');
+        $this->tempFiles[] = $a;
+        $b = $this->createTempFile();
+
+        // First path backslash-escaped, second path quoted.
+        $input = str_replace(' ', '\ ', $a)." '$b'\n";
+
+        $files = $this->readAllWithPasteDetection($this->streamOf($input), null, true);
+
+        $this->assertSame([$a, $b], array_map(static fn (InputFile $f): string => $f->getPathname(), $files));
+    }
+
+    public function testReadWithPasteDetectionReturnsNoFileForAnEmptyMultipleAnswer()
+    {
+        // An empty answer ends the collection of a multiple question instead of aborting.
+        $this->assertSame([], $this->readAllWithPasteDetection($this->streamOf("\n"), null, true));
+    }
+
     public function testReadWithPasteDetectionRejectsAnUndecodablePastedImage()
     {
         $truncated = "\x1b_Ga=T,f=100,m=1;".base64_encode('chunk one')."\x1b\\";
@@ -240,6 +330,18 @@ class FileInputHelperTest extends TestCase
         }
     }
 
+    /**
+     * @param callable():list<InputFile> $read
+     *
+     * @return list<InputFile>
+     */
+    private function invokeCollectFiles(BufferedOutput $output, FileQuestion $question, callable $read, bool $canPaste): array
+    {
+        $method = new \ReflectionMethod(FileInputHelper::class, 'collectFiles');
+
+        return $method->invoke(new FileInputHelper(), $output, $question, $read, $canPaste);
+    }
+
     private function createTempFile(): string
     {
         $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'sf_console_'.bin2hex(random_bytes(4)).'.txt';
@@ -270,6 +372,16 @@ class FileInputHelperTest extends TestCase
      */
     private function readWithPasteDetection($stream, ?ImageProtocolInterface $protocol = null): InputFile
     {
+        return $this->readAllWithPasteDetection($stream, $protocol)[0];
+    }
+
+    /**
+     * @param resource $stream
+     *
+     * @return list<InputFile>
+     */
+    private function readAllWithPasteDetection($stream, ?ImageProtocolInterface $protocol = null, bool $multiple = false): array
+    {
         $reflection = new \ReflectionClass(FileInputHelper::class);
         $method = $reflection->getMethod('readWithPasteDetection');
 
@@ -285,6 +397,6 @@ class FileInputHelperTest extends TestCase
             $reflection->getProperty('protocol')->setValue($helper, $protocol);
         }
 
-        return $method->invoke($helper, $stream, new BufferedOutput(), new FileQuestion('?'), $inputHelper);
+        return $method->invoke($helper, $stream, new BufferedOutput(), new FileQuestion('?', multiple: $multiple), $inputHelper);
     }
 }

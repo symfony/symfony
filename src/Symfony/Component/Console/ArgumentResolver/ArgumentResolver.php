@@ -158,7 +158,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
             new Resolver\UidValueResolver(),
             $inputFileResolver,
             $builtinTypeResolver,
-            new Resolver\MapInputValueResolver($builtinTypeResolver, $backedEnumResolver, $dateTimeResolver),
+            new Resolver\MapInputValueResolver($builtinTypeResolver, $backedEnumResolver, $dateTimeResolver, null, $inputFileResolver),
             $dateTimeResolver,
             new Resolver\DefaultValueResolver(),
             new Resolver\VariadicValueResolver(),

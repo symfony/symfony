@@ -71,6 +71,7 @@ return static function (ContainerConfigurator $container) {
                 service('console.argument_resolver.backed_enum'),
                 service('console.argument_resolver.datetime'),
                 service('validator')->nullOnInvalid(),
+                service('console.argument_resolver.input_file'),
             ])
             ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => MapInputValueResolver::class])
 

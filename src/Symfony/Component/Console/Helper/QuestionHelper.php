@@ -114,9 +114,9 @@ class QuestionHelper extends Helper
     private function doAsk($inputStream, OutputInterface $output, Question $question): mixed
     {
         if ($question instanceof FileQuestion) {
-            $this->writePrompt($output, $question);
+            $files = (new FileInputHelper())->readFileInput($inputStream, $output, $question, fn () => $this->writePrompt($output, $question));
 
-            return (new FileInputHelper())->readFileInput($inputStream, $output, $question);
+            return $question->isMultiple() ? $files : ($files[0] ?? null);
         }
 
         $this->writePrompt($output, $question);
@@ -504,7 +504,14 @@ class QuestionHelper extends Helper
                 $value = $interviewer();
 
                 if ($constraints = $question->getConstraints()) {
-                    $this->validateConstraints($value, $constraints);
+                    if ($question instanceof FileQuestion && $question->isMultiple()) {
+                        // Validate each collected file individually rather than the whole list.
+                        foreach ($value as $file) {
+                            $this->validateConstraints($file, $constraints);
+                        }
+                    } else {
+                        $this->validateConstraints($value, $constraints);
+                    }
                 }
 
                 if ($validator = $question->getValidator()) {

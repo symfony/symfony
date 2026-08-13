@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T13:17:54Z
+
+Thanks for this, and thanks for your patience with how long it took to come back to you.
+
+Both of @GromNaN's points were already applied in your second commit, the `xxh3` fingerprint and the wording in the class docblock. What was left is that the two CHANGELOG entries still said "Code Climate compatible", which is the deprecated name he asked to move away from, and both sat in the 8.1 section, which has shipped since.
+
+I rebased on 8.2 and pushed. The entries now read:
+
+```
+Yaml:    * Add a `gitlab` output format to the `lint:yaml` command, producing a report in the GitLab Code Quality format
+Console: * Add `GitlabCiReporter` to emit reports in the GitLab Code Quality format
+```
+
+both under 8.2, and no occurrence of "Code Climate" is left in either component.
+
+I also ran the command end to end rather than only the unit tests:
+
+```json
+[
+    {
+        "description": "A colon cannot be used in an unquoted mapping value at line 2 (near \"  baz: qux\").",
+        "check_name": "yaml-lint",
+        "fingerprint": "c12caa85cad90a3f",
+        "severity": "major",
+        "location": { "path": "/tmp/bad.yaml", "lines": { "begin": 2 } }
+    }
+]
+```
+
+Valid Code Quality report, and the 16 hex characters confirm `xxh3` is really on the path. Yaml is green at 1328 tests.

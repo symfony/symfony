@@ -87,6 +87,7 @@ trait FollowRedirectsTrait
             static $redirectCount = 0;
             $context->setInfo('redirect_count', ++$redirectCount);
 
+            $context->getResponse()->cancel();
             $context->replaceRequest($method, $url, $options);
 
             if ($redirectCount >= $maxRedirects) {

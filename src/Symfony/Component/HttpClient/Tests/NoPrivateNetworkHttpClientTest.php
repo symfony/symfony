@@ -246,6 +246,66 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertEquals($content, $response->getContent());
     }
 
+    /**
+     * The redirect response is abandoned in favor of the target response as soon as it's
+     * followed. If it isn't explicitly canceled at that point, its underlying transport is left
+     * running unsupervised in the background, and its own destructor can later throw uncaught,
+     * independently of the response actually being used, whenever it eventually gets
+     * garbage-collected on its own.
+     */
+    public function testRedirectResponseIsCanceledAfterBeingFollowed()
+    {
+        $redirectResponse = new MockResponse('', ['http_code' => 302, 'redirect_url' => 'http://104.26.14.7']);
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient([$redirectResponse, new MockResponse('final body')]));
+
+        $response = $client->request('GET', 'http://104.26.14.6/');
+
+        // MockHttpClient::request() wraps $redirectResponse into a fresh MockResponse instance
+        // (see MockResponse::fromRequest()) -- that's the one AsyncResponse actually holds and
+        // the one that must end up canceled, not the request template itself.
+        $wrapped = new \ReflectionProperty($response, 'response');
+        $firstHop = $wrapped->getValue($response);
+
+        $this->assertSame('final body', $response->getContent());
+        $this->assertTrue($firstHop->getInfo('canceled'));
+    }
+
+    /**
+     * Demonstrates the actual consequence of not canceling the abandoned redirect response: its
+     * own destructor throws uncaught. In production, this happens because the response's
+     * underlying transport is left running unsupervised in the background and can complete (or
+     * time out) entirely independently of AsyncResponse's own bookkeeping -- e.g. curl finishing
+     * headers for an abandoned handle before any PHP-level code ever calls getStatusCode() on it.
+     * That exact curl/GC timing can't be forced in a fast, deterministic test, but the state it
+     * leaves behind can be recreated directly: a response whose status was genuinely never
+     * checked by anything. Without the fix, destructing such a response crashes; with it, the
+     * explicit cancel() call already short-circuits that destructor check beforehand.
+     */
+    public function testUnfollowedRedirectResponseDoesNotThrowFromDestructWhenLeftUnchecked()
+    {
+        $redirectResponse = new MockResponse('', ['http_code' => 302, 'redirect_url' => 'http://104.26.14.7']);
+        $client = new NoPrivateNetworkHttpClient(new MockHttpClient([$redirectResponse, new MockResponse('final body')]));
+
+        $response = $client->request('GET', 'http://104.26.14.6/');
+
+        $wrapped = new \ReflectionProperty($response, 'response');
+        $firstHop = $wrapped->getValue($response);
+
+        $this->assertSame('final body', $response->getContent());
+
+        // Simulate curl completing this abandoned hop's headers on its own, as if
+        // getStatusCode() had never been called on it by anything.
+        (new \ReflectionProperty($firstHop, 'initializer'))->setValue($firstHop, static fn () => false);
+
+        try {
+            unset($firstHop);
+        } catch (\Throwable $e) {
+            $this->fail(\sprintf('Destructing the abandoned redirect response threw: %s(%s)', $e::class, $e->getMessage()));
+        }
+
+        $this->addToAssertionCount(1);
+    }
+
     private function getMockHttpClient(string $ipAddr, string $content)
     {
         return new MockHttpClient(new MockResponse($content, ['primary_ip' => $ipAddr]));

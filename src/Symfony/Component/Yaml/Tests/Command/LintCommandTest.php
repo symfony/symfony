@@ -14,6 +14,7 @@ namespace Symfony\Component\Yaml\Tests\Command;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\CI\GitlabCiReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -83,6 +84,10 @@ bar';
 
     public function testLintIncorrectFileWithGitlabFormat()
     {
+        if (!class_exists(GitlabCiReporter::class)) {
+            $this->markTestSkipped('The "gitlab" format requires symfony/console 8.2 or higher.');
+        }
+
         $incorrectContent = <<<YAML
             foo:
             bar
@@ -107,6 +112,10 @@ bar';
 
     public function testLintCorrectFileWithGitlabFormat()
     {
+        if (!class_exists(GitlabCiReporter::class)) {
+            $this->markTestSkipped('The "gitlab" format requires symfony/console 8.2 or higher.');
+        }
+
         $tester = $this->createCommandTester();
         $filename = $this->createFile('foo: bar');
 

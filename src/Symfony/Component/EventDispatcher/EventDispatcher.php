@@ -34,6 +34,8 @@ class EventDispatcher implements EventDispatcherInterface
     private array $listeners = [];
     private array $sorted = [];
     private array $optimized;
+    /** @var array<string, \WeakMap<object, array<string, bool>>> */
+    private array $removedListeners = [];
 
     public function __construct()
     {
@@ -88,6 +90,10 @@ class EventDispatcher implements EventDispatcherInterface
             return null;
         }
 
+        if (isset($this->removedListeners[$eventName])) {
+            $this->sortListeners($eventName);
+        }
+
         if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
             $listener[0] = $listener[0]();
             $listener[1] ??= '__invoke';
@@ -112,11 +118,19 @@ class EventDispatcher implements EventDispatcherInterface
     public function hasListeners(?string $eventName = null): bool
     {
         if (null !== $eventName) {
+            if (empty($this->listeners[$eventName])) {
+                return false;
+            }
+
+            if (isset($this->removedListeners[$eventName])) {
+                $this->sortListeners($eventName);
+            }
+
             return !empty($this->listeners[$eventName]);
         }
 
-        foreach ($this->listeners as $eventListeners) {
-            if ($eventListeners) {
+        foreach (array_keys($this->listeners) as $eventName) {
+            if ($this->hasListeners($eventName)) {
                 return true;
             }
         }
@@ -136,17 +150,19 @@ class EventDispatcher implements EventDispatcherInterface
             return;
         }
 
-        if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
+        if (($isArray = \is_array($listener) && isset($listener[0]) && 2 >= \count($listener)) && $listener[0] instanceof \Closure) {
             $listener[0] = $listener[0]();
             $listener[1] ??= '__invoke';
         }
 
+        $lazy = false;
+
         foreach ($this->listeners[$eventName] as $priority => &$listeners) {
             foreach ($listeners as $k => &$v) {
-                // Lazy listeners are arrays, they can never match a non-array listener
-                if (\is_array($listener) && $v !== $listener && \is_array($v) && isset($v[0]) && $v[0] instanceof \Closure && 2 >= \count($v)) {
-                    $v[0] = $v[0]();
-                    $v[1] ??= '__invoke';
+                if (\is_array($v) && isset($v[0]) && $v[0] instanceof \Closure && 2 >= \count($v)) {
+                    // Comparing would require initializing the listener, defer instead
+                    $lazy = true;
+                    continue;
                 }
                 if ($v === $listener || ($listener instanceof \Closure && $v == $listener)) {
                     unset($listeners[$k], $this->sorted[$eventName], $this->optimized[$eventName]);
@@ -156,6 +172,15 @@ class EventDispatcher implements EventDispatcherInterface
             if (!$listeners) {
                 unset($this->listeners[$eventName][$priority]);
             }
+        }
+
+        if ($lazy && $isArray && \is_object($listener[0])) {
+            // The listener might be one of the services that are not initialized yet.
+            // Defer the removal to the moment they are instantiated anyway.
+            $removedListeners = $this->removedListeners[$eventName] ??= new \WeakMap();
+            $methods = $removedListeners[$listener[0]] ?? [];
+            $methods[\is_string($listener[1] ?? null) ? $listener[1] : '__invoke'] = true;
+            $removedListeners[$listener[0]] = $methods;
         }
     }
 
@@ -216,14 +241,25 @@ class EventDispatcher implements EventDispatcherInterface
     {
         krsort($this->listeners[$eventName]);
         $this->sorted[$eventName] = [];
+        $removedListeners = $this->removedListeners[$eventName] ?? null;
+        unset($this->removedListeners[$eventName]);
 
-        foreach ($this->listeners[$eventName] as &$listeners) {
-            foreach ($listeners as &$listener) {
+        foreach ($this->listeners[$eventName] as $priority => &$listeners) {
+            foreach ($listeners as $k => &$listener) {
                 if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
                     $listener[0] = $listener[0]();
                     $listener[1] ??= '__invoke';
+
+                    if (isset($removedListeners[$listener[0]][$listener[1]])) {
+                        unset($listeners[$k]);
+                        continue;
+                    }
                 }
                 $this->sorted[$eventName][] = $listener;
+            }
+
+            if (!$listeners) {
+                unset($this->listeners[$eventName][$priority]);
             }
         }
     }
@@ -233,6 +269,10 @@ class EventDispatcher implements EventDispatcherInterface
      */
     private function optimizeListeners(string $eventName): array
     {
+        if (isset($this->removedListeners[$eventName])) {
+            $this->sortListeners($eventName);
+        }
+
         krsort($this->listeners[$eventName]);
         $this->optimized[$eventName] = [];
 

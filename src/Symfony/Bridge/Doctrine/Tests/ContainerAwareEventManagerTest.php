@@ -15,6 +15,7 @@ use Doctrine\Common\EventSubscriber;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
@@ -167,6 +168,42 @@ class ContainerAwareEventManagerTest extends TestCase
 
         $this->evm->removeEventListener('foo', $listener2);
         $this->assertSame([], $this->evm->getListeners('foo'));
+    }
+
+    public function testRemoveLazyEventListenerByObjectKeepsListenersLazy()
+    {
+        $called = 0;
+        $listener = new MyListener();
+        $evm = new ContainerAwareEventManager(new ServiceLocator([
+            'lazy1' => static function () use (&$called, $listener) {
+                ++$called;
+
+                return $listener;
+            },
+            'lazy2' => static function () use (&$called) {
+                ++$called;
+
+                return new MyListener();
+            },
+        ]));
+        $evm->addEventListener('foo', 'lazy1');
+        $evm->addEventListener('foo', 'lazy2');
+
+        $evm->removeEventListener('foo', $listener);
+        $this->assertSame(0, $called);
+
+        $this->assertCount(1, $evm->getListeners('foo'));
+    }
+
+    public function testDispatchEventAfterRemovingLazyEventListenerByObject()
+    {
+        $this->container->set('lazy', $listener = new MyListener());
+        $this->evm->addEventListener('foo', 'lazy');
+
+        $this->evm->removeEventListener('foo', $listener);
+        $this->evm->dispatchEvent('foo');
+
+        $this->assertSame(0, $listener->calledByEventNameCount);
     }
 
     public function testRemoveLazyEventSubscriberByObject()

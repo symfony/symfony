@@ -26,6 +26,8 @@ class ContainerAwareEventManager extends EventManager
     private array $initialized = [];
     private bool $initializedSubscribers = false;
     private array $initializedHashMapping = [];
+    /** @var array<string, \WeakMap<object, true>> */
+    private array $removedListeners = [];
     private array $methods = [];
 
     /**
@@ -126,15 +128,15 @@ class ContainerAwareEventManager extends EventManager
         foreach ((array) $events as $event) {
             $eventHash = $hash;
 
-            // The listener might be registered as a service that is not initialized yet,
-            // in which case it is stored under the hash of its service id
-            if (\is_object($listener) && isset($this->listeners[$event]) && !isset($this->listeners[$event][$eventHash]) && !isset($this->initialized[$event])) {
-                $this->initializeListeners($event);
-            }
-
             if (null !== $initializedHash = $this->initializedHashMapping[$event][$eventHash] ?? null) {
                 unset($this->initializedHashMapping[$event][$eventHash]);
                 $eventHash = $initializedHash;
+            } elseif (\is_object($listener) && isset($this->listeners[$event]) && !isset($this->listeners[$event][$eventHash]) && !isset($this->initialized[$event])) {
+                // The listener might be one of the services that are not initialized yet,
+                // which are stored under the hash of their service id. Defer the removal
+                // to the moment they are instantiated anyway.
+                $this->removedListeners[$event] ??= new \WeakMap();
+                $this->removedListeners[$event][$listener] = true;
             }
 
             unset($this->listeners[$event][$eventHash], $this->methods[$event][$eventHash]);
@@ -162,12 +164,19 @@ class ContainerAwareEventManager extends EventManager
     private function initializeListeners(string $eventName): void
     {
         $this->initialized[$eventName] = true;
+        $removedListeners = $this->removedListeners[$eventName] ?? null;
+        unset($this->removedListeners[$eventName]);
 
         // We'll refill the whole array in order to keep the same order
         $listeners = [];
         foreach ($this->listeners[$eventName] as $hash => $listener) {
             if (\is_string($listener)) {
                 $listener = $this->container->get($listener);
+
+                if (isset($removedListeners[$listener])) {
+                    continue;
+                }
+
                 $newHash = $this->getHash($listener);
 
                 $this->initializedHashMapping[$eventName][$hash] = $newHash;

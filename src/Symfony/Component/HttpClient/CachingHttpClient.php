@@ -58,11 +58,11 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
     /**
      * The HTTP methods that are always cacheable.
      */
-    private const CACHEABLE_METHODS = ['GET', 'HEAD'];
+    private const CACHEABLE_METHODS = ['GET', 'HEAD', 'QUERY'];
     /**
      * The HTTP methods that are considered safe per RFC 9110.
      */
-    private const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS', 'TRACE'];
+    private const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS', 'TRACE', 'QUERY'];
     /**
      * Headers that influence the response and may affect caching behavior.
      */
@@ -151,7 +151,11 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             throw new InvalidArgumentException(\sprintf('The "extra.cache_policy" option must be a callable, "%s" given.', get_debug_type($cacheHook)));
         }
 
-        if ('' !== $options['body'] || ($options['extra']['no_cache'] ?? false) || isset($options['normalized_headers']['range']) || !\in_array($method, self::CACHEABLE_METHODS, true)) {
+        $isQuery = 'QUERY' === $method;
+        $hasDisqualifyingBody = $isQuery ? !\is_string($options['body']) : '' !== $options['body'];
+        $isMalformedQuery = $isQuery && '' === trim(substr($options['normalized_headers']['content-type'][0] ?? '', \strlen('content-type: ')));
+
+        if ($hasDisqualifyingBody || $isMalformedQuery || ($options['extra']['no_cache'] ?? false) || isset($options['normalized_headers']['range']) || !\in_array($method, self::CACHEABLE_METHODS, true)) {
             if (isset($requestCacheControl['only-if-cached'])) {
                 return self::createGatewayTimeoutResponse($method, $url, $options);
             }
@@ -186,7 +190,8 @@ class CachingHttpClient implements HttpClientInterface, LoggerAwareInterface, Re
             return new AsyncResponse($this->client, $method, $url, $options);
         }
 
-        $requestHash = self::hash($method.$fullUrl.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));
+        $influencingHeaders = $isQuery ? self::RESPONSE_INFLUENCING_HEADERS + ['content-type' => true] : self::RESPONSE_INFLUENCING_HEADERS;
+        $requestHash = self::hash($method.$fullUrl.($isQuery ? \strlen($options['body'])."\0".$options['body'] : '').serialize(array_intersect_key($options['normalized_headers'], $influencingHeaders)));
         $varyKey = "vary_{$requestHash}";
         $varyFields = $this->cache->get($varyKey, static fn ($item, &$save): array => ($save = false) ?: [], 0);
 

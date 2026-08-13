@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `SlackPlainTextInputBlock` to add a plain-text input to a Slack message
+
 7.4
 ---
 

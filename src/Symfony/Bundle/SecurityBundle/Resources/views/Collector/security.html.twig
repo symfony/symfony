@@ -310,10 +310,47 @@
                                     </td>
                                 </tr>
 
-                                {% if collector.supportsRoleHierarchy %}
+                                {% if collector.supportsRoleHierarchy and collector.rolesDiagram is not empty %}
+                                <script>
+                                    {{ source('@WebProfiler/Script/Mermaid/mermaid-flowchart-v2.min.js') }}
+                                    const isDarkMode = document.querySelector('body').classList.contains('theme-dark');
+                                    mermaid.initialize({
+                                        flowchart: {
+                                            useMaxWidth: true,
+                                        },
+                                        securityLevel: 'loose',
+                                        theme: 'base',
+                                        themeVariables: {
+                                            darkMode: isDarkMode,
+                                            fontFamily: 'var(--font-family-system)',
+                                            fontSize: 'var(--font-size-body)',
+                                            // the properties below don't support CSS variables
+                                            primaryColor: isDarkMode ? 'lightsteelblue' : 'aliceblue',
+                                            primaryTextColor: isDarkMode ? '#000' : '#000',
+                                            primaryBorderColor: isDarkMode ? 'steelblue' : 'lightsteelblue',
+                                            lineColor: isDarkMode ? '#939393' : '#d4d4d4',
+                                            secondaryColor: isDarkMode ? 'lightyellow' : 'lightyellow',
+                                            tertiaryColor: isDarkMode ? 'lightSalmon' : 'lightSalmon',
+                                        }
+                                    });
+                                    document.addEventListener('DOMContentLoaded', () => {
+                                        const mEl = document.querySelector('.sf-mermaid');
+                                        mermaid.run({
+                                            nodes: [mEl],
+                                        });
+                                    });
+                                </script>
                                 <tr>
                                     <th>Inherited Roles</th>
                                     <td>{{ collector.inheritedRoles is empty ? 'none' : profiler_dump(collector.inheritedRoles, maxDepth: 1) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Available Roles</th>
+                                    <td>
+                                        <pre class="sf-mermaid">
+                                            {{ collector.rolesDiagram|raw }}
+                                        </pre>
+                                    </td>
                                 </tr>
                                 {% endif %}
 

@@ -34,6 +34,7 @@ use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
+use Symfony\Component\Security\Core\Dumper\MermaidDumper;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
@@ -133,7 +134,15 @@ class SecurityDataCollectorTest extends TestCase
     public function testCollectWhenAuthenticationTokenIsNull()
     {
         $tokenStorage = new TokenStorage();
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
+        $mermaidDumper = $this->createMock(MermaidDumper::class);
+
+        $mermaidDumper
+            ->expects($this->once())
+            ->method('dump')
+            ->with($this->getRoleHierarchy())
+            ->willReturn('graph TD; A-->B;');
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), mermaidDumper: $mermaidDumper);
         $collector->collect(new Request(), new Response());
 
         $this->assertTrue($collector->isEnabled());
@@ -154,8 +163,15 @@ class SecurityDataCollectorTest extends TestCase
     {
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('hhamon', 'P4$$w0rD', $roles), 'provider', $roles));
+        $mermaidDumper = $this->createMock(MermaidDumper::class);
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
+        $mermaidDumper
+            ->expects($this->once())
+            ->method('dump')
+            ->with($this->getRoleHierarchy())
+            ->willReturn('graph TD; A-->B;');
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), mermaidDumper: $mermaidDumper);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -177,8 +193,15 @@ class SecurityDataCollectorTest extends TestCase
 
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER']), 'provider', ['ROLE_USER'], $adminToken));
+        $mermaidDumper = $this->createMock(MermaidDumper::class);
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
+        $mermaidDumper
+            ->expects($this->once())
+            ->method('dump')
+            ->with($this->getRoleHierarchy())
+            ->willReturn('graph TD; A-->B;');
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), mermaidDumper: $mermaidDumper);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 

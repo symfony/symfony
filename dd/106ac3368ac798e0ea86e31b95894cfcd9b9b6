@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-09-19T05:57:59Z
+
+Maybe rename "Roles Diagram" to "Available Roles"? I mean it is clear that this is a diagram
+
+---------------------------------------------------------------------------
+
+by damienfern at 2025-09-22T06:35:23Z
+
+> @damienfern waw very nice one! I like it
+>
+> may I ask you how difficult/challenging (if doable) can it be to do the "second part" of my comment? related to visualizing the current request user roles inside this newly added graph?
+>
+> (for example take as comparison the voter part with granted/denied etc with green/red or highlighted color)
+
+I still have it in mind, but no idea how to do it. I pushed this PR first so once it is merged, I can start working on it.
+
+---------------------------------------------------------------------------
+
+by 94noni at 2026-04-29T17:18:32Z
+
+@damienfern & reviewers, is there any chance of this being merged as a small DX feature ? thank you
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T16:56:46Z
+
+Thanks for your patience, @damienfern, and thanks @94noni for the nudge in April that nobody answered.
+
+Everything asked for is on the head: the 6.4 leftover went to #61813, @94noni's and @alexandre-daubois' emptiness guards are in, and @OskarStark's "Available Roles" rename too. Rebased on 8.2 and pushed.
+
+What I changed while rebasing:
+
+ * `MermaidDumper` now sits after `$impersonateUrlGenerator` in the collector constructor, since that argument landed on 8.2 in the meantime. The three test call sites passed the dumper positionally as argument 7, so they now use `mermaidDumper:` by name and will not break again the next time an argument is added.
+ * `getRolesDiagram()` returned `$this->data['roles_diagram']` for a key that is only set when a role hierarchy is configured, so calling it without one raised an undefined-key warning. It now returns null.
+ * the CHANGELOG entry moved from 8.1, which has shipped, to 8.2, and the header table says 8.2.
+ * squashed the four commits into one.
+
+SecurityBundle is green at 439 tests.
+
+@fabpot, two things for you. Your `CHANGES_REQUESTED` from 2025-09-24 appears to be a misfire: the comment attached to it is "That's a good idea indeed", agreeing with @damienfern's suggestion that Fabbot should lint CHANGELOG files, which is not a request on this PR. It has been the blocking state for eleven months, so it needs dismissing either way.
+
+The one real decision left: this changes `MermaidDumper::dump()` to return an empty string instead of `graph TD\n    classDef default fill:#e1f5fe;` when the hierarchy is empty, so the template can skip injecting the Mermaid script. `MermaidDumper` shipped in 7.4, so that is a behaviour change on released code. It looks right to me, dumping a graph with no nodes is not useful output, and the profiler is the only consumer we ship, but it is your call rather than something to slip in.

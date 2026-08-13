@@ -14,6 +14,8 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Tests;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackPlainTextInputBlock;
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
 use Symfony\Component\Notifier\Bridge\Slack\SlackSentMessage;
 use Symfony\Component\Notifier\Bridge\Slack\SlackTransport;
@@ -240,6 +242,46 @@ final class SlackTransportTest extends TransportTestCase
         $transport = $this->createTransport($client, 'another-channel');
 
         $sentMessage = $transport->send($chatMessage);
+
+        $this->assertSame('1503435956.000247', $sentMessage->getMessageId());
+    }
+
+    public function testSlackTransportSendsMessageWithInputBlock()
+    {
+        $channel = 'testChannel';
+        $message = 'testMessage';
+
+        $response = $this->createMock(ResponseInterface::class);
+
+        $response->expects($this->exactly(2))
+            ->method('getStatusCode')
+            ->willReturn(200);
+
+        $response->expects($this->once())
+            ->method('getContent')
+            ->willReturn(json_encode(['ok' => true, 'ts' => '1503435956.000247', 'channel' => 'C123456']));
+
+        $options = new SlackOptions();
+
+        $options->block((new SlackSectionBlock())->text($message));
+
+        $options->block(new SlackPlainTextInputBlock('Time spent', 'time_spent_input', 'Enter some text here'));
+
+        $expectedBody = json_encode([
+            'blocks' => $options->toArray()['blocks'],
+            'channel' => $channel,
+            'text' => $message,
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
+
+            return $response;
+        });
+
+        $transport = self::createTransport($client, $channel);
+
+        $sentMessage = $transport->send(new ChatMessage('testMessage', $options));
 
         $this->assertSame('1503435956.000247', $sentMessage->getMessageId());
     }

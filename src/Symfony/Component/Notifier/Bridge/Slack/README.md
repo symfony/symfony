@@ -250,6 +250,28 @@ $chatMessage->options($options);
 $chatter->send($chatMessage);
 ```
 
+Adding a Plain Text Input to a Message
+----------------------------
+To add a simple text input field to your Slack message, use the `SlackPlainTextInputBlock` class.
+```php
+use Symfony\Component\Notifier\Bridge\Slack\Block\SlackPlainTextInputBlock;
+use Symfony\Component\Notifier\Bridge\Slack\SlackOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('Enter your feedback');
+
+$options = (new SlackOptions())
+->block(
+new SlackPlainTextInputBlock('Your Feedback', 'feedback_action_id', 'Type your feedback here...')
+);
+
+// Add the custom options to the chat message and send the message
+$chatMessage->options($options);
+
+$chatter->send($chatMessage);
+```
+
+
 Sending a Message as a Reply
 ----------------------------
 

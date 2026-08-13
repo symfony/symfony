@@ -280,13 +280,37 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('esi'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testFragmentsAndHinclude()
     {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Setting the "framework.fragments.hinclude_default_template" configuration option is deprecated. It will be removed in version 9.0.');
+
         $container = $this->createContainerFromFile('fragments_and_hinclude');
         $this->assertTrue($container->has('fragment.uri_generator'));
         $this->assertTrue($container->hasAlias(FragmentUriGeneratorInterface::class));
         $this->assertTrue($container->hasParameter('fragment.renderer.hinclude.global_template'));
-        $this->assertEquals('global_hinclude_template', $container->getParameter('fragment.renderer.hinclude.global_template'));
+        $this->assertSame('global_hinclude_template', $container->getDefinition('fragment.renderer.hinclude')->getArgument(2));
+    }
+
+    public function testFragmentsWithoutHincludeDefaultTemplate()
+    {
+        $container = $this->createContainerFromFile('fragments_without_hinclude_template');
+
+        $this->assertTrue($container->hasDefinition('fragment.renderer.hinclude'));
+        $this->assertTrue($container->hasParameter('fragment.renderer.hinclude.global_template'));
+        $this->assertNull($container->getDefinition('fragment.renderer.hinclude')->getArgument(2));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testHincludeGlobalTemplateParameterIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: The "fragment.renderer.hinclude.global_template" parameter is deprecated. It will be removed in version 9.0.');
+
+        $container = $this->createContainerFromFile('fragments_without_hinclude_template');
+
+        $container->getParameter('fragment.renderer.hinclude.global_template');
     }
 
     public function testSsi()

@@ -11,7 +11,10 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
@@ -30,6 +33,8 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 class HttpKernelExtensionTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testFragmentWithError()
     {
         $renderer = $this->getFragmentHandler(new \Exception('foo'));
@@ -56,6 +61,19 @@ class HttpKernelExtensionTest extends TestCase
         $this->expectExceptionMessage('The "inline" renderer does not exist.');
 
         $renderer->render('/foo');
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testRenderHIncludeIsDeprecatedAtParseTime()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/twig-bridge 8.2: Twig Function "render_hinclude" is deprecated; use "render_esi() or render(), or Symfony UX Turbo" instead in index at line 1.');
+
+        $loader = new ArrayLoader(['index' => '{{ render_hinclude("/foo") }}']);
+        $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
+        $twig->addExtension(new HttpKernelExtension());
+
+        $twig->parse($twig->tokenize($twig->getLoader()->getSourceContext('index')));
     }
 
     public function testGenerateFragmentUri()

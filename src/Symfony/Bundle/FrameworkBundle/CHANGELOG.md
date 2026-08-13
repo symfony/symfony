@@ -20,6 +20,7 @@ CHANGELOG
  * Add the `http_client.*.retry_failed.base_uris` option, to retry a failed request against the next URI in the list
  * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`
  * Add a `priority` option to `framework.messenger.transports` to order the receivers `messenger:consume --all` consumes
+ * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use ESI or inline rendering, or Symfony UX Turbo, instead
 
 8.1
 ---

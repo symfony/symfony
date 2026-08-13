@@ -51,6 +51,16 @@ final class HttpKernelRuntime
         return $this->handler->render($uri, $strategy, $options);
     }
 
+    /**
+     * @internal
+     *
+     * @deprecated since Symfony 8.2, use renderFragment() with the "esi" strategy or Symfony UX Turbo instead
+     */
+    public function renderHIncludeFragment(string|ControllerReference $uri, array $options = []): ?string
+    {
+        return $this->handler->render($uri, 'hinclude', $options);
+    }
+
     public function generateFragmentUri(ControllerReference $controller, bool $absolute = false, bool $strict = true, bool $sign = true): string
     {
         if (null === $this->fragmentUriGenerator) {

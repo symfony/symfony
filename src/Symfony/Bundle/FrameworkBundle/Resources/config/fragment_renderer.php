@@ -46,7 +46,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('twig')->nullOnInvalid(),
                 service('uri_signer'),
-                param('fragment.renderer.hinclude.global_template'),
+                abstract_arg('hinclude global template'),
             ])
             ->call('setFragmentPath', [param('fragment.path')])
 

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Fragment;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
@@ -19,6 +21,8 @@ use Symfony\Component\HttpKernel\Fragment\HIncludeFragmentRenderer;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class HIncludeFragmentRendererTest extends TestCase
 {
     public function testRenderExceptionWhenControllerAndNoSigner()

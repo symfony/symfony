@@ -22,6 +22,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\InstanceofLateAlias\LateAliasedInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\InstanceofLateAlias\LateAliasedService;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -402,6 +406,116 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
             ],
         ], $container->getDefinition('decorator')->getTags());
         $this->assertFalse($container->hasParameter('container.behavior_describing_tags'));
+    }
+
+    public function testAutoconfiguredCaseInsensitiveTypeIsApplied()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Bar::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(strtolower(BarInterface::class))->addTag('some_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->getDefinition('foo');
+        $this->assertInstanceOf(ChildDefinition::class, $def);
+        $this->assertSame('.instanceof.'.strtolower(BarInterface::class).'.0.foo', $def->getParent());
+        $this->assertSame(['some_tag' => [[]]], $def->getTags());
+    }
+
+    public function testAutoconfiguredCaseInsensitiveTypeOfTheClassItselfIsNotApplied()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Bar::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(strtolower(Bar::class))->addTag('some_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->getDefinition('foo');
+        $this->assertNotInstanceOf(ChildDefinition::class, $def);
+        $this->assertSame([], $def->getTags());
+    }
+
+    public function testAutoconfiguredTypeMatchingANonExistentClassExactlyIsApplied()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'App\Nope')->setAutoconfigured(true);
+        $container->registerForAutoconfiguration('App\Nope')->addTag('some_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->getDefinition('foo');
+        $this->assertInstanceOf(ChildDefinition::class, $def);
+        $this->assertSame('.instanceof.App\Nope.0.foo', $def->getParent());
+        $this->assertSame(['some_tag' => [[]]], $def->getTags());
+    }
+
+    public function testAutoconfiguredAliasDefinedBeforeThePassIsApplied()
+    {
+        $alias = 'Symfony\Component\DependencyInjection\Tests\Compiler\PreloadedBarInterfaceAlias';
+        if (!interface_exists($alias, false)) {
+            class_alias(BarInterface::class, $alias);
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('foo', Bar::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration($alias)->addTag('some_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame(['some_tag' => [[]]], $container->getDefinition('foo')->getTags());
+    }
+
+    public function testAutoconfiguredAliasDefinedWhileAutoloadingTheServiceClassIsApplied()
+    {
+        $this->assertFalse(class_exists(LateAliasedService::class, false));
+
+        $container = new ContainerBuilder();
+        $container->register('foo', LateAliasedService::class)->setAutoconfigured(true);
+        $container->register('bar', LateAliasedService::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(\ArrayAccess::class)->addTag('unrelated_tag');
+        $container->registerForAutoconfiguration(LateAliasedInterface::class)->addTag('late_tag');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame(['late_tag' => [[]]], $container->getDefinition('foo')->getTags());
+        $this->assertSame(['late_tag' => [[]]], $container->getDefinition('bar')->getTags());
+    }
+
+    public function testDuplicateCaseInsensitiveAutoconfiguredTypesAreAllApplied()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Bar::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(BarInterface::class)->addTag('tag_from_canonical');
+        $container->registerForAutoconfiguration(strtolower(BarInterface::class))->addTag('tag_from_lowercase');
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $def = $container->getDefinition('foo');
+        $this->assertTrue($container->hasDefinition('.instanceof.'.BarInterface::class.'.0.foo'));
+        $this->assertTrue($container->hasDefinition('.instanceof.'.strtolower(BarInterface::class).'.0.foo'));
+        $this->assertSame('.instanceof.'.strtolower(BarInterface::class).'.0.foo', $def->getParent());
+        $this->assertSame(['tag_from_lowercase' => [[]], 'tag_from_canonical' => [[]]], $def->getTags());
+    }
+
+    public function testProcessCanBeCalledSeveralTimes()
+    {
+        $pass = new ResolveInstanceofConditionalsPass();
+
+        $container = new ContainerBuilder();
+        $container->register('foo', Bar::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(BarInterface::class)->addTag('first_tag');
+
+        $pass->process($container);
+
+        $this->assertSame(['first_tag' => [[]]], $container->findDefinition('foo')->getTags());
+
+        $container = new ContainerBuilder();
+        $container->register('foo', Bar::class)->setAutoconfigured(true);
+        $container->registerForAutoconfiguration(Bar::class)->addTag('second_tag');
+
+        $pass->process($container);
+
+        $this->assertSame(['second_tag' => [[]]], $container->findDefinition('foo')->getTags());
     }
 
     public function testSyntheticService()

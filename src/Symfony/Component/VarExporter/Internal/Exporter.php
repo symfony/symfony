@@ -89,26 +89,37 @@ class Exporter
 
         // Single-line: content fits within the 20-items budget
         if ($size <= 20) {
-            $j = -1;
-            $code = '[';
-            foreach ($value as $k => $v) {
-                if ('[' !== $code) {
-                    $code .= ', ';
-                }
-                if (!\is_int($k) || 1 !== $k - $j) {
-                    $code .= self::export($k, $indent).' => ';
-                }
-                if (\is_int($k) && $k > $j) {
-                    $j = $k;
-                }
-                $code .= self::export($v, $indent);
-            }
-
-            return $code.']';
+            return self::exportSingleLine($value, $indent);
         }
 
-        // Multi-line wrapped: pack values onto each line; before appending the next
-        // value, check that the line would still hold <= 20 items.
+        return self::exportWrapped($value, $indent);
+    }
+
+    private static function exportSingleLine(array $value, string $indent): string
+    {
+        $j = -1;
+        $code = '[';
+        foreach ($value as $k => $v) {
+            if ('[' !== $code) {
+                $code .= ', ';
+            }
+            if (!\is_int($k) || 1 !== $k - $j) {
+                $code .= self::export($k, $indent).' => ';
+            }
+            if (\is_int($k) && $k > $j) {
+                $j = $k;
+            }
+            $code .= self::export($v, $indent);
+        }
+
+        return $code.']';
+    }
+
+    private static function exportWrapped(array $value, string $indent): string
+    {
+        // Pack values onto each line; before appending the next value,
+        // check that the line would still hold <= 20 items.
+        $subIndent = $indent.'    ';
         $j = -1;
         $code = '';
         $line = '';

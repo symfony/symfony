@@ -281,6 +281,42 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([], $this->evm->getListeners('foo'));
     }
 
+    public function testRemoveLazyEventListenerByObject()
+    {
+        $this->container->set('lazy1', $listener1 = new MyListener());
+        $this->container->set('lazy2', $listener2 = new MyListener());
+        $this->evm->addEventListener('foo', 'lazy1');
+        $this->evm->addEventListener('foo', 'lazy2');
+
+        $this->evm->removeEventListener('foo', $listener1);
+        $this->assertSame([$listener2], array_values($this->evm->getListeners('foo')));
+
+        $this->evm->removeEventListener('foo', $listener2);
+        $this->assertSame([], $this->evm->getListeners('foo'));
+    }
+
+    public function testRemoveLazyEventSubscriberByObject()
+    {
+        $this->container->set('lazy', $subscriber = new MySubscriber(['foo']));
+        $this->evm->addEventListener('foo', 'lazy');
+
+        $this->evm->removeEventSubscriber($subscriber);
+
+        $this->assertSame([], $this->evm->getListeners('foo'));
+    }
+
+    public function testRemoveEventListenerOnSeveralEvents()
+    {
+        $this->container->set('lazy', new MyListener());
+        $this->evm->addEventListener(['foo', 'bar'], 'lazy');
+
+        $this->evm->getListeners('foo');
+        $this->evm->removeEventListener(['foo', 'bar'], 'lazy');
+
+        $this->assertSame([], $this->evm->getListeners('foo'));
+        $this->assertSame([], $this->evm->getListeners('bar'));
+    }
+
     public function testRemoveAllEventListener()
     {
         $this->container->set('lazy', new MyListener());

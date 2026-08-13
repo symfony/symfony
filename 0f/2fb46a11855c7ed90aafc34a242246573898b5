@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-09T12:50:11Z
+
+Rebased this PR onto current `8.2` and pushed `91b83ed6f908`.
+
+It is up to date with the target branch again and waiting for review.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-07-30T14:54:55Z
+
+Thanks for the review. Reworked in f4212549e31 to follow the second option from the issue: BrowserKit assertions are now non-verbose by default, with `setBrowserKitAssertionsAsVerbose(true)` and per-assertion `verbose: true` kept as opt-in paths.
+
+I also removed the env-var approach and left the `assertResponseRedirects()` / `LogicalAnd` issue out of this PR as requested.
+
+Validation: RED before the default flip was `testFailureMessageIsNotVerboseByDefault` failing because the body was still present. GREEN after the fix: local `./run-ci.sh` passes with `OK (3 tests, 6 assertions)`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T12:39:18Z
+
+Thanks, the rework is exactly what the issue asked for. I rebased on 8.2 and moved the CHANGELOG entry, which had landed in the 8.1 section, then pushed.
+
+For the record on what is in there now: the default flips in `BrowserKitAssertionsTrait`, `setBrowserKitAssertionsAsVerbose(true)` and per-assertion `verbose: true` stay as the opt-in paths, the `UPGRADE-8.2.md` entry is present since failure output changes, and three tests cover the default, the per-assertion argument and the setter. FrameworkBundle is green, and flipping the default back locally does fail one of the new tests, so they are load-bearing.
+
+The `assertResponseRedirects()` body leak I mentioned is untouched here, as agreed: it lives in the `LogicalAnd` path and shipped in 7.4, so it is a separate bugfix on 7.4.

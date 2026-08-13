@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-04-20T13:09:03Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by SMS-Proxima at 2026-05-25T10:58:48Z
+
+The PR has been rebased on `8.2`. The merge conflict in `FrameworkExtension.php` is resolved and the branch now merges cleanly.
+
+Regarding the 2 failing checks:
+- **PHPStan**: errors are pre-existing in the repo (Cache, DependencyInjection, ExpressionLanguage) — unrelated to this PR
+- **Windows / x86 / all extensions / lowest-php**: infrastructure/network issue — unrelated to this PR
+
+This PR is ready for review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T16:39:27Z
+
+Thanks for this, and thanks for your patience: it sat almost four months without a review, after you had already rebased it and diagnosed the red checks correctly yourself.
+
+Rebased on 8.2 and pushed, with the packaging brought in line. The important one was the missing `splitsh.json` entry: without it the `symfony/sms-proxima-notifier` package never gets published, while `UnsupportedSchemeException` still tells users to `composer require` it. No CI job catches that in either direction, since `package-tests.yml` skips the new-package check for component bridges.
+
+Also done:
+
+ * dropped `.github/workflows/`, none of the other bridges carry one; those files are generated into the split repositories by tooling rather than committed here
+ * rewrote the README against the shape the sibling bridges use, underlined headings, the DSN block, and the `Sponsor` and `Resources` sections that were missing
+ * aligned `.gitattributes`, `.gitignore`, `LICENSE` and `phpunit.xml.dist` with the template, mostly missing trailing newlines
+ * squashed the eight commits into one and set the header table to 8.2
+
+One fix outside the bridge: `FrameworkExtension.php` was missing a space after a comma on the `Prelude` line. That is pre-existing, but Fabbot lints every file a PR touches, so it would have failed here.
+
+The bridge suite is green, and so is the `UnsupportedSchemeException` test that enumerates every scheme.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T16:45:40Z
+
+Also rewrote the bridge CHANGELOG. It used `# CHANGELOG` with a `## 1.0.0 (2026-04-20)` heading and a feature list; all 70 Notifier bridges use the underlined style with the Symfony minor as the heading and a single ` * Add the bridge` entry, so it now matches.

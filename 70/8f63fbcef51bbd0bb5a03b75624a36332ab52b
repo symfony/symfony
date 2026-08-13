@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T07:11:29Z
+
+Reworked while reviewing: the same defect was in the sibling branch a few lines above, where a direct self-reference is handed back the target being built without checking it against the target resolved for the property, so both reuse paths are now guarded. Also simplified the fixtures, the collection wrapper is not needed to reproduce, and updated the description.

@@ -183,6 +183,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadO
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadOnlyPromotedPropertyBMapped;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Recursion\AB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Recursion\Dto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ChildSource as RecursionCacheChildSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ItemSource as RecursionCacheItemSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ItemSummaryTarget as RecursionCacheItemSummaryTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\ItemTarget as RecursionCacheItemTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfSource as RecursionCacheSelfSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfSummaryTarget as RecursionCacheSelfSummaryTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\RecursionCacheMultiTarget\SelfTarget as RecursionCacheSelfTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\Category;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\SelfReferencing\CategoryDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\LoadedValueService;
@@ -1722,5 +1729,31 @@ final class ObjectMapperTest extends TestCase
         ));
 
         $this->assertSame('lower', $mapper->map(new TargetInClassMapSource(), TargetInClassMapTarget::class)->label);
+    }
+
+    public function testRecursionCacheIsNotReusedForADifferentTarget()
+    {
+        // mapping to ItemSummaryTarget caches it for $item, while the back-reference
+        // ChildTarget::$item resolves to the other target ItemSource declares
+        $item = new RecursionCacheItemSource();
+        $child = new RecursionCacheChildSource();
+        $child->label = 'child';
+        $child->item = $item;
+        $item->children = [$child];
+
+        $mapped = (new ObjectMapper())->map($item, RecursionCacheItemSummaryTarget::class);
+
+        $this->assertInstanceOf(RecursionCacheItemTarget::class, $mapped->children[0]->item);
+    }
+
+    public function testSelfReferenceIsNotReusedForADifferentTarget()
+    {
+        $source = new RecursionCacheSelfSource();
+        $source->self = $source;
+
+        $mapped = (new ObjectMapper())->map($source, RecursionCacheSelfTarget::class);
+
+        $this->assertInstanceOf(RecursionCacheSelfSummaryTarget::class, $mapped->self);
+        $this->assertSame(1, $mapped->self->id);
     }
 }

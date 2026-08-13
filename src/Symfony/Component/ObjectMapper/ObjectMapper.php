@@ -352,9 +352,10 @@ final class ObjectMapper implements ObjectMapperInterface, ObjectMapperAwareInte
         ) {
             $value = $this->applyTransforms($mapTo, $value, $source, $target);
 
-            if ($value === $source) {
+            // an already mapped source is reusable only when it matches the target resolved for this property
+            if ($value === $source && $target instanceof $mapTo->target) {
                 $value = $target;
-            } elseif ($objectMap->offsetExists($value)) {
+            } elseif ($objectMap->offsetExists($value) && $objectMap[$value] instanceof $mapTo->target) {
                 $value = $objectMap[$value];
             } else {
                 if ($mapTo->transform) {

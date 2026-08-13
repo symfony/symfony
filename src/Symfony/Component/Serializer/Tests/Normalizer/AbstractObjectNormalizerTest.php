@@ -1441,6 +1441,39 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $normalizer->denormalize($data, ScalarCollectionDocBlockDummy::class));
     }
 
+    public function testDenormalizeConvertsScalarCollectionElements()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize([
+            'ints' => ['1', '2'],
+            'floats' => ['1.5', null],
+            'bools' => ['name' => 'true'],
+        ], ScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+
+        $this->assertSame([1, 2], $dummy->ints);
+        $this->assertSame([1.5, null], $dummy->floats);
+        $this->assertSame(['name' => true], $dummy->bools);
+    }
+
+    public function testDenormalizeConvertsScalarCollectionElementsDecodedFromXml()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize(['ints' => ['1', '2']], ScalarCollectionsDummy::class, 'xml');
+
+        $this->assertSame([1, 2], $dummy->ints);
+    }
+
+    public function testDenormalizeLeavesUnconvertibleScalarCollectionElementsUntouched()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize(['ints' => [1, 'nope', ['a' => 1]]], ScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+
+        $this->assertSame([1, 'nope', ['a' => 1]], $dummy->ints);
+    }
+
     public function testDenormalizeCollectionOfUnionTypesPropertyWithPhpDocExtractor()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
@@ -2263,6 +2296,18 @@ class ScalarCollectionDocBlockDummy
     {
         return $this->values;
     }
+}
+
+class ScalarCollectionsDummy
+{
+    /** @var list<int> */
+    public array $ints = [];
+
+    /** @var list<?float> */
+    public array $floats = [];
+
+    /** @var array<string, bool> */
+    public array $bools = [];
 }
 
 class UnionCollectionDocBlockDummy

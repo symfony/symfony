@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
 use AsyncAws\Core\Exception\Exception as AsyncAwsException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -39,6 +40,7 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
         private (ReceiverInterface&MessageCountAwareInterface)|null $receiver = null,
         private ?SenderInterface $sender = null,
         private bool $handleRetries = true,
+        private ?LoggerInterface $logger = null,
     ) {
         $this->serializer = $serializer ?? new PhpSerializer();
     }
@@ -115,7 +117,7 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
 
     private function getSender(): SenderInterface
     {
-        return $this->sender ??= new AmazonSqsSender($this->connection, $this->serializer);
+        return $this->sender ??= new AmazonSqsSender($this->connection, $this->serializer, $this->logger);
     }
 
     private function isRedelivered(Envelope $envelope): bool

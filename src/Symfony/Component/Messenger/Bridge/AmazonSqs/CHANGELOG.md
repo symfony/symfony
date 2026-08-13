@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow auto-setup to create the queue when the DSN names the account the client already authenticates as
+ * Add `AmazonSqsFairQueueStamp` to set a `MessageGroupId` on standard queues, enabling SQS fair queues
 
 7.4
 ---

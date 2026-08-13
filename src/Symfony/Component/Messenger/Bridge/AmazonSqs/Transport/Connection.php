@@ -421,6 +421,8 @@ class Connection
             $parameters['MessageGroupId'] = $messageGroupId ?? __METHOD__;
             $parameters['MessageDeduplicationId'] = $messageDeduplicationId ?? sha1(json_encode(['body' => $body, 'headers' => $headers]));
             unset($parameters['DelaySeconds']);
+        } elseif (null !== $messageGroupId) {
+            $parameters['MessageGroupId'] = $messageGroupId;
         }
 
         $this->client->sendMessage($parameters);

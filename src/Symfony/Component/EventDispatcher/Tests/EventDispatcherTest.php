@@ -350,6 +350,40 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners('foo'));
     }
 
+    public function testRemoveKeepsLazyListenersLazy()
+    {
+        $called = 0;
+        $factory = static function () use (&$called) {
+            ++$called;
+
+            return new TestWithDispatcher();
+        };
+
+        $this->dispatcher->addListener('foo', [$factory, 'foo']);
+        $this->dispatcher->addListener('foo', $listener = static function () {});
+
+        $this->dispatcher->removeListener('foo', $listener);
+
+        $this->assertSame(0, $called);
+        $this->assertTrue($this->dispatcher->hasListeners('foo'));
+    }
+
+    public function testPriorityKeepsLazyListenersLazy()
+    {
+        $called = 0;
+        $factory = static function () use (&$called) {
+            ++$called;
+
+            return new TestWithDispatcher();
+        };
+
+        $this->dispatcher->addListener('foo', [$factory, 'foo'], 3);
+        $this->dispatcher->addListener('foo', $listener = static function () {}, 5);
+
+        $this->assertSame(5, $this->dispatcher->getListenerPriority('foo', $listener));
+        $this->assertSame(0, $called);
+    }
+
     public function testPriorityFindsLazyListeners()
     {
         $test = new TestWithDispatcher();

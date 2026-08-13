@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Test\Constraint as ResponseConstraint;
  */
 trait BrowserKitAssertionsTrait
 {
-    private static bool $defaultVerboseMode = true;
+    private static bool $defaultVerboseMode = false;
 
     public static function setBrowserKitAssertionsAsVerbose(bool $verbose): void
     {

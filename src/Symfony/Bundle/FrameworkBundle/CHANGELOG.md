@@ -15,6 +15,7 @@ CHANGELOG
  * Report `.env` variables that the container never uses in `debug:container --env-vars`
  * Add `service_id` and `advisory` options to lock stores to use advisory locks on an existing `\PDO` or Doctrine DBAL connection service
  * Add `framework.webhook.signature_format`, `framework.webhook.timestamp_header_name` and `framework.webhook.timestamp_tolerance` options
+ * Make BrowserKit assertions non-verbose by default
 
 8.1
 ---

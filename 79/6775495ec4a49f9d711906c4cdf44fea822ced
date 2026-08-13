@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by andrehoong-pixieset at 2025-11-18T22:12:13Z
+
+@nicolas-grekas just a heads up this was pointing to 8.1 when it should have been pointing to 7.4, I just corrected it!
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-19T09:10:12Z
+
+It cannot target 7.4. We are 1.5 month after the feature freeze. This will go in 8.1.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-11-19T17:30:04Z
+
+the failures look related
+
+---------------------------------------------------------------------------
+
+by andrehoong-pixieset at 2025-12-02T17:41:16Z
+
+Hey @xabbuh, @stof  the related failures have been fixed, is there anything I can do to push this PR forward?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T12:58:44Z
+
+Thanks for your patience, @andrehoong-pixieset, this sat far longer than it should have after you asked how to move it forward.
+
+Everything asked for was already done: @stof's point about the header being `X-Mc-ReturnPathDomain` was applied on 2025-11-19, and @fabpot's CHANGELOG remark on 2025-11-20 was applied the same day, so that review is stale.
+
+I rebased on 8.2 and pushed. Two changes: the CHANGELOG entry moved from the 8.1 section, which has shipped since, to a new 8.2 one, and the six commits are squashed into one, since four of them were "Update CHANGELOG" and "Fix CHANGELOG".
+
+The implementation follows the existing `X-MC-Subaccount` precedent exactly, including adding the header to the pass-through exclusion list. Mailchimp bridge is green at 48 tests, and removing the payload line does fail the new test, so it is covered.

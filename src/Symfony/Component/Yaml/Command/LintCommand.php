@@ -155,7 +155,9 @@ class LintCommand extends Command
             'txt' => $this->displayTxt($io, $files),
             'json' => $this->displayJson($io, $files),
             'github' => $this->displayTxt($io, $files, true),
-            'gitlab' => $this->displayGitlab($io, $files),
+            'gitlab' => class_exists(GitlabCiReporter::class)
+                ? $this->displayGitlab($io, $files)
+                : throw new InvalidArgumentException('The "gitlab" format requires symfony/console 8.2 or higher.'),
             default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
     }
@@ -294,6 +296,12 @@ class LintCommand extends Command
     /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['txt', 'json', 'github', 'gitlab'];
+        $formats = ['txt', 'json', 'github'];
+
+        if (class_exists(GitlabCiReporter::class)) {
+            $formats[] = 'gitlab';
+        }
+
+        return $formats;
     }
 }

@@ -81,6 +81,41 @@ bar';
         self::assertStringMatchesFormat('%A::error file=%s,line=2,col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
     }
 
+    public function testLintIncorrectFileWithGitlabFormat()
+    {
+        $incorrectContent = <<<YAML
+            foo:
+            bar
+            YAML;
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile($incorrectContent);
+
+        $tester->execute(['filename' => $filename, '--format' => 'gitlab'], ['decorated' => false]);
+
+        self::assertSame(1, $tester->getStatusCode(), 'Returns 1 in case of error');
+
+        $report = json_decode(trim($tester->getDisplay()), true);
+        self::assertIsArray($report);
+        self::assertCount(1, $report);
+        self::assertSame('yaml-lint', $report[0]['check_name']);
+        self::assertSame('major', $report[0]['severity']);
+        self::assertStringContainsString('Unable to parse at line 2 (near "bar")', $report[0]['description']);
+        self::assertSame($filename, $report[0]['location']['path']);
+        self::assertSame(2, $report[0]['location']['lines']['begin']);
+        self::assertNotEmpty($report[0]['fingerprint']);
+    }
+
+    public function testLintCorrectFileWithGitlabFormat()
+    {
+        $tester = $this->createCommandTester();
+        $filename = $this->createFile('foo: bar');
+
+        $tester->execute(['filename' => $filename, '--format' => 'gitlab'], ['decorated' => false]);
+
+        self::assertSame(0, $tester->getStatusCode(), 'Returns 0 in case of success');
+        self::assertSame([], json_decode(trim($tester->getDisplay()), true));
+    }
+
     public function testLintAutodetectsGithubActionEnvironment()
     {
         $prev = getenv('GITHUB_ACTIONS');
@@ -163,7 +198,7 @@ bar';
 
     public static function provideCompletionSuggestions()
     {
-        yield 'option' => [['--format', ''], ['txt', 'json', 'github']];
+        yield 'option' => [['--format', ''], ['txt', 'json', 'github', 'gitlab']];
     }
 
     private function createFile($content): string

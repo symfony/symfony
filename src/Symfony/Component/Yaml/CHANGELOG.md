@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add support for the `!!null`, `!!bool` and `!!int` tags, and accept quoted values for them and for `!!float`
  * Throw a `ParseException` when the value of a `!!float` tag is not a valid float, instead of casting it to `0.0`
+ * Add a `gitlab` output format to the `lint:yaml` command, producing a report in the GitLab Code Quality format
 
 8.0
 ---

@@ -57,8 +57,7 @@ class MermaidDumperTest extends TestCase
         $dumper = new MermaidDumper();
         $output = $dumper->dump($roleHierarchy);
 
-        $this->assertStringContainsString('graph TB', $output);
-        $this->assertStringContainsString('classDef default fill:#e1f5fe;', $output);
+        $this->assertEmpty($output);
     }
 
     public function testDumpComplexHierarchy()

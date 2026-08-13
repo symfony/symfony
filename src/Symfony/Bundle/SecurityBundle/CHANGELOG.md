@@ -14,6 +14,7 @@ CHANGELOG
  * Deprecate configuring an access control rule with many `roles`, use `allow_if` or role hierarchy instead
  * Deprecate configuring both an access control rule `allow_if` and `roles`, update `allow_if` instead
  * Add support for decorating custom authentication failure and success handlers
+ * Add role hierarchy graph to the profiler security panel
 
 8.1
 ---

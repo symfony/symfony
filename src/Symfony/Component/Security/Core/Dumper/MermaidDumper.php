@@ -32,7 +32,7 @@ class MermaidDumper
         $hierarchy = $this->extractHierarchy($roleHierarchy);
 
         if (!$hierarchy) {
-            return "graph {$direction->value}\n    classDef default fill:#e1f5fe;";
+            return '';
         }
 
         $output = ["graph {$direction->value}"];

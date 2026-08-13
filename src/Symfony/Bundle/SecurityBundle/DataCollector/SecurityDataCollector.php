@@ -23,6 +23,7 @@ use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter;
+use Symfony\Component\Security\Core\Dumper\MermaidDumper;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Component\Security\Http\Event\TokenDeauthenticatedEvent;
 use Symfony\Component\Security\Http\FirewallMapInterface;
@@ -49,6 +50,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
         private ?FirewallMapInterface $firewallMap = null,
         private ?TraceableFirewallListener $firewall = null,
         private ?ImpersonateUrlGenerator $impersonateUrlGenerator = null,
+        private MermaidDumper $mermaidDumper = new MermaidDumper(),
     ) {
         $this->hasVarDumper = class_exists(ClassStub::class);
     }
@@ -104,7 +106,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 $impersonatorUser = $originalToken->getUserIdentifier();
             }
 
-            if (null !== $this->roleHierarchy) {
+            if ($this->roleHierarchy) {
                 foreach ($this->roleHierarchy->getReachableRoleNames($assignedRoles) as $role) {
                     if (!\in_array($role, $assignedRoles, true)) {
                         $inheritedRoles[] = $role;
@@ -235,6 +237,9 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
                 $this->data['auth_profile_token'] = null;
                 $response->headers->clearCookie($authCookieName);
             }
+        }
+        if ($this->roleHierarchy) {
+            $this->data['roles_diagram'] = $this->mermaidDumper->dump($this->roleHierarchy);
         }
     }
 
@@ -404,5 +409,10 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
     public function getName(): string
     {
         return 'security';
+    }
+
+    public function getRolesDiagram(): ?string
+    {
+        return $this->data['roles_diagram'] ?? null;
     }
 }

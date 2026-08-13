@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T16:45:42Z
+
+Sorry, this sat two years without a single reply. That is on us.
+
+I have rebased it on 8.2 and finished it. `getAllowedAttributes()` was restructured since by the wildcard fix (3759838b4a2), so the change is ported rather than replayed:
+
+* the exclusion is a separate condition, so ignored beats allowed whichever groups are requested;
+* the "no restriction" short-circuit at the end now also requires no ignored groups. Without that, passing only `IGNORED_GROUPS` returned `false` and every attribute was serialized, which your third test case covers;
+* added `AbstractNormalizerContextBuilder::withIgnoredGroups()`, which every other context option has, with a test;
+* moved the CHANGELOG entry to the 8.2 section and fixed the Branch row.
+
+Your tests apply unchanged and pass. Serializer is green (1430 tests), PropertyInfo too (662).
+
+One known limitation for reviewers: `SerializerExtractor::getProperties()` carries the twin of this check but is driven by its own `serializer_groups` context key, so it does not honour ignored groups. Adding that means introducing a `serializer_ignored_groups` key in PropertyInfo, which is a separate decision and out of scope here.

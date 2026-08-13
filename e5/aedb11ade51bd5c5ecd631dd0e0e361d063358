@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-05-01T10:09:11Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.3" but it seems your PR description refers to branch "7.3 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-01T10:20:41Z
+
+Please check fabbot.io CI
+
+---------------------------------------------------------------------------
+
+by camilleislasse at 2025-05-01T10:55:44Z
+
+> Can you please add a testcase where this block is used int he transport? Thanks
+
+How can I do that? Is there a similar test for another block that I could use as a reference?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-01T10:57:54Z
+
+Check the transport test, I am currently on a phone and cannot check
+
+---------------------------------------------------------------------------
+
+by camilleislasse at 2025-05-02T08:11:59Z
+
+> Check the transport test, I am currently on a phone and cannot check
+
+Something like [this](https://github.com/symfony/symfony/pull/60310/commits/5e6db9e47a840687aad674eb3ba624372cc32ec8)?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-02T20:35:19Z
+
+Yes
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T15:33:37Z
+
+Thanks for your patience, @camilleislasse. You did everything @OskarStark asked within a day back in May 2025, and then this sat for fifteen months.
+
+Rebased on 8.2 and pushed. The only conflict was the import block in `SlackTransportTest`. I also added the missing CHANGELOG entry for the Slack bridge, squashed the four commits into one, and set the header table to 8.2.
+
+The bridge is green at 77 tests, php-cs-fixer is clean on the changed files, and breaking the block's `type` locally fails both the unit test and the transport test @OskarStark asked for, so the coverage is real.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T16:05:58Z
+
+Pushed the two Fabbot fixes: the missing license header on `SlackPlainTextInputBlockTest`, and the redundant parentheses around `new SlackPlainTextInputBlock(...)` in the transport test. Still green at 77 tests.

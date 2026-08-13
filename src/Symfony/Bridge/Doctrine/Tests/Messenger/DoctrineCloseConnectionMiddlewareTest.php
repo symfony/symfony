@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineCloseConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
@@ -21,6 +23,8 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 {
     private MockObject&Connection $connection;

@@ -24,6 +24,11 @@ DoctrineBridge
  * `UniqueEntity` now throws a `ConstraintDefinitionException` when a checked field holds an array or is a to-many
    association and the default `findBy` repository method is used. Such fields were silently validated against a
    query that could not match. Use the `repositoryMethod` option to provide a method that can query them
+ * Deprecate `DoctrineCloseConnectionMiddleware` in favor of the new `DoctrineDbalCloseConnectionMiddleware`,
+   which targets DBAL connections instead of entity managers. Its first argument is a `ConnectionRegistry` instead
+   of a `ManagerRegistry`, and its second one takes connection names, either one or a list, instead of an entity
+   manager name. Passing no name now closes every DBAL connection, where the deprecated middleware closed the
+   connection of the default entity manager
 
 Form
 ----

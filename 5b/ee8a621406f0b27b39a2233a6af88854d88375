@@ -1,0 +1,182 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-10-15T19:31:24Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.4 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-10-18T07:05:21Z
+
+Branch rebased, commits squashed.
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-10-26T19:55:50Z
+
+Rebased. Still waiting for review
+
+---------------------------------------------------------------------------
+
+by GrzegorzDrozd at 2025-11-08T08:37:59Z
+
+Hi @Greg0 !
+
+Is there a chance for you to target 6.4?
+
+Thanks and have a good day!
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-11-08T10:18:09Z
+
+@GrzegorzDrozd AFAIR features can be proposed only for future releases. That one will target probably nearest v8.1
+
+7.4 and 8.0 are in RC stage
+
+---------------------------------------------------------------------------
+
+by GrzegorzDrozd at 2025-11-09T18:28:18Z
+
+> @GrzegorzDrozd AFAIR features can be proposed only for future releases. That one will target probably nearest v8.1
+>
+> 7.4 and 8.0 are in RC stage
+
+What if we threat this as a bug. In fact code prevents you from sending message using a fair queue mechanism.
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-11-09T19:01:55Z
+
+> > @GrzegorzDrozd AFAIR features can be proposed only for future releases. That one will target probably nearest v8.1
+> >
+> > 7.4 and 8.0 are in RC stage
+>
+> What if we threat this as a bug. In fact code prevents you from sending message using a fair queue mechanism.
+
+I would say code just not supports it instead of supporting it in wrong way (bug). AWS introduced that in Q2 2025 so it's new feature in SQS itself.
+
+Docs about contributing describes clearly what is what.
+I want and need that change in my daily work too 😊
+
+There is always possibility of forking messenger SQS lib and applying such changes in private scope.
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-11-27T20:53:47Z
+
+Symfony docs update
+https://github.com/symfony/symfony-docs/pull/21598
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-12-15T21:51:24Z
+
+> I'm wondering whether we should throw an exception when both the Fifo and Fair stamps are set instead of silently ignoring the Fair stamp.
+>
+> And the readme of the bridge should document that bridge-specific stamp (symfony-docs currently does not have dedicated documentation pages for each platform bridge)
+
+Would you like me to place change that will throw exception in that specific case? I do not have strong arguments to follow any of proposed paths (silent ignore or exception throwing). Exception make sense because it's not expected to use that both stamps and the same time.
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-12-17T22:14:05Z
+
+@stof Actually, after thinking about this more carefully, I believe keeping the silent precedence is the better approach.
+Here's why:
+The `AmazonSqsFifoStamp` is often added automatically by the transport layer when it detects a `.fifo` queue suffix (which is [forced by AWS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queue-message-identifiers.html#sqs-general-identifiers)). In multi-tenant applications, it's common to have middleware that could automatically add `AmazonSqsFairQueueStamp` globally to all messages for tenant isolation.
+
+This creates a practical conflict: if we throw an exception when both stamps are present, it would force developers to add complex conditional logic in their middleware to check queue types before adding the fair queue stamp. This is particularly problematic because:
+
+- Middleware typically doesn't have visibility into the transport configuration or queue naming
+- It would break the composability of stamps and middleware
+
+The current behavior (FIFO taking precedence) is actually the correct AWS behavior - FIFO queues already guarantee ordering and uses the same `MessageGroupId` attribute internally, so the fair queue stamp would be redundant anyway.
+
+If we want to be more explicit, we could:
+
+- Add a debug log when both stamps are present and FIFO takes precedence
+- Document this behavior clearly in the stamp's docblock
+
+But throwing an exception would make the feature harder to use in real-world scenarios where automatic stamp application is needed.
+
+What do you think?
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2025-12-17T22:31:09Z
+
+> And the readme of the bridge should document that bridge-specific stamp (symfony-docs currently does not have dedicated documentation pages for each platform bridge)
+
+@stof I've updated bridge readme
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2026-01-11T13:14:43Z
+
+@stof Share your thoughts, it's been a while
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-01-27T16:18:32Z
+
+> * Add a debug log when both stamps are present and FIFO takes precedence
+
+That sounds like a good idea.
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2026-02-04T15:22:03Z
+
+@stof still waiting for your input or any other symfony maintainer
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2026-03-27T07:23:22Z
+
+@stof I would appreciate if you could finish review
+
+---------------------------------------------------------------------------
+
+by Greg0 at 2026-05-06T17:19:19Z
+
+Great! It will be simplier to schedule that changes straight to symfony 9
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T17:18:10Z
+
+Thanks for your patience, @Greg0. You chased this five times over ten months and every review point was already addressed; that is on us, not on you.
+
+I implemented @GromNaN's suggestion, the debug log when both stamps are present, and pushed it rebased on 8.2. Your reasoning for keeping silent precedence over an exception stands: the FIFO stamp is often added by `AddFifoStampMiddleware` rather than written by the user, so throwing would fire on configurations nobody wrote. A debug log says the same thing without breaking anything.
+
+The logger reaches the sender without any new wiring: `AmazonSqsTransportFactory` already holds a `LoggerInterface` for `Connection`, so it now also passes it to `AmazonSqsTransport`, which hands it to `AmazonSqsSender`. Both are trailing optional arguments, so nothing breaks for anyone constructing these directly.
+
+Other changes while rebasing:
+
+ * the CHANGELOG entry moved from 7.4 to 8.2 and now names the new stamp rather than the feature in the abstract
+ * `testSendWithAmazonSqsFairQueueStampWontWorkAlongsideFifoStamp` now also asserts the log record, and removing the `debug()` call makes it fail
+ * squashed the five commits into one, and the header table says 8.2
+
+@stof's points are all in from your earlier rounds, including the AWS links moved inline into the stamp descriptions. The bridge is green at 97 tests.

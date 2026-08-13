@@ -82,6 +82,21 @@ class MandrillApiTransportTest extends TestCase
         $this->assertArrayNotHasKey('headers', $payload['message']);
     }
 
+    public function testReturnPathDomainHeaderIsAddedToPayload()
+    {
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('X-MC-ReturnPathDomain', 'foo-bar');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('return_path_domain', $payload['message']);
+        $this->assertEquals('foo-bar', $payload['message']['return_path_domain']);
+        $this->assertArrayNotHasKey('headers', $payload['message']);
+    }
+
     public function testSend()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {

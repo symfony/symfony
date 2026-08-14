@@ -429,7 +429,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             return $this->appendNode($parentNode, $data, $format, $context, 'data');
         }
 
-        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : get_resource_type($data).' resource'));
+        throw new NotEncodableValueException('An unexpected value could not be serialized: '.(!\is_resource($data) ? var_export($data, true) : '"'.get_resource_type($data).'" resource'));
     }
 
     /**

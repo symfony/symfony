@@ -436,6 +436,27 @@ class StdinBufferTest extends TestCase
         $this->assertSame(['B'], $sequences, 'Buffer should accept new input after abort');
     }
 
+    public function testUnterminatedPasteAbortsAtCapWhenEveryWriteEndsWithAPartialEndMarker()
+    {
+        $buffer = new StdinBuffer();
+        $pastes = [];
+
+        $buffer->onData(static function (string $data) {});
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        $buffer->process("\x1b[200~");
+
+        // A lone ESC is a one-byte prefix of "\x1b[201~", so it gets held back
+        // for the next read instead of being appended to the content. The cap
+        // has to be enforced on that path too, or a writer that ends every
+        // chunk this way never reaches it and the buffer grows unbounded.
+        for ($i = 0; $i < 24 && !$pastes; ++$i) {
+            $buffer->process(str_repeat('A', 1024 * 1024)."\x1b");
+        }
+
+        $this->assertSame(['[paste exceeded 16 MiB limit]'], $pastes);
+    }
+
     public function testUnterminatedOscAbortsAtCap()
     {
         $buffer = new StdinBuffer();

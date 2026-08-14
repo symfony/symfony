@@ -1,0 +1,281 @@
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-12-18T19:32:27Z
+
+Not sure about the xml conf, advices welcome!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-12-19T08:04:55Z
+
+Can you please rebase on 6.3 since this is a bugfix?
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-12-19T08:41:05Z
+
+Rebased on 6.3!
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-12-19T10:14:13Z
+
+Edit: Edit: Still got a problem with the way base uris are defined.
+Configuration-wise the proposed changes seem to work. But not in the field.
+
+On a fresh install in 6.3:
+```yaml
+# config/packages/framework.yaml
+    http_client:
+        scoped_clients:
+            test_client:
+                base_uri:
+                    - 'https://jsonplaceholder.typicode.com/'
+                    - 'https://jsonplaceholder.typicode.com/'
+                retry_failed:
+                    max_retries: 3
+```
+```php
+// in any controller
+    #[Route('/', name: 'app_client')]
+    public function index(HttpClientInterface $testClient): Response
+    {
+        dump($testClient->request('GET', '/posts/1')->toArray());
+        // ...
+    }
+```
+
+Results in a `TypeError: Symfony\Component\HttpClient\ScopingHttpClient::forBaseUri(): Argument #2 ($baseUri) must be of type string, array given` since the `base_uri` are passed when creating the `ScopingHttpClient` and not the `RetryableHttpClient`.
+
+Any thought on how to do this? Conditional definition for both seems the most straightforward way, but I'm not sure about that
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2023-12-19T12:13:20Z
+
+Made an attempt just as a discussion base. Works as is, but maybe there's a better way to do it or some constraints I haven't tought about.
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-04-23T10:08:25Z
+
+Hey there!
+
+Sorry for the ping, I know it's been a while, but could I interest you back in a review around here? @nicolas-grekas maybe, or someone else? This was asked in an issue so maybe we should look into it.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-04-24T08:30:52Z
+
+In the meantime it needs to be rebased on 6.4 please
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-04-25T15:00:34Z
+
+Okay there have been obviously a huge mistake on my part here... Fixing asap.
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-04-25T15:01:41Z
+
+Seems okay with the right destination branch. Sorry for the spam!
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-04-29T08:43:09Z
+
+Test failures seem unrelated here, but any advice would be welcome!
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-05-31T14:34:05Z
+
+Hey there!
+
+Bumping this, as it's still a missing feature. Should I create a new PR to get back in the recent ones?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-21T15:07:01Z
+
+Hi @Tiriel, thanks for your patience.
+I think I changed my mind on the topic: this looks like a new feature to me.
+To built on this idea, I'm wondering if it wouldn't make more sense to allow a new `base_uris` option under `retry_failed`.
+That would make everything simpler I think.
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-08-22T12:23:12Z
+
+> Hi @Tiriel, thanks for your patience. I think I changed my mind on the topic: this looks like a new feature to me.
+
+That's no problem to me, I'll go and change the PR description!
+
+> To built on this idea, I'm wondering if it wouldn't make more sense to allow a new `base_uris` option under `retry_failed`. That would make everything simpler I think.
+
+Not sure about that though. I don't know if it's a better idea or not, but I'm not sure about what we should priorize:
+* consistency (keep the `base_uri` option where it is already defined for the scoped clients)
+* intent behind the change (allow to try multiple uris in case of retry)
+
+Both seem to have pros and cons to me, but ultimately I'll get behind the majority advice (or your, if there not much debate ;) )
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-08-22T12:24:03Z
+
+Also going to rebase and target the latest branch asap
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-22T12:32:07Z
+
+I think `base_uris` under `retry_strategy` is more flexible as it allows using `scope` on top to control how scoped clients behave
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-08-22T12:41:34Z
+
+Then how do we deal with the `base_uri` option under each scoped client? Unless I miss something, it would be possible to define a `base_uri` in a scope client and an array of `base_uris` in the `retry_strategy`.
+
+I see four possibilities:
+* adding a `base_uri` under the scoped client and an array of `base_uris` in the retry strategy is blocked, raising an exception
+* adding a `base_uri` under the scoped client and an array of `base_uris` in the retry strategy is *not* blocked, base uri from scoped client is kept
+* adding a `base_uri` under the scoped client and an array of `base_uris` in the retry strategy is *not* blocked, base uris from retry strategy are kept
+* adding a `base_uri` under the scoped client and an array of `base_uris` in the retry strategy is *not* blocked, base uri from scoped client is merged inside the array
+
+Personnally, I think the first option (blocking) or the last (merging) are the best, with a preference for the blocking.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-22T12:48:32Z
+
+I would merge them: the base_uri is prepended to base_uris if any.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-22T12:52:58Z
+
+Hum, actually no: we'd need to make setting both `base_uri` and `base_uris` conflict, and we'd then need to compute a regular expression that "`|`" all `base_uris` so that scoped clients accepts them all in its scope (unless `scope` is set).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-08-22T12:55:25Z
+
+Alternatively, if we keep base_uri as allowing an array, we could make defining a `retry_strategy` optional (and auto-enable it then).
+We also need to allow setting both a `scope` and an array of `base_uris` for completeness (both options are exclusive at the moment).
+
+WDYT?
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2024-08-26T09:14:48Z
+
+> Alternatively, if we keep base_uri as allowing an array, we could make defining a `retry_strategy` optional (and auto-enable it then).
+
+This seems like a better option to me, a bit more friendly to use
+
+> We also need to allow setting both a `scope` and an array of `base_uris` for completeness (both options are exclusive at the moment).
+
+This seems a bit redundant. IIRC, `scope` makes the configuration active only on uris matching the scope. So if you set an array of base uris and the scope, the scope will simply be active on every call since the base uris matching the scope will be prepended to each call.
+
+In this case, I haven't looked at feasability yet, but maybe we could have a unified `scope`/`base_uri` option, working differently depending on the actual call you make: when calling `request`, if you pass a full uri with scheme/host, it works as scope, and if you pass a path, it prepends the base uri.
+
+Seems a lot of work though, and not necessarily on the scope of this PR.
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2026-03-26T16:41:10Z
+
+@nicolas-grekas just rebased, so we can start looking at this again. Will get back to it soon!
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2026-04-02T09:02:58Z
+
+Not sure about the CI failings here. The transport exception doesn't seem related to this PR bu maybe I'm missing something
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-27T03:34:06Z
+
+Reviewed, rebased onto the current 8.2 and reworked. Thanks @Tiriel, and sorry for the very long wait.
+
+The config node was only half the problem. As submitted, the option compiled into the container and did nothing at runtime for scoped clients, which is the only place it could be set. `ScopingHttpClient::request()` resolves the URL against the scope base URI and then `unset($options["base_uri"])`, so the retryable client, sitting below it at priority 25, received an absolute URL and no base URI. `shiftBaseUri()` had nothing to act on and every attempt went to the same host.
+
+I could not see this from the tests because they assert on the service definition: the class, `getArgument(2)` and the method call. Those pass whether or not the feature works. A functional test recording the URLs that reach the transport shows it plainly:
+
+```
+-    1 => "GET https://b.example.com/posts/1"
++    1 => "GET https://a.example.com/posts/1"
+```
+
+So the retryable client is now decorated at priority 12 instead of 25 when `base_uris` is set, which puts it outside the scoping client. It sees the relative URL, injects a string base URI per attempt, and scoping resolves it as usual. The reorder is conditional on purpose: it exists only to serve this feature, so nobody else should pay for it. I dumped and diffed a container built from the existing `http_client_retry` fixture before and after, and it is byte identical.
+
+@nicolas-grekas, the caching question you would have hit: at 12 the retryable client is also outside `CachingHttpClient` at 20, so retries re-enter the cache. I think that is fine and slightly better. Retries only happen after a failure, failures are not cached, and a rotated URI has a different cache key, so a retry misses and reaches the transport just as before. A cache hit also stops paying for the `AsyncResponse` retry machinery. It is noted in the PR body.
+
+Your strings-only request from December 2023, restated by @javiereguiluz, is applied: the prototype is a `stringPrototype()` that cannot be empty. I dropped the `fixXmlConfig` singular alias, since XML bundle configuration no longer exists on 8.2 and it only reintroduced the `base_uri` / `base_uris` confusion.
+
+Three configurations that used to be accepted silently are now rejected: `base_uris` without a `scope`, which is your point about the scope regexp no longer matching once the host rotates; `base_uris` with retries disabled; and `base_uris` with a single entry, which `shiftBaseUri()` degrades to a plain base URI.
+
+Also fixed: the default client never received the list. Only the scoped call site passed it, so `default_options.retry_failed.base_uris` validated, compiled to `withOptions(["base_uri" => []])`, and did nothing, in the one place where the mechanism would have worked without any reordering.
+
+Finally I dropped three changes that were unrelated to the goal and changed the container for existing setups: the unconditional `withOptions` call, which made every retryable client clone its whole inner chain for an empty array; the `http_client.client` tag on the scoping service, which made the profiler list those clients twice; and the `array_filter` replacing `unset($scopeConfig["base_uri"])`, which leaked a `base_uri` default option into `CachingHttpClient`.
+
+Local runs: FrameworkBundle 1403 green. HttpClient shows the usual Vulcain and pause-timing failures on this machine, which also fail on a clean 8.2 and which this diff cannot reach, since it touches no file in that component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-27T04:34:45Z
+
+Updated: the scope is now derived from the URIs rather than hand-written, which is what @nicolas-grekas suggested back in August 2024.
+
+The previous revision required an explicit `scope` alongside `base_uris`, because the regexp `forBaseUri()` derives from a single URI stops matching once the host rotates, and the scoped options would silently stop applying on the fallback host. Requiring the regexp was the conservative half of the answer; deriving it is the right one, and it also keeps the two from drifting apart when someone adds a URI to the list.
+
+That needs a factory in the component rather than a `preg_quote` in the extension. The derivation is `resolveUrl(parseUrl("."), parseUrl($baseUri))`, which resolves `.` against the base and therefore drops the last path segment, and both helpers are private to `HttpClientTrait`. A naive version is wrong for any base URI carrying a path, and does not even match the base URI itself:
+
+```
+https://a.example.com/v1/api   derived: https\://a\.example\.com/v1/
+                                naive: https\://a\.example\.com/v1/api/
+```
+
+So `ScopingHttpClient::forBaseUris()` joins the derived prefixes with `|`, uses the first URI as the default `base_uri`, and is covered by three unit tests in the component, including one asserting that an unlisted host is out of scope.
+
+The config semantics shifted with it. `base_uris` now lists the URIs to fall back to **after** `base_uri`, instead of being the complete rotation list, so the primary host is no longer written twice. The effective list is `[base_uri, ...base_uris]` and both the scoping and the retryable client are given that same union. The `scope`-is-required rule is gone; a `base_uri` is required instead, which the scoped client config already effectively demanded.
+
+The functional test now also proves the scope part, which is the bit the earlier revision got silently wrong:
+
+```
+GET https://a.example.com/posts/1 X-Scoped: yes
+GET https://b.example.com/posts/1 X-Scoped: yes
+```
+
+With `forBaseUri()` in place of `forBaseUris()`, the header disappears from the second line while the rotation still happens.
+
+FrameworkBundle now requires HttpClient 8.2 for the new factory, added as a `conflict` entry since http-client is a require-dev here, matching the `symfony/workflow` precedent in the same block.
+
+Container for an existing `retry_failed` configuration is still byte identical, re-checked after these changes. Local runs: ScopingHttpClient 11, FrameworkBundle DI 514, functional HttpClient 5, all green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T07:43:41Z
+
+Rebased onto the current 8.2 and re-reviewed. Thanks for your patience, @Tiriel.
+
+Two things I checked rather than assumed, since both looked risky:
+
+**The scope alternation is safe.** `forBaseUris()` joins `preg_quote()`d URIs with `|`, and the match is `preg_match("{{$regexp}}A", $url)`. The `A` modifier anchors every alternative, not just the first, so a crafted URL cannot widen the scope:
+
+```
+https://a.example.com/x                  => 1
+https://b.example.com/x                  => 1
+https://evil.com/https://b.example.com/x => 0
+```
+
+**The priority drop from 25 to 12 does what its comment says.** `DecoratorServicePass` feeds an `SplPriorityQueue`, which yields the highest priority first, so the highest priority is the innermost decorator. 12 therefore places `RetryableHttpClient` outside `ScopingHttpClient` (15), which is what makes the rotated base URI survive scoping.
+
+One consequence that was not written down: 12 also places it outside `CachingHttpClient` (20), so for clients using `base_uris`, retries now wrap the cache rather than sitting inside it, and a retried request can be served from cache. That looks right to me, retrying the whole cached operation rather than only the transport, but it is a behaviour change beyond scoping and worth being explicit about. I extended the decorator-ordering comment in `FrameworkExtension` to record the conditional priority.
+
+Verified: `ScopingHttpClientTest` and the new functional `HttpClientTest` green at 16, FrameworkBundle DI green at 578, PHPStan clean on `ScopingHttpClient`. Restricting the alternation to the first URI fails two of those tests, so the multi-URI scope is covered rather than incidental.
+
+The changelog entries moved to the 8.2 sections of both packages after the rebase.

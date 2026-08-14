@@ -1,0 +1,124 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-09-17T17:02:38Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-09-18T08:24:35Z
+
+Thanks for looking into this topic.
+I'm wondering about two things:
+- what's the perf improvement? aka is this providing measurable benefits?
+- shouldn't we turn this into a new adapter? Like we have Redis and RedisTagAware adapter?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2024-09-18T08:49:51Z
+
+> what's the perf improvement? aka is this providing measurable benefits?
+
+The problem as far as I could see (feel free to double-check and correct) is that the only alternative for this use case would be the general `TagAwareAdapter`. So `new TagAwareAdapter(new PdoAdapter())`.
+The performance problem in the `TagAwareAdapter` comes from the fact that it keeps versions of the cache tags and thus they have to be checked on every cache item lookup (see `TagAwareAdapter::getTagVersions()`). So if you have a cache setup that works with a lot of cache invalidation, the `TagAwareAdapter` becomes rather unsuitable as for every cache lookup, it has to check quite a few tag versions. Adding native tagging support to the `PdoAdapter` can fix this.
+
+> shouldn't we turn this into a new adapter? Like we have Redis and RedisTagAware adapter?
+
+Hmm, I guess we could. It would make the PR a bit more bloated because I guess we'd also follow the Redis schema and extract common logic into a `PdoTrait`?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2024-09-18T16:52:26Z
+
+@nicolas-grekas like this? Not sure how to best fix the remaining Psalm issue. It's the same in all other cache adapters as far as I could see but the baseline protects those. But yes, in theory `$failed` could be `null`.
+
+---------------------------------------------------------------------------
+
+by bendavies at 2024-11-25T18:05:13Z
+
+was looking for this exact feature. thanks @Toflar.
+what needs doing here?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2024-11-25T18:16:16Z
+
+Well I have incorporated the requested changes and then never heard back regarding the Psalm issue. I have rebased onto 7.3 now which is about all I can do I guess 😊 Failed 8.4 tests are unrelated.
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-09-03T03:31:02Z
+
+Any plans to merge? Or may be @Toflar will close the PR?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2025-09-03T11:04:32Z
+
+Nothing has changed, I still think it's a valuable addition.
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-09-04T04:42:59Z
+
+@Toflar can you resolve conflicts and fix tests?
+
+---------------------------------------------------------------------------
+
+by Toflar at 2025-09-04T09:34:12Z
+
+PHP 8.5 failures: unrelated
+Psalm issue: No idea what causes this failure
+Windows test: unrelated
+
+Rebased and adjusted all the attributes in tests etc. so we're back to square 1 😊
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-09-05T02:51:22Z
+
+@OskarStark  @nicolas-grekas can you look into PR, please?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2025-12-03T13:20:26Z
+
+still awaiting review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T20:22:20Z
+
+Thanks for your patience @Toflar. Reviewed, rebased on 8.2 and reworked, keeping your design: a dedicated tags table, and `TAGS_PREFIX` made overridable so this adapter stores bare tag names, with a docblock stating the redeclare-orphans-existing-entries caveat.
+
+Beyond the rebase, four things needed fixing:
+
+**The tags table could not be created on pgsql, sqlsrv and oci.** The DDL was missing the closing parenthesis of `PRIMARY KEY(...)` before the `;CREATE INDEX`:
+
+```sql
+... PRIMARY KEY(item_id, item_tag);CREATE INDEX ...   -- unbalanced
+```
+
+Only sqlite and mysql had valid DDL, which matches what CI can exercise. While fixing it I also made `createTagsTable()` run the statements one by one: Oracle rejects `;`-separated batches outright, and pdo_sqlite silently ignores everything after the first statement, so on sqlite the tag index was never actually created. Verified on a real sqlite database that both tables and the index now exist, and that `invalidateTags()` removes exactly the tagged items.
+
+**`PdoTrait` was extracted from a year-old copy of `PdoAdapter`.** Three fixes had landed upstream in the meantime and were silently lost by the move; they are re-applied to the trait: the mysql `ENGINE` declaration fix (c4c9008f21f), escaping of `_` in the namespace `LIKE` of `clear()` (33a48d0fc3a), and the sqlsrv VARBINARY stream binding (af745d416b4).
+
+**The mysql tags-table DDL carried the same stray `COLLATE utf8mb4_bin,` clause** that c4c9008f21f removed from the items table; dropped for consistency.
+
+**Squashed and updated the metadata**: single commit under your authorship, header table now says 8.2.
+
+Cache is green at 5783 adapter tests locally (sqlite; the other drivers skip without a server), and the whole diff stays inside the Cache component. Worth an integration run against pgsql and sqlsrv before merge, since exactly those drivers had the broken DDL.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T20:34:19Z
+
+FrameworkBundle wiring is in #65351, stacked on this branch: `cache.adapter.pdo_tag_aware`, handled like `cache.adapter.redis_tag_aware` including the skip of the `TagAwareAdapter` wrapping. Merge this one first.

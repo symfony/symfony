@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by norkunas at 2023-06-21T14:10:15Z
+
+would be nice to push this forward.
+
+---------------------------------------------------------------------------
+
+by misterxan at 2024-04-26T08:25:48Z
+
+@plfort can you resolve conflict? We really need this functionality and it would be cool to merge this, thanks in advance!
+
+---------------------------------------------------------------------------
+
+by plfort at 2024-07-17T13:45:17Z
+
+Rebased on 7.2
+Does everything look OK ? @nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T13:44:53Z
+
+Thanks for your patience @plfort, and sorry it took so long to answer your question from July 2024. The feature is wanted, all seven review threads are resolved, so @artyuum's change request is stale.
+
+I rebased on 8.2, squashed the eleven commits into one and pushed. Two things needed fixing, both from the branch having aged rather than from the original work.
+
+**The `is_array()` guard had to be widened, not removed.** The branch dropped it:
+
+```php
+-if ($fields && !(\is_array($element) && $element = $this->reduceElementKeys($fields, $element))) {
++if ($fields && !$element = $this->reduceElementKeys($fields, $element)) {
+```
+
+That guard came from fced6c7bb77, which fixed a `TypeError` for non-array items such as `''`, `1` and `null` when `fields` is set. Removing it brings that back, and the branch also carried an older copy of the test file that no longer had `getValidCollectionValues`, the regression test for exactly that case, so CI could not have caught it. It is now:
+
+```php
+if ($fields && !((\is_array($element) || \is_object($element)) && $element = $this->reduceElementKeys($fields, $element))) {
+```
+
+**`getPropertyAccessor()` returned the concrete class.** The constructor accepts `PropertyAccessorInterface`, so injecting any decorator that implements the interface without extending `PropertyAccessor` threw:
+
+> TypeError: UniqueValidator::getPropertyAccessor(): Return value must be of type PropertyAccessor, PropertyAccessorInterface@anonymous returned
+
+It returns the interface now, matching `AbstractComparisonValidator`.
+
+The test file had moved to `#[DataProvider]` attributes and the `validate()` helper of `ConstraintValidatorTestCase`, so I ported your cases onto the current file rather than restoring the old one. Your coverage is all there: public field, private field with a getter, property path, and mixed objects and arrays, on both the valid and the invalid provider.
+
+Validator is green at 5294 tests, and reverting `UniqueValidator.php` fails 5 of the new cases.

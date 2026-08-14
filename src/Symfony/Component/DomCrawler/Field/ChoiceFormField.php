@@ -71,6 +71,62 @@ class ChoiceFormField extends FormField
     }
 
     /**
+     * Selects an option by its visible text content.
+     *
+     * The match is case-sensitive and performed after collapsing ASCII
+     * whitespace sequences in both the input and the option text. The
+     * `label` attribute of <option> elements is not honored; only the
+     * textual content is considered.
+     *
+     * When several options share the same text, the first one wins.
+     * Disabled options remain selectable, mirroring select().
+     *
+     * For `<select multiple>`, an array of texts can be passed to select
+     * several options at once.
+     *
+     * @see self::normalizeWhitespace()
+     *
+     * @throws \LogicException           When the field is not a select
+     * @throws \InvalidArgumentException When no option matches the given text
+     */
+    public function selectByText(string|array $text): void
+    {
+        if ('select' !== $this->type) {
+            throw new \LogicException(\sprintf('You cannot call selectByText() on "%s" as it is not a select (%s).', $this->name, $this->type));
+        }
+
+        $texts = (array) $text;
+        $values = [];
+        foreach ($texts as $needle) {
+            $values[] = $this->resolveTextToValue($needle);
+        }
+
+        $this->setValue(\is_array($text) ? $values : $values[0]);
+    }
+
+    /**
+     * Collapses sequences of HTML5 ASCII whitespace into a single space and trims the result,
+     * the same way Crawler::text() does, so the text passed by the caller matches what a user
+     * sees. Non-ASCII whitespace, e.g. U+00A0 or U+2028, is left untouched.
+     */
+    private static function normalizeWhitespace(string $string): string
+    {
+        return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $string), " \n\r\t\x0C");
+    }
+
+    private function resolveTextToValue(string $text): string
+    {
+        $needle = self::normalizeWhitespace($text);
+        foreach ($this->options as $option) {
+            if ($option['text'] === $needle) {
+                return $option['value'];
+            }
+        }
+
+        throw new \InvalidArgumentException(\sprintf('Input "%s" has no option with text "%s" (possible texts: "%s").', $this->name, $text, implode('", "', array_column($this->options, 'text'))));
+    }
+
+    /**
      * Ticks a checkbox.
      *
      * @throws \LogicException When the type provided is not correct
@@ -241,7 +297,7 @@ class ChoiceFormField extends FormField
     }
 
     /**
-     * Returns option value with associated disabled flag.
+     * Returns option value, normalized text content and disabled flag.
      */
     private function buildOptionValue(\DOMElement $node): array
     {
@@ -250,6 +306,7 @@ class ChoiceFormField extends FormField
         $defaultDefaultValue = 'select' === $this->node->nodeName ? '' : 'on';
         $defaultValue = (isset($node->nodeValue) && $node->nodeValue) ? $node->nodeValue : $defaultDefaultValue;
         $option['value'] = $node->hasAttribute('value') ? $node->getAttribute('value') : $defaultValue;
+        $option['text'] = self::normalizeWhitespace($node->nodeValue);
         $option['disabled'] = $node->hasAttribute('disabled');
 
         return $option;

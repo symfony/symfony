@@ -815,8 +815,8 @@ final class KeyParser
             $codepoint = \ord($key);
             $rawCtrl = $this->rawCtrlChar($key);
 
-            if ($ctrl && $alt && !$shift && !$this->kittyProtocolActive && null !== $rawCtrl) {
-                return "\x1b".$rawCtrl === $data;
+            if ($ctrl && $alt && !$shift && !$this->kittyProtocolActive && null !== $rawCtrl && "\x1b".$rawCtrl === $data) {
+                return true;
             }
 
             if ($alt && !$ctrl && !$shift && !$this->kittyProtocolActive && (($key >= 'a' && $key <= 'z') || $isDigit)) {

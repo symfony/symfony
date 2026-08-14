@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class ResponseHeaderSame extends Constraint
 {
+    private ?string $actualValue = null;
+
     public function __construct(
         private string $headerName,
         private string $expectedValue,
@@ -32,7 +34,9 @@ final class ResponseHeaderSame extends Constraint
      */
     protected function matches($response): bool
     {
-        return $this->expectedValue === $response->headers->get($this->headerName, null);
+        $this->actualValue = $response->headers->get($this->headerName, null);
+
+        return $this->expectedValue === $this->actualValue;
     }
 
     /**
@@ -40,6 +44,17 @@ final class ResponseHeaderSame extends Constraint
      */
     protected function failureDescription($response): string
     {
-        return 'the Response '.$this->toString();
+        $description = 'the Response '.$this->toString();
+
+        if (null === $this->actualValue) {
+            return $description.\sprintf(', header "%s" is not set', $this->headerName);
+        }
+
+        // nothing to add when both values match, which is the case when the assertion is negated
+        if ($this->expectedValue !== $this->actualValue) {
+            $description .= \sprintf(', value of header "%s" is "%s"', $this->headerName, $this->actualValue);
+        }
+
+        return $description;
     }
 }

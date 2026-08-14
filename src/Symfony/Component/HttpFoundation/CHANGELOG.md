@@ -11,6 +11,7 @@ CHANGELOG
  * Add `ParameterBag::filterCallback()` to filter a parameter value through a callback
  * Reject a `Cookie` whose name uses the `__Secure-`/`__Host-` prefix when its attributes break the prefix contract
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore
+ * Report the actual header value when the `ResponseHeaderSame` constraint fails
 
 8.1
 ---

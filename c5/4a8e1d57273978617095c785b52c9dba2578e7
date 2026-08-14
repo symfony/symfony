@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T13:54:49Z
+
+Argument order and the `UPGRADE-8.2.md` merge look good to me. A few things:
+
+1. `$this->isHandling = true` is set before `getConnections()`, which sits outside the `try`/`finally` that resets it. When it throws (unknown name, non-DBAL connection) the flag stays true, so every later message takes the re-entrancy early return and the middleware silently stops logging for the rest of the worker's life. Setting the flag after the two resolution lines fixes it.
+
+2. The `DoctrineDbalCloseConnectionMiddleware` changes look out of scope here. Moving `getConnections()` into the `finally` also means a misconfigured name now fails after the handler ran, and an exception coming from the handler is demoted to `previous` while `UnrecoverableMessageHandlingException` surfaces, which Messenger will not retry. I would drop that hunk, docblock removal included.
+
+3. `@param list<string>|string $connectionNames or none to close them all` is copied from the close middleware; this one does not close anything.
+
+4. Worth covering the default "no names, every connection" path, since that is the headline change in the upgrade note, plus the case where no transaction is left open.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-14T14:02:31Z
+
+> docblock removal
+
+Does that include `@author`?
+
+Also documenting that `DoctrineDbalCloseConnectionMiddleware` closes connections seems redundant to me which is why I dropped it.
+
+Other points were addressed, thanks for the review as always!

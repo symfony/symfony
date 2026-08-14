@@ -640,7 +640,9 @@ final class AnsiUtils
                     foreach ($graphemes as $grapheme) {
                         $w = "\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme);
                         if ($currentCol + $w > $length) {
-                            break;
+                            // Breaking would leave the outer scan running and let a later
+                            // segment contribute columns the prefix never reached.
+                            return $result;
                         }
                         $result .= $grapheme;
                         $currentCol += $w;

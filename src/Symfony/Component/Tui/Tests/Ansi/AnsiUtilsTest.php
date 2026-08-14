@@ -566,4 +566,26 @@ class AnsiUtilsTest extends TestCase
         // A tab is never split, so the result stops below the limit here.
         $this->assertSame(4, AnsiUtils::visibleWidth(AnsiUtils::truncateToWidth("\tx\t\t", 6, '')));
     }
+
+    public function testSliceByColumnStopsAtAWideCharacterInsteadOfTakingLaterColumns()
+    {
+        // "東" occupies columns 1-2, "京" columns 3-4, the space column 5.
+        // Neither wide character can be split, so the slice stops before it
+        // instead of skipping it and pulling in a character further right.
+        $line = "\x1b[31m東京\x1b[0m OK";
+
+        $this->assertSame("\x1b[31m", AnsiUtils::sliceByColumn($line, 0, 1));
+        $this->assertSame("\x1b[31m東", AnsiUtils::sliceByColumn($line, 0, 2));
+        $this->assertSame("\x1b[31m東", AnsiUtils::sliceByColumn($line, 0, 3));
+        $this->assertSame("\x1b[31m東京", AnsiUtils::sliceByColumn($line, 0, 4));
+        $this->assertSame("\x1b[31m東京\x1b[0m ", AnsiUtils::sliceByColumn($line, 0, 5));
+        $this->assertSame("\x1b[31m東京\x1b[0m O", AnsiUtils::sliceByColumn($line, 0, 6));
+    }
+
+    public function testTruncateToWidthDoesNotPullInCharactersPastAWideCharacter()
+    {
+        // Truncating "東京 OK" to 4 columns keeps "東" and drops the rest;
+        // the space at column 5 must not surface where "京" was dropped.
+        $this->assertSame("\x1b[31m東\x1b[0m…", AnsiUtils::truncateToWidth("\x1b[31m東京\x1b[0m OK", 4, '…'));
+    }
 }

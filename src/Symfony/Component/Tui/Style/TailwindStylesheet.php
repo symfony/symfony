@@ -392,8 +392,11 @@ class TailwindStylesheet extends StyleSheet
      */
     private function parseColorValue(string $value): Color|string|int|null
     {
-        // Bracket syntax for arbitrary hex: [#ff5500]
-        if (preg_match('/^\[#([0-9a-fA-F]{3,6})]$/', $value, $m)) {
+        // Bracket syntax for arbitrary hex: [#ff5500], [#f50].
+        // Only the two lengths Color::hex() accepts: matching 4 or 5 digits here
+        // hands it a value it rejects, turning a typo into an exception while
+        // every other unparsable value is ignored.
+        if (preg_match('/^\[#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})]$/', $value, $m)) {
             return '#'.$m[1];
         }
 

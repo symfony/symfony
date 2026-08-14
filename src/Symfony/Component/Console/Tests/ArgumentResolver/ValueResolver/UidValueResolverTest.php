@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\UidValueResolver;
 use Symfony\Component\Console\Attribute\Argument;
@@ -28,10 +29,10 @@ use Symfony\Component\Uid\UuidV4;
 
 class UidValueResolverTest extends TestCase
 {
-    public function testResolveUuidArgument()
+    #[DataProvider('provideUuid')]
+    public function testResolveUuidArgument(string $uuid)
     {
         $resolver = new UidValueResolver();
-        $uuid = '550e8400-e29b-41d4-a716-446655440000';
 
         $input = new ArrayInput(['id' => $uuid], new InputDefinition([
             new InputArgument('id'),
@@ -52,13 +53,13 @@ class UidValueResolverTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertInstanceOf(Uuid::class, $result[0]);
-        $this->assertSame($uuid, (string) $result[0]);
+        $this->assertSame('550e8400-e29b-41d4-a716-446655440000', (string) $result[0]);
     }
 
-    public function testResolveUlidArgument()
+    #[DataProvider('provideUlid')]
+    public function testResolveUlidArgument(string $ulid)
     {
         $resolver = new UidValueResolver();
-        $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
 
         $input = new ArrayInput(['id' => $ulid], new InputDefinition([
             new InputArgument('id'),
@@ -79,13 +80,13 @@ class UidValueResolverTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertInstanceOf(Ulid::class, $result[0]);
-        $this->assertSame($ulid, (string) $result[0]);
+        $this->assertSame('01ARZ3NDEKTSV4RRFFQ69G5FAV', (string) $result[0]);
     }
 
-    public function testResolveUuidOption()
+    #[DataProvider('provideUuid')]
+    public function testResolveUuidOption(string $uuid)
     {
         $resolver = new UidValueResolver();
-        $uuid = '550e8400-e29b-41d4-a716-446655440000';
 
         $input = new ArrayInput(['--id' => $uuid], new InputDefinition([
             new InputOption('id', null, InputOption::VALUE_REQUIRED),
@@ -106,7 +107,34 @@ class UidValueResolverTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertInstanceOf(Uuid::class, $result[0]);
-        $this->assertSame($uuid, (string) $result[0]);
+        $this->assertSame('550e8400-e29b-41d4-a716-446655440000', (string) $result[0]);
+    }
+
+    #[DataProvider('provideUlid')]
+    public function testResolveUlidOption(string $ulid)
+    {
+        $resolver = new UidValueResolver();
+
+        $input = new ArrayInput(['--id' => $ulid], new InputDefinition([
+            new InputOption('id', null, InputOption::VALUE_REQUIRED),
+        ]));
+
+        $command = new class {
+            public function __invoke(
+                #[Option]
+                ?Ulid $id = null,
+            ) {
+            }
+        };
+        $reflection = new \ReflectionMethod($command, '__invoke');
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $result = iterator_to_array($resolver->resolve('id', $input, $member));
+
+        $this->assertCount(1, $result);
+        $this->assertInstanceOf(Ulid::class, $result[0]);
+        $this->assertSame('01ARZ3NDEKTSV4RRFFQ69G5FAV', (string) $result[0]);
     }
 
     public function testArgumentThrowsOnInvalidUid()
@@ -249,5 +277,21 @@ class UidValueResolverTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertInstanceOf(UuidV4::class, $result[0]);
+    }
+
+    public static function provideUuid(): iterable
+    {
+        yield 'Binary' => ["\x55\x0E\x84\x00\xE2\x9B\x41\xD4\xA7\x16\x44\x66\x55\x44\x00\x00"];
+        yield 'Base 32' => ['2N1T201RMV87AAE5J4CSAM8000'];
+        yield 'Base 58' => ['BWBeN28Vb7cMEx7Ym8AUzs'];
+        yield 'RFC 4122/9562' => ['550e8400-e29b-41d4-a716-446655440000'];
+    }
+
+    public static function provideUlid()
+    {
+        yield 'Binary' => ["\x01\x56\x3E\x3A\xB5\xD3\xD6\x76\x4C\x61\xEF\xB9\x93\x02\xBD\x5B"];
+        yield 'Base 32' => ['01ARZ3NDEKTSV4RRFFQ69G5FAV'];
+        yield 'Base 58' => ['1AaLyDYFxmKZxXbNo18znE'];
+        yield 'RFC 4122/9562' => ['01563e3a-b5d3-d676-4c61-efb99302bd5b'];
     }
 }

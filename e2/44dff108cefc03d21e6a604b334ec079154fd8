@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T08:09:44Z
+
+Recap, replacing my earlier notes.
+
+Correctness looks good: suite green, and fuzzing 400 random trees x 14 frames against 8.2 gives byte-identical renderer output and identical screen state. Byte volume and write count to the terminal are unchanged too.
+
+Performance, real terminal at 202x61:
+
+| case | 8.2 | PR |
+| --- | --- | --- |
+| deep tree, 16 levels of layout containers | 90 fps | 155 fps |
+| full screen, every row changes | 122 fps | 120 fps |
+| content fitting the viewport | 2067 fps | 1873 fps |
+| sidebar 200 \| main 300, one row changes | 147 fps | 30 fps |
+
+The last row is the one to look at, and it is the scenario from the description: a container holding far more children than the terminal has rows, with almost nothing changing. `ConcatenatedLineBuffer::getLine()` walks the segment list on each call, and `layoutHorizontal()` calls it once per row per child while rebuilding every row, so the reuse is discarded and replaced by an O(rows x segments) walk. At 976 children per column with a single line changed, render goes from 5.95ms to 83.88ms.
+
+Recording each segment's start offset and count in the constructor, binary searching on a miss, and remembering the last resolved segment brings that case back to the same order as 8.2 and leaves the other three untouched, tests still green.
+
+Two smaller ones: `findCursorPosition()` now returns the last cursor marker where `prepareLines()` returned the first, visible only when several widgets are focused at once, and `ConcatenatedLineBuffer::getLine()` ends with an unreachable `throw`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T08:31:20Z
+
+Pushed a commit on top with the `getLine()` fix from above plus three more from profiling: `ChromeApplier` measures each line once instead of three times, `ArrayLineBuffer` computes its max width lazily, and `resolveStyle()` is memoized per widget keyed on the render revision.
+
+ms/frame, 202x61:
+
+| | full screen, every row changes | sidebar 200 \| main 300, one row |
+| --- | --- | --- |
+| 8.2 | 3.54 | 2.28 |
+| before | 3.50 | 12.88 |
+| after | 2.79 | 3.29 |
+
+Note on the style memo: resetting it per frame is not enough, since `renderContainer()` resolves child styles when filtering hidden children, before `beforeRender()` runs, so a class added there would be missed. Keying on the render revision covers it, and `testStyleChangedDuringBeforeRenderIsApplied` guards it.
+
+Suite green (1722 tests), and fuzzing the two commits against each other over 400 random trees x 14 frames gives identical renderer output and screen state.

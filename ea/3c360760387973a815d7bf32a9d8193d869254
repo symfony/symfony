@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by alexisLefebvre at 2024-07-19T14:39:17Z
+
+I think the changelogs should explain (briefly) how to define bigger to lower priorities, do `0` has priority over `10`?
+
+---------------------------------------------------------------------------
+
+by petervanderwal at 2024-07-25T18:12:20Z
+
+> I think the changelogs should explain (briefly) how to define bigger to lower priorities, do `0` has priority over `10`?
+
+Updated the changelog to indicate that the priority is passed on to the `messenger.receiver` service tag.
+
+A higher priority (number) will go earlier than a lower priority -- https://symfony.com/doc/current/service_container/tags.html#tagged-services-with-priority
+
+---------------------------------------------------------------------------
+
+by bendavies at 2024-12-17T12:31:56Z
+
+this looks like a very worthwhile change.
+currently using `--all` isn't really a viable option on highly prioritized transports.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T20:13:25Z
+
+Thanks for your patience @petervanderwal, this waited far too long on a question of mine that I never followed up.
+
+To answer it: yes, `PriorityTaggedServiceTrait::findAndSortTaggedServices()` is the right tool, with one caveat that is probably why it was not obvious. It returns sorted references and drops the tag attributes, and this loop needs them, since it maps both the service id and each tag `alias` to the same reference and reads `is_failure_transport`. So it cannot be a drop-in. It can give the order, with the tags read back per id:
+
+```php
+$tagsById = $container->findTaggedServiceIds('messenger.receiver');
+foreach ($this->findAndSortTaggedServices('messenger.receiver', $container) as $reference) {
+    $id = (string) $reference;
+    foreach ($tagsById[$id] ?? [] as $tag) { ... }
+}
+```
+
+That removes `$receiverPriority`, both `uksort()` calls and the `max()` you asked about in the other thread. Your instinct there was right: with the receivers walked in priority order, everything derived from them inherits it and the bookkeeping disappears.
+
+**That also fixes something the rebase would otherwise have broken.** Your version set argument 4 of the consume command from `array_values($receiverNames)`, taken from the sorted map, which was correct on your base. Since then 8.2 gained `is_consumable` filtering, and argument 4 now comes from `$consumableReceiverNames`, which is built during the tag loop and was not being sorted. Merging the two naively kept the sorting on a value that is no longer used: `testItRegistersMultipleReceiversAndSetsTheReceiverNamesOnTheCommand` fails on that combination. Sorting the iteration instead of the result keeps your test passing for the right reason.
+
+Also applied: @OskarStark's suggestion on the config node, rewritten as `Order in which "messenger:consume --all" consumes this transport, higher comes first.`, and the header table now says 8.2, which @carsonbot flagged on day one.
+
+The XSD and XML fixture hunks are dropped, since XML configuration was removed from FrameworkBundle in 8.2.
+
+Messenger's DI tests are green at 52, FrameworkBundle's at 578. The Messenger suite shows the same failures before and after this change (1165 tests, 3 errors, 5 failures), all in `WorkerTest::testParallelExecution*` because my local vendor predates `amphp/parallel` landing with #63650.

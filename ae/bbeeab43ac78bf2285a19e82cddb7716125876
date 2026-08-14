@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-13T13:17:25Z
+
+@nicolas-grekas do you have an idea on how middlewares could say they support only one or also many connections?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T13:31:03Z
+
+Thanks, all my previous points are addressed. I pushed the three remaining ones on top of your rework:
+
+- `$connectionNames` is normalized to an array in the constructor, so `handle()` drops the `(array)` cast and the `[] !== $this->connectionNames` check compares like with like. I left `''` alone: it resolves as a connection named `""` and fails with an unrecoverable exception, which beats silently meaning "all".
+- Expanded the UPGRADE entry with the actual migration: `ManagerRegistry` to `ConnectionRegistry`, entity manager name to connection name(s), and passing no name going from the default EM's connection to every DBAL connection.
+- The `@deprecated` annotation still pointed at `DoctrineCloseConnectionsMiddleware`, without the `Dbal`. Same typo in the PR title if you want to update it.
+
+About your question: I would not add a capability flag nor a marker interface. Anything a middleware declares at runtime blows up while consuming messages, which is the same late failure you already have to wrap in `UnrecoverableMessageHandlingException`.
+
+The constructor signature is the declaration. Let the base class own only the lookup, and let each middleware pick its arity:
+
+```php
+// many
+public function __construct(ConnectionRegistry $registry, array|string $connectionNames = [])
+abstract protected function handleForConnections(array $connections, ...): Envelope
+
+// one
+public function __construct(ConnectionRegistry $registry, ?string $connectionName = null)
+abstract protected function handleForConnection(Connection $connection, ...): Envelope
+```
+
+A single-connection middleware then cannot be handed a list at all, and the bundle config for it simply does not accept one. Share the lookup with a trait or a `final protected function resolveConnections()`; what should not be inherited is the arity.
+
+The case is real for exactly one middleware, `DoctrineTransactionMiddleware`: `beginTransaction`/`commit` over N connections is not a transaction. Ping, close and the transaction logger are all naturally N.
+
+Two side notes. `AbstractDbalMiddleware` is `@internal`, but the description argues its value is that userland can extend it. If it is really meant to be extended, `@internal` should go, and the constructor shape becomes a BC surface. And with no DBAL port of ping or transaction here, the abstract class has a single subclass, which is thin evidence for whatever contract we pick.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-13T14:01:26Z
+
+I created one trait per arity, which allows middlewares not to care about how getting the connections. Does that work for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T15:00:16Z
+
+The split is what I had in mind. Three things before it works for me:
+
+1. `handleForConnection()` is inside the `try`/`catch (\InvalidArgumentException)`, so any downstream middleware throwing one comes back out as `UnrecoverableMessageHandlingException`: no retry, straight to the failure transport. Messenger's own `InvalidArgumentException` extends `\InvalidArgumentException` too. `DbalConnectionsMiddlewareTrait` and `AbstractDoctrineMiddleware` both call the handler outside the `try`, please do the same.
+
+2. The rename dropped the `@var list<string>` and the `@param list<string>|string ... or none to handle them all`. "Empty means all" is the one non-obvious bit of that API, please restore them.
+
+3. I would make these two abstract classes rather than traits. The constructor is in the trait now, so a middleware needing an extra argument, `DoctrineOpenTransactionLoggerMiddleware` being the precedent with its `$logger`, has no `parent::__construct()` to call and must restate the whole constructor; miss the `$this->connectionNames =` line and you get `Typed property ...::$connectionNames must not be accessed before initialization` at runtime. Abstract classes give the same arity split, keep `parent::__construct()` working, and match `AbstractDoctrineMiddleware` right next door.
+
+Nits: `DbalConnectionMiddlewareTraitTest.php` declares `SingleDbalConnectionMiddlewareTraitTest`, and `@internal` is gone, so these are public API now and need a CHANGELOG line if that is intended.
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-13T15:44:55Z
+
+Thanks for the reviews :pray:
+
+Converted the traits into internal abstract classes, added missing PHPDoc on `$connectionNames` property and parameter, and moved `handleForConnection()` outside of the `try`/`catch` block.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T16:58:11Z
+
+I pushed a rework on top of your branch to settle the naming and arity discussion:
+
+- The abstract pair is now a single `AbstractDoctrineDbalMiddleware` owning only the lookup, via `final protected getConnection()`/`getConnections()`. Each middleware declares its own constructor and `handle()`, so the arity split lives in the constructor signature and an extra argument (the `$logger` case) keeps working through `parent::__construct()`.
+- The concrete class is renamed to `DoctrineDbalCloseConnectionMiddleware`, following the `DoctrineDbal*` prefix used by `DoctrineDbalStore` and `DoctrineDbalAdapter`. It sits one token away from its ORM sibling and the future `DoctrineDbalPingConnectionMiddleware`/`DoctrineDbalTransactionMiddleware` fall out naturally, without the plural.
+- The abstract classes had lost `implements MiddlewareInterface` in the trait round-trip, which fataled with a `TypeError` on every message as soon as the middleware was not first in the bus. The mocked stack could not catch it, so there is now a test dispatching through a real `MessageBus`.
+
+Tests, deprecation message and UPGRADE/CHANGELOG entries follow the new names; branch rebased on current 8.2.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T17:13:38Z
+
+Let me know if that works for you, sorry for the blurry leadership on this one 😅
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-08-13T17:27:13Z
+
+Not a fan of the middlewares needing a boilerplate for their controller, but that’ll work too.
+
+Thanks for fixing the remaining issues!

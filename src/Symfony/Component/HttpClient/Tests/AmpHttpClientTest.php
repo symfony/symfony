@@ -25,9 +25,7 @@ class AmpHttpClientTest extends HttpClientTestCase
         parent::testNonBlockingStream();
     }
 
-    /**
-     * @group transient-on-windows
-     */
+    #[Group('transient-on-windows')]
     public function testResolve()
     {
         parent::testResolve();

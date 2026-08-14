@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T08:42:54Z
+
+Thank you @HypeMC. The reworked approach is the right one, and it answers the question I left hanging in May.
+
+Prefixing at the single point where every violation converges covers the validator-originated errors your first version could not reach, and the guard keeps today's message for violations with no property path, which is why `testQueryValidationErrorCustomStatusCode` still expects a bare `Page is invalid`. The collection case is where it pays off most: `baz[1]: The file is too large` instead of a message that cannot say which of three uploads failed.
+
+On my "do we have anything to fix" question: we do. `ProblemNormalizer` composes its own `propertyPath: title` string from the violations list, it does not reuse the exception message, so there is no double prefixing in RFC 7807 output and the two paths stay independent. What this fixes is exactly the case we identified, the logs and any setup that does not go through the normalizer, where the path was simply unavailable.
+
+Rebased on 8.2 and pushed with three changes:
+
+ * the closure is typed `ConstraintViolationInterface` rather than `ConstraintViolation`, which is what the list yields. That was the PHPStan failure: 4 errors in this file before, 3 after, and the remaining ones are pre-existing `method_exists()` narrowing.
+ * `('' !== $path = $e->getPropertyPath())` instead of a truthy test, so a property path of `"0"` still gets prefixed. Note the parentheses are required, without them the assignment swallows the ternary and the expression evaluates to a bool.
+ * a CHANGELOG entry, and the header table set to 8.2.
+
+On whether this is a bug fix: I would say no. It changes the format of an error message rather than incorrect behaviour, and the tell is that it needed ten assertion updates in our own suite, so people do assert on these strings. 8.2 is the right target.
+
+HttpKernel is green at 1681 tests.

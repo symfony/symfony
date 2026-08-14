@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T08:44:31Z
+
+Thank you @Spomky, this is worth having and today gave it a lot of evidence. Six PRs closed on exactly this ground in one sweep, and #64749 is the uncomfortable one: `Message::toStringForArchive()` and `toIterableForArchive()`, four lines of existing API away, approved before the question was asked.
+
+| PR | what already covered it |
+| --- | --- |
+| #64749 | `getPreparedHeaders()` then re-add `Bcc` |
+| #50380 | `peekAll()` with `array_intersect_key()` |
+| #62165 | a `MessageEvent` listener |
+| #63477 | a lazy generator in `MessageProviderInterface` |
+| #48287 | `Tui\Widget\InputWidget` |
+| #52905 | `JsonStreamer` |
+
+I pushed two additions and split the bullet in three, since it had grown longer than its neighbours.
+
+**Reporting the attempt both ways.** Your version reports it when the attempt fails. The other direction matters just as much: when the existing API does cover the case, the close should carry the working snippet, not the refusal alone. #63477 and #64749 both closed with runnable code, and that is what makes the answer read as help rather than as a no.
+
+**Changed behavior, not only additions.** The riskier half is modifying public API that already exists, because nobody opts into it. Three cases from the same day: #61786 changed `MermaidDumper::dump()`, shipped in 7.4, to return an empty string; #64779 changed `Callback` to honour a `false` return; and a rework of my own on #60505 made the feature depend on a header that only exists when the toolbar is enabled.
+
+The detector for it is @derrabus', on #64779, and it is cheap enough to be a rule: *"This PR changes some old callback fixtures to make existing tests pass and that's a pretty good indicator that we've broken BC."*
+
+The file is identical on 6.4, 7.4, 8.1 and 8.2, so the merge up stays trivial.

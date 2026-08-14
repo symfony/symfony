@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add dump indicator to profiler list view for profiles with dumped content
+ * Log the profiler URL of each request at debug level on the `profiler` channel
 
 8.1
 ---

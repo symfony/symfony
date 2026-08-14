@@ -74,6 +74,8 @@ final class Color
         'grey' => [127, 127, 127],
     ];
 
+    private ?string $bgCode = null;
+
     /**
      * Create a color from a named ANSI color.
      */
@@ -295,7 +297,8 @@ final class Color
      */
     public function toBackgroundCode(): string
     {
-        return match ($this->type) {
+        // Memoized: a gradient paints the same Color instances frame after frame
+        return $this->bgCode ??= match ($this->type) {
             ColorType::Named => \sprintf("\x1b[%dm", self::BASIC_COLORS[(string) $this->value] + 10),
             ColorType::Palette => \sprintf("\x1b[48;5;%dm", (int) $this->value),
             ColorType::Hex => \sprintf(

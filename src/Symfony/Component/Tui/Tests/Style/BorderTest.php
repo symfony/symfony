@@ -13,6 +13,7 @@ namespace Symfony\Component\Tui\Tests\Style;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\BorderPattern;
@@ -298,5 +299,22 @@ class BorderTest extends TestCase
 
         $this->assertSame(BorderPattern::rounded()->getChars(), $border->pattern->getChars());
         $this->assertSame(Color::from('#ff0000')->toRgb(), $border->color->toRgb());
+    }
+
+    public function testWrapLinesKeepsReverseVideoBalancedOnPatternsUsingIt()
+    {
+        // tall-medium drives its top fill with strategy 3, which is reverse video.
+        $border = Border::all(1, 'tall-medium');
+        $style = new Style();
+
+        $lines = $border->wrapLines(['abc'], 3, $style);
+
+        $this->assertStringContainsString("\e[7m", $lines[0]);
+        $this->assertSame(
+            substr_count($lines[0], "\e[7m"),
+            substr_count($lines[0], "\e[27m"),
+            'reverse video must be closed as many times as it is opened'
+        );
+        $this->assertSame('▌▆▆▆▌', AnsiUtils::stripAnsiCodes($lines[0]));
     }
 }

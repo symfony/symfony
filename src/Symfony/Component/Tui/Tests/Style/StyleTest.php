@@ -19,6 +19,8 @@ use Symfony\Component\Tui\Style\BorderPattern;
 use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\CursorShape;
 use Symfony\Component\Tui\Style\Direction;
+use Symfony\Component\Tui\Style\GradientDirection;
+use Symfony\Component\Tui\Style\LinearGradient;
 use Symfony\Component\Tui\Style\Padding;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
@@ -420,5 +422,112 @@ class StyleTest extends TestCase
         $this->assertSame(Align::Right, $result->getAlign());
         $this->assertSame(VerticalAlign::Center, $result->getVerticalAlign());
         $this->assertSame(2, $result->getFlex());
+    }
+
+    public function testMergeAllGradientOverridesEarlierBackground()
+    {
+        $result = Style::mergeAll([
+            new Style(background: '#00ff00'),
+            (new Style())->withLinearGradient(['red', 'blue']),
+        ]);
+
+        $this->assertInstanceOf(LinearGradient::class, $result->getGradient());
+        $this->assertNull($result->getBackground());
+    }
+
+    public function testMergeAllBackgroundOverridesEarlierGradient()
+    {
+        $result = Style::mergeAll([
+            (new Style())->withLinearGradient(['red', 'blue']),
+            new Style(background: '#00ff00'),
+        ]);
+
+        $this->assertNull($result->getGradient());
+        $this->assertSame('#00ff00', $result->getBackground()->toHex());
+    }
+
+    public function testMergeAllKeepsGradientWhenLaterStylesSetNoBackground()
+    {
+        $result = Style::mergeAll([
+            (new Style())->withLinearGradient(['red', 'blue']),
+            new Style(bold: true),
+        ]);
+
+        $this->assertInstanceOf(LinearGradient::class, $result->getGradient());
+        $this->assertNull($result->getBackground());
+    }
+
+    public function testMergeAllKeepsBackgroundWhenLaterStylesSetNoGradient()
+    {
+        $result = Style::mergeAll([
+            new Style(background: '#00ff00'),
+            new Style(bold: true),
+        ]);
+
+        $this->assertNull($result->getGradient());
+        $this->assertSame('#00ff00', $result->getBackground()->toHex());
+    }
+
+    public function testWithLinearGradientFromArray()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue']);
+        $gradient = $style->getGradient();
+
+        $this->assertInstanceOf(LinearGradient::class, $gradient);
+        $this->assertNull($style->getBackground()); // gradient clears background
+    }
+
+    public function testWithLinearGradientFromObject()
+    {
+        $g = LinearGradient::from(['red', 'blue']);
+        $style = (new Style())->withLinearGradient($g);
+
+        $this->assertSame($g, $style->getGradient());
+    }
+
+    public function testWithLinearGradientWithDirection()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue'], GradientDirection::TopToBottom);
+        $codes = array_map(static fn ($row) => array_map(static fn ($c) => $c->toBackgroundCode(), $row), $style->getGradient()->resolve(2, 2));
+
+        // Vertical: col 0 and col 1 in same row are identical
+        $this->assertSame($codes[0][0], $codes[0][1]);
+        // Vertical: row 0 and row 1 differ
+        $this->assertNotSame($codes[0][0], $codes[1][0]);
+    }
+
+    public function testWithBackgroundClearsGradient()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue'])->withBackground('green');
+
+        $this->assertNull($style->getGradient());
+        $this->assertNotNull($style->getBackground());
+    }
+
+    public function testWithLinearGradientClearsBackground()
+    {
+        $style = (new Style())->withBackground('green')->withLinearGradient(['red', 'blue']);
+
+        $this->assertNull($style->getBackground());
+        $this->assertNotNull($style->getGradient());
+    }
+
+    public function testIsPlainFalseWhenGradientSet()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue']);
+
+        $this->assertFalse($style->isPlain());
+    }
+
+    public function testWithLinearGradientObjectAndDirectionOverridesDirection()
+    {
+        $g = LinearGradient::from(['#000000', '#ffffff']);
+        $style = (new Style())->withLinearGradient($g, GradientDirection::TopToBottom);
+
+        $this->assertNotSame($g, $style->getGradient());
+
+        $codes = array_map(static fn ($row) => array_map(static fn ($c) => $c->toBackgroundCode(), $row), $style->getGradient()->resolve(2, 2));
+        $this->assertSame($codes[0][0], $codes[0][1], 'vertical gradient: columns of a row are identical');
+        $this->assertNotSame($codes[0][0], $codes[1][0], 'vertical gradient: rows differ');
     }
 }

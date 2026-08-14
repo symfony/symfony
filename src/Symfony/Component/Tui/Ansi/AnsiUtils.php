@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Ansi;
 
 use Symfony\Component\String\UnicodeString;
+use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\CursorShape;
 
 /**
@@ -686,6 +687,74 @@ final class AnsiUtils
     public static function isPunctuation(string $char): bool
     {
         return preg_match('/[(){}[\]<>.,;:\'"!?+\-=*\/\\\\|&%^$#@~`]/', $char);
+    }
+
+    /**
+     * Paint a per-column background layer under a rendered line.
+     *
+     * Walks the line with walkCells(), injecting a background code before a
+     * visible cell only when no explicit background is active at that point:
+     * a background an inner widget set on its own cells wins over the layer,
+     * the way a child background wins over a parent one in CSS. Adjacent
+     * cells sharing a color state the code once.
+     *
+     * The line is painted over its full $width. Columns before $offsetX and
+     * past the last color clamp to the nearest edge of the layer, so a layer
+     * resolved for a content area extends under the border cells around it.
+     *
+     * @param array<int, Color> $colors Layer colors indexed by column
+     */
+    public static function paintBackground(string $line, array $colors, int $width, int $offsetX = 0): string
+    {
+        if (!$colors) {
+            return $line;
+        }
+
+        // Convert once so the walk below reads plain strings; the codes are
+        // memoized on the Color instances, which a gradient reuses across frames
+        $lastCol = \count($colors) - 1;
+        $codes = [];
+        for ($col = 0; $col < $width; ++$col) {
+            $codes[$col] = $colors[max(0, min($col - $offsetX, $lastCol))]->toBackgroundCode();
+        }
+
+        $result = '';
+        $col = 0;
+        // Last layer code written to the line. Reset whenever a sequence of the
+        // line goes through, since it may change the background behind our back.
+        $lastCode = null;
+
+        foreach (self::walkCells($line) as $token) {
+            // Zero-width tokens (SGR, cursor moves, OSC hyperlinks, APC
+            // markers) pass through untouched, wherever they sit on the line
+            if (0 === $token['width']) {
+                $result .= $token['text'];
+                $lastCode = null;
+                continue;
+            }
+
+            // Drop visible cells past the painted width
+            if ($token['col'] >= $width) {
+                continue;
+            }
+
+            if (!$token['bg'] && $codes[$token['col']] !== $lastCode) {
+                $result .= $lastCode = $codes[$token['col']];
+            }
+            $result .= $token['text'];
+            $col = $token['col'] + $token['width'];
+        }
+
+        // Fill the remaining width with layer-colored spaces
+        while ($col < $width) {
+            if ($codes[$col] !== $lastCode) {
+                $result .= $lastCode = $codes[$col];
+            }
+            $result .= ' ';
+            ++$col;
+        }
+
+        return $result."\x1b[49m";
     }
 
     /**

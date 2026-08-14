@@ -136,12 +136,22 @@ final class ChromeApplier
 
         $innerLines = [...$topPadding, ...$contentLines, ...$bottomPadding];
 
-        return new ArrayLineBuffer($border?->wrapLines(
-            $innerLines,
-            $innerWidth,
-            $style,
-            $outerStyle,
-        ) ?? $innerLines);
+        $lines = $border?->wrapLines($innerLines, $innerWidth, $style, $outerStyle) ?? $innerLines;
+
+        // A gradient paints as a background layer under the finished box, borders
+        // included: the box renders with no background at all, then one compositing
+        // pass injects a background code wherever no child background is active.
+        // The gradient spans the inner area; border cells around it clamp to the
+        // nearest edge color, and border rows count toward its height.
+        if (null !== $gradient = $style->getGradient()) {
+            $colors = $gradient->resolve($innerWidth, \count($lines));
+            $width = $borderLeft + $innerWidth + $borderRight;
+            foreach ($lines as $i => $line) {
+                $lines[$i] = AnsiUtils::paintBackground($line, $colors[$i], $width, $borderLeft);
+            }
+        }
+
+        return new ArrayLineBuffer($lines);
     }
 
     private function isIdentity(Style $style): bool

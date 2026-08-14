@@ -51,9 +51,18 @@ final class Renderer implements WidgetRendererInterface
     /** Current terminal columns, set during render() for breakpoint resolution */
     private ?int $currentColumns = null;
 
+    /**
+     * Resolved styles for the current frame, keyed on the widget's render
+     * revision so that a style changed from beforeRender() is picked up.
+     *
+     * @var \WeakMap<AbstractWidget, array{int, Style}>
+     */
+    private \WeakMap $styleCache;
+
     public function __construct(?StyleSheet $styleSheet = null, ?FontRegistry $fontRegistry = null)
     {
         $this->fontRegistry = $fontRegistry ?? new FontRegistry();
+        $this->styleCache = new \WeakMap();
         $this->positionTracker = new PositionTracker();
         $this->layoutEngine = new LayoutEngine($this, $this->positionTracker, $this->fontRegistry);
         $this->chromeApplier = new ChromeApplier($this);
@@ -98,31 +107,25 @@ final class Renderer implements WidgetRendererInterface
 
     /**
      * Render the widget tree starting from root.
-     *
-     * @return string[] Array of rendered lines
      */
-    public function render(ContainerWidget $root, int $columns, int $rows): array
+    public function renderFrame(ContainerWidget $root, int $columns, int $rows): LineBufferInterface
     {
         $context = new RenderContext($columns, $rows, null, $this->fontRegistry, fillRows: true);
         $this->currentColumns = $columns;
+        $this->styleCache = new \WeakMap();
         $this->positionTracker->reset();
 
-        $result = $this->renderWidget($root, $context);
+        $result = $this->renderWidgetLines($root, $context);
 
-        // Track root widget position
         $this->positionTracker->setWidgetRect($root, new WidgetRect(0, 0, $columns, \count($result)));
 
         return $result;
     }
 
-    public function renderWidget(AbstractWidget $widget, RenderContext $context): array
+    public function renderWidgetLines(AbstractWidget $widget, RenderContext $context): LineBufferInterface
     {
-        // Allow widget to sync state before rendering
         $widget->beforeRender();
 
-        // Check render cache: if the widget hasn't been invalidated and
-        // the available dimensions are unchanged, reuse the previous output.
-        // This skips style resolution, layout, chrome, and content rendering.
         $cacheColumns = $context->getColumns();
         $cacheRows = $context->getRows();
         $cached = $widget->getRenderCache($cacheColumns, $cacheRows);
@@ -130,53 +133,30 @@ final class Renderer implements WidgetRendererInterface
             return $cached;
         }
 
-        // 1. Resolve style by merging: global → FQCN → state → instance
         $resolvedStyle = $this->resolveStyle($widget);
 
-        // Hidden widgets produce no output and take no space
         if (true === $resolvedStyle->getHidden()) {
-            $widget->setRenderCache([], $cacheColumns, $cacheRows);
+            $lines = new ArrayLineBuffer([]);
+            $widget->setRenderCache($lines, $cacheColumns, $cacheRows);
 
-            return [];
+            return $lines;
         }
 
-        // 2. Apply maxColumns constraint if set
         $maxColumns = $resolvedStyle->getMaxColumns();
         if (null !== $maxColumns && $context->getColumns() > $maxColumns) {
             $context = $context->withColumns($maxColumns);
         }
 
-        // 3. Create enriched context with resolved style
         $styledContext = $context->withStyle($resolvedStyle);
 
-        // 4. For ContainerWidget, use the layout engine
         if ($widget instanceof ContainerWidget) {
             $lines = $this->renderContainer($widget, $styledContext, $resolvedStyle);
         } else {
-            // 5. For all other widgets (leaf widgets + ParentInterface),
-            // render content with inner dimensions, then apply chrome
             $innerContext = $this->chromeApplier->computeInnerContext($styledContext, $resolvedStyle);
-            $lines = $widget->render($innerContext);
-            $lines = $this->chromeApplier->apply($lines, $context->getColumns(), $resolvedStyle, $widget);
+            $lines = $this->chromeApplier->apply(new ArrayLineBuffer($widget->render($innerContext)), $context->getColumns(), $resolvedStyle, $widget);
         }
 
-        // Validate that no line exceeds the available width.
-        // This catches widget bugs early, at the source, rather than
-        // letting over-wide lines flow to ScreenWriter where the widget
-        // context is lost. Image lines (Kitty/iTerm2 protocol) are
-        // excluded because their visible width is not meaningful.
-        $availableColumns = $context->getColumns();
-        foreach ($lines as $i => $line) {
-            if ('' === $line || AnsiUtils::containsImage($line)) {
-                continue;
-            }
-
-            $lineWidth = AnsiUtils::visibleWidth($line);
-            if ($lineWidth > $availableColumns) {
-                throw new RenderException(\sprintf("Widget \"%s\" rendered line %d with width %d, exceeding the available %d columns.\nLine preview: \"%s\".", $widget::class, $i, $lineWidth, $availableColumns, mb_substr(AnsiUtils::stripAnsiCodes($line), 0, 100)), $i, $lineWidth, $availableColumns);
-            }
-        }
-
+        $this->validateLines($widget, $lines, $context->getColumns());
         $widget->setRenderCache($lines, $cacheColumns, $cacheRows);
 
         return $lines;
@@ -184,7 +164,16 @@ final class Renderer implements WidgetRendererInterface
 
     public function resolveStyle(AbstractWidget $widget): Style
     {
-        return $this->styleSheet->resolve($widget, $this->currentColumns);
+        $revision = $widget->getRenderRevision();
+        $cached = $this->styleCache[$widget] ?? null;
+
+        if (null !== $cached && $cached[0] === $revision) {
+            return $cached[1];
+        }
+
+        $this->styleCache[$widget] = [$revision, $style = $this->styleSheet->resolve($widget, $this->currentColumns)];
+
+        return $style;
     }
 
     public function measureIntrinsicWidth(AbstractWidget $widget, int $maxColumns, int $rows): int
@@ -247,12 +236,9 @@ final class Renderer implements WidgetRendererInterface
 
     /**
      * Render a container widget with its children.
-     *
-     * @return string[]
      */
-    private function renderContainer(ContainerWidget $widget, RenderContext $context, Style $resolvedStyle): array
+    private function renderContainer(ContainerWidget $widget, RenderContext $context, Style $resolvedStyle): LineBufferInterface
     {
-        // Filter out hidden children so they don't take up layout space
         $children = array_values(array_filter(
             $widget->all(),
             fn (AbstractWidget $child) => true !== $this->resolveStyle($child)->getHidden(),
@@ -262,25 +248,20 @@ final class Renderer implements WidgetRendererInterface
         $rows = $context->getRows();
 
         if (!$children) {
-            return $this->chromeApplier->apply([], $columns, $resolvedStyle, $widget);
+            return $this->chromeApplier->apply(new ArrayLineBuffer([]), $columns, $resolvedStyle, $widget);
         }
 
-        // Calculate inner dimensions (content area after border/padding)
         [$innerColumns, $innerRows] = $this->chromeApplier->computeInnerDimensions($columns, $rows, $resolvedStyle);
 
-        // Get direction and gap from resolved style
         $direction = $resolvedStyle->getDirection() ?? Direction::Vertical;
         $gap = $resolvedStyle->getGap() ?? 0;
 
-        // Compute styled gap line matching what a child widget would render as blank
-        // This ensures gap lines inherit the container's resolved style (e.g. bold from * rule)
         $gapLine = null;
         if ($gap > 0) {
             $gapContent = str_repeat(' ', max(1, $innerColumns));
             $gapLine = $resolvedStyle->isPlain() ? $gapContent : $resolvedStyle->apply($gapContent);
         }
 
-        // Push the content area's absolute offset onto the position stack
         if ($this->positionTracker->isActive()) {
             [$parentRow, $parentCol] = $this->positionTracker->currentOffset();
             [$chromeTop, $chromeLeft] = $this->chromeApplier->computeChromeOffset($resolvedStyle);
@@ -292,9 +273,6 @@ final class Renderer implements WidgetRendererInterface
         $verticalAlign = $resolvedStyle->getVerticalAlign();
         $hasVerticalAlign = null !== $verticalAlign;
 
-        // Render children using layout engine.
-        // For horizontal containers, pass verticalAlign so layoutHorizontal can
-        // offset shorter children (align-items). For vertical containers it is unused.
         $childLines = $this->layoutEngine->layout(
             $children,
             $innerColumns,
@@ -305,44 +283,52 @@ final class Renderer implements WidgetRendererInterface
             Direction::Horizontal === $direction ? $verticalAlign : null,
         );
 
-        // Pop position stack
         $this->positionTracker->pop();
 
-        // Apply vertical alignment offset when VerticalAlign is set and the widget owns its rows.
         if ($hasVerticalAlign && \count($childLines) < $innerRows
             && ($context->shouldFillRows() || $widget->isVerticallyExpanded())
         ) {
             if (0 < $verticalOffset = $this->layoutEngine->computeVerticalAlignOffset(\count($childLines), $innerRows, $verticalAlign)) {
-                $topPad = array_fill(0, $verticalOffset, '');
-                array_unshift($childLines, ...$topPad);
+                $childLines = new ConcatenatedLineBuffer([
+                    new ArrayLineBuffer(array_fill(0, $verticalOffset, '')),
+                    $childLines,
+                ]);
                 $this->positionTracker->shiftContentPositions($children, 0, $verticalOffset);
             }
         }
 
-        // Pad to fill allocated rows so that chrome (e.g. background-color) covers the full height.
-        //
-        // A fill child is detected by isVerticallyExpanded()=true AND shouldFillRows()=false:
-        // layoutVertical creates a fresh RenderContext (fillRows=false) with exactly $childFillRows,
-        // so the child must fill those rows itself before chromeApplier runs — otherwise layoutVertical
-        // pads with bare empty strings that bypass chromeApplier and leave background incomplete.
-        //
-        // Root renders (shouldFillRows=true) pad only when VerticalAlign is explicitly set;
-        // without it the root returns its natural content height.
         $shouldPad = ($widget->isVerticallyExpanded() && !$context->shouldFillRows())
             || ($context->shouldFillRows() && $hasVerticalAlign);
         if ($shouldPad && \count($childLines) < $innerRows) {
-            while (\count($childLines) < $innerRows) {
-                $childLines[] = '';
-            }
+            $childLines = new ConcatenatedLineBuffer([
+                $childLines,
+                new ArrayLineBuffer(array_fill(0, $innerRows - \count($childLines), '')),
+            ]);
         }
 
-        // Apply horizontal alignment for child widgets and adjust tracked positions
         if ($hasAlign && 0 < $alignOffset = $this->layoutEngine->computeAlignOffset($childLines, $innerColumns, $align)) {
             $childLines = $this->layoutEngine->shiftLines($childLines, $alignOffset);
             $this->positionTracker->shiftContentPositions($children, $alignOffset);
         }
 
-        // Apply chrome (padding, border, background)
         return $this->chromeApplier->apply($childLines, $columns, $resolvedStyle, $widget);
+    }
+
+    private function validateLines(AbstractWidget $widget, LineBufferInterface $lines, int $availableColumns): void
+    {
+        if ($lines->getMaxVisibleWidth() <= $availableColumns) {
+            return;
+        }
+
+        foreach ($lines as $i => $line) {
+            if ('' === $line || AnsiUtils::containsImage($line)) {
+                continue;
+            }
+
+            $lineWidth = AnsiUtils::visibleWidth($line);
+            if ($lineWidth > $availableColumns) {
+                throw new RenderException(\sprintf("Widget \"%s\" rendered line %d with width %d, exceeding the available %d columns.\nLine preview: \"%s\".", $widget::class, $i, $lineWidth, $availableColumns, mb_substr(AnsiUtils::stripAnsiCodes($line), 0, 100)), $i, $lineWidth, $availableColumns);
+            }
+        }
     }
 }

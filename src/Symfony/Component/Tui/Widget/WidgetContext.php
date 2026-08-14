@@ -101,7 +101,7 @@ final class WidgetContext
      */
     public function renderWidget(AbstractWidget $widget, RenderContext $context): array
     {
-        return $this->renderer->renderWidget($widget, $context);
+        return $this->renderer->renderWidgetLines($widget, $context)->toArray();
     }
 
     public function scheduleTick(callable $callback, float $intervalSeconds): string

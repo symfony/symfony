@@ -29,7 +29,7 @@ class LayoutEngineTest extends TestCase
         $root = new ContainerWidget();
         $root->add(new TextWidget('Hello'));
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         $this->assertStringContainsString('Hello', $result[0]);
@@ -42,7 +42,7 @@ class LayoutEngineTest extends TestCase
         $root->add(new TextWidget('First'));
         $root->add(new TextWidget('Second'));
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(2, $result);
         $this->assertStringContainsString('First', $result[0]);
@@ -57,7 +57,7 @@ class LayoutEngineTest extends TestCase
         $root->add(new TextWidget('First'));
         $root->add(new TextWidget('Second'));
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(4, $result);
         $this->assertStringContainsString('First', $result[0]);
@@ -74,7 +74,7 @@ class LayoutEngineTest extends TestCase
         $root->add(new TextWidget('Left'));
         $root->add(new TextWidget('Right'));
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         $this->assertStringContainsString('Left', $result[0]);
@@ -89,7 +89,7 @@ class LayoutEngineTest extends TestCase
         $root->add(new TextWidget('A'));
         $root->add(new TextWidget('B'));
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         // Gap of 4 spaces between the two columns
@@ -116,17 +116,17 @@ class LayoutEngineTest extends TestCase
         $root->add($fill3);
 
         // With 10 rows: 1 for header, 9 remaining for 3 fill children (no remainder)
-        $result = $renderer->render($root, 20, 10);
+        $result = $renderer->renderFrame($root, 20, 10)->toArray();
         $this->assertCount(10, $result);
 
         // With 11 rows: 1 for header, 10 remaining for 3 fill children
         // base=3, extra=1 => first fill gets 4, others get 3 => 1+4+3+3 = 11
-        $result = $renderer->render($root, 20, 11);
+        $result = $renderer->renderFrame($root, 20, 11)->toArray();
         $this->assertCount(11, $result, 'Remainder rows should be distributed to fill children, not lost');
 
         // With 12 rows: 1 for header, 11 remaining for 3 fill children
         // base=3, extra=2 => first two fills get 4, last gets 3 => 1+4+4+3 = 12
-        $result = $renderer->render($root, 20, 12);
+        $result = $renderer->renderFrame($root, 20, 12)->toArray();
         $this->assertCount(12, $result, 'All remainder rows should be distributed across fill children');
     }
 
@@ -148,7 +148,7 @@ class LayoutEngineTest extends TestCase
         $root->add($center);
         $root->add($right);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         // L starts at position 0, C at position 20, R at position 60
@@ -173,7 +173,7 @@ class LayoutEngineTest extends TestCase
         $root->add($sidebar);
         $root->add($content);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         // "Menu" is 4 chars; sidebar gets intrinsic width (4)
@@ -198,7 +198,7 @@ class LayoutEngineTest extends TestCase
         $root->add($sidebar);
         $root->add($content);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         // Text wraps within the 10-column constraint; content starts at column 10
         $this->assertSame('M', $result[0][10]);
@@ -219,7 +219,7 @@ class LayoutEngineTest extends TestCase
         $root->add($left);
         $root->add($right);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         // Both get equal space: 40 each
@@ -239,7 +239,7 @@ class LayoutEngineTest extends TestCase
         $root->add(new TextWidget('B'));
         $root->add(new TextWidget('C'));
 
-        $result = $renderer->render($root, 90, 24);
+        $result = $renderer->renderFrame($root, 90, 24)->toArray();
 
         $this->assertCount(1, $result);
         // 90 / 3 = 30 each
@@ -263,7 +263,7 @@ class LayoutEngineTest extends TestCase
         $root->add($left);
         $root->add($right);
 
-        $result = $renderer->render($root, 82, 24);
+        $result = $renderer->renderFrame($root, 82, 24)->toArray();
 
         $this->assertCount(1, $result);
         // Available = 82 - 2 gap = 80, each gets 40
@@ -288,7 +288,7 @@ class LayoutEngineTest extends TestCase
         $root->add($sidebar);
         $root->add($content);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         // "Hi" = 2 chars + 2 pad left + 2 pad right = 6 cols
@@ -310,7 +310,7 @@ class LayoutEngineTest extends TestCase
         $root->add($sidebar);
         $root->add($content);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         // "Hi" = 2 chars + 1 border left + 1 border right = 4 cols
         // Border chars are multibyte; use mb_substr for character-level position
@@ -333,7 +333,7 @@ class LayoutEngineTest extends TestCase
         $root->add($sidebar);
         $root->add($content);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         // "Hi" = 2 + 1 border-left + 1 pad-left + 1 pad-right + 1 border-right = 6
         $stripped = AnsiUtils::stripAnsiCodes($result[0]);
@@ -357,7 +357,7 @@ class LayoutEngineTest extends TestCase
         $root->add($main);
         $root->add($aside);
 
-        $result = $renderer->render($root, 80, 24);
+        $result = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $result);
         // Gap total = 2 * 2 = 4, available = 80 - 4 = 76

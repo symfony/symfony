@@ -214,7 +214,7 @@ class TuiTest extends TestCase
         $root->add(new TextWidget('This is a longer text that should wrap properly.')->setStyle(Style::padding([0, 1])));
         $root->add(new TextWidget('End'));
 
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         foreach ($lines as $i => $line) {
             $width = AnsiUtils::visibleWidth($line);
@@ -604,7 +604,9 @@ class TuiTest extends TestCase
 
         $received = null;
         $listener = new class($received) {
-            public function __construct(private mixed &$received) {}
+            public function __construct(private mixed &$received)
+            {
+            }
 
             public function __invoke(InputEvent $event): void
             {

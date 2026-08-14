@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Render;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Exception\LogicException;
 use Symfony\Component\Tui\Exception\RenderException;
 use Symfony\Component\Tui\Terminal\TerminalInterface;
 
@@ -37,24 +38,22 @@ final class ScreenWriter
 {
     private const PRINTABLE_ASCII = ' !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~';
 
-    /** @var string[] */
-    private array $previousLines = [];
+    private ?LineBufferInterface $previousLines = null;
     private int $previousWidth = 0;
-    private int $cursorRow = 0;
     private int $hardwareCursorRow = 0;
     private int $maxLinesRendered = 0;
     private bool $showHardwareCursor = true;
     private int $scrollOffset = 0;
 
-    /** @var string[] */
-    private array $previousRawLines = [];
-
     /** @var array{row: int, col: int, shape: int}|null */
     private ?array $previousCursorPos = null;
+    private readonly LineBufferDiffer $lineBufferDiffer;
 
     public function __construct(
         private readonly TerminalInterface $terminal,
+        ?LineBufferDiffer $lineBufferDiffer = null,
     ) {
+        $this->lineBufferDiffer = $lineBufferDiffer ?? new LineBufferDiffer();
     }
 
     public function setShowHardwareCursor(bool $enabled): void
@@ -93,15 +92,8 @@ final class ScreenWriter
         return $this->scrollOffset;
     }
 
-    /**
-     * Write ANSI lines to the terminal using differential rendering.
-     *
-     * @param string[] $lines The new content to display
-     */
-    public function writeLines(array $lines): void
+    public function writeFrame(LineBufferInterface $lines): void
     {
-        // Apply scroll offset: when content exceeds the viewport, slice to
-        // show a window shifted up from the bottom by scrollOffset lines.
         if ($this->scrollOffset > 0) {
             $totalLines = \count($lines);
             $rows = $this->terminal->getRows();
@@ -109,21 +101,28 @@ final class ScreenWriter
                 $maxOffset = $totalLines - $rows;
                 $effectiveOffset = min($this->scrollOffset, $maxOffset);
                 $startLine = $totalLines - $rows - $effectiveOffset;
-                $lines = \array_slice($lines, $startLine, $rows);
+                $lines = new ArrayLineBuffer($lines->slice($startLine, $rows));
             }
         }
 
-        if ($this->previousLines && $this->previousWidth === $this->terminal->getColumns() && $lines === $this->previousRawLines) {
-            $this->positionHardwareCursor($this->previousCursorPos, \count($this->previousLines));
+        $changedRange = null === $this->previousLines ? null : $this->lineBufferDiffer->findChangedRange($lines, $this->previousLines);
+        $cursorPos = match (true) {
+            null === $this->previousLines => $this->findCursorPosition($lines),
+            null === $changedRange => $this->previousCursorPos,
+            null === $this->previousCursorPos && \count($lines) === \count($this->previousLines) => $this->findCursorPosition($lines, $changedRange['first'], $changedRange['last']),
+            default => $this->findCursorPosition($lines),
+        };
+
+        if (null !== $this->previousLines && $this->previousWidth === $this->terminal->getColumns() && null === $changedRange) {
+            $this->positionHardwareCursor($cursorPos, \count($lines));
+            $this->previousLines = $lines;
+            $this->previousCursorPos = $cursorPos;
 
             return;
         }
 
-        $rawLines = $lines;
-        ['lines' => $lines, 'cursor_pos' => $cursorPos, 'first_changed' => $firstChanged, 'last_changed' => $lastChanged] = $this->prepareLines($lines);
-
-        $this->writeInternal($lines, $cursorPos, $firstChanged, $lastChanged);
-        $this->previousRawLines = $rawLines;
+        $this->writeInternal($lines, $cursorPos, $changedRange['first'] ?? 0, $changedRange['last'] ?? \count($lines) - 1);
+        $this->previousLines = $lines;
         $this->previousCursorPos = $cursorPos;
     }
 
@@ -135,11 +134,9 @@ final class ScreenWriter
      */
     public function reset(): void
     {
-        $this->previousLines = [];
-        $this->previousRawLines = [];
+        $this->previousLines = null;
         $this->previousCursorPos = null;
         $this->previousWidth = -1; // -1 triggers widthChanged
-        $this->cursorRow = 0;
         $this->hardwareCursorRow = 0;
         $this->maxLinesRendered = 0;
     }
@@ -152,7 +149,7 @@ final class ScreenWriter
     public function getState(): array
     {
         return [
-            'line_count' => \count($this->previousLines),
+            'line_count' => null === $this->previousLines ? 0 : \count($this->previousLines),
             'cursor_row' => $this->hardwareCursorRow,
         ];
     }
@@ -160,10 +157,9 @@ final class ScreenWriter
     /**
      * Internal write implementation.
      *
-     * @param string[]                                   $lines
      * @param array{row: int, col: int, shape: int}|null $cursorPos
      */
-    private function writeInternal(array $lines, ?array $cursorPos, int $firstChanged, int $lastChanged): void
+    private function writeInternal(LineBufferInterface $lines, ?array $cursorPos, int $firstChanged, int $lastChanged): void
     {
         $columns = $this->terminal->getColumns();
         $rows = $this->terminal->getRows();
@@ -172,21 +168,13 @@ final class ScreenWriter
         $widthChanged = 0 !== $this->previousWidth && $this->previousWidth !== $columns;
 
         // First render or width changed
-        if (!$this->previousLines || $widthChanged) {
+        if (null === $this->previousLines || $widthChanged) {
             $this->fullRender($lines, $cursorPos, $widthChanged);
 
             return;
         }
 
-        $lineCount = \count($lines);
-
-        if (-1 === $firstChanged) {
-            $this->positionHardwareCursor($cursorPos, $lineCount);
-
-            return;
-        }
-
-        if ($firstChanged >= $lineCount) {
+        if ($firstChanged >= \count($lines)) {
             $this->handleDeletedLines($lines, $cursorPos, $rows);
 
             return;
@@ -229,10 +217,9 @@ final class ScreenWriter
      *    erase exceeds the terminal height, clearing is more efficient than
      *    erasing them one by one.
      *
-     * @param string[]                                   $newLines
      * @param array{row: int, col: int, shape: int}|null $cursorPos
      */
-    private function fullRender(array $newLines, ?array $cursorPos, bool $clear): void
+    private function fullRender(LineBufferInterface $newLines, ?array $cursorPos, bool $clear): void
     {
         $buffer = "\x1b[?2026h"; // Begin synchronized output
 
@@ -240,15 +227,19 @@ final class ScreenWriter
             $buffer .= "\x1b[2J\x1b[3J\x1b[H"; // Clear screen, clear scrollback, and home
         }
 
-        if ($newLines) {
-            $buffer .= implode("\r\n", $newLines);
+        $first = true;
+        foreach ($newLines as $line) {
+            if (!$first) {
+                $buffer .= "\r\n";
+            }
+            $buffer .= $this->prepareLine($line);
+            $first = false;
         }
 
         $buffer .= "\x1b[?2026l"; // End synchronized output
 
         $this->terminal->write($buffer);
-        $this->cursorRow = max(0, \count($newLines) - 1);
-        $this->hardwareCursorRow = $this->cursorRow;
+        $this->hardwareCursorRow = max(0, \count($newLines) - 1);
 
         if ($clear) {
             $this->maxLinesRendered = \count($newLines);
@@ -257,26 +248,15 @@ final class ScreenWriter
         }
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
-        $this->previousLines = $newLines;
         $this->previousWidth = $this->terminal->getColumns();
     }
 
     /**
-     * @param string[]                                   $newLines
      * @param array{row: int, col: int, shape: int}|null $cursorPos
-     *
-     * @return bool True when a full render fallback was used
      */
-    private function handleDeletedLines(array $newLines, ?array $cursorPos, int $height): bool
+    private function handleDeletedLines(LineBufferInterface $newLines, ?array $cursorPos, int $height): void
     {
-        if (\count($this->previousLines) <= \count($newLines)) {
-            $this->positionHardwareCursor($cursorPos, \count($newLines));
-            $this->previousLines = $newLines;
-            $this->previousWidth = $this->terminal->getColumns();
-
-            return false;
-        }
-
+        $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
         $buffer = "\x1b[?2026h";
 
         $targetRow = max(0, \count($newLines) - 1);
@@ -290,17 +270,17 @@ final class ScreenWriter
 
         $buffer .= "\r";
 
-        $extraLines = \count($this->previousLines) - \count($newLines);
+        $extraLines = $previousLineCount - \count($newLines);
 
         if ($extraLines > $height) {
             $this->fullRender($newLines, $cursorPos, true);
 
-            return true;
+            return;
         }
 
         $newLineCount = \count($newLines);
 
-        if ($extraLines > 0 && $newLineCount > 0) {
+        if ($newLineCount > 0) {
             $buffer .= "\x1b[1B";
         }
 
@@ -319,22 +299,18 @@ final class ScreenWriter
         $buffer .= "\x1b[?2026l";
 
         $this->terminal->write($buffer);
-        $this->cursorRow = $targetRow;
         $this->hardwareCursorRow = $targetRow;
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
-        $this->previousLines = $newLines;
         $this->previousWidth = $this->terminal->getColumns();
-
-        return false;
     }
 
     /**
-     * @param string[]                                   $newLines
      * @param array{row: int, col: int, shape: int}|null $cursorPos
      */
-    private function differentialRender(array $newLines, ?array $cursorPos, int $firstChanged, int $lastChanged, int $width): void
+    private function differentialRender(LineBufferInterface $newLines, ?array $cursorPos, int $firstChanged, int $lastChanged, int $width): void
     {
+        $previousLineCount = \count($this->previousLines ?? throw new LogicException('Previous lines are not available.'));
         $buffer = "\x1b[?2026h"; // Begin synchronized output
 
         // Move cursor to first changed line
@@ -356,7 +332,7 @@ final class ScreenWriter
             }
             $buffer .= "\x1b[2K";
 
-            $line = $newLines[$i];
+            $line = $this->prepareLine($newLines->getLine($i));
             $lineWidth = null;
             $lineLength = \strlen($line);
 
@@ -375,7 +351,7 @@ final class ScreenWriter
                 $this->hardwareCursorRow = $i;
                 // Force a full re-render with screen clear on next call
                 // since the screen is now in a partially updated state
-                $this->previousLines = [];
+                $this->previousLines = null;
                 $this->previousWidth = -1;
 
                 // Strip ANSI codes for readable debug output
@@ -390,109 +366,63 @@ final class ScreenWriter
 
         $finalCursorRow = $renderEnd;
 
-        // Handle content size changes
-        if (\count($this->previousLines) > \count($newLines)) {
-            // Content shrunk - clear extra lines
-            if ($renderEnd < \count($newLines) - 1) {
-                $moveDown = \count($newLines) - 1 - $renderEnd;
-                $buffer .= "\x1b[{$moveDown}B";
-                $finalCursorRow = \count($newLines) - 1;
-            }
-
-            $extraLines = \count($this->previousLines) - \count($newLines);
+        if ($previousLineCount > \count($newLines)) {
+            $extraLines = $previousLineCount - \count($newLines);
             $buffer .= str_repeat("\r\n\x1b[2K", $extraLines);
-
             $buffer .= "\x1b[{$extraLines}A";
-        } elseif (\count($newLines) > \count($this->previousLines) && $renderEnd < \count($newLines) - 1) {
-            // Content grew - output any additional lines not already rendered
-            // Only needed if renderEnd < newLines.length - 1 (i.e., we didn't render to the end)
-            for ($i = $renderEnd + 1; $i < \count($newLines); ++$i) {
-                $buffer .= "\r\n\x1b[2K";
-                $buffer .= $newLines[$i];
-                $finalCursorRow = $i;
-            }
         }
 
         $buffer .= "\x1b[?2026l"; // End synchronized output
 
         $this->terminal->write($buffer);
 
-        $this->cursorRow = max(0, \count($newLines) - 1);
         $this->hardwareCursorRow = $finalCursorRow;
         $this->maxLinesRendered = max($this->maxLinesRendered, \count($newLines));
 
         $this->positionHardwareCursor($cursorPos, \count($newLines));
-        $this->previousLines = $newLines;
         $this->previousWidth = $this->terminal->getColumns();
     }
 
     /**
-     * Strip cursor markers, apply line resets, and detect changed rows in one pass.
-     *
-     * @param string[] $lines
-     *
-     * @return array{lines: string[], cursor_pos: array{row: int, col: int, shape: int}|null, first_changed: int, last_changed: int}
+     * @return array{row: int, col: int, shape: int}|null
      */
-    private function prepareLines(array $lines): array
+    private function findCursorPosition(LineBufferInterface $lines, ?int $firstRow = null, ?int $lastRow = null): ?array
     {
-        $cursorPos = null;
-        $firstChanged = -1;
-        $lastChanged = -1;
-        $lineCount = \count($lines);
-        $previousLineCount = \count($this->previousLines);
+        $firstVisibleRow = max(0, \count($lines) - $this->terminal->getRows());
+        $firstRow = max($firstVisibleRow, $firstRow ?? $firstVisibleRow);
+        $lastRow = min(\count($lines) - 1, $lastRow ?? \count($lines) - 1);
 
-        foreach ($lines as $row => $line) {
-            if ($line === $oldLine = $row < $previousLineCount ? $this->previousLines[$row] : '') {
+        for ($row = $lastRow; $row >= $firstRow; --$row) {
+            $line = $lines->getLine($row);
+            $markerIndex = strpos($line, AnsiUtils::CURSOR_MARKER_PREFIX);
+            if (false === $markerIndex || false === $endIndex = strpos($line, "\x07", $markerIndex)) {
                 continue;
             }
 
-            if (str_contains($line, "\x1b")) {
-                if ($oldLine === $line."\x1b[0m" || $oldLine === $line.AnsiUtils::SEGMENT_RESET) {
-                    $lines[$row] = $oldLine;
-                    continue;
-                }
+            $shape = (int) substr($line, $markerIndex + \strlen(AnsiUtils::CURSOR_MARKER_PREFIX), $endIndex - $markerIndex - \strlen(AnsiUtils::CURSOR_MARKER_PREFIX));
 
-                if (null === $cursorPos) {
-                    $markerIndex = strpos($line, AnsiUtils::CURSOR_MARKER_PREFIX);
-                    if (false !== $markerIndex && false !== $endIndex = strpos($line, "\x07", $markerIndex)) {
-                        $markerLen = $endIndex - $markerIndex + 1;
-                        $shapeStr = substr($line, $markerIndex + \strlen(AnsiUtils::CURSOR_MARKER_PREFIX), $endIndex - $markerIndex - \strlen(AnsiUtils::CURSOR_MARKER_PREFIX));
-                        $beforeMarker = substr($line, 0, $markerIndex);
-                        $cursorPos = ['row' => $row, 'col' => AnsiUtils::visibleWidth($beforeMarker), 'shape' => (int) $shapeStr];
-                        $line = substr($line, 0, $markerIndex).substr($line, $markerIndex + $markerLen);
-                    }
-                }
-
-                if (str_contains($line, "\x1b") && !AnsiUtils::containsImage($line)) {
-                    $line = str_contains($line, "\x1b]8;")
-                        ? $line.AnsiUtils::SEGMENT_RESET
-                        : $line."\x1b[0m";
-                }
-            }
-
-            $lines[$row] = $line;
-
-            if ($oldLine !== $line) {
-                if (-1 === $firstChanged) {
-                    $firstChanged = $row;
-                }
-                $lastChanged = $row;
-            }
+            return ['row' => $row, 'col' => AnsiUtils::visibleWidth(substr($line, 0, $markerIndex)), 'shape' => $shape];
         }
 
-        if ($previousLineCount > $lineCount) {
-            if (-1 === $firstChanged) {
-                $firstChanged = $lineCount;
-            }
-            $lastChanged = $previousLineCount - 1;
+        return null;
+    }
+
+    private function prepareLine(string $line): string
+    {
+        if (!str_contains($line, "\x1b")) {
+            return $line;
         }
 
-        return [
-            'lines' => $lines,
-            'cursor_pos' => $cursorPos,
-            'first_changed' => $firstChanged,
-            'last_changed' => $lastChanged,
-        ];
+        $markerIndex = strpos($line, AnsiUtils::CURSOR_MARKER_PREFIX);
+        if (false !== $markerIndex && false !== $endIndex = strpos($line, "\x07", $markerIndex)) {
+            $line = substr($line, 0, $markerIndex).substr($line, $endIndex + 1);
+        }
+
+        if (!str_contains($line, "\x1b") || AnsiUtils::containsImage($line)) {
+            return $line;
+        }
+
+        return str_contains($line, "\x1b]8;") ? $line.AnsiUtils::SEGMENT_RESET : $line."\x1b[0m";
     }
 
     /**

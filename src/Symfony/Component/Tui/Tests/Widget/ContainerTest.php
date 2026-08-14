@@ -255,7 +255,7 @@ class ContainerTest extends TestCase
             '.spaced' => new Style(gap: 2),
         ]);
         $renderer = new Renderer($stylesheet);
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         // With gap=2: First, 2 empty lines, Second = 4 total
         $this->assertCount(4, $lines);
@@ -277,7 +277,7 @@ class ContainerTest extends TestCase
             '.horizontal' => new Style(direction: Direction::Horizontal),
         ]);
         $renderer = new Renderer($stylesheet);
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         $this->assertCount(1, $lines);
         $this->assertStringContainsString('Left', $lines[0]);
@@ -302,13 +302,13 @@ class ContainerTest extends TestCase
         $renderer = new Renderer($stylesheet);
 
         // Narrow terminal: vertical (2 lines)
-        $lines = $renderer->render($root, 60, 24);
+        $lines = $renderer->renderFrame($root, 60, 24)->toArray();
         $this->assertCount(2, $lines);
         $this->assertStringContainsString('A', $lines[0]);
         $this->assertStringContainsString('B', $lines[1]);
 
         // Wide terminal: horizontal (1 line)
-        $lines = $renderer->render($root, 120, 24);
+        $lines = $renderer->renderFrame($root, 120, 24)->toArray();
         $this->assertCount(1, $lines);
         $this->assertStringContainsString('A', $lines[0]);
         $this->assertStringContainsString('B', $lines[0]);
@@ -342,7 +342,7 @@ class ContainerTest extends TestCase
         $root->add($container);
 
         $renderer = new Renderer($stylesheet);
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         $text = implode("\n", array_map(static fn ($l) => AnsiUtils::stripAnsiCodes($l), $lines));
         $this->assertStringContainsString('Visible', $text);
@@ -362,7 +362,7 @@ class ContainerTest extends TestCase
         $root->add($container);
 
         $renderer = new Renderer();
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         // A + gap + C = 3 lines (no gap for the hidden widget)
         $this->assertCount(3, $lines);
@@ -382,7 +382,7 @@ class ContainerTest extends TestCase
         $root->add($container);
 
         $renderer = new Renderer();
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         // Hidden widget should not take column space: the visible widgets should share the full width
         $this->assertCount(1, $lines);
@@ -415,13 +415,13 @@ class ContainerTest extends TestCase
         $renderer = new Renderer($stylesheet);
 
         // Narrow: both visible
-        $lines = $renderer->render($root, 60, 24);
+        $lines = $renderer->renderFrame($root, 60, 24)->toArray();
         $text = implode("\n", array_map(static fn ($l) => AnsiUtils::stripAnsiCodes($l), $lines));
         $this->assertStringContainsString('Always', $text);
         $this->assertStringContainsString('Mobile Only', $text);
 
         // Wide: hint hidden
-        $lines = $renderer->render($root, 120, 24);
+        $lines = $renderer->renderFrame($root, 120, 24)->toArray();
         $text = implode("\n", array_map(static fn ($l) => AnsiUtils::stripAnsiCodes($l), $lines));
         $this->assertStringContainsString('Always', $text);
         $this->assertStringNotContainsString('Mobile Only', $text);
@@ -440,7 +440,7 @@ class ContainerTest extends TestCase
             '.item' => new Style(hidden: true),
         ]);
         $renderer = new Renderer($stylesheet);
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         $text = implode("\n", array_map(static fn ($l) => AnsiUtils::stripAnsiCodes($l), $lines));
         $this->assertStringContainsString('Visible', $text);
@@ -463,7 +463,7 @@ class ContainerTest extends TestCase
         $root->add($container);
 
         $renderer = new Renderer();
-        $lines = $renderer->render($root, 40, 24);
+        $lines = $renderer->renderFrame($root, 40, 24)->toArray();
 
         $text = implode("\n", array_map(static fn ($l) => AnsiUtils::stripAnsiCodes($l), $lines));
         $this->assertStringContainsString('Before', $text);
@@ -532,7 +532,7 @@ class ContainerTest extends TestCase
         $root->add($outer);
 
         $renderer = new Renderer();
-        $lines = $renderer->render($root, 30, 10);
+        $lines = $renderer->renderFrame($root, 30, 10)->toArray();
 
         $borderLine = $lines[0];
 
@@ -583,7 +583,7 @@ class ContainerTest extends TestCase
         $root->add($container);
         $renderer = new Renderer();
 
-        return $renderer->render($root, $columns, $rows);
+        return $renderer->renderFrame($root, $columns, $rows)->toArray();
     }
 }
 

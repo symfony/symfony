@@ -34,7 +34,7 @@ final class TextAlignTest extends TestCase
         $text->addStyleClass($styleClass);
         $root->add($text);
 
-        $lines = $renderer->render($root, 10, 5);
+        $lines = $renderer->renderFrame($root, 10, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $this->assertSame($expectedVisible, AnsiUtils::stripAnsiCodes($lines[0]));
@@ -61,7 +61,7 @@ final class TextAlignTest extends TestCase
         $text->addStyleClass('pr-1');
         $root->add($text);
 
-        $lines = $renderer->render($root, 10, 5);
+        $lines = $renderer->renderFrame($root, 10, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -80,7 +80,7 @@ final class TextAlignTest extends TestCase
         $text->addStyleClass('text-center');
         $root->add($text);
 
-        $lines = $renderer->render($root, 10, 5);
+        $lines = $renderer->renderFrame($root, 10, 5)->toArray();
 
         $this->assertCount(2, $lines);
         $line1 = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -103,7 +103,7 @@ final class TextAlignTest extends TestCase
         $text->addStyleClass('text-red-500');
         $root->add($text);
 
-        $lines = $renderer->render($root, 10, 5);
+        $lines = $renderer->renderFrame($root, 10, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);
@@ -124,7 +124,7 @@ final class TextAlignTest extends TestCase
         $text->addStyleClass('text-center');
         $root->add($text);
 
-        $lines = $renderer->render($root, 20, 5);
+        $lines = $renderer->renderFrame($root, 20, 5)->toArray();
 
         $this->assertCount(3, $lines);
 
@@ -153,7 +153,7 @@ final class TextAlignTest extends TestCase
         $text->addStyleClass('bg-blue-500');
         $root->add($text);
 
-        $lines = $renderer->render($root, 10, 5);
+        $lines = $renderer->renderFrame($root, 10, 5)->toArray();
 
         $this->assertCount(1, $lines);
         $visible = AnsiUtils::stripAnsiCodes($lines[0]);

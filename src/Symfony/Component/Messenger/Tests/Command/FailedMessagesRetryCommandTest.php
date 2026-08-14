@@ -22,6 +22,8 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
+use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -337,6 +339,82 @@ class FailedMessagesRetryCommandTest extends TestCase
 
         $tester->execute(['id' => ['10']]);
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRedispatchRunWithServiceLocator()
+    {
+        $message = new \stdClass();
+        $redeliveryStamp = new RedeliveryStamp(2);
+        $envelope = new Envelope($message, [
+            new ReceivedStamp('async'),
+            new ConsumedByWorkerStamp(),
+            new SentToFailureTransportStamp('async'),
+            new TransportMessageIdStamp('failed-id'),
+            $redeliveryStamp,
+        ]);
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with('failed-id')->willReturn($envelope);
+        $receiver->expects($this->once())->method('ack')->with($envelope);
+        $receiver->expects($this->never())->method('reject');
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch')
+            ->with($this->callback(function (Envelope $dispatchedEnvelope) use ($message, $redeliveryStamp) {
+                $this->assertSame($message, $dispatchedEnvelope->getMessage());
+                $this->assertNull($dispatchedEnvelope->last(ReceivedStamp::class));
+                $this->assertNull($dispatchedEnvelope->last(ConsumedByWorkerStamp::class));
+                $this->assertNull($dispatchedEnvelope->last(SentToFailureTransportStamp::class));
+                $this->assertNull($dispatchedEnvelope->last(TransportMessageIdStamp::class));
+                $this->assertSame($redeliveryStamp, $dispatchedEnvelope->last(RedeliveryStamp::class));
+
+                return true;
+            }))
+            ->willReturnCallback(static fn (Envelope $dispatchedEnvelope) => $dispatchedEnvelope);
+
+        $failureTransportName = 'failure_receiver';
+        $command = new FailedMessagesRetryCommand(
+            $failureTransportName,
+            new ServiceLocator([$failureTransportName => static fn () => $receiver]),
+            $bus,
+            new EventDispatcher(),
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => ['failed-id'], '--force' => true, '--redispatch' => true]);
+
+        $this->assertStringContainsString('[OK]', $tester->getDisplay());
+    }
+
+    public function testRedispatchKeepsTheMessageWhenTheBusThrows()
+    {
+        $envelope = new Envelope(new \stdClass(), [
+            new SentToFailureTransportStamp('async'),
+            new TransportMessageIdStamp('failed-id'),
+        ]);
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->exactly(2))->method('find')->willReturn($envelope);
+        $receiver->expects($this->never())->method('ack');
+        $receiver->expects($this->never())->method('reject');
+
+        $bus = $this->createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willThrowException(new \RuntimeException('Transport is down'));
+
+        $failureTransportName = 'failure_receiver';
+        $command = new FailedMessagesRetryCommand(
+            $failureTransportName,
+            new ServiceLocator([$failureTransportName => static fn () => $receiver]),
+            $bus,
+            new EventDispatcher(),
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['id' => ['failed-id', 'other-id'], '--force' => true, '--redispatch' => true]);
+
+        // every id is still attempted, and the run does not report success
+        $this->assertStringContainsString('Transport is down', $tester->getDisplay());
+        $this->assertStringNotContainsString('[OK] All done!', $tester->getDisplay());
     }
 
     public function testRetryMessagesFilteredByClass()

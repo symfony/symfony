@@ -13,10 +13,12 @@ namespace Symfony\Component\Tui\Tests\Style;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Exception\InvalidArgumentException;
 use Symfony\Component\Tui\Style\Border;
 use Symfony\Component\Tui\Style\BorderPattern;
 use Symfony\Component\Tui\Style\Color;
+use Symfony\Component\Tui\Style\GradientDirection;
 use Symfony\Component\Tui\Style\Style;
 
 class BorderTest extends TestCase
@@ -298,5 +300,184 @@ class BorderTest extends TestCase
 
         $this->assertSame(BorderPattern::rounded()->getChars(), $border->pattern->getChars());
         $this->assertSame(Color::from('#ff0000')->toRgb(), $border->color->toRgb());
+    }
+
+    public function testWrapLinesWithGradientAppliesPerColumnCodesToTopRow()
+    {
+        $border = Border::all(1, 'normal');
+        $style = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::LeftToRight);
+
+        $lines = $border->wrapLines(['abc'], 3, $style);
+
+        // Top border row should contain both the black code (col 0) and white code (col last)
+        $black = Color::from('#000000')->toBackgroundCode();
+        $white = Color::from('#ffffff')->toBackgroundCode();
+
+        // lines[0] is top border row (with corners + 3 fill chars = 5 columns total)
+        $this->assertStringContainsString($black, $lines[0]);
+        $this->assertStringContainsString($white, $lines[0]);
+
+        // lines[2] is bottom border row: should also have gradient
+        $this->assertStringContainsString($black, $lines[2]);
+        $this->assertStringContainsString($white, $lines[2]);
+    }
+
+    public function testWrapLinesWithGradientAppliesGradientToCorners()
+    {
+        $border = Border::all(1, 'normal');
+        $style = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::LeftToRight);
+
+        $lines = $border->wrapLines(['abc'], 3, $style);
+
+        $black = Color::from('#000000')->toBackgroundCode();
+        $white = Color::from('#ffffff')->toBackgroundCode();
+
+        // A row is 5 columns: left corner, 3 fill cells, right corner. Assert on the
+        // background actually in effect at each corner rather than on the presence of
+        // a code somewhere in the row, which a repeated color need not restate.
+        foreach ([0, 2] as $row) {
+            $this->assertSame($black, self::backgroundAtColumn($lines[$row], 0), "row $row: left corner takes the first gradient color");
+            $this->assertSame($white, self::backgroundAtColumn($lines[$row], 4), "row $row: right corner takes the last gradient color");
+        }
+    }
+
+    public function testWrapLinesWithGradientStatesARepeatedBorderColorOnlyOnce()
+    {
+        // A vertical gradient gives every cell of a row the same color, so the row
+        // must state it once instead of before each of its 5 cells.
+        $border = Border::all(1, 'normal');
+        $style = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::TopToBottom);
+
+        $lines = $border->wrapLines(['abc'], 3, $style);
+
+        $this->assertSame(1, substr_count($lines[0], "\x1b[48;2;"), 'top border row');
+        $this->assertSame(1, substr_count($lines[2], "\x1b[48;2;"), 'bottom border row');
+    }
+
+    public function testWrapLinesWithGradientKeepsReverseVideoOnPatternsUsingIt()
+    {
+        // tall-medium drives its top fill with strategy 3, which is reverse video.
+        // Hoisting the constant foreground out of the run must not unbalance it.
+        $border = Border::all(1, 'tall-medium');
+        $style = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::LeftToRight);
+
+        $lines = $border->wrapLines(['abc'], 3, $style);
+
+        $this->assertStringContainsString("\e[7m", $lines[0]);
+        $this->assertSame(
+            substr_count($lines[0], "\e[7m"),
+            substr_count($lines[0], "\e[27m"),
+            'reverse video must be closed as many times as it is opened'
+        );
+        $this->assertSame('▌▆▆▆▌', AnsiUtils::stripAnsiCodes($lines[0]));
+    }
+
+    /**
+     * Return the background code in effect at a given visible column of a line.
+     */
+    private static function backgroundAtColumn(string $line, int $column): string
+    {
+        $background = '';
+        $col = 0;
+
+        foreach (preg_split('/(\x1b\[[0-9;]*[a-zA-Z])/', $line, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) as $part) {
+            if (str_starts_with($part, "\x1b[")) {
+                if (preg_match('/^\x1b\[(?:4[0-7]|10[0-7]|48;[25];[0-9;]+)m$/', $part)) {
+                    $background = $part;
+                } elseif ("\x1b[49m" === $part || "\x1b[0m" === $part) {
+                    $background = '';
+                }
+
+                continue;
+            }
+
+            foreach (preg_split('//u', $part, -1, \PREG_SPLIT_NO_EMPTY) as $ignored) {
+                if ($col === $column) {
+                    return $background;
+                }
+                ++$col;
+            }
+        }
+
+        return $background;
+    }
+
+    public function testWrapLinesWithGradientAppliesBackgroundToSideSegments()
+    {
+        // Standalone gradient container (no outer background): side segments use inner gradient edge colors
+        $border = Border::all(1, 'normal');
+        $style = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::LeftToRight);
+
+        $gradient = $style->getGradient();
+        $innerWidth = 3;
+        $codes = $gradient->resolve($innerWidth, 1);
+        $innerLine = $codes[0][0].' '.$codes[0][1].' '.$codes[0][2].' '."\x1b[49m]";
+
+        $lines = $border->wrapLines([$innerLine], $innerWidth, $style);
+
+        $black = Color::from('#000000')->toBackgroundCode();
+        $white = Color::from('#ffffff')->toBackgroundCode();
+
+        $this->assertStringStartsWith($black, $lines[1]);
+        $this->assertStringContainsString($white, substr($lines[1], -50));
+    }
+
+    public function testWrapLinesWithGradientAlwaysUsesChildGradientRegardlessOfOuterStyle()
+    {
+        // Border chars (side segs, corners, fill) must always show the child's own gradient,
+        // whether outer has a gradient, a solid bg, or nothing.
+        $border = Border::all(1, 'normal');
+        $innerStyle = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::LeftToRight);
+
+        $black = Color::from('#000000')->toBackgroundCode();
+        $white = Color::from('#ffffff')->toBackgroundCode();
+        $fill50 = Color::from('#000000')->mix(Color::from('#ffffff'), 50)->toBackgroundCode();
+
+        foreach ([
+            'no outer' => new Style(),
+            'outer gradient' => (new Style())->withLinearGradient(['#ff0000', '#0000ff'], GradientDirection::TopToBottom),
+            'outer solid bg' => (new Style())->withBackground('#ff0000'),
+        ] as $label => $outerStyle) {
+            $lines = $border->wrapLines(['abc'], 3, $innerStyle, $outerStyle);
+
+            // innerWidth=3 gradient: strip=[black, 50%gray, white]
+            // Left side seg (content row) = strip[0] of child gradient = black
+            $this->assertStringStartsWith($black, $lines[1], "$label: left side seg must use child gradient");
+            // Top/bottom border rows must contain the 50% fill color (col 2 of child gradient)
+            $this->assertStringContainsString($fill50, $lines[0], "$label: top fill must use child gradient");
+            $this->assertStringContainsString($fill50, $lines[2], "$label: bottom fill must use child gradient");
+        }
+    }
+
+    public function testWrapLinesGradientSpansInnerWidthOnly()
+    {
+        // Gradient spans innerWidth=3 only (not totalWidth=5).
+        // strip for width=3: [offset=0 → black, offset=0.5 → 50%gray, offset=1 → white]
+        // Corners use same endpoints as the fill:
+        //   left corner  = strip[0] = black
+        //   fill[0]      = strip[0] = black  ← pure black, NOT 25% gray
+        //   fill[1]      = strip[1] = 50% gray
+        //   fill[2]      = strip[2] = white
+        //   right corner = strip[2] = white
+        $border = Border::all(1, 'normal');
+        $style = (new Style())->withLinearGradient(['#000000', '#ffffff'], GradientDirection::LeftToRight);
+
+        $lines = $border->wrapLines(['abc'], 3, $style);
+
+        $black = Color::from('#000000')->toBackgroundCode();
+        $gray = Color::from('#000000')->mix(Color::from('#ffffff'), 50)->toBackgroundCode();
+        $white = Color::from('#ffffff')->toBackgroundCode();
+        $quarter = Color::from('#000000')->mix(Color::from('#ffffff'), 25)->toBackgroundCode();
+
+        foreach ([0, 2] as $row) {
+            $this->assertSame($black, self::backgroundAtColumn($lines[$row], 0), "row $row: left corner");
+            $this->assertSame($black, self::backgroundAtColumn($lines[$row], 1), "row $row: fill[0] is offset=0");
+            $this->assertSame($gray, self::backgroundAtColumn($lines[$row], 2), "row $row: fill[1] is offset=0.5");
+            $this->assertSame($white, self::backgroundAtColumn($lines[$row], 3), "row $row: fill[2] is offset=1");
+            $this->assertSame($white, self::backgroundAtColumn($lines[$row], 4), "row $row: right corner");
+
+            // Spanning totalWidth=5 instead of innerWidth=3 would put 25% gray on a cell.
+            $this->assertStringNotContainsString($quarter, $lines[$row], "row $row: the strip must span innerWidth");
+        }
     }
 }

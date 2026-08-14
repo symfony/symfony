@@ -416,6 +416,96 @@ final class BorderPattern
         );
     }
 
+    /**
+     * Paint a left or right border segment over one cell of a gradient.
+     *
+     * @internal
+     */
+    public function buildGradientSideSegment(string $segment, int $strategy, Style $outerStyle, ?Color $borderColor, string $bgCode): string
+    {
+        return $bgCode.$this->applyFgOnly($segment, $strategy, $outerStyle, $borderColor);
+    }
+
+    /**
+     * Paint a full top or bottom border row over one row of a gradient.
+     *
+     * The corners echo the endpoints of the row: the left one takes the first code,
+     * the right one the last.
+     *
+     * @param array<int, string> $chars         The three characters of the row: left corner, fill, right corner
+     * @param array<int, int>    $strategies    Their color strategies (see the class docblock)
+     * @param array<int, string> $gradientCodes ANSI background codes of the row, indexed by column
+     *
+     * @internal
+     */
+    public function buildGradientBorderRow(array $chars, array $strategies, int $innerWidth, int $leftWidth, int $rightWidth, Style $outerStyle, ?Color $borderColor, array $gradientCodes): string
+    {
+        $result = '';
+        // Last background code written to the row. The colors of a border row often
+        // repeat from one cell to the next, and re-stating one the terminal already
+        // holds costs up to 19 bytes per cell.
+        $lastCode = null;
+
+        if ($leftWidth > 0) {
+            $cornerChar = '' !== $chars[0] ? $chars[0] : ' ';
+            $result .= $lastCode = $gradientCodes[0] ?? '';
+            for ($i = 0; $i < $leftWidth; ++$i) {
+                $result .= $this->applyFgOnly($cornerChar, $strategies[0], $outerStyle, $borderColor);
+            }
+        }
+
+        if ($innerWidth > 0) {
+            // The foreground of the fill is constant across the row, so it is stated
+            // once around the run instead of before and after every character.
+            $fillChar = '' !== $chars[1] ? $chars[1] : ' ';
+            $reversed = 2 === $strategies[1] || 3 === $strategies[1];
+
+            $result .= $this->foregroundCode($borderColor);
+            if ($reversed) {
+                $result .= "\e[7m";
+            }
+
+            for ($i = 0; $i < $innerWidth; ++$i) {
+                $code = $gradientCodes[$i] ?? '';
+                if ($code !== $lastCode) {
+                    $result .= $lastCode = $code;
+                }
+                $result .= $fillChar;
+            }
+
+            if ($reversed) {
+                $result .= "\e[27m";
+            }
+            $result .= $this->foregroundCode($outerStyle->getColor());
+        }
+
+        if ($rightWidth > 0) {
+            $cornerChar = '' !== $chars[2] ? $chars[2] : ' ';
+            $code = $gradientCodes[\count($gradientCodes) - 1] ?? '';
+            if ($code !== $lastCode) {
+                $result .= $code;
+            }
+            for ($i = 0; $i < $rightWidth; ++$i) {
+                $result .= $this->applyFgOnly($cornerChar, $strategies[2], $outerStyle, $borderColor);
+            }
+        }
+
+        $result .= "\x1b[49m";
+
+        return $result;
+    }
+
+    private function applyFgOnly(string $char, int $strategy, Style $outerStyle, ?Color $borderColor): string
+    {
+        $outerForeground = $outerStyle->getColor();
+
+        // Strategies 2 and 3 use reverse video: apply fg then reverse video, then reset reverse
+        return match ($strategy) {
+            2, 3 => $this->foregroundCode($borderColor)."\e[7m".$char."\e[27m".$this->foregroundCode($outerForeground),
+            default => $this->foregroundCode($borderColor).$char.$this->foregroundCode($outerForeground),
+        };
+    }
+
     private function applyColors(string $segment, ?Color $foreground, ?Color $background, ?Color $outerForeground, ?Color $outerBackground): string
     {
         return $this->foregroundCode($foreground)

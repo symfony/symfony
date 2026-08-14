@@ -19,7 +19,10 @@ use Symfony\Component\Tui\Style\BorderPattern;
 use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\CursorShape;
 use Symfony\Component\Tui\Style\Direction;
+use Symfony\Component\Tui\Style\GradientDirection;
+use Symfony\Component\Tui\Style\LinearGradient;
 use Symfony\Component\Tui\Style\Padding;
+use Symfony\Component\Tui\Style\RadialGradient;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Style\VerticalAlign;
@@ -420,5 +423,151 @@ class StyleTest extends TestCase
         $this->assertSame(Align::Right, $result->getAlign());
         $this->assertSame(VerticalAlign::Center, $result->getVerticalAlign());
         $this->assertSame(2, $result->getFlex());
+    }
+
+    public function testMergeAllGradientOverridesEarlierBackground()
+    {
+        $result = Style::mergeAll([
+            new Style(background: '#00ff00'),
+            (new Style())->withLinearGradient(['red', 'blue']),
+        ]);
+
+        $this->assertInstanceOf(LinearGradient::class, $result->getGradient());
+        $this->assertNull($result->getBackground());
+    }
+
+    public function testMergeAllBackgroundOverridesEarlierGradient()
+    {
+        $result = Style::mergeAll([
+            (new Style())->withLinearGradient(['red', 'blue']),
+            new Style(background: '#00ff00'),
+        ]);
+
+        $this->assertNull($result->getGradient());
+        $this->assertSame('#00ff00', $result->getBackground()->toHex());
+    }
+
+    public function testMergeAllKeepsGradientWhenLaterStylesSetNoBackground()
+    {
+        $result = Style::mergeAll([
+            (new Style())->withLinearGradient(['red', 'blue']),
+            new Style(bold: true),
+        ]);
+
+        $this->assertInstanceOf(LinearGradient::class, $result->getGradient());
+        $this->assertNull($result->getBackground());
+    }
+
+    public function testMergeAllKeepsBackgroundWhenLaterStylesSetNoGradient()
+    {
+        $result = Style::mergeAll([
+            new Style(background: '#00ff00'),
+            new Style(bold: true),
+        ]);
+
+        $this->assertNull($result->getGradient());
+        $this->assertSame('#00ff00', $result->getBackground()->toHex());
+    }
+
+    public function testWithLinearGradientFromArray()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue']);
+        $gradient = $style->getGradient();
+
+        $this->assertInstanceOf(LinearGradient::class, $gradient);
+        $this->assertNull($style->getBackground()); // gradient clears background
+    }
+
+    public function testWithLinearGradientFromObject()
+    {
+        $g = LinearGradient::leftToRight('red', 'blue');
+        $style = (new Style())->withLinearGradient($g);
+
+        $this->assertSame($g, $style->getGradient());
+    }
+
+    public function testWithLinearGradientWithDirection()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue'], GradientDirection::TopToBottom);
+        $codes = $style->getGradient()->resolve(2, 2);
+
+        // Vertical: col 0 and col 1 in same row are identical
+        $this->assertSame($codes[0][0], $codes[0][1]);
+        // Vertical: row 0 and row 1 differ
+        $this->assertNotSame($codes[0][0], $codes[1][0]);
+    }
+
+    public function testWithBackgroundClearsGradient()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue'])->withBackground('green');
+
+        $this->assertNull($style->getGradient());
+        $this->assertNotNull($style->getBackground());
+    }
+
+    public function testWithLinearGradientClearsBackground()
+    {
+        $style = (new Style())->withBackground('green')->withLinearGradient(['red', 'blue']);
+
+        $this->assertNull($style->getBackground());
+        $this->assertNotNull($style->getGradient());
+    }
+
+    public function testIsPlainFalseWhenGradientSet()
+    {
+        $style = (new Style())->withLinearGradient(['red', 'blue']);
+
+        $this->assertFalse($style->isPlain());
+    }
+
+    public function testWithLinearGradientObjectAndDirectionOverridesDirection()
+    {
+        $g = LinearGradient::leftToRight('#000000', '#ffffff');
+        $style = (new Style())->withLinearGradient($g, GradientDirection::TopToBottom);
+
+        $this->assertNotSame($g, $style->getGradient());
+
+        $codes = $style->getGradient()->resolve(2, 2);
+        $this->assertSame($codes[0][0], $codes[0][1], 'vertical gradient: columns of a row are identical');
+        $this->assertNotSame($codes[0][0], $codes[1][0], 'vertical gradient: rows differ');
+    }
+
+    public function testWithRadialGradientFromArray()
+    {
+        $style = (new Style())->withRadialGradient(['red', 'blue']);
+
+        $this->assertInstanceOf(RadialGradient::class, $style->getGradient());
+        $this->assertNull($style->getBackground());
+    }
+
+    public function testWithRadialGradientFromObject()
+    {
+        $g = RadialGradient::centered('red', 'blue');
+        $style = (new Style())->withRadialGradient($g);
+
+        $this->assertSame($g, $style->getGradient());
+    }
+
+    public function testWithRadialGradientObjectAndCenterOverridesCenter()
+    {
+        $g = RadialGradient::centered('#ff0000', '#0000ff');
+        $style = (new Style())->withRadialGradient($g, 0.0, 0.0);
+
+        $this->assertNotSame($g, $style->getGradient());
+        $this->assertSame(
+            RadialGradient::from(['#ff0000', '#0000ff'], 0.0, 0.0)->resolve(5, 5),
+            $style->getGradient()->resolve(5, 5)
+        );
+    }
+
+    public function testWithRadialGradientObjectKeepsUnspecifiedGeometry()
+    {
+        $g = RadialGradient::from(['#ff0000', '#0000ff'], 0.2, 0.3, 1.0);
+        $style = (new Style())->withRadialGradient($g, null, null, 3.0);
+
+        $this->assertSame(
+            RadialGradient::from(['#ff0000', '#0000ff'], 0.2, 0.3, 3.0)->resolve(6, 4),
+            $style->getGradient()->resolve(6, 4)
+        );
     }
 }

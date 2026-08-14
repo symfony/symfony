@@ -150,24 +150,69 @@ final class Border
         $outerStyle ??= new Style();
         $borderColor = $this->color ?? $innerStyle->getColor();
 
+        $gradient = $innerStyle->getGradient();
+        $totalRows = $this->top + \count($innerLines) + $this->bottom;
+        $gradientCodes = $gradient?->resolve($innerWidth, $totalRows);
+
         $lines = [];
 
         if ($this->top > 0) {
             for ($row = 0; $row < $this->top; ++$row) {
-                $lines[] = $this->buildBorderRow($pattern, $chars[0], $strategies[0], $innerWidth, $this->left, $this->right, $outerStyle, $innerStyle, $borderColor);
+                if (null !== $gradientCodes) {
+                    $lines[] = $pattern->buildGradientBorderRow($chars[0], $strategies[0], $innerWidth, $this->left, $this->right, $outerStyle, $borderColor, $gradientCodes[$row]);
+                } else {
+                    $lines[] = $this->buildBorderRow($pattern, $chars[0], $strategies[0], $innerWidth, $this->left, $this->right, $outerStyle, $innerStyle, $borderColor);
+                }
             }
         }
 
         $leftSegment = $this->left > 0 ? $pattern->applyBorderSegment(str_repeat('' !== $chars[1][0] ? $chars[1][0] : ' ', $this->left), $strategies[1][0], $outerStyle, $innerStyle, $borderColor) : '';
         $rightSegment = $this->right > 0 ? $pattern->applyBorderSegment(str_repeat('' !== $chars[1][2] ? $chars[1][2] : ' ', $this->right), $strategies[1][2], $outerStyle, $innerStyle, $borderColor) : '';
 
-        foreach ($innerLines as $line) {
-            $lines[] = $leftSegment.$line.$rightSegment;
+        $leftBorderChar = '' !== $chars[1][0] ? $chars[1][0] : ' ';
+        $rightBorderChar = '' !== $chars[1][2] ? $chars[1][2] : ' ';
+
+        if (null !== $gradientCodes) {
+            foreach ($innerLines as $idx => $line) {
+                $contentRow = $this->top + $idx;
+                $rowCodes = $gradientCodes[$contentRow];
+                $lastCol = \count($rowCodes) - 1;
+
+                $leftBgCode = $rowCodes[0] ?? '';
+                $rightBgCode = $rowCodes[$lastCol] ?? '';
+
+                $leftSeg = $this->left > 0
+                    ? $pattern->buildGradientSideSegment(
+                        str_repeat($leftBorderChar, $this->left),
+                        $strategies[1][0], $outerStyle, $borderColor,
+                        $leftBgCode,
+                    )
+                    : '';
+
+                $rightSeg = $this->right > 0
+                    ? $pattern->buildGradientSideSegment(
+                        str_repeat($rightBorderChar, $this->right),
+                        $strategies[1][2], $outerStyle, $borderColor,
+                        $rightBgCode,
+                    )."\x1b[49m"
+                    : '';
+
+                $lines[] = $leftSeg.$line.$rightSeg;
+            }
+        } else {
+            foreach ($innerLines as $line) {
+                $lines[] = $leftSegment.$line.$rightSegment;
+            }
         }
 
         if ($this->bottom > 0) {
-            for ($row = 0; $row < $this->bottom; ++$row) {
-                $lines[] = $this->buildBorderRow($pattern, $chars[2], $strategies[2], $innerWidth, $this->left, $this->right, $outerStyle, $innerStyle, $borderColor);
+            for ($r = 0; $r < $this->bottom; ++$r) {
+                if (null !== $gradientCodes) {
+                    $bottomRowIndex = $this->top + \count($innerLines) + $r;
+                    $lines[] = $pattern->buildGradientBorderRow($chars[2], $strategies[2], $innerWidth, $this->left, $this->right, $outerStyle, $borderColor, $gradientCodes[$bottomRowIndex]);
+                } else {
+                    $lines[] = $this->buildBorderRow($pattern, $chars[2], $strategies[2], $innerWidth, $this->left, $this->right, $outerStyle, $innerStyle, $borderColor);
+                }
             }
         }
 

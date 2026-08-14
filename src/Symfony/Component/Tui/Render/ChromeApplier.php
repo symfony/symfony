@@ -107,9 +107,6 @@ final class ChromeApplier
             return new ArrayLineBuffer([]);
         }
 
-        $styledEmptyLine = $style->apply(str_repeat(' ', $innerWidth));
-        $topPadding = $paddingTop > 0 ? array_fill(0, $paddingTop, $styledEmptyLine) : [];
-        $bottomPadding = $paddingBottom > 0 ? array_fill(0, $paddingBottom, $styledEmptyLine) : [];
         $textAlign = $style->getTextAlign() ?? TextAlign::Left;
 
         // For center/right alignment, compute offset from the widest line
@@ -125,13 +122,49 @@ final class ChromeApplier
             };
         }
 
-        $contentLines = [];
+        $gradient = $style->getGradient();
         $padLen = $paddingLeft + $alignPadLeft;
         $leftPad = str_repeat(' ', $padLen);
-        foreach ($processedLines as $i => $line) {
-            $lineWithPad = $leftPad.$line;
-            $rightPad = str_repeat(' ', max(0, $innerWidth - $padLen - $processedWidths[$i]));
-            $contentLines[] = $style->apply($lineWithPad.$rightPad);
+
+        if (null !== $gradient) {
+            $totalRows = $paddingTop + \count($processedLines) + $paddingBottom;
+            $fullHeight = $borderTop + $totalRows + $borderBottom;
+            // Resolve over innerWidth so the gradient spans the content area only.
+            // Borders echo the endpoint colors; content always starts at offset=0 and ends at offset=1.
+            $fullCodes = $gradient->resolve($innerWidth, $fullHeight);
+            $codes = [];
+            for ($r = 0; $r < $totalRows; ++$r) {
+                $codes[$r] = $fullCodes[$borderTop + $r];
+            }
+
+            $topPadding = [];
+            for ($r = 0; $r < $paddingTop; ++$r) {
+                $topPadding[] = $this->buildGradientLine('', $codes[$r], $innerWidth);
+            }
+
+            $contentLines = [];
+            foreach ($processedLines as $i => $line) {
+                $lineWithPad = $leftPad.$line;
+                $rightPad = str_repeat(' ', max(0, $innerWidth - $padLen - $processedWidths[$i]));
+                $contentLines[] = $this->buildGradientLine($lineWithPad.$rightPad, $codes[$paddingTop + $i], $innerWidth);
+            }
+
+            $bottomPadding = [];
+            for ($r = 0; $r < $paddingBottom; ++$r) {
+                $row = $paddingTop + \count($processedLines) + $r;
+                $bottomPadding[] = $this->buildGradientLine('', $codes[$row], $innerWidth);
+            }
+        } else {
+            $styledEmptyLine = $style->apply(str_repeat(' ', $innerWidth));
+            $topPadding = $paddingTop > 0 ? array_fill(0, $paddingTop, $styledEmptyLine) : [];
+            $bottomPadding = $paddingBottom > 0 ? array_fill(0, $paddingBottom, $styledEmptyLine) : [];
+
+            $contentLines = [];
+            foreach ($processedLines as $i => $line) {
+                $lineWithPad = $leftPad.$line;
+                $rightPad = str_repeat(' ', max(0, $innerWidth - $padLen - $processedWidths[$i]));
+                $contentLines[] = $style->apply($lineWithPad.$rightPad);
+            }
         }
 
         $innerLines = [...$topPadding, ...$contentLines, ...$bottomPadding];
@@ -212,6 +245,179 @@ final class ChromeApplier
         // visual formatting (color, bold, etc.). The Renderer owns layout
         // (padding, border, gap, direction, hidden, cursorShape, textAlign, align, verticalAlign); widgets own content.
         return new RenderContext($innerColumns, $innerRows, $context->getStyle()->withoutLayoutProperties(), $context->getFontRegistry());
+    }
+
+    /**
+     * Build a line applying per-column gradient background codes.
+     *
+     * Walks the ANSI string in a single O(n) pass, injecting a gradient bg code
+     * before each visible character only when no child widget has set an explicit
+     * background color. This implements CSS-style cascade: child bg takes
+     * precedence over the parent gradient.
+     *
+     * @param array<int, string> $rowCodes Per-column ANSI bg codes indexed by column
+     */
+    private function buildGradientLine(string $content, array $rowCodes, int $width): string
+    {
+        $result = '';
+        $col = 0;
+        $i = 0;
+        $len = \strlen($content);
+        $childBgActive = false;
+        // Last gradient code written to the line, so a run of cells sharing a color
+        // states it once. Reset to null whenever a sequence of the child goes
+        // through, since it may have changed the background behind our back.
+        $lastCode = null;
+
+        while ($i < $len && $col < $width) {
+            $ord = \ord($content[$i]);
+
+            // ANSI escape sequence (CSI: ESC [): pass through, track bg state
+            if (0x1B === $ord && '[' === ($content[$i + 1] ?? '')) {
+                $j = self::endOfCsi($content, $i, $len);
+                $seq = substr($content, $i, $j - $i);
+                $childBgActive = $this->parseBgState($seq, $childBgActive);
+                $result .= $seq;
+                $lastCode = null;
+                $i = $j;
+                continue;
+            }
+
+            // Printable ASCII: inject gradient code only when child has no active bg
+            if ($ord >= 0x20 && $ord <= 0x7E) {
+                if (!$childBgActive && ($rowCodes[$col] ?? '') !== $lastCode) {
+                    $result .= $lastCode = $rowCodes[$col] ?? '';
+                }
+                $result .= $content[$i];
+                ++$col;
+                ++$i;
+                continue;
+            }
+
+            // Multi-byte UTF-8: same logic
+            if ($ord >= 0x80) {
+                $seqLen = match (true) {
+                    ($ord & 0xE0) === 0xC0 => 2,
+                    ($ord & 0xF0) === 0xE0 => 3,
+                    ($ord & 0xF8) === 0xF0 => 4,
+                    default => 1,
+                };
+                $char = substr($content, $i, $seqLen);
+                $charWidth = AnsiUtils::graphemeWidth($char);
+                if (!$childBgActive && ($rowCodes[$col] ?? '') !== $lastCode) {
+                    $result .= $lastCode = $rowCodes[$col] ?? '';
+                }
+                $result .= $char;
+                $col += $charWidth;
+                $i += $seqLen;
+                continue;
+            }
+
+            ++$i;
+        }
+
+        // Fill remaining width with gradient-colored spaces
+        while ($col < $width) {
+            if (($rowCodes[$col] ?? '') !== $lastCode) {
+                $result .= $lastCode = $rowCodes[$col] ?? '';
+            }
+            $result .= ' ';
+            ++$col;
+        }
+
+        // Re-emit the escape sequences left after the last visible cell. When the
+        // content fills the line exactly, the loop above stops on $col and would
+        // otherwise drop the resets a child appended past its last character
+        // (ESC[22m, ESC[39m, ...), leaking its style onto the next line.
+        while ($i < $len) {
+            if (0x1B !== \ord($content[$i]) || '[' !== ($content[$i + 1] ?? '')) {
+                ++$i;
+                continue;
+            }
+
+            $j = self::endOfCsi($content, $i, $len);
+            $result .= substr($content, $i, $j - $i);
+            $i = $j;
+        }
+
+        return $result."\x1b[49m";
+    }
+
+    /**
+     * Return the offset just past the CSI sequence starting at $start.
+     */
+    private static function endOfCsi(string $content, int $start, int $len): int
+    {
+        $j = $start + 2;
+        // Parameter bytes (0x30–0x3F)
+        while ($j < $len && \ord($content[$j]) >= 0x30 && \ord($content[$j]) <= 0x3F) {
+            ++$j;
+        }
+        // Intermediate bytes (0x20–0x2F)
+        while ($j < $len && \ord($content[$j]) >= 0x20 && \ord($content[$j]) <= 0x2F) {
+            ++$j;
+        }
+        // Final byte (0x40–0x7E)
+        if ($j < $len && \ord($content[$j]) >= 0x40 && \ord($content[$j]) <= 0x7E) {
+            ++$j;
+        }
+
+        return $j;
+    }
+
+    /**
+     * Parse a CSI escape sequence to determine the new bg-active state.
+     *
+     * Returns true if the sequence sets a background color (child bg takes
+     * precedence over parent gradient), false if it resets the background.
+     * Returns $current unchanged if the sequence doesn't affect bg.
+     */
+    private function parseBgState(string $seq, bool $current): bool
+    {
+        // Only process CSI sequences (ESC [)
+        if (\strlen($seq) < 3 || "\x1b[" !== substr($seq, 0, 2)) {
+            return $current;
+        }
+
+        // Parameter string is between [ and the final byte
+        if ('' === $params = substr($seq, 2, -1)) {
+            return false; // bare ESC [ m = SGR 0 = full reset
+        }
+
+        $state = $current;
+        $parts = explode(';', $params);
+        $count = \count($parts);
+        $idx = 0;
+
+        while ($idx < $count) {
+            $n = (int) $parts[$idx];
+
+            if (38 === $n || 48 === $n || 58 === $n) {
+                // Extended color: N;5;I (256-color) or N;2;R;G;B (RGB). Only 48
+                // sets a background, but the payload of 38 (foreground) and 58
+                // (underline) has to be skipped just the same: a zero channel
+                // would otherwise be read as SGR 0 and clear the child bg.
+                if (48 === $n) {
+                    $state = true;
+                }
+                if ($idx + 1 < $count) {
+                    if ('5' === $parts[$idx + 1]) {
+                        $idx += 2; // skip N + 5; ++$idx at end advances past I
+                    } elseif ('2' === $parts[$idx + 1]) {
+                        $idx += 4; // skip N + 2 + R + G; ++$idx at end advances past B
+                    }
+                }
+            } elseif (0 === $n || 49 === $n) {
+                // SGR 0 (full reset) or SGR 49 (bg-default): clear child bg
+                $state = false;
+            } elseif (($n >= 40 && $n <= 47) || ($n >= 100 && $n <= 107)) {
+                // Standard (40-47) and bright (100-107) bg colors
+                $state = true;
+            }
+            ++$idx;
+        }
+
+        return $state;
     }
 
     /**

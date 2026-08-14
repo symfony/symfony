@@ -64,6 +64,7 @@ final class Style
     private ?string $ansiPrefix = null;
     private ?string $ansiSuffix = null;
     private ?string $bgCode = null;
+    private ?GradientInterface $gradient = null;
 
     /**
      * @param Padding|null          $padding       Padding specification (null = not set, see Padding::from())
@@ -122,153 +123,101 @@ final class Style
         $this->bgCode = null;
     }
 
-    /**
-     * Get the background color.
-     */
     public function getBackground(): ?Color
     {
         return $this->backgroundColor;
     }
 
-    /**
-     * Get the foreground color.
-     */
+    public function getGradient(): ?GradientInterface
+    {
+        return $this->gradient;
+    }
+
     public function getColor(): ?Color
     {
         return $this->foregroundColor;
     }
 
-    /**
-     * Get the padding.
-     */
     public function getPadding(): ?Padding
     {
         return $this->padding;
     }
 
-    /**
-     * Get the border.
-     */
     public function getBorder(): ?Border
     {
         return $this->border;
     }
 
-    /**
-     * Get the bold flag.
-     */
     public function getBold(): ?bool
     {
         return $this->bold;
     }
 
-    /**
-     * Get the dim flag.
-     */
     public function getDim(): ?bool
     {
         return $this->dim;
     }
 
-    /**
-     * Get the italic flag.
-     */
     public function getItalic(): ?bool
     {
         return $this->italic;
     }
 
-    /**
-     * Get the strikethrough flag.
-     */
     public function getStrikethrough(): ?bool
     {
         return $this->strikethrough;
     }
 
-    /**
-     * Get the underline flag.
-     */
     public function getUnderline(): ?bool
     {
         return $this->underline;
     }
 
-    /**
-     * Get the reverse flag.
-     */
     public function getReverse(): ?bool
     {
         return $this->reverse;
     }
 
-    /**
-     * Get the layout direction.
-     */
     public function getDirection(): ?Direction
     {
         return $this->direction;
     }
 
-    /**
-     * Get the gap between children.
-     */
     public function getGap(): ?int
     {
         return $this->gap;
     }
 
-    /**
-     * Get the hidden flag.
-     */
     public function getHidden(): ?bool
     {
         return $this->hidden;
     }
 
-    /**
-     * Get the cursor shape.
-     */
     public function getCursorShape(): ?CursorShape
     {
         return $this->cursorShape;
     }
 
-    /**
-     * Get the text alignment.
-     */
     public function getTextAlign(): ?TextAlign
     {
         return $this->textAlign;
     }
 
-    /**
-     * Get the FIGlet font name or path.
-     */
     public function getFont(): ?string
     {
         return $this->font;
     }
 
-    /**
-     * Get the maximum width in columns.
-     */
     public function getMaxColumns(): ?int
     {
         return $this->maxColumns;
     }
 
-    /**
-     * Get the horizontal alignment of child widgets.
-     */
     public function getAlign(): ?Align
     {
         return $this->align;
     }
 
-    /**
-     * Get the vertical alignment of child widgets.
-     */
     public function getVerticalAlign(): ?VerticalAlign
     {
         return $this->verticalAlign;
@@ -300,11 +249,12 @@ final class Style
             && null === $this->italic
             && null === $this->strikethrough
             && null === $this->underline
-            && null === $this->reverse;
+            && null === $this->reverse
+            && null === $this->gradient;
     }
 
     /**
-     * Create a style with padding only.
+     * Creates a style with padding only.
      *
      * @param Padding|array<int> $padding Padding specification (see Padding::from())
      */
@@ -314,7 +264,7 @@ final class Style
     }
 
     /**
-     * Create a style with border only.
+     * Creates a style with border only.
      *
      * @param Border|array<int>         $border  Border specification (see Border::from())
      * @param BorderPattern|string|null $pattern Border pattern (see BorderPattern::fromName())
@@ -355,11 +305,11 @@ final class Style
         $align = null;
         $verticalAlign = null;
         $flex = null;
+        $gradient = null;
 
         foreach ($styles as $style) {
             $padding = $style->padding ?? $padding;
             $border = $style->border ?? $border;
-            $background = $style->backgroundColor ?? $background;
             $color = $style->foregroundColor ?? $color;
             $bold = $style->bold ?? $bold;
             $dim = $style->dim ?? $dim;
@@ -377,9 +327,19 @@ final class Style
             $align = $style->align ?? $align;
             $verticalAlign = $style->verticalAlign ?? $verticalAlign;
             $flex = $style->flex ?? $flex;
+            // Background and gradient share a single slot: they are mutually
+            // exclusive on a Style (see withBackground()/withLinearGradient()),
+            // so the last style setting either one wins over the other.
+            if (null !== $style->gradient) {
+                $gradient = $style->gradient;
+                $background = null;
+            } elseif (null !== $style->backgroundColor) {
+                $background = $style->backgroundColor;
+                $gradient = null;
+            }
         }
 
-        return new self(
+        $result = new self(
             $padding,
             $border,
             $background,
@@ -401,10 +361,13 @@ final class Style
             $verticalAlign,
             $flex,
         );
+        $result->gradient = $gradient;
+
+        return $result;
     }
 
     /**
-     * Create new style with different padding.
+     * Creates new style with different padding.
      *
      * @param Padding|array<int> $padding Padding specification (see Padding::from())
      */
@@ -417,7 +380,7 @@ final class Style
     }
 
     /**
-     * Create new style with different border.
+     * Creates new style with different border.
      *
      * @param Border|array<int>         $border  Border specification (see Border::from())
      * @param BorderPattern|string|null $pattern Border pattern (see BorderPattern::fromName())
@@ -432,7 +395,7 @@ final class Style
     }
 
     /**
-     * Create new style with a different border pattern.
+     * Creates new style with a different border pattern.
      */
     public function withBorderPattern(BorderPattern|string|null $pattern): self
     {
@@ -442,7 +405,7 @@ final class Style
     }
 
     /**
-     * Create new style with a different border color.
+     * Creates new style with a different border color.
      */
     public function withBorderColor(Color|string|int|null $color): self
     {
@@ -452,7 +415,7 @@ final class Style
     }
 
     /**
-     * Create new style with background color.
+     * Creates new style with background color.
      *
      * @param Color|string|int|null $background Color specification:
      *                                          - Color instance
@@ -464,13 +427,53 @@ final class Style
     public function withBackground(Color|string|int|null $background): self
     {
         $clone = clone $this;
+        $clone->gradient = null;
         $clone->backgroundColor = null !== $background ? Color::from($background) : null;
 
         return $clone;
     }
 
     /**
-     * Create new style with foreground color.
+     * Creates new style with a linear gradient.
+     *
+     * Clears any background color: the two are mutually exclusive. Requires a
+     * truecolor terminal, see LinearGradient.
+     *
+     * @param LinearGradient|array<Color|string|int> $gradient  Colors array or pre-built gradient object (see LinearGradient::from())
+     * @param GradientDirection|Angle|null           $direction Gradient axis. Null keeps the direction of a pre-built
+     *                                                          gradient, and defaults to left-to-right for an array.
+     */
+    public function withLinearGradient(LinearGradient|array $gradient, GradientDirection|Angle|null $direction = null): self
+    {
+        $clone = clone $this;
+        $clone->gradient = LinearGradient::from($gradient, $direction);
+        $clone->backgroundColor = null;
+
+        return $clone;
+    }
+
+    /**
+     * Creates new style with a radial gradient.
+     *
+     * Clears any background color: the two are mutually exclusive. Requires a
+     * truecolor terminal, see RadialGradient.
+     *
+     * @param RadialGradient|array<Color|string|int> $gradient    Colors array or pre-built gradient object (see RadialGradient::from())
+     * @param float|null                             $cx          Horizontal center in normalized coordinates [0, 1] (0=left, 0.5=center, 1=right)
+     * @param float|null                             $cy          Vertical center in normalized coordinates [0, 1] (0=top, 0.5=center, 1=bottom)
+     * @param float|null                             $aspectRatio Cell height / cell width ratio. Standard terminals use ~2.0. Set to 1.0 for square-pixel rendering.
+     */
+    public function withRadialGradient(RadialGradient|array $gradient, ?float $cx = null, ?float $cy = null, ?float $aspectRatio = null): self
+    {
+        $clone = clone $this;
+        $clone->gradient = RadialGradient::from($gradient, $cx, $cy, $aspectRatio);
+        $clone->backgroundColor = null;
+
+        return $clone;
+    }
+
+    /**
+     * Creates new style with foreground color.
      *
      * @param Color|string|int|null $color Color specification:
      *                                     - Color instance
@@ -488,7 +491,7 @@ final class Style
     }
 
     /**
-     * Create new style with bold enabled.
+     * Creates new style with bold enabled.
      */
     public function withBold(bool $bold = true): self
     {
@@ -499,7 +502,7 @@ final class Style
     }
 
     /**
-     * Create new style with dim/faint enabled.
+     * Creates new style with dim/faint enabled.
      */
     public function withDim(bool $dim = true): self
     {
@@ -510,7 +513,7 @@ final class Style
     }
 
     /**
-     * Create new style with italic enabled.
+     * Creates new style with italic enabled.
      */
     public function withItalic(bool $italic = true): self
     {
@@ -521,7 +524,7 @@ final class Style
     }
 
     /**
-     * Create new style with strikethrough enabled.
+     * Creates new style with strikethrough enabled.
      */
     public function withStrikethrough(bool $strikethrough = true): self
     {
@@ -532,7 +535,7 @@ final class Style
     }
 
     /**
-     * Create new style with underline enabled.
+     * Creates new style with underline enabled.
      */
     public function withUnderline(bool $underline = true): self
     {
@@ -543,7 +546,7 @@ final class Style
     }
 
     /**
-     * Create new style with reverse video enabled.
+     * Creates new style with reverse video enabled.
      */
     public function withReverse(bool $reverse = true): self
     {
@@ -554,7 +557,7 @@ final class Style
     }
 
     /**
-     * Create new style with layout direction.
+     * Creates new style with layout direction.
      */
     public function withDirection(Direction $direction): self
     {
@@ -565,7 +568,7 @@ final class Style
     }
 
     /**
-     * Create new style with gap between children.
+     * Creates new style with gap between children.
      */
     public function withGap(int $gap): self
     {
@@ -576,7 +579,7 @@ final class Style
     }
 
     /**
-     * Create new style with hidden flag.
+     * Creates new style with hidden flag.
      *
      * Hidden widgets are skipped during rendering; they produce no output
      * and take no space, similar to CSS `display: none`.
@@ -590,7 +593,7 @@ final class Style
     }
 
     /**
-     * Create new style with a cursor shape.
+     * Creates new style with a cursor shape.
      */
     public function withCursorShape(CursorShape $cursorShape): self
     {
@@ -601,7 +604,7 @@ final class Style
     }
 
     /**
-     * Create new style with text alignment.
+     * Creates new style with text alignment.
      */
     public function withTextAlign(TextAlign $textAlign): self
     {
@@ -612,7 +615,7 @@ final class Style
     }
 
     /**
-     * Create new style with a FIGlet font.
+     * Creates new style with a FIGlet font.
      *
      * @param string|null $font Bundled font name (big, small, slant, standard, mini) or path to a .flf file, or null to clear
      */
@@ -625,7 +628,7 @@ final class Style
     }
 
     /**
-     * Create new style with a maximum column width.
+     * Creates new style with a maximum column width.
      *
      * @param int|null $maxColumns Maximum width in columns, or null to clear
      */
@@ -638,7 +641,7 @@ final class Style
     }
 
     /**
-     * Create new style with horizontal alignment for child widgets.
+     * Creates new style with horizontal alignment for child widgets.
      */
     public function withAlign(Align $align): self
     {
@@ -649,7 +652,7 @@ final class Style
     }
 
     /**
-     * Create new style with vertical alignment for child widgets.
+     * Creates new style with vertical alignment for child widgets.
      */
     public function withVerticalAlign(VerticalAlign $verticalAlign): self
     {
@@ -660,7 +663,7 @@ final class Style
     }
 
     /**
-     * Create new style with a flex grow weight for horizontal layouts.
+     * Creates new style with a flex grow weight for horizontal layouts.
      *
      * @param int|null $flex 0 = intrinsic width, 1+ = proportional weight, null = clear
      */
@@ -673,7 +676,7 @@ final class Style
     }
 
     /**
-     * Create a copy with only visual formatting and content properties.
+     * Creates a copy with only visual formatting and content properties.
      *
      * Strips layout properties that the Renderer owns: padding, border,
      * gap, direction, hidden, cursorShape, textAlign, maxColumns, align,

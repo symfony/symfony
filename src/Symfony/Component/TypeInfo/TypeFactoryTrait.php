@@ -457,7 +457,7 @@ trait TypeFactoryTrait
 
             $valueType = $valueTypes ? CollectionType::mergeCollectionValueTypes($valueTypes) : Type::mixed();
 
-            return self::collection($type, $valueType, $keyType, \is_array($value) && [] !== $value && array_is_list($value));
+            return self::collection($type, $valueType, $keyType, \is_array($value) && $value && array_is_list($value));
         }
 
         if ($value instanceof \ArrayAccess) {

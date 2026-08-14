@@ -2349,7 +2349,7 @@ class Configuration implements ConfigurationInterface
                     ->info('Mailer configuration')
                     ->{$enableIfStandalone('symfony/mailer', Mailer::class)}()
                     ->validate()
-                        ->ifTrue(static fn ($v) => isset($v['dsn']) && \count($v['transports']))
+                        ->ifTrue(static fn ($v) => isset($v['dsn']) && $v['transports'])
                         ->thenInvalid('"dsn" and "transports" cannot be used together.')
                     ->end()
                     ->children()

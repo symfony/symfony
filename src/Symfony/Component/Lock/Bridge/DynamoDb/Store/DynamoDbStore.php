@@ -81,13 +81,13 @@ class DynamoDbStore implements PersistingStoreInterface
 
             // check for extra keys in options
             $optionsExtraKeys = array_diff_key($options, self::DEFAULT_OPTIONS);
-            if (0 < \count($optionsExtraKeys)) {
+            if ($optionsExtraKeys) {
                 throw new InvalidArgumentException(\sprintf('Unknown option found: [%s]. Allowed options are [%s].', implode(', ', $optionsExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
             }
 
             // check for extra keys in query
             $queryExtraKeys = array_diff_key($query, self::DEFAULT_OPTIONS);
-            if (0 < \count($queryExtraKeys)) {
+            if ($queryExtraKeys) {
                 throw new InvalidArgumentException(\sprintf('Unknown option found in DSN: [%s]. Allowed options are [%s].', implode(', ', $queryExtraKeys), implode(', ', array_keys(self::DEFAULT_OPTIONS))));
             }
 

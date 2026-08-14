@@ -299,7 +299,7 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $jwe = $serializerManager->unserialize($accessToken);
             $jweHeaderChecker->check($jwe, 0);
             $result = $jweDecrypter->decryptUsingKeySet($jwe, $this->decryptionKeyset, 0);
-            if (false === $result) {
+            if (!$result) {
                 throw new \RuntimeException('The JWE could not be decrypted.');
             }
 

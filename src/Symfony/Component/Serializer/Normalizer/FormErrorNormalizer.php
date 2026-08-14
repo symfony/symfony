@@ -31,7 +31,7 @@ final class FormErrorNormalizer implements NormalizerInterface
             'errors' => $this->convertFormErrorsToArray($data),
         ];
 
-        if (0 !== \count($data->all())) {
+        if ($data->all()) {
             $error['children'] = $this->convertFormChildrenToArray($data);
         }
 

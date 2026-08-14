@@ -376,7 +376,7 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
 
     public function hasGroupSequence(): bool
     {
-        return isset($this->groupSequence) && \count($this->groupSequence->groups) > 0;
+        return isset($this->groupSequence) && $this->groupSequence->groups;
     }
 
     public function getGroupSequence(): ?GroupSequence

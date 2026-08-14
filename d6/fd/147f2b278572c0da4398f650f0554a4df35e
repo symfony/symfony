@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2023-02-03T16:49:36Z
+
+I like this! A quick question: what happens if the header doesn't exist? Should we expect a message error like this?
+
+```
+Failed asserting that the Response has header "Cache-Control" with value "public",
+the header "Cache-Control" was not included in the response.
+```
+
+---------------------------------------------------------------------------
+
+by jschaedl at 2023-02-03T18:06:37Z
+
+Hi @javiereguiluz,
+
+I guess most people check for header existence before they assert the header value, but I think it makes sense to add the `null` case, yes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T07:24:42Z
+
+Thanks for your patience, @jschaedl.
+
+The branch was too far behind to rebase usefully, `BrowserKitAssertionsTrait` has been largely rewritten since 7.1, so I reapplied your change on 8.2 and pushed it under your name.
+
+One design change: the `$logicalNot` constructor argument is gone. You added it so that `assertResponseHeaderNotSame()` would not print the actual value, which would be redundant there. But the same result falls out of only printing the actual value when it *differs* from the expected one, and in the negated case a failure means the two are equal, so nothing is printed. That keeps the constraint from having to know how the caller intends to compose it, and there is no new public argument.
+
+The three wordings are now covered by tests:
+
+```
+the Response has header "Cache-Control" with value "public", value of header "Cache-Control" is "no-cache, private".
+the Response has header "X-Missing" with value "expected", header "X-Missing" is not set.
+the Response does not have header "Cache-Control" with value "no-cache, private".
+```
+
+The second is @javiereguiluz's suggestion from the day you opened this, the third is the negated case going through `LogicalNot`.
+
+Also updated `WebTestCaseTest::testAssertResponseHeaderSame`, which asserted the old message, and added the HttpFoundation changelog entry. HttpFoundation is green at 1932 tests, and reverting the constraint fails two of the three new assertions.

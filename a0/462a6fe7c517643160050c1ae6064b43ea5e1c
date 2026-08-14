@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+
+by xavierleune at 2024-12-18T10:49:46Z
+
+Tests are failing on 8.2 / highest deps because of other components (Bridge\twig, Bundle\FrameworkBundle, Component\HttpKernel). It leaves us with psalm for which PHP 8.4 support can be tracked here: vimeo/psalm#11107. Not sure how to deal with it here.
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2024-12-20T13:39:56Z
+
+@mtarld Thanks for your feedback, I think everything is covered now :)
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2025-03-20T10:14:37Z
+
+Thanks @mtarld for your previous review, sorry I took so long to make the changes.
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2025-03-24T09:03:44Z
+
+@OskarStark thanks for your feedback, I renamed the variables.
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2025-03-26T10:45:55Z
+
+Hi @mtarld do you think we might be good on this pull request ? Thanks ! 🙏
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-04-01T08:06:12Z
+
+Would it be sufficient to split those PR into two separate feature PRs?
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2025-04-09T13:26:42Z
+
+@mtarld thanks for the feedback
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2025-05-06T08:35:58Z
+
+@stof I thought it would be very relevant in this component as this follows new opportunities offered by the language, wdyt ?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-23T13:09:11Z
+
+@xavierleune having property hooks in the language does not mean that accessing the backing value of a hook is a public API of the class.
+What you are suggesting here is exactly equivalent to using ReflectionProperty to read private properties of a class instead of calling a public getter (than might do more that returning the raw value).
+
+Thinking about this again, I'm actually voting -1 on this feature. I'd like to keep the existing behavior of the component that always uses the public API of the class to access things. This makes things a lot easier to reason about (and to document).
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2025-07-29T08:36:04Z
+
+Hi @stof, thanks for your feedback. Don't want to force anything here, so what about keeping only the propertyinfo part to only gather data about hooks ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-11T17:20:46Z
+
+Sorry for the year of silence on your own proposal.
+
+Taking you up on it: I dropped the PropertyAccess half and kept only the PropertyInfo metadata, which answers @stof's -1. Reporting that a property has hooks is not the same as offering to bypass them, and nothing here can reach a backing value. @OskarStark suggested the same split back in April 2025.
+
+What is left: `hasHook()` on `PropertyReadInfo` and `PropertyWriteInfo`, `isVirtual()` on `PropertyReadInfo`, and the detection in `ReflectionExtractor`. Rebased on 8.2, and the CHANGELOG entry moved from the 7.3 section to 8.2.
+
+Two things worth a reviewer's eye:
+
+* the extractor now checks the real property before `__get`. That is deliberate, since PHP only calls `__get` for inaccessible properties, so a hooked public property was previously reported through `__get`. It does change what `getReadInfo()` returns for a class that has both;
+* `VirtualProperties` changed on 8.2 after you wrote the tests. `set => $value` writes the backing store, so `virtualSetHookOnly` and `virtualHook` are no longer virtual, and those two assertions are corrected. I added a `virtualSetOnly` property with an empty set body to keep covering the genuinely virtual case.
+
+PropertyInfo 663 tests, PropertyAccess 493, Serializer 1429, Form 4955, all green.
+
+The hook bypass in PropertyAccess is not part of this any more, so if you want to pursue it, it needs its own discussion with @stof.
+
+---------------------------------------------------------------------------
+
+by xavierleune at 2026-08-11T20:23:01Z
+
+Thanks for the follow up @nicolas-grekas 👍

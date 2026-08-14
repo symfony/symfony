@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-27T15:11:53Z
+
+I don't think we should change the `__name__` placeholder. there is no conflict between those placeholders in different prototypes, and it makes things more complex to understand regarding the way the `prototype_data` option works.
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2026-02-27T22:04:21Z
+
+> I don't think we should change the `__name__` placeholder. there is no conflict between those placeholders in different prototypes, and it makes things more complex to understand regarding the way the `prototype_data` option works.
+
+> Using the same type provider callable with the model data (in `postSetData`) and the submitted data (in `preSubmit`) makes it very hard to implement this properly (especially given that there is not even a non-ambiguous way to distinguish the 2 cases). It would be better to define proper APIs for both cases (either with 2 separate callables, or with an object implementing an interface with 2 methods)
+
+Thank you very much, I changed it and updated the PR description accordingly.
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2026-05-02T10:16:56Z
+
+@yceruto @xabbuh Do you think the feature is too exotic?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T16:12:19Z
+
+Sorry for the long wait on your question, and thanks for turning around every review point so quickly back in February.
+
+The feature is wanted. What I did not want was `CollectionType` growing a second mode: `entry_types`, `entry_type_options`, `entry_type_prototype_options`, `entry_type_prototype_data` and `entry_type_provider` next to the five options it already has, all mutually exclusive with them. It is the type people already get wrong most often, and the prototype story is where most of that pain lives.
+
+So I moved your work into a `PolymorphicCollectionType` and pushed it. `CollectionType` and its test are untouched now. Concretely:
+
+ * Options keep the names they have on `CollectionType`, just keyed by entry name: `entry_options`, `prototype_options`, `prototype_data`. No `entry_type_` prefixes.
+ * `entry_types` and `entry_type_provider` are required options rather than defaults validated later, so a misconfigured collection fails at resolution.
+ * `EntryTypeProviderInterface` is unchanged, it is the part of your design I liked most. The two methods are what makes the model-data and submitted-data cases unambiguous, which was @stof's point.
+ * `ResizeFormListener` is shared: `$type` accepts a map and takes an optional provider. That is the only change to existing code.
+ * Block prefix is `polymorphic_collection`, with a `polymorphic_collection_widget` block rendering one `data-prototype-<name>` per entry type. Entries and prototypes still get `collection_entry` spliced in, so existing themes apply.
+ * Your tests moved to `PolymorphicCollectionTypeTest` and all 27 pass. The 24 anonymous provider classes are now two fixtures, `NumericEntryTypeProvider` and `AuthorEntryTypeProvider`.
+ * Rebased onto 8.2, CHANGELOG entry moved there too.
+
+Form (5003 tests), TwigBridge (2002) and the Doctrine bridge (444) are green. I also checked that the tests fail when the provider dispatch is neutralised, so they are testing the feature and not the scaffolding.
+
+Let me know if the naming works for you, `PolymorphicCollectionType` was the clearest I found.
+
+---------------------------------------------------------------------------
+
+by michaelKaefer at 2026-08-13T07:48:27Z
+
+Thank you very much for your qualified improvements and the detailed review!
+
+If it is merged I plan to add a PR for the docs the next weeks.

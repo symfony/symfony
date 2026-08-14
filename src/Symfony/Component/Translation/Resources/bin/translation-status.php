@@ -142,7 +142,7 @@ function calculateTranslationStatus($originalFilePath, $translationFilePaths): a
 
 function isTranslationCompleted(array $translationStatus): bool
 {
-    return $translationStatus['total'] === $translationStatus['translated'] && 0 === count($translationStatus['mismatches']);
+    return $translationStatus['total'] === $translationStatus['translated'] && !$translationStatus['mismatches'];
 }
 
 function printTranslationStatus($originalFilePath, $translationStatus, $verboseOutput, $includeCompletedLanguages): void
@@ -204,7 +204,7 @@ function printTitle($title): void
 
 function printTable($translations, $verboseOutput, bool $includeCompletedLanguages): void
 {
-    if (0 === count($translations)) {
+    if (!$translations) {
         echo 'No translations found';
 
         return;

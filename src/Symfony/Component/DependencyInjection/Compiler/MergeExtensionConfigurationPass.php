@@ -44,7 +44,7 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         foreach ($this->extensions as $extension) {
-            if (!\count($container->getExtensionConfig($extension))) {
+            if (!$container->getExtensionConfig($extension)) {
                 $container->loadFromExtension($extension, []);
             }
         }

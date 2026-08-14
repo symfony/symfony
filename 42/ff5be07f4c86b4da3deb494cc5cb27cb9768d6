@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T16:15:49Z
+
+Rebased now that #52099 is merged. The two-word widening of `RoleHierarchy::$rolePlaceholdersPatterns` and `getMatchingPlaceholders()` is the only change this PR makes outside SecurityBundle, and it is load-bearing: with them private, `DebugRoleHierarchyTest` fails with `Call to private method RoleHierarchy::getMatchingPlaceholders() from scope DebugRoleHierarchy`. SecurityBundle and Security/Core are green at 854 tests together.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T16:24:34Z
+
+Two follow-ups:
+
+* the property is `protected private(set)` rather than plain `protected`. `DebugRoleHierarchy` only reads it, so subclasses get read access while writes stay with `RoleHierarchy` itself. Verified both ways: the subclass reads it through `isPlaceholder()`, and assigning it from a subclass fails with `Cannot modify private(set) property`;
+* `symfony/security-core` in the bundle goes from `^7.4|^8.0` to `^8.2`, since `DebugRoleHierarchy` needs API added in 8.2. Its siblings `security-csrf` and `security-http` were already `^8.2`. Without this the low-deps job would install security-core 7.4 and the command would not load.

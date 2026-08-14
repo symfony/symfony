@@ -16,10 +16,14 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 
+trigger_deprecation('symfony/doctrine-bridge', '8.2', 'The "%s" class is deprecated, use "%s" instead.', DoctrineCloseConnectionMiddleware::class, DoctrineDbalCloseConnectionMiddleware::class);
+
 /**
  * Closes connection and therefore saves number of connections.
  *
  * @author Fuong <insidestyles@gmail.com>
+ *
+ * @deprecated since Symfony 8.2, use DoctrineDbalCloseConnectionMiddleware instead
  */
 class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
 {

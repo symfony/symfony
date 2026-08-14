@@ -37,6 +37,7 @@ final class PropertyWriteInfo
         private readonly ?string $name = null,
         private readonly ?string $visibility = null,
         private readonly ?bool $static = null,
+        private readonly ?bool $hasHook = null,
     ) {
     }
 
@@ -113,5 +114,10 @@ final class PropertyWriteInfo
     public function hasErrors(): bool
     {
         return (bool) \count($this->errors);
+    }
+
+    public function hasHook(): ?bool
+    {
+        return $this->hasHook;
     }
 }

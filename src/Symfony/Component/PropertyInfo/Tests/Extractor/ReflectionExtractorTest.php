@@ -12,6 +12,7 @@
 namespace Symfony\Component\PropertyInfo\Tests\Extractor;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyInfo\Exception\MappingException;
@@ -26,6 +27,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProperty;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\FalseAccessorDummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\HookedProperties;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderValue;
@@ -750,10 +752,20 @@ class ReflectionExtractorTest extends TestCase
     public function testVirtualProperties()
     {
         $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualNoSetHook'));
+        $this->assertTrue($this->extractor->getReadInfo(VirtualProperties::class, 'virtualNoSetHook')->isVirtual());
+        $this->assertTrue($this->extractor->getReadInfo(VirtualProperties::class, 'virtualNoSetHook')->hasHook());
         $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualSetHookOnly'));
+        $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetHookOnly')->isVirtual());
+        $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetHookOnly')->hasHook());
+        $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualSetOnly'));
+        $this->assertTrue($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetOnly')->isVirtual());
+        $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualSetOnly')->hasHook());
         $this->assertTrue($this->extractor->isReadable(VirtualProperties::class, 'virtualHook'));
+        $this->assertFalse($this->extractor->getReadInfo(VirtualProperties::class, 'virtualHook')->isVirtual());
+        $this->assertTrue($this->extractor->getReadInfo(VirtualProperties::class, 'virtualHook')->hasHook());
         $this->assertFalse($this->extractor->isWritable(VirtualProperties::class, 'virtualNoSetHook'));
         $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualSetHookOnly'));
+        $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualSetOnly'));
         $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualHook'));
     }
 
@@ -795,6 +807,20 @@ class ReflectionExtractorTest extends TestCase
         $this->assertSame(PropertyWriteInfo::TYPE_PROPERTY, $writeMutator->getType());
         $this->assertSame($readVisibility, $readMutator->getVisibility());
         $this->assertSame($writeVisibility, $writeMutator->getVisibility());
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testHookedProperties()
+    {
+        $this->assertTrue($this->extractor->getReadInfo(HookedProperties::class, 'hookGetOnly')->hasHook());
+        $this->assertFalse($this->extractor->getReadInfo(HookedProperties::class, 'hookGetOnly')->isVirtual());
+        $this->assertFalse($this->extractor->getWriteInfo(HookedProperties::class, 'hookGetOnly')->hasHook());
+        $this->assertFalse($this->extractor->getReadInfo(HookedProperties::class, 'hookSetOnly')->hasHook());
+        $this->assertFalse($this->extractor->getReadInfo(HookedProperties::class, 'hookSetOnly')->isVirtual());
+        $this->assertTrue($this->extractor->getWriteInfo(HookedProperties::class, 'hookSetOnly')->hasHook());
+        $this->assertTrue($this->extractor->getReadInfo(HookedProperties::class, 'hookBoth')->hasHook());
+        $this->assertFalse($this->extractor->getReadInfo(HookedProperties::class, 'hookBoth')->isVirtual());
+        $this->assertTrue($this->extractor->getWriteInfo(HookedProperties::class, 'hookBoth')->hasHook());
     }
 
     public static function provideAsymmetricVisibilityMutator(): iterable

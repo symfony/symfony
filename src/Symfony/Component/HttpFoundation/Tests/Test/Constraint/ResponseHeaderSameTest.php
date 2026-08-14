@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Test\Constraint;
 
+use PHPUnit\Framework\Constraint\LogicalNot;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,27 @@ class ResponseHeaderSameTest extends TestCase
         $this->assertFalse($constraint->evaluate(new Response(), '', true));
 
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public".');
+        $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public", value of header "Cache-Control" is "no-cache, private".');
+
+        $constraint->evaluate(new Response());
+    }
+
+    public function testConstraintReportsMissingHeader()
+    {
+        $constraint = new ResponseHeaderSame('X-Missing', 'expected');
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Response has header "X-Missing" with value "expected", header "X-Missing" is not set.');
+
+        $constraint->evaluate(new Response());
+    }
+
+    public function testNegatedConstraintDoesNotRepeatTheValue()
+    {
+        $constraint = new LogicalNot(new ResponseHeaderSame('Cache-Control', 'no-cache, private'));
+
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage('Failed asserting that the Response does not have header "Cache-Control" with value "no-cache, private".');
 
         $constraint->evaluate(new Response());
     }

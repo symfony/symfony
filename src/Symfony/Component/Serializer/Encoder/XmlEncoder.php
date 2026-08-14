@@ -33,6 +33,11 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
     public const AS_COLLECTION = 'as_collection';
 
     /**
+     * An array of XML tags who should always be treated as a collection, even when it has only one child.
+     */
+    public const FORCE_COLLECTION = 'force_collection';
+
+    /**
      * An array of ignored XML node types while decoding, each one of the DOM Predefined XML_* constants.
      */
     public const DECODER_IGNORED_NODE_TYPES = 'decoder_ignored_node_types';
@@ -86,6 +91,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         self::IGNORE_EMPTY_ATTRIBUTES => false,
         self::PRESERVE_NUMERIC_KEYS => false,
         self::BOOLEAN_REPR => null,
+        self::FORCE_COLLECTION => [],
     ];
 
     public function __construct(array $defaultContext = [])
@@ -241,6 +247,14 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         $data = $this->parseXmlAttributes($node, $context);
 
         $value = $this->parseXmlValue($node, $context);
+
+        if (\is_array($value)
+            && ($childNodeName = $node->firstChild?->nodeName)
+            && 1 === \count($value)
+            && \in_array($node->nodeName, $context[self::FORCE_COLLECTION] ?? $this->defaultContext[self::FORCE_COLLECTION], true)
+        ) {
+            return [$childNodeName => [$value[$childNodeName]]];
+        }
 
         if (!$data) {
             return $value;

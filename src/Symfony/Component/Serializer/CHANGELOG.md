@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `force_collection` context option to `XmlEncoder` to always decode the given tags as a collection
  * Add `AbstractNormalizer::SKIP_INVALID_ATTRIBUTES` to denormalize the attributes whose value cannot be used as if they were absent from the input
  * Add `AbstractNormalizer::IGNORED_GROUPS` to exclude the attributes belonging to the given groups
  * Allow passing an associative array to `CsvEncoder::HEADERS_KEY` to map and reorder columns when encoding

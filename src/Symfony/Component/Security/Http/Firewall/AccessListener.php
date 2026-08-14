@@ -37,7 +37,7 @@ class AccessListener extends AbstractListener
         private AccessMapInterface $map,
         bool $exceptionOnNoToken = false,
     ) {
-        if (false !== $exceptionOnNoToken) {
+        if ($exceptionOnNoToken) {
             throw new \LogicException(\sprintf('Argument $exceptionOnNoToken of "%s()" must be set to "false".', __METHOD__));
         }
     }

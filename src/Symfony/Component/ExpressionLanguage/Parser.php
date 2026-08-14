@@ -242,7 +242,7 @@ class Parser
 
                     default:
                         if ('(' === $this->stream->current->value) {
-                            if (!($this->flags & self::IGNORE_UNKNOWN_FUNCTIONS) && false === isset($this->functions[$token->value])) {
+                            if (!($this->flags & self::IGNORE_UNKNOWN_FUNCTIONS) && !isset($this->functions[$token->value])) {
                                 throw new SyntaxError(\sprintf('The function "%s" does not exist.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, array_keys($this->functions));
                             }
 

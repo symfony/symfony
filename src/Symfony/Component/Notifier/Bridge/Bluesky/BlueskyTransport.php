@@ -65,7 +65,7 @@ final class BlueskyTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        if ([] === $this->authSession) {
+        if (!$this->authSession) {
             $this->authenticate();
         }
 
@@ -74,7 +74,7 @@ final class BlueskyTransport extends AbstractTransport
             'text' => $message->getSubject(),
             'createdAt' => $this->clock->now()->format('Y-m-d\\TH:i:s.u\\Z'),
         ];
-        if ([] !== $facets = $this->parseFacets($post['text'])) {
+        if ($facets = $this->parseFacets($post['text'])) {
             $post['facets'] = $facets;
         }
 

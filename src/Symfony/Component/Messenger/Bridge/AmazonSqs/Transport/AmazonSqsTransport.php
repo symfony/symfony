@@ -73,7 +73,7 @@ class AmazonSqsTransport implements TransportInterface, KeepaliveReceiverInterfa
 
     public function send(Envelope $envelope): Envelope
     {
-        if (false === $this->handleRetries && $this->isRedelivered($envelope)) {
+        if (!$this->handleRetries && $this->isRedelivered($envelope)) {
             return $envelope;
         }
 

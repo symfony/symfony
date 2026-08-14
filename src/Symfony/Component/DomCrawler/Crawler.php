@@ -180,7 +180,7 @@ class Crawler implements \Countable, \IteratorAggregate
         $base = $this->filterRelativeXPath('descendant-or-self::base')->extract(['href']);
 
         $baseHref = current($base);
-        if (\count($base) && $baseHref) {
+        if ($base && $baseHref) {
             if ($this->baseHref) {
                 $linkNode = $dom->createElement('a');
                 $linkNode->setAttribute('href', $baseHref);

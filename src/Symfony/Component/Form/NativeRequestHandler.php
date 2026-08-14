@@ -127,7 +127,7 @@ class NativeRequestHandler implements RequestHandlerInterface
         }
 
         // Don't auto-submit the form unless at least one field is present.
-        if ('' === $name && \count(array_intersect_key($data, $form->all())) <= 0) {
+        if ('' === $name && !array_intersect_key($data, $form->all())) {
             return;
         }
 

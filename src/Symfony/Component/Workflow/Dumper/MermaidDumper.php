@@ -164,7 +164,7 @@ class MermaidDumper implements DumperInterface
             $nodeStyles[] = 'stroke-width:4px';
         }
 
-        if (0 === \count($nodeStyles)) {
+        if (!$nodeStyles) {
             return '';
         }
 

@@ -51,7 +51,7 @@ class HttpHeaderSerializer
                     continue;
                 }
 
-                if (true === $value) {
+                if ($value) {
                     $attributesParts[] = $key;
                 }
             }

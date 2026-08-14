@@ -317,7 +317,7 @@ class MainConfiguration implements ConfigurationInterface
         $firewallNodeBuilder
             ->end()
             ->validate()
-                ->ifTrue(static fn ($v) => true === $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']))
+                ->ifTrue(static fn ($v) => $v['security'] && isset($v['pattern']) && !isset($v['request_matcher']))
                 ->then(static function ($firewall) use ($abstractFactoryKeys) {
                     foreach ($abstractFactoryKeys as $k) {
                         if (!isset($firewall[$k]['check_path'])) {
@@ -383,7 +383,7 @@ class MainConfiguration implements ConfigurationInterface
                 ->thenInvalid('You cannot set multiple provider types for the same provider')
             ->end()
             ->validate()
-                ->ifTrue(static fn ($v) => 0 === \count($v))
+                ->ifTrue(static fn ($v) => !$v)
                 ->thenInvalid('You must set a provider definition for the provider.')
             ->end()
         ;

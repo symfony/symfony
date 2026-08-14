@@ -184,7 +184,7 @@ class ArgvInput extends Input
                 unset($all[$key]);
             }
 
-            if (\count($all)) {
+            if ($all) {
                 if ($symfonyCommandName) {
                     $message = \sprintf('Too many arguments to "%s" command, expected arguments "%s".', $symfonyCommandName, implode('" "', array_keys($all)));
                 } else {
@@ -241,7 +241,7 @@ class ArgvInput extends Input
             throw new RuntimeException(\sprintf('The "--%s" option does not accept a value.', $name));
         }
 
-        if (\in_array($value, ['', null], true) && $option->acceptValue() && \count($this->parsed)) {
+        if (\in_array($value, ['', null], true) && $option->acceptValue() && $this->parsed) {
             // if option accepts an optional or mandatory argument
             // let's see if there is one provided
             $next = array_shift($this->parsed);
@@ -328,7 +328,7 @@ class ArgvInput extends Input
         $values = (array) $values;
         $tokens = $this->tokens;
 
-        while (0 < \count($tokens)) {
+        while ($tokens) {
             $token = array_shift($tokens);
             if ($onlyParams && '--' === $token) {
                 return $default;

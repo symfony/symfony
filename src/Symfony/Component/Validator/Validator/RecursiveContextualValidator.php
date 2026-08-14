@@ -506,7 +506,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
 
         // If no more groups should be validated for the property nodes,
         // we can safely quit
-        if (0 === \count($groups)) {
+        if (!$groups) {
             return;
         }
 
@@ -616,7 +616,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $this->validateInGroup($value, $cacheKey, $metadata, $group, $context);
         }
 
-        if (0 === \count($groups)) {
+        if (!$groups) {
             return;
         }
 
@@ -640,7 +640,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         // The $cascadedGroups property is set, if the "Default" group is
         // overridden by a group sequence
         // See validateClassNode()
-        $cascadedGroups = null !== $cascadedGroups && \count($cascadedGroups) > 0 ? $cascadedGroups : $groups;
+        $cascadedGroups = $cascadedGroups ?: $groups;
 
         if ($value instanceof LazyProperty) {
             $value = $value->getPropertyValue();

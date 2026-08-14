@@ -289,7 +289,7 @@ class JsonDescriptor extends Descriptor
         }
 
         $calls = $definition->getMethodCalls();
-        if (\count($calls) > 0) {
+        if ($calls) {
             $data['calls'] = [];
             foreach ($calls as $callData) {
                 $data['calls'][] = $callData[0];

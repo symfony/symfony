@@ -91,7 +91,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
             $chainDriverDef->addMethodCall('addDriver', [$mappingDriverDef, $namespace]);
         }
 
-        if (!\count($this->aliasMap)) {
+        if (!$this->aliasMap) {
             return;
         }
 

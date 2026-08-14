@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-21T19:25:10Z
+
+Cool thanks for digging this idea 💡;)
+
+> Is it something we want to be opt-in using the config?
+
+Please no! That'd ruin the DX improvement this provides!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-23T07:49:44Z
+
+I'm wondering if it would be possible, using some monolog formatter, to add a link to the profiler on the already existing `RESPONSE` log line (instead of adding a new line).
+Any idea if/how this could be possible?
+
+---------------------------------------------------------------------------
+
+by jeremyFreeAgent at 2025-05-23T08:09:41Z
+
+I don't know what is the best. I'll try it and we will see.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T06:35:38Z
+
+Thanks for your patience, @jeremyFreeAgent. Rebased on 8.2 and applied the two review points that were still open.
+
+@94noni was right about `X-Debug-Token-Link`: `WebDebugToolbarListener` already generates exactly the same absolute URL, same route, same token, same `ABSOLUTE_URL`, and stores it in that header. The listener now reads it instead of regenerating it, so the `UrlGenerator` dependency is gone from both the class and the service definition, and there is one source of truth. It also inherits that listener's error handling for free, since a failing generation there sets `X-Debug-Error` and leaves the header unset.
+
+That makes ordering matter, so the priority is now -2049 instead of -2048, one below `WebDebugToolbarListener`, rather than relying on registration order. A test asserts the relationship rather than the number.
+
+@GromNaN's point is in as well: the message is now interpolated by the logger, `'See profiler at {profiler_url}'` with the URL in the context, instead of being built with `sprintf()`.
+
+On your own question about folding this into the existing `RESPONSE` log line: I would keep the separate line. Doing it on `RESPONSE` needs a Monolog processor or formatter, which ties WebProfilerBundle to Monolog specifics and only works for handlers using that format, whereas a debug-level line on the `profiler` channel works with any handler and costs nothing in dev. Happy to be overruled.
+
+Tests rewritten around the header, including one that fails if the header name changes. WebProfilerBundle is green at 180 tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T07:00:11Z
+
+On the `RESPONSE` line idea: the link is known by then, `WebDebugToolbarListener` sets `X-Debug-Token-Link` at priority -128, so it is on the response for the whole rest of the request.
+
+But that line is not ours. There is no log message containing "RESPONSE" anywhere in symfony/symfony, and nothing in the framework logs once per response; it comes from the `symfony` CLI's local web server printing its own access log, so no Monolog formatter or processor can reach it, the record never goes through Monolog.
+
+Which makes it cheaper than expected, just in the other repository: the CLI proxies the response and already sees `X-Debug-Token-Link`, so it could append the link to its own line with no change here. Worth raising on symfony-cli.
+
+The two are independent anyway: this PR logs on the `profiler` channel inside the application, works with any handler and without a local server; the CLI-side version only applies when running behind it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T07:07:17Z
+
+Correction to my previous comment, and an answer to whether this belongs in `WebDebugToolbarListener`: no, and reading `X-Debug-Token-Link` was wrong too. I reverted that part.
+
+`WebProfilerExtension::load()` only loads `toolbar.php` when `toolbar.enabled` or `intercept_redirects` is set:
+
+```php
+if ($config['toolbar']['enabled'] || $config['intercept_redirects']) {
+    $loader->load('toolbar.php');
+```
+
+So with the toolbar off, `WebDebugToolbarListener` does not exist, nothing sets `X-Debug-Token-Link`, and both folding the logging into that listener and reading its header would silently log nothing. That is backwards for this feature: a profiler link in the logs is most useful exactly where the toolbar is useless, on API responses and other non-HTML traffic, which is also where people turn the toolbar off.
+
+So the listener stays separate, registered from `profiler.php` which is always loaded, and generates the URL itself as you originally wrote it. The duplication @94noni pointed at is one `generate()` call, and it is the price of not depending on the toolbar; there is a comment in the code saying so. The priority goes back to -2048 since there is no ordering dependency any more.
+
+@GromNaN's interpolation stays, that part was a real improvement and had not actually been applied on the previous head.
+
+Also removed a stray blank line the rebase left under the 7.3 heading in the changelog. WebProfilerBundle is green at 180 tests, and dropping the `{profiler_url}` placeholder fails the new test.

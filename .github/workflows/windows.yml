@@ -94,7 +94,7 @@ jobs:
           # HttpClient tests need to run separately, they timeout otherwise
           $hcJob = Start-Job -ScriptBlock {
             Set-Location $using:workingDir
-            & php phpunit src\Symfony\Component\HttpClient 2>&1 | Out-File -FilePath "hc.log" -Encoding utf8
+            & php phpunit src\Symfony\Component\HttpClient --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows 2>&1 | Out-File -FilePath "hc.log" -Encoding utf8
             return $LASTEXITCODE
           }
           sleep 10

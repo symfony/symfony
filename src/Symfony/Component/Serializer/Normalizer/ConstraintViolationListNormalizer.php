@@ -53,7 +53,7 @@ final class ConstraintViolationListNormalizer implements NormalizerInterface
             $payloadFieldsToSerialize = [];
         }
 
-        if (\is_array($payloadFieldsToSerialize) && [] !== $payloadFieldsToSerialize) {
+        if (\is_array($payloadFieldsToSerialize) && $payloadFieldsToSerialize) {
             $payloadFieldsToSerialize = array_flip($payloadFieldsToSerialize);
         }
 

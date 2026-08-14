@@ -378,7 +378,7 @@ class InputDefinition
             }
         }
 
-        if (\count($elements) && $this->getArguments()) {
+        if ($elements && $this->getArguments()) {
             $elements[] = '[--]';
         }
 

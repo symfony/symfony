@@ -47,7 +47,7 @@ class InMemoryStore implements SharedLockStoreInterface
             return;
         }
 
-        if (\count($this->readLocks[$hashKey] ?? []) > 0) {
+        if ($this->readLocks[$hashKey] ?? []) {
             throw new LockConflictedException();
         }
 

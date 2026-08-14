@@ -211,7 +211,7 @@ class Connection extends AbstractConnection
             }
         }
 
-        if ('tls' === $this->config['encryption'] && false === @ldap_start_tls($this->connection)) {
+        if ('tls' === $this->config['encryption'] && !@ldap_start_tls($this->connection)) {
             throw new LdapException('Could not initiate TLS connection: '.ldap_error($this->connection));
         }
     }

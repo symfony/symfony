@@ -54,7 +54,7 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $fields = (array) $constraint->fields;
 
-        if (0 === \count($fields)) {
+        if (!$fields) {
             throw new ConstraintDefinitionException('At least one field has to be specified.');
         }
 

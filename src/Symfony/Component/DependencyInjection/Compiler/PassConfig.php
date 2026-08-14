@@ -264,7 +264,7 @@ class PassConfig
      */
     private function sortPasses(array $passes): array
     {
-        if (0 === \count($passes)) {
+        if (!$passes) {
             return [];
         }
 

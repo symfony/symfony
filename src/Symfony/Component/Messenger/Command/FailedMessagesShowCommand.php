@@ -164,7 +164,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             $this->phpSerializer?->rejectPhpIncompleteClass();
         }
 
-        if (0 === \count($countPerClass)) {
+        if (!$countPerClass) {
             $io->success('No failed messages were found.');
 
             return;

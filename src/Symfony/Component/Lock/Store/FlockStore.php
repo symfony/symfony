@@ -40,7 +40,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     public function __construct(?string $lockPath = null)
     {
         if (!is_dir($lockPath ??= sys_get_temp_dir())) {
-            if (false === @mkdir($lockPath, 0o777, true) && !is_dir($lockPath)) {
+            if (!@mkdir($lockPath, 0o777, true) && !is_dir($lockPath)) {
                 throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
             }
         } elseif (!is_writable($lockPath)) {

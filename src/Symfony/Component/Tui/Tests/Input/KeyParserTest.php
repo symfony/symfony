@@ -290,4 +290,16 @@ class KeyParserTest extends TestCase
         $this->assertFalse($this->parser->matches("\x1b[43;5u", 'ctrl+a'));
         $this->assertFalse($this->parser->matches("\x1b[97;5u", 'ctrl++'));
     }
+
+    public function testCtrlAltLetterMatchesBothEncodingsWithoutTheKittyFlag()
+    {
+        // A CSI u sequence is parsed whether or not the flag is set, so both
+        // encodings have to match, as they do for alt and ctrl on their own.
+        $this->assertSame('ctrl+alt+a', $this->parser->parse("\x1b[97;7u")['key']);
+
+        $this->assertTrue($this->parser->matches("\x1b\x01", 'ctrl+alt+a'));
+        $this->assertTrue($this->parser->matches("\x1b[97;7u", 'ctrl+alt+a'));
+        $this->assertFalse($this->parser->matches("\x1b[98;7u", 'ctrl+alt+a'));
+        $this->assertFalse($this->parser->matches("\x1b[97;5u", 'ctrl+alt+a'));
+    }
 }

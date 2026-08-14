@@ -176,7 +176,7 @@ class ImportMapRenderer
             $output .= "\n<link rel=\"modulepreload\" href=\"$url\"$integrity>";
         }
 
-        if (\count($entryPoint) > 0) {
+        if ($entryPoint) {
             $output .= "\n<script type=\"module\"$scriptAttributes>";
             foreach ($entryPoint as $entryPointName) {
                 $entryPointName = $this->escapeAttributeValue($entryPointName);

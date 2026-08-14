@@ -122,7 +122,7 @@ trait LdapFactoryTrait
                 return null;
             }
 
-            if (true === $legProvidesLdapUsers = self::providesLdapUsers($container, (string) $leg)) {
+            if ($legProvidesLdapUsers = self::providesLdapUsers($container, (string) $leg)) {
                 return true;
             }
 

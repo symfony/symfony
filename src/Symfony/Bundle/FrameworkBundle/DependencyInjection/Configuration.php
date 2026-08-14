@@ -530,7 +530,7 @@ class Configuration implements ConfigurationInterface
                                         ->end()
                                         ->validate()
                                             ->ifTrue(static function ($v) {
-                                                if (!\is_array($v) || [] === $v) {
+                                                if (!\is_array($v) || !$v) {
                                                     return false;
                                                 }
                                                 $hasAllowList = false;

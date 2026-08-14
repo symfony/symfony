@@ -11,8 +11,12 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -21,6 +25,11 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
  */
 class UniqueValidator extends ConstraintValidator
 {
+    public function __construct(
+        private ?PropertyAccessorInterface $propertyAccessor = null,
+    ) {
+    }
+
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof Unique) {
@@ -42,7 +51,7 @@ class UniqueValidator extends ConstraintValidator
         foreach ($value as $index => $element) {
             $element = $normalizer($element);
 
-            if ($fields && !(\is_array($element) && $element = $this->reduceElementKeys($fields, $element))) {
+            if ($fields && !((\is_array($element) || \is_object($element)) && $element = $this->reduceElementKeys($fields, $element))) {
                 continue;
             }
 
@@ -72,18 +81,43 @@ class UniqueValidator extends ConstraintValidator
         return $unique->normalizer ?? static fn ($value) => $value;
     }
 
-    private function reduceElementKeys(array $fields, array $element): array
+    private function reduceElementKeys(array $fields, array|object $element): array
     {
         $output = [];
         foreach ($fields as $field) {
             if (!\is_string($field)) {
                 throw new UnexpectedTypeException($field, 'string');
             }
-            if (\array_key_exists($field, $element)) {
-                $output[$field] = $element[$field];
+
+            $elementAsArray = null;
+            // handle public object property
+            if (\is_object($element) && property_exists($element, $field)) {
+                $elementAsArray = (array) $element;
+            } elseif (\is_array($element)) {
+                $elementAsArray = $element;
+            }
+
+            if ($elementAsArray && \array_key_exists($field, $elementAsArray)) {
+                $output[$field] = $elementAsArray[$field];
+                continue;
+            }
+
+            try {
+                $output[$field] = $this->getPropertyAccessor()->getValue($element, $field);
+            } catch (AccessException) {
+                // fields are optional
             }
         }
 
         return $output;
+    }
+
+    private function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        if (!class_exists(PropertyAccess::class)) {
+            throw new LogicException('Property path requires symfony/property-access package to be installed. Try running "composer require symfony/property-access".');
+        }
+
+        return $this->propertyAccessor ??= PropertyAccess::createPropertyAccessor();
     }
 }

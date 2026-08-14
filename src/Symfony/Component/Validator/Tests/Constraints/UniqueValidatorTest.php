@@ -33,9 +33,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidValues($value)
+    public function testValidValues($value, array $fields = [])
     {
-        $this->validate($value, new Unique());
+        $this->validate($value, new Unique(fields: $fields));
 
         $this->assertNoViolation();
     }
@@ -54,6 +54,66 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             yield 'unique strings' => [['a', 'b', 'c']],
             yield 'unique arrays' => [[[1, 2], [2, 4], [4, 6]]],
             yield 'unique objects' => [[new \stdClass(), new \stdClass()]],
+            yield 'unique objects public field' => [
+                [
+                    new class {
+                        public int $fieldA = 1;
+                    },
+                    new class {
+                        public int $fieldA = 2;
+                    },
+                ],
+                ['fieldA'],
+            ],
+            yield 'unique objects private field' => [
+                [
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                    new class {
+                        private int $fieldB = 2;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                ],
+                ['fieldB'],
+            ],
+            yield 'unique objects property path field' => [
+                [
+                    new class {
+                        public array $fieldA = ['fieldB' => 1];
+                    },
+                    new class {
+                        public array $fieldA = ['fieldB' => 2];
+                    },
+                ],
+                ['fieldA[fieldB]'],
+            ],
+            yield 'mixed objects and arrays' => [
+                [
+                    new class {
+                        private int $fieldB = 1;
+
+                        public function getFieldB(): int
+                        {
+                            return $this->fieldB;
+                        }
+                    },
+                    new class {
+                        public int $fieldB = 2;
+                    },
+                    ['fieldB' => 3],
+                ],
+                ['fieldB'],
+            ],
         ];
     }
 
@@ -208,6 +268,42 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testCollectionObjectFieldsAreOptional()
+    {
+        $this->validate([
+            new class {
+                public int $value = 5;
+            },
+            new class {
+                public int $id = 1;
+                public int $value = 5;
+            },
+        ], new Unique(fields: 'id'));
+
+        $this->assertNoViolation();
+    }
+
+    public function testCollectionObjectPrivateFieldsAreOptional()
+    {
+        $this->validate([
+            new class {
+                private int $id = 2;
+                public int $value = 5;
+            },
+            new class {
+                private int $id = 2;
+                public int $value = 5;
+
+                public function getId(): int
+                {
+                    return $this->id;
+                }
+            },
+        ], new Unique(fields: 'id'));
+
+        $this->assertNoViolation();
+    }
+
     #[DataProvider('getInvalidFieldNames')]
     public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
     {
@@ -288,6 +384,58 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 ['nullField'],
                 'array',
             ],
+            'unique object string' => [[
+                (object) ['lang' => 'eng', 'translation' => 'hi'],
+                (object) ['lang' => 'eng', 'translation' => 'hello'],
+            ], ['lang'], 'array'],
+            'unique objects public field' => [[
+                new class {
+                    public int $fieldA = 1;
+                },
+                new class {
+                    public int $fieldA = 1;
+                },
+            ], ['fieldA'], 'array'],
+            'unique objects property path field' => [[
+                new class {
+                    public array $fieldA = ['fieldB' => 1];
+                },
+                new class {
+                    public array $fieldA = ['fieldB' => 1];
+                },
+            ], ['fieldA[fieldB]'], 'array'],
+            'unique objects private field' => [[
+                new class {
+                    private int $fieldB = 1;
+
+                    public function getFieldB(): int
+                    {
+                        return $this->fieldB;
+                    }
+                },
+                new class {
+                    private int $fieldB = 1;
+
+                    public function getFieldB(): int
+                    {
+                        return $this->fieldB;
+                    }
+                },
+            ], ['fieldB'], 'array'],
+            'mixed objects and arrays' => [[
+                new class {
+                    private int $fieldB = 1;
+
+                    public function getFieldB(): int
+                    {
+                        return $this->fieldB;
+                    }
+                },
+                new class {
+                    public int $fieldB = 1;
+                },
+                ['fieldB' => 1],
+            ], ['fieldB'], 'array'],
         ];
     }
 

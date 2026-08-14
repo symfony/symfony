@@ -52,6 +52,10 @@ trait BatchHandlerTrait
             $this->jobs[] = [$message, $ack];
             $this->flush(true);
 
+            if ($error = $ack->getError()) {
+                throw $error;
+            }
+
             return $ack->getResult();
         }
 

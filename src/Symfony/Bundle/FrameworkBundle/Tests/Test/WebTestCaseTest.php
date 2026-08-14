@@ -62,6 +62,32 @@ class WebTestCaseTest extends TestCase
         $this->getResponseTester(new Response('', 301))->assertResponseRedirects('https://example.com/');
     }
 
+    public function testAssertResponseRedirectsWithLocationOmitsBodyWhenNotVerbose()
+    {
+        $error = null;
+
+        try {
+            $this->getResponseTester(new Response('the response body', 301))->assertResponseRedirects('https://example.com/', verbose: false);
+        } catch (AssertionFailedError $error) {
+        }
+
+        $this->assertNotNull($error, 'The assertion is expected to fail.');
+        $this->assertStringNotContainsString('the response body', $error->getMessage());
+    }
+
+    public function testAssertResponseRedirectsWithStatusCodeOmitsBodyWhenNotVerbose()
+    {
+        $error = null;
+
+        try {
+            $this->getResponseTester(new Response('the response body', 302))->assertResponseRedirects(null, 301, verbose: false);
+        } catch (AssertionFailedError $error) {
+        }
+
+        $this->assertNotNull($error, 'The assertion is expected to fail.');
+        $this->assertStringNotContainsString('the response body', $error->getMessage());
+    }
+
     public function testAssertResponseRedirectsWithLocationWithoutHost()
     {
         $this->getResponseTester(new Response('', 301, ['Location' => 'https://example.com/']))->assertResponseRedirects('/');

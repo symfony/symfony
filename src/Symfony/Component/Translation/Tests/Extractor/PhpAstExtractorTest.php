@@ -209,6 +209,16 @@ final class PhpAstExtractorTest extends TestCase
         $this->assertEquals($expectedCatalogue, $catalogue->all());
     }
 
+    public function testExtractionSkipsClassesNamedTranslatableMessageInOtherNamespaces()
+    {
+        $extractor = new PhpAstExtractor([new TranslatableMessageVisitor()]);
+        $catalogue = new MessageCatalogue('en');
+
+        $extractor->extract(__DIR__.'/../Fixtures/extractor-ast-other-namespace/', $catalogue);
+
+        $this->assertSame(['message from the Symfony class' => 'message from the Symfony class'], $catalogue->all('messages'));
+    }
+
     public static function resourcesProvider(): array
     {
         $directory = __DIR__.'/../Fixtures/extractor-ast/';

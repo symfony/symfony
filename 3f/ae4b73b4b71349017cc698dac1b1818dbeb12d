@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T08:55:19Z
+
+Thank you @michaelthieulin. Rebased on 8.2 and pushed with one change: `Crawler::normalizeWhitespace()` stays private and non-static, and `ChoiceFormField` carries its own copy of the two-line helper instead.
+
+Making it public turns an internal detail of `Crawler::text()` into API we have to keep forever, for one caller in the same component. Duplicating the `preg_replace()` is the cheaper trade, and the copy documents that it mirrors `Crawler::text()` so the text you pass matches what a user sees. `Crawler.php` is untouched now, and the changelog entry about exposing it is gone.
+
+I checked the semantics rather than assuming them, and your docblock is accurate on all three:
+
+```
+duplicate text          -> first option wins
+"  Spaced\n  Out "      -> matched by "Spaced Out"
+unknown text            -> InvalidArgumentException: Input "c" has no option with text "Nope"
+                           (possible texts: "Same", "Same", "Spaced Out")
+```
+
+DomCrawler is green at 457 tests, and dropping the normalisation from `resolveTextToValue()` fails one of the new ones, so the whitespace behaviour is covered.

@@ -59,7 +59,7 @@ final class UidValueResolver implements ValueResolverInterface
             return $value;
         }
 
-        if (!\is_string($value) || !$argument->typeName::isValid($value, $argument->typeName::FORMAT_ALL)) {
+        if (!\is_string($value) || !$argument->typeName::isValid($value, \defined("{$argument->typeName}::FORMAT_ALL") ? $argument->typeName::FORMAT_ALL : null)) {
             throw new InvalidArgumentException(\sprintf('The uid for the "%s" argument is invalid.', $argument->name));
         }
 
@@ -78,7 +78,7 @@ final class UidValueResolver implements ValueResolverInterface
             return $value;
         }
 
-        if (!\is_string($value) || !$option->typeName::isValid($value, $option->typeName::FORMAT_ALL)) {
+        if (!\is_string($value) || !$option->typeName::isValid($value, \defined("{$option->typeName}::FORMAT_ALL") ? $option->typeName::FORMAT_ALL : null)) {
             throw new InvalidOptionException(\sprintf('The uid for the "--%s" option is invalid.', $option->name));
         }
 

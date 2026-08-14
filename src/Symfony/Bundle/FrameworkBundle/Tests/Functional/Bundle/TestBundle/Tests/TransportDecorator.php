@@ -30,7 +30,7 @@ class TransportDecorator implements HttpClientInterface
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        self::$requests[] = $method.' '.$url;
+        self::$requests[] = $method.' '.$url.' '.implode(',', array_filter((array) ($options['headers'] ?? []), static fn ($h) => str_starts_with((string) $h, 'X-Scoped')));
 
         return $this->inner->request($method, $url, $options);
     }

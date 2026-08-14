@@ -102,4 +102,18 @@ class HttpClientTest extends AbstractWebTestCase
             $client = $inner;
         }
     }
+
+    public function testScopedClientRetriesAgainstTheNextBaseUri()
+    {
+        TransportDecorator::$requests = [];
+
+        static::bootKernel(['test_case' => 'HttpClientRetry', 'root_config' => 'config.yml']);
+        static::getContainer()->get('test.rotating.http_client')->request('GET', '/posts/1')->getStatusCode();
+
+        // the second attempt goes to the fallback URI, and the scoped options still apply to it
+        $this->assertSame([
+            'GET https://a.example.com/posts/1 X-Scoped: yes',
+            'GET https://b.example.com/posts/1 X-Scoped: yes',
+        ], TransportDecorator::$requests);
+    }
 }

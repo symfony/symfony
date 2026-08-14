@@ -102,6 +102,42 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame('http://foo.bar/', $response->getInfo('url'));
     }
 
+    public function testForBaseUris()
+    {
+        $client = ScopingHttpClient::forBaseUris(new MockHttpClient(null, null), ['http://a.example.com/foo', 'http://b.example.com/']);
+
+        $response = $client->request('GET', '/bar');
+        $this->assertSame('http://a.example.com/bar', $response->getInfo('url'), 'the first URI is the default one');
+
+        $response = $client->request('GET', '/bar', ['base_uri' => 'http://b.example.com/']);
+        $this->assertSame('http://b.example.com/bar', $response->getInfo('url'));
+    }
+
+    public function testForBaseUrisScopesEveryUri()
+    {
+        $client = ScopingHttpClient::forBaseUris(
+            new MockHttpClient(null, null),
+            ['http://a.example.com/', 'http://b.example.com/'],
+            ['headers' => ['X-Scoped' => 'yes']],
+        );
+
+        foreach (['http://a.example.com/', 'http://b.example.com/'] as $baseUri) {
+            $response = $client->request('GET', '/bar', ['base_uri' => $baseUri]);
+            $this->assertContains('X-Scoped: yes', $response->getRequestOptions()['headers'], $baseUri.' is in scope');
+        }
+
+        $response = $client->request('GET', 'http://c.example.com/bar');
+        $this->assertNotContains('X-Scoped: yes', $response->getRequestOptions()['headers'], 'an unlisted host is out of scope');
+    }
+
+    public function testForBaseUrisRejectsAnEmptyList()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one base URI must be provided.');
+
+        ScopingHttpClient::forBaseUris(new MockHttpClient(), []);
+    }
+
     public function testRetryableHttpClientIntegration()
     {
         $responses = [

@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        public: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\RetryMockClientCallback: ~
+
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\TransportDecorator:
+        decorates: http_client.transport
+        arguments: ['@.inner']
+
+    test.rotating.http_client:
+        alias: rotating.http_client
+        public: true

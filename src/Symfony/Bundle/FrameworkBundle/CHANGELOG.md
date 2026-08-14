@@ -16,6 +16,7 @@ CHANGELOG
  * Add `service_id` and `advisory` options to lock stores to use advisory locks on an existing `\PDO` or Doctrine DBAL connection service
  * Add `framework.webhook.signature_format`, `framework.webhook.timestamp_header_name` and `framework.webhook.timestamp_tolerance` options
  * Make BrowserKit assertions non-verbose by default
+ * Add the `http_client.*.retry_failed.base_uris` option, to retry a failed request against the next URI in the list
 
 8.1
 ---

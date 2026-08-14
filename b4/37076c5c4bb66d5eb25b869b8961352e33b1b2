@@ -1,0 +1,178 @@
+---------------------------------------------------------------------------
+
+by ker0x at 2022-11-02T11:25:13Z
+
+I just updated the PR with the following changes:
+
+- A new computed variable `form_id` is available in the view. It is the concatenation of `form_` and the `ID` of the form.
+- The `<form>` element uses the `row_attr` option instead of `attr` to display attributes. The `row_attr` option was never used on the root form and this avoids duplicating attributes.
+- The `form_attr` option now only accepts a boolean value.
+    - If set on the root form, each child will have a `form` attribute with the `form_id` as value.
+    - If set on a child, it will have a `form` attribute with the `form_id` as value.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-17T16:58:22Z
+
+Looks like a rebase is needed. Still up to do it?
+
+---------------------------------------------------------------------------
+
+by ker0x at 2023-04-18T11:05:49Z
+
+@nicolas-grekas PR has been rebase, however unit tests are failing with high and low deps and I don't know why!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2023-04-21T08:17:16Z
+
+looks like you need to update the `composer.json` file of the Twig bridge to make sure that the Form component is not older than 6.3 (in the `require-dev` and `conflict` sections)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-13T14:12:26Z
+
+I pushed the fix to the composer.json.
+Can you please update the description of the PR? I feel like it's a bit out of sync.
+
+---------------------------------------------------------------------------
+
+by ker0x at 2023-07-26T09:54:43Z
+
+@nicolas-grekas description update 👍
+
+@HeahDude I agree to target `6.4` instead of `5.4`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-07-26T10:00:58Z
+
+> target 6.4 instead of 5.4
+
+Would be better I agree. Can you update the target of this PR and rebase on 6.4 please?
+
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-03-30T17:57:30Z
+
+May I ask here for the topic of deprecating the "name" attribute, as based on the spec, "id" attribute is a clean switch and supersets the "name" one? Details here #63617
+
+Edit : [PR over this PR](https://github.com/symfony/symfony/pull/63944) created.
+
+---------------------------------------------------------------------------
+
+by ker0x at 2026-05-30T09:12:29Z
+
+@nicolas-grekas @xabbuh I have rebased on top of 8.2, if you want to take another look to it!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-26T15:50:06Z
+
+Reviewed, rebased onto the current 8.2 and reworked. Thanks @ker0x, and sorry this sat so long.
+
+I changed the mechanism from `row_attr` to a dedicated `form_id` view variable. Three problems came from overloading `row_attr`, and all three disappear with a variable of its own:
+
+* `row_attr` already means the attributes of a field's row wrapper. Rendering it on the `<form>` tag makes an existing `row_attr`, for instance one set by a `FormTypeExtension` to class every row, start appearing on the form element too.
+* `form_start` rendered `row_attr|merge(attr)`, and `merge` lets the right operand win, so `attr` overrode `row_attr`. A bootstrap 3 horizontal form with `attr: {class: "app-form"}` therefore lost the theme's own `form-horizontal` class: `class="app-form form-horizontal"` became `class="app-form"`. @xabbuh asked for a fallback to `attr` for themes that do not provide `row_attr`, and this is the half that was missing. The coverage that would have caught it had been converted from `attr` to `row_attr`, so nothing passed `attr` to `renderStart` any more.
+* the id was computed twice, once in `FormType` for the tag and once in `BaseType` for the children's `form` attribute. Overriding `row_attr` at render time, which the PR's own updated test documents as the way to add a class, left `<form>` with the app's id and the children pointing at `form_my_form`, that is at nothing.
+
+I also kept the `form_attr` string form as it is. The earlier version made it stop setting `vars["id"]` for the root, which changed every descendant id and every `label for=`. That is a wider break than the one the UPGRADE entry described, and it is not needed for the fix.
+
+What is left is a `form_id` variable on root forms, `form_div_layout` filling `attr.id` from it when the application has not set one, and `BaseType` pointing `form_attr` children at the same value. Since every theme inherits `form_start` from `form_div_layout`, none of the other layouts needed a change, and `bootstrap_3_horizontal_layout.html.twig` is untouched.
+
+Tests now prove the fix rather than record the output: the `<form>` id and the children's `form` attribute are asserted equal, an explicit `attr.id` is asserted to win, and the `form_attr` string form is asserted not to move descendant ids. The first fails on a clean 8.2. The start-tag expectations are updated across all layouts.
+
+One open detail: there is no way to suppress the id. `attr: {id: ""}` renders `id=""`, which is invalid HTML. I did not add an opt-out; say if you want one.
+
+Local runs: Form 4939, Twig bridge 2002, both green. php-cs-fixer clean.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T10:29:41Z
+
+Unrelated to this PR but worth recording while we are in this method: the root-form branch of `BaseType::buildView()` still does `$id = ltrim($id, '_0123456789')`, and the comment above it cites the HTML4 rule that ids must start with a letter. HTML5 dropped that: an id can be any non-empty string without whitespace. So the strip is no longer required, and it silently changes ids for form names starting with an underscore or a digit.
+
+Nothing to change here, since this PR prefixes with `form_` and is a bugfix. Recording it because #53981 proposed removing that `ltrim` and was just closed by its author, so the observation would otherwise be lost.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:36:57Z
+
+Rebased on 8.2 (two CHANGELOG conflicts) and moved the `TwigBridge` section of `UPGRADE-8.2.md` into alphabetical order, it sat between `Form` and `FrameworkBundle`.
+
+Also flipped the header table to feature: this targets the dev branch, adds the public `form_id` view variable and carries two `[BC BREAK]` upgrade entries, so it is not a bugfix even though it fixes #42075.
+
+@xabbuh your 2023 change request looks settled. The version constraints you asked for are handled by degradation instead: the theme guards with `form_id is defined and form_id`, and the layout tests skip when the variable is missing, so TwigBridge 8.2 on an older symfony/form renders as before. The `row_attr` fallback point is moot since the id no longer travels through `row_attr`. Could you dismiss or re-review?
+
+One thing left open: with Form 8.2 and TwigBridge 8.1, children get `form="form_<root id>"` while no theme renders that id, so the option keeps doing nothing. That is not a regression, but a `conflict` entry on Form would close it if we want to.
+
+Checked: Form 4946 tests, TwigBridge 2010, both green. Reverting only the theme while keeping `BaseType` fails the new assertions, which is the check that proves the theme change (reverting `BaseType` too makes them skip).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:41:56Z
+
+Correction: the description claimed there was no way to suppress the id. There is, and it is the usual one for any attribute: `attr: {id: false}` renders no `id` at all, because the `attributes` block skips a value that `is same as(false)`. Verified through the real rendering path:
+
+```
+attr.id = false => <form name="form" method="get" >
+attr.id = ''    => <form name="form" method="get" id="">
+attr.id = null  => <form name="form" method="get" id="">
+```
+
+So no new opt-out is needed. Making `''` mean "remove" would special-case `id`, since `attr: {class: ''}` would still render `class=""`, and it would silently change what that value does today. The description and the `UPGRADE-8.2.md` entry now both mention `attr: {id: false}`.
+
+Two pre-existing details that surfaced while checking, neither caused by this PR: `attr: {id: null}` renders `id=""`, which is not valid HTML5, and dropping an attribute leaves a stray space before the `>`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T14:52:43Z
+
+Made the id opt-in, following the question of whether this had to be a BC break.
+
+It did not. `FormType::finishView()` runs after the children exist, so it can tell whether anything actually points at the id, exactly as it already computes `multipart`. `form_id` is now left `null` when no descendant uses `form_attr`, and the theme's existing `form_id is defined and form_id` guard then renders nothing. The walk is recursive, so a `form_attr` on a grandchild still counts.
+
+What that changes:
+
+* forms that do not use `form_attr` render byte for byte as before, so the TwigBridge entry in `UPGRADE-8.2.md` is no longer a `[BC BREAK]`;
+* the six per-layout test files no longer need touching at all. Their `testStartTag*` expectations are back to their original values and the `requireFormIdViewVariable()` guards are gone from them. The diff went from 15 files to 9;
+* the remaining `[BC BREAK]`, on the Form side, only affects `form_attr` users, whose `form="<root id>"` becomes `form="form_<root id>"`. That reference pointed at a `<div>` and never resolved, so it only moves for people whose feature was already broken.
+
+Tests added first, then the change: `testFormIdIsNotSetWhenNothingReferencesIt`, `testFormIdIsSetWhenADescendantReferencesIt` (nested, to cover the recursion) and `testStartTagRendersNoIdWhenNothingReferencesIt`. With the gating removed they fail with "Failed asserting that 'form_parent' is null" and the rendered tag still containing `id=`. Form 4948 tests and TwigBridge 2019 tests pass.
+
+The description is rewritten to document the final behaviour.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-08T09:04:29Z
+
+@xabbuh applied, a string `form_attr` now stays the reference as is. Chasing it turned up two more cases where the `<form>` id and the children disagreed:
+
+* the root branch runs `ltrim($id, '_0123456789')` before deriving the id while the child branch re-derived from the raw root name, so a form named `_foo` rendered `id="form_foo"` with its children pointing at `form__foo`;
+* `isFormIdReferenced()` tested `isset($child->vars['attr']['form'])`, so a hand-written `attr: {form: ...}` pointing at some other form made the `<form>` grow an id it never had before.
+
+`form_id` is now whatever the `<form>` element will actually carry: `attr.id` when the application set one, the `form_attr` string when it is a string, `form_<root id>` otherwise. Only the name-derived id needs the prefix, since only that one collides with the id of the wrapping element. Children read the variable off the root view instead of recomputing it, so the two cannot drift.
+
+The setup you had in mind renders unchanged:
+
+```
+form_attr: 'my-form' + attr: {id: 'my-form'}
+  <form name="registration" method="post" id="my-form">   child form="my-form"
+```
+
+Six new tests, revert-verify both ways: reverting `BaseType`/`FormType` fails 11 tests, reverting only the theme fails the two rendering assertions. Form 4954 and TwigBridge 2028 green, php-cs-fixer clean. Rebased on the current 8.2, one `UPGRADE-8.2.md` conflict with the `TimezoneType` deprecation. Description updated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-10T09:01:48Z
+
+@xabbuh right, `$options` there was the root's, so a `form_attr` string on a child was invisible.
+
+The whole computation moved to `FormType::finishView()`, which runs on the root once every child view exists. It walks the form tree once, collecting the views that use `form_attr` and the identifier the application chose, then writes `form_id` and the children's `form` attribute together. `BaseType::buildView()` no longer touches either, so the two cannot disagree.
+
+Your test suggestion is applied and passes: with the string on the child, `<form ... id="custom-identifier">` and `form="custom-identifier"`. Two Form tests added for the same rule, one for a string on a grandchild, one for the root string winning over a descendant one.
+
+Revert-verify: reverting `BaseType`/`FormType` fails 16 of the 21 `form_attr`/`form_id` tests, reverting only the theme fails 18 layout tests. Form 4964 and TwigBridge 2029 green, php-cs-fixer clean. Rebased on the current 8.2.
+
+One point for you: when the string sits on the root it is also `vars['id']`, so `<form id="X">` and the wrapping `<div id="X">` both carry it. It is not a duplicate when the string sits on a child. Removing it would mean no longer deriving `vars['id']` from `form_attr`, which moves every descendant id and every `label for=`, so I left it.

@@ -1,0 +1,417 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-20T09:00:34Z
+
+I really like this feature, but it adds a lot of complexity and I am not sure it's worth.
+If this feature would get accepted, we would need a DebugRolesCommand IMHO 🤷‍♂️
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-10-20T14:29:05Z
+
+Nice ! I would suggest to not match on `*` only. But either prefix or suffixed with `_`. So `*` act as `[a-zA-Z]+`
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-20T14:51:40Z
+
+> I really like this feature, but it adds a lot of complexity and I am not sure it's worth. If this feature would get accepted, we would need a DebugRolesCommand IMHO 🤷‍♂️
+
+I agree that adds complexity in the hierarchy config, but since it's optional we keep simple what should remain simple, no? The drawback I see is the config could be less meaningful as all roles involved in the hierarchy are not necessary listed, but here again, we let the choice to the developer ^^
+
+100% OK for a debug roles command, maybe something like this?
+```
+$ bin/console debug:security:role-hierarchy
+
+Role hierarchy configuration:
+
+ROLE_SHOP_*
+  => ROLE_USER_SHOP
+    => ROLE_USER_*
+      => ROLE_USER
+ROLE_BLOG_*
+  => ROLE_USER_BLOG
+    => ROLE_USER_*
+      => ROLE_USER
+ROLE_USER_*
+  => ROLE_USER
+
+$ bin/console debug:security:role-hierarchy ROLE_SHOP_VIEW ROLE_BLOG_POST
+
+Effective roles for ROLE_SHOP_VIEW, ROLE_BLOG_POST:
+ - ROLE_SHOP_VIEW
+ - ROLE_BLOG_POST
+ - ROLE_USER_SHOP
+ - ROLE_BLOG_USER
+ - ROLE_USER
+
+$ bin/console debug:security:role-hierarchy ROLE_SHOP_VIEW --tree
+
+Effective roles for ROLE_SHOP_VIEW:
+ - ROLE_SHOP_VIEW
+ - ROLE_USER_SHOP
+   - ROLE_USER
+```
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-20T15:29:46Z
+
+> Nice ! I would suggest to not match on `*` only. But either prefix or suffixed with `_`. So `*` act as `[a-zA-Z]`
+
+@Neirda24 Thanks! Which use cases would you like to avoid with this restriction? `ROLE_*_CREATE` should not match roles like `ROLE_BLOG_POST_CREATE`? Or you think about the placeholder syntax itself, so `ROLE*` is not considered as a valid placeholder?
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2023-10-20T15:32:28Z
+
+> > Nice ! I would suggest to not match on `*` only. But either prefix or suffixed with `_`. So `*` act as `[a-zA-Z]`
+>
+> @Neirda24 Thanks! Which use cases would you like to avoid with this restriction? `ROLE_*_CREATE` should not match roles like `ROLE_BLOG_POST_CREATE`? Or you think about the placeholder syntax itself, so `ROLE*` is not considered as a valid placeholder?
+
+The latter. About your first suggestion you are right it should be matcheable. Maybe with `ROLE_**_CREATE` to allow any number of words in between ?
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-20T16:27:49Z
+
+> > > Nice ! I would suggest to not match on `*` only. But either prefix or suffixed with `_`. So `*` act as `[a-zA-Z]`
+> >
+> >
+> > @Neirda24 Thanks! Which use cases would you like to avoid with this restriction? `ROLE_*_CREATE` should not match roles like `ROLE_BLOG_POST_CREATE`? Or you think about the placeholder syntax itself, so `ROLE*` is not considered as a valid placeholder?
+>
+> The latter. About your first suggestion you are right it should be matcheable. Maybe with `ROLE_**_CREATE` to allow any number of words in between ?
+
+Got it, I'll add the restriction for placeholder syntax.
+
+For `**`, I'm not sure, I mean it will force the use of `_` as a word separator, and thus introduce the concept of words in the role syntax, but only when using placeholders. If find it a little bit confusing, while `*` could just mean _match anything here_.
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-20T19:08:44Z
+
+@Neirda24 I updated the placeholder pattern matching in [this commit](https://github.com/symfony/symfony/pull/52099/commits/0240d67cb0a028f8041b375c41202aeaa44066f4), looks fine to you?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-22T07:15:56Z
+
+I'm not sure your example really show the (real) advantage of this feature.
+
+Current configuration:
+
+```
+role_hierarchy:
+  ROLE_USER_SHOP:         ROLE_USER
+  ROLE_USER_BLOG:         ROLE_USER
+
+  ROLE_SHOP_VIEW:         ROLE_USER_SHOP
+  ROLE_SHOP_BUY:          ROLE_USER_SHOP
+  ROLE_SHOP_ADD_TO_CART:  ROLE_USER_SHOP
+
+  ROLE_BLOG_VIEW:         ROLE_USER_BLOG
+  ROLE_BLOG_POST:         ROLE_USER_BLOG
+  ROLE_BLOG_REPORT:       ROLE_USER_BLOG
+  ROLE_BLOG_COMMENT:      ROLE_USER_BLOG
+```
+
+You kinda uses your "roles" as "permission", so you could have written it like that no ?
+
+```
+role_hierarchy:
+  ROLE_USER:                 [ROLE_USER_BLOG, ROLE_USER_SHOP]
+  ROLE_USER_BLOG:     [ROLE_BLOG_VIEW, ROLE_BLOG_POST, ROLE_BLOG_REPORT, ROLE_BLOG_COMMENT]
+  ROLE_USER_SHOP:     [ROLE_SHOP_VIEW, ROLE_SHOP_BUY, ROLE_SHOP_ADD_TO_CART]
+```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-10-22T07:57:42Z
+
+> 100% OK for a debug roles command, maybe something like this?
+
+Yes 👍
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-23T07:56:10Z
+
+> You kinda uses your "roles" as "permission", so you could have written it like that no ?
+>
+> ```
+> role_hierarchy:
+>   ROLE_USER:                 [ROLE_USER_BLOG, ROLE_USER_SHOP]
+>   ROLE_USER_BLOG:     [ROLE_BLOG_VIEW, ROLE_BLOG_POST, ROLE_BLOG_REPORT, ROLE_BLOG_COMMENT]
+>   ROLE_USER_SHOP:     [ROLE_SHOP_VIEW, ROLE_SHOP_BUY, ROLE_SHOP_ADD_TO_CART]
+> ```
+
+This configuration is not really equivalent. By giving the role `ROLE_USER` to someone you also give all inherited roles. In my example, you can give the single role `ROLE_BLOG_VIEW` to a user, and thus `ROLE_USER_BLOG` and `ROLE_USER` are inherited, but not the others (`ROLE_BLOG_POST`, `ROLE_SHOP_VIEW`, `ROLE_USER_SHOP`, etc.).
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-23T08:24:06Z
+
+That is why i used the term "permission", that for me is quite different from "role"  (a role beeing itself an abstraction for a set of permissions) [^1]
+
+In your example, today you'd have to give this user "ROLE_BLOG_VIEW" and let's say "ROLE_SHOP_VIEW", and then you inherit ROLE_BLOG_USER and ROLE_SHOP_USER, then ROLE_USER.
+
+How does the new placeholder system help/ease things ?
+
+Again, i **do** think it's a great idea, but i'd like to see a before/after example to illustrate.
+
+In the one you gave, i don't see someone with ROLE_BLOG_REPORT but not ROLE_BLOG_VIEW.
+
+[^1]: even if Symfony sometimes uses both, like ROLE_ADMIN & ROLE_ALLOWED_TO_SWITCH.
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-10-23T14:41:49Z
+
+> That is why i used the term "permission", that for me is quite different from "role" (a role beeing itself an abstraction for a set of permissions) [1](#user-content-fn-1-01e7e834a34b75a3b9952d53661fe3f8)
+
+I think it depends on the usage.
+
+Without a role hierarchy, what's behind a role depends on the code that is actually protected with it. If the role is used only to protect a single action (ex: create a specific kind of entity in database), then it acts like a permission. If it's used to protect multiple actions in various places, then it "grants" multiple things and acts like a set of permissions.
+
+With a role hierarchy, yes, roles used in keys are a set of permissions, as they inherit other ones. But I would think that roles used only in the values could then be either permissions or sets of permissions, with the same reasoning as above.
+
+I see roles as a special type of argument for the authorization layer, that triggers the role voter and look for matching elements in the user's token.
+
+But that's my understanding, I may be wrong :grin:.
+
+> In your example, today you'd have to give this user "ROLE_BLOG_VIEW" and let's say "ROLE_SHOP_VIEW", and then you inherit ROLE_BLOG_USER and ROLE_SHOP_USER, then ROLE_USER.
+>
+> How does the new placeholder system help/ease things ?
+
+I think the main advantage here is to _map_ all potential roles that matches the pattern to a well-defined role name, that could be used to protect a domain section of the application easily. In the future, it will be easy to add/rename roles that will be covered with the pattern, without rewriting the hierarchy.
+
+> Again, i **do** think it's a great idea, but i'd like to see a before/after example to illustrate.
+>
+> In the one you gave, i don't see someone with ROLE_BLOG_REPORT but not ROLE_BLOG_VIEW.
+
+I agree that my first example is not sufficient to demonstrate the potential usages of the feature, and doesn't reflect a real configuration. Thanks for pointing this out!
+
+Rewriting this example like this could feel more real?
+
+Current configuration:
+```yaml
+role_hierarchy:
+  ROLE_USER_SHOP:         [ROLE_USER, ROLE_SHOP_VIEW]
+  ROLE_USER_BLOG:         [ROLE_USER, ROLE_BLOG_VIEW]
+
+  ROLE_SHOP_BUY:          ROLE_USER_SHOP
+  ROLE_SHOP_ADD_TO_CART:  ROLE_USER_SHOP
+
+  ROLE_BLOG_POST:         ROLE_USER_BLOG
+  ROLE_BLOG_REPORT:       ROLE_USER_BLOG
+  ROLE_BLOG_COMMENT:      ROLE_USER_BLOG
+```
+
+With placeholder:
+```yaml
+role_hierarchy:
+  ROLE_USER_*:    ROLE_USER
+
+  ROLE_SHOP_*:    ROLE_USER_SHOP
+  ROLE_USER_SHOP: ROLE_SHOP_VIEW
+
+  ROLE_BLOG_*:    ROLE_USER_BLOG
+  ROLE_USER_BLOG: ROLE_BLOG_VIEW
+```
+
+But now I find this use case too simple. It was intended to show the placeholder syntax, but it doesn't fit a real situation.
+
+I made another one that, I hope, better illustrates the advantages:
+
+Let's have an application with:
+- A blog, with readers, authors, and moderators. Both authors and moderators are readers.
+- A shop, with basic users who can browse, buyers, sellers, and moderators. Sellers and moderators are not necessarily buyers.
+- A moderator zone, where moderators can see all pending requests or whatever, protected with access control (`/moderation` requires role `ROLE_MODERATOR`).
+
+Current configuration:
+```yaml
+role_hierarchy:
+  # Blog readers can view posts and add comments
+  ROLE_BLOG_READER:
+    - ROLE_USER
+    - ROLE_BLOG_VIEW
+    - ROLE_BLOG_COMMENT
+  # Blog moderators are blog readers who can moderate comments and posts
+  ROLE_BLOG_MODERATOR:
+    - ROLE_MODERATOR
+    - ROLE_BLOG_READER
+    - ROLE_BLOG_MODERATE_COMMENT
+    - ROLE_BLOG_MODERATE_POST
+  # Blog authors are blog readers who can create posts
+  ROLE_BLOG_AUTHOR:
+    - ROLE_BLOG_READER
+    - ROLE_BLOG_CREATE_POST
+
+  # Shop users can view items
+  ROLE_SHOP_USER:
+    - ROLE_USER
+    - ROLE_SHOP_VIEW
+  # Shop buyers are shop users who can view items, buy them, and post reviews
+  ROLE_SHOP_BUYER:
+    - ROLE_SHOP_USER
+    - ROLE_SHOP_BUY_ITEM
+    - ROLE_SHOP_POST_REVIEW
+  # Shop sellers are shop users who can add items
+  ROLE_SHOP_SELLER:
+    - ROLE_SHOP_USER
+    - ROLE_SHOP_CREATE_ITEM
+  # Shop moderators are shop users who and moderate items and reviews
+  ROLE_SHOP_MODERATOR:
+    - ROLE_SHOP_USER
+    - ROLE_MODERATOR
+    - ROLE_SHOP_MODERATE_ITEM
+    - ROLE_SHOP_MODERATE_REVIEW
+```
+
+With placeholders:
+```yaml
+role_hierarchy:
+  # All users with roles have ROLE_USER
+  ROLE_*: ROLE_USER
+  # All moderators have ROLE_MODERATOR
+  ROLE_*_MODERATOR: ROLE_MODERATOR
+
+  # Having a blog role allows to view the blog
+  ROLE_BLOG_*: ROLE_BLOG_VIEW
+  # Blog readers can comment posts
+  ROLE_BLOG_READER:
+    - ROLE_BLOG_COMMENT
+  # Blog moderators can also moderate comments and posts
+  ROLE_BLOG_MODERATOR:
+    - ROLE_BLOG_READER
+    - ROLE_BLOG_MODERATE_COMMENT
+    - ROLE_BLOG_MODERATE_POST
+  # Blog authors can also create posts
+  ROLE_BLOG_AUTHOR:
+    - ROLE_BLOG_READER
+    - ROLE_BLOG_CREATE_POST
+
+  # Having a shop role allows to view the shop
+  ROLE_SHOP_*: ROLE_SHOP_VIEW
+  # Shop buyers can buy and review items
+  ROLE_SHOP_BUYER:
+    - ROLE_SHOP_BUY_ITEM
+    - ROLE_SHOP_POST_REVIEW
+  # Shop sellers can add items
+  ROLE_SHOP_SELLER: ROLE_SHOP_CREATE_ITEM
+  # Shop moderators can moderate items and reviews
+  ROLE_SHOP_MODERATOR:
+    - ROLE_SHOP_MODERATE_ITEM
+    - ROLE_SHOP_MODERATE_REVIEW
+```
+
+The advantages I see here:
+- All roles grant `ROLE_USER`.
+- The role `ROLE_MODERATOR` is easy to configure globally.
+- It's easy to configure that _anyone who can do something on the shop can view the shop_, even if the role is not explicitly declared in the hierarchy configuration (for example a user who can only post reviews on items but not buy anything).
+- It's scalable: we can add more domain sections to the application, following the naming convention for moderators will handle their access to the moderator zone automatically.
+
+The drawbacks:
+- It requires some naming conventions. But here the example is simple, I also consider more complex use cases for application having dozens of domain-specific roles, and I assume having a good naming convention is a must-have in this case.
+
+Wdyt about this one? If it's better I can update the PR description with it.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2023-10-23T16:13:39Z
+
+> Wdyt about this one? If it's better I can update the PR description with it.
+
+Absolutely perfect for me, thanks a lot 😄   (and you have now your documentation PR 100% ready 👏 )
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-11-07T10:31:11Z
+
+Hi there!
+
+I worked on the `debug:roles` command. Here are some usages:
+
+`bin/console debug:roles`:
+
+![image](https://github.com/symfony/symfony/assets/7271091/f5cdeaeb-405d-4108-866d-008876fec2ec)
+
+`bin/console debug:roles --tree`:
+
+![image](https://github.com/symfony/symfony/assets/7271091/32f495f6-9f02-4714-812e-dfae47fa6b78)
+
+`bin/console debug:roles ROLE_BLOG_MODERATOR`:
+
+![image](https://github.com/symfony/symfony/assets/7271091/fdd2e977-6806-455d-a839-f9d7752ce086)
+
+`bin/console debug:roles ROLE_BLOG_MODERATOR --tree`:
+
+![image](https://github.com/symfony/symfony/assets/7271091/1ec9bbec-a473-4161-b29e-7b3aed72405c)
+
+However I'm not sure about the strategy to debug the `RoleHierarchy`. I added a wrapper so it can access needed variables through reflection, but in find it weak at the moment:
+- It doesn't work with custom implementations of `RoleHierarchyInterface`
+- I needed to access the method to match placeholders through reflection too, and at this point I wonder if a dedicated service for the placeholder matching logic would be better
+
+Does it make sense to dynamically configure the command options depending on the current `RoleHierarchyInterface` implementation? The tree view is only applicable for the built in impl, but it could be nice to still resolve reachable roles for custom impl.
+
+---------------------------------------------------------------------------
+
+by Jean-Beru at 2023-11-10T19:27:22Z
+
+Nice PR @squrious !
+
+Wrapping `RoleHierarchyInterface` to access protected/private properties/methods could introduce bugs when using a custom implementation (as you said) or decorating it.
+
+I think we have to found an other way or make this command simpler.
+
+---------------------------------------------------------------------------
+
+by squrious at 2023-11-14T10:11:23Z
+
+> I think we have to found an other way or make this command simpler.
+
+I reworked the solution to avoid the use of reflection. Now a dedicated `debug.security.role_hierarchy` is registered and injected in the command. If the role hierarchy uses a custom implementation, it is injected "as it is" and the command is only able to display reachable role names. I also added some tests to enforce this behavior.
+
+I also added a changelog entry to the Security Bundle. But the tests fail because the command is in a different package, so maybe it would be better to add the command in another PR when/if this one gets merged?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T15:32:38Z
+
+Thanks for your patience @squrious, this sat far too long for work that was essentially done in 2023.
+
+I split it in two, as the discussion here was mostly about the command rather than the feature:
+
+* this PR keeps the placeholder support alone;
+* the `debug:roles` command moved to #65345, which builds on this one and should be merged after it.
+
+The hierarchy had been rewritten on 8.2 in the meantime, `$map` is now keyed by role name and `getParentRoleNames()` was added, so I ported the feature onto the current shape rather than merging. Three things changed along the way:
+
+**A role holding a regex delimiter broke the pattern.** `getPlaceholderPattern()` called `preg_quote($role)` without the delimiter while building a `/…/` pattern:
+
+```
+ROLE_A/B_*  ->  PHP warning: preg_grep(): Unknown modifier 'B'
+                and the placeholder silently never matched
+```
+
+It is `preg_quote($role, '/')` now, with a test.
+
+**Applications without placeholders were paying for the feature.** `getReachableRoleNames()` runs on every `RoleHierarchyVoter` vote and the voter does not cache, so the extra work landed on every authorization check. Measured over 20k calls:
+
+```
+8.2                              0.34 us/call
+before, no placeholder declared  0.52 us/call
+after,  no placeholder declared  0.34 us/call
+```
+
+The resolution is skipped entirely when the hierarchy declares no placeholder.
+
+**Placeholders leaked into `getParentRoleNames()`.** That method is new since this PR was written. It walks the map, so it returned `ROLE_FOO_*` as a parent of `ROLE_USER`, which is not a role anyone can hold. Placeholder keys are excluded there now, with a test.
+
+Security/Core is green at 407 tests, and reverting `RoleHierarchy.php` fails 7 of them.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T15:46:27Z
+
+Follow-up: `$rolePlaceholdersPatterns` and `getMatchingPlaceholders()` are private here now. They only need to be protected for `DebugRoleHierarchy`, so #65345 widens them itself. Nothing is exposed unless the command is taken, and private to protected is a safe widening within the same release.

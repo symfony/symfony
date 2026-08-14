@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0
+ * Add `PolymorphicCollectionType` for collections whose entries do not all share the same type
  * Add `inputmode="numeric"` to `IntegerType` when the `grouping` option is enabled
  * Add the `choice_help` option to `ChoiceType`
  * Add `$help` parameter to `ChoiceListFactoryInterface::createView()`

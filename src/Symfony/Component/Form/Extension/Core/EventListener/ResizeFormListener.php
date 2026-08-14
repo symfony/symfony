@@ -12,12 +12,14 @@
 namespace Symfony\Component\Form\Extension\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\EntryTypeProviderInterface;
 use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
  * Resize a collection form element based on the data sent from the client.
@@ -31,14 +33,21 @@ class ResizeFormListener implements EventSubscriberInterface
     private \Closure|bool $deleteEmpty;
     private array $preSetDataChildrenStack = [];
 
+    /**
+     * @param string|array<string, string>    $type              A type, or one type per entry name when $entryTypeProvider is given
+     * @param array<mixed>                    $options           Options for $type, or one set of options per entry name
+     * @param array<mixed>|null               $prototypeOptions  Same shape as $options
+     * @param EntryTypeProviderInterface|null $entryTypeProvider Picks the entry name to use for a given entry's data
+     */
     public function __construct(
-        private string $type,
+        private string|array $type,
         private array $options = [],
         private bool $allowAdd = false,
         private bool $allowDelete = false,
         bool|callable $deleteEmpty = false,
         ?array $prototypeOptions = null,
         private bool $keepAsList = false,
+        private ?EntryTypeProviderInterface $entryTypeProvider = null,
     ) {
         $this->deleteEmpty = \is_bool($deleteEmpty) ? $deleteEmpty : $deleteEmpty(...);
         $this->prototypeOptions = $prototypeOptions ?? $options;
@@ -90,9 +99,10 @@ class ResizeFormListener implements EventSubscriberInterface
                 continue;
             }
 
-            $form->add($name, $this->type, array_replace([
-                'property_path' => '['.$name.']',
-            ], $this->options));
+            $form->add($name, $this->forModelData($this->type, $value), array_replace(
+                ['property_path' => '['.$name.']'],
+                $this->forModelData($this->options, $value),
+            ));
         }
     }
 
@@ -118,9 +128,10 @@ class ResizeFormListener implements EventSubscriberInterface
         if ($this->allowAdd) {
             foreach ($data as $name => $value) {
                 if (!$form->has($name)) {
-                    $form->add($name, $this->type, array_replace([
-                        'property_path' => '['.$name.']',
-                    ], $this->prototypeOptions));
+                    $form->add($name, $this->forSubmittedData($this->type, $value), array_replace(
+                        ['property_path' => '['.$name.']'],
+                        $this->forSubmittedData($this->prototypeOptions, $value),
+                    ));
                 }
             }
         }
@@ -188,13 +199,34 @@ class ResizeFormListener implements EventSubscriberInterface
                 $form->remove($name);
             }
             foreach ($formReindex as $index => $child) {
-                $form->add($index, $this->type, array_replace([
-                    'property_path' => '['.$index.']',
-                ], $this->options, ['data' => $child->getData()]));
+                $form->add($index, $this->forModelData($this->type, $child->getData()), array_replace(
+                    ['property_path' => '['.$index.']'],
+                    $this->forModelData($this->options, $child->getData()),
+                    ['data' => $child->getData()],
+                ));
                 $data[$index] = $child->getData();
             }
         }
 
         $event->setData($data);
+    }
+
+    private function forModelData(string|array $value, mixed $data): string|array
+    {
+        return \is_string($this->type) ? $value : $this->entryOf($value, $this->entryTypeProvider->forModelData($data));
+    }
+
+    private function forSubmittedData(string|array $value, mixed $data): string|array
+    {
+        return \is_string($this->type) ? $value : $this->entryOf($value, $this->entryTypeProvider->forSubmittedData($data));
+    }
+
+    private function entryOf(array $value, int|string $name): string|array
+    {
+        if (!\array_key_exists($name, $this->type)) {
+            throw new InvalidOptionsException(\sprintf('The "%s" instance given as "entry_type_provider" must return a key of the "entry_types" option, but it returned "%s". Allowed keys are "%s".', $this->entryTypeProvider::class, $name, implode('", "', array_keys($this->type))));
+        }
+
+        return $value[$name];
     }
 }

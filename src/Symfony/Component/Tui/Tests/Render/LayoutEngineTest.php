@@ -368,4 +368,67 @@ class LayoutEngineTest extends TestCase
         $this->assertSame('M', $line[4]);
         $this->assertSame('X', $line[43]);
     }
+
+    public function testIntrinsicChildrenAreClampedToTheAvailableColumns()
+    {
+        // Each flex: 0 child is measured on its own against the full width, so
+        // their natural widths can add up to more columns than the row has.
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->setStyle(new Style(direction: Direction::Horizontal));
+
+        foreach (['abcdefgh', 'ijklmnop'] as $text) {
+            $child = new TextWidget($text);
+            $child->setStyle(new Style(flex: 0));
+            $root->add($child);
+        }
+
+        $result = $renderer->render($root, 10, 1);
+
+        $this->assertSame(10, AnsiUtils::visibleWidth($result[0]));
+        foreach ($result as $line) {
+            $this->assertLessThanOrEqual(10, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testClampedIntrinsicChildrenStillFillTheRow()
+    {
+        // Scaling the natural widths down leaves a remainder, and dropping it
+        // would cost a child a column the row has room for.
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->setStyle(new Style(direction: Direction::Horizontal));
+
+        foreach (['aaaa', 'bbbbbb', 'cc'] as $text) {
+            $child = new TextWidget($text);
+            $child->setStyle(new Style(flex: 0));
+            $root->add($child);
+        }
+
+        $result = $renderer->render($root, 10, 1);
+
+        $this->assertSame('aaabbbbbcc', AnsiUtils::stripAnsiCodes($result[0]));
+    }
+
+    public function testFlexChildrenLeaveAColumnForEachRemainingSibling()
+    {
+        // A heavier weight must not spend the columns its later siblings need:
+        // they are floored to one column each, which overflowed the row.
+        $renderer = new Renderer();
+        $root = new ContainerWidget();
+        $root->setStyle(new Style(direction: Direction::Horizontal));
+
+        foreach ([null, 3, 1, null, null] as $flex) {
+            $child = new TextWidget('Hello');
+            $child->setStyle(new Style(flex: $flex));
+            $root->add($child);
+        }
+
+        $result = $renderer->render($root, 5, 1);
+
+        $this->assertSame(5, AnsiUtils::visibleWidth($result[0]));
+        foreach ($result as $line) {
+            $this->assertLessThanOrEqual(5, AnsiUtils::visibleWidth($line));
+        }
+    }
 }

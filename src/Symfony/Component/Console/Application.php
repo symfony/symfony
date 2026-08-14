@@ -281,7 +281,7 @@ class Application implements ResetInterface
      */
     public function doRun(InputInterface $input, OutputInterface $output): int
     {
-        if (true === $input->hasParameterOption(['--version', '-V'], true)) {
+        if ($input->hasParameterOption(['--version', '-V'], true)) {
             $output->writeln($this->getLongVersion());
 
             return 0;

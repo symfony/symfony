@@ -58,7 +58,7 @@ final class ServerLogHandler extends AbstractProcessingHandler
 
         try {
             if (!$this->socket = $this->socket ?: $this->createSocket()) {
-                return false === $this->bubble;
+                return !$this->bubble;
             }
         } finally {
             restore_error_handler();

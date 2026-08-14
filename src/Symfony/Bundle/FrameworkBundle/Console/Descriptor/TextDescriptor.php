@@ -643,7 +643,7 @@ class TextDescriptor extends Descriptor
      */
     private function formatMethods(array $methods): string
     {
-        if ([] === $methods) {
+        if (!$methods) {
             $methods = ['ANY'];
         }
 

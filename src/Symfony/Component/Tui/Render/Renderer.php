@@ -193,7 +193,7 @@ final class Renderer implements WidgetRendererInterface
             // For containers, render children within inner dimensions and measure
             $children = array_values(array_filter(
                 $widget->all(),
-                fn (AbstractWidget $child) => true !== $this->resolveStyle($child)->getHidden(),
+                fn (AbstractWidget $child) => !$this->resolveStyle($child)->getHidden(),
             ));
 
             $direction = $resolvedStyle->getDirection() ?? Direction::Vertical;

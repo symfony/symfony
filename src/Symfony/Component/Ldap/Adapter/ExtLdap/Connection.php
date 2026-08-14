@@ -69,7 +69,7 @@ class Connection extends AbstractConnection
             $this->connect();
         }
 
-        if (false === @ldap_bind($this->connection, $dn, $password)) {
+        if (!@ldap_bind($this->connection, $dn, $password)) {
             $error = ldap_error($this->connection);
             ldap_get_option($this->connection, \LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic);
 
@@ -97,7 +97,7 @@ class Connection extends AbstractConnection
             $this->connect();
         }
 
-        if (false === @ldap_sasl_bind($this->connection, $dn, $password, $mech, $realm, $authcId, $authzId, $props)) {
+        if (!@ldap_sasl_bind($this->connection, $dn, $password, $mech, $realm, $authcId, $authzId, $props)) {
             $error = ldap_error($this->connection);
             ldap_get_option($this->connection, \LDAP_OPT_DIAGNOSTIC_MESSAGE, $diagnostic);
 

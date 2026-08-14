@@ -178,7 +178,7 @@ final class InputFile extends \SplFileInfo
         $target = rtrim($directory, '/\\').\DIRECTORY_SEPARATOR.$name;
 
         if (!is_dir($directory)) {
-            if (false === @mkdir($directory, 0o777, true) && !is_dir($directory)) {
+            if (!@mkdir($directory, 0o777, true) && !is_dir($directory)) {
                 throw new InvalidFileException(\sprintf('Unable to create the "%s" directory.', $directory));
             }
         } elseif (!is_writable($directory)) {

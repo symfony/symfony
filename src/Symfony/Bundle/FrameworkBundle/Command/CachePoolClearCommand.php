@@ -115,7 +115,7 @@ final class CachePoolClearCommand extends Command
                     $failure = true;
                 }
             } else {
-                if (false === $this->poolClearer->clearPool($id)) {
+                if (!$this->poolClearer->clearPool($id)) {
                     $io->warning(\sprintf('Cache pool "%s" could not be cleared.', $pool));
                     $failure = true;
                 }

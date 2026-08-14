@@ -136,7 +136,7 @@ class ImportMapAuditCommand extends Command
             ));
         }
 
-        if ([] !== $rows) {
+        if ($rows) {
             $vulnerabilityCount = 0;
             $vulnerabilitySummary = [];
             foreach ($vulnerabilitiesCount as $severity => $count) {

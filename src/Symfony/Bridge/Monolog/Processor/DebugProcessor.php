@@ -60,7 +60,7 @@ class DebugProcessor implements DebugLoggerInterface, ResetInterface, Resettable
             return $this->records[spl_object_id($request)] ?? [];
         }
 
-        if (0 === \count($this->records)) {
+        if (!$this->records) {
             return [];
         }
 

@@ -86,7 +86,7 @@ class AttributeFileLoader extends FileLoader
                 continue;
             }
 
-            if (true === $class && \T_STRING === $token[0]) {
+            if ($class && \T_STRING === $token[0]) {
                 return $namespace.'\\'.$token[1];
             }
 

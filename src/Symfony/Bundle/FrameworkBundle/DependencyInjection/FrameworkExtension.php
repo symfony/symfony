@@ -2688,7 +2688,7 @@ class FrameworkExtension extends Extension
                 ->replaceArgument(0, $transportRateLimiterReferences);
         }
 
-        if (\count($failureTransports) > 0) {
+        if ($failureTransports) {
             if ($this->hasConsole()) {
                 $container->getDefinition('console.command.messenger_failed_messages_retry')
                     ->replaceArgument(0, $config['failure_transport']);
@@ -3110,7 +3110,7 @@ class FrameworkExtension extends Extension
 
         $loader->load('mailer.php');
         $loader->load('mailer_transports.php');
-        if (!\count($config['transports']) && null === $config['dsn']) {
+        if (!$config['transports'] && null === $config['dsn']) {
             $config['dsn'] = 'smtp://null';
         }
         $transports = $config['dsn'] ? ['main' => $config['dsn']] : $config['transports'];

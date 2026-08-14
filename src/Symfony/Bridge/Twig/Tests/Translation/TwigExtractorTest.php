@@ -42,7 +42,7 @@ class TwigExtractorTest extends TestCase
         $m = new \ReflectionMethod($extractor, 'extractTemplate');
         $m->invoke($extractor, $template, $catalogue);
 
-        if (0 === \count($messages)) {
+        if (!$messages) {
             $this->assertSame($catalogue->all(), $messages);
         }
 

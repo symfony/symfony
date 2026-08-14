@@ -46,7 +46,7 @@ function centered(string $text)
 
 function cd(string $dir): void
 {
-    if (false === chdir($dir)) {
+    if (!chdir($dir)) {
         bailout("Could not switch to directory $dir.");
     }
 }

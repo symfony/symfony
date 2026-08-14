@@ -110,7 +110,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             }
         }
 
-        if (\count($emptyFields) > 0) {
+        if ($emptyFields) {
             throw new TransformationFailedException(\sprintf('The fields "%s" should not be empty.', implode('", "', $emptyFields)));
         }
 
@@ -126,7 +126,7 @@ class DateTimeToArrayTransformer extends BaseDateTimeTransformer
             throw new TransformationFailedException('This year is invalid.');
         }
 
-        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && false === checkdate($value['month'], $value['day'], $value['year'])) {
+        if (!empty($value['month']) && !empty($value['day']) && !empty($value['year']) && !checkdate($value['month'], $value['day'], $value['year'])) {
             throw new TransformationFailedException('This is an invalid date.');
         }
 

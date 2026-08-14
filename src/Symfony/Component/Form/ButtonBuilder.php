@@ -365,7 +365,7 @@ class ButtonBuilder implements \IteratorAggregate, FormBuilderInterface
      */
     public function setAutoInitialize(bool $initialize): static
     {
-        if (true === $initialize) {
+        if ($initialize) {
             throw new BadMethodCallException('Buttons do not support automatic initialization.');
         }
 

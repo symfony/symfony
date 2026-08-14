@@ -312,7 +312,7 @@ class AmqpExtIntegrationTest extends TestCase
     {
         $envelopes = [];
         $startTime = microtime(true);
-        while (0 === \count($envelopes) && $startTime + $timeout > time()) {
+        while (!$envelopes && $startTime + $timeout > time()) {
             $envelopes = iterator_to_array($receiver->get());
         }
 

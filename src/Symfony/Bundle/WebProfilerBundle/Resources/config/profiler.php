@@ -16,6 +16,7 @@ use Symfony\Bundle\WebProfilerBundle\Controller\ProfilerController;
 use Symfony\Bundle\WebProfilerBundle\Controller\RouterController;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
+use Symfony\Bundle\WebProfilerBundle\EventListener\ProfilerLinkLogListener;
 use Symfony\Bundle\WebProfilerBundle\Profiler\CodeExtension;
 use Symfony\Bundle\WebProfilerBundle\Twig\WebProfilerExtension;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
@@ -84,5 +85,14 @@ return static function (ContainerConfigurator $container) {
         ->set('twig.extension.code', CodeExtension::class)
             ->args([service('debug.file_link_formatter'), param('kernel.project_dir'), param('kernel.charset')])
             ->tag('twig.extension')
+
+        ->set('web_profiler.profiler_link_log_listener', ProfilerLinkLogListener::class)
+            ->args([
+                service('logger')->nullOnInvalid(),
+                service('router')->ignoreOnInvalid(),
+            ])
+
+            ->tag('monolog.logger', ['channel' => 'profiler'])
+            ->tag('kernel.event_subscriber')
     ;
 };

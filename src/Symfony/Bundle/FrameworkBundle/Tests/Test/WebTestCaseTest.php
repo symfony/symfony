@@ -150,7 +150,8 @@ class WebTestCaseTest extends TestCase
     {
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'no-cache, private');
         $this->expectException(AssertionFailedError::class);
-        $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public".');
+        // the ", value of header ... is ..." suffix requires symfony/http-foundation >= 8.2
+        $this->expectExceptionMessage('Failed asserting that the Response has header "Cache-Control" with value "public"');
         $this->getResponseTester(new Response())->assertResponseHeaderSame('Cache-Control', 'public');
     }
 

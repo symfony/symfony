@@ -655,7 +655,7 @@ class Inline
      *
      * @throws ParseException when object parsing support was disabled and the parser detected a PHP object or when a reference could not be resolved
      */
-    private static function evaluateScalar(ParserState $state, string $scalar, int $flags, array &$references = [], ?bool &$isQuotedString = null): mixed
+    private static function evaluateScalar(ParserState $state, string $scalar, int $flags, array &$references = [], bool &$isQuotedString = false): mixed
     {
         $isQuotedString = false;
         $scalar = trim($scalar);

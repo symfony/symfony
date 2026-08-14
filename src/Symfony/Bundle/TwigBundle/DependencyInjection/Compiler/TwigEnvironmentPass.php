@@ -26,7 +26,7 @@ class TwigEnvironmentPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        if (false === $container->hasDefinition('twig')) {
+        if (!$container->hasDefinition('twig')) {
             return;
         }
 

@@ -67,7 +67,7 @@ final class MailchimpRequestParser extends AbstractRequestParser
      */
     private function validateSignature(array $content, string $secret, string $webhookUrl, ?string $mandrillHeaderSignature): void
     {
-        if (null === $mandrillHeaderSignature || false === isset($content['mandrill_events'])) {
+        if (null === $mandrillHeaderSignature || !isset($content['mandrill_events'])) {
             throw new RejectWebhookException(400, 'Signature is wrong.');
         }
         // First add url to signedData.

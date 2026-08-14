@@ -60,7 +60,7 @@ class ChoiceValidator extends ConstraintValidator
             $choices = $constraint->choices;
         }
 
-        if (true !== $constraint->strict) {
+        if (!$constraint->strict) {
             throw new RuntimeException('The "strict" option of the Choice constraint should not be used.');
         }
 

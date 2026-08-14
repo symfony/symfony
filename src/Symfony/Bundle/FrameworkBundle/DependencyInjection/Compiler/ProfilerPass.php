@@ -26,7 +26,7 @@ class ProfilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        if (false === $container->hasDefinition('profiler')) {
+        if (!$container->hasDefinition('profiler')) {
             return;
         }
 

@@ -68,7 +68,7 @@ class LdapUserProvider implements UserProviderInterface, PasswordUpgraderInterfa
 
         $identifier = $this->ldap->escape($identifier, '', LdapInterface::ESCAPE_FILTER);
         $query = str_replace('{user_identifier}', $identifier, $this->defaultSearch);
-        $search = $this->ldap->query($this->baseDn, $query, ['filter' => 0 == \count($this->extraFields) ? '*' : $this->extraFields]);
+        $search = $this->ldap->query($this->baseDn, $query, ['filter' => !$this->extraFields ? '*' : $this->extraFields]);
 
         $entries = $search->execute();
         $count = \count($entries);

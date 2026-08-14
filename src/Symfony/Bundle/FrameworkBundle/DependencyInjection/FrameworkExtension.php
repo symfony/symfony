@@ -2353,7 +2353,7 @@ class FrameworkExtension extends Extension
         }
 
         foreach ($config['resources'] as $resourceName => $resourceStores) {
-            if (0 === \count($resourceStores)) {
+            if (!$resourceStores) {
                 continue;
             }
 

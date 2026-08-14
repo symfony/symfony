@@ -132,7 +132,7 @@ final class MatrixTransport extends AbstractTransport
     private function updateAccountData(string $userId, string $type, array $data): void
     {
         $response = $this->request('PUT', \sprintf('/_matrix/client/v3/user/%s/account_data/%s', urlencode($userId), $type), ['json' => $data]);
-        if ([] !== $response->toArray()) {
+        if ($response->toArray()) {
             throw new TransportException('Unable to update account data.', $response);
         }
     }

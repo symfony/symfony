@@ -25,13 +25,17 @@ DoctrineBridge
    association and the default `findBy` repository method is used. Such fields were silently validated against a
    query that could not match. Use the `repositoryMethod` option to provide a method that can query them
  * Deprecate `DoctrineCloseConnectionMiddleware` in favor of `DoctrineDbalCloseConnectionMiddleware`,
-   and `DoctrineOpenTransactionLoggerMiddleware` in favor of `DoctrineDbalOpenTransactionLoggerMiddleware`.
+   `DoctrineOpenTransactionLoggerMiddleware` in favor of `DoctrineDbalOpenTransactionLoggerMiddleware`,
+   and `DoctrinePingConnectionMiddleware` in favor of `DoctrineDbalPingConnectionMiddleware`.
    Those new middlewares target DBAL connections instead of entity managers. They are instantiated with a
    `ConnectionRegistry` instead of a `ManagerRegistry`, and connection names (either one or a list) instead
-   of an entity manager name. Passing no name now targets every DBAL connection, where the deprecated middlewares
-   targeted the connection of the default entity manager. Beware that `DoctrineDbalOpenTransactionLoggerMiddleware`
+   of an entity manager name. Passing no name now targets every DBAL connection, where the deprecated close and
+   logger middlewares targeted the connection of the default entity manager, and the deprecated ping middleware
+   targeted the connections of every entity manager. Beware that `DoctrineDbalOpenTransactionLoggerMiddleware`
    takes its logger as second argument and its connection names as third, where
-   `DoctrineOpenTransactionLoggerMiddleware` took the entity manager name as second argument and its logger as third
+   `DoctrineOpenTransactionLoggerMiddleware` took the entity manager name as second argument and its logger as third.
+   Also note that `DoctrineDbalPingConnectionMiddleware` does not reset closed entity managers as its deprecated
+   counterpart did: workers already reset them between messages
 
 Form
 ----

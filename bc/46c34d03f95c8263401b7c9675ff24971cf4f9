@@ -1,0 +1,98 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-07-02T09:18:09Z
+
+What about expanding the `Callback` constraint instead?
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-06T09:14:50Z
+
+@xabbuh I did what you asked. Please, review it again. Thanks.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-07-21T15:29:07Z
+
+Clean feature 👍. Thanks
+The only real question is the BC status of now-honoring the callback's false return.
+I may be wrong, but callback that both adds its own violation via `$context` and returns `false` will now raise a second, automatic `This value is not valid.`. is that intended?
+
+Maybe a PHP 8.5 mention in the changelog.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-07-21T15:59:25Z
+
+> The only real question is the BC status of now-honoring the callback's false return.
+
+That is a problem, I believe. This PR changes some old callback fixtures to make existing tests pass and that's a pretty good indicator that we've broken BC.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-21T20:24:54Z
+
+Thanks for the reviews. I made some changes to ensure this new feature doesn't change the previous behavior (I reverted all changes in the existing tests too).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T07:46:43Z
+
+Rebased on 8.2 and squashed the three commits; no code changes were needed.
+
+@Spomky, @derrabus: the BC concern is addressed. The automatic violation is gated on `message`, which is a new option defaulting to `null`, so no existing constraint can reach it. Checked against the shapes you were worried about:
+
+```
+returns false, no message                  => 0 violations
+adds violation via $context + returns false => 1 violation  (own)
+adds violation via $context, returns nothing => 1 violation  (own)
+returns false WITH message                 => 1 violation  (auto)
+returns true WITH message                  => 0 violations
+adds violation + returns false WITH message => 2 violations (own, auto)
+```
+
+The last line is the only way to get two, and it takes opting into `message` and also building your own, which is a deliberate combination rather than something existing code falls into. The reverted test fixtures @derrabus pointed at as the tell are indeed all back to their original state.
+
+The PHP 8.5 fixture is already handled too: `testClosureInAttribute` carries `#[RequiresPhp('>=8.5.0')]`, so `CallbackTestWithClosure` is never autoloaded on older runtimes and never parsed. Verified by running the suite on both: 5280 tests green on 8.4 and on 8.5.
+
+Only thing left is the docs PR, since `message` is new public API on a widely used constraint.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T07:52:59Z
+
+Follow-up: the return value is now type-checked rather than compared to `false`.
+
+`false === $return` silently ignored anything else falsy, so `#[Callback(fn ($v) => preg_match('/x/', $v), message: '...')]` never raised a violation, `preg_match()` returns `0`. Accepting any falsy value instead would have been worse: the classic `function ($object, ExecutionContextInterface $context)` callback returns `null`, so setting `message` on one would have raised a violation on every single validation.
+
+So when `message` is set the callback must return a boolean, and anything else throws:
+
+```
+The callback targeted by the Callback constraint must return a boolean when the "message" option is set, "int" returned.
+```
+
+When `message` is not set nothing is inspected, so existing callbacks that return `0`, a string or nothing at all are unaffected:
+
+```
+legacy: returns false, no message      => 0 violations
+legacy: returns 0, no message          => 0 violations
+legacy: void callback, no message      => 0 violations
+legacy: adds violation + false         => 1 violation (own)
+new: false WITH message                => 1 violation (auto)
+new: true WITH message                 => 0 violations
+WITH message, returns int/void/string  => ConstraintDefinitionException
+```
+
+Two tests cover it, the docblock and the changelog now state the contract. Validator is green at 5282 tests on both 8.4 and 8.5.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T08:01:14Z
+
+The exception now names the target, like the other Callback ones do:
+
+```
+The callback targeted by the Callback constraint on "App\Entity\Order::$deliveryDate" must return a boolean when the "message" option is set, "int" returned.
+```
+
+It uses the class and property from the execution context when there is one, falls back to the property path otherwise, and drops the fragment entirely when validating a bare value with no context, so the message never reads `on ""`. Two tests cover the class::$property and property-path forms. Validator is green at 5283 tests on 8.4 and 8.5.

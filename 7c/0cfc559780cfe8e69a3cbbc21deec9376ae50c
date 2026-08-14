@@ -1,0 +1,193 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-09-15T15:19:06Z
+
+Rebase needed + JSON schema updated missing now (see #60228 for an example)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-11-14T12:02:13Z
+
+Hi @daniser, I'm really interested by the ability to put a group on a SerializedName attribute :)
+Are you still up to work on this PR ? Or should someone continue it ?
+
+Thanks !
+
+---------------------------------------------------------------------------
+
+by daniser at 2025-11-14T13:56:33Z
+
+> Hi @daniser, I'm really interested by the ability to put a group on a SerializedName attribute :) Are you still up to work on this PR ? Or should someone continue it ?
+>
+> Thanks !
+
+Unfortunately I don't have much free time to work on this. I'd be grateful if someone would pick this up.
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2025-11-14T15:11:57Z
+
+Hi @nicolas-grekas
+Something like that for the JSON schema ?
+```
+"serialized_name": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["serialized_path"],
+    "properties": {
+      "serialized_path": {
+        "type": "string"
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Groups this context applies to"
+      }
+    },
+    "description": "Context configurations for this attribute"
+  }
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-14T15:26:09Z
+
+Could be, I'd be happy to review on a follow up PR!
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2025-12-23T21:02:51Z
+
+> Hi @nicolas-grekas Something like that for the JSON schema ?
+>
+> ```
+> "serialized_name": {
+>     "type": "object",
+>     "additionalProperties": false,
+>     "required": ["serialized_path"],
+>     "properties": {
+>       "serialized_path": {
+>         "type": "string"
+>       },
+>       "groups": {
+>         "type": "array",
+>         "items": {
+>           "type": "string"
+>         },
+>         "description": "Groups this context applies to"
+>       }
+>     },
+>     "description": "Context configurations for this attribute"
+>   }
+> ```
+
+Do you plan finishing the PR @nlhommet ?
+
+---------------------------------------------------------------------------
+
+by nlhommet at 2026-01-14T14:40:10Z
+
+I wanted to, but given the number of conflicts over the rebase, I didn't pursue it. It would take me too long to understand what had been done.
+
+---------------------------------------------------------------------------
+
+by daniser at 2026-01-14T20:38:53Z
+
+I'll try to at least resolve conflicts, wish me luck!
+
+---------------------------------------------------------------------------
+
+by daniser at 2026-01-21T13:35:37Z
+
+@VincentLanglet @nlhommet Rebase completed, hope I didn't screw anything up. JSON schema has also been updated.
+
+@nicolas-grekas Can you please review this PR? Or do I need to fix failing tests first? If this is the case, I still need someone to help me with that. Don't have much free time + have to relearn what have been done over a year ago.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-01-21T16:29:14Z
+
+I was hoping the conflict artefact was the cause of the test failure :'(.
+
+We're so close to a green CI. Unless you have clues about the why, I'll have to find time to debug this.
+
+Still, thanks for this awesome feature.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-01-30T08:28:22Z
+
+Then I think this is ready for a new review @mtarld @nicolas-grekas @OskarStark :)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-04-13T10:20:33Z
+
+Hi, do you mind reviewer this PR @mtarld @nicolas-grekas @OskarStark ? Thanks :)
+
+---------------------------------------------------------------------------
+
+by daniser at 2026-04-13T10:59:17Z
+
+> Hi, do you mind reviewer this PR @mtarld @nicolas-grekas @OskarStark ? Thanks :)
+
+Sorry to wake you up with my OCD activity lol, but I support your request :)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-06-16T14:59:05Z
+
+Could someone review this useful PR @OskarStark @mtarld @dunglas @nicolas-grekas.
+
+Thanks
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-27T15:52:46Z
+
+@symfony/mergers / Serializer experts: I rebased the PR and fixed a few things, but there are design decisions that remain on us to settle, see updated PR description. Help wanted as I'm not enough into the topic to decide on my own 🙏
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T12:19:54Z
+
+Rebased on the current 8.2. Three conflicts, all keep-both: the Serializer CHANGELOG, the phpstan ignore list, and tests added next to the new FILTER_BOOL tests in `AbstractObjectNormalizerTest`.
+
+The red PHPStan job is fixed with the rebase. The six errors were the `getSerializedName()`/`getSerializedPath()` call sites passing the `$groups` argument that the interface only declares in a comment, same situation as the setters the PR already ignores. The ignore entry now covers both getters and setters, and its path covers the call sites in `NameConverter/` and `Normalizer/`. Verified by running PHPStan on both states: base 39 errors, PR 38, zero new, one fixed (a strict-comparison error in `MetadataAwareNameConverter` the rework removed).
+
+Also dropped the edit to `Tests/Fixtures/serializer.class.metadata.php`: the compiled class-metadata classes were removed in 8.0, nothing references that fixture anymore, so the PR no longer needs to touch it.
+
+Serializer suite green at 1488 tests. Revert-verify still holds on the rebased head: reverting `AbstractObjectNormalizer` fails the two per-group path tests, reverting `MetadataAwareNameConverter` fails the per-group name tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T12:36:35Z
+
+The three questions left open in the description are settled and pushed:
+
+**Per-attribute `#[Context]` groups no longer pick names and paths.** The deciding constraint is on the denormalization side: an incoming key has to be resolved to an attribute before that attribute's `#[Context]` can be loaded, so per-attribute groups can never inform name resolution there. Making normalization read the top-level groups too is the only symmetric rule. `updateData()` now resolves paths with the top-level groups and pins the `groups` key of the context handed to the name converter; per-attribute contexts keep applying to values, and the child context is untouched. The new round-trip test fails on the previous behavior with the value written under one path and read back from another.
+
+**Group resolution is declaration order.** `getSerializedName()`/`getSerializedPath()` used to return the first match in the order the caller listed the context groups, so `['a', 'b']` and `['b', 'a']` produced different payloads. They now return the first declared entry whose group is in the context, with `'*'` as the fallback, making the context groups a set as they are everywhere else in the component. Two tests lock the difference and fail on the caller-order loop.
+
+**YAML says `serialized:`.** Same term as the XML element, with `name`, `path` and `groups` per entry. While renaming I also fixed the `?? false` in the loop that silently dropped a path of `'0'` or `''` where the flat key rejects them, and added the three missing tests for the validation errors (`serialized` not a list, `groups` not a list, empty group name), which the previous head raised but never tested.
+
+Serializer is green at 1494 tests, php-cs-fixer clean, and the scoped PHPStan diff against 8.2 reports zero new errors (32 total, down from 38 on the previous head).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T12:40:09Z
+
+Moving the review notes out of the description, for the record. What changed in the July rework:
+
+* **the accessors take real parameters.** `getSerializedName()` and friends were reading an undeclared argument through `func_get_arg()`, which is what made PHPStan red with 16 errors and made `getSerializedName('a')` emit a raw `foreach()` warning. `AttributeMetadata` is `@final`, so the class now declares `array $groups = ['*']` with `@param list<string>` and only the interface keeps the commented-out form, as @xabbuh asked.
+* **an empty `groups` array is refused.** `new SerializedName('x', [])` silently meant "every group", giving two ways to say the same thing, which @xabbuh asked to reject. It now throws and points at omitting the argument. Absent groups in YAML or XML still mean every group, which is a default rather than a second spelling.
+* **the YAML loader no longer drops falsy names.** `if ($serializedName = $line[...] ?? false)` skipped `'0'` and `''` entirely, so `'0'` was lost and the `MappingException` below it was unreachable. It now uses `isset()`, so `'0'` round trips and `''` is rejected. The same fix later went into the per-group list for paths.
+* **YAML validates the mapping shape.** `groups: a` instead of a list produced a raw `foreach()` warning and silently dropped the mapping; `groups: ['']` and `groups: [1]` created groups named `''` and `'1'`. All three now raise a `MappingException` naming the file, the attribute and the class.
+* **a warm metadata cache survives the upgrade.** `__serialize()` renamed two keys with no `__unserialize()`, so a payload written by 8.1 produced `Creation of dynamic property` deprecations and then `getSerializedName()` returned `null` where it used to return the configured name. A shim now maps the old single-value keys onto the per-group arrays.
+* **the normalizer half is tested.** Reverting only `AbstractObjectNormalizer.php` used to leave the whole suite green, so the runtime side of per-group `SerializedPath` was unprotected. Three tests now drive it through `ObjectNormalizer`, and reverting that file fails two of them.
+
+Baseline check at the time: 32 of 33 runtime observations byte-identical against 8.2, covering both attributes with and without groups, groups and `'*'` in the context, inheritance, the raw name converter in both directions, both file loaders with the previous syntax, and the existing exception paths.
+
+The three design decisions settled on 2026-08-14 are in the previous comment.

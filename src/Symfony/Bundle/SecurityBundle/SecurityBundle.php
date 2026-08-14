@@ -17,6 +17,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSessionDomainC
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\CleanRememberMeVerifierPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\MakeFirewallsEventDispatcherTraceablePass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterCsrfFeaturesPass;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterDebugRoleHierarchyPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterEntryPointPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterGlobalSecurityEventListenersPass;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\RegisterLdapLocatorPass;
@@ -101,6 +102,7 @@ class SecurityBundle extends Bundle
         // execute after ResolveChildDefinitionsPass optimization pass, to ensure class names are set
         $container->addCompilerPass(new SortFirewallListenersPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $container->addCompilerPass(new ReplaceDecoratedRememberMeHandlerPass(), PassConfig::TYPE_OPTIMIZE);
+        $container->addCompilerPass(new RegisterDebugRoleHierarchyPass(), PassConfig::TYPE_OPTIMIZE);
 
         $container->addCompilerPass(new AddEventAliasesPass(array_merge(
             AuthenticationEvents::ALIASES,

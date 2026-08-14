@@ -24,7 +24,7 @@ class RoleHierarchy implements RoleHierarchyInterface
      *
      * @var array<string, string>
      */
-    private array $rolePlaceholdersPatterns = [];
+    protected private(set) array $rolePlaceholdersPatterns = [];
 
     /**
      * @param array<string, list<string>> $hierarchy
@@ -126,7 +126,7 @@ class RoleHierarchy implements RoleHierarchyInterface
      *
      * @return list<string>
      */
-    private function getMatchingPlaceholders(array $roles): array
+    protected function getMatchingPlaceholders(array $roles): array
     {
         $matching = [];
 

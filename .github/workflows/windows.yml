@@ -117,7 +117,7 @@ jobs:
           mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
           php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
           # HttpClient tests need to run separately, they block when run with other components' tests concurrently
-          php phpunit src\Symfony\Component\HttpClient || ($x = 1)
+          php phpunit src\Symfony\Component\HttpClient --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
 
           exit $x
 
@@ -131,6 +131,6 @@ jobs:
           Copy c:\php\php.ini-max c:\php\php.ini
           php phpunit src\Symfony --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
           # HttpClient tests need to run separately, they block when run with other components' tests concurrently
-          php phpunit src\Symfony\Component\HttpClient || ($x = 1)
+          php phpunit src\Symfony\Component\HttpClient --exclude-group tty,benchmark,intl-data,network,transient-on-windows || ($x = 1)
 
           exit $x

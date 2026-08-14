@@ -9,6 +9,8 @@ CHANGELOG
  * Allow using closures with the `#[MapEntity]` attribute
  * Deprecate `DoctrineCloseConnectionMiddleware` in favor of the new `DoctrineDbalCloseConnectionMiddleware`
  * Deprecate `DoctrineOpenTransactionLoggerMiddleware` in favor of the new `DoctrineDbalOpenTransactionLoggerMiddleware`
+ * Deprecate `DoctrinePingConnectionMiddleware` in favor of the new `DoctrineDbalPingConnectionMiddleware`
+ * Add `DoctrineDbalTransactionMiddleware` to wrap all handlers in a single DBAL transaction without requiring the ORM
 
 8.1
 ---

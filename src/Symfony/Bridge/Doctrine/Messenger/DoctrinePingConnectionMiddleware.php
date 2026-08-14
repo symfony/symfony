@@ -18,10 +18,14 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 
+trigger_deprecation('symfony/doctrine-bridge', '8.2', 'The "%s" class is deprecated, use "%s" instead.', DoctrinePingConnectionMiddleware::class, DoctrineDbalPingConnectionMiddleware::class);
+
 /**
  * Checks whether the connection is still open or reconnects otherwise.
  *
  * @author Fuong <insidestyles@gmail.com>
+ *
+ * @deprecated since Symfony 8.2, use DoctrineDbalPingConnectionMiddleware instead
  */
 class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
 {

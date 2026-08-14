@@ -17,12 +17,16 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bridge\Doctrine\Messenger\DoctrinePingConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 {
     private string $entityManagerName = 'default';

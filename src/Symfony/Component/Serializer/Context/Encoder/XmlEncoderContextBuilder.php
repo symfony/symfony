@@ -186,4 +186,14 @@ final class XmlEncoderContextBuilder implements ContextBuilderInterface
     {
         return $this->with(XmlEncoder::BOOLEAN_REPR, $booleanRepr);
     }
+
+    /**
+     * Configures which tags must always be decoded as a collection, even with a single child.
+     *
+     * @param list<string>|null $forceCollection
+     */
+    public function withForceCollection(?array $forceCollection): static
+    {
+        return $this->with(XmlEncoder::FORCE_COLLECTION, $forceCollection);
+    }
 }

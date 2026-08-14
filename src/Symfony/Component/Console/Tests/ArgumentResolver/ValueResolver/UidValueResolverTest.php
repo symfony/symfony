@@ -289,9 +289,12 @@ class UidValueResolverTest extends TestCase
 
     public static function provideUlid()
     {
-        yield 'Binary' => ["\x01\x56\x3E\x3A\xB5\xD3\xD6\x76\x4C\x61\xEF\xB9\x93\x02\xBD\x5B"];
+        if (\defined(Ulid::class.'::FORMAT_ALL')) {
+            yield 'Binary' => ["\x01\x56\x3E\x3A\xB5\xD3\xD6\x76\x4C\x61\xEF\xB9\x93\x02\xBD\x5B"];
+            yield 'Base 58' => ['1AaLyDYFxmKZxXbNo18znE'];
+            yield 'RFC 4122/9562' => ['01563e3a-b5d3-d676-4c61-efb99302bd5b'];
+        }
+
         yield 'Base 32' => ['01ARZ3NDEKTSV4RRFFQ69G5FAV'];
-        yield 'Base 58' => ['1AaLyDYFxmKZxXbNo18znE'];
-        yield 'RFC 4122/9562' => ['01563e3a-b5d3-d676-4c61-efb99302bd5b'];
     }
 }

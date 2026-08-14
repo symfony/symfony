@@ -8,6 +8,7 @@ CHANGELOG
  * Throw a `ConstraintDefinitionException` from `UniqueEntity` when a checked field holds an array or is a to-many association, instead of building a query that cannot match
  * Allow using closures with the `#[MapEntity]` attribute
  * Deprecate `DoctrineCloseConnectionMiddleware` in favor of the new `DoctrineDbalCloseConnectionMiddleware`
+ * Deprecate `DoctrineOpenTransactionLoggerMiddleware` in favor of the new `DoctrineDbalOpenTransactionLoggerMiddleware`
 
 8.1
 ---

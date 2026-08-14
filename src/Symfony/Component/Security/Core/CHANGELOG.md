@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow using wildcards as placeholders in the keys of the `RoleHierarchy` map
+
 8.1
 ---
 

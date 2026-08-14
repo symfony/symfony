@@ -285,6 +285,43 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp($ack)]), new StackMiddleware());
     }
 
+    public function testBatchHandlerCanBeUsedWithAckStamp()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public array $processedMessages = [];
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function shouldFlush()
+            {
+                return true;
+            }
+
+            private function process(array $jobs): void
+            {
+                $this->processedMessages = array_column($jobs, 0);
+
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $envelope = $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function () {})]), new StackMiddleware());
+
+        $this->assertNull($envelope->last(NoAutoAckStamp::class));
+        $this->assertCount(1, $handler->processedMessages);
+    }
+
     public function testBatchHandlerNoBatch()
     {
         $handler = new class implements BatchHandlerInterface {

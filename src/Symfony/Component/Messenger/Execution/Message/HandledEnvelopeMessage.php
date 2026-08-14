@@ -16,16 +16,12 @@ use Symfony\Component\Messenger\Envelope;
 /**
  * @internal
  */
-final class DeferredBatchMessage
+final class HandledEnvelopeMessage
 {
-    public bool $acked;
-
     public function __construct(
-        public readonly mixed $context,
+        public readonly int $requestId,
         public readonly Envelope $envelope,
-        bool &$acked,
-        public readonly float $queuedAt,
+        public readonly ?\Throwable $error,
     ) {
-        $this->acked = &$acked;
     }
 }

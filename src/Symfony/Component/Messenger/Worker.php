@@ -29,6 +29,7 @@ use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
 use Symfony\Component\Messenger\Execution\MessageExecutionStrategyInterface;
 use Symfony\Component\Messenger\Execution\SyncMessageExecutionStrategy;
 use Symfony\Component\Messenger\Stamp\AckStamp;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
@@ -93,6 +94,7 @@ class Worker
         ], $options);
         $queueNames = $options['queues'] ?? null;
         $endTime = null !== $options['time_limit'] ? $this->clock->now()->format('U.u') + $options['time_limit'] : null;
+        $bufferedEnvelopes = [];
 
         $this->metadata->set(['queueNames' => $queueNames]);
 
@@ -117,15 +119,40 @@ class Worker
             $envelopeHandledStart = $this->clock->now();
             $fetchSize = max(1, $options['fetch_size'] ?? 1);
 
-            foreach ($this->receivers as $transportName => $receiver) {
-                if ($queueNames) {
-                    /** @var QueueReceiverInterface $receiver */
-                    $envelopes = $receiver->getFromQueues($queueNames, $fetchSize);
-                } else {
-                    $envelopes = $receiver->get($fetchSize);
+            if ($this->messageExecutionStrategy->shouldPauseConsumption()
+                && $this->messageExecutionStrategy->wait($this->preAck(...))
+            ) {
+                if ($this->shouldStop) {
+                    break;
                 }
 
-                foreach ($envelopes as $envelope) {
+                continue;
+            }
+
+            // drain buffered envelopes first: they are already off the broker and must not
+            // be starved by fetching new messages from higher-priority receivers
+            $receivers = $bufferedEnvelopes ? array_intersect_key($this->receivers, $bufferedEnvelopes) + $this->receivers : $this->receivers;
+
+            foreach ($receivers as $transportName => $receiver) {
+                if ($envelopes = $bufferedEnvelopes[$transportName] ?? null) {
+                    unset($bufferedEnvelopes[$transportName]);
+                    // advance past the last handled envelope now that the worker is ready
+                    // again; lazy receivers fetch from the broker only at this point
+                    $envelopes->next();
+                } else {
+                    if ($queueNames) {
+                        /** @var QueueReceiverInterface $receiver */
+                        $envelopes = $receiver->getFromQueues($queueNames, $fetchSize);
+                    } else {
+                        $envelopes = $receiver->get($fetchSize);
+                    }
+
+                    $envelopes = (static fn () => yield from $envelopes)();
+                    $envelopes->rewind();
+                }
+
+                for (; $envelopes->valid(); $envelopes->next()) {
+                    $envelope = $envelopes->current();
                     $envelopeHandled = true;
 
                     if ($receiver instanceof KeepaliveReceiverInterface) {
@@ -133,8 +160,14 @@ class Worker
                     }
 
                     $this->rateLimit($transportName);
-                    $this->handleMessage($envelope, $transportName);
+                    $this->handleMessage($envelope, $transportName, $options['bus_name'] ?? null);
                     $this->eventDispatcher?->dispatch(new WorkerRunningEvent($this, false));
+
+                    if ($this->messageExecutionStrategy->shouldPauseConsumption()) {
+                        $bufferedEnvelopes[$transportName] = $envelopes;
+
+                        break 2;
+                    }
 
                     if ($this->shouldStop) {
                         break 2;
@@ -176,7 +209,7 @@ class Worker
         $this->eventDispatcher?->dispatch(new WorkerStoppedEvent($this));
     }
 
-    private function handleMessage(Envelope $envelope, string $transportName): void
+    private function handleMessage(Envelope $envelope, string $transportName, ?string $busName = null): void
     {
         $event = new WorkerMessageReceivedEvent($envelope, $transportName);
         $this->eventDispatcher?->dispatch($event);
@@ -184,6 +217,10 @@ class Worker
 
         if (!$event->shouldHandle()) {
             return;
+        }
+
+        if (null !== $busName && $busName !== $envelope->last(BusNameStamp::class)?->getBusName()) {
+            $envelope = $envelope->withoutAll(BusNameStamp::class)->with(new BusNameStamp($busName));
         }
 
         $this->messageExecutionStrategy->execute(
@@ -308,7 +345,7 @@ class Worker
             if ($deferredMessage->acked) {
                 continue;
             }
-            $transportName = $deferredMessage->transportName;
+            $transportName = $deferredMessage->context;
             $envelope = $deferredMessage->envelope;
             try {
                 $e = null;

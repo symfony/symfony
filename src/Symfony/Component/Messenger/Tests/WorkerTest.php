@@ -31,8 +31,10 @@ use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\RuntimeException;
 use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
+use Symfony\Component\Messenger\Execution\ParallelExecutionStrategy;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
@@ -43,12 +45,15 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\NoAutoAckStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
+use Symfony\Component\Messenger\Tests\Fixtures\App\HandledByBusStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
@@ -65,6 +70,8 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 #[Group('time-sensitive')]
 class WorkerTest extends TestCase
 {
+    private string $console = __DIR__.'/Fixtures/App/bin/console';
+
     public function testWorkerDispatchTheReceivedMessage()
     {
         $apiMessage = new DummyMessage('API');
@@ -111,6 +118,292 @@ class WorkerTest extends TestCase
         $this->assertSame('transport', $envelopes[0]->last(ReceivedStamp::class)->getTransportName());
 
         $this->assertSame(2, $receiver->getAcknowledgeCount());
+    }
+
+    public function testBusNameOptionOverridesTheStampedBusName()
+    {
+        $envelope = new Envelope(new DummyMessage('Hello'), [new BusNameStamp('origin.bus')]);
+        $receiver = new DummyReceiver([[$envelope]]);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())
+            ->method('dispatch')
+            ->with($this->callback(
+                static fn (Envelope $e) => 1 === \count($e->all(BusNameStamp::class))
+                    && 'forced.bus' === $e->last(BusNameStamp::class)->getBusName()
+            ))
+            ->willReturnArgument(0);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: new MockClock());
+        $worker->run(['bus_name' => 'forced.bus']);
+    }
+
+    public function testFuturesAreAcknowledgedOnTheirOriginatingTransport()
+    {
+        $receiverWithoutMessages = new DummyReceiver([
+            [],
+            [],
+        ]);
+        $receiverWithFuture = new DummyReceiver([
+            [
+                new Envelope(new DummyMessage('API')),
+            ],
+            [],
+        ]);
+
+        $bus = new MessageBus();
+
+        $dispatcher = new class implements EventDispatcherInterface {
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent && $event->isWorkerIdle()) {
+                    $event->getWorker()->stop();
+                }
+
+                return $event;
+            }
+        };
+
+        $worker = new Worker([
+            'secondary' => $receiverWithoutMessages,
+            'primary' => $receiverWithFuture,
+        ], $bus, $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy = new ParallelExecutionStrategy($this->console));
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(0, $receiverWithoutMessages->getAcknowledgeCount());
+        $this->assertSame(1, $receiverWithFuture->getAcknowledgeCount());
+    }
+
+    public function testParallelExecutionPreservesWorkerStamps()
+    {
+        $apiMessage = new DummyMessage('API');
+        $ipaMessage = new DummyMessage('IPA');
+
+        $receiver = new DummyReceiver([
+            [new Envelope($apiMessage), new Envelope($ipaMessage)],
+        ]);
+
+        $dispatcher = new class implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+            public array $handledEnvelopes = [];
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(2);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerMessageHandledEvent) {
+                    $this->handledEnvelopes[] = $event->getEnvelope();
+                }
+
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $envelope = $dispatcher->handledEnvelopes[0];
+        $envelopeOther = $dispatcher->handledEnvelopes[1];
+
+        $this->assertSame($apiMessage->getMessage(), $envelope->getMessage()->getMessage());
+        $this->assertSame($ipaMessage->getMessage(), $envelopeOther->getMessage()->getMessage());
+        $this->assertCount(1, $envelope->all(ReceivedStamp::class));
+        $this->assertCount(1, $envelope->all(ConsumedByWorkerStamp::class));
+        $this->assertSame('transport', $envelope->last(ReceivedStamp::class)->getTransportName());
+    }
+
+    public function testParallelExecutionUsesExplicitBusName()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'))],
+        ]);
+
+        $dispatcher = new class implements EventDispatcherInterface {
+            private StopWorkerOnMessageLimitListener $listener;
+
+            public function __construct()
+            {
+                $this->listener = new StopWorkerOnMessageLimitListener(1);
+            }
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof WorkerRunningEvent) {
+                    $this->listener->onWorkerRunning($event);
+                }
+
+                return $event;
+            }
+        };
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run([
+            'bus_name' => 'other.bus',
+        ]);
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame('other.bus', $receiver->getAcknowledgedEnvelopes()[0]->last(HandledByBusStamp::class)?->getBusName());
+    }
+
+    public function testParallelExecutionFlushesBatchOnMessageLimit()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getAcknowledgedEnvelopes()[0]->last(HandledStamp::class)?->getResult());
+    }
+
+    public function testParallelExecutionFlushesBatchWhenChildMemoryLimitIsReached()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'))],
+            [],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console, memoryLimit: 1);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame(1, $receiver->getAcknowledgeCount());
+        $this->assertSame(1, $receiver->getAcknowledgedEnvelopes()[0]->last(HandledStamp::class)?->getResult());
+    }
+
+    public function testParallelExecutionBatchesMessagesOnTheSameTask()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('Hey'))],
+            [new Envelope(new DummyMessage('Bob'))],
+            [],
+        ]);
+
+        $dispatcher = new class implements EventDispatcherInterface {
+            public function dispatch(object $event): object
+            {
+                static $calls = 0;
+
+                if ($event instanceof WorkerRunningEvent && 3 <= ++$calls) {
+                    $event->getWorker()->stop();
+                }
+
+                return $event;
+            }
+        };
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertSame([2, 2], array_map(static fn (Envelope $envelope) => $envelope->last(HandledStamp::class)?->getResult(), $receiver->getAcknowledgedEnvelopes()));
+    }
+
+    public function testParallelExecutionRemembersBatchingKeysAfterThePreviousBatchWasFlushed()
+    {
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+
+        $firstReceiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('first'))],
+        ]);
+
+        $firstDispatcher = new EventDispatcher();
+        $firstDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $firstWorker = new Worker(['transport' => $firstReceiver], new MessageBus(), $firstDispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $firstWorker->run();
+
+        $this->assertSame(1, $firstReceiver->getAcknowledgedEnvelopes()[0]->last(HandledStamp::class)?->getResult());
+
+        $secondReceiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('second')), new Envelope(new DummyMessage('third'))],
+            [],
+        ]);
+
+        $secondDispatcher = new EventDispatcher();
+        $secondDispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($secondReceiver) {
+            if ($event->isWorkerIdle() && 0 < $secondReceiver->getAcknowledgeCount()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $secondWorker = new Worker(['transport' => $secondReceiver], new MessageBus(), $secondDispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $secondWorker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $handledBatches = [];
+
+        foreach ($secondReceiver->getAcknowledgedEnvelopes() as $envelope) {
+            $handledBatches[$envelope->getMessage()->getMessage()] = $envelope->last(HandledStamp::class)?->getResult();
+        }
+
+        $this->assertSame(['second' => 2, 'third' => 2], $handledBatches);
+    }
+
+    public function testParallelExecutionFailureKeepsDebugInfoWithoutLeakingControlStamp()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('fail'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $failedEvent = null;
+        $dispatcher->addListener(WorkerMessageFailedEvent::class, static function (WorkerMessageFailedEvent $event) use (&$failedEvent) {
+            $failedEvent = $event;
+        });
+
+        $messageExecutionStrategy = new ParallelExecutionStrategy($this->console);
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock(), messageExecutionStrategy: $messageExecutionStrategy);
+
+        $worker->run();
+        $messageExecutionStrategy->shutdown();
+
+        $this->assertInstanceOf(WorkerMessageFailedEvent::class, $failedEvent);
+        $this->assertSame(1, $receiver->getRejectCount());
+        $this->assertNull($failedEvent->getEnvelope()->last(NoAutoAckStamp::class));
+
+        $throwable = $failedEvent->getThrowable();
+        $this->assertInstanceOf(HandlerFailedException::class, $throwable);
+        $this->assertNull($throwable->getEnvelope()?->last(NoAutoAckStamp::class));
     }
 
     public function testHandlingErrorCausesReject()
@@ -963,8 +1256,8 @@ class WorkerTest extends TestCase
 
         $dummyHandler = new DummyBatchHandler();
         $envelopeWithNoAutoAck = $envelope->with(new NoAutoAckStamp(new HandlerDescriptor($dummyHandler)));
-        $unacks = new DeferredBatchMessageQueue();
         $acked = false;
+        $unacks = new DeferredBatchMessageQueue();
         $unacks->add($dummyHandler, 'transport', $envelopeWithNoAutoAck, $acked, 0.0);
         (new \ReflectionProperty($worker, 'unacks'))->setValue($worker, $unacks);
 

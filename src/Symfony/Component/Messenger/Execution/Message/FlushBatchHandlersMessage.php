@@ -11,21 +11,13 @@
 
 namespace Symfony\Component\Messenger\Execution\Message;
 
-use Symfony\Component\Messenger\Envelope;
-
 /**
  * @internal
  */
-final class DeferredBatchMessage
+final class FlushBatchHandlersMessage
 {
-    public bool $acked;
-
     public function __construct(
-        public readonly mixed $context,
-        public readonly Envelope $envelope,
-        bool &$acked,
-        public readonly float $queuedAt,
+        public readonly bool|float $force,
     ) {
-        $this->acked = &$acked;
     }
 }

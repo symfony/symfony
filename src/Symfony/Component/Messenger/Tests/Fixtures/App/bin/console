@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Messenger\Tests\Fixtures\App\App;
+
+require_once __DIR__.'/../Kernel.php';
+
+$vendor = __DIR__;
+while (!is_dir($vendor.'/vendor')) {
+    $vendor = \dirname($vendor);
+}
+require_once $vendor.'/vendor/autoload.php';
+
+return new App();

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `debug:roles` command to inspect the role hierarchy
  * Add `allowed_time_drift` option to the OIDC token handler configuration
  * Allow disabling the redirection on successful logout by passing `null` to the `target` option
  * Deprecate the `remember_me` option of the `form_login`, `json_login`, `login_link`, and `access_token` authenticators, as it has no effect

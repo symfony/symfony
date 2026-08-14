@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-13T19:50:30Z
+
+FTR, I verified this runs smoothly with ext-parallel also.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-11T21:26:03Z
+
+@fabpot thanks for the reminder, PR rebased and improved
+
+Status: needs review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-12T16:39:17Z
+
+SA tools green, the failure were artifacts of the way the CI ran.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-07-20T14:43:33Z
+
+Rebased now that the SA jobs improvement has landed in 6.4 + been merged up.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T15:21:46Z
+
+Rebased on 8.2 (conflicts in the Messenger CHANGELOG and in `FrameworkExtensionTestCase`'s use statements, both keep-both).
+
+@fabpot on your three points:
+
+* rebase: done;
+* Psalm and PHPStan: both green on the last run, along with the other twelve jobs;
+* ~skipping without `amphp/parallel`: covered by the `class_exists(ContextWorkerFactory::class)` guards in `Tests/Execution/*`, and this PR adds `amphp/parallel` to the root `composer.json`, so a monorepo install has it.~
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T15:36:19Z
+
+More approvals @symfony/mergers ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T10:16:45Z
+
+Rebased on the current 8.2, one keep-both conflict in Messenger's `conflict` block.
+
+php-cs-fixer had four files to fix, which I applied: the two new fixtures under `Tests/Fixtures/App` were missing the license header, and `FrameworkExtensionTestCase` had an out-of-order import from the August rebase plus a closure that should be static.
+
+@fabpot on your third point, tests are already skipped where it matters: `ParallelExecutionStrategyTest`, `DispatchTaskTest` and `ConsumeMessagesCommandTest` guard on `ContextWorkerFactory`. `amphp/parallel` is in Messenger's `require-dev` and in the root `composer.json`, so any real checkout has it.
+
+On the two red jobs from the 7 August run:
+
+- `Unit Tests (8.6)` failed in `VarExporter` and in `PhpSerializerWithClassNotFoundSupportTest`, both on `__PHP_Incomplete_Class` behaviour. That job is green on the 8.2 branch today, so it was the base, not this PR.
+- `x86 / minimal-exts / lowest-php` failed in `RateLimiter\Tests\Policy\RateTest::testCalculateTimeForTokensIsCappedOnOverflow`, a 32-bit overflow in a component this PR does not touch.
+
+Both should clear on the fresh run.

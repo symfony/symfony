@@ -168,17 +168,41 @@ class ConfigDebugCommand extends AbstractConfigCommand
      */
     private function getConfigForPath(array $config, string $path, string $alias): mixed
     {
-        $steps = explode('.', $path);
-
-        foreach ($steps as $step) {
-            if (!\is_array($config) || !\array_key_exists($step, $config)) {
-                throw new LogicException(\sprintf('Unable to find configuration for "%s.%s".', $alias, $path));
-            }
-
-            $config = $config[$step];
+        if (null === $found = self::resolvePath($config, explode('.', $path))) {
+            throw new LogicException(\sprintf('Unable to find configuration for "%s.%s".', $alias, $path));
         }
 
-        return $config;
+        return $found[0];
+    }
+
+    /**
+     * Resolves the steps of a path against the configuration, joining consecutive steps
+     * when a key contains dots, e.g. "options.option.main" for the "option.main" key.
+     *
+     * @param list<string> $steps
+     *
+     * @return array{0: mixed}|null The value wrapped in an array, or null when the path leads nowhere
+     */
+    private static function resolvePath(mixed $config, array $steps): ?array
+    {
+        if (!$steps) {
+            return [$config];
+        }
+
+        if (!\is_array($config)) {
+            return null;
+        }
+
+        // shortest key first, so that a path made of single steps resolves without backtracking
+        for ($i = 1; $i <= \count($steps); ++$i) {
+            $key = implode('.', \array_slice($steps, 0, $i));
+
+            if (\array_key_exists($key, $config) && null !== $found = self::resolvePath($config[$key], \array_slice($steps, $i))) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 
     private function getConfigForExtension(ExtensionInterface $extension, ContainerBuilder $container): array

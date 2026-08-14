@@ -29,7 +29,13 @@ class TestExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(ContainerBuilder $container): void
     {
-        $container->prependExtensionConfig('test', ['custom' => 'foo']);
+        $container->prependExtensionConfig('test', [
+            'custom' => 'foo',
+            'options' => [
+                'option.main' => ['data' => 'foo'],
+                'option.sub' => ['data' => 'bar'],
+            ],
+        ]);
     }
 
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface

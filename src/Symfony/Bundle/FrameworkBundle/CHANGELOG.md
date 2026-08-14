@@ -17,6 +17,7 @@ CHANGELOG
  * Add `framework.webhook.signature_format`, `framework.webhook.timestamp_header_name` and `framework.webhook.timestamp_tolerance` options
  * Make BrowserKit assertions non-verbose by default
  * Add the `http_client.*.retry_failed.base_uris` option, to retry a failed request against the next URI in the list
+ * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`
 
 8.1
 ---

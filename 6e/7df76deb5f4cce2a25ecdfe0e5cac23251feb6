@@ -1,0 +1,192 @@
+---------------------------------------------------------------------------
+
+by AlexandreGerault at 2024-10-23T07:34:41Z
+
+Thanks @nicolas-grekas for the reviews. I applied the suggested changes. I also realized it uses `$this->defaultContext` instead of raw values so I refactored it a bit at this point (I hope it doesn't bother 😅 )
+
+Also could you share your thoughts about the goal of this PR please? 🙏 I'm quite unsure this is the right approach for this problem.
+
+I'm also unsure whether this should be handled by the decoder (right now we have a workaround with a custom normalizer looking at specific keys).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-10-23T07:43:55Z
+
+> we have a workaround with a custom normalizer looking at specific keys
+
+So you figured out a way that doesn't require changing the component? then it might be the best way, because as you spotted, defining which tags in the xml tree would need this arrayification is tricky. A normalizer looks like a better place to me.
+
+---------------------------------------------------------------------------
+
+by AlexandreGerault at 2024-10-23T10:51:06Z
+
+We found a workaround, but that's not exactly what I would expect from the component.
+
+Here's the workaround we ended with, just as information:
+```php
+public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+{
+    // If the first element is not an array, wrap it in an array
+    if (! is_array(reset($data['plans']))) {
+        $data['plans'] = [$data['plans']];
+    }
+
+    // The return thing
+}
+```
+
+It works in our specific use case (which is why we didn't make a generic normalizer with context option and all), but I find it odd that there are no ways of telling "this XML tag should always be treated as a collection". I mean, it makes more sense to me to be handled by a decoder option, as it is (at least it's what I understand for now) directly related to the XML format. I might be wrong still.
+
+However if I'm right (that it should be handled by the decoder), I can also understand that it would be too tricky to be handled in the decoder and that the maintainers refuses to maintain such a feature.
+
+On the other hand, if you consider it can be added, I'd gladly work on a better implementation and look for more edge cases etc.
+
+EDIT: What I'm trying to say is that, as I user, I'd like to have an easy option for this when dealing with XML. But I also understand that, for maintaining reason, it would be better handled in userland code as it could lead to some unwanted behavior.
+
+---------------------------------------------------------------------------
+
+by thomasLecler at 2024-10-24T08:47:41Z
+
+I was also looking for something like this, great 👍
+Hope this will be implemented in the coming Laravel updates
+
+---------------------------------------------------------------------------
+
+by AlexandreGerault at 2024-10-25T07:41:23Z
+
+> I was also looking for something like this, great 👍 Hope this will be implemented in the coming Laravel updates
+
+Not related to Laravel. However you can still use it as a dependency as the component is just like any other library.
+
+---------------------------------------------------------------------------
+
+by thomasLecler at 2024-10-25T09:11:40Z
+
+> > I was also looking for something like this, great 👍 Hope this will be implemented in the coming Laravel updates
+>
+> Not related to Laravel. However you can still use it as a dependency as the component is just like any other library
+
+I know,
+
+Indeed this is my case 👍
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-11-04T13:48:12Z
+
+You are using only the encode/decode functions, right?
+
+Because for my project when i got something like
+```xml
+<order_rows>
+    <order_row></order_row>
+</order_rows>
+```
+
+I use `#[SerializedPath("[order_rows][order_row]")]`
+
+---------------------------------------------------------------------------
+
+by AlexandreGerault at 2024-11-05T09:03:43Z
+
+@Hanmac what if your XML ends up looking like this:
+```xml
+<order_rows>
+</order_rows>
+```
+Does it handle it well? :thinking:
+
+---------------------------------------------------------------------------
+
+by Hanmac at 2024-11-05T09:17:52Z
+
+> @Hanmac what if your XML ends up looking like this:
+>
+> ```
+> <order_rows>
+> </order_rows>
+> ```
+>
+> Does it handle it well? 🤔
+
+That should be skipped
+
+the only problem i have with this approach, (or in general) are empty collections when normalizing/encoding:
+
+```php
+  #[SerializedPath("[order_rows][order_row]")]
+  protected array $rows = [];
+```
+
+if for some reason, the rows are empty, than current AbstractObjectNormalizer does normalize it to this:
+```
+[
+'order_rows' => [
+  'order_row' => []
+]
+]
+```
+
+which then the Encoder does turn into this:
+
+```xml
+<order_rows>
+    <order_row />
+</order_rows>
+```
+
+for this to work better, i added a Normalizer that turns empty arrays into `null` and then i have `AbstractObjectNormalizer::SKIP_NULL_VALUES` enabled to remove them.
+
+i think i mentioned them in another ticket before, might need to create a new one => #58768
+
+---------------------------------------------------------------------------
+
+by AlexandreGerault at 2025-05-14T12:14:33Z
+
+Hey
+I waited a bit and forgot about this PR. I notice the milestones have been updated since. Any feedback or interest in going further (working on how to define related tags for example, as suggested by @mtarld )?
+I'm still up to work on this 👍
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-30T22:07:29Z
+
+Still  up to work in this @AlexandreGerault?
+About your question, it's all community contribs, so if you need this, its yours to push for ;)
+I'm fine having this on my side.
+
+---------------------------------------------------------------------------
+
+by AlexandreGerault at 2026-01-31T13:00:51Z
+
+@nicolas-grekas I'm still up to work on this for sure!
+
+I could actually fix my problem with a workaround (but not ideal in my humble opinion though). However I still think an option would be more suitable.
+
+There's still the question raised by @mtarld for the star and the one I thought of right after his comment: what syntax should be used as a key?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-02-02T07:49:01Z
+
+Hey @AlexandreGerault, I think you can go without bothering for the `*` for the moment :slightly_smiling_face:
+Let think about it in a new PR!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T20:26:12Z
+
+Thanks for your patience @AlexandreGerault. You asked for a green light before investing more time, got one in January, and then nobody came back to you, so I finished it rather than leave it waiting again.
+
+What I did: rebased on 8.2 and squashed. The conflicts were both keep-both, `XmlEncoder`'s default context and `XmlEncoderContextBuilder` having each gained options meanwhile, plus `!\count($data)` having become `!$data` upstream.
+
+@mtarld's two points, for the record:
+
+* the `*` wildcard is out of scope here, per his own message of 2026-02-02, so nothing to do;
+* on moving the block below the `!\is_array($value)` check and dropping the `is_array()` test, you were right and I checked it: your block returns early and sits above the `if (!$data)` branch, so the later guard is not reachable from it and the `is_array()` is not redundant. The block stays where it is.
+
+Small things I changed: `$nodeName` was assigned at the top of `parseXml()` and used once ten lines below, so it is inlined; there was no CHANGELOG entry, so I added one; and php-cs-fixer reindented the heredoc in the new test.
+
+Serializer is green at 1495 tests. Reverting `XmlEncoder.php` fails 2 of the new cases, `XmlEncoderTest::testDecodeGivenAttributeAlwaysAsCollection` and `XmlEncoderContextBuilderTest::testWithers`, so the coverage holds the feature rather than passing either way.
+
+The description was still the unfilled template, so I rewrote it as documentation for whoever opens the symfony-docs PR.

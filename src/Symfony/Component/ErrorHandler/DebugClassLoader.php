@@ -1072,7 +1072,7 @@ class DebugClassLoader
      */
     private function patchReturnTypeWillChange(\ReflectionMethod $method): void
     {
-        if (\count($method->getAttributes(\ReturnTypeWillChange::class))) {
+        if ($method->getAttributes(\ReturnTypeWillChange::class)) {
             return;
         }
 

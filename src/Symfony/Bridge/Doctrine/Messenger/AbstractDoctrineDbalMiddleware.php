@@ -52,7 +52,7 @@ abstract class AbstractDoctrineDbalMiddleware implements MiddlewareInterface
             foreach ($names ?: array_keys($this->connectionRegistry->getConnectionNames()) as $name) {
                 if (($connection = $this->connectionRegistry->getConnection($name)) instanceof Connection) {
                     $connections[$name] = $connection;
-                } elseif ([] !== $names) {
+                } elseif ($names) {
                     throw new UnrecoverableMessageHandlingException(\sprintf('Expected "%s" to be a DBAL connection, but got a "%s".', $name, $connection::class));
                 }
             }

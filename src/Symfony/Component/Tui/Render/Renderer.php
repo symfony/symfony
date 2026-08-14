@@ -135,7 +135,7 @@ final class Renderer implements WidgetRendererInterface
 
         $resolvedStyle = $this->resolveStyle($widget);
 
-        if (true === $resolvedStyle->getHidden()) {
+        if ($resolvedStyle->getHidden()) {
             $lines = new ArrayLineBuffer([]);
             $widget->setRenderCache($lines, $cacheColumns, $cacheRows);
 
@@ -241,7 +241,7 @@ final class Renderer implements WidgetRendererInterface
     {
         $children = array_values(array_filter(
             $widget->all(),
-            fn (AbstractWidget $child) => true !== $this->resolveStyle($child)->getHidden(),
+            fn (AbstractWidget $child) => !$this->resolveStyle($child)->getHidden(),
         ));
 
         $columns = $context->getColumns();

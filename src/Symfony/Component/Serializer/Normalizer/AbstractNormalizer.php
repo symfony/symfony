@@ -255,8 +255,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             // If you update this check, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
             if (
                 !$ignore
-                && ([] === $groups || \in_array('*', $groups, true) || array_intersect($attributeMetadata->getGroups(), $groups))
-                && ([] === $ignoredGroups || !array_intersect($attributeMetadata->getGroups(), $ignoredGroups))
+                && (!$groups || \in_array('*', $groups, true) || array_intersect($attributeMetadata->getGroups(), $groups))
+                && (!$ignoredGroups || !array_intersect($attributeMetadata->getGroups(), $ignoredGroups))
                 && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
             ) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
@@ -264,12 +264,12 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         // returning false means "no restriction", which would defeat the exclusion
-        if (!$ignoreUsed && [] === $ignoredGroups && $allowExtraAttributes) {
-            if ([] === $groups) {
+        if (!$ignoreUsed && !$ignoredGroups && $allowExtraAttributes) {
+            if (!$groups) {
                 return false;
             }
 
-            if ([] === $allowedAttributes && \in_array('*', $groups, true)) {
+            if (!$allowedAttributes && \in_array('*', $groups, true)) {
                 return false;
             }
         }

@@ -153,7 +153,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             }
         }
 
-        if (0 === \count($ids)) {
+        if (!$ids) {
             if (!$input->isInteractive()) {
                 throw new RuntimeException('Message id must be passed when in non-interactive mode.');
             }

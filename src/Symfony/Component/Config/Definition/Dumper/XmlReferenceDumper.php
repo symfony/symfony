@@ -61,7 +61,7 @@ class XmlReferenceDumper
         if ($node->getParent()) {
             $remapping = array_filter($node->getParent()->getXmlRemappings(), static fn (array $mapping) => $rootName === $mapping[1]);
 
-            if (\count($remapping)) {
+            if ($remapping) {
                 [$singular] = current($remapping);
                 $rootName = $singular;
             }
@@ -158,7 +158,7 @@ class XmlReferenceDumper
                     $comments[] = 'One of '.$child->getPermissibleValues('; ');
                 }
 
-                if (\count($comments)) {
+                if ($comments) {
                     $rootAttributeComments[$name] = implode(";\n", $comments);
                 }
 
@@ -175,14 +175,14 @@ class XmlReferenceDumper
         // render comments
 
         // root node comment
-        if (\count($rootComments)) {
+        if ($rootComments) {
             foreach ($rootComments as $comment) {
                 $this->writeLine('<!-- '.$comment.' -->', $depth);
             }
         }
 
         // attribute comments
-        if (\count($rootAttributeComments)) {
+        if ($rootAttributeComments) {
             foreach ($rootAttributeComments as $attrName => $comment) {
                 $commentDepth = $depth + 4 + \strlen($attrName) + 2;
                 $commentLines = explode("\n", $comment);
@@ -201,7 +201,7 @@ class XmlReferenceDumper
 
         // render start tag + attributes
         $rootIsVariablePrototype = isset($prototypeValue);
-        $rootIsEmptyTag = (0 === \count($rootChildren) && !$rootIsVariablePrototype);
+        $rootIsEmptyTag = (!$rootChildren && !$rootIsVariablePrototype);
         $rootOpenTag = '<'.$rootName;
         if (1 >= ($attributesCount = \count($rootAttributes))) {
             if (1 === $attributesCount) {

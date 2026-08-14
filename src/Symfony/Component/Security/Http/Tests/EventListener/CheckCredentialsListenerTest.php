@@ -47,7 +47,7 @@ class CheckCredentialsListenerTest extends TestCase
             InMemoryUser::class => $hasher,
         ]);
 
-        if (false === $result) {
+        if (!$result) {
             $this->expectException(BadCredentialsException::class);
             $this->expectExceptionMessage('The presented password is invalid.');
         }
@@ -55,7 +55,7 @@ class CheckCredentialsListenerTest extends TestCase
         $credentials = new PasswordCredentials($password);
         (new CheckCredentialsListener($hasherFactory))->checkPassport($this->createEvent(new Passport(new UserBadge('wouter', fn () => $this->user), $credentials)));
 
-        if (true === $result) {
+        if ($result) {
             $this->assertTrue($credentials->isResolved());
         }
     }
@@ -86,14 +86,14 @@ class CheckCredentialsListenerTest extends TestCase
         $hasherFactory = $this->createMock(PasswordHasherFactory::class);
         $hasherFactory->expects($this->never())->method('getPasswordHasher');
 
-        if (false === $result) {
+        if (!$result) {
             $this->expectException(BadCredentialsException::class);
         }
 
         $credentials = new CustomCredentials(static fn () => $result, ['password' => 'foo']);
         (new CheckCredentialsListener($hasherFactory))->checkPassport($this->createEvent(new Passport(new UserBadge('wouter', fn () => $this->user), $credentials)));
 
-        if (true === $result) {
+        if ($result) {
             $this->assertTrue($credentials->isResolved());
         }
     }

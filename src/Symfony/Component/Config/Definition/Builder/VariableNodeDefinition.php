@@ -41,7 +41,7 @@ class VariableNodeDefinition extends NodeDefinition
             $node->setAllowOverwrite($this->merge->allowOverwrite);
         }
 
-        if (true === $this->default) {
+        if ($this->default) {
             $node->setDefaultValue($this->defaultValue);
         }
 

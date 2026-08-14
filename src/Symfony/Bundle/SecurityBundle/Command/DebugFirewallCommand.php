@@ -207,7 +207,7 @@ final class DebugFirewallCommand extends Command
 
         $authenticators = $this->authenticators[$name] ?? [];
 
-        if (0 === \count($authenticators)) {
+        if (!$authenticators) {
             $io->text('No authenticators have been registered for this firewall.');
 
             return;

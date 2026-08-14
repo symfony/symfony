@@ -77,10 +77,10 @@ class ParameterBag implements ParameterBagInterface
             }
 
             $nonNestedAlternative = null;
-            if (!\count($alternatives) && str_contains($name, '.')) {
+            if (!$alternatives && str_contains($name, '.')) {
                 $namePartsLength = array_map('strlen', explode('.', $name));
                 $key = substr($name, 0, -1 * (1 + array_pop($namePartsLength)));
-                while (\count($namePartsLength)) {
+                while ($namePartsLength) {
                     if ($this->has($key)) {
                         if (\is_array($this->get($key))) {
                             $nonNestedAlternative = $key;

@@ -318,7 +318,7 @@ class TextDescriptor extends Descriptor
         $tableRows[] = ['Tags', $tagInformation];
 
         $calls = $definition->getMethodCalls();
-        if (\count($calls) > 0) {
+        if ($calls) {
             $callInformation = [];
             foreach ($calls as $call) {
                 $callInformation[] = $call[0];

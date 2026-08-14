@@ -368,13 +368,13 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
                 $node->setKeyAttribute($this->key, $this->removeKeyItem);
             }
 
-            if (true === $this->atLeastOne || false === $this->allowEmptyValue) {
+            if ($this->atLeastOne || !$this->allowEmptyValue) {
                 $node->setMinNumberOfElements(1);
             }
 
             if ($this->default) {
                 if (!\is_array($this->defaultValue)) {
-                    throw new \InvalidArgumentException(\sprintf('%s: the default value of an array node has to be an array.', $node->getPath()));
+                    throw new \InvalidArgumentException($node->getPath().': the default value of an array node has to be an array.');
                 }
 
                 $node->setDefaultValue($this->defaultValue);
@@ -437,11 +437,11 @@ class ArrayNodeDefinition extends NodeDefinition implements ParentNodeDefinition
             throw new InvalidDefinitionException(\sprintf('->useAttributeAsKey() is not applicable to concrete nodes at path "%s".', $path));
         }
 
-        if (false === $this->allowEmptyValue) {
+        if (!$this->allowEmptyValue) {
             throw new InvalidDefinitionException(\sprintf('->cannotBeEmpty() is not applicable to concrete nodes at path "%s".', $path));
         }
 
-        if (true === $this->atLeastOne) {
+        if ($this->atLeastOne) {
             throw new InvalidDefinitionException(\sprintf('->requiresAtLeastOneElement() is not applicable to concrete nodes at path "%s".', $path));
         }
 

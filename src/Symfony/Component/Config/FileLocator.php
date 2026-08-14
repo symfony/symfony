@@ -60,7 +60,7 @@ class FileLocator implements FileLocatorInterface
 
         foreach ($paths as $path) {
             if (@file_exists($file = $path.\DIRECTORY_SEPARATOR.$name)) {
-                if (true === $first) {
+                if ($first) {
                     return $file;
                 }
                 $filepaths[] = $file;

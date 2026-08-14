@@ -76,7 +76,7 @@ class ProcessHelperTest extends TestCase
             }
         }
 
-        if ([] !== $expectedOutputLines) {
+        if ($expectedOutputLines) {
             sort($expectedOutputLines);
             sort($output);
 

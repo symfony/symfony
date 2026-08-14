@@ -82,7 +82,7 @@ final class AllMySmsTransport extends AbstractTransport
 
         $success = $response->toArray(false);
 
-        if (false === isset($success['smsId'])) {
+        if (!isset($success['smsId'])) {
             throw new TransportException(\sprintf('Unable to send the SMS: "%s" (%s).', $success['description'], $success['code']), $response);
         }
 

@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T08:32:18Z
+
+Thank you @Jibbarth. The problem is real: `getConfigForPath()` splits on `.`, so any `useAttributeAsKey()` node keyed by something containing a dot has been unreachable.
+
+I reworked the resolution rather than adding syntax, and pushed it rebased on 8.2. `options.option.main` now just works, no brackets:
+
+```php
+for ($i = 1; $i <= \count($steps); ++$i) {
+    $key = implode('.', \array_slice($steps, 0, $i));
+
+    if (\array_key_exists($key, $config) && null !== $found = self::resolvePath($config[$key], \array_slice($steps, $i))) {
+        return $found;
+    }
+}
+```
+
+Two reasons for preferring this over `path.[sub.path].option`:
+
+Discoverability. Nobody types brackets on a hunch, and the help text is the only place the syntax exists.
+
+More concretely, brackets contradict the command's own completion: `buildPathsCompletion()` flattens paths with dots and emits no brackets, so tab-completion already suggests `test.options.option.main`, and with the bracket syntax accepting that suggestion still fails. Resolving the dotted form makes the suggestions the command already produces work.
+
+On the cost, the naive worry is that joining consecutive steps is exponential in the number of segments. It is not, because `array_key_exists()` prunes at every level: only keys that exist are followed. A path with no dotted keys matches on the first iteration at each level, so it behaves exactly like the previous loop.
+
+Ambiguity, if a node had both `a` and `a.b`, is resolved shortest-key-first, which keeps today's behaviour for every existing path.
+
+Your fixture is kept and the tests now assert the unbracketed path resolves, that resolution continues past a dotted key (`options.option.sub.data`), and that an unknown dotted key still reports the original path. I also added the missing FrameworkBundle changelog entry. Reverting to the old loop fails four of them.

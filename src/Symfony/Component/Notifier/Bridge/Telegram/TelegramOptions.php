@@ -161,6 +161,20 @@ final class TelegramOptions implements MessageOptionsInterface
     }
 
     /**
+     * Edits the caption of a message that contains media, without re-sending the
+     * media itself. The subject of the message is used as the new caption.
+     *
+     * @return $this
+     */
+    public function editCaption(int $messageId): static
+    {
+        $this->options['message_id'] = $messageId;
+        $this->options['edit_caption'] = true;
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function answerCallbackQuery(string $callbackQueryId, bool $showAlert = false, int $cacheTime = 0): static

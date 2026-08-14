@@ -18,6 +18,7 @@ CHANGELOG
  * Make BrowserKit assertions non-verbose by default
  * Add the `http_client.*.retry_failed.base_uris` option, to retry a failed request against the next URI in the list
  * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`
+ * Add a `priority` option to `framework.messenger.transports` to order the receivers `messenger:consume --all` consumes
 
 8.1
 ---

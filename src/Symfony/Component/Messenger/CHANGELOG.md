@@ -9,6 +9,7 @@ CHANGELOG
  * `RedispatchMessage` now dispatches to the senders configured for the message (routing config or `#[AsMessage]`) when `$transportNames` is empty, instead of sending to no sender at all
  * Add a `--concurrency` option to the `messenger:consume` command to process messages in parallel
  * Add a `--redispatch` option to the `messenger:failed:retry` command to send messages back to their transport instead of handling them in the command
+ * Allow prioritizing receivers so that `messenger:consume --all` consumes receivers in a predefined order
 
 8.1
 ---

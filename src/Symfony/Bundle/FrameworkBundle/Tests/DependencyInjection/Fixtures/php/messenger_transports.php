@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 $container->loadFromExtension('framework', [
     'serializer' => true,
     'messenger' => [
@@ -20,6 +29,10 @@ $container->loadFromExtension('framework', [
                     'max_delay' => 100,
                 ],
                 'rate_limiter' => 'customised_worker',
+            ],
+            'prioritized' => [
+                'dsn' => 'amqp://localhost/%2f/messages?exchange_name=priority',
+                'priority' => 10,
             ],
             'failed' => 'in-memory:///',
             'redis' => 'redis://127.0.0.1:6379/messages',

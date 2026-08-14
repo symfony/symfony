@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\DependencyInjection;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -29,6 +30,8 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
  */
 class MessengerPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     public function process(ContainerBuilder $container): void
     {
         $busIds = array_keys($container->findTaggedServiceIds('messenger.bus'));
@@ -264,6 +267,7 @@ class MessengerPass implements CompilerPassInterface
     {
         $receiverMapping = [];
         $failureTransportsMap = [];
+
         if ($container->hasDefinition('console.command.messenger_failed_messages_retry')) {
             $commandDefinition = $container->getDefinition('console.command.messenger_failed_messages_retry');
             $globalReceiverName = $commandDefinition->getArgument(0);
@@ -276,8 +280,12 @@ class MessengerPass implements CompilerPassInterface
             }
         }
 
+        // the receivers are walked in tag priority order, so that everything derived from
+        // them keeps that order, "messenger:consume --all" included
+        $tagsById = $container->findTaggedServiceIds('messenger.receiver');
         $consumableReceiverNames = [];
-        foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
+        foreach ($this->findAndSortTaggedServices('messenger.receiver', $container) as $reference) {
+            $id = (string) $reference;
             $receiverClass = $this->getServiceClass($container, $id);
             if (!is_subclass_of($receiverClass, ReceiverInterface::class)) {
                 throw new RuntimeException(\sprintf('Invalid receiver "%s": class "%s" must implement interface "%s".', $id, $receiverClass, ReceiverInterface::class));
@@ -285,9 +293,10 @@ class MessengerPass implements CompilerPassInterface
 
             $receiverMapping[$id] = new Reference($id);
 
-            foreach ($tags as $tag) {
+            foreach ($tagsById[$id] ?? [] as $tag) {
                 if (isset($tag['alias'])) {
                     $receiverMapping[$tag['alias']] = $receiverMapping[$id];
+
                     if ($tag['is_failure_transport'] ?? false) {
                         $failureTransportsMap[$tag['alias']] = $receiverMapping[$id];
                     }

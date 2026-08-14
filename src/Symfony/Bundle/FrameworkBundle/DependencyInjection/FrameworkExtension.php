@@ -2568,6 +2568,7 @@ class FrameworkExtension extends Extension
             $tags = [
                 'alias' => $name,
                 'is_failure_transport' => \in_array($name, $failureTransports, true),
+                'priority' => $transport['priority'],
             ];
             $serializerReferencesByTransport[$name] = new Reference($serializerId);
             if (str_starts_with($transport['dsn'], 'sync://')) {

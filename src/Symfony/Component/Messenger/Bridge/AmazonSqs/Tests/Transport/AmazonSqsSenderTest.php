@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 use AsyncAws\Core\Exception\Http\NetworkException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsFairQueueStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsFifoStamp;
@@ -126,23 +125,13 @@ class AmazonSqsSenderTest extends TestCase
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer->method('encode')->with($envelope)->willReturn($encoded);
 
-        $logger = new class implements LoggerInterface {
-            use LoggerTrait;
-
-            public array $records = [];
-
-            public function log($level, string|\Stringable $message, array $context = []): void
-            {
-                $this->records[] = [$level, (string) $message, $context];
-            }
-        };
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('debug')
+            ->with($this->stringContains('takes precedence'), $this->anything());
 
         $sender = new AmazonSqsSender($connection, $serializer, $logger);
         $sender->send($envelope);
-
-        $this->assertCount(1, $logger->records);
-        $this->assertSame('debug', $logger->records[0][0]);
-        $this->assertStringContainsString('takes precedence', $logger->records[0][1]);
     }
 
     public function testItConvertsNetworkExceptionDuringSendIntoTransportException()

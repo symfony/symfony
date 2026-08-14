@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests\Fixtures\Attributes;
 
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedPath;
 
-class SerializedPathInConstructorDummy
+class SerializedPathPerGroupDummy
 {
-    public function __construct(
-        #[SerializedPath('[one][two]')] public $three,
-        #[SerializedPath('[five][six]'), SerializedPath('[six][five]', 'a')]
-        public $eleven,
-    ) {
-    }
+    #[Groups(['a', 'b'])]
+    #[SerializedPath('[six][five]', 'a')]
+    #[SerializedPath('[five][six]', 'b')]
+    public $eleven;
 }

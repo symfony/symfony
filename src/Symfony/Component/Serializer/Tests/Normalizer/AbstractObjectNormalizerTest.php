@@ -58,6 +58,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathPerGroupDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPerGroupWithContextDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyMessageNumberFour;
@@ -1779,6 +1781,65 @@ class AbstractObjectNormalizerTest extends TestCase
 
             throw $e;
         }
+    }
+
+    public function testSerializedPathPerGroupIsUsedWhenNormalizing()
+    {
+        $normalizer = $this->getSerializedPathPerGroupNormalizer();
+        $object = new SerializedPathPerGroupDummy();
+        $object->eleven = 'ELEVEN';
+
+        $this->assertSame(['six' => ['five' => 'ELEVEN']], $normalizer->normalize($object, null, ['groups' => ['a']]));
+        $this->assertSame(['five' => ['six' => 'ELEVEN']], $normalizer->normalize($object, null, ['groups' => ['b']]));
+    }
+
+    public function testSerializedPathPerGroupIsUsedWhenDenormalizing()
+    {
+        $normalizer = $this->getSerializedPathPerGroupNormalizer();
+
+        $inA = $normalizer->denormalize(['six' => ['five' => 'ELEVEN']], SerializedPathPerGroupDummy::class, null, ['groups' => ['a']]);
+        $this->assertSame('ELEVEN', $inA->eleven);
+
+        $inB = $normalizer->denormalize(['five' => ['six' => 'ELEVEN']], SerializedPathPerGroupDummy::class, null, ['groups' => ['b']]);
+        $this->assertSame('ELEVEN', $inB->eleven);
+    }
+
+    public function testSerializedPathPerGroupRoundTrips()
+    {
+        $normalizer = $this->getSerializedPathPerGroupNormalizer();
+        $object = new SerializedPathPerGroupDummy();
+        $object->eleven = 'ELEVEN';
+
+        foreach ([['a'], ['b']] as $groups) {
+            $data = $normalizer->normalize($object, null, ['groups' => $groups]);
+            $this->assertSame('ELEVEN', $normalizer->denormalize($data, SerializedPathPerGroupDummy::class, null, ['groups' => $groups])->eleven);
+        }
+    }
+
+    public function testSerializedPerGroupIgnoresTheGroupsOfPerAttributeContexts()
+    {
+        $normalizer = $this->getSerializedPathPerGroupNormalizer();
+        $object = new SerializedPerGroupWithContextDummy();
+        $object->name = 'NAME';
+        $object->path = 'PATH';
+
+        $data = $normalizer->normalize($object, null, ['groups' => ['a']]);
+
+        $this->assertSame(['inA' => 'NAME', 'in' => ['a' => 'PATH']], $data);
+
+        $denormalized = $normalizer->denormalize($data, SerializedPerGroupWithContextDummy::class, null, ['groups' => ['a']]);
+
+        $this->assertSame('NAME', $denormalized->name);
+        $this->assertSame('PATH', $denormalized->path);
+    }
+
+    private function getSerializedPathPerGroupNormalizer(): ObjectNormalizer
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        new Serializer([$normalizer]);
+
+        return $normalizer;
     }
 }
 

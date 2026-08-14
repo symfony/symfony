@@ -68,6 +68,30 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals($serializedPath, $attributeMetadata->getSerializedPath());
     }
 
+    public function testSerializedNameResolutionIgnoresTheOrderOfTheContextGroups()
+    {
+        $attributeMetadata = new AttributeMetadata('name');
+        $attributeMetadata->setSerializedName('inB', ['b']);
+        $attributeMetadata->setSerializedName('inA', ['a']);
+
+        $this->assertSame('inB', $attributeMetadata->getSerializedName(['a', 'b']));
+        $this->assertSame('inB', $attributeMetadata->getSerializedName(['b', 'a']));
+        $this->assertSame('inA', $attributeMetadata->getSerializedName(['a']));
+    }
+
+    public function testSerializedPathResolutionIgnoresTheOrderOfTheContextGroups()
+    {
+        $attributeMetadata = new AttributeMetadata('path');
+        $inB = new PropertyPath('[in][b]');
+        $inA = new PropertyPath('[in][a]');
+        $attributeMetadata->setSerializedPath($inB, ['b']);
+        $attributeMetadata->setSerializedPath($inA, ['a']);
+
+        $this->assertSame($inB, $attributeMetadata->getSerializedPath(['a', 'b']));
+        $this->assertSame($inB, $attributeMetadata->getSerializedPath(['b', 'a']));
+        $this->assertSame($inA, $attributeMetadata->getSerializedPath(['a']));
+    }
+
     public function testIgnore()
     {
         $attributeMetadata = new AttributeMetadata('ignored');

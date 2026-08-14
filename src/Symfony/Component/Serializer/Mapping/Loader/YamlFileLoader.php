@@ -103,6 +103,42 @@ class YamlFileLoader extends FileLoader
                     $attributeMetadata->setIgnore($data['ignore']);
                 }
 
+                if (isset($data['serialized']) && !\is_array($data['serialized'])) {
+                    throw new MappingException(\sprintf('The "serialized" value must be a list in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                }
+
+                foreach ($data['serialized'] ?? [] as $line) {
+                    $groups = $line['groups'] ?? ['*'];
+
+                    if (!\is_array($groups)) {
+                        throw new MappingException(\sprintf('The "groups" value must be a list in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                    }
+
+                    foreach ($groups as $group) {
+                        if (!\is_string($group) || '' === $group) {
+                            throw new MappingException(\sprintf('Group names must be non-empty strings in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+                    }
+
+                    if (isset($line['name'])) {
+                        $serializedName = $line['name'];
+
+                        if (!\is_string($serializedName) || '' === $serializedName) {
+                            throw new MappingException(\sprintf('The "name" value must be a non-empty string in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+
+                        $attributeMetadata->setSerializedName($serializedName, $groups);
+                    }
+
+                    if (isset($line['path'])) {
+                        try {
+                            $attributeMetadata->setSerializedPath(new PropertyPath((string) $line['path']), $groups);
+                        } catch (InvalidPropertyPathException) {
+                            throw new MappingException(\sprintf('The "path" value must be a valid property path in "%s" for the attribute "%s" of the class "%s".', $this->file, $attribute, $classMetadata->getName()));
+                        }
+                    }
+                }
+
                 foreach ($data['contexts'] ?? [] as $line) {
                     $groups = $line['groups'] ?? [];
 

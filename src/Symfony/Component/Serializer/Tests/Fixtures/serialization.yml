@@ -15,17 +15,35 @@
     foo:
       serialized_name: 'baz'
     bar:
-      serialized_name: 'qux'
+      serialized:
+        - name: 'qux'
+    duux:
+      serialized:
+        - name: 'duxi'
+        - name: 'duxa'
+          groups: [a]
+
 'Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathDummy':
   attributes:
     three:
       serialized_path: '[one][two]'
     seven:
-      serialized_path: '[three][four]'
+      serialized:
+        - path: '[three][four]'
+    eleven:
+      serialized:
+        - path: '[five][six]'
+        - path: '[six][five]'
+          groups: [a]
 'Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedPathInConstructorDummy':
   attributes:
     three:
       serialized_path: '[one][two]'
+    eleven:
+      serialized_path: '[five][six]'
+      serialized:
+        - path: '[six][five]'
+          groups: [a]
 'Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy':
   discriminator_map:
     type_property: type

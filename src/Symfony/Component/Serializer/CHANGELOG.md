@@ -11,6 +11,7 @@ CHANGELOG
  * Trigger a deprecation when denormalizing an array that is not a list into a `list`-typed property
  * Add the `XmlEncoder::BOOLEAN_REPR` context option to choose the strings representing booleans when encoding, e.g. `['true', 'false']`
  * Add support for denormalizing arrays of union types, e.g. `array<Foo|Bar>`
+ * Add support for configuring serialized names and paths per group, with repeatable `#[SerializedName]` and `#[SerializedPath]` attributes, a `serialized` key in YAML and a `<serialized>` element in XML
 
 8.1
 ---

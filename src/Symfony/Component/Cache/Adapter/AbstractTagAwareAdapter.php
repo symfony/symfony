@@ -41,7 +41,14 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
      */
     protected const NS_SEPARATOR = ':';
 
-    private const TAGS_PREFIX = "\1tags\1";
+    /**
+     * The prefix that turns an item key into the key of its tag entry, for
+     * adapters that store tags in the same key space as items. Adapters with
+     * a dedicated tag store, e.g. a database table, can redeclare it as an
+     * empty string. The value is part of the persisted keys, so changing it
+     * on an existing pool orphans the tag entries already written.
+     */
+    protected const TAGS_PREFIX = "\1tags\1";
 
     protected function __construct(string $namespace = '', int $defaultLifetime = 0)
     {
@@ -186,7 +193,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
     public function commit(): bool
     {
         $ok = true;
-        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, $this->getId(...), self::TAGS_PREFIX, $this->defaultLifetime, $this->rootNamespace);
+        $byLifetime = (self::$mergeByLifetime)($this->deferred, $expiredIds, $this->getId(...), static::TAGS_PREFIX, $this->defaultLifetime, $this->rootNamespace);
         $retry = $this->deferred = [];
 
         if ($expiredIds) {
@@ -261,7 +268,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
         try {
             foreach ($this->doDeleteYieldTags(array_values($ids)) as $id => $tags) {
                 foreach ($tags as $tag) {
-                    $tagData[$this->getId(self::TAGS_PREFIX.$tag, $this->rootNamespace)][] = $id;
+                    $tagData[$this->getId(static::TAGS_PREFIX.$tag, $this->rootNamespace)][] = $id;
                 }
             }
         } catch (\Exception) {
@@ -300,7 +307,7 @@ abstract class AbstractTagAwareAdapter implements TagAwareAdapterInterface, TagA
 
         $tagIds = [];
         foreach (array_unique($tags) as $tag) {
-            $tagIds[] = $this->getId(self::TAGS_PREFIX.$tag, $this->rootNamespace);
+            $tagIds[] = $this->getId(static::TAGS_PREFIX.$tag, $this->rootNamespace);
         }
 
         try {

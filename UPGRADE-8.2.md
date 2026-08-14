@@ -33,6 +33,11 @@ DoctrineBridge
 Form
 ----
 
+ * [BC BREAK] Children that use the `form_attr` option now carry the id the themes render on the `<form>`
+   element instead of the id of the element wrapping the fields, so that the reference resolves. That id is
+   the `attr.id` of the root form when the application set one, the string given to `form_attr` when the
+   option is a string, wherever it sits in the form tree, and `form_<root id>` otherwise. Forms that do not
+   use `form_attr` are unaffected: the `form_id` view variable stays `null` when nothing references it
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0 and will be removed in 9.0
  * `TimezoneType` with the `intl` option enabled now offers the identifier PHP reports as canonical when ICU
    keys a zone and its legacy aliases under one display name, so `Asia/Kolkata` is offered where `Asia/Calcutta`
@@ -125,6 +130,14 @@ Tui
 ---
 
  * [BC BREAK] Add argument `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
+
+TwigBridge
+----------
+
+ * `form_start()` renders an `id` attribute on the `<form>` element when a child uses the `form_attr` option,
+   taken from the new `form_id` view variable. Forms that do not use it render as before. Set `attr.id` on
+   the root form to choose the id, or `attr: {id: false}` to render none. A custom theme overriding the
+   `form_start` block renders no id until that block is updated
 
 Validator
 ---------

@@ -8,6 +8,7 @@ CHANGELOG
  * Add `inputmode="numeric"` to `IntegerType` when the `grouping` option is enabled
  * Add the `choice_help` option to `ChoiceType`
  * Add `$help` parameter to `ChoiceListFactoryInterface::createView()`
+ * Add the `form_id` view variable, holding the id to render on the `<form>` element of a root form when a child uses `form_attr`
 
 8.1
 ---

@@ -15,6 +15,7 @@ CHANGELOG
 ---
 
  * Bump ext-redis to 6.1 and ext-relay to 0.12 minimum
+ * Add `PdoTagAwareAdapter`
 
 7.3
 ---

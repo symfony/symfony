@@ -116,7 +116,7 @@ class AmqpExtIntegrationTest extends TestCase
 
         // this should be the custom routing key message first
         $this->assertCount(1, $envelopes);
-        /** @var Envelope $envelope */
+        /* @var Envelope $envelope */
         $receiver->ack($envelopes[0]);
         $this->assertEquals($customRoutingKeyMessage, $envelopes[0]->getMessage());
 
@@ -125,7 +125,7 @@ class AmqpExtIntegrationTest extends TestCase
         // duration should be about 2 seconds
         $this->assertApproximateDuration($startTime, 2);
 
-        /** @var RedeliveryStamp|null $retryStamp */
+        /* @var RedeliveryStamp|null $retryStamp */
         // verify the stamp still exists from the last send
         $this->assertCount(1, $envelopes);
         $retryStamp = $envelopes[0]->last(RedeliveryStamp::class);
@@ -285,7 +285,7 @@ class AmqpExtIntegrationTest extends TestCase
     {
         $envelopes = [];
         $startTime = microtime(true);
-        while (0 === \count($envelopes) && $startTime + $timeout > time()) {
+        while (!$envelopes && $startTime + $timeout > time()) {
             $envelopes = iterator_to_array($receiver->get());
         }
 

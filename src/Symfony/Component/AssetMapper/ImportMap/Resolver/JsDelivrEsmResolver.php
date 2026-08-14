@@ -204,7 +204,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 'extraFiles' => [],
             ];
 
-            if (0 !== \count($extraFiles)) {
+            if ($extraFiles) {
                 $extraFileResponses[$package] = [];
                 foreach ($extraFiles as $extraFile) {
                     $extraFileResponses[$package][] = [$this->httpClient->request('GET', \sprintf(self::URL_PATTERN_DIST_CSS, $entry->getPackageName(), $entry->version, $extraFile)), $extraFile, $entry->getPackageName(), $entry->version];
@@ -244,7 +244,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
                 }
                 $contents[$package]['extraFiles'][$extraFile] = $content;
 
-                if (0 !== \count($extraFiles)) {
+                if ($extraFiles) {
                     $extraFileResponses[$package] = [];
                     foreach ($extraFiles as $newExtraFile) {
                         $extraFileResponses[$package][] = [$this->httpClient->request('GET', \sprintf(self::URL_PATTERN_DIST_CSS, $packageName, $version, $newExtraFile)), $newExtraFile, $packageName, $version];

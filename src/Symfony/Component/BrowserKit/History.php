@@ -51,7 +51,7 @@ class History
      */
     public function isEmpty(): bool
     {
-        return 0 === \count($this->stack);
+        return !$this->stack;
     }
 
     /**

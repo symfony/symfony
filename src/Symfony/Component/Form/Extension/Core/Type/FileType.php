@@ -73,7 +73,7 @@ class FileType extends AbstractType
 
                 // Since the array is never considered empty in the view data format
                 // on submission, we need to evaluate the configured empty data here
-                if ([] === $data) {
+                if (!$data) {
                     $emptyData = $form->getConfig()->getEmptyData();
                     $data = $emptyData instanceof \Closure ? $emptyData($form, $data) : $emptyData;
                 }

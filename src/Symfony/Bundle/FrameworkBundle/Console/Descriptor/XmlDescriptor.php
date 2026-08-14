@@ -367,7 +367,7 @@ class XmlDescriptor extends Descriptor
         $serviceXML->setAttribute('file', $definition->getFile() ?? '');
 
         $calls = $definition->getMethodCalls();
-        if (\count($calls) > 0) {
+        if ($calls) {
             $serviceXML->appendChild($callsXML = $dom->createElement('calls'));
             foreach ($calls as $callData) {
                 $callsXML->appendChild($callXML = $dom->createElement('call'));

@@ -166,7 +166,7 @@ class TextDescriptor extends Descriptor
                     unset($options[$group][$class]);
                 }
 
-                if (!\is_array($opt) || 0 === \count($opt)) {
+                if (!\is_array($opt) || !$opt) {
                     continue;
                 }
 

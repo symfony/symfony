@@ -140,7 +140,7 @@ class Profiler implements ResetInterface
      */
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): ?Profile
     {
-        if (false === $this->enabled) {
+        if (!$this->enabled) {
             return null;
         }
 

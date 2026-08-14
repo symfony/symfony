@@ -56,7 +56,7 @@ class PhraseProvider implements ProviderInterface
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
             foreach ($catalogue->getDomains() as $domain) {
-                if (!\count($catalogue->all($domain))) {
+                if (!$catalogue->all($domain)) {
                     continue;
                 }
 

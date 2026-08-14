@@ -42,7 +42,7 @@ class Node
 
         $repr = [str_replace('Symfony\Component\ExpressionLanguage\Node\\', '', static::class).'('.implode(', ', $attributes)];
 
-        if (\count($this->nodes)) {
+        if ($this->nodes) {
             foreach ($this->nodes as $node) {
                 foreach (explode("\n", (string) $node) as $line) {
                     $repr[] = '    '.$line;
@@ -67,9 +67,6 @@ class Node
         }
     }
 
-    /**
-     * @return mixed
-     */
     public function evaluate(array $functions, array $values)
     {
         $results = [];

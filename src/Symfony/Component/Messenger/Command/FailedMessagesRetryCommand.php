@@ -174,7 +174,7 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
                 }
 
                 // break the loop if all messages are consumed
-                if (0 === \count($envelopes)) {
+                if (!$envelopes) {
                     break;
                 }
 

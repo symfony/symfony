@@ -31,7 +31,7 @@ class FilesystemTestCase extends TestCase
             self::$linkOnWindows = true;
             $originFile = tempnam(sys_get_temp_dir(), 'li');
             $targetFile = tempnam(sys_get_temp_dir(), 'li');
-            if (true !== @link($originFile, $targetFile)) {
+            if (!@link($originFile, $targetFile)) {
                 $report = error_get_last();
                 if (\is_array($report) && str_contains($report['message'], 'error code(1314)')) {
                     self::$linkOnWindows = false;
@@ -43,7 +43,7 @@ class FilesystemTestCase extends TestCase
             self::$symlinkOnWindows = true;
             $originDir = tempnam(sys_get_temp_dir(), 'sl');
             $targetDir = tempnam(sys_get_temp_dir(), 'sl');
-            if (true !== @symlink($originDir, $targetDir)) {
+            if (!@symlink($originDir, $targetDir)) {
                 $report = error_get_last();
                 if (\is_array($report) && str_contains($report['message'], 'error code(1314)')) {
                     self::$symlinkOnWindows = false;
@@ -103,7 +103,7 @@ class FilesystemTestCase extends TestCase
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
+        return ($data = posix_getpwuid($this->getFileOwnerId($filepath))) ? $data['name'] : null;
     }
 
     protected function getFileGroupId($filepath)
@@ -119,8 +119,8 @@ class FilesystemTestCase extends TestCase
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
-            return $datas['name'];
+        if ($data = posix_getgrgid($this->getFileGroupId($filepath))) {
+            return $data['name'];
         }
 
         $this->markTestSkipped('Unable to retrieve file group name');

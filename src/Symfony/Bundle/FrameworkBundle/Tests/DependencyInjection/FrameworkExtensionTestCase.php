@@ -31,6 +31,7 @@ use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
@@ -2348,6 +2349,37 @@ abstract class FrameworkExtensionTestCase extends TestCase
             }
 
             $this->assertSame(RedisTagAwareAdapter::class, $defParent->getClass(), \sprintf("'%s' is not %s", $aliasForArgumentStr, RedisTagAwareAdapter::class));
+        }
+    }
+
+    public function testPdoTagAwareAdapter()
+    {
+        $container = $this->createContainerFromFile('cache_pdo_tag_aware', [], true);
+
+        $argNames = [
+            'cachePdoTagAwareFoo',
+            'cachePdoTagAwareFoo2',
+            'cachePdoTagAwareBar',
+            'cachePdoTagAwareBar2',
+            'cachePdoTagAwareBaz',
+            'cachePdoTagAwareBaz2',
+        ];
+        foreach ($argNames as $argumentName) {
+            foreach ([TagAwareCacheInterface::class, CacheInterface::class, CacheItemPoolInterface::class] as $alias) {
+                $aliasForArgumentStr = \sprintf('%s $%s', $alias, $argumentName);
+                $aliasForArgument = $container->getAlias($aliasForArgumentStr);
+                $this->assertNotNull($aliasForArgument, \sprintf("No alias found for '%s'", $aliasForArgumentStr));
+
+                $def = $container->getDefinition((string) $aliasForArgument);
+                $this->assertInstanceOf(ChildDefinition::class, $def, \sprintf("No definition found for '%s'", $aliasForArgumentStr));
+
+                $defParent = $container->getDefinition($def->getParent());
+                if ($defParent instanceof ChildDefinition) {
+                    $defParent = $container->getDefinition($defParent->getParent());
+                }
+
+                $this->assertSame(PdoTagAwareAdapter::class, $defParent->getClass(), \sprintf("'%s' is not %s", $aliasForArgumentStr, PdoTagAwareAdapter::class));
+            }
         }
     }
 

@@ -20,6 +20,7 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
+use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
@@ -213,6 +214,23 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'cache'])
 
         ->set('cache.adapter.pdo', PdoAdapter::class)
+            ->abstract()
+            ->args([
+                abstract_arg('PDO connection service'),
+                '', // namespace
+                0, // default lifetime
+                [], // table options
+                service('cache.default_marshaller')->ignoreOnInvalid(),
+            ])
+            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_pdo_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
+
+        ->set('cache.adapter.pdo_tag_aware', PdoTagAwareAdapter::class)
             ->abstract()
             ->args([
                 abstract_arg('PDO connection service'),

@@ -2743,7 +2743,7 @@ class FrameworkExtension extends Extension
                 'tags' => false,
             ];
         }
-        $redisTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware']];
+        $nativeTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware'], ['cache.adapter.pdo_tag_aware']];
         foreach ($config['pools'] as $name => $pool) {
             if (null === ($pool['provider'] ??= null)) {
                 unset($pool['provider']);
@@ -2752,10 +2752,10 @@ class FrameworkExtension extends Extension
             $isDsnPool = !$pool['adapters'] && isset($pool['provider']);
             $pool['adapters'] = $pool['adapters'] ?: ['cache.app'];
 
-            $isRedisTagAware = \in_array($pool['adapters'], $redisTagAwareAdapters, true);
+            $isNativeTagAware = \in_array($pool['adapters'], $nativeTagAwareAdapters, true);
             foreach ($pool['adapters'] as $provider => $adapter) {
-                if (\in_array($config['pools'][$adapter]['adapters'] ?? null, $redisTagAwareAdapters, true)) {
-                    $isRedisTagAware = true;
+                if (\in_array($config['pools'][$adapter]['adapters'] ?? null, $nativeTagAwareAdapters, true)) {
+                    $isNativeTagAware = true;
                 } elseif ($config['pools'][$adapter]['tags'] ?? false) {
                     $pool['adapters'][$provider] = $adapter = '.'.$adapter.'.inner';
                 }
@@ -2780,10 +2780,10 @@ class FrameworkExtension extends Extension
                 $pool['reset'] = 'reset';
             }
 
-            if ($isRedisTagAware && 'cache.app' === $name) {
+            if ($isNativeTagAware && 'cache.app' === $name) {
                 $container->setAlias('cache.app.taggable', $name);
                 $definition->addTag('cache.taggable', ['pool' => $name]);
-            } elseif ($isRedisTagAware) {
+            } elseif ($isNativeTagAware) {
                 $tagAwareId = $name;
                 $container->setAlias('.'.$name.'.inner', $name);
                 $definition->addTag('cache.taggable', ['pool' => $name]);

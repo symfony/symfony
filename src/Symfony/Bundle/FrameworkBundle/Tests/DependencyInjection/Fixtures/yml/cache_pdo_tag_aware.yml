@@ -1,0 +1,18 @@
+framework:
+    cache:
+        pools:
+            cache.pdo_tag_aware.foo:
+                adapter: cache.adapter.pdo_tag_aware
+            cache.pdo_tag_aware.foo2:
+                tags: true
+                adapter: cache.adapter.pdo_tag_aware
+            cache.pdo_tag_aware.bar:
+                adapter: cache.pdo_tag_aware.foo
+            cache.pdo_tag_aware.bar2:
+                tags: true
+                adapter: cache.pdo_tag_aware.foo
+            cache.pdo_tag_aware.baz:
+                adapter: cache.pdo_tag_aware.foo2
+            cache.pdo_tag_aware.baz2:
+                tags: true
+                adapter: cache.pdo_tag_aware.foo2

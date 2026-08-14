@@ -12,12 +12,16 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
@@ -244,7 +248,41 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
-    public function testWriteInfoExtractorCanBeInjected()
+    public function testDenormalizeWithAccessorButNoWriteInfoExtractorDoesNotApplyValue()
+    {
+        $propertyAccessor = new class implements PropertyAccessorInterface {
+            public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
+            {
+                throw new AssertionFailedError('PropertyAccessor->setValue should not be called without injected PropertyWriteInfoExtractorInterface');
+            }
+
+            public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
+            {
+                throw new \BadMethodCallException('Not implemented in test.');
+            }
+
+            public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
+            {
+                return true;
+            }
+
+            public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
+            {
+                return true;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(
+            propertyAccessor: $propertyAccessor,
+        );
+
+        $obj = $normalizer->denormalize(['foo' => 'bar'], ObjectWithUnconventionalSetter::class);
+
+        $this->assertInstanceOf(ObjectWithUnconventionalSetter::class, $obj);
+        $this->assertSame('init', $obj->getFoo());
+    }
+
+    public function testDenormalizeWithAccessorAndWriteInfoExtractorAppliesValue()
     {
         $writeInfoExtractor = new class implements PropertyWriteInfoExtractorInterface {
             public array $properties = [];
@@ -257,11 +295,41 @@ class ObjectNormalizerTest extends TestCase
             }
         };
 
-        $normalizer = new ObjectNormalizer(null, null, null, null, null, null, [], null, $writeInfoExtractor);
-        new Serializer([$normalizer]);
+        $propertyAccessor = new class implements PropertyAccessorInterface {
+            public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
+            {
+                if ($propertyPath !== 'foo') {
+                    throw new InvalidPropertyPathException(\sprintf('Can only set foo, got %s', $propertyPath));
+                }
 
-        $normalizer->denormalize(['foo' => 'bar'], ObjectWithUnconventionalSetter::class);
+                $objectOrArray->assign(\sprintf('%s_set_from_custom_accessor', $value));
+            }
 
+            public function getValue(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): mixed
+            {
+                throw new \BadMethodCallException('Not implemented in test.');
+            }
+
+            public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
+            {
+                return true;
+            }
+
+            public function isReadable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
+            {
+                return true;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(
+            propertyAccessor: $propertyAccessor,
+            writeInfoExtractor: $writeInfoExtractor,
+        );
+
+        $obj = $normalizer->denormalize(['foo' => 'bar'], ObjectWithUnconventionalSetterWithWriteInfoExtractor::class);
+
+        $this->assertInstanceOf(ObjectWithUnconventionalSetterWithWriteInfoExtractor::class, $obj);
+        $this->assertSame('bar_set_from_custom_accessor', $obj->getFoo());
         $this->assertSame(['foo'], $writeInfoExtractor->properties);
     }
 
@@ -2508,3 +2576,5 @@ class ObjectWithUnconventionalSetter
         $this->foo = $foo;
     }
 }
+
+class ObjectWithUnconventionalSetterWithWriteInfoExtractor extends ObjectWithUnconventionalSetter {}

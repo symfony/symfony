@@ -17,10 +17,14 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
+trigger_deprecation('symfony/doctrine-bridge', '8.2', 'The "%s" class is deprecated, use "%s" instead.', DoctrineOpenTransactionLoggerMiddleware::class, DoctrineDbalOpenTransactionLoggerMiddleware::class);
+
 /**
  * Middleware to log when transaction has been left open.
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @deprecated since Symfony 8.2, use DoctrineDbalOpenTransactionLoggerMiddleware instead
  */
 class DoctrineOpenTransactionLoggerMiddleware extends AbstractDoctrineMiddleware
 {

@@ -14,12 +14,16 @@ namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\AbstractLogger;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineOpenTransactionLoggerMiddleware;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
+#[Group('legacy')]
+#[IgnoreDeprecations]
 class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 {
     private AbstractLogger $logger;
@@ -49,7 +53,7 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
         $this->middleware = new DoctrineOpenTransactionLoggerMiddleware($managerRegistry, null, $this->logger);
     }
 
-    public function testMiddlewareWrapsInTransactionAndFlushes()
+    public function testMiddlewareLogsUnclosedTransaction()
     {
         $this->connection->expects($this->exactly(2))
             ->method('getTransactionNestingLevel')

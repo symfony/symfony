@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -175,7 +176,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 }
 
                 if (\count($violations)) {
-                    throw HttpException::fromStatusCode($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), iterator_to_array($violations))), new ValidationFailedException($payload, $violations));
+                    throw HttpException::fromStatusCode($validationFailedCode, implode("\n", array_map(static fn (ConstraintViolationInterface $e) => ('' !== $path = $e->getPropertyPath()) ? \sprintf('%s: %s', $path, $e->getMessage()) : $e->getMessage(), iterator_to_array($violations))), new ValidationFailedException($payload, $violations));
                 }
             } else {
                 try {

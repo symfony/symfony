@@ -19,12 +19,14 @@ use Symfony\Component\Cache\Traits\RedisProxy;
 #[Group('integration')]
 class RedisTagAwareAdapterTest extends RedisAdapterTest
 {
+    use RedisTagAwarePruneTestTrait;
     use TagAwareTestTrait;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->skippedTests['testTagItemExpiry'] = 'Testing expiration slows down the test suite';
+        $this->skippedTests['testPrune'] = 'Redis expires items by itself, prune() only garbage-collects tag Sets';
     }
 
     public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface

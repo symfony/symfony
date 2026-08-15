@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `AbstractAdapter::createAdapter()` to create the adapter matching a connection
+ * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
 
 8.0
 ---

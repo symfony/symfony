@@ -17,9 +17,11 @@ use Symfony\Component\Form\Flow\ButtonFlowInterface;
 use Symfony\Component\Form\Flow\DataStorage\DataStorageInterface;
 use Symfony\Component\Form\Flow\DataStorage\NullDataStorage;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\Form\Flow\FormFlowCursor;
 use Symfony\Component\Form\Flow\FormFlowInterface;
 use Symfony\Component\Form\Flow\StepAccessor\PropertyPathStepAccessor;
 use Symfony\Component\Form\Flow\StepAccessor\StepAccessorInterface;
+use Symfony\Component\Form\Flow\StepFlowConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
@@ -55,27 +57,8 @@ class FormFlowType extends AbstractFlowType
     public function buildViewFlow(FormView $view, FormFlowInterface $form, array $options): void
     {
         $view->vars['cursor'] = $cursor = $form->getCursor();
-
-        $index = 0;
-        $position = 1;
-        foreach ($form->getConfig()->getSteps() as $name => $step) {
-            $isSkipped = $step->isSkipped($form->getViewData());
-
-            $stepVars = [
-                'name' => $name,
-                'index' => $index++,
-                'position' => $isSkipped ? -1 : $position++,
-                'is_current_step' => $name === $cursor->getCurrentStep(),
-                'can_be_skipped' => null !== $step->getSkip(),
-                'is_skipped' => $isSkipped,
-            ];
-
-            $view->vars['steps'][$name] = $stepVars;
-
-            if (!$isSkipped) {
-                $view->vars['visible_steps'][$name] = $stepVars;
-            }
-        }
+        $view->vars['steps'] = $this->buildStepsVars($form->getConfig()->getSteps(), $cursor, $form->getViewData());
+        $view->vars['visible_steps'] = array_filter($view->vars['steps'], static fn ($step) => !$step['is_skipped']);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -121,5 +104,50 @@ class FormFlowType extends AbstractFlowType
         if ($button instanceof ButtonFlowInterface && $button->isClearSubmission()) {
             $event->setData([]);
         }
+    }
+
+    /**
+     * @param array<string, StepFlowConfigInterface> $steps
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function buildStepsVars(array $steps, FormFlowCursor $cursor, mixed $viewData, int $level = 0): array
+    {
+        $tree = [];
+        $index = 0;
+        $position = 1;
+        $currentStep = $cursor->getCurrentStep();
+
+        foreach ($steps as $name => $step) {
+            $children = [];
+            if ($childSteps = $step->getSteps()) {
+                $children = $this->buildStepsVars($childSteps, $cursor, $viewData, $level + 1);
+            }
+
+            $isSkipped = $step->isSkipped($viewData);
+
+            $tree[$name] = [
+                'name' => $name,
+                'level' => $level,
+                'index' => $index++,
+                'position' => $isSkipped ? -1 : $position++,
+                'is_before_current_step' => $cursor->getStepIndexOf($name) < $cursor->getStepIndex(),
+                'is_current_step' => $name === $currentStep,
+                'has_current_step_descendant' => $this->hasCurrentStepDescendant($children),
+                'is_after_current_step' => $cursor->getStepIndexOf($name) > $cursor->getStepIndex(),
+                'can_be_skipped' => null !== $step->getSkip(),
+                'is_skipped' => $isSkipped,
+                'is_group' => $step->isGroup(),
+                'children' => $children,
+                'visible_children' => array_filter($children, static fn (array $child): bool => !$child['is_skipped']),
+            ];
+        }
+
+        return $tree;
+    }
+
+    private function hasCurrentStepDescendant(array $children): bool
+    {
+        return array_any($children, static fn (array $child): bool => $child['is_current_step'] || $child['has_current_step_descendant']);
     }
 }

@@ -177,7 +177,7 @@ class FormFlow extends Form implements FormFlowInterface
     {
         $steps = $this->cursor->getSteps();
 
-        if (false === $targetIndex = array_search($step, $steps)) {
+        if (false === $targetIndex = array_search($step, $steps, true)) {
             throw new InvalidArgumentException(\sprintf('Step "%s" does not exist.', $step));
         }
 
@@ -221,7 +221,7 @@ class FormFlow extends Form implements FormFlowInterface
 
             $cursor = $cursor->withCurrentStep($newStep);
 
-            if (!$this->config->getStep($newStep)->isSkipped($data)) {
+            if (!$cursor->getCurrentStepNode()->isGroupOrSkipped($data)) {
                 break;
             }
 
@@ -230,11 +230,9 @@ class FormFlow extends Form implements FormFlowInterface
 
                 if ($this->config->isAutoReset()) {
                     $this->reset();
-
-                    return true;
                 }
 
-                break;
+                return true;
             }
         }
 

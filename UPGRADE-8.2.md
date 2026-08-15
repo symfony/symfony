@@ -40,6 +40,9 @@ DoctrineBridge
 Form
 ----
 
+ * Add `createStepGroup()` method to `FormFlowBuilderInterface`; implementations not extending the default `FormFlowBuilder` must implement it
+ * Add `setGroup()`, `addStep()` and `removeStep()` methods to `StepFlowBuilderConfigInterface`; implementations not extending the default `StepFlowBuilder` must implement them
+ * Add `isGroup()`, `getSteps()`, `hasStep()` and `getStep()` methods to `StepFlowConfigInterface`; implementations not extending the default `StepFlowBuilder` must implement them
  * [BC BREAK] Children that use the `form_attr` option now carry the id the themes render on the `<form>`
    element instead of the id of the element wrapping the fields, so that the reference resolves. That id is
    the `attr.id` of the root form when the application set one, the string given to `form_attr` when the

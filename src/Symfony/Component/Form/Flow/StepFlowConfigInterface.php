@@ -13,6 +13,11 @@ namespace Symfony\Component\Form\Flow;
 
 /**
  * @author Yonel Ceruto <open@yceruto.dev>
+ *
+ * @method bool                isGroup()
+ * @method array<string, self> getSteps()
+ * @method bool                hasStep(string $name)
+ * @method self                getStep(string $name)
  */
 interface StepFlowConfigInterface
 {

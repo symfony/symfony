@@ -19,6 +19,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @author Yonel Ceruto <open@yceruto.dev>
  *
+ * @method StepFlowBuilderConfigInterface createStepGroup(string $name)
+ *
  * @extends \Traversable<string, FormBuilderInterface>
  */
 interface FormFlowBuilderInterface extends FormBuilderInterface, FormFlowConfigInterface

@@ -11,8 +11,14 @@
 
 namespace Symfony\Component\Form\Flow;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+
 /**
  * @author Yonel Ceruto <open@yceruto.dev>
+ *
+ * @method $this setGroup(bool $group)
+ * @method $this addStep(StepFlowBuilderConfigInterface|string $name, string $type = FormType::class, array $options = [], ?callable $skip = null, int $priority = 0)
+ * @method $this removeStep(string $name)
  */
 interface StepFlowBuilderConfigInterface extends StepFlowConfigInterface
 {

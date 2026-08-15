@@ -1,0 +1,105 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-04-12T15:39:16Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by vojtechsmejkal at 2025-04-14T10:36:16Z
+
+Some [tests on Windows](https://github.com/symfony/symfony/actions/runs/14421339615/job/40444302562?pr=60205) are failing. It seems like `ext-openssl` is not installed on that environment. If my assumption is correct, what is the preferred way to resolve this?
+
+Rest of the failing tests seem to come from Doctrine bridge which should be unrelated to changes made in this PR.
+
+---------------------------------------------------------------------------
+
+by Methraen at 2025-05-23T07:20:41Z
+
+> Some [tests on Windows](https://github.com/symfony/symfony/actions/runs/14421339615/job/40444302562?pr=60205) are failing. It seems like `ext-openssl` is not installed on that environment. If my assumption is correct, what is the preferred way to resolve this?
+>
+> Rest of the failing tests seem to come from Doctrine bridge which should be unrelated to changes made in this PR.
+
+If im not wrong, only Symfony maintainers can modify the CI pipelines configuration,
+
+@nicolas-grekas would it be okay to enable the missing ext so that the PR can be completed?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-05-23T07:22:57Z
+
+Adding the extension is possible by patching .github/workflow files as fit.
+
+---------------------------------------------------------------------------
+
+by vojtechsmejkal at 2025-05-25T15:21:16Z
+
+I have rebased my branch and I have also modified `.github/workflows/windows.yaml` to exclude tests from this bridge to run on minimal extensions environment.
+
+All tests have passed now.
+
+@nicolas-grekas does this approach make sense?
+
+---------------------------------------------------------------------------
+
+by cesurapp at 2026-02-07T23:20:11Z
+
+A problem that hasn't been solved for 2 years, I can't believe it!! I'm still using the package I wrote 2 years ago, what are you waiting for to merge it??
+
+---------------------------------------------------------------------------
+
+by vojtechsmejkal at 2026-02-08T07:35:07Z
+
+I'm still waiting for the review. I'll rebase the branch above 8.1 and solve the minor conflicts.
+
+I would also like to see this PR merged in order to not have to keep local overrides of the Firebase logic in my projects.
+
+If I can help with anything else, please let me know.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T05:48:09Z
+
+Thanks for your patience @vojtechsmejkal, and for doing what was asked back in May 2025 only to hear nothing since. Rebased on 8.2, squashed and pushed.
+
+**One real bug, in the JWT.** `kid` was in the payload, and it is a JOSE *header* parameter, so Google could not select the signing key from it. Generated a JWT against a throwaway RSA key to confirm:
+
+```
+before  header : {"alg":"RS256","typ":"JWT"}
+        payload: {...,"kid":"KEY_ID_123"}
+after   header : {"alg":"RS256","typ":"JWT","kid":"KEY_ID_123"}
+        payload: {"iss":...,"sub":...,"aud":"https://fcm.googleapis.com/","iat":...,"exp":...}
+```
+
+The signature verified in both cases, so the `openssl_sign()` side was fine; it would have worked while a service account had a single key and broken on rotation.
+
+**The Windows workflow change is no longer needed.** You excluded this bridge from the minimal-extensions job because `ext-openssl` was missing. Both Windows jobs now write `extension=php_openssl.dll` into `php.ini`, so I dropped that hunk and the PR no longer touches `.github/`.
+
+**The three notification tests were never updated.** `AndroidNotificationTest`, `IOSNotificationTest` and `WebNotificationTest` still asserted the legacy flat payload, so all eight failed. They now carry `#[IgnoreDeprecations]`, since the classes they cover are deprecated here, and their expectations match the v1 shape: `android.notification.channel_id`, `apns.payload.aps`, `webpush.notification`, with the target as `topic` rather than `to`.
+
+Smaller things: the deprecation version strings said `7.3` and are now `8.2`; the CHANGELOG entries moved from a `7.3` section to `8.2` and were shortened to one line each; `ext-openssl` and `symfony/deprecation-contracts` are now declared in the bridge's `composer.json` against the current constraints; the README kept its `Sponsor` section, which the branch had dropped; and there was a `tergetType:` typo in the new README examples.
+
+The bridge is green at 26 tests, php-cs-fixer is clean, and the diff is confined to the Firebase bridge.
+
+One thing worth a second opinion before merge: `FirebaseOptions` defaults `targetType` to `Topic`, so a bare string that used to be a device token in the legacy `to` field is now sent as a topic. That is the right default for the new API, but it is a silent behaviour change for anyone constructing options positionally, so it may deserve a line in the deprecation notes.

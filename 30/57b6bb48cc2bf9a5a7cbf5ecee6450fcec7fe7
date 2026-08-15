@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-23T14:29:40Z
+
+Hi,
+
+This is interesting. I will take a look at it.
+While this focuses on how to create a form, is there anything different to do with the data object? (I mean compared to the usual approach.)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-03-23T15:07:04Z
+
+Hey @Spomky I confirm that data object binding or handling doesn't change respecting the current usual approach. I added a note to clarify that:
+
+> Important: Having nested steps does not mean the data-mapping process is also nested across those steps. Nesting steps only affects the structural representation and navigation of the flow. Each form step data will still target the root underlying object handled by this NestedStepsFlowType.
+
+I'll add some demo cases to https://github.com/yceruto/formflow-demo, probably next weekend.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-03-29T15:51:04Z
+
+I've added two new view vars to help building progress step bars (`is_before_current_step`, `is_after_current_step`). Example:
+```twig
+{% for step in form.vars.visible_steps %}
+    <div class="text-center" style="min-width: 2rem">
+        {% if step.is_before_current_step %}
+            {# Complete step markup #}
+        {% elseif step.is_current_step %}
+            {# Current step markup #}
+        {% elseif step.is_after_current_step %}
+            {# Pending state markup #}
+        {% endif %}
+    </div>
+{% endfor %}
+```
+This way, we don’t have to deal with step index comparisons, which are more complex to compute with nested steps.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-03-30T09:58:54Z
+
+I've fixed some issues about navigation logic. Demo app is now updated with a nested steps [example](https://github.com/yceruto/formflow-demo/commit/bcb158dbfd2adb86c9223568d05b31650d3abdf0) (it requires the symfony "./link" and "symfony serve" to test it)
+
+Ready for review again.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-05-11T14:50:17Z
+
+> Missing upgrade notes about the added methods
+
+Added.
+
+>I'm still wondering why all implementers/consumers should care about the new methods when they don't care about steps.
+
+The new methods only matter for code that actually deals with steps. If an implementer/consumer doesn't interact with flow steps, the additions are irrelevant to them
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-11T15:02:07Z
+
+Interface segregation FTW?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-05-11T15:37:28Z
+
+>Interface segregation FTW?
+
+Those new methods don't have a different conceptual scope. They align/belong to the current interfaces. I think introducing new interfaces for those methods solely to remove the deprecation warnings might overengineer the solution a bit (introducing 3 additional interfaces). do you still think it's worth it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T12:28:38Z
+
+Answering the question that sat with me since May, sorry for the wait: no, not worth it, let's keep the `@method` annotations on the existing interfaces.
+
+You are right on the conceptual point, and it is the criterion that matters. Interface segregation earns its keep when the capability is orthogonal to the base contract, `ResetInterface` being the house example. Steps are not orthogonal to a form flow, they are its essence: every implementer of `FormFlowBuilderInterface` deals with steps or has no reason to implement it. Three parallel interfaces would also force `instanceof` branching at every call site of the new methods, and after 9.0 merges the methods in, the extra interfaces would remain as permanent vestiges. The `@method` plus upgrade-note path is the established one for exactly this case.
+
+Everything else from the May round is in on the current head: `array_search` in `FormFlowCursor`, the `$this` return types, and the upgrade notes. One leftover from the branch moving under you: the notes live in `UPGRADE-8.1.md`, and with the retarget they belong in `UPGRADE-8.2.md`, same for the CHANGELOG section if it names 8.1. With that moved, this is good to go from my side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T12:32:17Z
+
+Rebased on the current 8.2 and pushed, @yceruto: the branch was 1988 commits behind so CI was stale. The upgrade notes moved from `UPGRADE-8.1.md` into the Form section of `UPGRADE-8.2.md`, the CHANGELOG entry from the 8.1 to the 8.2 section, and php-cs-fixer had four files to touch (`static fn`, `new self`, an unused import). Flow tests green at 102, Form at 5062. Ready to merge once CI confirms.

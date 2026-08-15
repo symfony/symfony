@@ -383,7 +383,7 @@ class LayoutEngineTest extends TestCase
             $root->add($child);
         }
 
-        $result = $renderer->render($root, 10, 1);
+        $result = $renderer->renderFrame($root, 10, 1)->toArray();
 
         $this->assertSame(10, AnsiUtils::visibleWidth($result[0]));
         foreach ($result as $line) {
@@ -405,7 +405,7 @@ class LayoutEngineTest extends TestCase
             $root->add($child);
         }
 
-        $result = $renderer->render($root, 10, 1);
+        $result = $renderer->renderFrame($root, 10, 1)->toArray();
 
         $this->assertSame('aaabbbbbcc', AnsiUtils::stripAnsiCodes($result[0]));
     }
@@ -424,7 +424,7 @@ class LayoutEngineTest extends TestCase
             $root->add($child);
         }
 
-        $result = $renderer->render($root, 5, 1);
+        $result = $renderer->renderFrame($root, 5, 1)->toArray();
 
         $this->assertSame(5, AnsiUtils::visibleWidth($result[0]));
         foreach ($result as $line) {

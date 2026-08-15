@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests\Notification;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
 
 final class WebNotificationTest extends TestCase
 {
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testWebNotificationOptions()
     {
         $notification = new WebNotification('device_token', [
@@ -24,17 +28,19 @@ final class WebNotificationTest extends TestCase
         ], ['key' => 'value']);
 
         $this->assertSame([
-            'to' => 'device_token',
             'notification' => [
                 'title' => 'Test Title',
                 'body' => 'Test Body',
             ],
             'data' => ['key' => 'value'],
+            'topic' => 'device_token',
         ], $notification->toArray());
 
-        $this->assertSame('device_token', $notification->getRecipientId());
+        $this->assertSame('[topic]device_token', $notification->getRecipientId());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testWebNotificationWithAllOptions()
     {
         $notification = (new WebNotification('device_token', []))
@@ -45,19 +51,27 @@ final class WebNotificationTest extends TestCase
             ->clickAction('https://example.com');
 
         $expected = [
-            'to' => 'device_token',
             'notification' => [
                 'title' => 'New Title',
                 'body' => 'New Body',
-                'icon' => '/images/icon.png',
-                'click_action' => 'https://example.com',
             ],
-            'data' => ['custom' => 'data'],
+            'data' => [
+                'custom' => 'data',
+            ],
+            'webpush' => [
+                'notification' => [
+                    'icon' => '/images/icon.png',
+                    'click_action' => 'https://example.com',
+                ],
+            ],
+            'topic' => 'device_token',
         ];
 
         $this->assertSame($expected, $notification->toArray());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testWebNotificationChaining()
     {
         $notification = new WebNotification('device_token', []);
@@ -68,12 +82,15 @@ final class WebNotificationTest extends TestCase
 
         $this->assertSame($notification, $result);
         $this->assertSame([
-            'to' => 'device_token',
-            'notification' => [
-                'icon' => '/favicon.ico',
-                'click_action' => 'https://myapp.com/action',
-            ],
+            'notification' => [],
             'data' => [],
+            'webpush' => [
+                'notification' => [
+                    'icon' => '/favicon.ico',
+                    'click_action' => 'https://myapp.com/action',
+                ],
+            ],
+            'topic' => 'device_token',
         ], $notification->toArray());
     }
 }

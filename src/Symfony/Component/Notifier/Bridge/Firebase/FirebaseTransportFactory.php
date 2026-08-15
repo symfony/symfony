@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase;
 
+use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
 use Symfony\Component\Notifier\Exception\UnsupportedSchemeException;
 use Symfony\Component\Notifier\Transport\AbstractTransportFactory;
 use Symfony\Component\Notifier\Transport\Dsn;
 
 /**
  * @author Jeroen Spee <https://github.com/Jeroeny>
+ * @author Vojtech Smejkal <https://vojtechsmejkal.cz>
  */
 final class FirebaseTransportFactory extends AbstractTransportFactory
 {
@@ -28,11 +30,25 @@ final class FirebaseTransportFactory extends AbstractTransportFactory
             throw new UnsupportedSchemeException($dsn, 'firebase', $this->getSupportedSchemes());
         }
 
-        $token = \sprintf('%s:%s', $this->getUser($dsn), $this->getPassword($dsn));
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
+        $user = $this->getUser($dsn);
 
-        return (new FirebaseTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        try {
+            $projectId = $dsn->getRequiredOption('project_id');
+            $privateKeyId = $dsn->getRequiredOption('private_key_id');
+            $privateKey = $dsn->getRequiredOption('private_key');
+
+            return (new FirebaseTransport('', $projectId, $user, $privateKeyId, $privateKey, $this->client, $this->dispatcher))
+                ->setHost($host)
+                ->setPort($port);
+        } catch (MissingRequiredOptionException) {
+            trigger_deprecation('symfony/firebase-notifier', '8.2', 'Using Firebase Notifier without project_id, private_key_id and private_key options is deprecated. Update your Firebase DSN.');
+
+            return (new FirebaseTransport('', '', '', '', '', $this->client, $this->dispatcher))
+                ->setHost($host)
+                ->setPort($port);
+        }
     }
 
     protected function getSupportedSchemes(): array

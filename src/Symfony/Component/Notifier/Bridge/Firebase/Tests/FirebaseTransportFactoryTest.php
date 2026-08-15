@@ -17,6 +17,7 @@ use Symfony\Component\Notifier\Test\IncompleteDsnTestTrait;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
+ * @author Vojtech Smejkal <https://vojtechsmejkal.cz>
  */
 final class FirebaseTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
@@ -30,14 +31,15 @@ final class FirebaseTransportFactoryTest extends AbstractTransportFactoryTestCas
     public static function createProvider(): iterable
     {
         yield [
-            'firebase://host.test',
-            'firebase://username:password@host.test',
+            'firebase://fcm.googleapis.com',
+            'firebase://firebase-adminsdk@iam.gserviceaccount.com@default?project_id=PROJECT_ID&private_key_id=PRIVATE_KEY_ID&private_key=PRIVATE_KEY',
         ];
     }
 
     public static function supportsProvider(): iterable
     {
         yield [true, 'firebase://username:password@default'];
+        yield [true, 'firebase://firebase-adminsdk@iam.gserviceaccount.com@default?project_id=PROJECT_ID&private_key_id=PRIVATE_KEY_ID&private_key=PRIVATE_KEY'];
         yield [false, 'somethingElse://username:password@default'];
     }
 
@@ -49,6 +51,5 @@ final class FirebaseTransportFactoryTest extends AbstractTransportFactoryTestCas
     public static function incompleteDsnProvider(): iterable
     {
         yield ['firebase://:password@default'];
-        yield ['firebase://username@default'];
     }
 }

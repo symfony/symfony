@@ -11,11 +11,15 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests\Notification;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Firebase\Notification\AndroidNotification;
 
 final class AndroidNotificationTest extends TestCase
 {
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testAndroidNotificationOptions()
     {
         $notification = new AndroidNotification('device_token', [
@@ -24,17 +28,19 @@ final class AndroidNotificationTest extends TestCase
         ], ['key' => 'value']);
 
         $this->assertSame([
-            'to' => 'device_token',
             'notification' => [
                 'title' => 'Test Title',
                 'body' => 'Test Body',
             ],
             'data' => ['key' => 'value'],
+            'topic' => 'device_token',
         ], $notification->toArray());
 
-        $this->assertSame('device_token', $notification->getRecipientId());
+        $this->assertSame('[topic]device_token', $notification->getRecipientId());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testAndroidNotificationWithAllOptions()
     {
         $notification = (new AndroidNotification('device_token', []))
@@ -53,27 +59,35 @@ final class AndroidNotificationTest extends TestCase
             ->titleLocArgs(['title_arg1', 'title_arg2']);
 
         $expected = [
-            'to' => 'device_token',
             'notification' => [
                 'title' => 'New Title',
                 'body' => 'New Body',
-                'android_channel_id' => 'channel_123',
-                'icon' => 'notification_icon',
-                'sound' => 'notification_sound',
-                'tag' => 'tag_123',
-                'color' => '#FF0000',
-                'click_action' => 'OPEN_ACTIVITY',
-                'body_loc_key' => 'body_key',
-                'body_loc_args' => ['arg1', 'arg2'],
-                'title_loc_key' => 'title_key',
-                'title_loc_args' => ['title_arg1', 'title_arg2'],
             ],
-            'data' => ['custom' => 'data'],
+            'data' => [
+                'custom' => 'data',
+            ],
+            'android' => [
+                'notification' => [
+                    'channel_id' => 'channel_123',
+                    'icon' => 'notification_icon',
+                    'sound' => 'notification_sound',
+                    'tag' => 'tag_123',
+                    'color' => '#FF0000',
+                    'click_action' => 'OPEN_ACTIVITY',
+                    'body_loc_key' => 'body_key',
+                    'body_loc_args' => ['arg1', 'arg2'],
+                    'title_loc_key' => 'title_key',
+                    'title_loc_args' => ['title_arg1', 'title_arg2'],
+                ],
+            ],
+            'topic' => 'device_token',
         ];
 
         $this->assertSame($expected, $notification->toArray());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testAndroidNotificationChaining()
     {
         $notification = new AndroidNotification('device_token', []);
@@ -84,12 +98,15 @@ final class AndroidNotificationTest extends TestCase
 
         $this->assertSame($notification, $result);
         $this->assertSame([
-            'to' => 'device_token',
-            'notification' => [
-                'android_channel_id' => 'test_channel',
-                'icon' => 'test_icon',
-            ],
+            'notification' => [],
             'data' => [],
+            'android' => [
+                'notification' => [
+                    'channel_id' => 'test_channel',
+                    'icon' => 'test_icon',
+                ],
+            ],
+            'topic' => 'device_token',
         ], $notification->toArray());
     }
 }

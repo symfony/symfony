@@ -26,17 +26,20 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Oskar Stark <oskarstark@googlemail.com>
+ * @author Vojtech Smejkal <https://vojtechsmejkal.cz>
  */
 final class FirebaseTransportTest extends TransportTestCase
 {
+    private const PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\nMIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAmU2f/GKCLuvw8NAl\nbqJW5RxhMrUrcampGQxz2F2OT3fqoyKBhAGzNhxbgPZYDeXp7WNNLTk9WLT7sDNM\ndjVUuQIDAQABAkAtOTX52QF4YAfKskxoj6E8oxuVPtabCCanCgJekHK7xDpYpYre\ncvxoPhw0c4McZiFoBOlr0TqyY9qpDWXDHLDFAiEAy9jNU/N438WrurUPuOfyqIYx\n25NJWQ7sgjfDJBMVHO8CIQDAhmed4Uih7QKZAMPeRayFeemdjcXNmN4wp/YjiLZ4\n1wIgaTWnnBnAnDYo0T+cMsI8QvCoEP0u0TFbrkXbiOX0cq8CIQCrg9GxrG75mt1y\nk2TrkuS0cLy4GQJ8PFDNxgSY+YWeNwIgavjv+v6MgyLrMTuZsAd67+5Z5axjdJL8\nbwLzq+QOXk8=\n-----END PRIVATE KEY-----\n";
+
     public static function createTransport(?HttpClientInterface $client = null): FirebaseTransport
     {
-        return new FirebaseTransport('username:password', $client ?? new MockHttpClient());
+        return new FirebaseTransport('', 'test_project_id', 'firebase-adminsdk-test@test-project.iam.gserviceaccount.com', 'private_key_id', self::PRIVATE_KEY, $client ?? new MockHttpClient());
     }
 
     public static function toStringProvider(): iterable
     {
-        yield ['firebase://fcm.googleapis.com/fcm/send', self::createTransport()];
+        yield ['firebase://fcm.googleapis.com', self::createTransport()];
     }
 
     public static function supportedMessagesProvider(): iterable
@@ -66,12 +69,12 @@ final class FirebaseTransportTest extends TransportTestCase
     public static function sendWithErrorThrowsExceptionProvider(): iterable
     {
         yield [new MockResponse(
-            json_encode(['results' => [['error' => 'testErrorCode']]]),
+            json_encode(['error' => ['message' => 'testErrorCode']]),
             ['response_headers' => ['content-type' => ['application/json']], 'http_code' => 200]
         )];
 
         yield [new MockResponse(
-            json_encode(['results' => [['error' => 'testErrorCode']]]),
+            json_encode(['error' => ['message' => 'testErrorCode']]),
             ['response_headers' => ['content-type' => ['application/json']], 'http_code' => 400]
         )];
     }

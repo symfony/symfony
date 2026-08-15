@@ -1,0 +1,14 @@
+framework:
+    rate_limiter:
+        foo_limiter:
+            lock_factory: ~
+            policy: token_bucket
+            limit: 10
+            rate:
+                interval: 5 seconds
+                amount: 10
+    mailer:
+        transports:
+            main:
+                dsn: smtp://example.com
+                rate_limiter: foo_limiter

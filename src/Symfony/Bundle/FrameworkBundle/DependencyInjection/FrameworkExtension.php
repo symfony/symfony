@@ -408,6 +408,7 @@ class FrameworkExtension extends Extension
         }
 
         if ($this->readConfigEnabled('mailer', $container, $config['mailer'])) {
+            $this->readConfigEnabled('rate_limiter', $container, $config['rate_limiter']);
             $this->registerMailerConfiguration($config['mailer'], $container, $loader, $this->readConfigEnabled('webhook', $container, $config['webhook']));
 
             if (!$this->hasConsole() || !class_exists(MailerTestCommand::class)) {
@@ -3115,7 +3116,33 @@ class FrameworkExtension extends Extension
             $config['dsn'] = 'smtp://null';
         }
         $transports = $config['dsn'] ? ['main' => $config['dsn']] : $config['transports'];
-        $container->getDefinition('mailer.transports')->setArgument(0, $transports);
+        $transports = array_map(static function (array|string $transport): array {
+            if (\is_array($transport)) {
+                return $transport;
+            }
+
+            return ['dsn' => $transport];
+        }, $transports);
+
+        $container->getDefinition('mailer.transports')->setArgument(0, array_combine(array_keys($transports), array_column($transports, 'dsn')));
+
+        $transportRateLimiterReferences = [];
+
+        foreach ($transports as $name => $transport) {
+            if ($transport['rate_limiter'] ?? null) {
+                $transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
+            }
+        }
+
+        if ($transportRateLimiterReferences && $this->isInitializedConfigEnabled('rate_limiter')) {
+            if (!interface_exists(LimiterInterface::class)) {
+                throw new LogicException('Rate limiter cannot be used within Mailer as the RateLimiter component is not installed. Try running "composer require symfony/rate-limiter".');
+            }
+
+            $container->getDefinition('mailer.rate_limiter_locator')->replaceArgument(0, $transportRateLimiterReferences);
+        } else {
+            $container->removeDefinition('mailer.rate_limiter_locator');
+        }
 
         $mailer = $container->getDefinition('mailer.mailer');
         if (false === $messageBus = $config['message_bus']) {

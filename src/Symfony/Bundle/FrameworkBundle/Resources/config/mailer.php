@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
 use Symfony\Component\Mailer\EventListener\DkimSignedMessageListener;
 use Symfony\Component\Mailer\EventListener\EnvelopeListener;
@@ -48,6 +49,7 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.transport_factory', Transport::class)
             ->args([
                 tagged_iterator('mailer.transport_factory'),
+                service('mailer.rate_limiter_locator')->nullOnInvalid(),
             ])
 
         ->alias('mailer.default_transport', 'mailer.transports')
@@ -121,5 +123,9 @@ return static function (ContainerConfigurator $container) {
                 service('mailer.transports'),
             ])
             ->tag('console.command')
+
+        ->set('mailer.rate_limiter_locator', ServiceLocator::class)
+            ->args([[]])
+            ->tag('container.service_locator')
     ;
 };

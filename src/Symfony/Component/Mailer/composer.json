@@ -28,6 +28,7 @@
         "symfony/console": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
+        "symfony/rate-limiter": "^7.4|^8.0",
         "symfony/twig-bridge": "^7.4|^8.0"
     },
     "conflict": {

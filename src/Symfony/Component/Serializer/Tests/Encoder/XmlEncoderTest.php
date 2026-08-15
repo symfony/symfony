@@ -77,6 +77,13 @@ class XmlEncoderTest extends TestCase
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
     }
 
+    public function testDecodeWithoutRootNode()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid XML data, it does not contain a root node.');
+        $this->encoder->decode('<?xml version="1.0"?><foo></foo>', 'xml', [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_ELEMENT_NODE]]);
+    }
+
     public function testAttributes()
     {
         $obj = new ScalarDummy();
@@ -97,7 +104,7 @@ class XmlEncoderTest extends TestCase
                 '@bool-false' => false,
                 '@int' => 3,
                 '@float' => 3.4,
-                '@sring' => 'a',
+                '@string' => 'a',
             ],
         ];
         $expected = '<?xml version="1.0"?>'."\n".
@@ -109,7 +116,7 @@ class XmlEncoderTest extends TestCase
             '<Bar>2</Bar>'.
             '<Bar>3</Bar>'.
             '<a>b</a>'.
-            '<scalars bool-true="1" bool-false="0" int="3" float="3.4" sring="a"/>'.
+            '<scalars bool-true="1" bool-false="0" int="3" float="3.4" string="a"/>'.
             '</response>'."\n";
         $this->assertEquals($expected, $this->encoder->encode($obj, 'xml'));
     }

@@ -142,7 +142,9 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             }
         }
 
-        // todo: throw an exception if the root node name is not correctly configured (bc)
+        if (!$rootNode) {
+            throw new NotEncodableValueException('Invalid XML data, it does not contain a root node.');
+        }
 
         if ($rootNode->hasChildNodes()) {
             $data = $this->parseXml($rootNode, $context);

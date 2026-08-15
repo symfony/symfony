@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T17:39:52Z
+
+Thanks @HypeMC for the quick catch and the precise diagnosis. I reworked the branch to remove the limitation instead of guarding against it, so wrapping keeps working on wide terminals rather than switching off above 120 columns.
+
+The key fact is that PCRE only duplicates bounded repetitions of groups; a bounded repetition of a single character compiles to a counter of constant size, valid up to 65535. So `wrap()` now folds each tag and URL to a single unused private-use codepoint, wraps with `.{1,width}`, and restores them at the end. Each tag and each URL already counted as one repetition unit, so the semantics are unchanged.
+
+What I checked:
+
+- a differential fuzz over 23200 cases (tags, URLs, multibyte, tabs, CRLF, over-long words, both `allowCutUrls` modes) at widths 1 to 136 produces byte-for-byte the same output as the previous pattern;
+- the full Console test suite passes;
+- widths from 137 up to and beyond the quantifier limit now wrap instead of failing, and `preg_replace()` no longer returns `null`, which used to swallow the text being wrapped.
+
+I flipped the new descriptor test accordingly: a 200-column terminal now asserts wrapped output, and `OutputWrapperTest` covers the two widths that used to fail. I also updated the description to match.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-08-15T17:52:38Z
+
+@nicolas-grekas Brilliant idea, I've tested it and it works perfectly. As always, big thanks!

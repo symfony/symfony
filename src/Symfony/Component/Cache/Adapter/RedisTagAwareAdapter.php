@@ -24,6 +24,7 @@ use Symfony\Component\Cache\Exception\LogicException;
 use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\Marshaller\TagAwareMarshaller;
+use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\RedisTrait;
 
 /**
@@ -38,6 +39,7 @@ use Symfony\Component\Cache\Traits\RedisTrait;
  * Design limitations:
  *  - Max 4 billion cache keys per cache tag as limited by Redis Set datatype.
  *    E.g. If you use a "all" items tag for expiry instead of clear(), that limits you to 4 billion cache items also.
+ *  - Tag Sets keep references to expired or evicted items until prune() garbage-collects them.
  *
  * @see https://redis.io/topics/lru-cache#eviction-policies Documentation for Redis eviction policies.
  * @see https://redis.io/topics/data-types#sets Documentation for Redis Set datatype.
@@ -45,7 +47,7 @@ use Symfony\Component\Cache\Traits\RedisTrait;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author André Rømcke <andre.romcke+symfony@gmail.com>
  */
-class RedisTagAwareAdapter extends AbstractTagAwareAdapter
+class RedisTagAwareAdapter extends AbstractTagAwareAdapter implements PruneableInterface
 {
     use RedisTrait;
 
@@ -82,6 +84,90 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         }
 
         $this->init($redis, $namespace, $defaultLifetime, new TagAwareMarshaller($marshaller));
+    }
+
+    /**
+     * Removes references to expired or evicted items from all the tag Sets of the pool,
+     * and deletes the Sets that reference no existing item anymore.
+     */
+    public function prune(): bool
+    {
+        $prefix = '';
+        $prefixLen = 0;
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $prefix = $this->redis->getOptions()->prefix ? $this->redis->getOptions()->prefix->getPrefix() : '';
+            $prefixLen = \strlen($prefix);
+        }
+
+        $ok = true;
+        $rootNamespace = '' === $this->namespace ? '' : $this->namespace.static::NS_SEPARATOR;
+
+        if ($this->redis instanceof \Relay\Cluster) {
+            $prefix = Relay::SCAN_PREFIX & $this->redis->getOption(Relay::OPT_SCAN) ? '' : $this->redis->getOption(Relay::OPT_PREFIX);
+            $prefixLen = \strlen($this->redis->getOption(Relay::OPT_PREFIX) ?? '');
+            $pattern = $prefix.$rootNamespace.'*'.static::TAGS_PREFIX.'*';
+
+            foreach ($this->redis->_masters() as $ipAndPort) {
+                $address = implode(':', $ipAndPort);
+                $cursor = null;
+                do {
+                    $keys = $this->redis->scan($cursor, $address, $pattern, 1000);
+                    if (isset($keys[1]) && \is_array($keys[1])) {
+                        $cursor = $keys[0];
+                        $keys = $keys[1];
+                    }
+                    foreach ($keys ?: [] as $key) {
+                        if ($prefixLen) {
+                            $key = substr($key, $prefixLen);
+                        }
+                        $ok = $this->pruneTagSet($key) && $ok;
+                    }
+                } while ($cursor);
+            }
+
+            return $ok;
+        }
+
+        $hosts = $this->getHosts();
+        $host = reset($hosts);
+        if ($host instanceof \Predis\Client) {
+            $connection = $host->getConnection();
+
+            if ($connection instanceof ReplicationInterface) {
+                $hosts = [$host->getClientFor('master')];
+            } elseif ($connection instanceof Predis2ReplicationInterface) {
+                $connection->switchToMaster();
+                $hosts = [$host];
+            }
+        }
+
+        foreach ($hosts as $host) {
+            if ($host instanceof Relay) {
+                $prefix = Relay::SCAN_PREFIX & $host->getOption(Relay::OPT_SCAN) ? '' : $host->getOption(Relay::OPT_PREFIX);
+                $prefixLen = \strlen($host->getOption(Relay::OPT_PREFIX) ?? '');
+            } elseif (!$host instanceof \Predis\ClientInterface) {
+                $prefix = \defined('Redis::SCAN_PREFIX') && (\Redis::SCAN_PREFIX & $host->getOption(\Redis::OPT_SCAN)) ? '' : $host->getOption(\Redis::OPT_PREFIX);
+                $prefixLen = \strlen($host->getOption(\Redis::OPT_PREFIX) ?? '');
+            }
+            $pattern = $prefix.$rootNamespace.'*'.static::TAGS_PREFIX.'*';
+
+            $cursor = null;
+            do {
+                $keys = $host instanceof \Predis\ClientInterface ? $host->scan($cursor ?? 0, ['MATCH' => $pattern, 'COUNT' => 1000]) : $host->scan($cursor, $pattern, 1000);
+                if (isset($keys[1]) && \is_array($keys[1])) {
+                    $cursor = $keys[0];
+                    $keys = $keys[1];
+                }
+                foreach ($keys ?: [] as $key) {
+                    if ($prefixLen) {
+                        $key = substr($key, $prefixLen);
+                    }
+                    $ok = $this->pruneTagSet($key) && $ok;
+                }
+            } while ($cursor);
+        }
+
+        return $ok;
     }
 
     protected function doSave(array $values, int $lifetime, array $addTagData = [], array $delTagData = []): array
@@ -314,5 +400,83 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
         }
 
         return $this->redisEvictionPolicy = '';
+    }
+
+    private function pruneTagSet(string $setId): bool
+    {
+        // Skipping keys that are not Sets tells apart unrelated keys that happen to match the scanned pattern
+
+        $lua = <<<'EOLUA'
+                        if 'set' ~= redis.call('TYPE', KEYS[1]).ok then
+                            return false
+                        end
+
+                        return redis.call('SSCAN', KEYS[1], ARGV[1], 'COUNT', 1000)
+            EOLUA;
+
+        $cursor = '0';
+        do {
+            $results = $this->pipeline(function () use ($lua, $setId, $cursor) {
+                yield 'eval' => $this->redis instanceof \Predis\ClientInterface ? [$lua, 1, $setId, $cursor] : [$lua, [$setId, $cursor], 1];
+            });
+
+            $ids = null;
+            foreach ($results as $result) {
+                if ($result instanceof \RedisException || $result instanceof \Relay\Exception || $result instanceof ErrorInterface) {
+                    CacheItem::log($this->logger, 'Failed to prune tag set "{key}": '.$result->getMessage(), ['key' => $setId, 'exception' => $result]);
+
+                    return false;
+                }
+                if (\is_array($result)) {
+                    [$cursor, $ids] = $result;
+                }
+            }
+
+            if (null === $ids) {
+                return true;
+            }
+
+            $dead = [];
+            if ($ids) {
+                foreach ($this->pipeline(static function () use ($ids) {
+                    foreach ($ids as $id) {
+                        yield 'exists' => [$id];
+                    }
+                }) as $id => $exists) {
+                    if (!$exists) {
+                        $dead[] = $id;
+                    }
+                }
+            }
+
+            if ($dead) {
+                foreach ($this->pipeline(static function () use ($setId, $dead) {
+                    yield 'sRem' => array_merge([$setId], $dead);
+                }) as $result) {
+                }
+
+                // Items saved while pruning might have been removed from the Set right after their reference
+                // was added to it; checking them again and restoring their reference makes no save be lost
+                $revived = [];
+                foreach ($this->pipeline(static function () use ($dead) {
+                    foreach ($dead as $id) {
+                        yield 'exists' => [$id];
+                    }
+                }) as $id => $exists) {
+                    if ($exists) {
+                        $revived[] = $id;
+                    }
+                }
+
+                if ($revived) {
+                    foreach ($this->pipeline(static function () use ($setId, $revived) {
+                        yield 'sAdd' => array_merge([$setId], $revived);
+                    }) as $result) {
+                    }
+                }
+            }
+        } while ('0' !== $cursor);
+
+        return true;
     }
 }

@@ -180,6 +180,20 @@ class TextDescriptorTest extends AbstractDescriptorTestCase
         $this->assertStringContainsString('[default: "super-long-default-value"]', $lines[1]);
     }
 
+    public function testWrappingOnWideTerminal()
+    {
+        $output = new BufferedOutput();
+        $option = new InputOption('name', null, InputOption::VALUE_REQUIRED, str_repeat('long description ', 30));
+        (new TextDescriptor())->describe($output, $option, ['terminal_width' => 200, 'raw_output' => true]);
+
+        $lines = explode("\n", rtrim($output->fetch()));
+        $this->assertCount(3, $lines);
+        $this->assertStringContainsString('long description', $lines[0]);
+        foreach ($lines as $line) {
+            $this->assertLessThanOrEqual(200, Helper::width(Helper::removeDecoration(new OutputFormatter(), $line)));
+        }
+    }
+
     public function testUnboundedOutputWhenNotATty()
     {
         $output = new BufferedOutput();

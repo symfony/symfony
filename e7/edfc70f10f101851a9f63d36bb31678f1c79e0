@@ -1,0 +1,116 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-10-21T14:27:54Z
+
+> I also wrote this script that can be put in a composer plugin or a standalone script to generate a unique schema file for all the environments.
+
+if you expect such script to be a supported use case, the `JsonSchemaGenerator` should not be an internal class, as this script relies on using this class.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-09T12:16:42Z
+
+Here is a summary of the changes made since the last review:
+
+- **`deprecationMessage` removed**: deprecated nodes now use the standard `description` field, prefixed with _"Deprecated since vendor/package X.Y: ..."_ — this makes the schema valid per JSON Schema draft 2020-12 (which is now the target version)
+- **BackedEnum support**: enum nodes backed by `string` or `int` now include both the YAML tag (`!php/enum Foo::Bar`) and the backing value (`"bar"`) in the `enum` list
+- **FrameworkBundle compiler pass**: added `JsonSchemaConfigDumpPass` (debug-only, conditioned on `symfony/yaml` being available) that generates `config/schema.json` for all registered bundles, following the same pattern as `PhpConfigReferenceDumpPass`
+- The sample standalone script has been removed from the PR description as it is superseded by the compiler pass
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-09T21:07:36Z
+
+Shared `$defs` to reduce repetition in generated schemas
+
+All typed nodes now emit \`\$ref\` instead of inline type schemas. The generated schema is organised in two namespaces:
+
+```json
+{
+  "$defs": {
+    "types": {
+      "boolean": { "type": "boolean" },
+      "integer": { "type": "integer" },
+      "param": { "type": "string", "pattern": "^%[^%]+%$" },
+      "scalar": { "type": ["boolean", "null", "number", "string"] },
+      "object": { "type": "object" },
+      ...
+    },
+    "nodes": {
+      "framework": { "$ref": "#/$defs/types/object", "properties": { ... } },
+      "security": { ... }
+    }
+  },
+  "properties": {
+    "framework": { "$ref": "#/$defs/nodes/framework" },
+    "security":  { "$ref": "#/$defs/nodes/security" }
+  }
+}
+```
+
+When `parameterSchemas` are injected (FrameworkBundle), the primitive type defs include `%param%` support:
+
+```json
+"boolean": { "anyOf": [{ "type": "boolean" }, { "$ref": "#/$defs/types/param" }] }
+```
+
+`ScalarNode` now correctly maps to `scalar` (`string|number|boolean|null`) instead of `variable` (all types including `array` and `object`), fixing overly permissive schemas for scalar prototypes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T08:34:09Z
+
+I went through the five open threads against the current head, running the code rather than reading it. Three are resolved by the April rework and can be closed:
+
+* @mdeboer's draft version point: the dumper now declares `https://json-schema.org/draft/2020-12/schema`, where `deprecated` is valid;
+* @stof's `BackedEnum` point: backing values are emitted next to the `!php/enum` form;
+* the boolean-only nullability special case: `BaseNode::isNullable()` now generalises it, and the object, array and boolean branches consult it.
+
+But the nullability discussion @stof started is only half done. I built a tree with one node of each kind and compared what the node accepts at runtime (`normalize()` then `finalize()`) with what the generated schema says:
+
+```
+node                                 runtime(null)   schema
+stringNode('s')                      accepted        {"$ref": ".../string"}          too strict
+stringNode('s')->treatNullLike('')   accepted        {"$ref": ".../string"}          too strict
+integerNode('i')                     REJECTED        {"$ref": ".../integer"}         consistent
+integerNode('i')->treatNullLike(0)   accepted        {"$ref": ".../integer"}         too strict
+enumNode('e')->values(['a','b'])     REJECTED        {"enum": ["a","b",null]}        too lax
+  ... ->values(['a','b',null])       accepted        {"enum": ["a","b",null,null]}   double null
+  ... ->enumFqcn(Suit::class)        accepted        {"enum": [...cases..., null]}   consistent
+```
+
+Three findings:
+
+* the `string_null`, `integer_null` and `number_null` `$defs` are defined but never referenced: the `StringNode` and `NumericNode` branches do not consult `isNullable()`, unlike their boolean, object and array siblings. With `treatNullLike()`, the IDE would flag `~` as invalid on a node that accepts it;
+* `EnumNode` appends `null` to every enum unconditionally. A plain value enum rejects null at runtime (`The value of type "null" is not allowed for path "mode"`), so the schema validates configs the component throws on. When null *is* a declared value it is emitted twice. Only the `enumFqcn` case accepts null implicitly, so the append should be gated on `\in_array(null, $values, true)` or the enum-FQCN case rather than unconditional;
+* a plain `StringNode` accepts null at runtime through its `ScalarNode` heritage, while `isNullable()` reports false, since it only looks at `equivalentValues`. So even wiring `isNullable()` into the string branch would not close the gap. That is worth a decision rather than a patch: either `isNullable()` should reflect `validateType()`'s actual null acceptance, or the schema knowingly stays stricter than the runtime for plain scalars, which is arguably the better DX and just deserves a comment saying so.
+
+One note on my harness in case you want to reproduce: `finalize(null)` alone reports `treatNullLike()` nodes as rejecting, because that conversion happens in `normalize()`. The table above runs both phases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T08:47:09Z
+
+I pushed the fixes for my findings above as a commit on top, so both existing authorships stay intact, and resolved the five open threads: three were already answered by the April rework (draft 2020-12, `BackedEnum` backing values, `isNullable()` replacing the boolean special case), and the remaining nullability gaps are closed by the new commit:
+
+* the `StringNode` and `NumericNode` branches now consult `isNullable()`, so the `string_null`, `integer_null` and `number_null` `$defs` are referenced at last;
+* `EnumNode` no longer appends `null` unconditionally: it is emitted when null is a declared value or when the node is bound to an enum FQCN, which is the case that accepts and returns null at runtime;
+* `BaseNode::isNullable()` no longer counts the identity null mapping the builder registers on every node. That mapping leaves null to be rejected by the type check, so an `integerNode()` without `treatNullLike()` reported nullable while rejecting null.
+
+Two behaviour notes visible in the regenerated `ExampleConfiguration.schema.json`:
+
+* a plain `stringNode()` is now `string_null`, because `StringNodeDefinition` defaults `nullEquivalent` to `''`: writing `~` on such a node is accepted and means the empty string;
+* `string_list_default_null`, an `arrayNode()->defaultNull()`, went from `array_null` to `array`: `defaultNull()` resets the null equivalence, and writing `~` explicitly on that node throws `Expected "array", but got "null"`. The schema now matches that.
+
+Every node kind and null-handling combination is asserted against what `normalize()` plus `finalize()` actually accepts; reverting the two source files fails 8 of the test rows. Config is green at 614 tests and the FrameworkBundle compiler tests at 18.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T09:40:02Z
+
+The three red jobs after the squash were all this PR's, now fixed in the same commit:
+
+* **low-deps and x86**: `JsonSchemaConfigDumpPass` lives in FrameworkBundle and instantiates `JsonSchemaDumper`, which is new in Config, so those jobs resolve `symfony/config` from packagist and every debug kernel boot died with `Class "JsonSchemaDumper" not found`. The pass now returns early when the class is missing, the same way it already does for `Yaml`, and its test skips in that situation instead of failing;
+* **PHPStan**: `Cannot unset offset 'type'` on the schema shape. The `unset` was dead code, since `type` is only ever set non-empty (the fallback branch and the normalized-types block both write non-empty values), so the single-element collapse is now `\is_array($schema['type'] ?? null) && 1 === \count(...)` and the unset is gone.
+
+Config is green at 622 tests, the compiler tests at 18, php-cs-fixer clean.

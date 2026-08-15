@@ -450,6 +450,16 @@ final class LayoutEngine
 
         $this->positionTracker->restoreStack($savedStack);
 
+        // Each intrinsic child is measured on its own against the full width, so
+        // several of them can add up to more than the row. Every flex sibling
+        // still ends up with at least one column, so clamp the intrinsic widths
+        // to what is left, or the row overflows and the renderer rejects it.
+        $intrinsicBudget = $availableColumns - \count($flexWeights);
+        if ($intrinsicWidths && array_sum($intrinsicWidths) > $intrinsicBudget) {
+            $intrinsicWidths = self::shrinkToFit($intrinsicWidths, $intrinsicBudget);
+            $usedColumns = array_sum($intrinsicWidths);
+        }
+
         // Second pass: distribute remaining space among flex children
         $remainingColumns = max(0, $availableColumns - $usedColumns);
         $result = [];
@@ -468,6 +478,10 @@ final class LayoutEngine
                         $allocated = $remainingColumns - $flexColumnsUsed;
                     } else {
                         $allocated = (int) floor($remainingColumns * $flexWeights[$index] / $totalFlexWeight);
+                        // Each flex child still to come keeps at least one
+                        // column, so a heavier weight cannot spend their share:
+                        // they are floored to 1 below and the row would overflow.
+                        $allocated = min($allocated, $remainingColumns - $flexColumnsUsed - ($flexCount - $flexAllocated));
                     }
                 } else {
                     $allocated = 0;
@@ -478,5 +492,51 @@ final class LayoutEngine
         }
 
         return $result;
+    }
+
+    /**
+     * Reduce widths so they sum to at most the budget, keeping one column each.
+     *
+     * Scales proportionally first, then trims the widest entries to absorb the
+     * rounding, so the narrow children keep their content.
+     *
+     * @param array<int, int> $widths
+     *
+     * @return array<int, int>
+     */
+    private static function shrinkToFit(array $widths, int $budget): array
+    {
+        $total = array_sum($widths);
+        // layoutHorizontal() caps the child count at the column count, so every
+        // child is guaranteed at least one column here.
+        $budget = max(\count($widths), $budget);
+
+        // Carry the fraction each child loses over to the next one, so the
+        // scaled widths add up to the budget instead of leaving columns unused.
+        $used = 0;
+        $carry = 0;
+        foreach ($widths as $index => $width) {
+            $carry += $width * $budget;
+            $share = intdiv($carry, $total);
+            $carry -= $share * $total;
+            $used += $widths[$index] = max(1, $share);
+        }
+
+        // The carry only overshoots by the number of entries raised to 1.
+        while ($used > $budget) {
+            $widest = null;
+            foreach ($widths as $index => $width) {
+                if ($width > 1 && (null === $widest || $width > $widths[$widest])) {
+                    $widest = $index;
+                }
+            }
+            if (null === $widest) {
+                break;
+            }
+            --$widths[$widest];
+            --$used;
+        }
+
+        return $widths;
     }
 }

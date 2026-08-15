@@ -113,18 +113,18 @@ final class StdinBuffer
                     if (0 < $hold) {
                         $this->pasteBuffer .= substr($this->buffer, 0, -$hold);
                         $this->buffer = substr($this->buffer, -$hold);
-
-                        break;
+                    } else {
+                        $this->pasteBuffer .= $this->buffer;
+                        $this->buffer = '';
                     }
-
-                    $this->pasteBuffer .= $this->buffer;
-                    $this->buffer = '';
 
                     // Cap reached without an end marker: discard the partial
                     // paste and emit a visible overflow notice through the
                     // paste callback so the user can see why their paste did
                     // not land. Defense against unbounded buffering from a
-                    // missing/spoofed end marker.
+                    // missing/spoofed end marker. This has to run on the held
+                    // path too: a writer that ends every chunk with a byte of
+                    // the end marker would otherwise never reach the check.
                     if (\strlen($this->pasteBuffer) > self::MAX_PASTE_BYTES) {
                         $this->pasteBuffer = '';
                         $this->inPaste = false;
@@ -132,6 +132,14 @@ final class StdinBuffer
                         if (null !== $this->onPaste) {
                             ($this->onPaste)(self::PASTE_OVERFLOW_MESSAGE);
                         }
+
+                        // The paste is over, so the held bytes are no longer a
+                        // partial end marker: parse them as normal input.
+                        continue;
+                    }
+
+                    if (0 < $hold) {
+                        break;
                     }
                 }
                 continue;

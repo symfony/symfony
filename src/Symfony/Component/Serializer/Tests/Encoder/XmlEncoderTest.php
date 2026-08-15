@@ -307,6 +307,13 @@ class XmlEncoderTest extends TestCase
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
     }
 
+    public function testDecodeWithoutRootNode()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid XML data, it does not contain a root node.');
+        $this->encoder->decode('<?xml version="1.0"?><foo></foo>', 'xml', [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_ELEMENT_NODE]]);
+    }
+
     public function testDecodeScalar()
     {
         $source = '<?xml version="1.0"?>'."\n".

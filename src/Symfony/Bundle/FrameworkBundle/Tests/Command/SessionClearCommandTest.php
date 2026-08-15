@@ -16,12 +16,22 @@ use Symfony\Bundle\FrameworkBundle\Command\SessionClearCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHandlerInterface;
 
-abstract class ClearableSessionHandler implements \SessionHandlerInterface, ClearableSessionHandlerInterface
-{
+// the interface only exists since HttpFoundation 8.2, older versions must not fatal at load time
+if (interface_exists(ClearableSessionHandlerInterface::class)) {
+    abstract class ClearableSessionHandler implements \SessionHandlerInterface, ClearableSessionHandlerInterface
+    {
+    }
 }
 
 class SessionClearCommandTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        if (!interface_exists(ClearableSessionHandlerInterface::class)) {
+            $this->markTestSkipped(ClearableSessionHandlerInterface::class.' is not available.');
+        }
+    }
+
     public function testClearSucceeds()
     {
         $handler = $this->createMock(ClearableSessionHandler::class);

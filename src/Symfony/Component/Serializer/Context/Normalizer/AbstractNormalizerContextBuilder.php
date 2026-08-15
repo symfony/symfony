@@ -189,4 +189,13 @@ abstract class AbstractNormalizerContextBuilder implements ContextBuilderInterfa
     {
         return $this->with(AbstractNormalizer::REQUIRE_ALL_PROPERTIES, $requireAllProperties);
     }
+
+    /**
+     * Configures whether 'Default' and class-short-name groups are added when no
+     * custom group is specified.
+     */
+    public function withEnableDefaultGroups(?bool $enableDefaultGroups): static
+    {
+        return $this->with(AbstractNormalizer::ENABLE_DEFAULT_GROUPS, $enableDefaultGroups);
+    }
 }

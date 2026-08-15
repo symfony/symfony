@@ -23,6 +23,7 @@ CHANGELOG
  * Add `COLLECT_EXTRA_ATTRIBUTES_ERRORS` option to `Serializer` to collect extra-attributes errors during denormalization
  * Deprecate `PartialDenormalizationException::getErrors()`, use `getNotNormalizableValueErrors()` instead
  * Enable using `#[WithAccessors]` from the PropertyInfo component with the serializer
+ * Add `AbstractNormalizer::ENABLE_DEFAULT_GROUPS` context option to opt into implicit `Default` and class-short-name groups for attributes without explicit `#[Groups]`, mirroring Validator group conventions
 
 8.0
 ---

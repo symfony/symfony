@@ -82,6 +82,13 @@ final class MetadataAwareNameConverter implements NameConverterInterface
 
         $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
 
+        if ($context[AbstractNormalizer::ENABLE_DEFAULT_GROUPS] ?? false) {
+            $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
+            if (!array_diff($contextGroups, $defaultGroups)) {
+                $contextGroups = array_merge($contextGroups, $defaultGroups);
+            }
+        }
+
         if (null !== $attributesMetadata[$propertyName]->getSerializedName($contextGroups) && null !== $attributesMetadata[$propertyName]->getSerializedPath($contextGroups)) {
             throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $propertyName, $class));
         }
@@ -120,25 +127,39 @@ final class MetadataAwareNameConverter implements NameConverterInterface
 
         $classMetadata = $this->metadataFactory->getMetadataFor($class);
 
-        $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+        $enableDefaultGroups = $context[AbstractNormalizer::ENABLE_DEFAULT_GROUPS] ?? false;
+
+        $groups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
+        $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
+
+        $groupsHasBeenDefined = [] !== $groups;
+        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
+
+        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            $groups = array_merge($groups, $defaultGroups);
+        }
 
         $cache = [];
         foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (null === $serializedName = $metadata->getSerializedName($contextGroups)) {
+            if (null === $serializedName = $metadata->getSerializedName($groups)) {
                 continue;
             }
 
-            if (null !== $metadata->getSerializedPath($contextGroups)) {
+            if (null !== $metadata->getSerializedPath($groups)) {
                 throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
             }
 
-            $metadataGroups = $metadata->getGroups();
+            $metadataGroups = $metadata->getGroups()
+                ?: ($enableDefaultGroups && !$customGroupsHasBeenDefined ? $defaultGroups : []);
 
-            if ($contextGroups && !$metadataGroups) {
+            if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $groups)) {
                 continue;
             }
 
-            if ($metadataGroups && !array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
+            // When the flag is off, preserve legacy semantics: any non-empty context
+            // groups (including ['*']) skips ungrouped properties. When the flag is on,
+            // ['*'] keeps them.
+            if (!$metadataGroups && $groupsHasBeenDefined && (!$enableDefaultGroups || !\in_array('*', $groups, true))) {
                 continue;
             }
 
@@ -154,6 +175,6 @@ final class MetadataAwareNameConverter implements NameConverterInterface
             return $class.'-'.$context['cache_key'];
         }
 
-        return $class.hash('xxh128', serialize($context[AbstractNormalizer::GROUPS] ?? []));
+        return $class.hash('xxh128', serialize($context[AbstractNormalizer::GROUPS] ?? []).serialize($context[AbstractNormalizer::ENABLE_DEFAULT_GROUPS] ?? false));
     }
 }

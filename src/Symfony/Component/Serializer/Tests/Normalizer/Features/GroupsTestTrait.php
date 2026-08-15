@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\DefaultGroupsDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 
 /**
@@ -87,5 +88,140 @@ trait GroupsTestTrait
         $obj->setFoo('foo');
 
         $this->assertEquals([], $normalizer->normalize($obj, null, ['groups' => ['notExist']]));
+    }
+
+    public function testNormalizeWithDefaultGroups()
+    {
+        $normalizer = $this->getNormalizerForGroups();
+
+        $assertNormalizedProperties = function (array $expectedProperties, array $normalized): void {
+            $actualProperties = array_keys($normalized);
+
+            sort($expectedProperties);
+            sort($actualProperties);
+
+            $this->assertSame($expectedProperties, $actualProperties);
+        };
+
+        $assertNormalizedProperties(
+            ['foo', 'fooBar', 'symfony', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['a']]),
+        );
+
+        $assertNormalizedProperties(
+            ['bar', 'foo', 'fooBar', 'symfony', 'quux', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy()),
+        );
+
+        $assertNormalizedProperties(
+            ['bar', 'foo', 'fooBar', 'symfony', 'quux', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => []]),
+        );
+
+        $assertNormalizedProperties(
+            ['foo', 'bar', 'quux', 'fooBar', 'symfony', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['*']]),
+        );
+
+        $assertNormalizedProperties(
+            ['default'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['Default']]),
+        );
+
+        $assertNormalizedProperties(
+            ['className'],
+            $normalizer->normalize(new GroupDummy(), context: ['groups' => ['GroupDummy']]),
+        );
+
+        $assertNormalizedProperties(
+            ['foo', 'fooBar', 'symfony', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['a'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['bar', 'foo', 'fooBar', 'symfony', 'quux', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => [],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['foo', 'bar', 'quux', 'fooBar', 'symfony', 'default', 'className', 'kevin', 'coopTilleuls'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['*'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['default', 'className'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['Default'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['default', 'className'],
+            $normalizer->normalize(new GroupDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['GroupDummy'],
+            ]),
+        );
+    }
+
+    public function testNormalizeWithDefaultGroupsAndUngroupedProperty()
+    {
+        $normalizer = $this->getNormalizerForGroups();
+
+        $assertNormalizedProperties = function (array $expectedProperties, array $normalized): void {
+            $actualProperties = array_keys($normalized);
+
+            sort($expectedProperties);
+            sort($actualProperties);
+
+            $this->assertSame($expectedProperties, $actualProperties);
+        };
+
+        // Ungrouped properties match Default and class-short-name groups when the flag is on.
+        $assertNormalizedProperties(
+            ['noGroup', 'defaultGroup', 'classGroup'],
+            $normalizer->normalize(new DefaultGroupsDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['Default'],
+            ]),
+        );
+
+        $assertNormalizedProperties(
+            ['noGroup', 'defaultGroup', 'classGroup'],
+            $normalizer->normalize(new DefaultGroupsDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['DefaultGroupsDummy'],
+            ]),
+        );
+
+        // A custom group excludes ungrouped properties even when the flag is on.
+        $assertNormalizedProperties(
+            ['customGroup'],
+            $normalizer->normalize(new DefaultGroupsDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => ['custom'],
+            ]),
+        );
+
+        // groups=[] with flag on: $groupsHasBeenDefined must be captured before the
+        // implicit defaultGroups merge, otherwise properties with non-Default groups
+        // (like customGroup) would wrongly be filtered out.
+        $assertNormalizedProperties(
+            ['noGroup', 'customGroup', 'defaultGroup', 'classGroup'],
+            $normalizer->normalize(new DefaultGroupsDummy(), context: [
+                'enable_default_groups' => true,
+                'groups' => [],
+            ]),
+        );
     }
 }

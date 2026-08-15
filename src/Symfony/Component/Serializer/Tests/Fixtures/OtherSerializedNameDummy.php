@@ -19,6 +19,18 @@ use Symfony\Component\Serializer\Attribute\SerializedName;
  */
 class OtherSerializedNameDummy
 {
+    #[Groups(['Default']), SerializedName('renamedDefaultGroup')]
+    private $defaultGroup;
+
+    #[Groups(['OtherSerializedNameDummy']), SerializedName('renamedClassGroup')]
+    public $classGroup;
+
+    #[SerializedName('renamedNoGroup')]
+    public $noGroup;
+
+    #[Groups(['custom']), SerializedName('renamedCustomGroup')]
+    public $customGroup;
+
     #[Groups(['a'])]
     private $buz;
 

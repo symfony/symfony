@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T05:54:10Z
+
+Thanks for your patience @fritzmg. Rebased on 8.2, squashed and pushed.
+
+**@fabpot, on your question about prefixing the rate limiter with the transport name:** no prefix, and the branch already had it right. It resolves `rate_limiter: foo_limiter` to the `limiter.foo_limiter` service, which is exactly what Messenger does for a transport's rate limiter. Same line, same shape:
+
+```php
+// FrameworkExtension, messenger transports (existing)
+$transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
+// FrameworkExtension, mailer transports (this PR)
+$transportRateLimiterReferences[$name] = new Reference('limiter.'.$transport['rate_limiter']);
+```
+
+`limiter.` is the service id every `framework.rate_limiter.*` entry is registered under, not a new namespace. Prefixing with the transport name would also stop a limiter being shared, which is what you want when a provider's cap applies to the whole account rather than one transport.
+
+Your other two points are settled: the stray `.phpunit-12.1-0.md5` was already gone, and the CHANGELOG entry now sits under `8.2` in both Mailer and FrameworkBundle.
+
+**What the rebase needed.** XML config was removed from FrameworkBundle in 8.2, so the hunk touching `Resources/config/schema/symfony-1.0.xsd` could not apply and the XML fixture went with it; the PR no longer touches either. The php and yml fixtures still declared `annotations: false`, which no longer exists under `framework`, so both `PhpFrameworkExtensionTest::testMailerRateLimiter` and the Yaml one errored on an unrecognized option. There was also a stray comma in the yml fixture's `interval: 5 seconds,`.
+
+In `TransportTest::testSetsRateLimiter`, `createMock()` on `RateLimiterFactoryInterface` had no expectations, which is a PHPUnit notice now, so it is a stub; the `AbstractTransport` mock does set expectations on one of the two DSNs, so it stays a mock under `#[AllowMockObjectsWithoutExpectations]`.
+
+Mailer is green at 956 tests and the FrameworkBundle DI suite at 582. php-cs-fixer is clean.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T07:59:13Z
+
+@fritzmg heads up on a behaviour change I pushed, please confirm you are happy with it before this gets merged.
+
+The transport consumed the limiter and failed when it was over budget:
+
+```php
+$rateLimiter?->consume(1)->ensureAccepted();   // throws RateLimitExceededException
+```
+
+It now paces instead:
+
+```php
+$rateLimiter?->reserve()->wait();
+```
+
+My reasoning is that both precedents wait rather than throw:
+
+* `Worker::rateLimit()` in Messenger consumes, and when the token is refused it dispatches `WorkerRateLimitedEvent` and calls `$rateLimiter->reserve()->wait()`;
+* `AbstractTransport` itself, the very class this touches, already throttles by sleeping in `setMaxPerSecond()`: `$sleep = (1 / $this->rate) - (microtime(true) - $this->lastSent); usleep(...)`.
+
+For the case in your description, a host that allows 500 mails an hour, throwing means the 501st message fails rather than being sent a little later, and a synchronous send loses it unless the caller catches the exception. "Rate limited transport" reads as pacing to me.
+
+The trade is that a send can now block. That is already true of `setMaxPerSecond()`, and the option is opt-in, but it is a real difference: with a low limit and a synchronous send you can sit in a long `usleep`. If you would rather keep failing fast, or want `reserve(1, $maxTime)` so it waits up to a bound and throws beyond it, say so and I will change it back. No test asserted either behaviour, so nothing forced the choice.
+
+Also in this push: `setRateLimiterFactory()` gained the summary line and `@return $this` that its neighbour `setMaxPerSecond()` carries, and the config option's `info()` now says it paces the messages rather than "to use when sending".
+
+Mailer is green at 956 tests, FrameworkBundle DI at 582, php-cs-fixer clean.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2026-08-15T09:41:00Z
+
+My idea was rather to then take advantage of the retry policy of the messenger transport in such a case - or the `$retryDelay` of the `RecoverableMessageHandlingException` for messenger transports that support it.
+
+This would now block the whole messenger queue, would it not? Potentially for a long time if you have a sudden influx of a lot of email messages (say from a sign-up form or a newsletter). And in order to avoid that you would need to define a separate messenger transport anyway - which kind of defeats the purpose of this PR in my opinion. At least that's my first thought.
+
+---------------------------------------------------------------------------
+
+by fritzmg at 2026-08-15T10:03:04Z
+
+It needs to stay
+
+```php
+$rateLimiter?->consume(1)->ensureAccepted();
+```
+
+Otherwise having
+
+```php
+try {
+    return $this->transport->send($message->getMessage(), $message->getEnvelope());
+} catch (RateLimitExceededException $e) {
+    $retryDelay = ($e->getRetryAfter()->getTimestamp() - time()) * 1000;
+
+    throw new RecoverableMessageHandlingException('Rate limit for mailer transport exceeded.', 0, $e, $retryDelay);
+}
+```
+
+In the `MessageHandler` makes no sense anymore.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T10:11:22Z
+
+Agreed, reverted to `consume(1)->ensureAccepted()` — the `MessageHandler` conversion is meaningful again, and the queue keeps draining while a limited transport is over budget.
+
+Also in this push: the retry delay is clamped with `max(0, …)` (limiters floor `retryAfter` to the second, so the diff can hit 0 right before a reset); two behavior tests, since the only test on this path asserted wiring — the transport throws once the limit is hit, and the handler rethrows as recoverable with the delay; a leftover 7.4 changelog entry from the rebase is removed; wording in the config `info()` and the `setRateLimiterFactory()` docblock now describes the fail-fast behavior.
+
+One note for the docs PR: `RateLimitExceededException` is not a `TransportExceptionInterface`, so `FailoverTransport` won't fail over on a rate limit — spilling to the next transport could be a later opt-in feature.
+
+Mailer is green at 958 tests, FrameworkBundle DI at 583.

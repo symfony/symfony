@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by wkania at 2026-03-25T20:15:25Z
+
+Failing tests are not related.
+Fixed deprecated code "Using ArrayAccess on Doctrine\ORM\Mapping\FieldMapping is deprecated and will not be possible in Doctrine ORM 4.0. Use the corresponding property instead."
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T12:45:54Z
+
+Thanks @wkania, the premise is right and verified, the docs have promised this since the `date_point` type shipped. I rebased on 8.2, squashed with your authorship and hardened the pass on three axes:
+
+* `setTypedFieldMapper()` replaces, so appending our call silently discarded a mapper the application configured through DoctrineBundle's `typed_field_mapper` option. An existing call is now wrapped in `ChainTypedFieldMapper` with the application's mapper first;
+* only `doctrine.orm.default_configuration` was covered; the pass now iterates every `doctrine.orm.*_configuration`, so multi-entity-manager setups get the mapping everywhere;
+* `DayPoint` and `TimePoint` had the identical docs gap, and the same pass already registers their DBAL types, so the map covers all three.
+
+Plus a `class_exists(DefaultTypedFieldMapper::class)` guard for ORM versions without typed field mapping. Each behaviour has a test, the bridge suite is green at 481, and restoring the original pass fails 3 of the new tests.

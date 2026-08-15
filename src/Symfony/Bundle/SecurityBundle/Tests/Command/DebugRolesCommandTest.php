@@ -42,7 +42,7 @@ class DebugRolesCommandTest extends TestCase
               - ROLE_BAZ
 
             EOF;
-        $this->assertStringContainsString($expected, $tester->getDisplay());
+        $this->assertStringContainsString($expected, str_replace(\PHP_EOL, "\n", $tester->getDisplay()));
     }
 
     public function testDebugBuiltInHierarchyWithTreeOption()
@@ -66,7 +66,7 @@ class DebugRolesCommandTest extends TestCase
             └── ROLE_BAZ
 
             EOF;
-        $this->assertStringContainsString($expected, $tester->getDisplay());
+        $this->assertStringContainsString($expected, str_replace(\PHP_EOL, "\n", $tester->getDisplay()));
     }
 
     public function testDebugCustomRoleHierarchy()
@@ -89,7 +89,7 @@ class DebugRolesCommandTest extends TestCase
              * ROLE_FOO
              * ROLE_BAR
             EOF;
-        $this->assertStringContainsString($expected, $tester->getDisplay());
+        $this->assertStringContainsString($expected, str_replace(\PHP_EOL, "\n", $tester->getDisplay()));
     }
 
     public function testDebugCustomRoleHierarchyWithNoArgumentsAsksInteractively()

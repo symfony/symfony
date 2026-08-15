@@ -25,6 +25,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Yaml\Yaml;
 
+#[RequiresMethod(JsonSchemaDumper::class, 'dump')]
 #[RequiresMethod(Yaml::class, 'parse')]
 class JsonSchemaConfigDumpPassTest extends TestCase
 {
@@ -33,10 +34,6 @@ class JsonSchemaConfigDumpPassTest extends TestCase
 
     protected function setUp(): void
     {
-        if (!class_exists(JsonSchemaDumper::class)) {
-            $this->markTestSkipped(JsonSchemaDumper::class.' is not available.');
-        }
-
         $this->tempDir = sys_get_temp_dir().'/sf_test_json_schema';
         mkdir($this->tempDir, 0o777, true);
 
@@ -50,7 +47,8 @@ class JsonSchemaConfigDumpPassTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (is_dir($this->tempDir)) {
+        // tearDown() still runs when setUp() did not complete, leaving the properties unset
+        if (isset($this->tempDir) && is_dir($this->tempDir)) {
             if ('\\' === \DIRECTORY_SEPARATOR) {
                 exec('attrib -r '.escapeshellarg($this->readOnlyDir));
             }

@@ -58,6 +58,52 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has('_stateless'));
     }
 
+    public function testGetListenersWithFirewallAttribute()
+    {
+        $request = new Request(attributes: ['_firewall' => 'main']);
+
+        $firewallConfig = new FirewallConfig('main', 'user_checker');
+        $listener = static function () {};
+        $exceptionListener = $this->createStub(ExceptionListener::class);
+        $logoutListener = $this->createStub(LogoutListener::class);
+        $firewallContext = new FirewallContext([$listener], $exceptionListener, $logoutListener, $firewallConfig);
+
+        $matcher = $this->createMock(RequestMatcherInterface::class);
+        $matcher->expects($this->never())
+            ->method('matches');
+
+        $container = new Container();
+        $container->set('security.firewall.map.context.main', $firewallContext);
+
+        $firewallMap = new FirewallMap($container, ['security.firewall.map.context.main' => $matcher]);
+
+        $this->assertEquals([[$listener], $exceptionListener, $logoutListener], $firewallMap->getListeners($request));
+        $this->assertEquals($firewallConfig, $firewallMap->getFirewallConfig($request));
+        $this->assertEquals('security.firewall.map.context.main', $request->attributes->get(self::ATTRIBUTE_FIREWALL_CONTEXT));
+    }
+
+    public function testGetListenersWithUnknownFirewallAttributeThrows()
+    {
+        $request = new Request(attributes: ['_firewall' => 'mian']);
+
+        $map = new FirewallMap(new Container(), ['security.firewall.map.context.main' => null]);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Invalid firewall "mian" requested by the route: no firewall with this name is configured.');
+        $map->getListeners($request);
+    }
+
+    public function testGetListenersWithNonStringFirewallAttributeThrows()
+    {
+        $request = new Request(attributes: ['_firewall' => ['main']]);
+
+        $map = new FirewallMap(new Container(), []);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "_firewall" route default must be a non-empty string, "array" given.');
+        $map->getListeners($request);
+    }
+
     #[DataProvider('providesStatefulStatelessRequests')]
     public function testGetListeners(Request $request, bool $expectedState)
     {

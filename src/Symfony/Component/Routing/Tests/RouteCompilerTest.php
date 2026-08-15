@@ -282,6 +282,16 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
+    public function testRouteWithFirewallAsPathParameter()
+    {
+        $route = new Route('/{_firewall}');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('cannot contain "_firewall" as a path parameter');
+
+        $route->compile();
+    }
+
     #[DataProvider('getVariableNamesStartingWithADigit')]
     public function testRouteWithVariableNameStartingWithADigit(string $name)
     {

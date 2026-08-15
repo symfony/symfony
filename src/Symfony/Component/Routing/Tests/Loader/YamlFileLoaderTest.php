@@ -100,6 +100,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals(['https'], $route->getSchemes());
         $this->assertEquals('context.getMethod() == "GET"', $route->getCondition());
         $this->assertTrue($route->getDefault('_stateless'));
+        $this->assertSame('api', $route->getDefault('_firewall'));
     }
 
     public function testLoadWithResource()

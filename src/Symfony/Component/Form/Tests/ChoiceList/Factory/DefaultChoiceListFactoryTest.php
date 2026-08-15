@@ -94,6 +94,13 @@ class DefaultChoiceListFactoryTest extends TestCase
             : new DefaultChoiceListFactoryTest_Castable('Group 2');
     }
 
+    public function getGroupAsTranslatableMessage($object)
+    {
+        return $this->obj1 === $object || $this->obj2 === $object
+            ? new TranslatableMessage('group.1', ['%param%' => 'value'])
+            : new TranslatableMessage('group.2', ['%param%' => 'value']);
+    }
+
     protected function setUp(): void
     {
         $this->obj1 = (object) ['label' => 'A', 'index' => 'w', 'value' => 'a', 'preferred' => false, 'group' => 'Group 1', 'attr' => [], 'labelTranslationParameters' => []];
@@ -577,6 +584,77 @@ class DefaultChoiceListFactoryTest extends TestCase
         );
 
         $this->assertGroupedView($view);
+    }
+
+    public function testCreateViewFlatGroupByTranslatableMessageDoesntCastItToString()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [$this->obj2, $this->obj3],
+            null, // label
+            null, // index
+            $this->getGroupAsTranslatableMessage(...)
+        );
+
+        $groups = array_values($view->choices);
+
+        $this->assertCount(2, $groups);
+        $this->assertInstanceOf(TranslatableMessage::class, $groups[0]->label);
+        $this->assertSame('group.1', $groups[0]->label->getMessage());
+        $this->assertSame(['%param%' => 'value'], $groups[0]->label->getParameters());
+        $this->assertEquals([0 => new ChoiceView($this->obj1, '0', 'A'), 1 => new ChoiceView($this->obj2, '1', 'B')], $groups[0]->choices);
+        $this->assertInstanceOf(TranslatableMessage::class, $groups[1]->label);
+        $this->assertSame('group.2', $groups[1]->label->getMessage());
+        $this->assertEquals([2 => new ChoiceView($this->obj3, '2', 'C'), 3 => new ChoiceView($this->obj4, '3', 'D')], $groups[1]->choices);
+
+        $preferredGroups = array_values($view->preferredChoices);
+
+        $this->assertCount(2, $preferredGroups);
+        $this->assertEquals([1 => new ChoiceView($this->obj2, '1', 'B')], $preferredGroups[0]->choices);
+        $this->assertEquals([2 => new ChoiceView($this->obj3, '2', 'C')], $preferredGroups[1]->choices);
+    }
+
+    public function testCreateViewFlatGroupByTranslatableInterfaceDoesntCastItToString()
+    {
+        $group = new class implements TranslatableInterface {
+            public function trans(TranslatorInterface $translator, ?string $locale = null): string
+            {
+                return 'Group 1';
+            }
+        };
+
+        $view = $this->factory->createView(
+            $this->list,
+            [],
+            null, // label
+            null, // index
+            static fn () => $group
+        );
+
+        $groups = array_values($view->choices);
+
+        $this->assertCount(1, $groups);
+        $this->assertSame($group, $groups[0]->label);
+        $this->assertCount(4, $groups[0]->choices);
+    }
+
+    public function testCreateViewFlatGroupByTranslatableMessageDoesNotCollideWithStringGroupKeys()
+    {
+        $view = $this->factory->createView(
+            $this->list,
+            [],
+            null, // label
+            null, // index
+            fn ($object) => $this->obj1 === $object ? "\0".'1' : new TranslatableMessage('group.opaque')
+        );
+
+        $groups = array_values($view->choices);
+
+        $this->assertCount(2, $groups);
+        $this->assertSame("\0".'1', $groups[0]->label);
+        $this->assertCount(1, $groups[0]->choices);
+        $this->assertInstanceOf(TranslatableMessage::class, $groups[1]->label);
+        $this->assertCount(3, $groups[1]->choices);
     }
 
     public function testCreateViewFlatGroupByAsClosure()

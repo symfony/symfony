@@ -17,6 +17,7 @@ CHANGELOG
 
  * Add option `uid_format` to `EntityType`
  * Deprecate setting an `$aliasMap` in `RegisterMappingsPass`; namespace aliases are no longer supported in Doctrine
+ * Map the `DatePoint`, `DayPoint` and `TimePoint` property types to their Doctrine types, so schema tools detect them without an explicit `type`
 
 8.0
 ---

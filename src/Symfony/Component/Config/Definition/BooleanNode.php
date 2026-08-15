@@ -29,6 +29,11 @@ class BooleanNode extends ScalarNode
         parent::__construct($name, $parent, $pathSeparator);
     }
 
+    public function isNullable(): bool
+    {
+        return $this->nullable;
+    }
+
     protected function validateType(mixed $value): void
     {
         if (!\is_bool($value)) {

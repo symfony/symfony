@@ -32,6 +32,7 @@ CHANGELOG
  * Add support for configuring JsonStreamer's `default_options`
  * Add project-scoped `flock` and `semaphore` lock store services
  * Add `createFormFlowBuilder` method to `AbstractController` and `ControllerHelper`
+ * Generate JSON schema for YAML configuration of bundles
  * Deprecate setting the `framework.profiler.collect_serializer_data` config option
  * Deprecate the `framework.http_cache.terminate_on_cache_hit` config option
  * Add support for `framework.secrets.decryption_env_var` to contain dots

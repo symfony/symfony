@@ -174,4 +174,14 @@ class ScalarNodeTest extends TestCase
             [''],
         ];
     }
+
+    public function testIsNullable()
+    {
+        $node = new ScalarNode('root');
+        $this->assertFalse($node->isNullable());
+
+        $node = new ScalarNode('root');
+        $node->addEquivalentValue(null, 'null');
+        $this->assertTrue($node->isNullable());
+    }
 }

@@ -1,0 +1,287 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Example Configuration Schema",
+    "$defs": {
+        "types": {
+            "variable": {
+                "type": [
+                    "array",
+                    "boolean",
+                    "null",
+                    "number",
+                    "object",
+                    "string"
+                ]
+            },
+            "scalar": {
+                "type": [
+                    "boolean",
+                    "null",
+                    "number",
+                    "string"
+                ]
+            },
+            "array": {
+                "type": "array"
+            },
+            "array_null": {
+                "type": [
+                    "array",
+                    "null"
+                ]
+            },
+            "object": {
+                "type": "object"
+            },
+            "object_null": {
+                "type": [
+                    "object",
+                    "null"
+                ]
+            },
+            "string": {
+                "type": "string"
+            },
+            "string_null": {
+                "type": [
+                    "string",
+                    "null"
+                ]
+            },
+            "boolean": {
+                "type": "boolean"
+            },
+            "boolean_null": {
+                "type": [
+                    "boolean",
+                    "null"
+                ]
+            },
+            "integer": {
+                "type": "integer"
+            },
+            "integer_null": {
+                "type": [
+                    "integer",
+                    "null"
+                ]
+            },
+            "number": {
+                "type": "number"
+            },
+            "number_null": {
+                "type": [
+                    "number",
+                    "null"
+                ]
+            }
+        }
+    },
+    "$ref": "#/$defs/types/object",
+    "properties": {
+        "acme_root": {
+            "$ref": "#/$defs/types/object_null",
+            "properties": {
+                "boolean": {
+                    "$ref": "#/$defs/types/boolean",
+                    "default": true
+                },
+                "scalar_empty": {
+                    "$ref": "#/$defs/types/scalar"
+                },
+                "scalar_null": {
+                    "$ref": "#/$defs/types/scalar",
+                    "default": null
+                },
+                "scalar_true": {
+                    "$ref": "#/$defs/types/scalar",
+                    "default": true
+                },
+                "scalar_false": {
+                    "$ref": "#/$defs/types/scalar",
+                    "default": false
+                },
+                "scalar_default": {
+                    "$ref": "#/$defs/types/scalar",
+                    "default": "default"
+                },
+                "scalar_array_empty": {
+                    "$ref": "#/$defs/types/scalar",
+                    "default": []
+                },
+                "scalar_array_defaults": {
+                    "$ref": "#/$defs/types/scalar",
+                    "default": [
+                        "elem1",
+                        "elem2"
+                    ]
+                },
+                "scalar_required": {
+                    "$ref": "#/$defs/types/scalar"
+                },
+                "scalar_deprecated": {
+                    "$ref": "#/$defs/types/scalar",
+                    "deprecated": true,
+                    "description": "Deprecated since vendor/package 1.1: The child node \"scalar_deprecated\" at path \"acme_root.scalar_deprecated\" is deprecated."
+                },
+                "scalar_deprecated_with_message": {
+                    "$ref": "#/$defs/types/scalar",
+                    "deprecated": true,
+                    "description": "Deprecated since vendor/package 1.1: Deprecation custom message for \"scalar_deprecated_with_message\" at \"acme_root.scalar_deprecated_with_message\""
+                },
+                "node_with_a_looong_name": {
+                    "$ref": "#/$defs/types/scalar"
+                },
+                "enum_with_default": {
+                    "enum": [
+                        "this",
+                        "that"
+                    ],
+                    "default": "this"
+                },
+                "enum": {
+                    "enum": [
+                        "this",
+                        "that",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Ccc"
+                    ]
+                },
+                "enum_with_class": {
+                    "enum": [
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\StringBackedTestEnum::Foo",
+                        "foo",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\StringBackedTestEnum::BarBaz",
+                        "bar baz",
+                        null
+                    ]
+                },
+                "unit_enum_with_class": {
+                    "enum": [
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Foo",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Bar",
+                        "!php/enum Symfony\\Component\\Config\\Tests\\Fixtures\\TestEnum::Ccc",
+                        null
+                    ]
+                },
+                "array": {
+                    "$ref": "#/$defs/types/object_null",
+                    "properties": {
+                        "child1": {
+                            "$ref": "#/$defs/types/scalar"
+                        },
+                        "child2": {
+                            "$ref": "#/$defs/types/scalar"
+                        },
+                        "child3": {
+                            "$ref": "#/$defs/types/scalar",
+                            "description": "this is a long\nmulti-line info text\nwhich should be indented",
+                            "examples": [
+                                "example setting"
+                            ]
+                        }
+                    },
+                    "additionalProperties": false,
+                    "description": "some info"
+                },
+                "scalar_prototyped": {
+                    "$ref": "#/$defs/types/array_null",
+                    "items": {
+                        "$ref": "#/$defs/types/scalar"
+                    }
+                },
+                "string_list_default_null": {
+                    "$ref": "#/$defs/types/array",
+                    "items": {
+                        "$ref": "#/$defs/types/string_null"
+                    },
+                    "default": null
+                },
+                "variable": {
+                    "$ref": "#/$defs/types/variable",
+                    "examples": [
+                        [
+                            "foo",
+                            "bar"
+                        ]
+                    ]
+                },
+                "parameters": {
+                    "$ref": "#/$defs/types/object_null",
+                    "additionalProperties": {
+                        "$ref": "#/$defs/types/scalar",
+                        "description": "Parameter name"
+                    }
+                },
+                "connections": {
+                    "$ref": "#/$defs/types/array_null",
+                    "items": {
+                        "$ref": "#/$defs/types/object_null",
+                        "properties": {
+                            "user": {
+                                "$ref": "#/$defs/types/scalar"
+                            },
+                            "pass": {
+                                "$ref": "#/$defs/types/scalar"
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                },
+                "cms_pages": {
+                    "$ref": "#/$defs/types/object_null",
+                    "additionalProperties": {
+                        "$ref": "#/$defs/types/object_null",
+                        "additionalProperties": {
+                            "$ref": "#/$defs/types/object_null",
+                            "properties": {
+                                "title": {
+                                    "$ref": "#/$defs/types/scalar"
+                                },
+                                "path": {
+                                    "$ref": "#/$defs/types/scalar"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "path"
+                            ],
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "pipou": {
+                    "$ref": "#/$defs/types/object_null",
+                    "additionalProperties": {
+                        "$ref": "#/$defs/types/array_null",
+                        "items": {
+                            "$ref": "#/$defs/types/object_null",
+                            "properties": {
+                                "didou": {
+                                    "$ref": "#/$defs/types/scalar"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "array_with_array_example_and_no_default_value": {
+                    "$ref": "#/$defs/types/object_null",
+                    "examples": [
+                        [
+                            "foo",
+                            "bar"
+                        ]
+                    ]
+                },
+                "custom_node": {
+                    "type": "null"
+                }
+            },
+            "required": [
+                "scalar_required"
+            ],
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

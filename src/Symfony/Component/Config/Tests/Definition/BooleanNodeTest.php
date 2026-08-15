@@ -93,4 +93,10 @@ class BooleanNodeTest extends TestCase
             [new \stdClass()],
         ];
     }
+
+    public function testIsNullable()
+    {
+        $this->assertFalse(new BooleanNode('root')->isNullable());
+        $this->assertTrue(new BooleanNode('root', nullable: true)->isNullable());
+    }
 }

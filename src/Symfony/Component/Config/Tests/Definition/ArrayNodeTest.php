@@ -324,4 +324,14 @@ class ArrayNodeTest extends TestCase
             ],
         ];
     }
+
+    public function testIsNullable()
+    {
+        $node = new ArrayNode('root');
+        $this->assertFalse($node->isNullable());
+
+        $node = new ArrayNode('root');
+        $node->addEquivalentValue(null, []);
+        $this->assertTrue($node->isNullable());
+    }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\MaxUlid;
 use Symfony\Component\Uid\NilUlid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUlid;
+use Symfony\Component\Uid\TimeOrderedUidInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\UuidV4;
 
@@ -350,5 +351,47 @@ class UlidTest extends TestCase
     public function testToString()
     {
         $this->assertSame('01HK77WP8T7107EZH9CNAES202', (new Ulid('01HK77WP8T7107EZH9CNAES202'))->toString());
+    }
+
+    public function testCreateBoundaries()
+    {
+        $time = new \DateTimeImmutable('2026-04-13 09:30:00.123 UTC');
+        [$min, $max] = Ulid::createBoundaries($time);
+
+        $this->assertSame('01KP32TAHV0000000000000000', (string) $min);
+        $this->assertSame('01KP32TAHVZZZZZZZZZZZZZZZZ', (string) $max);
+        $this->assertSame($time->format('Uv'), $min->getDateTime()->format('Uv'));
+
+        $inside = new Ulid(Ulid::generate($time));
+        $this->assertLessThan(0, $min->compare($inside));
+        $this->assertGreaterThan(0, $max->compare($inside));
+    }
+
+    public function testCreateBoundariesWithoutTime()
+    {
+        [$min, $max] = Ulid::createBoundaries();
+
+        $this->assertSame(substr($min, 0, 10), substr($max, 0, 10));
+        $this->assertEqualsWithDelta(time(), $min->getDateTime()->getTimestamp(), 1);
+    }
+
+    public function testCreateBoundariesOnExtendedClassReturnsStatic()
+    {
+        [$min, $max] = CustomUlid::createBoundaries();
+
+        $this->assertInstanceOf(CustomUlid::class, $min);
+        $this->assertInstanceOf(CustomUlid::class, $max);
+    }
+
+    public function testCreateBoundariesLeavesTheGeneratorClockAlone()
+    {
+        Ulid::createBoundaries(new \DateTimeImmutable('@4102444800'));
+
+        $this->assertLessThan(new \DateTimeImmutable('+1 day'), new Ulid()->getDateTime());
+    }
+
+    public function testTimeOrderedUid()
+    {
+        $this->assertInstanceOf(TimeOrderedUidInterface::class, new Ulid());
     }
 }

@@ -20,7 +20,7 @@ use Symfony\Component\Uid\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class UuidV6 extends Uuid implements TimeBasedUidInterface
+class UuidV6 extends Uuid implements TimeOrderedUidInterface
 {
     protected const TYPE = 6;
 
@@ -70,6 +70,24 @@ class UuidV6 extends Uuid implements TimeBasedUidInterface
             substr($uuid, -12, 6),
             $time
         ), '-', 8, 0));
+    }
+
+    /**
+     * Returns the lowest and highest UUIDs sharing the timestamp, for range comparisons.
+     *
+     * Every UUIDv6 created for the given clock tick of 100 nanoseconds sorts between the two bounds:
+     *
+     *     [$min, $max] = UuidV6::createBoundaries($time);
+     *     // WHERE uuid BETWEEN :min AND :max
+     *
+     * @return array{static, static}
+     */
+    public static function createBoundaries(?\DateTimeInterface $time = null): array
+    {
+        $time = BinaryUtil::dateTimeToHex($time ?? new \DateTimeImmutable());
+        $time = substr($time, 1, 8).'-'.substr($time, 9, 4).'-6'.substr($time, 13, 3);
+
+        return [static::fromString($time.'-8000-000000000000'), static::fromString($time.'-bfff-ffffffffffff')];
     }
 
     public static function generate(?\DateTimeInterface $time = null, ?Uuid $node = null): string

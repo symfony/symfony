@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `TimeOrderedUidInterface`, implemented by `Ulid`, `UuidV6` and `UuidV7`
+ * Add `Ulid::createBoundaries()`, `UuidV6::createBoundaries()` and `UuidV7::createBoundaries()` returning the lowest and highest ids sharing a timestamp
+
 8.1
 ---
 

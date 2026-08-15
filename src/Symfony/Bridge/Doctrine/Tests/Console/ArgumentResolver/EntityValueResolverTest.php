@@ -15,6 +15,7 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ArgumentResolver\Console\EntityValueResolver;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -253,6 +254,77 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
+    public function testResolveWithStripNull()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $input = new ArrayInput(['entity' => null], new InputDefinition([
+            new InputArgument('entity'),
+        ]));
+
+        $member = $this->createMember('entity', \stdClass::class, new MapEntity(mapping: ['entity'], stripNull: true), nullable: true);
+
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
+
+        $manager->expects($this->never())
+            ->method('getRepository');
+
+        $this->expectException(NearMissValueResolverException::class);
+
+        iterator_to_array($resolver->resolve('entity', $input, $member));
+    }
+
+    public function testAlreadyResolved()
+    {
+        $manager = $this->createStub(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $object = new \stdClass();
+        $input = new ArrayInput(['entity' => $object], new InputDefinition([
+            new InputArgument('entity'),
+        ]));
+
+        $member = $this->createMember('entity', \stdClass::class, new MapEntity());
+
+        $this->assertSame([], iterator_to_array($resolver->resolve('entity', $input, $member)));
+    }
+
+    #[TestWith([[12]])]
+    #[TestWith([['foo']])]
+    #[TestWith([[1, 2, 3, 4]])]
+    #[TestWith([['foo', 'bar', 'baz']])]
+    public function testResolveWithFindBy(array $commandArg)
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $input = new ArrayInput(['entity' => $commandArg], new InputDefinition([
+            new InputArgument('entity'),
+        ]));
+
+        $expectedResult = array_fill(0, \count($commandArg), new \stdClass());
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->with(['entity' => $commandArg], null, null, null)
+            ->willReturn($expectedResult);
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $member = $this->createMember('entity', 'array', new MapEntity(class: \stdClass::class, mapping: ['entity']));
+
+        $this->assertSame([$expectedResult], iterator_to_array($resolver->resolve('entity', $input, $member)));
+    }
+
     public function testResolveWithClosure()
     {
         $manager = $this->createMock(ObjectManager::class);
@@ -310,45 +382,6 @@ class EntityValueResolverTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         iterator_to_array($resolver->resolve('entity', $input, $member));
-    }
-
-    public function testResolveWithStripNull()
-    {
-        $manager = $this->createMock(ObjectManager::class);
-        $registry = $this->createRegistry($manager);
-        $resolver = new EntityValueResolver($registry);
-
-        $input = new ArrayInput(['entity' => null], new InputDefinition([
-            new InputArgument('entity'),
-        ]));
-
-        $member = $this->createMember('entity', \stdClass::class, new MapEntity(mapping: ['entity'], stripNull: true), nullable: true);
-
-        $manager->expects($this->never())
-            ->method('getClassMetadata');
-
-        $manager->expects($this->never())
-            ->method('getRepository');
-
-        $this->expectException(NearMissValueResolverException::class);
-
-        iterator_to_array($resolver->resolve('entity', $input, $member));
-    }
-
-    public function testAlreadyResolved()
-    {
-        $manager = $this->createStub(ObjectManager::class);
-        $registry = $this->createRegistry($manager);
-        $resolver = new EntityValueResolver($registry);
-
-        $object = new \stdClass();
-        $input = new ArrayInput(['entity' => $object], new InputDefinition([
-            new InputArgument('entity'),
-        ]));
-
-        $member = $this->createMember('entity', \stdClass::class, new MapEntity());
-
-        $this->assertSame([], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
     public function testResolveByIdFromOption()
@@ -475,6 +508,9 @@ class EntityValueResolverTest extends TestCase
     {
         $parts = [];
 
+        if (null !== $entity->class) {
+            $parts[] = \sprintf('class: %s', var_export($entity->class, true));
+        }
         if (null !== $entity->id) {
             $parts[] = \sprintf('id: %s', var_export($entity->id, true));
         }

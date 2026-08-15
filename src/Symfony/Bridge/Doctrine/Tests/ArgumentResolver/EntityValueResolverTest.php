@@ -590,6 +590,52 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
+    public function testResolveWithFindBy()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('arg1', 1);
+
+        $argument = $this->createArgument('array', new MapEntity(class: \stdClass::class, mapping: ['arg1' => 'arg1']), 'arg1');
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->with(['arg1' => 1], null, null, null)
+            ->willReturn([$object = new \stdClass()]);
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with('stdClass')
+            ->willReturn($repository);
+
+        $this->assertSame([[$object]], $resolver->resolve($request, $argument));
+    }
+
+    public function testArrayArgumentSkipsTheIdentifierLookup()
+    {
+        $manager = $this->createStub(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        // without a mapping, a bare "id" route attribute wins the identifier lookup and
+        // would resolve a single entity into the array-typed argument
+        $request = new Request();
+        $request->attributes->set('id', 7);
+
+        $argument = $this->createArgument('array', new MapEntity(class: \stdClass::class), 'posts');
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->never())->method('find');
+        $manager->method('getRepository')->willReturn($repository);
+
+        $this->expectException(NearMissValueResolverException::class);
+        $resolver->resolve($request, $argument);
+    }
+
     private function createArgument(?string $class = null, ?MapEntity $entity = null, string $name = 'arg', bool $isNullable = false): ArgumentMetadata
     {
         return new ArgumentMetadata($name, $class ?? \stdClass::class, false, false, null, $isNullable, $entity ? [$entity] : []);

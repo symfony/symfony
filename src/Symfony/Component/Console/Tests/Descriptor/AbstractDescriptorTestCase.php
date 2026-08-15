@@ -106,7 +106,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     protected function assertDescription($expectedDescription, $describedObject, array $options = [])
     {
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
-        $this->getDescriptor()->describe($output, $describedObject, $options + ['raw_output' => true]);
+        $this->getDescriptor()->describe($output, $describedObject, $options + ['raw_output' => true, 'terminal_width' => \PHP_INT_MAX]);
         $this->assertEquals($this->normalizeOutput($expectedDescription), $this->normalizeOutput($output->fetch()));
     }
 

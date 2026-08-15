@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by herman-aka-wouter at 2026-05-06T09:47:40Z
+
+Rebased onto `8.1` and addressed the review:
+
+- `$context` moved to the **last** constructor argument of `NovuOptions` (after `$options`) so existing positional callers keep working.
+- PR base retargeted to `8.1`; CHANGELOG entry moved under an `8.1` section.
+- README example and tests updated to the new positional order (`$overrides, $options, $context`).
+
+See inline replies for the rationale on removing overrides from `NovuSubscriberRecipient`.
+
+---------------------------------------------------------------------------
+
+by herman-aka-wouter at 2026-05-21T12:14:25Z
+
+@nicolas-grekas any chance to look at this?

@@ -145,7 +145,7 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals($expected, $nameConverter->denormalize($propertyName, OtherSerializedNameDummy::class, null, $context));
     }
 
-    #[DataProvider('fallbackAttributeAndContextProvider')]
+    #[DataProvider('denormalizeFallbackAttributeAndContextProvider')]
     public function testDenormalizeWithGroupsAndFallback(string $expected, string $propertyName, array $context = [])
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -198,6 +198,76 @@ final class MetadataAwareNameConverterTest extends TestCase
             ['puux', 'puxi', ['groups' => ['i']]],
             ['puux', 'puxa', ['groups' => ['a']]],
             ['puux', 'PUUX', ['groups' => ['z']]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => [], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+        ];
+    }
+
+    public static function denormalizeFallbackAttributeAndContextProvider(): array
+    {
+        return [
+            ['buz', 'BUZ', ['groups' => ['a']]],
+            ['buzForExport', 'buz', ['groups' => ['b']]],
+            ['buz', 'BUZ', ['groups' => 'a']],
+            ['buzForExport', 'buz', ['groups' => 'b']],
+            ['buz', 'BUZ', ['groups' => ['c']]],
+            ['buz', 'BUZ', []],
+            ['buzForExport', 'buz', ['groups' => ['*']]],
+            ['duux', 'duxi', ['groups' => ['*']]],
+            ['duux', 'duxa', ['groups' => ['a']]],
+            ['puux', 'PUUX', []],
+            ['puux', 'PUUX', ['groups' => ['*']]],
+            ['puux', 'puxi', ['groups' => ['i']]],
+            ['puux', 'puxa', ['groups' => ['a']]],
+            ['puux', 'PUUX', ['groups' => ['z']]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => [], 'enable_default_groups' => true]],
+            ['customgroup', 'customGroup', ['groups' => [], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['*'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+            ['customgroup', 'customGroup', ['groups' => ['Default'], 'enable_default_groups' => true]],
+
+            ['defaultGroup', 'renamedDefaultGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['classGroup', 'renamedClassGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['noGroup', 'renamedNoGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+            ['customgroup', 'customGroup', ['groups' => ['OtherSerializedNameDummy'], 'enable_default_groups' => true]],
+
+            ['defaultgroup', 'defaultGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['classgroup', 'classGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['nogroup', 'noGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
+            ['customGroup', 'renamedCustomGroup', ['groups' => ['custom'], 'enable_default_groups' => true]],
         ];
     }
 
@@ -210,6 +280,18 @@ final class MetadataAwareNameConverterTest extends TestCase
         $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['a']]));
         $this->assertEquals('buzForExport', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class, null, ['groups' => ['b']]));
         $this->assertEquals('buz', $nameConverter->denormalize('buz', OtherSerializedNameDummy::class));
+    }
+
+    public function testDenormalizeUngroupedSerializedNameWithStarGroup()
+    {
+        // BC: with the default-groups flag OFF, a property carrying SerializedName
+        // but no #[Groups] must NOT be resolved when groups=['*']. Pre-feature, the
+        // condition `$contextGroups && !$metadataGroups` skipped it; the rewrite
+        // must preserve that.
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+
+        $this->assertEquals('renamedNoGroup', $nameConverter->denormalize('renamedNoGroup', OtherSerializedNameDummy::class, null, ['groups' => ['*']]));
     }
 
     public function testDenormalizeWithNestedPathAndName()

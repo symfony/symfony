@@ -227,6 +227,8 @@ class PropertyNormalizerTest extends TestCase
                 'coopTilleuls' => 'coop',
                 'fooBar' => null,
                 'symfony' => null,
+                'default' => null,
+                'className' => null,
                 'baz' => 'baz',
             ],
             $this->normalizer->normalize($group, 'any')

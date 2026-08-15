@@ -38,11 +38,36 @@ class SerializerExtractor implements PropertyListExtractorInterface
             return null;
         }
 
+        // Read the key as a literal rather than via AbstractNormalizer::ENABLE_DEFAULT_GROUPS, as
+        // PropertyInfo is compatible with older Serializer versions that lack the constant.
+        $enableDefaultGroups = $context['enable_default_groups'] ?? false;
+
+        $groups = $context['serializer_groups'] ?? [];
+        $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
+
+        $groupsHasBeenDefined = $enableDefaultGroups
+            ? [] !== $groups
+            : null !== ($context['serializer_groups'] ?? null);
+
+        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
+
+        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            $groups = array_merge($groups, $defaultGroups);
+        }
+
         $properties = [];
         $serializerClassMetadata = $this->classMetadataFactory->getMetadataFor($class);
 
         foreach ($serializerClassMetadata->getAttributesMetadata() as $serializerAttributeMetadata) {
-            if (!$serializerAttributeMetadata->isIgnored() && (null === $context['serializer_groups'] || \in_array('*', $context['serializer_groups'], true) || array_intersect($serializerAttributeMetadata->getGroups(), $context['serializer_groups']))) {
+            if ($serializerAttributeMetadata->isIgnored()) {
+                continue;
+            }
+
+            if (!($attributeGroups = $serializerAttributeMetadata->getGroups()) && $enableDefaultGroups && !$customGroupsHasBeenDefined) {
+                $attributeGroups = $defaultGroups;
+            }
+
+            if (!$groupsHasBeenDefined || \in_array('*', $groups, true) || array_intersect($attributeGroups, $groups)) {
                 $properties[] = $serializerAttributeMetadata->getName();
             }
         }

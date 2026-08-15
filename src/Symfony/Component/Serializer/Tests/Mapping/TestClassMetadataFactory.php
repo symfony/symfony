@@ -47,6 +47,14 @@ class TestClassMetadataFactory
         $symfony = new AttributeMetadata('symfony');
         $expected->addAttributeMetadata($symfony);
 
+        $default = new AttributeMetadata('default');
+        $default->addGroup('Default');
+        $expected->addAttributeMetadata($default);
+
+        $className = new AttributeMetadata('className');
+        $className->addGroup('GroupDummy');
+        $expected->addAttributeMetadata($className);
+
         if ($withParent) {
             $kevin = new AttributeMetadata('kevin');
             $kevin->addGroup('a');

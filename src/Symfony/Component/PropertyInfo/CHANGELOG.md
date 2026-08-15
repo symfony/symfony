@@ -12,6 +12,7 @@ CHANGELOG
 ---
 
  * Add support for property hook settable types in `ReflectionExtractor`
+ * Support `enable_default_groups` context option in `SerializerExtractor`
 
 7.3
 ---

@@ -148,6 +148,11 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
     public const SKIP_INVALID_ATTRIBUTES = 'skip_invalid_attributes';
 
     /**
+     * Add 'Default' and class-short-name groups when no custom group is specified.
+     */
+    public const ENABLE_DEFAULT_GROUPS = 'enable_default_groups';
+
+    /**
      * @internal
      */
     protected const CIRCULAR_REFERENCE_LIMIT_COUNTERS = 'circular_reference_limit_counters';
@@ -241,24 +246,47 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             return false;
         }
 
+        $classMetadata = $this->classMetadataFactory->getMetadataFor($classOrObject);
+        $class = $classMetadata->getName();
+
+        $enableDefaultGroups = $context[self::ENABLE_DEFAULT_GROUPS] ?? $this->defaultContext[self::ENABLE_DEFAULT_GROUPS] ?? false;
+
         $groups = $this->getGroups($context);
         $ignoredGroups = $this->getIgnoredGroups($context);
+        $defaultGroups = ['Default', (false !== $nsSep = strrpos($class, '\\')) ? substr($class, $nsSep + 1) : $class];
+
+        // Capture before the merge below, so it reflects the user's intent rather than
+        // the post-merge state.
+        $groupsHasBeenDefined = [] !== $groups;
+        $customGroupsHasBeenDefined = (bool) array_diff($groups, $defaultGroups);
+
+        if ($enableDefaultGroups && !$customGroupsHasBeenDefined) {
+            $groups = array_merge($groups, $defaultGroups);
+        }
 
         $allowedAttributes = [];
         $ignoreUsed = false;
 
-        foreach ($this->classMetadataFactory->getMetadataFor($classOrObject)->getAttributesMetadata() as $attributeMetadata) {
+        foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
             if ($ignore = $attributeMetadata->isIgnored()) {
                 $ignoreUsed = true;
             }
 
-            // If you update this check, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
-            if (
-                !$ignore
-                && (!$groups || \in_array('*', $groups, true) || array_intersect($attributeMetadata->getGroups(), $groups))
-                && (!$ignoredGroups || !array_intersect($attributeMetadata->getGroups(), $ignoredGroups))
-                && $this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)
-            ) {
+            // If you update these checks, update accordingly the one in Symfony\Component\PropertyInfo\Extractor\SerializerExtractor::getProperties()
+            if ($ignore || !$this->isAllowedAttribute($classOrObject, $name = $attributeMetadata->getName(), null, $context)) {
+                continue;
+            }
+
+            if (!($attributeGroups = $attributeMetadata->getGroups()) && $enableDefaultGroups && !$customGroupsHasBeenDefined) {
+                $attributeGroups = $defaultGroups;
+            }
+
+            // the synthesized groups count for exclusion too: ignoring "Default" excludes ungrouped attributes
+            if ($ignoredGroups && array_intersect($attributeGroups, $ignoredGroups)) {
+                continue;
+            }
+
+            if (!$groupsHasBeenDefined || \in_array('*', $groups, true) || array_intersect($attributeGroups, $groups)) {
                 $allowedAttributes[] = $attributesAsString ? $name : $attributeMetadata;
             }
         }

@@ -28,8 +28,6 @@ class NovuSubscriberRecipient implements RecipientInterface
      *                bcc?: string[]
      *            }|null
      *        } $overrides
-     *
-     * @see https://docs.novu.co/channels/email/#sending-email-overrides
      */
     public function __construct(
         private readonly string $subscriberId,
@@ -41,6 +39,9 @@ class NovuSubscriberRecipient implements RecipientInterface
         private readonly ?string $locale = null,
         private readonly array $overrides = [],
     ) {
+        if ([] !== $overrides) {
+            trigger_deprecation('symfony/novu-notifier', '8.2', 'Passing "$overrides" to "%s()" is deprecated, pass them to "%s" instead.', __METHOD__, NovuOptions::class);
+        }
     }
 
     public function getSubscriberId(): string
@@ -78,8 +79,13 @@ class NovuSubscriberRecipient implements RecipientInterface
         return $this->locale;
     }
 
+    /**
+     * @deprecated since Symfony 8.2, pass overrides to NovuOptions instead
+     */
     public function getOverrides(): array
     {
+        trigger_deprecation('symfony/novu-notifier', '8.2', 'The "%s()" method is deprecated, pass overrides to "%s" instead.', __METHOD__, NovuOptions::class);
+
         return $this->overrides;
     }
 }

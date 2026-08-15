@@ -33,6 +33,10 @@ class NovuOptionsTest extends TestCase
                 ],
             ],
             [],
+            [
+                'tenant' => 'tenant-id',
+                'app' => 'app-id',
+            ],
         );
 
         $this->assertSame(
@@ -48,6 +52,10 @@ class NovuOptionsTest extends TestCase
                         'from' => 'no-reply@example.com',
                         'senderName' => 'No-Reply',
                     ],
+                ],
+                'context' => [
+                    'tenant' => 'tenant-id',
+                    'app' => 'app-id',
                 ],
             ],
             $options->toArray()

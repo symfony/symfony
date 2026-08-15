@@ -67,6 +67,7 @@ class NovuTransport extends AbstractTransport
             ],
             'payload' => json_decode($message->getContent()),
             'overrides' => $options['overrides'] ?? [],
+            'context' => $options['context'] ?? [],
         ];
 
         $endpoint = \sprintf('https://%s/v1/events/trigger', $this->getEndpoint());

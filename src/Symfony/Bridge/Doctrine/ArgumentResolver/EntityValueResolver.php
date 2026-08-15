@@ -69,8 +69,8 @@ final class EntityValueResolver implements ValueResolverInterface
             if (null === $object = $this->findViaExpression($this->expressionLanguage, $manager, $options, $variables)) {
                 $message = \sprintf(' The expression "%s" returned null.', $options->expr);
             }
-        // find by identifier?
-        } elseif (false === $object = $this->findById($manager, $options, $this->getIdentifier($request, $options, $argument))) {
+        // find by identifier? an array argument maps to a list, so the single-entity identifier lookup does not apply
+        } elseif ('array' === $argument->getType() || false === $object = $this->findById($manager, $options, $this->getIdentifier($request, $options, $argument))) {
             // find by criteria
             if (!$criteria = $this->getCriteria($request, $options, $manager, $argument)) {
                 if (!class_exists(NearMissValueResolverException::class)) {
@@ -79,7 +79,12 @@ final class EntityValueResolver implements ValueResolverInterface
 
                 throw new NearMissValueResolverException(\sprintf('Cannot find mapping for "%s": declare one using either the #[MapEntity] attribute or mapped route parameters.', $options->class));
             }
-            $object = $this->findOneByCriteria($manager, $options, $criteria);
+
+            if ('array' === $argument->getType()) {
+                $object = $this->findByCriteria($manager, $options, $criteria);
+            } else {
+                $object = $this->findOneByCriteria($manager, $options, $criteria);
+            }
         }
 
         if (null === $object && !$argument->isNullable()) {

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T20:43:00Z
+
+Thanks @kira0269, this held up well under review: I probed the base failure, the group merging, the parameter-sensitive equality and the BC claim about string keys, and every one checked out. What I changed while rebasing on current 8.2: resolved both CHANGELOG conflicts, and hardened the opaque key generation. `"\\0".count($views)` could collide with a string group label that itself starts with a NUL byte, which silently merged unrelated groups; the key now probes for a free slot and a test pins that case. I also appended a "For the docs" section to the description for the future symfony-docs PR.

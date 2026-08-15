@@ -1,0 +1,35 @@
+{
+    "name": "symfony/mongodb-messenger",
+    "type": "symfony-messenger-bridge",
+    "description": "Symfony MongoDB Messenger Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alessandro Lai",
+            "email": "alessandro.lai85@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "ext-mongodb": "^1.21|^2.0",
+        "mongodb/mongodb": "^1.21|^2.0",
+        "psr/clock": "^1.0",
+        "symfony/messenger": "^8.2"
+    },
+    "require-dev": {
+        "symfony/clock": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Messenger\\Bridge\\MongoDb\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

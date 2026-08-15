@@ -2449,6 +2449,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('messenger.transport.beanstalkd.factory')->addTag('messenger.transport_factory');
         }
 
+        if (ContainerBuilder::willBeAvailable('symfony/mongodb-messenger', MessengerBridge\MongoDb\Transport\MongoDbTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+            $container->getDefinition('messenger.transport.mongodb.factory')->addTag('messenger.transport_factory');
+        }
+
         if ($config['stop_worker_on_signals'] && $this->hasConsole()) {
             $container->getDefinition('console.command.messenger_consume_messages')
                 ->replaceArgument(8, $config['stop_worker_on_signals']);
@@ -2531,6 +2535,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('messenger.transport.redis.factory');
             $container->removeDefinition('messenger.transport.sqs.factory');
             $container->removeDefinition('messenger.transport.beanstalkd.factory');
+            $container->removeDefinition('messenger.transport.mongodb.factory');
             $container->removeAlias(SerializerInterface::class);
         } else {
             $container->getDefinition('messenger.transport.symfony_serializer')

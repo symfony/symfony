@@ -16,14 +16,14 @@ use MongoDB\Driver\Manager;
 /*
  * Stubs for the mongodb/mongodb library version ~1.16
  */
-if (!class_exists(Client::class)) {
+if (!class_exists(Client::class, \extension_loaded('mongodb'))) {
     abstract class Client
     {
         abstract public function getManager(): Manager;
     }
 }
 
-if (!class_exists(Database::class)) {
+if (!class_exists(Database::class, \extension_loaded('mongodb'))) {
     abstract class Database
     {
         abstract public function getManager(): Manager;
@@ -32,7 +32,7 @@ if (!class_exists(Database::class)) {
     }
 }
 
-if (!class_exists(Collection::class)) {
+if (!class_exists(Collection::class, \extension_loaded('mongodb'))) {
     abstract class Collection
     {
         abstract public function getManager(): Manager;

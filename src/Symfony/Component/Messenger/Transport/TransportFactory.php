@@ -51,6 +51,8 @@ class TransportFactory implements TransportFactoryInterface
             $packageSuggestion = ' Run "composer require symfony/amazon-sqs-messenger" to install Amazon SQS transport.';
         } elseif (str_starts_with($dsn, 'beanstalkd://')) {
             $packageSuggestion = ' Run "composer require symfony/beanstalkd-messenger" to install Beanstalkd transport.';
+        } elseif (str_starts_with($dsn, 'mongodb://') || str_starts_with($dsn, 'mongodb+srv://')) {
+            $packageSuggestion = ' Run "composer require symfony/mongodb-messenger" to install MongoDB transport.';
         }
 
         if ($dsn = $this->santitizeDsn($dsn)) {

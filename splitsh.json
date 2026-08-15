@@ -71,6 +71,7 @@
         "amqp-messenger": "src/Symfony/Component/Messenger/Bridge/Amqp",
         "beanstalkd-messenger": "src/Symfony/Component/Messenger/Bridge/Beanstalkd",
         "doctrine-messenger": "src/Symfony/Component/Messenger/Bridge/Doctrine",
+        "mongodb-messenger": "src/Symfony/Component/Messenger/Bridge/MongoDb",
         "redis-messenger": "src/Symfony/Component/Messenger/Bridge/Redis",
         "mime": "src/Symfony/Component/Mime",
         "notifier": {

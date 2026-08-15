@@ -82,6 +82,7 @@ use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
+use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -1089,6 +1090,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         if (class_exists(BeanstalkdTransportFactory::class)) {
             $expectedFactories[] = 'messenger.transport.beanstalkd.factory';
+        }
+
+        if (class_exists(MongoDbTransportFactory::class)) {
+            $expectedFactories[] = 'messenger.transport.mongodb.factory';
         }
 
         $this->assertTrue($container->hasDefinition('messenger.receiver_locator'));

@@ -21,7 +21,7 @@ jobs:
     name: Unit Tests
 
     env:
-      extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis,relay,zstd
+      extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,mongodb,redis,relay,zstd
 
     strategy:
       matrix:

@@ -12,7 +12,16 @@
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MigratingSessionHandler;
+
+abstract class ClearableSessionHandlerAndTimestamp implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface, ClearableSessionHandlerInterface
+{
+}
+
+abstract class NonClearableSessionHandlerWithTimestamp implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+{
+}
 
 class MigratingSessionHandlerTest extends TestCase
 {
@@ -195,5 +204,39 @@ class MigratingSessionHandlerTest extends TestCase
         $result = $dualHandler->updateTimestamp($sessionId, $data);
 
         $this->assertTrue($result);
+    }
+
+    public function testClearCallsBothHandlersWhenBothAreClearable()
+    {
+        $currentHandler = $this->createMock(ClearableSessionHandlerAndTimestamp::class);
+        $currentHandler->expects($this->once())->method('clear');
+
+        $writeOnlyHandler = $this->createMock(ClearableSessionHandlerAndTimestamp::class);
+        $writeOnlyHandler->expects($this->once())->method('clear');
+
+        $dualHandler = new MigratingSessionHandler($currentHandler, $writeOnlyHandler);
+        $dualHandler->clear();
+    }
+
+    public function testClearCallsOnlyCurrentHandlerWhenWriteOnlyHandlerNotClearable()
+    {
+        $currentHandler = $this->createMock(ClearableSessionHandlerAndTimestamp::class);
+        $currentHandler->expects($this->once())->method('clear');
+
+        $writeOnlyHandler = $this->createStub(NonClearableSessionHandlerWithTimestamp::class);
+
+        $dualHandler = new MigratingSessionHandler($currentHandler, $writeOnlyHandler);
+        $dualHandler->clear();
+    }
+
+    public function testClearThrowsWhenCurrentHandlerNotClearable()
+    {
+        $currentHandler = $this->createStub(NonClearableSessionHandlerWithTimestamp::class);
+        $writeOnlyHandler = $this->createStub(NonClearableSessionHandlerWithTimestamp::class);
+
+        $dualHandler = new MigratingSessionHandler($currentHandler, $writeOnlyHandler);
+
+        $this->expectException(\LogicException::class);
+        $dualHandler->clear();
     }
 }

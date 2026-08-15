@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\FrameworkBundle\Command\SessionClearCommand;
 use Symfony\Component\HttpFoundation\Session\SessionFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
@@ -109,5 +110,11 @@ return static function (ContainerConfigurator $container) {
                 service('session.marshalling_handler.inner'),
                 service('session.marshaller'),
             ])
+
+        ->set('console.command.session_clear', SessionClearCommand::class)
+            ->args([
+                service('session.handler'),
+            ])
+            ->tag('console.command')
     ;
 };

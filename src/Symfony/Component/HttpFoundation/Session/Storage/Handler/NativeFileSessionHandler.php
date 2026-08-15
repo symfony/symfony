@@ -16,8 +16,11 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * @author Drak <drak@zikula.org>
  */
-class NativeFileSessionHandler extends \SessionHandler
+class NativeFileSessionHandler extends \SessionHandler implements ClearableSessionHandlerInterface
 {
+    // the prefix is hardcoded by PHP's files save handler; session.name only renames the cookie
+    private const SESSION_FILE_PREFIX = 'sess_';
+
     /**
      * @param string|null $savePath Path of directory to save session files
      *                              Default null will leave setting as defined by PHP.
@@ -50,6 +53,21 @@ class NativeFileSessionHandler extends \SessionHandler
         }
         if ('files' !== \ini_get('session.save_handler')) {
             ini_set('session.save_handler', 'files');
+        }
+    }
+
+    public function clear(): void
+    {
+        $savePath = \ini_get('session.save_path');
+        if (str_contains($savePath, ';')) {
+            $savePath = ltrim(strrchr($savePath, ';'), ';');
+        }
+
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($savePath, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::LEAVES_ONLY);
+        foreach ($files as $file) {
+            if (str_starts_with($file->getFilename(), self::SESSION_FILE_PREFIX)) {
+                unlink($file->getRealPath());
+            }
         }
     }
 }

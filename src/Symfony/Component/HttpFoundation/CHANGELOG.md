@@ -16,6 +16,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add `ClearableSessionHandlerInterface` for clearing all session data
  * Add `BinaryFileResponse::shouldDeleteFileAfterSend()`
  * Deprecate setting public properties of `Request` and `Response` objects directly; use setters or constructor arguments instead
  * Add `SessionHasFlashMessage` test constraint

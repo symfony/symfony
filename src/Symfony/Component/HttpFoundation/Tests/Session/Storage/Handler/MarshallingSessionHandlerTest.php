@@ -11,11 +11,17 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionHandler;
+
+abstract class ClearableAbstractSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
+{
+}
 
 /**
  * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
@@ -117,5 +123,25 @@ class MarshallingSessionHandlerTest extends TestCase
             ->with('session_id', 'data')->willReturn(true);
 
         $marshallingSessionHandler->updateTimestamp('session_id', 'data');
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testClearForwardsToInnerHandler()
+    {
+        $clearableHandler = $this->createMock(ClearableAbstractSessionHandler::class);
+        $clearableHandler->expects($this->once())->method('clear');
+        $marshallingSessionHandler = new MarshallingSessionHandler($clearableHandler, $this->createStub(MarshallerInterface::class));
+
+        $marshallingSessionHandler->clear();
+    }
+
+    #[AllowMockObjectsWithoutExpectations]
+    public function testClearThrowsWhenInnerHandlerNotClearable()
+    {
+        $nonClearableHandler = $this->createStub(AbstractSessionHandler::class);
+        $marshallingSessionHandler = new MarshallingSessionHandler($nonClearableHandler, $this->createStub(MarshallerInterface::class));
+
+        $this->expectException(\LogicException::class);
+        $marshallingSessionHandler->clear();
     }
 }

@@ -47,7 +47,7 @@ use Doctrine\DBAL\Types\Types;
  * @author Michael Williams <michael.williams@funsational.com>
  * @author Tobias Schultze <http://tobion.de>
  */
-class PdoSessionHandler extends AbstractSessionHandler
+class PdoSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
 {
     /**
      * No locking is done. This means sessions are prone to loss of data due to
@@ -976,6 +976,11 @@ class PdoSessionHandler extends AbstractSessionHandler
     /**
      * Return a PDO instance.
      */
+    public function clear(): void
+    {
+        $this->getConnection()->exec("DELETE FROM $this->table");
+    }
+
     protected function getConnection(): \PDO
     {
         if (!isset($this->pdo)) {

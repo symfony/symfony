@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * @author Drak <drak@zikula.org>
  */
-class NullSessionHandler extends AbstractSessionHandler
+class NullSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
 {
     public function close(): bool
     {
@@ -51,5 +51,9 @@ class NullSessionHandler extends AbstractSessionHandler
     public function gc(int $maxlifetime): int|false
     {
         return 0;
+    }
+
+    public function clear(): void
+    {
     }
 }

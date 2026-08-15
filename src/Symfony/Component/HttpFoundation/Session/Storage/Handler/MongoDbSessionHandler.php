@@ -26,7 +26,7 @@ use MongoDB\Driver\Query;
  *
  * @see https://php.net/mongodb
  */
-class MongoDbSessionHandler extends AbstractSessionHandler
+class MongoDbSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
 {
     private Manager $manager;
     private string $namespace;
@@ -177,6 +177,13 @@ class MongoDbSessionHandler extends AbstractSessionHandler
 
         // Not found
         return '';
+    }
+
+    public function clear(): void
+    {
+        $write = new BulkWrite();
+        $write->delete([]);
+        $this->manager->executeBulkWrite($this->namespace, $write);
     }
 
     private function getUTCDateTime(int $additionalSeconds = 0): UTCDateTime

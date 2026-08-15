@@ -16,7 +16,7 @@ namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class StrictSessionHandler extends AbstractSessionHandler
+class StrictSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
 {
     private bool $doDestroy;
 
@@ -83,5 +83,16 @@ class StrictSessionHandler extends AbstractSessionHandler
     public function gc(int $maxlifetime): int|false
     {
         return $this->handler->gc($maxlifetime);
+    }
+
+    public function clear(): void
+    {
+        if ($this->handler instanceof ClearableSessionHandlerInterface) {
+            $this->handler->clear();
+
+            return;
+        }
+
+        throw new \LogicException(\sprintf('The session handler "%s" does not support clearing all sessions.', get_debug_type($this->handler)));
     }
 }

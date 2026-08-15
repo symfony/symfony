@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -447,6 +448,17 @@ class JsonDescriptor extends Descriptor
 
         if ($value instanceof AbstractArgument) {
             return ['type' => 'abstract', 'text' => $value->getText()];
+        }
+
+        if ($value instanceof LazyProxyArgument) {
+            [$reference, $interfaces] = $value->getValues();
+
+            $data = ['type' => 'lazy_proxy', 'id' => (string) $reference];
+            if ($interfaces) {
+                $data['interfaces'] = $interfaces;
+            }
+
+            return $data;
         }
 
         if ($value instanceof ArgumentInterface) {

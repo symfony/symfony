@@ -2343,6 +2343,54 @@ class PhpDumperTest extends TestCase
         $this->assertSame($container->get('foo'), $bar->foo->initializeLazyObject());
     }
 
+    public function testLazyProxyArgumentInServiceLocator()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic(true);
+        $container->register('bar', 'stdClass')
+            ->setPublic(true)
+            ->setProperty('locator', new ServiceLocatorArgument(['foo' => new LazyProxyArgument(new Reference('foo'))]));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        $dump = $dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Lazy_Proxy_Argument_In_Service_Locator']);
+
+        $this->assertStringContainsString("'foo' => ['privates', '.lazy.foo.", $dump, 'The locator builds the proxy on demand, not upfront');
+
+        eval('?>'.$dump);
+
+        $container = new \Symfony_DI_PhpDumper_Test_Lazy_Proxy_Argument_In_Service_Locator();
+
+        $locator = $container->get('bar')->locator;
+
+        $foo = $locator->get('foo');
+        $r = new \ReflectionClass(Foo::class);
+        $this->assertTrue($r->isUninitializedLazyObject($foo));
+        $this->assertSame($container->get('foo'), $r->initializeLazyObject($foo));
+    }
+
+    public function testUnresolvedLazyProxyArgumentCannotBeDumped()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', Foo::class)
+            ->setPublic(true);
+        $container->register('bar', LazyProxyArgumentConsumer::class)
+            ->setPublic(true)
+            ->addArgument(new LazyProxyArgument(new Reference('foo')));
+        $container->getCompilerPassConfig()->setOptimizationPasses([]);
+        $container->getCompilerPassConfig()->setRemovingPasses([]);
+        $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Cannot dump an unresolved lazy proxy argument for service "foo"; run the "ResolveLazyProxyPass" compiler pass first.');
+
+        $dumper->dump();
+    }
+
     public function testCallableAdapterConsumer()
     {
         $container = new ContainerBuilder();

@@ -16,6 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -310,6 +311,33 @@ class XmlDumper extends Dumper
                 }
                 $envExpr = $this->container->resolveEnvPlaceholders($value->getValue());
                 yield \sprintf('<%s%s>%s</%1$s>', $type, $xmlAttr, $this->encode($envExpr, 0));
+
+                continue;
+            }
+
+            if ($value instanceof LazyProxyArgument) {
+                [$reference, $interfaces] = $value->getValues();
+
+                $xmlAttr .= \sprintf(' type="lazy_proxy" id="%s"', $this->encode((string) $reference));
+                $xmlAttr .= match ($reference->getInvalidBehavior()) {
+                    ContainerInterface::NULL_ON_INVALID_REFERENCE => ' on-invalid="null"',
+                    ContainerInterface::IGNORE_ON_INVALID_REFERENCE => ' on-invalid="ignore"',
+                    ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE => ' on-invalid="ignore_uninitialized"',
+                    default => '',
+                };
+                if (1 === \count($interfaces)) {
+                    $xmlAttr .= \sprintf(' interface="%s"', $this->encode($interfaces[0]));
+                }
+
+                if (1 < \count($interfaces)) {
+                    yield \sprintf('<%s%s>', $type, $xmlAttr);
+                    foreach ($interfaces as $interface) {
+                        yield \sprintf('  <interface>%s</interface>', $this->encode($interface, 0));
+                    }
+                    yield \sprintf('</%s>', $type);
+                } else {
+                    yield \sprintf('<%s%s/>', $type, $xmlAttr);
+                }
 
                 continue;
             }

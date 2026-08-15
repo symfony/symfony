@@ -71,11 +71,27 @@
                 {
                     "type": "service",
                     "id": ".definition_2"
+                },
+                {
+                    "type": "lazy_proxy",
+                    "id": ".definition_2"
                 }
             ],
             {
                 "type": "abstract",
                 "text": "placeholder"
+            },
+            {
+                "type": "lazy_proxy",
+                "id": ".definition_2"
+            },
+            {
+                "type": "lazy_proxy",
+                "id": ".definition_2",
+                "interfaces": [
+                    "Full\\Qualified\\Interface1",
+                    "Full\\Qualified\\Interface2"
+                ]
             }
         ],
         "file": null,
@@ -83,7 +99,7 @@
         "factory_method": "get",
         "tags": [],
         "usages": [
-          "alias_1"
+            "alias_1"
         ]
     }
 ]

@@ -64,11 +64,27 @@
                     {
                         "type": "service",
                         "id": ".definition_2"
+                    },
+                    {
+                        "type": "lazy_proxy",
+                        "id": ".definition_2"
                     }
                 ],
                 {
                     "type": "abstract",
                     "text": "placeholder"
+                },
+                {
+                    "type": "lazy_proxy",
+                    "id": ".definition_2"
+                },
+                {
+                    "type": "lazy_proxy",
+                    "id": ".definition_2",
+                    "interfaces": [
+                        "Full\\Qualified\\Interface1",
+                        "Full\\Qualified\\Interface2"
+                    ]
                 }
             ],
             "file": null,

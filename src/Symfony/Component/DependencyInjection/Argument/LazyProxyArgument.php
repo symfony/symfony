@@ -25,6 +25,7 @@ class LazyProxyArgument implements ArgumentInterface
 
     private Reference $service;
     private array $interfaces;
+    private ?Reference $resolvedReference = null;
 
     /**
      * @param string|string[] $interfaces The interface(s) the proxy should implement, or none to proxy the service's own class
@@ -37,7 +38,7 @@ class LazyProxyArgument implements ArgumentInterface
 
     public function getValues(): array
     {
-        return [$this->service, $this->interfaces];
+        return [$this->service, $this->interfaces, $this->resolvedReference];
     }
 
     public function setValues(array $values): void
@@ -47,6 +48,8 @@ class LazyProxyArgument implements ArgumentInterface
         if (isset($values[1])) {
             $this->setInterfaces($values[1]);
         }
+
+        $this->resolvedReference = $values[2] ?? null;
     }
 
     private function setInterfaces(string|array $interfaces): void

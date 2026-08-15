@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -225,8 +226,11 @@ class ObjectsProvider
                 ->addArgument(new IteratorArgument([
                     new Reference('definition_1'),
                     new Reference('.definition_2'),
+                    new LazyProxyArgument(new Reference('.definition_2')),
                 ]))
                 ->addArgument(new AbstractArgument('placeholder'))
+                ->addArgument(new LazyProxyArgument(new Reference('.definition_2')))
+                ->addArgument(new LazyProxyArgument(new Reference('.definition_2'), ['Full\\Qualified\\Interface1', 'Full\\Qualified\\Interface2']))
                 ->setFactory(['Full\\Qualified\\FactoryClass', 'get']),
             '.definition_2' => $definition2
                 ->setPublic(false)

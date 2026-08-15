@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\EnvClosure;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -1868,6 +1869,10 @@ class PhpDumper extends Dumper
                 }
 
                 ++$calls[$id][0];
+            } elseif ($argument instanceof LazyProxyArgument) {
+                if ($resolvedReference = $argument->getValues()[2]) {
+                    $this->getDefinitionsFromArguments([$resolvedReference], $definitions, $calls, $byConstructor);
+                }
             } elseif (!$argument instanceof Definition) {
                 // no-op
             } elseif (isset($definitions[$argument])) {
@@ -1901,6 +1906,16 @@ class PhpDumper extends Dumper
 
             return \sprintf('[%s]', implode(', ', $code));
         } elseif ($value instanceof ArgumentInterface) {
+            if ($value instanceof LazyProxyArgument) {
+                [$reference, , $resolvedReference] = $value->getValues();
+
+                if (!$resolvedReference) {
+                    throw new RuntimeException(\sprintf('Cannot dump an unresolved lazy proxy argument for service "%s"; run the "ResolveLazyProxyPass" compiler pass first.', $reference));
+                }
+
+                return $this->dumpValue($resolvedReference, $interpolate);
+            }
+
             $scope = [$this->definitionVariables, $this->referenceVariables];
             $this->definitionVariables = $this->referenceVariables = null;
 
@@ -1971,6 +1986,9 @@ class PhpDumper extends Dumper
                     $serviceMap = '';
                     $serviceTypes = '';
                     foreach ($value->getValues() as $k => $v) {
+                        if ($v instanceof LazyProxyArgument) {
+                            $v = $v->getValues()[2] ?? $v;
+                        }
                         if (!$v instanceof Reference) {
                             $serviceMap .= \sprintf("\n            %s => [%s],", $this->export($k), $this->dumpValue($v));
                             $serviceTypes .= \sprintf("\n            %s => '?',", $this->export($k));

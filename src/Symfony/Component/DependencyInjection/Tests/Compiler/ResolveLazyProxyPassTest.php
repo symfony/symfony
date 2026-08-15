@@ -36,7 +36,10 @@ class ResolveLazyProxyPassTest extends TestCase
 
         (new ResolveLazyProxyPass())->process($container);
 
-        $lazyId = (string) $container->getDefinition('foo')->getArgument(0);
+        $argument = $container->getDefinition('foo')->getArgument(0);
+        self::assertInstanceOf(LazyProxyArgument::class, $argument);
+
+        $lazyId = (string) $argument->getValues()[2];
         self::assertStringStartsWith('.lazy.a.', $lazyId);
         self::assertSame(A::class, $container->getDefinition($lazyId)->getClass());
     }
@@ -50,7 +53,7 @@ class ResolveLazyProxyPassTest extends TestCase
 
         (new ResolveLazyProxyPass())->process($container);
 
-        $lazyId = (string) $container->getDefinition('foo')->getArgument(0);
+        $lazyId = (string) $container->getDefinition('foo')->getArgument(0)->getValues()[2];
         self::assertStringStartsWith('.lazy.final_impl.', $lazyId);
         self::assertSame(FinalLazyProxyImplementation::class, $container->getDefinition($lazyId)->getClass());
         self::assertSame([['interface' => LazyProxyTestInterface::class]], $container->getDefinition($lazyId)->getTag('proxy'));
@@ -65,7 +68,7 @@ class ResolveLazyProxyPassTest extends TestCase
 
         (new ResolveLazyProxyPass())->process($container);
 
-        $lazyId = (string) $container->getDefinition('foo')->getArgument(0);
+        $lazyId = (string) $container->getDefinition('foo')->getArgument(0)->getValues()[2];
         self::assertStringStartsWith('.lazy.a.', $lazyId);
         self::assertSame('object', $container->getDefinition($lazyId)->getClass());
         self::assertSame([
@@ -165,14 +168,18 @@ class ResolveLazyProxyPassTest extends TestCase
         $container->register('a', A::class);
         $container->register('foo', Foo::class)
             ->setPublic(true)
-            ->addArgument(new LazyProxyArgument(new TypedReference('a', A::class)));
+            ->addArgument(new LazyProxyArgument($reference = new TypedReference('a', A::class)));
 
         $container->compile();
 
         $argument = $container->getDefinition('foo')->getArgument(0);
-        self::assertInstanceOf(Reference::class, $argument);
-        self::assertNotInstanceOf(LazyProxyArgument::class, $argument);
-        self::assertStringStartsWith('.lazy.a.', (string) $argument);
-        self::assertTrue($container->getDefinition((string) $argument)->isLazy());
+        self::assertInstanceOf(LazyProxyArgument::class, $argument);
+
+        [$service, $interfaces, $resolvedReference] = $argument->getValues();
+        self::assertSame($reference, $service);
+        self::assertSame([], $interfaces);
+        self::assertInstanceOf(Reference::class, $resolvedReference);
+        self::assertStringStartsWith('.lazy.a.', (string) $resolvedReference);
+        self::assertTrue($container->getDefinition((string) $resolvedReference)->isLazy());
     }
 }

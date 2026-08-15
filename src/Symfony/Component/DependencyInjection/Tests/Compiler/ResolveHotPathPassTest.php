@@ -13,7 +13,9 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveHotPathPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
@@ -53,5 +55,23 @@ class ResolveHotPathPassTest extends TestCase
         $this->assertFalse($container->getDefinition('service_container')->hasTag('container.hot_path'));
         $this->assertFalse($container->getDefinition('deprec_with_tag')->hasTag('container.hot_path'));
         $this->assertFalse($container->getDefinition('deprec_ref_notag')->hasTag('container.hot_path'));
+    }
+
+    public function testProcessPropagatesThroughLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('proxied', \stdClass::class);
+        $container->register('foo', \stdClass::class)
+            ->addTag('container.hot_path')
+            ->addArgument(new LazyProxyArgument(new Reference('proxied')));
+
+        (new ResolveLazyProxyPass())->process($container);
+        (new ResolveHotPathPass())->process($container);
+
+        $lazyId = (string) $container->getDefinition('foo')->getArgument(0)->getValues()[2];
+
+        $this->assertTrue($container->getDefinition($lazyId)->hasTag('container.hot_path'));
+        $this->assertTrue($container->getDefinition('proxied')->hasTag('container.hot_path'));
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -410,10 +411,12 @@ class TextDescriptor extends Descriptor
                     }
 
                     foreach ($argument->getValues() as $ref) {
-                        $argumentsInformation[] = \sprintf('- Service(%s)', $ref);
+                        $argumentsInformation[] = '- '.($ref instanceof LazyProxyArgument ? self::formatLazyProxyArgument($ref) : \sprintf('Service(%s)', $ref));
                     }
                 } elseif ($argument instanceof ServiceLocatorArgument) {
                     $argumentsInformation[] = \sprintf('Service locator (%d element(s))', \count($argument->getValues()));
+                } elseif ($argument instanceof LazyProxyArgument) {
+                    $argumentsInformation[] = self::formatLazyProxyArgument($argument);
                 } elseif ($argument instanceof Definition) {
                     $argumentsInformation[] = 'Inlined Service';
                 } elseif ($argument instanceof \UnitEnum) {
@@ -751,5 +754,12 @@ class TextDescriptor extends Descriptor
             isset($options['raw_text']) && $options['raw_text'] ? strip_tags($content) : $content,
             isset($options['raw_output']) ? !$options['raw_output'] : true
         );
+    }
+
+    private static function formatLazyProxyArgument(LazyProxyArgument $argument): string
+    {
+        [$reference, $interfaces] = $argument->getValues();
+
+        return \sprintf('Lazy Proxy for Service(%s)%s', (string) $reference, $interfaces ? \sprintf(' implementing "%s"', implode('", "', $interfaces)) : '');
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 /**
  * @author Ahmed TAILOULOUTE <ahmed.tailouloute@gmail.com>
  */
-class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface, ClearableSessionHandlerInterface
 {
     public function __construct(
         private AbstractSessionHandler $handler,
@@ -69,5 +69,16 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
     public function updateTimestamp(#[\SensitiveParameter] string $sessionId, string $data): bool
     {
         return $this->handler->updateTimestamp($sessionId, $data);
+    }
+
+    public function clear(): void
+    {
+        if ($this->handler instanceof ClearableSessionHandlerInterface) {
+            $this->handler->clear();
+
+            return;
+        }
+
+        throw new \LogicException(\sprintf('The session handler "%s" does not support clearing all sessions.', get_debug_type($this->handler)));
     }
 }

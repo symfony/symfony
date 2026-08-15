@@ -71,4 +71,24 @@ class NativeFileSessionHandlerTest extends TestCase
 
         $this->assertEquals($path, \ini_get('session.save_path'));
     }
+
+    public function testClearDeletesSessionFiles()
+    {
+        $savePath = sys_get_temp_dir().'/sf_session_clear_test_'.uniqid('', true);
+        mkdir($savePath, 0o777, true);
+
+        touch($savePath.'/sess_abc123');
+        touch($savePath.'/sess_def456');
+        touch($savePath.'/not_a_session.txt');
+
+        $handler = new NativeFileSessionHandler($savePath);
+        $handler->clear();
+
+        $this->assertFileDoesNotExist($savePath.'/sess_abc123');
+        $this->assertFileDoesNotExist($savePath.'/sess_def456');
+        $this->assertFileExists($savePath.'/not_a_session.txt');
+
+        unlink($savePath.'/not_a_session.txt');
+        rmdir($savePath);
+    }
 }

@@ -20,7 +20,7 @@ use Relay\Relay;
  *
  * @author Dalibor Karlović <dalibor@flexolabs.io>
  */
-class RedisSessionHandler extends AbstractSessionHandler
+class RedisSessionHandler extends AbstractSessionHandler implements ClearableSessionHandlerInterface
 {
     /**
      * Key prefix for shared environments.
@@ -99,5 +99,57 @@ class RedisSessionHandler extends AbstractSessionHandler
         $ttl = ($this->ttl instanceof \Closure ? ($this->ttl)() : $this->ttl) ?? \ini_get('session.gc_maxlifetime');
 
         return $this->redis->expire($this->prefix.$sessionId, (int) $ttl);
+    }
+
+    public function clear(): void
+    {
+        if ($this->redis instanceof \Predis\ClientInterface) {
+            $cursor = 0;
+            do {
+                [$cursor, $keys] = $this->redis->scan($cursor, 'MATCH', $this->prefix.'*', 'COUNT', 1000);
+                if ($keys) {
+                    $this->redis->del($keys);
+                }
+            } while ($cursor);
+
+            return;
+        }
+
+        if ($this->redis instanceof \RedisCluster) {
+            foreach ($this->redis->_masters() as $master) {
+                $cursor = null;
+                do {
+                    $keys = $this->redis->scan($cursor, $master, $this->prefix.'*', 1000);
+                    if ($keys) {
+                        $this->redis->del(...$keys);
+                    }
+                } while ($cursor);
+            }
+
+            return;
+        }
+
+        if ($this->redis instanceof \RedisArray) {
+            foreach ($this->redis->_hosts() as $host) {
+                $instance = $this->redis->_instance($host);
+                $cursor = null;
+                do {
+                    $keys = $instance->scan($cursor, $this->prefix.'*', 1000);
+                    if ($keys) {
+                        $instance->del(...$keys);
+                    }
+                } while ($cursor);
+            }
+
+            return;
+        }
+
+        $cursor = null;
+        do {
+            $keys = $this->redis->scan($cursor, $this->prefix.'*', 1000);
+            if ($keys) {
+                $this->redis->del(...$keys);
+            }
+        } while ($cursor);
     }
 }

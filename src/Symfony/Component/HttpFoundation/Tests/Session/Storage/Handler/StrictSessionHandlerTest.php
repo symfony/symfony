@@ -13,7 +13,12 @@ namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
+
+abstract class ClearableInnerSessionHandler implements \SessionHandlerInterface, ClearableSessionHandlerInterface
+{
+}
 
 class StrictSessionHandlerTest extends TestCase
 {
@@ -200,5 +205,23 @@ class StrictSessionHandlerTest extends TestCase
         $proxy = new StrictSessionHandler($handler);
 
         $this->assertSame(1, $proxy->gc(123));
+    }
+
+    public function testClearForwardsToInnerHandler()
+    {
+        $handler = $this->createMock(ClearableInnerSessionHandler::class);
+        $handler->expects($this->once())->method('clear');
+        $proxy = new StrictSessionHandler($handler);
+
+        $proxy->clear();
+    }
+
+    public function testClearThrowsWhenInnerHandlerNotClearable()
+    {
+        $handler = $this->createStub(\SessionHandlerInterface::class);
+        $proxy = new StrictSessionHandler($handler);
+
+        $this->expectException(\LogicException::class);
+        $proxy->clear();
     }
 }

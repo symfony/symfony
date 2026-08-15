@@ -426,6 +426,25 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('test_data', stream_get_contents($boundData[6]['data']));
     }
 
+    public function testClear()
+    {
+        $pdo = $this->getMemorySqlitePdo();
+        $storage = new PdoSessionHandler($pdo);
+
+        $storage->open('', 'sid');
+        $storage->write('id1', 'data1');
+        $storage->write('id2', 'data2');
+        $storage->close();
+
+        $countBefore = (int) $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn();
+        $this->assertSame(2, $countBefore);
+
+        $storage->clear();
+
+        $countAfter = (int) $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn();
+        $this->assertSame(0, $countAfter);
+    }
+
     /**
      * @return resource
      */

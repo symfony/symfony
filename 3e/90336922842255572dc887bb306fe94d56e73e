@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by BastienClement at 2026-05-16T15:42:56Z
+
+Thanks for the review.
+
+About the framework-bundle config : testing shows the option is already configurable through the existing `framework.serializer.default_context` plumbing without further wiring:
+
+```yaml
+framework:
+  serializer:
+    default_context:
+      enable_default_groups: true
+```
+
+Verified by inspecting the compiled container, and confirmed at runtime.
+
+This matches the precedent set by similar runtime serialization flags: `enable_max_depth` and `AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION`.
+
+Neither got a dedicated boolean node; `enable_attributes` is the only first-class flag in `framework.serializer`, and it's structurally different: it gates DI compile-time attribute autoconfiguration rather than runtime context.
+
+Happy to add a dedicated `framework.serializer.enable_default_groups` boolean node if more discoverability is wanted, but holding off by default to keep the change minimal and consistent with the existing pattern. Let me know which you prefer.
+
+---
+
+One follow-up from reviewing the commit: there was an asymmetry between `AbstractNormalizer` and `MetadataAwareNameConverter` when the flag is on with `groups=['Default']` (or the class short-name). `getAllowedAttributes` synthesizes default groups for ungrouped properties, the name converter doesn't
+
+With a property like
+```php
+#[SerializedName('renamedX')] public $x
+```
+and context
+```php
+['groups' => ['Default'], 'enable_default_groups' => true]
+```
+, output is `{"x":"v"}` instead of `{"renamedX":"v"}`. The property is included but its rename isn't applied. Round-trip then drops the input. Two existing rows in tests were asserting the broken output.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T16:10:42Z
+
+Thanks @BastienClement for your thorough May reply and your patience since; your `default_context` answer was verified and is now in the description.
+
+I rebased, squashed with your authorship and reworked the name-converter half, because #58236 merged in the meantime and made `MetadataAwareNameConverter::normalize()` context-aware by itself. That collision invalidated the design note this PR led with, in a good way:
+
+* your flip-unified `normalize()` path and its flag-off legacy branch are gone; both directions now use #58236's context-aware code, and the flag only merges the synthesized groups into the group set. That keeps flag-off byte-for-byte identical to current 8.2, and the #51514 revert sentinel, `ConstraintViolationListNormalizerTest::testNormalizeWithMetadataAwareNameConverter`, is green;
+* your May commit's synthesis survives, mirrored into both lookup paths;
+* the shared provider rows could no longer serve both directions, since normalize applies `'*'`-scoped renames in any context while denormalize stays visibility-filtered, so the fallback provider is split per direction with expectations taken from observed behaviour;
+* new interaction pinned by a test: the synthesized groups count for `ignored_groups` exclusion, so `ignored_groups: ['Default']` with the flag on excludes ungrouped attributes.
+
+Serializer is green at 1544, PropertyInfo at 664, and restoring the base normalizer and converter while keeping the tests fails 8 of them. Given the size of the rework, a look from you and @mtarld before merge would be welcome.

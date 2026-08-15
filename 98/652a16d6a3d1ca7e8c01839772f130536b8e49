@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by eissasoubhi at 2026-08-15T00:06:15Z
+
+CI failures appear unrelated to this PR: Psalm fails in `Cache/Adapter/PdoAdapter.php`, while the Windows failures are in `SecurityBundle/DebugRolesCommandTest`. The relevant Unit, Integration, PHPStan, and CS checks pass
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T11:48:04Z
+
+Squashed and amended: added the CHANGELOG entry and a docblock on `ignore()`, and a leading backslash is now trimmed so `ignore('\\Vendor\\Sdk\\')` cannot silently match nothing.

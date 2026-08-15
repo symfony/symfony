@@ -280,6 +280,20 @@ class ClassMetadataTest extends TestCase
         $this->assertInstanceOf(GroupSequence::class, $this->metadata->getGroupSequence());
     }
 
+    public function testGroupSequenceAcceptsTheClassConstantAsTheDefaultGroup()
+    {
+        $this->metadata->setGroupSequence(['Foo', Entity::class]);
+
+        $this->assertSame(['Foo', 'Entity'], $this->metadata->getGroupSequence()->groups);
+    }
+
+    public function testGroupSequenceLeavesForeignClassNamesUntouched()
+    {
+        $this->expectException(GroupDefinitionException::class);
+
+        $this->metadata->setGroupSequence(['Foo', ConstraintA::class]);
+    }
+
     public function testGroupSequencesFailIfNotContainingDefaultGroup()
     {
         $this->expectException(GroupDefinitionException::class);

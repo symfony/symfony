@@ -33,6 +33,8 @@ use Symfony\Component\Mailer\Bridge\Postmark\RemoteEvent\PostmarkPayloadConverte
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
+use Symfony\Component\Mailer\Bridge\Scaleway\RemoteEvent\ScalewayPayloadConverter;
+use Symfony\Component\Mailer\Bridge\Scaleway\Webhook\ScalewayRequestParser;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
 use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
@@ -86,6 +88,15 @@ return static function (ContainerConfigurator $container) {
         ->set('mailer.webhook.request_parser.resend', ResendRequestParser::class)
             ->args([service('mailer.payload_converter.resend')])
         ->alias(ResendRequestParser::class, 'mailer.webhook.request_parser.resend')
+
+        ->set('mailer.payload_converter.scaleway', ScalewayPayloadConverter::class)
+        ->set('mailer.webhook.request_parser.scaleway', ScalewayRequestParser::class)
+            ->args([
+                service('mailer.payload_converter.scaleway'),
+                service('http_client')->nullOnInvalid(),
+                service('cache.app')->nullOnInvalid(),
+            ])
+        ->alias(ScalewayRequestParser::class, 'mailer.webhook.request_parser.scaleway')
 
         ->set('mailer.payload_converter.sendgrid', SendgridPayloadConverter::class)
         ->set('mailer.webhook.request_parser.sendgrid', SendgridRequestParser::class)

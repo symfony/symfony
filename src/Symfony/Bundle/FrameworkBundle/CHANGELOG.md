@@ -92,6 +92,7 @@ CHANGELOG
  * Deprecate `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
  * Add support for selecting the appropriate error renderer based on the `APP_RUNTIME_MODE` env var
  * Add `KernelInterface::getShareDir()`, `APP_SHARE_DIR` and `%kernel.share_dir%` to store application data that are shared between all front-end servers
+ * Add support for rate limited transports
 
 7.3
 ---

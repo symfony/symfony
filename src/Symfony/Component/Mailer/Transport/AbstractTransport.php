@@ -24,6 +24,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\BodyRendererInterface;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
@@ -33,6 +34,7 @@ abstract class AbstractTransport implements TransportInterface
     private LoggerInterface $logger;
     private float $rate = 0;
     private float $lastSent = 0;
+    private ?RateLimiterFactoryInterface $rateLimiterFactory = null;
 
     public function __construct(
         private ?EventDispatcherInterface $dispatcher = null,
@@ -62,10 +64,14 @@ abstract class AbstractTransport implements TransportInterface
     {
         $message = clone $message;
         $envelope = null !== $envelope ? clone $envelope : Envelope::create($message);
+        $rateLimiter = $this->rateLimiterFactory?->create();
 
         try {
             if (!$this->dispatcher) {
                 $sentMessage = new SentMessage($message, $envelope);
+
+                $rateLimiter?->consume(1)->ensureAccepted();
+
                 $this->doSend($sentMessage);
 
                 return $sentMessage;
@@ -87,6 +93,8 @@ abstract class AbstractTransport implements TransportInterface
             $sentMessage = new SentMessage($message, $envelope);
 
             try {
+                $rateLimiter?->consume(1)->ensureAccepted();
+
                 $this->doSend($sentMessage);
             } catch (\Throwable $error) {
                 $this->dispatcher->dispatch(new FailedMessageEvent($message, $error));
@@ -101,6 +109,20 @@ abstract class AbstractTransport implements TransportInterface
         } finally {
             $this->checkThrottling();
         }
+    }
+
+    /**
+     * Sets the rate limiter used to throttle the messages sent by this transport.
+     *
+     * When the limit is exceeded, send() throws a RateLimitExceededException.
+     *
+     * @return $this
+     */
+    public function setRateLimiterFactory(RateLimiterFactoryInterface $rateLimiterFactory): static
+    {
+        $this->rateLimiterFactory = $rateLimiterFactory;
+
+        return $this;
     }
 
     abstract protected function doSend(SentMessage $message): void;

@@ -26,6 +26,9 @@ use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\RawMessage;
+use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
@@ -55,6 +58,42 @@ class AbstractTransportTest extends TestCase
         $this->assertEqualsWithDelta(0, time() - $start, 1);
         $transport->send($message, $envelope);
         $this->assertEqualsWithDelta(0, time() - $start, 1);
+    }
+
+    public function testRateLimiting()
+    {
+        $transport = new class extends AbstractTransport {
+            public int $sent = 0;
+
+            protected function doSend(SentMessage $message): void
+            {
+                ++$this->sent;
+            }
+
+            public function __toString(): string
+            {
+                return 'fake://';
+            }
+        };
+        $transport->setRateLimiterFactory(new RateLimiterFactory([
+            'id' => 'mailer',
+            'policy' => 'fixed_window',
+            'limit' => 2,
+            'interval' => '1 hour',
+        ], new InMemoryStorage()));
+
+        $message = new RawMessage('');
+        $envelope = new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')]);
+
+        $this->assertNotNull($transport->send($message, $envelope));
+        $this->assertNotNull($transport->send($message, $envelope));
+
+        try {
+            $transport->send($message, $envelope);
+            $this->fail('The third message should not have been sent.');
+        } catch (RateLimitExceededException) {
+            $this->assertSame(2, $transport->sent);
+        }
     }
 
     public function testSendingRawMessages()

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add a `rate_limiter` option to mailer transports
  * Reorder EsmtpTransport authenticators to prefer PLAIN over obsolete LOGIN
 
 8.0

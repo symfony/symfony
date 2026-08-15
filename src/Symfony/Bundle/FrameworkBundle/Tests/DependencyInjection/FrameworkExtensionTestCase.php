@@ -2787,6 +2787,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('http_client.transport', (string) $arguments[0]);
     }
 
+    public function testMailerRateLimiter()
+    {
+        $container = $this->createContainerFromFile('mailer_with_rate_limiter');
+
+        $this->assertTrue($container->hasDefinition('mailer.rate_limiter_locator'));
+        $l = $container->getDefinition('mailer.rate_limiter_locator');
+        $this->assertCount(1, $l->getArguments());
+        $this->assertEquals(new Reference('limiter.foo_limiter', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE), $l->getArgument(0)['main']);
+    }
+
     public function testHttpClientMockResponseFactory()
     {
         $container = $this->createContainerFromFile('http_client_mock_response_factory');

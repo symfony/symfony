@@ -63,7 +63,7 @@ final class RegisterDatePointTypePass implements CompilerPassInterface
                 }
 
                 // a mapper configured by the application keeps the first say
-                $mapper = new Definition(ChainTypedFieldMapper::class, [[$call[1][0], $mapperDefinition]]);
+                $mapper = new Definition(ChainTypedFieldMapper::class, [$call[1][0], $mapperDefinition]);
             }
 
             $calls[] = ['setTypedFieldMapper', [$mapper]];

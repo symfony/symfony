@@ -1,0 +1,21 @@
+{
+    "id": "3c5a7e19-6b2d-4f80-9c1e-5d7b3a9f1c4e",
+    "type": "email_blocklisted",
+    "organization_id": "6d7fa23a-1c4f-44f4-9a1c-4a5b1f8b8f1a",
+    "project_id": "8c8bfa06-9d5f-4a3e-a6a5-1a4a4f2f0b7e",
+    "domain_id": "b6a2f0a4-9d4f-46e3-9f1a-0b6a2f0a49d4",
+    "domain_name": "example.com",
+    "created_at": "2026-01-15T10:34:00Z",
+    "email_from": "sender@example.com",
+    "email_to": "recipient@example.com",
+    "email_headers": [
+        {
+            "key": "Message-Id",
+            "value": "<42@example.com>"
+        }
+    ],
+    "email_blocklisted_at": "2026-01-15T10:34:00Z",
+    "blocklist_id": "9e8d7c6b-5a49-4382-b1c0-d9e8f7a6b5c4",
+    "blocklist_type": "mailbox_not_found",
+    "blocklist_reason": "The recipient mailbox does not exist"
+}

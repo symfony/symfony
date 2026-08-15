@@ -20,7 +20,13 @@
         "symfony/mailer": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/http-client": "^7.4|^8.0"
+        "symfony/cache": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/webhook": "^7.4|^8.0"
+    },
+    "conflict": {
+        "symfony/http-foundation": "<7.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Scaleway\\": "" },

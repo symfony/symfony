@@ -1,0 +1,64 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-03-26T17:38:32Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by Bellangelo at 2026-03-27T10:54:11Z
+
+Hi @chalasr, the failing tests seems to be unrelated to my code changes. If not, I would need some help because I can't see how they could affect these tests.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-03-27T13:19:43Z
+
+Failures are totally unrelated indeed, you can ignore them
+
+---------------------------------------------------------------------------
+
+by Bellangelo at 2026-04-13T17:39:44Z
+
+Hi @chalasr, I understand that this PR might not be a high-priority but do you have an estimation on when it would be reviewed?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-04-13T19:22:57Z
+
+I will checkout this locally asap  hopefully by the end of the week.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T13:05:21Z
+
+Thanks @Bellangelo, and sorry the promised review never came; I took it now. The design was better than it first looks: wrapping only engages on an interactive terminal via `stream_isatty`, so piped output, generated docs and every descriptor test fixture stay byte-for-byte unchanged. That decision is what made the rest reviewable, and it is kept.
+
+What I changed, rebasing on 8.2 and squashing with your authorship:
+
+* the rebase was a real merge: `TextDescriptor` gained the `[deprecated]`/`[hidden]` option rendering and a `Helper::width()` multibyte fix on 8.2 meanwhile, so your two-layout wrapping is now applied on top of those method bodies rather than replacing them;
+* the wrap engine moved from `wordwrap()` to the component's own `OutputWrapper`. `wordwrap()` counts bytes and formatter tags, so UTF-8 descriptions wrapped early, a long token could be split mid-multibyte-character, and the invisible `<comment>` markup around defaults consumed visible columns. `OutputWrapper` measures visible width and never breaks inside a tag; three regression tests pin the tag, multibyte and non-tty behaviours;
+* one genuine bug this uncovered: with the non-tty `PHP_INT_MAX` width flowing into the wrapper, the PCRE quantifier it builds exceeds the 65535 limit and `preg_replace()` returns null, which silently erased descriptions. The wrap is now skipped above 65535 columns, with a comment saying why.
+
+Console is green at 1807 tests (tty group excluded locally), the descriptor suite at 155, and restoring the base descriptor fails 7 of the wrapping tests.

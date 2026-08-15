@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-13T21:12:00Z
+
+I wonder if a new `MapEntities` attribute (plurial) would be more explicit. By adding the `$limit`, `$offset`, and `$orderBy` options, the would be provided to the `findBy` method.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-04-13T23:45:04Z
+
+@GromNaN The `#[MapEntity]` attribute already supports loading lists of entities via [an expression](https://symfony.com/doc/current/doctrine.html#fetch-via-an-expression):
+
+```php
+#[Route('/posts_by/{author_id}')]
+public function authorPosts(
+    #[MapEntity(class: Post::class, expr: 'repository.findBy({"author": author_id}, {}, 10)')]
+    iterable $posts
+): Response {
+}
+```
+
+So adding a new attribute might not be necessary. As for the `$limit`, `$offset`, and `$orderBy` options, this can already be achieved via an expression, or via a closure if #63866 gets accepted.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T15:44:39Z
+
+@GromNaN all three of your April points were applied by @Brajk19 within days and awaited your ack; I picked it up, rebased on 8.2, squashed with his authorship and verified each: the type check is `'array'` only with `iterable` untouched, the same pattern is on the console resolver, and both suggestion commits are in.
+
+One interaction the threads had not reached: the identifier lookup ran before the new branch, and `getIdentifier()` falls back to a bare `id` route attribute when no mapping matches. So `#[MapEntity(class: Post::class)] array $posts` on a route carrying `{id}` resolved a single entity into the array parameter, a `TypeError` at controller invocation. The identifier lookup is now skipped for `array` arguments; that configuration fails with the clear `NearMissValueResolverException` instead, and a test pins it, verified to fail when the skip is removed.
+
+The rebase was also a real merge: the console resolver tests gained closure-expression tests and an `$asOption` mode on the base meanwhile, both kept alongside the new `findBy` tests.
+
+Bridge suite green at 487, the two resolver suites at 50, empty `findBy()` results resolve to an empty array with no 404 and a test pins that too.

@@ -73,7 +73,7 @@ final class OutputWrapper
         $text = preg_replace_callback('#'.implode('|', $patternBlocks).'#iux', static function ($m) use (&$map, &$i, $text) {
             do {
                 $placeholder = mb_chr(0xF0000 + $i++, 'UTF-8');
-            } while (str_contains($text, $placeholder));
+            } while (false === $placeholder || str_contains($text, $placeholder));
             $map[$placeholder] = $m[0];
 
             return $placeholder;

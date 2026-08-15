@@ -12,17 +12,23 @@
 namespace Symfony\Component\Notifier\Bridge\Firebase\Notification;
 
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
+use Symfony\Component\Notifier\Bridge\Firebase\TargetType;
 
 final class IOSNotification extends FirebaseOptions
 {
+    public function __construct(string $target, array $options = [], array $data = [], TargetType $targetType = TargetType::Topic)
+    {
+        trigger_deprecation('symfony/firebase-notifier', '8.2', 'Using %s class is deprecated, use %s instead.', self::class, FirebaseOptions::class);
+
+        parent::__construct($target, ['notification' => $options], $data, $targetType);
+    }
+
     /**
      * @return $this
      */
     public function sound(string $sound): static
     {
-        $this->options['sound'] = $sound;
-
-        return $this;
+        return $this->addApnsOption('sound', $sound);
     }
 
     /**
@@ -30,9 +36,7 @@ final class IOSNotification extends FirebaseOptions
      */
     public function badge(string $badge): static
     {
-        $this->options['badge'] = $badge;
-
-        return $this;
+        return $this->addApnsOption('badge', $badge);
     }
 
     /**
@@ -40,9 +44,7 @@ final class IOSNotification extends FirebaseOptions
      */
     public function clickAction(string $clickAction): static
     {
-        $this->options['click_action'] = $clickAction;
-
-        return $this;
+        return $this->addApnsOption('category', $clickAction);
     }
 
     /**
@@ -50,9 +52,7 @@ final class IOSNotification extends FirebaseOptions
      */
     public function subtitle(string $subtitle): static
     {
-        $this->options['subtitle'] = $subtitle;
-
-        return $this;
+        return $this->addApnsAlertOption('subtitle', $subtitle);
     }
 
     /**
@@ -60,9 +60,7 @@ final class IOSNotification extends FirebaseOptions
      */
     public function bodyLocKey(string $bodyLocKey): static
     {
-        $this->options['body_loc_key'] = $bodyLocKey;
-
-        return $this;
+        return $this->addApnsAlertOption('body_loc_key', $bodyLocKey);
     }
 
     /**
@@ -72,9 +70,7 @@ final class IOSNotification extends FirebaseOptions
      */
     public function bodyLocArgs(array $bodyLocArgs): static
     {
-        $this->options['body_loc_args'] = $bodyLocArgs;
-
-        return $this;
+        return $this->addApnsAlertOption('body_loc_args', $bodyLocArgs);
     }
 
     /**
@@ -82,9 +78,7 @@ final class IOSNotification extends FirebaseOptions
      */
     public function titleLocKey(string $titleLocKey): static
     {
-        $this->options['title_loc_key'] = $titleLocKey;
-
-        return $this;
+        return $this->addApnsAlertOption('title_loc_key', $titleLocKey);
     }
 
     /**
@@ -94,8 +88,6 @@ final class IOSNotification extends FirebaseOptions
      */
     public function titleLocArgs(array $titleLocArgs): static
     {
-        $this->options['title_loc_args'] = $titleLocArgs;
-
-        return $this;
+        return $this->addApnsAlertOption('title_loc_args', $titleLocArgs);
     }
 }

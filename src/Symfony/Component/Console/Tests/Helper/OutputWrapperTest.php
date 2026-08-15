@@ -68,5 +68,22 @@ class OutputWrapperTest extends TestCase
                 ornare</error> efficitur.
                 EOS,
         ];
+
+        yield 'Width above the PCRE compiled-size limit' => [
+            $baseTextWithUtf8AndUrl,
+            150,
+            false,
+            <<<'EOS'
+                Árvíztűrőtükörfúrógép https://github.com/symfony/symfony Lorem ipsum <comment>dolor</comment> sit amet, consectetur adipiscing elit. Praesent vestibulum nulla quis urna maximus porttitor. Donec
+                ullamcorper risus at <error>libero ornare</error> efficitur.
+                EOS,
+        ];
+
+        yield 'Width above the quantifier limit' => [
+            $baseTextWithUtf8AndUrl,
+            100000,
+            false,
+            $baseTextWithUtf8AndUrl,
+        ];
     }
 }

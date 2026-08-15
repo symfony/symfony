@@ -75,8 +75,8 @@ class RegisterDatePointTypePassTest extends TestCase
         $this->assertCount(1, $calls);
         $chainDef = array_values($calls)[0][1][0];
         $this->assertSame(ChainTypedFieldMapper::class, $chainDef->getClass());
-        $this->assertSame($userMapper, $chainDef->getArgument(0)[0]);
-        $this->assertSame(DefaultTypedFieldMapper::class, $chainDef->getArgument(0)[1]->getClass());
+        $this->assertSame($userMapper, $chainDef->getArgument(0));
+        $this->assertSame(DefaultTypedFieldMapper::class, $chainDef->getArgument(1)->getClass());
     }
 
     public function testEveryEntityManagerConfigurationIsCovered()

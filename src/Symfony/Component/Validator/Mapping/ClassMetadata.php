@@ -363,6 +363,17 @@ class ClassMetadata extends GenericMetadata implements ClassMetadataInterface
             $groupSequence = new GroupSequence($groupSequence);
         }
 
+        // the ::class constant of the annotated class is an alias of its group name
+        $groups = $groupSequence->groups;
+        foreach ($groups as $i => $group) {
+            if (\is_string($group) && $this->name === ltrim($group, '\\')) {
+                $groups[$i] = $this->getDefaultGroup();
+            }
+        }
+        if ($groups !== $groupSequence->groups) {
+            $groupSequence = new GroupSequence($groups);
+        }
+
         if (\in_array(Constraint::DEFAULT_GROUP, $groupSequence->groups, true)) {
             throw new GroupDefinitionException(\sprintf('The group "%s" is not allowed in group sequences.', Constraint::DEFAULT_GROUP));
         }

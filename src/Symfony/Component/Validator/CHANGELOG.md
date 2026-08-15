@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Accept the `::class` constant of the annotated class in `GroupSequence` definitions
  * Add the `cascadeCurrentGroup` option to `GroupSequence` and `GroupSequenceProvider`
  * Remove the unused `GroupSequence::$cascadedGroup` property
  * Add the `restrictGroups` option to the `Valid` constraint

@@ -103,6 +103,11 @@ Messenger
    Note that a message sent to a transport is no longer handled in process, so `RedispatchMessageHandler`
    returns `null` for it instead of the result of the handler
 
+Notifier
+--------
+
+ * Deprecate `NovuSubscriberRecipient::getOverrides()` and its `$overrides` constructor parameter, pass overrides to `NovuOptions` instead
+
 Security
 --------
 

@@ -16,6 +16,28 @@ Notification example
 ```php
 class NovuNotification extends Notification implements PushNotificationInterface
 {
+    /** @var array<string, mixed> */
+    private array $overrides = [];
+
+    /** @var array<string, mixed> */
+    private array $context = [];
+
+    /**
+     * @param array<string, mixed> $overrides
+     */
+    public function setOverrides(array $overrides): void
+    {
+        $this->overrides = $overrides;
+    }
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    public function setContext(array $context): void
+    {
+        $this->context = $context;
+    }
+
     public function asPushMessage(
         NovuSubscriberRecipient|RecipientInterface $recipient,
         ?string $transport = null,
@@ -31,8 +53,9 @@ class NovuNotification extends Notification implements PushNotificationInterface
                 $recipient->getPhone(),
                 $recipient->getAvatar(),
                 $recipient->getLocale(),
-                $recipient->getOverrides(),
+                $this->overrides,
                 [],
+                $this->context,
             ),
         );
     }
@@ -50,6 +73,16 @@ $notification->content(
         ]
     )
 );
+$notification->setOverrides([
+    'email' => [
+        'from' => 'no-reply@toppy.nl',
+        'senderName' => 'No-Reply',
+    ],
+]);
+$notification->setContext([
+    'tenant' => 'tenant-id',
+    'app' => 'app-id',
+]);
 
 $this->notifier->send(
     $notification,
@@ -61,12 +94,6 @@ $this->notifier->send(
         null,
         null,
         null,
-        [
-            'email' => [
-                'from' => 'no-reply@toppy.nl',
-                'senderName' => 'No-Reply',
-            ],
-        ],
     ),
 );
 ```

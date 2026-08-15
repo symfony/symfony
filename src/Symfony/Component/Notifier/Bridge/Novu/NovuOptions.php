@@ -28,8 +28,17 @@ class NovuOptions implements MessageOptionsInterface
      *                bcc?: string[]
      *            }|null
      *        } $overrides
+     * @param array{
+     *            tenant?: string,
+     *            app?: string,
+     *            extra?: array{
+     *                key?: string,
+     *                value?: string[]
+     *            }
+     *        } $context
      *
-     * @see https://docs.novu.co/channels/email/#sending-email-overrides
+     * @see https://docs.novu.co/platform/integrations/email#sending-email-overrides
+     * @see https://docs.novu.co/platform/workflow/advanced-features/contexts/manage-contexts
      */
     public function __construct(
         private readonly ?string $subscriberId = null,
@@ -41,6 +50,7 @@ class NovuOptions implements MessageOptionsInterface
         private readonly ?string $locale = null,
         private readonly array $overrides = [],
         private readonly array $options = [],
+        private readonly array $context = [],
     ) {
     }
 
@@ -54,6 +64,7 @@ class NovuOptions implements MessageOptionsInterface
             'avatar' => $this->avatar,
             'locale' => $this->locale,
             'overrides' => $this->overrides,
+            'context' => $this->context,
         ]);
     }
 

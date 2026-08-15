@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\DummyWithInterf
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\E;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\F;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\G;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\Ignored\SomeClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\IntersectionDummy;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy;
 
@@ -76,4 +77,68 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(F::class, false));
         self::assertTrue(class_exists(G::class, false));
     }
+
+    public function testPreloadIgnoresExactClass()
+    {
+        $r = new \ReflectionMethod(Preloader::class, 'doPreload');
+
+        $preloaded = [];
+        $ignoredClass = 'Vendor\\Package\\SomeClass';
+        $prefixedClass = $ignoredClass.'WithSuffix';
+        $autoloaded = [];
+        $loader = static function (string $class) use (&$autoloaded) {
+            $autoloaded[] = $class;
+        };
+
+        spl_autoload_register($loader, true, true);
+
+        try {
+            Preloader::ignore($ignoredClass);
+            $r->invokeArgs(null, [$ignoredClass, &$preloaded]);
+            $r->invokeArgs(null, [$prefixedClass, &$preloaded]);
+        } finally {
+            spl_autoload_unregister($loader);
+            (new \ReflectionProperty(Preloader::class, 'ignoredClasses'))->setValue(null, []);
+        }
+
+        self::assertSame([$prefixedClass], $autoloaded);
+    }
+
+    public function testPreloadIgnoresNamespacePrefix()
+    {
+        $r = new \ReflectionMethod(Preloader::class, 'doPreload');
+
+        $preloaded = [];
+        $ignoredClass = SomeClass::class;
+        self::assertFalse(class_exists($ignoredClass, false));
+
+        $autoloaded = false;
+        $loader = static function (string $class) use ($ignoredClass, &$autoloaded) {
+            if ($ignoredClass === $class) {
+                $autoloaded = true;
+            }
+        };
+
+        spl_autoload_register($loader, true, true);
+
+        try {
+            Preloader::ignore('\\Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Preload\\Ignored\\');
+            $r->invokeArgs(null, [PreloaderTestWithIgnoredType::class, &$preloaded]);
+        } finally {
+            spl_autoload_unregister($loader);
+            (new \ReflectionProperty(Preloader::class, 'ignoredClasses'))->setValue(null, []);
+        }
+
+        self::assertFalse($autoloaded);
+        self::assertFalse(class_exists($ignoredClass, false));
+        self::assertSame([
+            PreloaderTestWithIgnoredType::class => true,
+            $ignoredClass => true,
+        ], $preloaded);
+    }
+}
+
+class PreloaderTestWithIgnoredType
+{
+    public SomeClass $ignored;
 }

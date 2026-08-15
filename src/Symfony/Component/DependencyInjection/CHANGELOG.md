@@ -9,6 +9,7 @@ CHANGELOG
  * Add support for injecting a service as a lazy proxy on a per-argument basis, using the `!lazy_proxy` YAML tag, the `@~` reference prefix or the `lazy_proxy()` function in the PHP-DSL
  * Write a `CACHEDIR.TAG` file in the cache and build directories so backup tools can skip them
  * Add a `factory` argument to the `#[Autoconfigure]` attribute, and support the `factory` key under `_instanceof`
+ * Add `Preloader::ignore()` to exclude classes or namespace prefixes from preloading
 
 8.1
 ---

@@ -16,6 +16,16 @@ namespace Symfony\Component\DependencyInjection\Dumper;
  */
 final class Preloader
 {
+    private static array $ignoredClasses = [];
+
+    /**
+     * Excludes a class from preloading; a name ending with a backslash excludes a whole namespace instead.
+     */
+    public static function ignore(string $class): void
+    {
+        self::$ignoredClasses[] = ltrim($class, '\\');
+    }
+
     public static function append(string $file, array $list): void
     {
         if (!file_exists($file)) {
@@ -75,6 +85,12 @@ final class Preloader
         }
 
         $preloaded[$class] = true;
+
+        foreach (self::$ignoredClasses as $ignoredClass) {
+            if ($class === $ignoredClass || (str_ends_with($ignoredClass, '\\') && str_starts_with($class, $ignoredClass))) {
+                return;
+            }
+        }
 
         try {
             if (!class_exists($class) && !interface_exists($class, false) && !trait_exists($class, false)) {

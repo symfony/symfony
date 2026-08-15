@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T12:05:48Z
+
+Thanks @Nayte91, and thanks @94noni, @yceruto and @alexandre-daubois for the March review. The branch never received the changes agreed in the threads, so I finished it, rebased on 8.2 and squashed, keeping @Nayte91's authorship. The open points, each settled with its reasoning:
+
+* **confirmation wording**: now `This will clear all active sessions, including e.g. carts of anonymous users. Do you want to continue?`. It keeps @yceruto's point, saying what happens instead of vaguely warning, and folds in @alexandre-daubois's cart example, which is the concrete harm worth naming;
+* **@94noni's suggestion to hide the command**: not applied, and here is the argument. Destructive-but-legitimate commands are not hidden elsewhere, `doctrine:database:drop` being the precedent, and the ops use case, invalidating every session after a credential leak, is exactly when an operator discovers commands through `bin/console list`. The interactive confirm plus `--force` is the guard;
+* **@alexandre-daubois on the hardcoded `sess_` prefix**: checked empirically rather than argued. PHP's `files` save handler hardcodes the prefix in php-src; running with `session.name=MYAPP` still writes `sess_<id>`, the ini only renames the cookie. So the constant is correct, and it now carries a comment saying why;
+* the multi-line iterator construction in the file handler is folded to one line, and the CHANGELOG entries sit in the 8.2 sections.
+
+HttpFoundation session tests are green at 380, the command test at 5, and reverting the handlers while keeping the tests fails 9 of them. Review welcome.

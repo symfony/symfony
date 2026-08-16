@@ -1265,4 +1265,16 @@ class ConfigurationTest extends TestCase
             'ide' => 'phpstorm',
         ]]);
     }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testHincludeDefaultTemplateDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Setting the "framework.fragments.hinclude_default_template" configuration option is deprecated. It will be removed in version 9.0.');
+
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration(true), [[
+            'fragments' => ['hinclude_default_template' => 'default.html.twig'],
+        ]]);
+    }
 }

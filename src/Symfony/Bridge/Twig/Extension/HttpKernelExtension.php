@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Extension;
 
 use Symfony\Component\HttpKernel\Controller\ControllerReference;
+use Twig\DeprecatedCallableInfo;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -26,6 +27,14 @@ final class HttpKernelExtension extends AbstractExtension
     {
         return [
             new TwigFunction('render', [HttpKernelRuntime::class, 'renderFragment'], ['is_safe' => ['html']]),
+            new TwigFunction('render_hinclude', [HttpKernelRuntime::class, 'renderHIncludeFragment'], [
+                'is_safe' => ['html'],
+                'deprecation_info' => new DeprecatedCallableInfo(
+                    'symfony/twig-bridge',
+                    '8.2',
+                    'render_esi() or render(), or Symfony UX Turbo',
+                ),
+            ]),
             new TwigFunction('render_*', [HttpKernelRuntime::class, 'renderFragmentStrategy'], ['is_safe' => ['html']]),
             new TwigFunction('fragment_uri', [HttpKernelRuntime::class, 'generateFragmentUri']),
             new TwigFunction('controller', [self::class, 'controller']),

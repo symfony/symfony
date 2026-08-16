@@ -11,6 +11,7 @@ CHANGELOG
  * Seed the query bag from the `_query` route default when a route is matched
  * Deserialize the query parameter named by `#[MapQueryString(key:)]` as JSON when it holds a string, e.g. `?filter={"page":1}`
  * Prefix the property path to each violation message reported by `RequestPayloadValueResolver`
+ * Deprecate the `HIncludeFragmentRenderer` class, use the `EsiFragmentRenderer` or `InlineFragmentRenderer`, or Symfony UX Turbo, instead
 
 8.1
 ---

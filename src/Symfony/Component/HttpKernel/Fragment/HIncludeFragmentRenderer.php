@@ -21,6 +21,8 @@ use Twig\Environment;
  * Implements the Hinclude rendering strategy.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @deprecated since Symfony 8.2, will be removed in 9.0; use the "esi" or "inline" fragment renderer, or Symfony UX Turbo, instead
  */
 class HIncludeFragmentRenderer extends RoutableFragmentRenderer
 {
@@ -33,6 +35,7 @@ class HIncludeFragmentRenderer extends RoutableFragmentRenderer
         private ?string $globalDefaultTemplate = null,
         private string $charset = 'utf-8',
     ) {
+        trigger_deprecation('symfony/http-kernel', '8.2', 'The "%s" class is deprecated and will be removed in 9.0; use the "esi" or "inline" fragment renderer, or Symfony UX Turbo, instead.', self::class);
     }
 
     /**

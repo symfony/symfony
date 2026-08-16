@@ -935,7 +935,11 @@ class FrameworkExtension extends Extension
             return;
         }
 
+        $container->getDefinition('fragment.renderer.hinclude')
+            ->replaceArgument(2, $config['hinclude_default_template']);
+
         $container->setParameter('fragment.renderer.hinclude.global_template', $config['hinclude_default_template']);
+        $container->deprecateParameter('fragment.renderer.hinclude.global_template', 'symfony/framework-bundle', '8.2', 'The "%s" parameter is deprecated. It will be removed in version 9.0.');
 
         $loader->load('fragment_listener.php');
         $container->setParameter('fragment.path', $config['path']);

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
@@ -400,6 +401,19 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $container->register('bar', BarMethodCall::class)
             ->addMethodCall('setIterable', [new IteratorArgument([])]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingATaggedClassMapArgumentToArrayOrIterable()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', BarMethodCall::class)
+            ->addMethodCall('setArray', [new TaggedClassMapArgument('my_tag')])
+            ->addMethodCall('setIterable', [new TaggedClassMapArgument('my_tag')]);
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -231,6 +232,27 @@ class XmlDumperTest extends TestCase
 
         $dumper = new XmlDumper($container);
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_arguments.xml', $dumper->dump());
+    }
+
+    public function testTaggedClassMapArguments()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo_tagged_class_map', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new TaggedClassMapArgument('foo_tag'))
+        ;
+        $container->register('foo2_tagged_class_map', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new TaggedClassMapArgument('foo_tag', 'key', ['baz']))
+        ;
+        $container->register('foo3_tagged_class_map', 'Bar')
+            ->setPublic(true)
+            ->addArgument(new TaggedClassMapArgument('foo_tag', null, ['baz', 'qux']))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_tagged_class_map_arguments.xml', $dumper->dump());
     }
 
     #[IgnoreDeprecations]

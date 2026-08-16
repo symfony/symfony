@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition class="Full\Qualified\Class1" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+  <argument type="tagged_class_map" tag="app.message">
+    <argument key="foo">Full\Qualified\FooMessage</argument>
+  </argument>
+</definition>

@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -248,6 +249,18 @@ class ObjectsProvider
                 ->setFile('/path/to/file')
                 ->setFactory([new Definition('Full\\Qualified\\FactoryClass'), 'get']),
             'definition_without_class' => new Definition(),
+        ];
+    }
+
+    public static function getContainerDefinitionsWithTaggedClassMap()
+    {
+        $taggedClassMap = new TaggedClassMapArgument('app.message', 'format');
+        $taggedClassMap->setValues(['foo' => 'Full\\Qualified\\FooMessage']);
+
+        return [
+            'definition_tagged_class_map' => (new Definition('Full\\Qualified\\Class1'))
+                ->setPublic(true)
+                ->addArgument($taggedClassMap),
         ];
     }
 

@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator as ArgumentServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
@@ -70,10 +71,12 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\MyInlineService;
 use Symfony\Component\DependencyInjection\Tests\Compiler\SingleMethodInterface;
 use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Bar;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\DependencyContainerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooClassWithEnumAttribute;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\NewInInitializer;
@@ -383,6 +386,25 @@ class PhpDumperTest extends TestCase
         $this->assertCount(1, $firstIteration);
         $this->assertSame($firstIteration, $secondIteration);
         $this->assertSame(1, PhpDumperTest_TaggedIteratorService::$constructed);
+    }
+
+    public function testTaggedClassMapArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class, BarTagClass::class)->addResourceTag('my_tag', ['key' => 'bar']);
+        $container->register(FooTagClass::class, FooTagClass::class)->addResourceTag('my_tag', ['key' => 'foo']);
+        $container->register('tagged_class_map', 'stdClass')
+            ->setProperty('classMap', new TaggedClassMapArgument('my_tag', 'key'))
+            ->setPublic(true);
+
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+        eval('?>'.$dumper->dump(['class' => 'Symfony_DI_PhpDumper_Test_Tagged_Class_Map']));
+
+        $compiled = new \Symfony_DI_PhpDumper_Test_Tagged_Class_Map();
+
+        $this->assertSame(['bar' => BarTagClass::class, 'foo' => FooTagClass::class], $compiled->get('tagged_class_map')->classMap);
     }
 
     public function testDumpAsFilesWithLazyFactoriesInlined()

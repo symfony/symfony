@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -857,6 +858,20 @@ trait ContentLoaderTrait
                 }
 
                 return $argument;
+            }
+            if ('tagged_class_map' === $value->getTag()) {
+                if (\is_array($argument) && isset($argument['tag']) && $argument['tag']) {
+                    if ($diff = array_diff(array_keys($argument), $supportedKeys = ['tag', 'index_by', 'exclude'])) {
+                        throw new InvalidArgumentException(\sprintf('"!tagged_class_map" tag contains unsupported key "%s"; supported ones are "%s".', implode('", "', $diff), implode('", "', $supportedKeys)));
+                    }
+
+                    return new TaggedClassMapArgument($argument['tag'], $argument['index_by'] ?? null, (array) ($argument['exclude'] ?? null));
+                }
+                if (\is_string($argument) && $argument) {
+                    return new TaggedClassMapArgument($argument);
+                }
+
+                throw new InvalidArgumentException(\sprintf('"!tagged_class_map" tags only accept a non empty string or an array with a key "tag" in "%s".', $file));
             }
             if ('service' === $value->getTag()) {
                 if ($isParameter) {

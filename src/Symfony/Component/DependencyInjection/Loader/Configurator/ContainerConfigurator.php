@@ -15,6 +15,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -202,6 +203,18 @@ function tagged_locator(string $tag, ?string $indexAttribute = null, string|arra
     }
 
     return new ServiceLocatorArgument(new TaggedIteratorArgument($tag, $indexAttribute, true, (array) $exclude, $excludeSelf));
+}
+
+/**
+ * Creates a class map by resource tag name.
+ *
+ * @param string          $tag            The tag name identifying the target classes
+ * @param string|null     $indexAttribute The name of the attribute that defines the key referencing each class in the tagged collection; defaults to the tag's last dot-segment
+ * @param string|string[] $exclude        A FQCN or a list of FQCNs to exclude from the class map
+ */
+function tagged_class_map(string $tag, ?string $indexAttribute = null, string|array $exclude = []): TaggedClassMapArgument
+{
+    return new TaggedClassMapArgument($tag, $indexAttribute, (array) $exclude);
 }
 
 /**

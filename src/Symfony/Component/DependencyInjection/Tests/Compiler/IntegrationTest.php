@@ -63,6 +63,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithCalla
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithClosureInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithClosureMarkerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticMethodTag;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedClassMapConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedIteratorConsumer;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedIteratorConsumerWithDefaultIndexMethod;
@@ -518,6 +519,32 @@ class IntegrationTest extends TestCase
         $this->assertTrue($container->getDefinition('interface')->hasTag('container.excluded'));
     }
 
+    public function testAutoconfiguredResourceTagWithCallableArrayAttributesViaClassMap()
+    {
+        $container = new ContainerBuilder();
+        $container->register(ResourceTaggedWithCallableInterface::class)
+            ->setAbstract(true)
+            ->setAutoconfigured(true)
+        ;
+        $container->register(FooResourceTaggedWithCallable::class, FooResourceTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+        ;
+        $container->register(BarResourceTaggedWithCallable::class, BarResourceTaggedWithCallable::class)
+            ->setAutoconfigured(true)
+        ;
+        $container->register(TaggedClassMapConsumer::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $this->assertSame([
+            'foo' => FooResourceTaggedWithCallable::class,
+            'bar' => BarResourceTaggedWithCallable::class,
+        ], $container->get(TaggedClassMapConsumer::class)->getParam());
+    }
+
     public function testAutoconfiguredTagWithCallableArrayAttributesFromYaml()
     {
         $container = new ContainerBuilder();
@@ -717,6 +744,27 @@ class IntegrationTest extends TestCase
 
         $param = iterator_to_array($s->getParam()->getIterator());
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
+    }
+
+    public function testTaggedClassMapConfiguredViaAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class, BarTagClass::class)
+            ->addResourceTag('foo_bar', ['foo' => 'bar'])
+        ;
+        $container->register(FooTagClass::class, FooTagClass::class)
+            ->addResourceTag('foo_bar', ['foo' => 'foo'])
+        ;
+        $container->register(TaggedClassMapConsumer::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        $s = $container->get(TaggedClassMapConsumer::class);
+
+        $this->assertSame(['bar' => BarTagClass::class, 'foo' => FooTagClass::class], $s->getParam());
     }
 
     #[IgnoreDeprecations]

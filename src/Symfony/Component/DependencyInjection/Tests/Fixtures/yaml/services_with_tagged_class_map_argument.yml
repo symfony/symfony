@@ -1,0 +1,15 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo_service_tagged_class_map:
+        class: Bar
+        arguments: [!tagged_class_map foo]
+    foo2_service_tagged_class_map:
+        class: Bar
+        arguments: [!tagged_class_map { tag: foo, index_by: key, exclude: Baz }]
+    foo3_service_tagged_class_map:
+        class: Bar
+        arguments: [!tagged_class_map { tag: foo, exclude: [Baz, Qux] }]

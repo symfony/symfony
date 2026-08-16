@@ -1,0 +1,17 @@
+ ---------------- --------------------------------------------------- 
+ [32m Option         [39m [32m Value                                             [39m 
+ ---------------- --------------------------------------------------- 
+  Service ID       -                                                  
+  Class            Full\Qualified\Class1                              
+  Tags             -                                                  
+  Public           yes                                                
+  Synthetic        no                                                 
+  Lazy             no                                                 
+  Shared           yes                                                
+  Abstract         no                                                 
+  Autowired        no                                                 
+  Autoconfigured   no                                                 
+  Arguments        Tagged class map for "app.message" (1 element(s))  
+                   - foo => Full\Qualified\FooMessage                 
+  Usages           none                                               
+ ---------------- --------------------------------------------------- 

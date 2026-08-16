@@ -15,11 +15,13 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_class_map;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_locator;
 
@@ -75,6 +77,13 @@ class ContainerConfiguratorTest extends TestCase
 
         $this->assertInstanceOf(ServiceLocatorArgument::class, $argument);
         $this->assertSame(['get_something'], $argument->getTaggedIteratorArgument()->getExclude());
+    }
+
+    public function testTaggedClassMap()
+    {
+        $this->assertEquals(new TaggedClassMapArgument('foo'), tagged_class_map('foo'));
+        $this->assertEquals(new TaggedClassMapArgument('foo', 'key', ['Baz']), tagged_class_map('foo', 'key', 'Baz'));
+        $this->assertEquals(new TaggedClassMapArgument('foo', null, ['Baz', 'Qux']), tagged_class_map('foo', exclude: ['Baz', 'Qux']));
     }
 
     public function testTaggedIteratorAcceptsNullExclude()

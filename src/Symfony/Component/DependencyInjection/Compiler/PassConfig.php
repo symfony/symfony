@@ -73,6 +73,7 @@ class PassConfig
             new ServiceLocatorTagPass(),
             new ResolveLazyProxyPass(),
             new ResolveTaggedIteratorArgumentPass(),
+            new ResolveTaggedClassMapArgumentPass(),
             new ResolveServiceSubscribersPass(),
             new ResolveReferencesToAliasesPass(),
             new ResolveInvalidReferencesPass(),

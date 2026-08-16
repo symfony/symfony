@@ -13,12 +13,14 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -120,6 +122,18 @@ abstract class AbstractDescriptorTestCase extends TestCase
     public static function getDescribeContainerDefinitionTestData(): array
     {
         return static::getDescriptionTestData(ObjectsProvider::getContainerDefinitions());
+    }
+
+    #[DataProvider('getDescribeContainerDefinitionWithTaggedClassMapTestData')]
+    #[RequiresMethod(TaggedClassMapArgument::class, 'getTag')]
+    public function testDescribeContainerDefinitionWithTaggedClassMap(Definition $definition, $expectedDescription, $file)
+    {
+        $this->assertDescription($expectedDescription, $definition);
+    }
+
+    public static function getDescribeContainerDefinitionWithTaggedClassMapTestData(): array
+    {
+        return static::getDescriptionTestData(ObjectsProvider::getContainerDefinitionsWithTaggedClassMap());
     }
 
     #[DataProvider('getDescribeContainerDefinitionWithArgumentsShownTestData')]

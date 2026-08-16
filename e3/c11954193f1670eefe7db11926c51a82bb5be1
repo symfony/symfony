@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-29T18:54:25Z
+
+please check failures ;)
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-03T14:15:09Z
+
+I rebased to 8.2 and I think the failing tests are unrelated. Thanks.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-03T15:33:41Z
+
+Sorry! It should be correctly rebased to 8.2 now. Thanks.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-07-03T20:57:46Z
+
+> Sorry! It should be correctly rebased to 8.2 now. Thanks.
+
+I think you forgot to push
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-07-24T07:09:30Z
+
+I rebased it to the 8.2 branch again. Thanks.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T14:48:11Z
+
+Thanks for your patience. @fabpot asked on 2026-07-03 to move this to 8.2, so I did that and pushed, rebased on 8.2.
+
+What changed: every deprecation version string goes from 8.1 to 8.2, in `HttpKernelExtension`, `HttpKernelRuntime`, `HIncludeFragmentRenderer`, the `hinclude_default_template` `setDeprecated()` call and the four test expectations. The UPGRADE entries move from `UPGRADE-8.1.md` to `UPGRADE-8.2.md`, which needed new `HttpKernel` and `TwigBridge` sections, and the three CHANGELOG entries move to their 8.2 sections. The header table now says 8.2 as well.
+
+I also squashed the ten commits into one, since eight of them were follow-up fixes from the review.
+
+Care was needed on the version bump: `Configuration.php` already carried three unrelated 8.1 deprecations, and `FrameworkExtensionTestCase` and `ConfigurationTest` two more, so only the lines this PR adds were touched.
+
+@stof's and my earlier points are in: the class carries the deprecation rather than the always-wired service, the Twig function is deprecated explicitly so template linting reports it, and the runtime method is `@internal`. FrameworkBundle DI is green at 579 tests, and the fragment plus Twig extension tests at 59.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-16T08:53:14Z
+
+Rebased on 8.2 and pushed a few fixes:
+
+* `fragment_renderer.php` referenced the renderer as a string, with a comment saying this avoided triggering the deprecation. It does not: the deprecation is triggered by the constructor, so `::class` and reflection stay silent. Restored the import.
+* The changelog and upgrade entries announced the `fragment.renderer.hinclude.global_template` parameter as deprecated, but nothing deprecated it. It is deprecated now. The extension inlines the value into the service argument so the parameter is never resolved at compile time, which means enabling `framework.fragments` does not trigger the deprecation by itself. Same shape as the `router.request_context.*` deprecation in 8.1.
+* Removed a stray comma inside the `render_hinclude()` replacement text.
+* Added tests for the parameter deprecation and for the case that must stay silent.
+
+I also rewrote the description to list the deprecated surface and to be explicit that the replacements are not equivalent: `render_esi()` and `render()` move composition to the server, and only UX Turbo keeps the non-blocking client-side loading. That distinction should make it into the docs.
+
+@fabpot your review asked for the 8.1 to 8.2 retarget, which was applied back in August, so this only needs a fresh look.

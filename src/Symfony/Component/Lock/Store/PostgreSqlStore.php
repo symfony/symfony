@@ -301,7 +301,7 @@ class PostgreSqlStore implements BlockingSharedLockStoreInterface, BlockingStore
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        $namespace = spl_object_hash($this->getConnection());
+        $namespace = spl_object_id($this->getConnection());
 
         return self::$storeRegistry[$namespace] ??= new InMemoryStore();
     }

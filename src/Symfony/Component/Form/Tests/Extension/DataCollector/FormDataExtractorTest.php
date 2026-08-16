@@ -263,7 +263,7 @@ class FormDataExtractorTest extends TestCase
                 'norm' => 'Foobar',
             ],
             'errors' => [
-                ['message' => 'Invalid!', 'origin' => spl_object_hash($form), 'trace' => []],
+                ['message' => 'Invalid!', 'origin' => spl_object_id($form), 'trace' => []],
             ],
             'synchronized' => true,
         ], $this->dataExtractor->extractSubmittedData($form));
@@ -284,7 +284,7 @@ class FormDataExtractorTest extends TestCase
                 'norm' => 'Foobar',
             ],
             'errors' => [
-                ['message' => 'Invalid!', 'origin' => spl_object_hash($form), 'trace' => []],
+                ['message' => 'Invalid!', 'origin' => spl_object_id($form), 'trace' => []],
             ],
             'synchronized' => true,
         ], $this->dataExtractor->extractSubmittedData($form));
@@ -299,7 +299,7 @@ class FormDataExtractorTest extends TestCase
 
         $form->submit('Foobar');
         $form->addError(new FormError('Invalid!', null, [], null, $violation));
-        $origin = spl_object_hash($form);
+        $origin = spl_object_id($form);
 
         if (class_exists(WordCount::class)) {
             $expectedFormat = <<<"EODUMP"
@@ -310,7 +310,7 @@ class FormDataExtractorTest extends TestCase
                   "errors" => array:1 [
                     0 => array:3 [
                       "message" => "Invalid!"
-                      "origin" => "$origin"
+                      "origin" => $origin
                       "trace" => array:2 [
                         0 => Symfony\Component\Validator\ConstraintViolation {
                           -message: "Foo"
@@ -340,7 +340,7 @@ class FormDataExtractorTest extends TestCase
                   "errors" => array:1 [
                     0 => array:3 [
                       "message" => "Invalid!"
-                      "origin" => "$origin"
+                      "origin" => $origin
                       "trace" => array:2 [
                         0 => Symfony\Component\Validator\ConstraintViolation {
                           -message: "Foo"

@@ -39,7 +39,7 @@ class ProxyAdapter implements AdapterInterface, CacheInterface, PruneableInterfa
     public function __construct(CacheItemPoolInterface $pool, string $namespace = '', int $defaultLifetime = 0)
     {
         $this->pool = $pool;
-        $this->poolHash = spl_object_hash($pool);
+        $this->poolHash = spl_object_id($pool);
         if ('' !== $namespace) {
             \assert('' !== CacheItem::validateKey($namespace));
             $this->namespace = $namespace;

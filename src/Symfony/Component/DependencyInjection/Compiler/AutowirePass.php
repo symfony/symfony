@@ -460,12 +460,14 @@ class AutowirePass extends AbstractRecursivePass
             return $reference;
         }
 
-        if ($filterType && false !== $m = strpbrk($type, '&|')) {
-            $types = array_diff(explode($m[0], $type), ['int', 'string', 'array', 'bool', 'float', 'iterable', 'object', 'callable', 'null']);
+        if ($filterType && strpbrk($type, '&|')) {
+            // a top-level "|" always outranks "&"
+            $glue = str_contains($type, '|') ? '|' : '&';
+            $types = array_diff(explode($glue, $type), ['int', 'string', 'array', 'bool', 'float', 'iterable', 'object', 'callable', 'null']);
 
             sort($types);
 
-            $type = implode($m[0], $types);
+            $type = implode($glue, $types);
         }
 
         $name = $target = (array_filter($reference->getAttributes(), static fn ($a) => $a instanceof Target)[0] ?? null)?->name;

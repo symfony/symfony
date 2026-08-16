@@ -244,13 +244,24 @@ class Deprecation
         }
 
         $method = $this->originatingMethod();
-        $groups = class_exists(Groups::class, false) ? [new Groups(), 'groups'] : [Test::class, 'getGroups'];
 
-        return 0 === strpos($method, 'testLegacy')
+        if (0 === strpos($method, 'testLegacy')
             || 0 === strpos($method, 'provideLegacy')
             || 0 === strpos($method, 'getLegacy')
             || strpos($this->originClass, '\Legacy')
-            || \in_array('legacy', $groups($this->originClass, $method), true);
+        ) {
+            return true;
+        }
+
+        // The method can be inherited from an internal class, in which case it has no
+        // doc block nor any file/line to read annotations or attributes from.
+        if (!method_exists($this->originClass, $method) || (new \ReflectionMethod($this->originClass, $method))->isInternal()) {
+            return false;
+        }
+
+        $groups = class_exists(Groups::class, false) ? [new Groups(), 'groups'] : [Test::class, 'getGroups'];
+
+        return \in_array('legacy', $groups($this->originClass, $method), true);
     }
 
     /**

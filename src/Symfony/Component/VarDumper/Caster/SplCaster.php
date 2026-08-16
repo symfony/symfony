@@ -262,12 +262,23 @@ class SplCaster
     private static function castSplArray(\ArrayObject|\ArrayIterator $c, array $a, Stub $stub, bool $isNested): array
     {
         $prefix = Caster::PREFIX_VIRTUAL;
-        $flags = $c->getFlags();
+        $hasDebugInfo = method_exists($c, '__debugInfo');
 
-        if (!($flags & \ArrayObject::STD_PROP_LIST)) {
-            $c->setFlags(\ArrayObject::STD_PROP_LIST);
-            $a = Caster::castObject($c, $c::class, method_exists($c, '__debugInfo'), $stub->class);
-            $c->setFlags($flags);
+        if ($c instanceof \ArrayObject) {
+            $flags = $c->getFlags();
+
+            if (!($flags & \ArrayObject::STD_PROP_LIST)) {
+                $c->setFlags(\ArrayObject::STD_PROP_LIST);
+                $a = Caster::castObject($c, $c::class, $hasDebugInfo, $stub->class);
+                $c->setFlags($flags);
+            }
+        } else {
+            // ArrayIterator::getFlags() and ArrayIterator::setFlags() are deprecated as of PHP 8.6
+            [$flags, , $properties] = $c->__serialize();
+
+            if (!($flags & \ArrayObject::STD_PROP_LIST)) {
+                $a = $properties;
+            }
         }
 
         unset($a["\0ArrayObject\0storage"], $a["\0ArrayIterator\0storage"]);

@@ -28,7 +28,7 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
 {
     use CompatibilityProcessor;
 
-    private array $commandData;
+    private array $commandDataStack = [];
     private bool $includeArguments;
     private bool $includeOptions;
 
@@ -40,8 +40,8 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
 
     private function doInvoke(array|LogRecord $record): array|LogRecord
     {
-        if (isset($this->commandData) && !isset($record['extra']['command'])) {
-            $record['extra']['command'] = $this->commandData;
+        if ($this->commandDataStack && !isset($record['extra']['command'])) {
+            $record['extra']['command'] = $this->commandDataStack[array_key_last($this->commandDataStack)];
         }
 
         return $record;
@@ -52,8 +52,8 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
      */
     public function reset()
     {
-        // the command data is set once, on ConsoleEvents::COMMAND, and must outlive any reset
-        // happening while the command is still running
+        // the command data is set on ConsoleEvents::COMMAND and removed on ConsoleEvents::TERMINATE,
+        // it must outlive any reset happening while a command is still running
     }
 
     /**
@@ -61,21 +61,31 @@ class ConsoleCommandProcessor implements EventSubscriberInterface, ResetInterfac
      */
     public function addCommandData(ConsoleEvent $event)
     {
-        $this->commandData = [
+        $commandData = [
             'name' => $event->getCommand()->getName(),
         ];
         if ($this->includeArguments) {
-            $this->commandData['arguments'] = $event->getInput()->getArguments();
+            $commandData['arguments'] = $event->getInput()->getArguments();
         }
         if ($this->includeOptions) {
-            $this->commandData['options'] = $event->getInput()->getOptions();
+            $commandData['options'] = $event->getInput()->getOptions();
         }
+
+        $this->commandDataStack[] = $commandData;
+    }
+
+    public function removeCommandData(): void
+    {
+        array_pop($this->commandDataStack);
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             ConsoleEvents::COMMAND => ['addCommandData', 1],
+            // lower than ConsoleHandler::onTerminate() (-255) so that records logged
+            // on ConsoleEvents::TERMINATE still carry the command information
+            ConsoleEvents::TERMINATE => ['removeCommandData', -2048],
         ];
     }
 }

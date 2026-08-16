@@ -648,6 +648,32 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([[$object]], $resolver->resolve($request, $argument));
     }
 
+    public function testResolveArrayWithRouteMapping()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('posts', 'john');
+        $request->attributes->set('_route_mapping', ['author' => 'posts']);
+
+        $argument = $this->createArgument('array', new MapEntity(class: \stdClass::class), 'posts');
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->with(['author' => 'john'])
+            ->willReturn($objects = [new \stdClass(), new \stdClass()]);
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with('stdClass')
+            ->willReturn($repository);
+
+        $this->assertSame([$objects], $resolver->resolve($request, $argument));
+    }
+
     public function testArrayArgumentSkipsTheIdentifierLookup()
     {
         $manager = $this->createStub(ObjectManager::class);

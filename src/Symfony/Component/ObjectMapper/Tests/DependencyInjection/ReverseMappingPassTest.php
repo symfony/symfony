@@ -80,6 +80,18 @@ final class ReverseMappingPassTest extends TestCase
         $this->assertSame([], $factory->getArgument(1));
     }
 
+    public function testProcessAcceptsAbstractResources()
+    {
+        $container = new ContainerBuilder();
+        $factory = $this->registerReverseClassFactory($container);
+
+        $this->registerMappedResource($container, QuoteRequestView::class, Quote::class)->setAbstract(true);
+
+        (new ReverseMappingPass())->process($container);
+
+        $this->assertSame([Quote::class => [QuoteRequestView::class]], $factory->getArgument(1));
+    }
+
     private function registerReverseClassFactory(ContainerBuilder $container): Definition
     {
         $definition = new Definition();

@@ -202,4 +202,7 @@ class SessionHandlerProxyTest extends TestCase
 
 abstract class TestSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
 {
+    abstract public function create_sid();
+
+    abstract public function validateId(string $id): bool;
 }

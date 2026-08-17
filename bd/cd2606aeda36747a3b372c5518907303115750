@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-16T08:58:50Z
+
+Thanks for the follow-up, the declarative output is much better than a reference to a generated id.
+
+Keeping the argument alive past `ResolveLazyProxyPass` means the places that assumed it had become a plain `Reference` by then need to be taught about it. I found four and pushed the fixes with tests:
+
+- `ResolveInvalidReferencesPass` pushed `getValues()` through its generic array handler, which nulls or unsets entries and re-indexes. On a lazy proxy pointing at a service tagged `container.excluded` with `nullOnInvalid()` or `ignoreOnInvalid()`, that assigned the interfaces array (or null) to `$service` and compilation died with `TypeError: Cannot assign array to property LazyProxyArgument::$service of type Reference`. It now degrades like the reference it wraps, so the argument becomes null instead.
+- `PhpDumper` only builds the lazily loaded service-locator entry `['privates', id, method, shared]` when the value is a `Reference`. A lazy proxy fell to the eager form, so every proxy in a locator was built when the locator was constructed rather than on `get()`. It now unwraps to the resolved reference and the dump is identical to before.
+- `ResolveHotPathPass` stops at any `ArgumentInterface`, so `container.hot_path` no longer reached the generated `.lazy.*` definition nor the proxied service. That definition is still instantiated eagerly when the consumer is built, so it belongs on the hot path; the pass now follows the resolved reference.
+- `TextDescriptor` prints iterator children with `sprintf('- Service(%s)', $ref)`. With `!iterator [ '@~a' ]`, `debug:container` died with `Object of class LazyProxyArgument could not be converted to string`. The formatting is now shared between the top-level and nested cases.
+
+Also added a lazy proxy to `ObjectsProvider`, both at the top level and inside the existing iterator, so the three descriptors are covered by fixtures.
+
+Verified the compiled container is unchanged against 8.2 for fifteen scenarios (interfaces, aliases, decorators, method calls, invalid behaviors, non-shared targets, several consumers, nesting in iterators, locators and plain arrays).

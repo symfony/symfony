@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 
 class FormFieldTest extends FormFieldTestCase
@@ -58,9 +59,7 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
     }
 
-    /**
-     * @dataProvider getIdsWithQuotes
-     */
+    #[DataProvider('getIdsWithQuotes')]
     public function testLabelIsAssignedByForAttributeWithQuotesInId(string $id)
     {
         $dom = new \DOMDocument();

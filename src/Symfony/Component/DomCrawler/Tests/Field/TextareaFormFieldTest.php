@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests\Field;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Field\TextareaFormField;
 
 class TextareaFormFieldTest extends FormFieldTestCase
@@ -44,9 +45,7 @@ class TextareaFormFieldTest extends FormFieldTestCase
         $this->assertEquals('foo bar <h1>Baz</h2>', $field->getValue(), '->initialize() sets the value of the field to the textarea node value');
     }
 
-    /**
-     * @dataProvider provideParsedContents
-     */
+    #[DataProvider('provideParsedContents')]
     public function testInitializeWithParsedContent(string $content, string $expected)
     {
         $field = new TextareaFormField($this->parseTextarea($content));

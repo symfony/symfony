@@ -12,13 +12,13 @@
 namespace Symfony\Component\DomCrawler\Field;
 
 /**
- * ChoiceFormField represents a choice form field.
+ * HtmlChoiceFormField represents a choice form field.
  *
  * It is constructed from an HTML select tag, or an HTML checkbox, or radio inputs.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ChoiceFormField extends FormField
+class HtmlChoiceFormField extends HtmlFormField
 {
     use ChoiceFormFieldTrait;
 
@@ -28,7 +28,7 @@ class ChoiceFormField extends FormField
      * @throws \LogicException When choice provided is neither multiple, radio nor select,
      *                         or when the node tag does not match the field type
      */
-    public function addChoice(\DOMElement $node): void
+    public function addChoice(\Dom\Element $node): void
     {
         $this->attachChoice($node);
     }
@@ -41,11 +41,15 @@ class ChoiceFormField extends FormField
     protected function initialize(): void
     {
         if ('input' !== $this->node->localName && 'select' !== $this->node->localName) {
-            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input or select tag (%s given).', $this->node->localName));
+            throw new \LogicException(\sprintf('An HtmlChoiceFormField can only be created from an input or select tag (%s given).', $this->node->localName));
         }
 
-        if ('input' === $this->node->localName && 'checkbox' !== strtolower($this->node->getAttribute('type')) && 'radio' !== strtolower($this->node->getAttribute('type'))) {
-            throw new \LogicException(\sprintf('A ChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is "%s").', $this->node->getAttribute('type')));
+        if ('input' === $this->node->localName) {
+            $type = strtolower($this->node->getAttribute('type') ?? '');
+
+            if ('checkbox' !== $type && 'radio' !== $type) {
+                throw new \LogicException(\sprintf('An HtmlChoiceFormField can only be created from an input tag with a type of checkbox or radio (given type is "%s").', $this->node->getAttribute('type')));
+            }
         }
 
         $this->initializeChoices();

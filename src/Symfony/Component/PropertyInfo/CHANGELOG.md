@@ -7,12 +7,12 @@ CHANGELOG
  * Allow defining accessors and mutators via a `#[WithAccessors]` attribute
  * Gather data from property hooks in ReflectionExtractor
  * Add `PropertyNameExtractorInterface` and `getPropertyName()` to enable property name extraction from an accessor or mutator
+ * Support `enable_default_groups` context option in `SerializerExtractor`
 
 8.1
 ---
 
  * Add support for property hook settable types in `ReflectionExtractor`
- * Support `enable_default_groups` context option in `SerializerExtractor`
 
 7.3
 ---

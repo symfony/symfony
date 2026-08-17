@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add dump indicator to profiler list view for profiles with dumped content
  * Log the profiler URL of each request at debug level on the `profiler` channel
+ * Add a Key Management panel, reporting what a request encrypted per call site and per key rather than call by call
 
 8.1
 ---

@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
+use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Notifier\Notifier;
@@ -1465,6 +1466,11 @@ class ConfigurationTest extends TestCase
                 'default_options' => [
                     'include_null_properties' => false,
                 ],
+            ],
+            'key_management' => [
+                'enabled' => !class_exists(FullStack::class) && interface_exists(EncrypterInterface::class),
+                'default_client' => null,
+                'clients' => [],
             ],
         ];
     }

@@ -33,6 +33,7 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
+use Symfony\Component\KeyManagement\EncrypterInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\Mailer;
@@ -198,6 +199,7 @@ class Configuration implements ConfigurationInterface
         $this->addWebhookSection($rootNode, $enableIfStandalone);
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
+        $this->addKeyManagementSection($rootNode, $enableIfStandalone);
 
         $rootNode
             ->validate()
@@ -3123,6 +3125,67 @@ class Configuration implements ConfigurationInterface
                                         ->info('The maximum length allowed for the sanitized input.')
                                         ->defaultValue(0)
                                     ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addKeyManagementSection(ArrayNodeDefinition $rootNode, callable $enableIfStandalone): void
+    {
+        $rootNode
+            ->children()
+                ->arrayNode('key_management')
+                    ->info('KMS clients configuration')
+                    ->{$enableIfStandalone('symfony/key-management', EncrypterInterface::class)}()
+                    ->fixXmlConfig('client')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(static fn (string $dsn): array => ['clients' => ['default' => $dsn]])
+                    ->end()
+                    ->children()
+                        ->scalarNode('default_client')
+                            ->info('Name of the default client (must match an entry of "clients"); inferred when only one client is registered.')
+                            ->defaultNull()
+                        ->end()
+                        ->arrayNode('clients')
+                            ->info('Map of client name to DSN; "service://<id>" takes the client the application registered under that service id instead of building one from a DSN.')
+                            ->normalizeKeys(false)
+                            ->useAttributeAsKey('name')
+                            ->scalarPrototype()
+                                ->cannotBeEmpty()
+                            ->end()
+                        ->end()
+                        ->arrayNode('store')
+                            ->info('Data key store: payloads then refer to a stored data key instead of carrying it, so the KMS is reached once per key and per process, and that key can be rewrapped under another provider without rewriting a payload.')
+                            ->children()
+                                ->scalarNode('connection')
+                                    ->info('Service id of the DBAL connection holding the table.')
+                                    ->defaultValue('doctrine.dbal.default_connection')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('client')
+                                    ->info('Name of the client wrapping the data keys this store creates (must match an entry of "clients").')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('key_id')
+                                    ->info('Master key wrapping the data keys this store creates (backend-specific: alias, ARN, key URL, ...).')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->scalarNode('table')
+                                    ->info('Name of the table holding the wrapped data keys.')
+                                    ->defaultValue('key_management_data_keys')
+                                    ->cannotBeEmpty()
+                                ->end()
+                                ->integerNode('max_age')
+                                    ->info('Seconds after which the current data key of a scope is retired in favour of a fresh one; the default of 30 days keeps what one key seals under the collision bound of the random 96-bit IV each payload carries.')
+                                    ->defaultValue(2592000)
+                                    ->min(0)
                                 ->end()
                             ->end()
                         ->end()

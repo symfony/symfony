@@ -52,7 +52,10 @@ $payload = $envelopeEncrypter->decrypt(Envelope::fromBytes(file_get_contents($pa
 
 Each bridge under `Symfony\Component\KeyManagement\Bridge\` is published as its
 own Composer package and documents the DSN schemes it supports in its own
-README.
+README. `symfony/doctrine-dbal-key-management` ships a Doctrine DBAL Type that
+decorates any parent Type with column-level envelope encryption, and
+`symfony/doctrine-orm-key-management` the attribute filling a blind index on
+flush.
 
 Searching an encrypted column
 -----------------------------
@@ -86,6 +89,22 @@ column of its own.
 Equal values give equal tags, so the column tells anyone reading it which rows
 share a value and how often each occurs. Index what is high-entropy and looked
 up by equality, and leave the rest to a decrypted scan.
+
+On a Doctrine entity, `symfony/doctrine-orm-key-management` writes the tag
+itself: the column says where it comes from, and a listener fills it on every
+flush. The query side is unchanged, since it has no entity to read the attribute
+on.
+
+```php
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\Attribute\BlindIndexed;
+
+#[ORM\Column(type: 'encrypted_string', length: 180)]
+private string $email = '';
+
+#[ORM\Column(length: 64)]
+#[BlindIndexed('email', Email::class)]
+private string $emailIndex = '';
+```
 
 Resources
 ---------

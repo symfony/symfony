@@ -163,7 +163,7 @@
                         "description": "Set true to enable support for the '_method' request parameter to determine the intended HTTP method on POST requests."
                     },
                     "allowed_http_method_override": {
-                        "$ref": "#/$defs/types/array",
+                        "$ref": "#/$defs/types/array_null",
                         "items": {
                             "$ref": "#/$defs/types/string_null"
                         },
@@ -325,10 +325,20 @@
                                                         "default": "_token"
                                                     },
                                                     "field_attr": {
-                                                        "$ref": "#/$defs/types/object_null",
-                                                        "additionalProperties": {
-                                                            "$ref": "#/$defs/types/scalar"
-                                                        },
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/object_null",
+                                                                "additionalProperties": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            },
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            }
+                                                        ],
                                                         "default": {
                                                             "data-controller": "csrf-protection"
                                                         }
@@ -541,7 +551,7 @@
                         "$ref": "#/$defs/types/object_null",
                         "properties": {
                             "expiration": {
-                                "$ref": "#/$defs/types/integer",
+                                "$ref": "#/$defs/types/integer_null",
                                 "default": null,
                                 "description": "Default expiration of signed URIs, in seconds."
                             }
@@ -794,7 +804,7 @@
                                                     ]
                                                 },
                                                 "events_to_dispatch": {
-                                                    "$ref": "#/$defs/types/array",
+                                                    "$ref": "#/$defs/types/array_null",
                                                     "items": {
                                                         "$ref": "#/$defs/types/string_null"
                                                     },
@@ -818,10 +828,20 @@
                                                                         "$ref": "#/$defs/types/scalar"
                                                                     },
                                                                     "metadata": {
-                                                                        "$ref": "#/$defs/types/object_null",
-                                                                        "additionalProperties": {
-                                                                            "$ref": "#/$defs/types/variable"
-                                                                        },
+                                                                        "anyOf": [
+                                                                            {
+                                                                                "$ref": "#/$defs/types/object_null",
+                                                                                "additionalProperties": {
+                                                                                    "$ref": "#/$defs/types/variable"
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                "$ref": "#/$defs/types/array_null",
+                                                                                "items": {
+                                                                                    "$ref": "#/$defs/types/variable"
+                                                                                }
+                                                                            }
+                                                                        ],
                                                                         "examples": [
                                                                             {
                                                                                 "color": "blue",
@@ -923,10 +943,20 @@
                                                                 "default": 1
                                                             },
                                                             "metadata": {
-                                                                "$ref": "#/$defs/types/object_null",
-                                                                "additionalProperties": {
-                                                                    "$ref": "#/$defs/types/variable"
-                                                                },
+                                                                "anyOf": [
+                                                                    {
+                                                                        "$ref": "#/$defs/types/object_null",
+                                                                        "additionalProperties": {
+                                                                            "$ref": "#/$defs/types/variable"
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "$ref": "#/$defs/types/array_null",
+                                                                        "items": {
+                                                                            "$ref": "#/$defs/types/variable"
+                                                                        }
+                                                                    }
+                                                                ],
                                                                 "examples": [
                                                                     {
                                                                         "color": "blue",
@@ -943,10 +973,20 @@
                                                     "minItems": 1
                                                 },
                                                 "metadata": {
-                                                    "$ref": "#/$defs/types/object_null",
-                                                    "additionalProperties": {
-                                                        "$ref": "#/$defs/types/variable"
-                                                    },
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "additionalProperties": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        },
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        }
+                                                    ],
                                                     "examples": [
                                                         {
                                                             "color": "blue",
@@ -1319,6 +1359,12 @@
                                                 }
                                             },
                                             {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
                                                 "type": [
                                                     "string"
                                                 ]
@@ -1376,10 +1422,20 @@
                                         "description": "Behavior if an asset cannot be found when imported from JavaScript or CSS files - e.g. \"import './non-existent.js'\". \"strict\" means an exception is thrown, \"warn\" means a warning is logged, \"ignore\" means the import is left as-is."
                                     },
                                     "extensions": {
-                                        "$ref": "#/$defs/types/object_null",
-                                        "additionalProperties": {
-                                            "$ref": "#/$defs/types/scalar"
-                                        },
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "additionalProperties": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            }
+                                        ],
                                         "description": "Key-value pair of file extensions set to their mime type.",
                                         "examples": [
                                             {
@@ -1413,10 +1469,20 @@
                                         "description": "Which entries end up in the rendered importmap: \"all\" of them, or only the ones \"reachable\" from the rendered entrypoints (their eager and lazy import chains) plus the polyfill."
                                     },
                                     "importmap_script_attributes": {
-                                        "$ref": "#/$defs/types/object_null",
-                                        "additionalProperties": {
-                                            "$ref": "#/$defs/types/scalar"
-                                        },
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "additionalProperties": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            }
+                                        ],
                                         "description": "Key-value pair of attributes to add to script tags output for the importmap.",
                                         "examples": [
                                             {
@@ -1690,10 +1756,20 @@
                                                     "$ref": "#/$defs/types/scalar"
                                                 },
                                                 "domains": {
-                                                    "$ref": "#/$defs/types/object_null",
-                                                    "additionalProperties": {
-                                                        "$ref": "#/$defs/types/scalar"
-                                                    }
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "additionalProperties": {
+                                                                "$ref": "#/$defs/types/scalar"
+                                                            }
+                                                        },
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/scalar"
+                                                            }
+                                                        }
+                                                    ]
                                                 },
                                                 "locales": {
                                                     "$ref": "#/$defs/types/array_null",
@@ -1721,10 +1797,20 @@
                                                             "$ref": "#/$defs/types/string_null"
                                                         },
                                                         "parameters": {
-                                                            "$ref": "#/$defs/types/object_null",
-                                                            "additionalProperties": {
-                                                                "$ref": "#/$defs/types/scalar"
-                                                            }
+                                                            "anyOf": [
+                                                                {
+                                                                    "$ref": "#/$defs/types/object_null",
+                                                                    "additionalProperties": {
+                                                                        "$ref": "#/$defs/types/scalar"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "$ref": "#/$defs/types/array_null",
+                                                                    "items": {
+                                                                        "$ref": "#/$defs/types/scalar"
+                                                                    }
+                                                                }
+                                                            ]
                                                         },
                                                         "domain": {
                                                             "$ref": "#/$defs/types/string_null"
@@ -1971,10 +2057,20 @@
                                         }
                                     },
                                     "default_context": {
-                                        "$ref": "#/$defs/types/object_null",
-                                        "additionalProperties": {
-                                            "$ref": "#/$defs/types/variable"
-                                        }
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "additionalProperties": {
+                                                    "$ref": "#/$defs/types/variable"
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/variable"
+                                                }
+                                            }
+                                        ]
                                     },
                                     "named_serializers": {
                                         "$ref": "#/$defs/types/object_null",
@@ -1985,10 +2081,20 @@
                                                     "$ref": "#/$defs/types/scalar"
                                                 },
                                                 "default_context": {
-                                                    "$ref": "#/$defs/types/object_null",
-                                                    "additionalProperties": {
-                                                        "$ref": "#/$defs/types/variable"
-                                                    }
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "additionalProperties": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        },
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        }
+                                                    ]
                                                 },
                                                 "include_built_in_normalizers": {
                                                     "$ref": "#/$defs/types/boolean",
@@ -2082,10 +2188,20 @@
                                         "default": false
                                     },
                                     "aliases": {
-                                        "$ref": "#/$defs/types/object_null",
-                                        "additionalProperties": {
-                                            "$ref": "#/$defs/types/scalar"
-                                        },
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "additionalProperties": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            }
+                                        ],
                                         "description": "Additional type aliases to be used during type context creation."
                                     }
                                 },
@@ -2413,6 +2529,13 @@
                                                 "minProperties": 1
                                             },
                                             {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                },
+                                                "minItems": 1
+                                            },
+                                            {
                                                 "type": [
                                                     "string"
                                                 ]
@@ -2480,10 +2603,20 @@
                                                         "description": "Serialization format for the messenger.transport.symfony_serializer service (which is not the serializer used by default)."
                                                     },
                                                     "context": {
-                                                        "$ref": "#/$defs/types/object_null",
-                                                        "additionalProperties": {
-                                                            "$ref": "#/$defs/types/variable"
-                                                        },
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/object_null",
+                                                                "additionalProperties": {
+                                                                    "$ref": "#/$defs/types/variable"
+                                                                }
+                                                            },
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/variable"
+                                                                }
+                                                            }
+                                                        ],
                                                         "description": "Context array for the messenger.transport.symfony_serializer service (which is not the serializer used by default)."
                                                     }
                                                 },
@@ -2519,10 +2652,20 @@
                                                             "description": "Service id of a custom serializer to use."
                                                         },
                                                         "options": {
-                                                            "$ref": "#/$defs/types/object_null",
-                                                            "additionalProperties": {
-                                                                "$ref": "#/$defs/types/variable"
-                                                            }
+                                                            "anyOf": [
+                                                                {
+                                                                    "$ref": "#/$defs/types/object_null",
+                                                                    "additionalProperties": {
+                                                                        "$ref": "#/$defs/types/variable"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "$ref": "#/$defs/types/array_null",
+                                                                    "items": {
+                                                                        "$ref": "#/$defs/types/variable"
+                                                                    }
+                                                                }
+                                                            ]
                                                         },
                                                         "failure_transport": {
                                                             "$ref": "#/$defs/types/scalar",
@@ -2820,17 +2963,37 @@
                                         "$ref": "#/$defs/types/object_null",
                                         "properties": {
                                             "vars": {
-                                                "$ref": "#/$defs/types/object_null",
-                                                "additionalProperties": {
-                                                    "$ref": "#/$defs/types/variable"
-                                                },
+                                                "anyOf": [
+                                                    {
+                                                        "$ref": "#/$defs/types/object_null",
+                                                        "additionalProperties": {
+                                                            "$ref": "#/$defs/types/variable"
+                                                        }
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/types/array_null",
+                                                        "items": {
+                                                            "$ref": "#/$defs/types/variable"
+                                                        }
+                                                    }
+                                                ],
                                                 "description": "Associative array: the default vars used to expand the templated URI."
                                             },
                                             "headers": {
-                                                "$ref": "#/$defs/types/object_null",
-                                                "additionalProperties": {
-                                                    "$ref": "#/$defs/types/variable"
-                                                },
+                                                "anyOf": [
+                                                    {
+                                                        "$ref": "#/$defs/types/object_null",
+                                                        "additionalProperties": {
+                                                            "$ref": "#/$defs/types/variable"
+                                                        }
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/types/array_null",
+                                                        "items": {
+                                                            "$ref": "#/$defs/types/variable"
+                                                        }
+                                                    }
+                                                ],
                                                 "description": "Associative array: header => value(s)."
                                             },
                                             "max_redirects": {
@@ -2842,10 +3005,20 @@
                                                 "description": "The default HTTP version, typically 1.1 or 2.0, leave to null for the best version."
                                             },
                                             "resolve": {
-                                                "$ref": "#/$defs/types/object_null",
-                                                "additionalProperties": {
-                                                    "$ref": "#/$defs/types/scalar"
-                                                },
+                                                "anyOf": [
+                                                    {
+                                                        "$ref": "#/$defs/types/object_null",
+                                                        "additionalProperties": {
+                                                            "$ref": "#/$defs/types/scalar"
+                                                        }
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/types/array_null",
+                                                        "items": {
+                                                            "$ref": "#/$defs/types/scalar"
+                                                        }
+                                                    }
+                                                ],
                                                 "description": "Associative array: domain => IP."
                                             },
                                             "proxy": {
@@ -2925,10 +3098,20 @@
                                                 "description": "The minimum version of TLS to accept; must be one of STREAM_CRYPTO_METHOD_TLSv*_CLIENT constants."
                                             },
                                             "extra": {
-                                                "$ref": "#/$defs/types/object_null",
-                                                "additionalProperties": {
-                                                    "$ref": "#/$defs/types/variable"
-                                                },
+                                                "anyOf": [
+                                                    {
+                                                        "$ref": "#/$defs/types/object_null",
+                                                        "additionalProperties": {
+                                                            "$ref": "#/$defs/types/variable"
+                                                        }
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/types/array_null",
+                                                        "items": {
+                                                            "$ref": "#/$defs/types/variable"
+                                                        }
+                                                    }
+                                                ],
                                                 "description": "Extra options for specific HTTP client."
                                             },
                                             "rate_limiter": {
@@ -3133,10 +3316,20 @@
                                                             "description": "A \"username:password\" pair to use Microsoft NTLM authentication (requires the cURL extension)."
                                                         },
                                                         "query": {
-                                                            "$ref": "#/$defs/types/object_null",
-                                                            "additionalProperties": {
-                                                                "$ref": "#/$defs/types/scalar"
-                                                            },
+                                                            "anyOf": [
+                                                                {
+                                                                    "$ref": "#/$defs/types/object_null",
+                                                                    "additionalProperties": {
+                                                                        "$ref": "#/$defs/types/scalar"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "$ref": "#/$defs/types/array_null",
+                                                                    "items": {
+                                                                        "$ref": "#/$defs/types/scalar"
+                                                                    }
+                                                                }
+                                                            ],
                                                             "description": "Associative array of query string values merged with the base URI."
                                                         },
                                                         "mock_response_factory": {
@@ -3144,10 +3337,20 @@
                                                             "description": "`true` to always return empty 200 responses, `false` to disable mocking, or the id of the service to use to generate mock responses (invokable or iterable)."
                                                         },
                                                         "headers": {
-                                                            "$ref": "#/$defs/types/object_null",
-                                                            "additionalProperties": {
-                                                                "$ref": "#/$defs/types/variable"
-                                                            },
+                                                            "anyOf": [
+                                                                {
+                                                                    "$ref": "#/$defs/types/object_null",
+                                                                    "additionalProperties": {
+                                                                        "$ref": "#/$defs/types/variable"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "$ref": "#/$defs/types/array_null",
+                                                                    "items": {
+                                                                        "$ref": "#/$defs/types/variable"
+                                                                    }
+                                                                }
+                                                            ],
                                                             "description": "Associative array: header => value(s)."
                                                         },
                                                         "max_redirects": {
@@ -3159,10 +3362,20 @@
                                                             "description": "The default HTTP version, typically 1.1 or 2.0, leave to null for the best version."
                                                         },
                                                         "resolve": {
-                                                            "$ref": "#/$defs/types/object_null",
-                                                            "additionalProperties": {
-                                                                "$ref": "#/$defs/types/scalar"
-                                                            },
+                                                            "anyOf": [
+                                                                {
+                                                                    "$ref": "#/$defs/types/object_null",
+                                                                    "additionalProperties": {
+                                                                        "$ref": "#/$defs/types/scalar"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "$ref": "#/$defs/types/array_null",
+                                                                    "items": {
+                                                                        "$ref": "#/$defs/types/scalar"
+                                                                    }
+                                                                }
+                                                            ],
                                                             "description": "Associative array: domain => IP."
                                                         },
                                                         "proxy": {
@@ -3242,10 +3455,20 @@
                                                             "description": "The minimum version of TLS to accept; must be one of STREAM_CRYPTO_METHOD_TLSv*_CLIENT constants."
                                                         },
                                                         "extra": {
-                                                            "$ref": "#/$defs/types/object_null",
-                                                            "additionalProperties": {
-                                                                "$ref": "#/$defs/types/variable"
-                                                            },
+                                                            "anyOf": [
+                                                                {
+                                                                    "$ref": "#/$defs/types/object_null",
+                                                                    "additionalProperties": {
+                                                                        "$ref": "#/$defs/types/variable"
+                                                                    }
+                                                                },
+                                                                {
+                                                                    "$ref": "#/$defs/types/array_null",
+                                                                    "items": {
+                                                                        "$ref": "#/$defs/types/variable"
+                                                                    }
+                                                                }
+                                                            ],
                                                             "description": "Extra options for specific HTTP client."
                                                         },
                                                         "rate_limiter": {
@@ -3621,10 +3844,20 @@
                                                         "description": "The private key passphrase"
                                                     },
                                                     "options": {
-                                                        "$ref": "#/$defs/types/object_null",
-                                                        "additionalProperties": {
-                                                            "$ref": "#/$defs/types/variable"
-                                                        }
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/object_null",
+                                                                "additionalProperties": {
+                                                                    "$ref": "#/$defs/types/variable"
+                                                                }
+                                                            },
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/variable"
+                                                                }
+                                                            }
+                                                        ]
                                                     }
                                                 },
                                                 "additionalProperties": false
@@ -3674,7 +3907,7 @@
                                                         "default": null
                                                     },
                                                     "sign_options": {
-                                                        "$ref": "#/$defs/types/integer",
+                                                        "$ref": "#/$defs/types/integer_null",
                                                         "default": null
                                                     }
                                                 },
@@ -3711,10 +3944,20 @@
                                                         "description": "S/MIME certificate repository service. This service shall implement the `Symfony\\Component\\Mailer\\EventListener\\SmimeCertificateRepositoryInterface`."
                                                     },
                                                     "certificates": {
-                                                        "$ref": "#/$defs/types/object_null",
-                                                        "additionalProperties": {
-                                                            "$ref": "#/$defs/types/scalar"
-                                                        },
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/object_null",
+                                                                "additionalProperties": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            },
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            }
+                                                        ],
                                                         "description": "Recipient S/MIME certificates, as a map of email address to certificate file path. Cannot be used together with \"repository\"."
                                                     },
                                                     "on_missing_certificate": {
@@ -3740,7 +3983,7 @@
                                                         "description": "Also encrypt for the sender, when a certificate is available for its address, so that the sender can read the messages it sent."
                                                     },
                                                     "cipher": {
-                                                        "$ref": "#/$defs/types/integer",
+                                                        "$ref": "#/$defs/types/integer_null",
                                                         "default": null,
                                                         "description": "A set of algorithms used to encrypt the message"
                                                     }
@@ -3843,10 +4086,20 @@
                                                         "description": "Service or class implementing `Symfony\\Component\\Mailer\\EventListener\\PgpPublicKeyRepositoryInterface` to provide recipient PGP public keys."
                                                     },
                                                     "keys": {
-                                                        "$ref": "#/$defs/types/object_null",
-                                                        "additionalProperties": {
-                                                            "$ref": "#/$defs/types/scalar"
-                                                        },
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/object_null",
+                                                                "additionalProperties": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            },
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            }
+                                                        ],
                                                         "description": "Recipient PGP public keys, as a map of email address to public key file path. Cannot be used together with \"repository\"."
                                                     },
                                                     "binary": {
@@ -4044,16 +4297,36 @@
                                         "description": "The message bus to use. Defaults to the default bus if the Messenger component is installed."
                                     },
                                     "chatter_transports": {
-                                        "$ref": "#/$defs/types/object_null",
-                                        "additionalProperties": {
-                                            "$ref": "#/$defs/types/scalar"
-                                        }
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "additionalProperties": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            }
+                                        ]
                                     },
                                     "texter_transports": {
-                                        "$ref": "#/$defs/types/object_null",
-                                        "additionalProperties": {
-                                            "$ref": "#/$defs/types/scalar"
-                                        }
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "additionalProperties": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            }
+                                        ]
                                     },
                                     "notification_on_failed_messages": {
                                         "$ref": "#/$defs/types/boolean",
@@ -4381,10 +4654,20 @@
                                                     "description": "Allows all static elements and attributes from the W3C Sanitizer API standard."
                                                 },
                                                 "allow_elements": {
-                                                    "$ref": "#/$defs/types/object_null",
-                                                    "additionalProperties": {
-                                                        "$ref": "#/$defs/types/variable"
-                                                    },
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "additionalProperties": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        },
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        }
+                                                    ],
                                                     "description": "Configures the elements that the sanitizer should retain from the input. The element name is the key, the value is either a list of allowed attributes for this element or \"*\" to allow the default set of attributes (https://wicg.github.io/sanitizer-api/#default-configuration).",
                                                     "examples": [
                                                         {
@@ -4429,26 +4712,56 @@
                                                     "description": "Configures elements as dropped. Dropped elements are elements the sanitizer should remove from the input, including their children."
                                                 },
                                                 "allow_attributes": {
-                                                    "$ref": "#/$defs/types/object_null",
-                                                    "additionalProperties": {
-                                                        "$ref": "#/$defs/types/variable"
-                                                    },
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "additionalProperties": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        },
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        }
+                                                    ],
                                                     "description": "Configures attributes as allowed. Allowed attributes are attributes the sanitizer should retain from the input."
                                                 },
                                                 "drop_attributes": {
-                                                    "$ref": "#/$defs/types/object_null",
-                                                    "additionalProperties": {
-                                                        "$ref": "#/$defs/types/variable"
-                                                    },
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "additionalProperties": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        },
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/variable"
+                                                            }
+                                                        }
+                                                    ],
                                                     "description": "Configures attributes as dropped. Dropped attributes are attributes the sanitizer should remove from the input."
                                                 },
                                                 "force_attributes": {
                                                     "$ref": "#/$defs/types/object_null",
                                                     "additionalProperties": {
-                                                        "$ref": "#/$defs/types/object_null",
-                                                        "additionalProperties": {
-                                                            "$ref": "#/$defs/types/string_null"
-                                                        }
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/object_null",
+                                                                "additionalProperties": {
+                                                                    "$ref": "#/$defs/types/string_null"
+                                                                }
+                                                            },
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/string_null"
+                                                                }
+                                                            }
+                                                        ]
                                                     },
                                                     "description": "Forcefully set the values of certain attributes on certain elements."
                                                 },
@@ -4476,7 +4789,7 @@
                                                 "allowed_link_hosts": {
                                                     "anyOf": [
                                                         {
-                                                            "$ref": "#/$defs/types/array",
+                                                            "$ref": "#/$defs/types/array_null",
                                                             "items": {
                                                                 "$ref": "#/$defs/types/string_null"
                                                             }
@@ -4514,7 +4827,7 @@
                                                 "allowed_media_hosts": {
                                                     "anyOf": [
                                                         {
-                                                            "$ref": "#/$defs/types/array",
+                                                            "$ref": "#/$defs/types/array_null",
                                                             "items": {
                                                                 "$ref": "#/$defs/types/string_null"
                                                             }
@@ -4620,7 +4933,7 @@
                                                     "subnets": {
                                                         "anyOf": [
                                                             {
-                                                                "$ref": "#/$defs/types/array",
+                                                                "$ref": "#/$defs/types/array_null",
                                                                 "items": {
                                                                     "$ref": "#/$defs/types/scalar"
                                                                 }
@@ -4718,7 +5031,8 @@
                                                 },
                                                 "secret": {
                                                     "$ref": "#/$defs/types/scalar",
-                                                    "default": ""
+                                                    "default": "",
+                                                    "description": "The secret used to verify incoming request signatures. It must be set in production: with an empty value, requests from any sender are accepted."
                                                 }
                                             },
                                             "required": [
@@ -4822,6 +5136,153 @@
                 },
                 "additionalProperties": false
             },
+            "mercure": {
+                "$ref": "#/$defs/types/object_null",
+                "properties": {
+                    "hubs": {
+                        "$ref": "#/$defs/types/object_null",
+                        "additionalProperties": {
+                            "$ref": "#/$defs/types/object_null",
+                            "properties": {
+                                "url": {
+                                    "$ref": "#/$defs/types/scalar",
+                                    "description": "URL of the hub's publish endpoint",
+                                    "examples": [
+                                        "https://demo.mercure.rocks/.well-known/mercure"
+                                    ]
+                                },
+                                "public_url": {
+                                    "$ref": "#/$defs/types/scalar",
+                                    "default": null,
+                                    "description": "URL of the hub's public endpoint",
+                                    "examples": [
+                                        "https://demo.mercure.rocks/.well-known/mercure"
+                                    ]
+                                },
+                                "jwt": {
+                                    "anyOf": [
+                                        {
+                                            "$ref": "#/$defs/types/object_null",
+                                            "properties": {
+                                                "value": {
+                                                    "$ref": "#/$defs/types/scalar",
+                                                    "description": "JSON Web Token to use to publish to this hub."
+                                                },
+                                                "provider": {
+                                                    "$ref": "#/$defs/types/scalar",
+                                                    "description": "The ID of a service to call to provide the JSON Web Token."
+                                                },
+                                                "factory": {
+                                                    "$ref": "#/$defs/types/scalar",
+                                                    "description": "The ID of a service to call to create the JSON Web Token."
+                                                },
+                                                "publish": {
+                                                    "$ref": "#/$defs/types/array_null",
+                                                    "items": {
+                                                        "$ref": "#/$defs/types/scalar"
+                                                    },
+                                                    "description": "A list of topics to allow publishing to when using the given factory to generate the JWT."
+                                                },
+                                                "subscribe": {
+                                                    "$ref": "#/$defs/types/array_null",
+                                                    "items": {
+                                                        "$ref": "#/$defs/types/scalar"
+                                                    },
+                                                    "description": "A list of topics to allow subscribing to when using the given factory to generate the JWT."
+                                                },
+                                                "secret": {
+                                                    "$ref": "#/$defs/types/scalar",
+                                                    "description": "The JWT Secret to use.",
+                                                    "examples": [
+                                                        "!ChangeMe!"
+                                                    ]
+                                                },
+                                                "passphrase": {
+                                                    "$ref": "#/$defs/types/scalar",
+                                                    "default": "",
+                                                    "description": "The JWT secret passphrase."
+                                                },
+                                                "algorithm": {
+                                                    "$ref": "#/$defs/types/scalar",
+                                                    "default": "hmac.sha256",
+                                                    "description": "The algorithm to use to sign the JWT"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        {
+                                            "type": [
+                                                "string"
+                                            ]
+                                        }
+                                    ],
+                                    "description": "JSON Web Token configuration."
+                                },
+                                "jwt_provider": {
+                                    "$ref": "#/$defs/types/scalar",
+                                    "description": "Deprecated since symfony/mercure-bundle 0.3: The child node \"jwt_provider\" at path \"mercure.hubs..jwt_provider\" is deprecated, use \"jwt.provider\" instead.\n\nThe ID of a service to call to generate the JSON Web Token.",
+                                    "deprecated": true
+                                },
+                                "bus": {
+                                    "$ref": "#/$defs/types/scalar",
+                                    "description": "Name of the Messenger bus where the handler for this hub must be registered. Default to the default bus if Messenger is enabled."
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "default_hub": {
+                        "$ref": "#/$defs/types/scalar"
+                    },
+                    "default_cookie_lifetime": {
+                        "$ref": "#/$defs/types/integer_null",
+                        "default": null,
+                        "description": "Default lifetime of the cookie containing the JWT, in seconds. Defaults to the value of \"framework.session.cookie_lifetime\"."
+                    },
+                    "enable_profiler": {
+                        "$ref": "#/$defs/types/boolean",
+                        "description": "Deprecated since symfony/mercure-bundle 0.3: The child node \"enable_profiler\" at path \"mercure.enable_profiler\" is deprecated.\n\nEnable Symfony Web Profiler integration.",
+                        "deprecated": true
+                    }
+                },
+                "additionalProperties": false
+            },
+            "test": {
+                "$ref": "#/$defs/types/object_null",
+                "properties": {
+                    "custom": {
+                        "$ref": "#/$defs/types/scalar"
+                    },
+                    "array": {
+                        "$ref": "#/$defs/types/object_null",
+                        "properties": {
+                            "child1": {
+                                "$ref": "#/$defs/types/scalar"
+                            },
+                            "child2": {
+                                "$ref": "#/$defs/types/scalar"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "options": {
+                        "$ref": "#/$defs/types/object_null",
+                        "additionalProperties": {
+                            "$ref": "#/$defs/types/object_null",
+                            "properties": {
+                                "key": {
+                                    "$ref": "#/$defs/types/scalar"
+                                },
+                                "data": {
+                                    "$ref": "#/$defs/types/scalar"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "additionalProperties": false
+            },
             "test_dump": {
                 "$ref": "#/$defs/types/object_null",
                 "properties": {
@@ -4842,19 +5303,31 @@
         "framework": {
             "$ref": "#/$defs/nodes/framework"
         },
+        "mercure": {
+            "$ref": "#/$defs/nodes/mercure"
+        },
+        "test": {
+            "$ref": "#/$defs/nodes/test"
+        },
         "test_dump": {
             "$ref": "#/$defs/nodes/test_dump"
         }
     },
     "patternProperties": {
         "^when@[a-zA-Z0-9]+$": {
-            "type": "object",
+            "$ref": "#/$defs/types/object_null",
             "properties": {
                 "foo": {
                     "$ref": "#/$defs/nodes/foo"
                 },
                 "framework": {
                     "$ref": "#/$defs/nodes/framework"
+                },
+                "mercure": {
+                    "$ref": "#/$defs/nodes/mercure"
+                },
+                "test": {
+                    "$ref": "#/$defs/nodes/test"
                 },
                 "test_dump": {
                     "$ref": "#/$defs/nodes/test_dump"

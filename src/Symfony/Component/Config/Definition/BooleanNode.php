@@ -31,7 +31,7 @@ class BooleanNode extends ScalarNode
 
     public function isNullable(): bool
     {
-        return $this->nullable;
+        return $this->nullable || ($this->hasDefaultValue() && null === $this->getDefaultValue());
     }
 
     protected function validateType(mixed $value): void

@@ -120,7 +120,7 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
             }
             ksort($whenProperties);
             $rootProperties['when@'.$env] = [
-                'type' => 'object',
+                '$ref' => '#/$defs/types/object_null',
                 'properties' => $whenProperties,
                 'additionalProperties' => false,
             ];
@@ -134,7 +134,7 @@ class JsonSchemaConfigDumpPass implements CompilerPassInterface
             'properties' => $rootProperties,
             'patternProperties' => [
                 '^when@[a-zA-Z0-9]+$' => [
-                    'type' => 'object',
+                    '$ref' => '#/$defs/types/object_null',
                     'properties' => $allProperties,
                 ],
             ],

@@ -38,6 +38,7 @@ use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
+use Symfony\Bundle\FrameworkBundle\Command\YamlLintSchemaResolver;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
@@ -61,6 +62,8 @@ use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
 use Symfony\Component\Workflow\Command\WorkflowDumpCommand;
+use Symfony\Component\Yaml\Schema\FileHeaderSchemaResolver;
+use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -324,6 +327,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('console.command.yaml_lint', YamlLintCommand::class)
+            ->args([
+                inline_service(YamlLintSchemaResolver::class)
+                    ->args([null, inline_service(FileHeaderSchemaResolver::class)]),
+                inline_service(SchemaValidator::class),
+                param('kernel.project_dir'),
+            ])
             ->tag('console.command')
 
         ->set('console.command.translation_lint', TranslationLintCommand::class)

@@ -152,6 +152,7 @@
         "monolog/monolog": "^3.0",
         "nikic/php-parser": "^5.0",
         "nyholm/psr7": "^1.0",
+        "opis/json-schema": "^2.6",
         "pda/pheanstalk": "^5.1|^7.0|^8.0",
         "php-http/discovery": "^1.15",
         "php-http/httplug": "^1.0|^2.0",

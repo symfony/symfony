@@ -34,6 +34,7 @@
         "symfony/polyfill-ctype": "^1.8"
     },
     "require-dev": {
+        "opis/json-schema": "^2.6",
         "symfony/console": "^7.4|^8.0",
         "yaml/yaml-test-suite": "*"
     },

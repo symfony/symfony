@@ -27,6 +27,7 @@
         "symfony/console": "^7.4|^8.0",
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/filesystem": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
         "symfony/process": "^7.4|^8.0",
         "symfony/serializer": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3.0",
@@ -42,6 +43,7 @@
         "ext-openssl": "Required to use OpenSslKms (AES-256-GCM) and the EnvelopeEncrypter",
         "ext-sodium": "Required to use SodiumKms (XChaCha20-Poly1305) and SealedBoxKms",
         "symfony/console": "Required to use the key-management:encrypt, key-management:decrypt and key-management:generate-data-key console commands",
+        "symfony/http-kernel": "Required to use the KeyManagementDataCollector and the debug decorators feeding it",
         "symfony/filesystem": "Required to use the FilesystemKeyLoader (read keys from a directory on disk)",
         "symfony/serializer": "Required to use the EnvelopeNormalizer with symfony/serializer",
         "symfony/uid": "Required to use the InMemoryDataKeyStore test double, which mints UUIDv7 references"

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T12:20:13Z
+
+Thanks for tracking this down. I reviewed it and found no blocker.
+
+I pushed one simplification: the fixture now uses `#[Map(transform: 'strtoupper')]` instead of a dedicated callable class, which is the style the other fixtures use, so `ReferenceFormatter` is gone. The transform is still observable. Reverting `ObjectMapper.php` alone makes `testDirectionlessTargetTransformIsNotAppliedToTheSameNameCopy` fail with `'sf-1'` against `'SF-1'`.
+
+Note for the merge-up. On 8.1 and 8.2 the same block carries an extra `&& !$mapping->targetClass` line, so both hunks conflict. The resolution is:
+
+```php
+if (null === $mapping->if
+    && !$mapping->targetClass
+    && $propertyName === $mapping->source
+    && ($mapping->target ?? $propertyName) === $propertyName
+) {
+```
+
+I verified this by patching an 8.2 checkout and running its ObjectMapper suite, which stays green. The three shapes in the table above behave there exactly as they do here: a bare `#[Map(transform: T)]` and a target-only `#[Map(target: 'id', transform: T)]` stop matching, while `#[Map(source: 'id', transform: T)]` keeps matching. No other shape changes, including those carrying a condition or a target class.

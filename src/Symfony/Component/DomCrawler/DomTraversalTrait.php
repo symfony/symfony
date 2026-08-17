@@ -18,6 +18,9 @@ namespace Symfony\Component\DomCrawler;
  * expose the same names for traversal, so the lookups below work on either of
  * them. Only \Dom\Element has a selector engine, hence no selector is used here.
  *
+ * The lookups are private: a shipped class carries its protected members as part
+ * of its extension contract, and these are an implementation detail.
+ *
  * @internal
  */
 trait DomTraversalTrait
@@ -25,7 +28,7 @@ trait DomTraversalTrait
     /**
      * Returns the closest ancestor with the given tag name, the node itself excluded.
      */
-    protected static function findAncestor(\DOMElement|\Dom\Element $node, string $localName): \DOMElement|\Dom\Element|null
+    private static function findAncestor(\DOMElement|\Dom\Element $node, string $localName): \DOMElement|\Dom\Element|null
     {
         $parent = $node->parentNode;
 
@@ -47,7 +50,7 @@ trait DomTraversalTrait
      *
      * @return list<\DOMElement|\Dom\Element>
      */
-    protected static function collectDescendants(\DOMElement|\Dom\Element|\DOMDocument|\Dom\Document $root, callable $accept): array
+    private static function collectDescendants(\DOMElement|\Dom\Element|\DOMDocument|\Dom\Document $root, callable $accept): array
     {
         $found = [];
         $walk = static function ($node) use (&$walk, &$found, $accept): void {

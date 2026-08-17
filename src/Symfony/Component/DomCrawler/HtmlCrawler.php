@@ -33,7 +33,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
     private const HTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
     private const XPATH_PREFIX = 'html';
 
-    protected ?string $baseHref;
+    private ?string $baseHref;
     private ?\Dom\Document $document = null;
 
     /**
@@ -473,11 +473,14 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
      */
     public function outerHtml(): string
     {
-        if (!$this->nodes || !$this->getNode(0) instanceof \Dom\Element) {
+        if (!$this->nodes || !($node = $this->getNode(0)) instanceof \Dom\Element) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return $this->getNode(0)->outerHTML;
+        // \Dom\Element::$outerHTML was added in PHP 8.5
+        $document = $node->ownerDocument;
+
+        return $document instanceof \Dom\HTMLDocument ? $document->saveHtml($node) : $document->saveXml($node);
     }
 
     /**
@@ -531,7 +534,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
                 } elseif ('_name' === $attribute) {
                     $elements[] = $node instanceof \Dom\Element ? $node->localName : $node->nodeName;
                 } else {
-                    $elements[] = $node instanceof \Dom\Element && $node->hasAttribute($attribute) ? $node->getAttribute($attribute) : null;
+                    $elements[] = $node instanceof \Dom\Element ? $node->getAttribute($attribute) ?? '' : '';
                 }
             }
 
@@ -581,6 +584,131 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
         }
 
         return $crawler;
+    }
+
+    /**
+     * Selects links by name or alt value for clickable images.
+     */
+    public function selectLink(string $value): static
+    {
+        $value = ' '.$value.' ';
+
+        return $this->select('a', static function (\Dom\Element $node) use ($value): bool {
+            if (str_contains(' '.self::normalizeSpace($node->textContent).' ', $value)) {
+                return true;
+            }
+
+            // \Dom\Element::$children was added in PHP 8.5
+            foreach ($node->childNodes as $child) {
+                if ($child instanceof \Dom\Element && 'img' === $child->localName && str_contains(' '.self::normalizeSpace($child->getAttribute('alt') ?? '').' ', $value)) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Selects images by alt value.
+     */
+    public function selectImage(string $value): static
+    {
+        return $this->select('img', static fn (\Dom\Element $node): bool => str_contains(self::normalizeSpace($node->getAttribute('alt') ?? ''), $value));
+    }
+
+    /**
+     * Selects a button by name or alt value for images.
+     */
+    public function selectButton(string $value): static
+    {
+        $paddedValue = ' '.$value.' ';
+
+        return $this->select('input, button', static function (\Dom\Element $node) use ($value, $paddedValue): bool {
+            if ($value === $node->getAttribute('id') || $value === $node->getAttribute('name')) {
+                return true;
+            }
+
+            $hasValue = static fn (string $attribute): bool => str_contains(' '.self::normalizeSpace($node->getAttribute($attribute) ?? '').' ', $paddedValue);
+
+            if ('button' === $node->localName) {
+                return $hasValue('value') || str_contains(' '.self::normalizeSpace($node->textContent).' ', $paddedValue);
+            }
+
+            $type = strtolower($node->getAttribute('type') ?? '');
+
+            if ((str_contains($type, 'submit') || str_contains($type, 'button')) && $hasValue('value')) {
+                return true;
+            }
+
+            return str_contains($type, 'image') && $hasValue('alt');
+        });
+    }
+
+    /**
+     * Returns a Link object for the first node in the list.
+     *
+     * @throws \InvalidArgumentException If the current node list is empty or the node is not an element
+     */
+    public function link(string $method = 'get'): HtmlLink
+    {
+        return new HtmlLink($this->getFirstElement(), $this->baseHref, $method);
+    }
+
+    /**
+     * @return HtmlLink[]
+     *
+     * @throws \InvalidArgumentException If the current node list contains non-elements
+     */
+    public function links(): array
+    {
+        $links = [];
+        foreach ($this->nodes as $node) {
+            $links[] = new HtmlLink($this->assertElement($node), $this->baseHref, 'get');
+        }
+
+        return $links;
+    }
+
+    /**
+     * Returns an Image object for the first node in the list.
+     *
+     * @throws \InvalidArgumentException If the current node list is empty or the node is not an element
+     */
+    public function image(): HtmlImage
+    {
+        return new HtmlImage($this->getFirstElement(), $this->baseHref);
+    }
+
+    /**
+     * @return HtmlImage[]
+     *
+     * @throws \InvalidArgumentException If the current node list contains non-elements
+     */
+    public function images(): array
+    {
+        $images = [];
+        foreach ($this->nodes as $node) {
+            $images[] = new HtmlImage($this->assertElement($node), $this->baseHref);
+        }
+
+        return $images;
+    }
+
+    /**
+     * Returns a Form object for the first node in the list.
+     *
+     * @throws \InvalidArgumentException If the current node list is empty or the node is not an element
+     */
+    public function form(?array $values = null, ?string $method = null): HtmlForm
+    {
+        $form = new HtmlForm($this->getFirstElement(), $this->uri, $method, $this->baseHref);
+
+        if (null !== $values) {
+            $form->setValues($values);
+        }
+
+        return $form;
     }
 
     public function getNode(int $position): ?\Dom\Node
@@ -687,6 +815,69 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
     private function normalizeWhitespace(string $string): string
     {
         return trim(preg_replace("/(?:[ \n\r\t\x0C]{2,}+|[\n\r\t\x0C])/", ' ', $string), " \n\r\t\x0C");
+    }
+
+    /**
+     * Collapses whitespace the way the XPath normalize-space() function does, so
+     * that the selectors below match what the classic crawler matches. That set
+     * of characters is narrower than the HTML5 one: it leaves the form feed out.
+     */
+    private static function normalizeSpace(string $string): string
+    {
+        return trim(preg_replace("/[ \n\r\t]++/", ' ', $string), " \n\r\t");
+    }
+
+    /**
+     * Selects the nodes matching the selector, the current nodes included, that
+     * the given predicate accepts.
+     *
+     * @param callable(\Dom\Element): bool $accept
+     */
+    private function select(string $selector, callable $accept): static
+    {
+        $crawler = $this->createSubCrawler(null);
+
+        foreach ($this->nodes as $node) {
+            if ($node instanceof \Dom\Element && $node->matches($selector) && $accept($node)) {
+                $crawler->addNode($node);
+            }
+
+            if (!$node instanceof \Dom\ParentNode) {
+                continue;
+            }
+
+            foreach ($node->querySelectorAll($selector) as $candidate) {
+                if ($accept($candidate)) {
+                    $crawler->addNode($candidate);
+                }
+            }
+        }
+
+        return $crawler;
+    }
+
+    /**
+     * @throws \InvalidArgumentException If the current node list is empty or the node is not an element
+     */
+    private function getFirstElement(): \Dom\Element
+    {
+        if (!$this->nodes) {
+            throw new \InvalidArgumentException('The current node list is empty.');
+        }
+
+        return $this->assertElement($this->nodes[0]);
+    }
+
+    /**
+     * @throws \InvalidArgumentException If the node is not an element
+     */
+    private function assertElement(\Dom\Node $node): \Dom\Element
+    {
+        if (!$node instanceof \Dom\Element) {
+            throw new \InvalidArgumentException(\sprintf('The current node list should contain only Dom\Element instances, "%s" found.', get_debug_type($node)));
+        }
+
+        return $node;
     }
 
     /**

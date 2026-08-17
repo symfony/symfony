@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\DomCrawler\Field;
 
+use Symfony\Component\DomCrawler\DomTraversalTrait;
+
 /**
  * Holds the choice logic shared by the classic and the native choice fields.
  *
@@ -22,6 +24,8 @@ namespace Symfony\Component\DomCrawler\Field;
  */
 trait ChoiceFormFieldTrait
 {
+    use DomTraversalTrait;
+
     private string $type;
     private bool $multiple;
     private array $options;

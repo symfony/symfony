@@ -275,7 +275,7 @@ class ChoiceFormField extends FormField
             }
 
             $found = false;
-            foreach ($this->xpath->query('descendant::option', $this->node) as $option) {
+            foreach (self::collectDescendants($this->node, static fn ($node) => 'option' === $node->localName) as $option) {
                 $optionValue = $this->buildOptionValue($option);
                 $this->options[] = $optionValue;
 

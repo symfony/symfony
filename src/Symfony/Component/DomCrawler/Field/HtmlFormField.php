@@ -14,38 +14,26 @@ namespace Symfony\Component\DomCrawler\Field;
 use Symfony\Component\DomCrawler\DomTraversalTrait;
 
 /**
- * FormField is the abstract class for all form fields.
+ * HtmlFormField is the abstract class for all form fields backed by the native HTML parser.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class FormField
+abstract class HtmlFormField
 {
     use DomTraversalTrait;
     use FormFieldTrait;
 
     protected string $name;
     protected string|array|null $value = null;
-
-    /**
-     * @deprecated since Symfony 8.2, not used anymore
-     */
-    protected \DOMDocument $document;
-
-    /**
-     * @deprecated since Symfony 8.2, not used anymore
-     */
-    protected \DOMXPath $xpath;
-
     protected bool $disabled = false;
 
     /**
-     * @param \DOMElement $node The node associated with this field
+     * @param \Dom\Element $node The node associated with this field
      */
     public function __construct(
-        protected \DOMElement $node,
+        protected \Dom\Element $node,
     ) {
-        $this->name = $node->getAttribute('name');
-        $this->xpath = new \DOMXPath($node->ownerDocument);
+        $this->name = $node->getAttribute('name') ?? '';
 
         $this->initialize();
     }
@@ -53,7 +41,7 @@ abstract class FormField
     /**
      * Returns the label tag associated to the field or null if none.
      */
-    public function getLabel(): ?\DOMElement
+    public function getLabel(): ?\Dom\Element
     {
         if ($this->node->hasAttribute('id')) {
             $id = $this->node->getAttribute('id');

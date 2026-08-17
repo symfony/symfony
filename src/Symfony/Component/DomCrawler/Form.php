@@ -21,6 +21,10 @@ use Symfony\Component\DomCrawler\Field\FormField;
  */
 class Form extends Link implements \ArrayAccess
 {
+    use DomTraversalTrait;
+
+    private const FIELD_TAGS = ['input', 'button', 'textarea', 'select'];
+
     private \DOMElement $button;
     private FormFieldRegistry $fields;
 
@@ -391,8 +395,6 @@ class Form extends Link implements \ArrayAccess
     {
         $this->fields = new FormFieldRegistry();
 
-        $xpath = new \DOMXPath($this->node->ownerDocument);
-
         // add submitted button if it has a valid name
         if ('form' !== $this->button->nodeName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
             if ('input' == $this->button->nodeName && 'image' == strtolower($this->button->getAttribute('type'))) {
@@ -416,14 +418,26 @@ class Form extends Link implements \ArrayAccess
 
         // find form elements corresponding to the current form
         if ($this->node->hasAttribute('id')) {
-            // corresponding elements are either descendants or have a matching HTML5 form attribute
-            $formId = Crawler::xpathLiteral($this->node->getAttribute('id'));
+            // corresponding elements are either descendants of the form or carry a matching HTML5 form attribute,
+            // so the whole document has to be walked
+            $formId = $this->node->getAttribute('id');
 
-            $fieldNodes = $xpath->query(\sprintf('( descendant::input[@form=%s] | descendant::button[@form=%1$s] | descendant::textarea[@form=%1$s] | descendant::select[@form=%1$s] | //form[@id=%1$s]//input[not(@form)] | //form[@id=%1$s]//button[not(@form)] | //form[@id=%1$s]//textarea[not(@form)] | //form[@id=%1$s]//select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $formId));
+            $fieldNodes = self::collectDescendants($this->node->ownerDocument, static function ($node) use ($formId): bool {
+                if (!\in_array($node->localName, self::FIELD_TAGS, true) || !self::isSubmittable($node)) {
+                    return false;
+                }
+
+                if ($node->hasAttribute('form')) {
+                    return $formId === $node->getAttribute('form');
+                }
+
+                return $formId === self::findAncestor($node, 'form')?->getAttribute('id');
+            });
         } else {
-            // do the xpath query with $this->node as the context node, to only find descendant elements
-            // however, descendant elements with form attribute are not part of this form
-            $fieldNodes = $xpath->query('( descendant::input[not(@form)] | descendant::button[not(@form)] | descendant::textarea[not(@form)] | descendant::select[not(@form)] )[( not(ancestor::template) or ancestor::turbo-stream )]', $this->node);
+            // only descendant elements belong to this form, and those carrying a form attribute belong to another one
+            $fieldNodes = self::collectDescendants($this->node, static fn ($node): bool => \in_array($node->localName, self::FIELD_TAGS, true)
+                && !$node->hasAttribute('form')
+                && self::isSubmittable($node));
         }
 
         foreach ($fieldNodes as $node) {
@@ -459,5 +473,15 @@ class Form extends Link implements \ArrayAccess
         } elseif ('textarea' == $nodeName) {
             $this->set(new Field\TextareaFormField($node));
         }
+    }
+
+    /**
+     * Tells whether a field takes part in a submission.
+     *
+     * Fields inside a template are inert, unless a turbo-stream brings them back.
+     */
+    private static function isSubmittable(\DOMElement|\Dom\Element $node): bool
+    {
+        return !self::findAncestor($node, 'template') || self::findAncestor($node, 'turbo-stream');
     }
 }

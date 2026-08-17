@@ -115,6 +115,7 @@ class AmqpReceiver implements QueueReceiverInterface, KeepaliveReceiverInterface
         $data = [
             'body' => false === $body ? '' : $body,
             'headers' => $amqpEnvelope->getHeaders(),
+            'extra' => ['routing_key' => $amqpEnvelope->getRoutingKey()],
         ];
 
         try {

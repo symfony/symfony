@@ -10,6 +10,7 @@ CHANGELOG
  * Add a `--concurrency` option to the `messenger:consume` command to process messages in parallel
  * Add a `--redispatch` option to the `messenger:failed:retry` command to send messages back to their transport instead of handling them in the command
  * Allow prioritizing receivers so that `messenger:consume --all` consumes receivers in a predefined order
+ * Add an optional `extra` key to the encoded envelope passed to `SerializerInterface::decode()`, holding metadata added by the receiving transport
 
 8.1
 ---

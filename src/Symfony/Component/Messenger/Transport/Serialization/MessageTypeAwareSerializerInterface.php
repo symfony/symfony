@@ -32,7 +32,12 @@ interface MessageTypeAwareSerializerInterface
      * therefore return the actual class for every well-formed envelope they can
      * produce, reserving null for malformed or unrecognized input.
      *
-     * @param array{body: string, headers?: array<string, string>} $encodedEnvelope
+     * The `extra` key, when present, holds metadata added by the transport that received
+     * the message rather than data produced by encode(). Implementations SHOULD NOT
+     * determine the message type from it: a signature covers the encoded envelope, so a
+     * type derived from transport metadata is not covered by one.
+     *
+     * @param array{body: string, headers?: array<string, string>, extra?: array<string, mixed>} $encodedEnvelope
      *
      * @return class-string|null
      */

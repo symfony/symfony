@@ -43,8 +43,9 @@ class AmqpTransportTest extends TestCase
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
         $amqpEnvelope->method('getBody')->willReturn('body');
         $amqpEnvelope->method('getHeaders')->willReturn(['my' => 'header']);
+        $amqpEnvelope->method('getRoutingKey')->willReturn('routing_key');
 
-        $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header'], 'extra' => ['routing_key' => 'routing_key']])->willReturn(new Envelope($decodedMessage));
         $connection->method('getQueueNames')->willReturn(['queueName']);
         $connection->expects($this->once())->method('get')->with('queueName')->willReturn($amqpEnvelope);
 

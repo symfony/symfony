@@ -28,6 +28,10 @@ interface SerializerInterface
      * The most common keys are:
      * - `body` (string) - the message body
      * - `headers` (string<string>) - a key/value pair of headers
+     * - `extra` (array<string, mixed>) - metadata added by the transport that received
+     *   the message, e.g. the AMQP routing key. Unlike `body` and `headers`, it is not
+     *   produced by encode() and does not survive a round trip, so implementations MUST
+     *   treat it as optional and MUST NOT require it to decode.
      *
      * On failure, implementations SHOULD return an Envelope wrapping a
      * MessageDecodingFailedException instead of throwing, so that the worker
@@ -35,7 +39,7 @@ interface SerializerInterface
      * MessageDecodingFailedException is still supported for BC with custom
      * serializers; transports will wrap the exception as a fallback.
      *
-     * @param array{body: string, headers?: array<string, string>} $encodedEnvelope
+     * @param array{body: string, headers?: array<string, string>, extra?: array<string, mixed>} $encodedEnvelope
      *
      * @throws MessageDecodingFailedException
      */

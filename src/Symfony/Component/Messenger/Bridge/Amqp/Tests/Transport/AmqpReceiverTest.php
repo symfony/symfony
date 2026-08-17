@@ -219,6 +219,28 @@ class AmqpReceiverTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
+    public function testItPassesTheRoutingKeyToTheSerializer()
+    {
+        $amqpEnvelope = $this->createAMQPEnvelope();
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer->expects($this->once())
+            ->method('decode')
+            ->with([
+                'body' => '{"message": "Hi"}',
+                'headers' => ['type' => DummyMessage::class],
+                'extra' => ['routing_key' => 'dummy_routing_key'],
+            ])
+            ->willReturn(new Envelope(new DummyMessage('Hi')));
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        iterator_to_array($receiver->get());
+    }
+
     private function createAMQPEnvelope(?string $messageId = null, string $body = '{"message": "Hi"}'): \AMQPEnvelope
     {
         $envelope = $this->createStub(\AMQPEnvelope::class);
@@ -227,6 +249,7 @@ class AmqpReceiverTest extends TestCase
             'type' => DummyMessage::class,
         ]);
         $envelope->method('getMessageId')->willReturn($messageId);
+        $envelope->method('getRoutingKey')->willReturn('dummy_routing_key');
 
         return $envelope;
     }

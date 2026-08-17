@@ -11,21 +11,21 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\HtmlFormField;
 
 /**
  * This is an internal class that must not be used directly.
  *
  * @internal
  */
-class FormFieldRegistry
+class HtmlFormFieldRegistry
 {
     use FormFieldRegistryTrait;
 
     /**
      * Adds a field to the registry.
      */
-    public function add(FormField $field): void
+    public function add(HtmlFormField $field): void
     {
         $segments = $this->getSegments($field->getName());
 
@@ -47,11 +47,11 @@ class FormFieldRegistry
     /**
      * Returns the value of the field based on the fully qualified name and its children.
      *
-     * @return FormField|FormField[]|FormField[][]
+     * @return HtmlFormField|HtmlFormField[]|HtmlFormField[][]
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function &get(string $name): FormField|array
+    public function &get(string $name): HtmlFormField|array
     {
         $segments = $this->getSegments($name);
         $target = &$this->fields;
@@ -74,7 +74,7 @@ class FormFieldRegistry
     public function set(string $name, mixed $value): void
     {
         $target = &$this->get($name);
-        if ((!\is_array($value) && $target instanceof FormField) || $target instanceof Field\ChoiceFormField) {
+        if ((!\is_array($value) && $target instanceof HtmlFormField) || $target instanceof Field\HtmlChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
             $registry = new static();

@@ -30,6 +30,25 @@ abstract class AbstractPart
         return $this->headers;
     }
 
+    /**
+     * Sets a parameter of the "Content-Type" header, e.g. "method" for "text/calendar".
+     *
+     * @return $this
+     */
+    public function setContentTypeParameter(string $name, string $value): static
+    {
+        if (!$this->headers->has('Content-Type')) {
+            $this->headers->addParameterizedHeader('Content-Type', $this->getMediaType().'/'.$this->getMediaSubtype());
+        }
+
+        $this->headers->setHeaderParameter('Content-Type', $name, $value);
+
+        return $this;
+    }
+
+    /**
+     * @return Headers A copy of the headers; changes made to it are not persisted on the part
+     */
     public function getPreparedHeaders(): Headers
     {
         $headers = clone $this->headers;

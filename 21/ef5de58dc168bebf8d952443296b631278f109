@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by Nayte91 at 2026-08-16T17:44:34Z
+
+Edited the PR since #48013 was merged! Changed a bit the logic to follows the same pattern.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T09:45:38Z
+
+Thanks for reworking this on top of #48013, the `attr` route is the right shape.
+
+I pushed one change: the merge into `attr` moved the `name` attribute to the end of the tag, so the default output of every form changed and 46 assertions had to be rewritten to match. Keeping the attribute where it is and skipping it only when `attr` defines it gives the same feature with byte-identical defaults:
+
+```twig
+<form{% if name != '' and attr.name is not defined %} name="{{ name }}"{% endif %} method=...
+```
+
+The diff is now the one-line guard plus your three tests. Your tests pass unchanged, and the 46 rewritten assertions are back to their original wording, which is the proof that nothing else moved. Also rebased on 8.2 and retitled to `[TwigBridge]`, since the diff no longer touches the Form component.
+
+Two things I left alone, both pre-existing and out of scope here: `attr: {name: false}` leaves a stray space before `>`, which the `attributes` block does for any false-valued attribute, and a nested field with `attr: {name: 'x'}` still renders a duplicate `name`.

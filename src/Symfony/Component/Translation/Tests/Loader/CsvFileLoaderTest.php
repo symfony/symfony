@@ -41,6 +41,18 @@ class CsvFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
+    public function testLoadEdgeCases()
+    {
+        $loader = new CsvFileLoader();
+        $catalogue = $loader->load(__DIR__.'/../Fixtures/csv-edge-cases.csv', 'en', 'domain1');
+
+        $this->assertSame([
+            'foo' => 'bar',
+            "multi\nline" => 'value',
+            'with;delimiter' => 'ok',
+        ], $catalogue->all('domain1'));
+    }
+
     public function testLoadNonExistingResource()
     {
         $this->expectException(NotFoundResourceException::class);

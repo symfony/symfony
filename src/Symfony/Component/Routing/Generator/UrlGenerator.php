@@ -298,6 +298,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                     $v = $vars;
                 } elseif ($v instanceof \Stringable) {
                     $v = (string) $v;
+                } else {
+                    $v = [];
                 }
             }
         });

@@ -75,6 +75,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\OrderTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DirectionlessTargetTransform\Product as DirectionlessTransformProduct;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DirectionlessTargetTransform\ProductInput as DirectionlessTransformProductInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\Address;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\User as UserEmbeddedMapping;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\UserDto;
@@ -1755,5 +1757,19 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertInstanceOf(RecursionCacheSelfSummaryTarget::class, $mapped->self);
         $this->assertSame(1, $mapped->self->id);
+    }
+
+    public function testDirectionlessTargetTransformIsNotAppliedToTheSameNameCopy()
+    {
+        $product = (new ObjectMapper())->map(new DirectionlessTransformProductInput(), DirectionlessTransformProduct::class);
+
+        $this->assertSame('sf-1', $product->reference);
+    }
+
+    public function testDirectionlessTransformIsAppliedWhenItsOwnClassIsTheSource()
+    {
+        $input = (new ObjectMapper())->map(new DirectionlessTransformProduct(), DirectionlessTransformProductInput::class);
+
+        $this->assertSame('SF-1', $input->reference);
     }
 }

@@ -1,0 +1,8 @@
+foo;bar
+
+#comment;ignored
+"multi
+line";value
+"with;delimiter";ok
+not-enough-columns
+too;many;columns

@@ -121,11 +121,13 @@ final class EntityValueResolver implements ValueResolverInterface
                 return false;
             }
 
-            foreach ($request->attributes->get('_route_mapping') ?? [] as $parameter => $attribute) {
-                if ($name === $attribute) {
-                    $options->mapping = [$name => $parameter];
+            if (!$options->mapping) {
+                foreach ($request->attributes->get('_route_mapping') ?? [] as $parameter => $attribute) {
+                    if ($name === $attribute) {
+                        $options->mapping = [$name => $parameter];
 
-                    return false;
+                        return false;
+                    }
                 }
             }
 

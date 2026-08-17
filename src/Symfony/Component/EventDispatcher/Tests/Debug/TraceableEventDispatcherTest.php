@@ -366,7 +366,7 @@ class TraceableEventDispatcherTest extends TestCase
 
         // repeated invocations are aggregated as a counter, the stored state must not grow
         $p = (new \ReflectionObject($tdispatcher))->getProperty('calledListenerInfos');
-        $this->assertCount(1, $p->getValue($tdispatcher)['']['foo']);
+        $this->assertCount(1, $p->getValue($tdispatcher)[0]['foo']);
     }
 
     public function testCallStackIsNotLeakingWithMultipleListeners()
@@ -456,7 +456,7 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(2, $tdispatcher->getCalledListeners());
 
         $p = (new \ReflectionObject($tdispatcher))->getProperty('calledListenerInfos');
-        $this->assertCount(1, $p->getValue($tdispatcher)['']['foo']);
+        $this->assertCount(1, $p->getValue($tdispatcher)[0]['foo']);
     }
 
     public function testCallStackIsNotLeakingWhenListenerIsAddedBetweenDispatches()

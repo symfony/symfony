@@ -1,0 +1,120 @@
+---------------------------------------------------------------------------
+
+by glengemann at 2022-12-03T01:45:21Z
+
+Hi! It is possible that you can solve the problem or at least have a workaround using a *Middleware* in conjunction with the *HandlerArgumentsStamp*.
+
+For example, I have a message with some AMQP properties attached:
+
+```php
+        $message = new DetectFacesMessage($file->getContent());
+        $this->bus->dispatch($message, [
+            new AmqpStamp('detect-faces', attributes: [
+                'content_type' => 'text/plain',
+                'correlation_id' => $uniqid,
+                'reply_to' => 'response-queue',
+            ]),
+        ]);
+```
+
+And I need the *content_type*, *correlation_id* and *reply_to* AMQP properties in the *consumer* in order to perform some logic. Then, my consumer look this way:
+
+```php
+    public function __invoke(
+        DetectFacesMessage $message,
+        string $replyTo,
+        string $correlationId,
+        string $contentType,
+        string $timestamp,
+    ) {
+
+    }
+```
+
+I have the _AMPQ properties_ as a method parameters because I am using a *Middleware*. It reads/gets the _AMPQ properties_ from the *AMPQ Envelope*. The *Middleware* look like this:
+
+```php
+    public function handle(Envelope $envelope, StackInterface $stack): Envelope
+    {
+        $amqpStamp = $envelope->last(AmqpReceivedStamp::class);
+        if ($amqpStamp) {
+            $replyTo = $amqpStamp->getAmqpEnvelope()->getReplyTo();
+            $correlationId = $amqpStamp->getAmqpEnvelope()->getCorrelationId();
+
+            $contentType = $amqpStamp->getAmqpEnvelope()->getContentType();
+            $timestamp = $amqpStamp->getAmqpEnvelope()->getTimestamp();
+            $routingKey = $amqpStamp->getAmqpEnvelope()->getRoutingKey(); // Here!
+
+            $arguments = [
+                $replyTo,
+                $correlationId,
+                $contentType,
+                $timestamp,
+            ];
+
+            $envelope = $envelope->with(new HandlerArgumentsStamp($arguments));
+        }
+
+        return $stack->next()->handle($envelope, $stack);
+    }
+```
+
+I think you can get the *routing key* in this way. Sounds good to you?
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2022-12-06T16:58:19Z
+
+Thanks @glengemann, I'm looking to have the routing key available in the serializer as part of decoding (I need it to work out which message to create based from the routing key). If I've understood correctly, serializer decoding (deserializing) is done before it enter into the bus and thus the middlewares.
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2026-06-25T01:22:26Z
+
+Looks like the feature is not interesting anymore, may be to close PR?
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2026-06-25T15:37:45Z
+
+I'd still like this I think, when I get chance I'll look to rebase the PR
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-07T10:01:47Z
+
+Sorry for the long silence here. Before rebasing, could you say more about the setup? If each routing key can be bound to its own queue, you can configure one transport per queue with its own `serializer`, and the message class follows from the transport rather than the routing key. If the payload carries a type field, a custom serializer can pick the class from the body.
+
+The routing key only becomes necessary if a wildcard binding funnels several keys into one queue and the body has no discriminator. If that is your case, tell us, because then the right fix is not an `extra` key in the decode payload but giving the serializer typed access to the stamps the receiver already builds (`AmqpReceivedStamp` carries the full `\AMQPEnvelope`). If one of the first two works for you, let's close this.
+
+---------------------------------------------------------------------------
+
+by jenkoian at 2026-08-10T14:35:40Z
+
+> If each routing key can be bound to its own queue, you can configure one transport per queue with its own serializer, and the message class follows from the transport rather than the routing key.
+
+I think this would work for my use case - it's been a while so struggling to remember the specifics of this now and of course I trust your judgement, but just to sound it out...
+
+I have 3 queues in my case, so I'd need to create 3 new transports (https://symfony.com/doc/current/messenger/custom-transport.html) with custom serializers for each? It seems like a lot of work?
+
+Again, I trust your judgement, but can I just ask why we want to avoid exposing the routing key to the serializer, sorry if it's obvious, it's been a few years since I've worked with this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T16:07:16Z
+
+Thanks for your patience on this one, and for pushing back rather than adding three transports. You were right that the routing key is not reachable at decode time: `Serializer::decode()` needs `headers['type']` and `PhpSerializer` needs a serialized envelope, both before any middleware runs, so the `AmqpReceivedStamp` route cannot help here.
+
+I rebased it onto 8.2 and pushed. Your commit could not be replayed, since `getEnvelope()` gained `MessageDecodingFailedException::wrap()`, fetch size and keepalive in the meantime, so I rewrote it against the current code and kept your authorship.
+
+Three changes to what you had:
+
+`routingKey` is now `routing_key`. The other keys in that array are lowercase, and the bridge already spells it that way in `default_publish_routing_key` and the `%routing_key%` queue pattern.
+
+`extra` is now documented on `SerializerInterface::decode()`, since it is part of a public contract. The wording says what it is and what it is not: metadata added by the receiving transport, not produced by `encode()`, does not survive a round trip, so implementations must treat it as optional.
+
+It is also documented on `MessageTypeAwareSerializerInterface::getMessageType()`, which did not exist when you opened this. That method lets a serializer name the message class without instantiating the payload, and `SigningSerializer` uses it to decide whether a message required a signature. It receives the same array you are extending, so `extra` reaches it too. I added a `SHOULD NOT` against deriving the type from `extra` there: the signature covers the encoded envelope, so a type taken from transport metadata is not covered by one.
+
+I also considered injecting the routing key as a header instead, which would have needed no interface change. I did not, because no receiver in the tree fabricates a header today: `headers` is exactly what the sender put on the wire. Injecting one would either overwrite a header the publisher legitimately set, or be indistinguishable from one they forged, and `getMessageType()` could not tell the two apart. Keeping it under `extra` makes the receiver the only writer.
+
+Amqp bridge suite is green at 110 tests. Over to reviewers for the shape of `extra` itself.

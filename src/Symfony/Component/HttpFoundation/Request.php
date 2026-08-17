@@ -1362,11 +1362,8 @@ class Request
             return null;
         }
 
-        if (str_starts_with($canonicalMimeType, 'application/') && str_contains($canonicalMimeType, '+')) {
-            $suffix = substr(strrchr($canonicalMimeType, '+'), 1);
-            if (isset(self::STRUCTURED_SUFFIX_FORMATS[$suffix])) {
-                return self::STRUCTURED_SUFFIX_FORMATS[$suffix];
-            }
+        if (null !== $suffixFormat = self::getStructuredSuffixFormat($canonicalMimeType)) {
+            return $suffixFormat;
         }
 
         if ($subtypeFallback && str_contains($canonicalMimeType, '/')) {
@@ -1380,6 +1377,33 @@ class Request
         }
 
         return null;
+    }
+
+    /**
+     * Gets the format associated with the structured syntax suffix of the mime type.
+     *
+     * Unlike getFormat(), registered formats take no part in the resolution: only
+     * the "+suffix" of an "application/*" mime type is considered, e.g.
+     * "application/vnd.api+json" -> "json". Use it when the underlying
+     * serialization format matters more than the registered alias.
+     *
+     * @see https://datatracker.ietf.org/doc/html/rfc6839
+     */
+    public static function getStructuredSuffixFormat(?string $mimeType): ?string
+    {
+        if (!$mimeType) {
+            return null;
+        }
+
+        if (false !== $pos = strpos($mimeType, ';')) {
+            $mimeType = trim(substr($mimeType, 0, $pos));
+        }
+
+        if (!str_starts_with($mimeType, 'application/') || false === $suffix = strrchr($mimeType, '+')) {
+            return null;
+        }
+
+        return self::STRUCTURED_SUFFIX_FORMATS[substr($suffix, 1)] ?? null;
     }
 
     /**

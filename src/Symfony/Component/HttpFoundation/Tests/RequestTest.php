@@ -625,6 +625,28 @@ b'])]
         ];
     }
 
+    #[DataProvider('getStructuredSuffixFormatProvider')]
+    public function testGetStructuredSuffixFormat(?string $expectedFormat, ?string $mimeType)
+    {
+        $this->assertSame($expectedFormat, Request::getStructuredSuffixFormat($mimeType));
+    }
+
+    public static function getStructuredSuffixFormatProvider()
+    {
+        return [
+            'registered alias resolves to its suffix format' => ['json', 'application/vnd.api+json'],
+            'unregistered media type resolves to its suffix format' => ['json', 'application/vnd.acme.error+json'],
+            'xml suffix' => ['xml', 'application/hal+xml'],
+            'last suffix wins' => ['xml', 'application/foo+bar+xml'],
+            'parameters are ignored' => ['json', 'application/vnd.api+json; charset=utf-8'],
+            'no suffix' => [null, 'application/json'],
+            'unknown suffix' => [null, 'application/foo+bar'],
+            'non-application type' => [null, 'image/svg+xml'],
+            'empty mime type' => [null, ''],
+            'null mime type' => [null, null],
+        ];
+    }
+
     public function testGetUri()
     {
         $server = [];

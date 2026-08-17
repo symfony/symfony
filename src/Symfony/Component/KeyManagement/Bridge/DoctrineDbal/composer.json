@@ -1,0 +1,39 @@
+{
+    "name": "symfony/doctrine-dbal-key-management",
+    "type": "symfony-key-management-bridge",
+    "description": "Symfony Doctrine DBAL Key Management Bridge",
+    "keywords": ["kms", "doctrine", "dbal", "encryption"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérôme Tamarelle",
+            "email": "jerome@tamarelle.net"
+        },
+        {
+            "name": "Florent Morselli",
+            "email": "florent.morselli@spomky-labs.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "doctrine/dbal": "^4.3",
+        "psr/container": "^1.1|^2.0",
+        "symfony/key-management": "^8.2",
+        "symfony/uid": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/dependency-injection": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\KeyManagement\\Bridge\\DoctrineDbal\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

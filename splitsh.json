@@ -40,6 +40,8 @@
         },
         "aws-key-management": "src/Symfony/Component/KeyManagement/Bridge/AwsKms",
         "azure-keyvault-key-management": "src/Symfony/Component/KeyManagement/Bridge/AzureKeyVault",
+        "doctrine-dbal-key-management": "src/Symfony/Component/KeyManagement/Bridge/DoctrineDbal",
+        "doctrine-orm-key-management": "src/Symfony/Component/KeyManagement/Bridge/DoctrineOrm",
         "flysystem-key-management": "src/Symfony/Component/KeyManagement/Bridge/Flysystem",
         "google-cloud-key-management": "src/Symfony/Component/KeyManagement/Bridge/GoogleCloudKms",
         "vault-key-management": "src/Symfony/Component/KeyManagement/Bridge/Vault",

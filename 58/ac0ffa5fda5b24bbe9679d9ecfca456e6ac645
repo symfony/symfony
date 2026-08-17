@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T14:05:10Z
+
+Thanks @thePanz for your patience since April. I finished the PR along the lines of that comment, keeping your authorship; the two methods became one:
+
+```php
+[$min, $max] = $factory->createBoundaries($time);
+```
+
+Beyond taste, the pair shape fixes a latent bug in the two-method version: `createWithRandomMin()` and `createWithRandomMax()` each called `create()`, so calling them back to back without an explicit time could land on two different milliseconds and produce a range that silently excludes ULIDs. Both bounds now derive from a single created ULID, and a test pins that they share the timestamp even without an explicit time.
+
+The second half of my own suggestion, a new interface implemented by both the Ulid and Uuid factories, I am dropping as speculative: `UuidFactory::create()` returns whatever version is configured, and boundaries only mean something for the time-based ones, so the interface would need conditional semantics nobody has asked for. The Uuid side can come with a concrete use case.
+
+Also added the missing tests and the CHANGELOG entry. Uid is green at 215 tests, and restoring the previous factory fails the 2 new ones.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T14:22:15Z
+
+Extended to the time-ordered UUID versions in the same commit: `UuidV7::createBoundaries()` and `UuidV6::createBoundaries()` as static constructors on the version classes, so the configured-version conditionality that killed the interface idea never arises, and `UuidV1` simply has no method since its timestamp is not byte-ordered. The v7 bounds are pinned against the RFC 9562 example timestamp (`017f22e2-79b0-...`), a generated id from the same tick sorts strictly between the bounds for both versions, and Uid is green at 217 tests with the 4 new ones failing when the methods are removed.
+
+---------------------------------------------------------------------------
+
+by thePanz at 2026-08-17T06:18:03Z
+
+Thank you @nicolas-grekas for your work on this one (if went off my radar, sorry!)
+
+And yeah, I like the new method, and agree on the point you had on:
+> [..] returns both bounds derived from one created ULID, so they always share the timestamp
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T09:33:52Z
+
+Moved `createBoundaries()` from `UlidFactory` to `Ulid`, so the three types are consistent. The split shape was mine, and nothing in the method needs a configured factory.
+
+The interface is back, on the ids instead of the factories: `TimeOrderedUidInterface extends TimeBasedUidInterface`, implemented by `Ulid`, `UuidV6` and `UuidV7`. Sorting in timestamp order is a property of the id type, not of what a factory is configured to create, so the conditional semantics that made me drop the idea do not arise. `UuidV1` keeps `TimeBasedUidInterface` alone.
+
+The bounds are now computed from the timestamp instead of from a created id. Going through `generate()` had a side effect: it keeps a monotonic clock in a static, so bounds for a future date moved that clock and the ids created next carried the future date.
+
+```php
+UuidV7::createBoundaries(new \DateTimeImmutable('@4102444800'));
+new UuidV7()->getDateTime(); // 2100-01-01 00:00:00.000806
+```
+
+A test pins that now. The bounds themselves are unchanged, byte for byte, from the epoch to year 9999.
+
+The two red jobs fail the same way on 8.2 itself at the commit this is rebased on.

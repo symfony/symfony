@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Mercure\Tests\Fixtures;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Jwt\TokenFactoryInterface;
 use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
+use Symfony\Component\Mercure\ProtocolVersion;
 use Symfony\Component\Mercure\Update;
 
 class DummyHub implements HubInterface
@@ -36,6 +37,14 @@ class DummyHub implements HubInterface
     }
 
     public function publish(Update $update): string
+    {
+    }
+
+    public function getProtocolVersion(): ProtocolVersion
+    {
+    }
+
+    public function getCookieName(): string
     {
     }
 }

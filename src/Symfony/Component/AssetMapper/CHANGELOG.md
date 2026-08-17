@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Defined stable alphabetical order of importmap entries
  * Add support for adding integrity metadata to importmaps
  * Add a `--no-esm` option to `importmap:require` and an `esm` option to importmap entries
 

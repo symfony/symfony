@@ -47,3 +47,8 @@ parameters:
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$fetchSize$#'
             path: src/Symfony/Component/Messenger/*
+        # the schema-API guards every DBAL integration carries, kept in step with Cache, Lock and
+        # Messenger; they go away together, once doctrine/dbal ^4.5 and doctrine/orm >= 3.6.8 are the minimum
+        -
+            message: '#^Call to function method_exists\(\) with .+ will always evaluate to true\.$#'
+            path: src/Symfony/Component/KeyManagement/Bridge/Doctrine*

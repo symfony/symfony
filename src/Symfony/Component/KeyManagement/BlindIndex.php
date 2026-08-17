@@ -27,6 +27,11 @@ use Symfony\Component\KeyManagement\Exception\DecryptionFailedException;
  *
  *     $repository->findOneBy(['emailIndex' => $index->of($email)]);  // and on the way out
  *
+ * The first of those two lines is the one that gets forgotten, and a row whose tag was not written
+ * is a row no search returns. On a Doctrine entity, the `BlindIndexed` attribute of
+ * `symfony/doctrine-orm-key-management` says on the index column where its value comes from and has
+ * a listener fill it on every flush.
+ *
  * This class indexes the value it is given, byte for byte. Anything the value has to go through
  * first belongs to a subclass overriding {@see project()}, and that is where it has to live rather
  * than at the call sites: an index computed on a trimmed value and searched on an untrimmed one

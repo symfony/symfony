@@ -28,7 +28,7 @@ class UrlValidator extends ConstraintValidator
             (
                 (?:
                     (?:
-                        (?:[\pL\pN\pS\pM\-\_]++\.)+
+                        (?:(?:[\pL\pN\pS\pM\-\_]|%%[0-9A-Fa-f]{2})++\.)+
                         (?:
                             (?:xn--[a-z0-9-]++)     # punycode in tld
                             |

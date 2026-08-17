@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionHandler;
@@ -21,9 +22,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
 class SessionIdInterfaceTest extends TestCase
 {
-    /**
-     * @dataProvider provideHandlers
-     */
+    #[DataProvider('provideHandlers')]
     public function testHandlersCreateSessionIds(\SessionHandlerInterface $handler)
     {
         $this->assertMatchesRegularExpression('/^[a-zA-Z0-9,-]{22,}$/', $handler->create_sid());

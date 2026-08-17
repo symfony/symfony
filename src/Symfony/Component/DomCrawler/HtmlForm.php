@@ -11,31 +11,33 @@
 
 namespace Symfony\Component\DomCrawler;
 
-use Symfony\Component\DomCrawler\Field\ChoiceFormField;
-use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\DomCrawler\Field\HtmlChoiceFormField;
+use Symfony\Component\DomCrawler\Field\HtmlFormField;
 
 /**
- * Form represents an HTML form.
+ * HtmlForm represents an HTML form, backed by the native HTML parser.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @implements \ArrayAccess<string, HtmlFormField|array<HtmlFormField>>
  */
-class Form extends Link implements \ArrayAccess
+class HtmlForm extends HtmlLink implements \ArrayAccess
 {
     use FormTrait;
 
-    private \DOMElement $button;
-    private FormFieldRegistry $fields;
+    private \Dom\Element $button;
+    private HtmlFormFieldRegistry $fields;
 
     /**
-     * @param \DOMElement $node       A \DOMElement instance
-     * @param string|null $currentUri The URI of the page where the form is embedded
-     * @param string|null $method     The method to use for the link (if null, it defaults to the method defined by the form)
-     * @param string|null $baseHref   The URI of the <base> used for relative links, but not for empty action
+     * @param \Dom\Element $node       A \Dom\Element instance
+     * @param string|null  $currentUri The URI of the page where the form is embedded
+     * @param string|null  $method     The method to use for the link (if null, it defaults to the method defined by the form)
+     * @param string|null  $baseHref   The URI of the <base> used for relative links, but not for empty action
      *
      * @throws \LogicException if the node is not a button inside a form tag
      */
     public function __construct(
-        \DOMElement $node,
+        \Dom\Element $node,
         ?string $currentUri = null,
         ?string $method = null,
         private ?string $baseHref = null,
@@ -48,7 +50,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets the form node associated with this form.
      */
-    public function getFormNode(): \DOMElement
+    public function getFormNode(): \Dom\Element
     {
         return $this->node;
     }
@@ -66,7 +68,7 @@ class Form extends Link implements \ArrayAccess
                 continue;
             }
 
-            if (!$field instanceof Field\FileFormField && $field->hasValue()) {
+            if (!$field instanceof Field\HtmlFileFormField && $field->hasValue()) {
                 $values[$name] = $field->getValue();
             }
         }
@@ -90,7 +92,7 @@ class Form extends Link implements \ArrayAccess
                 continue;
             }
 
-            if ($field instanceof Field\FileFormField) {
+            if ($field instanceof Field\HtmlFileFormField) {
                 $files[$name] = $field->getValue();
             }
         }
@@ -101,11 +103,11 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets a named field.
      *
-     * @return FormField|FormField[]|FormField[][]
+     * @return HtmlFormField|HtmlFormField[]|HtmlFormField[][]
      *
      * @throws \InvalidArgumentException When field is not present in this form
      */
-    public function get(string $name): FormField|array
+    public function get(string $name): HtmlFormField|array
     {
         return $this->fields->get($name);
     }
@@ -113,7 +115,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets a named field.
      */
-    public function set(FormField $field): void
+    public function set(HtmlFormField $field): void
     {
         $this->fields->add($field);
     }
@@ -121,7 +123,7 @@ class Form extends Link implements \ArrayAccess
     /**
      * Gets all fields.
      *
-     * @return FormField[]
+     * @return HtmlFormField[]
      */
     public function all(): array
     {
@@ -133,11 +135,11 @@ class Form extends Link implements \ArrayAccess
      *
      * @param string $name The field name
      *
-     * @return FormField|FormField[]|FormField[][]
+     * @return HtmlFormField|HtmlFormField[]|HtmlFormField[][]
      *
      * @throws \InvalidArgumentException if the field does not exist
      */
-    public function offsetGet(mixed $name): FormField|array
+    public function offsetGet(mixed $name): HtmlFormField|array
     {
         return $this->fields->get($name);
     }
@@ -150,7 +152,7 @@ class Form extends Link implements \ArrayAccess
     public function disableValidation(): static
     {
         foreach ($this->fields->all() as $field) {
-            if ($field instanceof ChoiceFormField) {
+            if ($field instanceof HtmlChoiceFormField) {
                 $field->disableValidation();
             }
         }
@@ -161,14 +163,14 @@ class Form extends Link implements \ArrayAccess
     /**
      * Sets the node for the form.
      *
-     * Expects a 'submit' button \DOMElement and finds the corresponding form element, or the form element itself.
+     * Expects a 'submit' button \Dom\Element and finds the corresponding form element, or the form element itself.
      *
      * @throws \LogicException If given node is not a button or input or does not have a form ancestor
      */
-    protected function setNode(\DOMElement $node): void
+    protected function setNode(\Dom\Element $node): void
     {
         $this->button = $node;
-        if ('button' === $node->localName || ('input' === $node->localName && \in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image'], true))) {
+        if ('button' === $node->localName || ('input' === $node->localName && \in_array(strtolower($node->getAttribute('type') ?? ''), ['submit', 'button', 'image'], true))) {
             if ($node->hasAttribute('form')) {
                 // if the node has the HTML5-compliant 'form' attribute, use it
                 $formId = $node->getAttribute('form');
@@ -185,7 +187,7 @@ class Form extends Link implements \ArrayAccess
                 if (null === $node = $node->parentNode) {
                     throw new \LogicException('The selected node does not have a form ancestor.');
                 }
-            } while ('form' !== $node->localName);
+            } while (!$node instanceof \Dom\Element || 'form' !== $node->localName);
         } elseif ('form' !== $node->localName) {
             throw new \LogicException(\sprintf('Unable to submit on a "%s" tag.', $node->localName));
         }
@@ -202,26 +204,26 @@ class Form extends Link implements \ArrayAccess
      */
     private function initialize(): void
     {
-        $this->fields = new FormFieldRegistry();
+        $this->fields = new HtmlFormFieldRegistry();
 
         // add submitted button if it has a valid name
         if ('form' !== $this->button->localName && $this->button->hasAttribute('name') && $this->button->getAttribute('name')) {
-            if ('input' == $this->button->localName && 'image' == strtolower($this->button->getAttribute('type'))) {
+            if ('input' === $this->button->localName && 'image' === strtolower($this->button->getAttribute('type') ?? '')) {
                 $name = $this->button->getAttribute('name');
                 $this->button->setAttribute('value', '0');
 
                 // temporarily change the name of the input node for the x coordinate
                 $this->button->setAttribute('name', $name.'.x');
-                $this->set(new Field\InputFormField($this->button));
+                $this->set(new Field\HtmlInputFormField($this->button));
 
                 // temporarily change the name of the input node for the y coordinate
                 $this->button->setAttribute('name', $name.'.y');
-                $this->set(new Field\InputFormField($this->button));
+                $this->set(new Field\HtmlInputFormField($this->button));
 
                 // restore the original name of the input node
                 $this->button->setAttribute('name', $name);
             } else {
-                $this->set(new Field\InputFormField($this->button));
+                $this->set(new Field\HtmlInputFormField($this->button));
             }
         }
 
@@ -229,34 +231,38 @@ class Form extends Link implements \ArrayAccess
             $this->addField($node);
         }
 
-        if ($this->baseHref && '' !== $this->node->getAttribute('action')) {
+        if ($this->baseHref && '' !== ($this->node->getAttribute('action') ?? '')) {
             $this->currentUri = $this->baseHref;
         }
     }
 
-    private function addField(\DOMElement $node): void
+    private function addField(\Dom\Element $node): void
     {
         if (!$node->hasAttribute('name') || !$node->getAttribute('name')) {
             return;
         }
 
         $localName = $node->localName;
-        if ('select' == $localName || 'input' == $localName && 'checkbox' == strtolower($node->getAttribute('type'))) {
-            $this->set(new ChoiceFormField($node));
-        } elseif ('input' == $localName && 'radio' == strtolower($node->getAttribute('type'))) {
+        $type = strtolower($node->getAttribute('type') ?? '');
+
+        if ('select' === $localName || 'input' === $localName && 'checkbox' === $type) {
+            $this->set(new HtmlChoiceFormField($node));
+        } elseif ('input' === $localName && 'radio' === $type) {
             // there may be other fields with the same name that are no choice
-            // fields already registered (see https://github.com/symfony/symfony/issues/11689)
-            if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof ChoiceFormField) {
-                $this->get($node->getAttribute('name'))->addChoice($node);
+            // fields already registered
+            $field = $this->has($node->getAttribute('name')) ? $this->get($node->getAttribute('name')) : null;
+
+            if ($field instanceof HtmlChoiceFormField) {
+                $field->addChoice($node);
             } else {
-                $this->set(new ChoiceFormField($node));
+                $this->set(new HtmlChoiceFormField($node));
             }
-        } elseif ('input' == $localName && 'file' == strtolower($node->getAttribute('type'))) {
-            $this->set(new Field\FileFormField($node));
-        } elseif ('input' == $localName && !\in_array(strtolower($node->getAttribute('type')), ['submit', 'button', 'image'], true)) {
-            $this->set(new Field\InputFormField($node));
-        } elseif ('textarea' == $localName) {
-            $this->set(new Field\TextareaFormField($node));
+        } elseif ('input' === $localName && 'file' === $type) {
+            $this->set(new Field\HtmlFileFormField($node));
+        } elseif ('input' === $localName && !\in_array($type, ['submit', 'button', 'image'], true)) {
+            $this->set(new Field\HtmlInputFormField($node));
+        } elseif ('textarea' === $localName) {
+            $this->set(new Field\HtmlTextareaFormField($node));
         }
     }
 }

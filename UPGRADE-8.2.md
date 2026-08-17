@@ -37,6 +37,11 @@ DoctrineBridge
    Also note that `DoctrineDbalPingConnectionMiddleware` does not reset closed entity managers as its deprecated
    counterpart did: workers already reset them between messages
 
+DomCrawler
+----------
+
+ * Deprecate the `$document` and `$xpath` properties of `FormField`, they are not used anymore
+
 Form
 ----
 

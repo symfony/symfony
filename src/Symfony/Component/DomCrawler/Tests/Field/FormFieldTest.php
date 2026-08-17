@@ -58,6 +58,18 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
     }
 
+    public function testLabelIsAssignedByForAttributeContainingAQuote()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('<html><form>
+            <label for=\'a"b\'>Foo label</label>
+            <input type="text" id=\'a"b\' name="foo" value="foo" />
+        </form></html>');
+
+        $field = new InputFormField($dom->getElementById('a"b'));
+        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
+    }
+
     public function testLabelIsAssignedByParentingRelation()
     {
         $dom = new \DOMDocument();

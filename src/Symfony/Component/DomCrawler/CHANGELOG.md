@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Add `HtmlCrawler`, `HtmlForm`, `HtmlLink`, `HtmlImage` and the `Html*FormField` classes, backed by the native HTML parser and its selector engine
+ * Deprecate the `$document` and `$xpath` properties of `FormField`, they are not used anymore
  * Add `ChoiceFormField::selectByText()` to select an option by its visible text content
 
 8.1

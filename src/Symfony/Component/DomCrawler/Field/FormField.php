@@ -57,10 +57,11 @@ abstract class FormField
     {
         if ($this->node->hasAttribute('id')) {
             $id = $this->node->getAttribute('id');
-            $labels = self::collectDescendants($this->node->ownerDocument, static fn ($node) => 'label' === $node->localName && $id === $node->getAttribute('for'));
 
-            if ($labels) {
-                return $labels[0];
+            foreach ($this->node->ownerDocument->getElementsByTagName('label') as $label) {
+                if ($id === $label->getAttribute('for')) {
+                    return $label;
+                }
             }
         }
 

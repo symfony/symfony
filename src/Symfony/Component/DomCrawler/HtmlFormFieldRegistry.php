@@ -24,6 +24,8 @@ class HtmlFormFieldRegistry
 
     /**
      * Adds a field to the registry.
+     *
+     * @psalm-suppress UnsupportedPropertyReferenceUsage the property is declared in FormFieldRegistryTrait
      */
     public function add(HtmlFormField $field): void
     {
@@ -50,6 +52,8 @@ class HtmlFormFieldRegistry
      * @return HtmlFormField|HtmlFormField[]|HtmlFormField[][]
      *
      * @throws \InvalidArgumentException if the field does not exist
+     *
+     * @psalm-suppress UnsupportedPropertyReferenceUsage the property is declared in FormFieldRegistryTrait
      */
     public function &get(string $name): HtmlFormField|array
     {
@@ -77,7 +81,7 @@ class HtmlFormFieldRegistry
         if ((!\is_array($value) && $target instanceof HtmlFormField) || $target instanceof Field\HtmlChoiceFormField) {
             $target->setValue($value);
         } elseif (\is_array($value)) {
-            $registry = new static();
+            $registry = new self();
             $registry->base = $name;
             $registry->fields = $value;
             foreach ($registry->all() as $k => $v) {

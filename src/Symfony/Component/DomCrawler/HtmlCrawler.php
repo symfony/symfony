@@ -37,12 +37,12 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
     private ?\Dom\Document $document = null;
 
     /**
-     * @var list<\Dom\Node>
+     * @var array<int, \Dom\Node>
      */
     private array $nodes = [];
 
     /**
-     * @param \Dom\NodeList<\Dom\Node>|\Dom\Node|\Dom\Node[]|string|null $node A Node to use as the base for the crawling
+     * @param \Dom\NodeList|\Dom\Node|\Dom\Node[]|string|null $node A Node to use as the base for the crawling
      */
     public function __construct(
         \Dom\NodeList|\Dom\Node|array|string|null $node = null,
@@ -79,7 +79,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
      * This method uses the appropriate specialized add*() method based
      * on the type of the argument.
      *
-     * @param \Dom\NodeList<\Dom\Node>|\Dom\Node|\Dom\Node[]|string|null $node
+     * @param \Dom\NodeList|\Dom\Node|\Dom\Node[]|string|null $node
      */
     public function add(\Dom\NodeList|\Dom\Node|array|string|null $node): void
     {
@@ -112,15 +112,10 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
         }
     }
 
-    /**
-     * @param \Dom\NodeList<\Dom\Node> $nodes
-     */
     public function addNodeList(\Dom\NodeList $nodes): void
     {
         foreach ($nodes as $node) {
-            if ($node instanceof \Dom\Node) {
-                $this->addNode($node);
-            }
+            $this->addNode($node);
         }
     }
 
@@ -386,11 +381,9 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
      */
     public function nodeName(): string
     {
-        if (!$this->nodes) {
+        if (!$node = $this->getNode(0)) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
-
-        $node = $this->getNode(0);
 
         return $node instanceof \Dom\Element ? $node->localName : $node->nodeName;
     }
@@ -407,7 +400,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
      */
     public function text(?string $default = null, bool $normalizeWhitespace = true): string
     {
-        if (!$this->nodes) {
+        if (!$node = $this->getNode(0)) {
             if (null !== $default) {
                 return $default;
             }
@@ -415,7 +408,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        $text = $this->getNode(0)->textContent;
+        $text = $node->textContent;
 
         if ($normalizeWhitespace) {
             return $this->normalizeWhitespace($text);
@@ -455,7 +448,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
      */
     public function html(?string $default = null): string
     {
-        if (!$this->nodes || !$this->getNode(0) instanceof \Dom\Element) {
+        if (!($node = $this->getNode(0)) instanceof \Dom\Element) {
             if (null !== $default) {
                 return $default;
             }
@@ -463,7 +456,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        return $this->getNode(0)->innerHTML;
+        return $node->innerHTML;
     }
 
     /**
@@ -473,14 +466,22 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
      */
     public function outerHtml(): string
     {
-        if (!$this->nodes || !($node = $this->getNode(0)) instanceof \Dom\Element) {
+        if (!($node = $this->getNode(0)) instanceof \Dom\Element) {
             throw new \InvalidArgumentException('The current node list is empty.');
         }
 
-        // \Dom\Element::$outerHTML was added in PHP 8.5
+        // \Dom\Element::$outerHTML was added in PHP 8.5, so the document serializes the node
         $document = $node->ownerDocument;
 
-        return $document instanceof \Dom\HTMLDocument ? $document->saveHtml($node) : $document->saveXml($node);
+        if ($document instanceof \Dom\HTMLDocument) {
+            return $document->saveHtml($node);
+        }
+
+        if ($document instanceof \Dom\XMLDocument) {
+            return $document->saveXml($node);
+        }
+
+        throw new \LogicException(\sprintf('Unable to serialize a node of a "%s" document.', get_debug_type($document)));
     }
 
     /**
@@ -506,7 +507,15 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
         }
 
         if (isset($data[0]) && $data[0] instanceof \Dom\NodeList) {
-            return $this->createSubCrawler($data);
+            $crawler = $this->createSubCrawler(null);
+
+            foreach ($data as $nodeList) {
+                if ($nodeList instanceof \Dom\NodeList) {
+                    $crawler->addNodeList($nodeList);
+                }
+            }
+
+            return $crawler;
         }
 
         return $data;
@@ -792,7 +801,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
                 REGEXP,
             static fn (array $m) => isset($m['name']) && '' !== $m['name'] ? self::XPATH_PREFIX.':'.$m['name'] : $m[0],
             $xpath
-        );
+        ) ?? $xpath;
     }
 
     /**
@@ -972,7 +981,7 @@ class HtmlCrawler implements \Countable, \IteratorAggregate
     /**
      * Creates a crawler for some subnodes.
      *
-     * @param \Dom\NodeList<\Dom\Node>|\Dom\Node|\Dom\Node[]|string|null $nodes
+     * @param \Dom\NodeList|\Dom\Node|\Dom\Node[]|string|null $nodes
      */
     private function createSubCrawler(\Dom\NodeList|\Dom\Node|array|string|null $nodes): static
     {

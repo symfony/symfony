@@ -21,6 +21,14 @@ parameters:
     ignoreErrors:
         # Added in PHP 8.4
         - '#^Class BcMath\\Number not found\.$#'
+        # the property is deprecated but still populated, so that a subclass reading it keeps working
+        -
+            message: '#^Access to deprecated property \$xpath of class Symfony\\Component\\DomCrawler\\Field\\FormField#'
+            path: src/Symfony/Component/DomCrawler/Field/FormField.php
+        # createSubCrawler() builds a crawler of the current class on purpose, so that a subclass keeps its own type
+        -
+            message: '#^Unsafe usage of new static\(\)\.$#'
+            path: src/Symfony/Component/DomCrawler/HtmlCrawler.php
         # DeferredBatchMessage::$acked aliases a bool that batch handlers flip during dispatch()
         -
             message: '#^If condition is always false\.$#'

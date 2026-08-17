@@ -49,10 +49,10 @@ class HtmlCrawlerTest extends TestCase
                 <a href="/foo">Fabien"s Foo</a>
                 <a href="/foo">' Fabien"s Foo</a>
 
-                <a href="/bar"><img alt="Bar"/></a>
-                <a href="/bar"><img alt="   Fabien's Bar   "/></a>
-                <a href="/bar"><img alt="Fabien&quot;s Bar"/></a>
-                <a href="/bar"><img alt="' Fabien&quot;s Bar"/></a>
+                <a href="/bar"><img alt="Bar"></a>
+                <a href="/bar"><img alt="   Fabien's Bar   "></a>
+                <a href="/bar"><img alt="Fabien&quot;s Bar"></a>
+                <a href="/bar"><img alt="' Fabien&quot;s Bar"></a>
 
                 <a href="/example">Klausi|Claudiu</a>
                 <a href="/deep"><span><img alt="Deep"></span></a>
@@ -258,9 +258,14 @@ class HtmlCrawlerTest extends TestCase
     {
         $crawler = new HtmlCrawler(self::HTML);
 
+        $this->assertSame(2, $crawler->filter('p')->count());
+
+        if (2 !== \Dom\HTMLDocument::createFromString('<!doctype html><body><p>a</p><p>b</p>', 0)->querySelectorAll('P')->length) {
+            $this->markTestSkipped('The selector engine of this PHP version does not fold tag names to lower case.');
+        }
+
         // tag names are matched case-insensitively in HTML
         $this->assertSame(2, $crawler->filter('P')->count());
-        $this->assertSame(2, $crawler->filter('p')->count());
     }
 
     public function testFilterIsScopedToTheCurrentNodes()
@@ -343,6 +348,14 @@ class HtmlCrawlerTest extends TestCase
             $this->assertSame($c->html(), $n->html(), $selector);
             $this->assertSame($c->outerHtml(), $n->outerHtml(), $selector);
         }
+    }
+
+    public function testOuterHtmlOfAnXmlDocument()
+    {
+        $crawler = new HtmlCrawler();
+        $crawler->addDocument(\Dom\XMLDocument::createFromString('<r><p class="i">a<b>b</b></p></r>'));
+
+        $this->assertSame('<p class="i">a<b>b</b></p>', $crawler->filter('p')->outerHtml());
     }
 
     public function testExtractMatchesCrawler()

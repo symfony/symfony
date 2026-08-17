@@ -18,6 +18,8 @@ use Symfony\Component\DomCrawler\Field\HtmlFormField;
  * HtmlForm represents an HTML form, backed by the native HTML parser.
  *
  * @author Fabien Potencier <fabien@symfony.com>
+ *
+ * @implements \ArrayAccess<string, HtmlFormField|array<HtmlFormField>>
  */
 class HtmlForm extends HtmlLink implements \ArrayAccess
 {
@@ -248,8 +250,10 @@ class HtmlForm extends HtmlLink implements \ArrayAccess
         } elseif ('input' === $localName && 'radio' === $type) {
             // there may be other fields with the same name that are no choice
             // fields already registered
-            if ($this->has($node->getAttribute('name')) && $this->get($node->getAttribute('name')) instanceof HtmlChoiceFormField) {
-                $this->get($node->getAttribute('name'))->addChoice($node);
+            $field = $this->has($node->getAttribute('name')) ? $this->get($node->getAttribute('name')) : null;
+
+            if ($field instanceof HtmlChoiceFormField) {
+                $field->addChoice($node);
             } else {
                 $this->set(new HtmlChoiceFormField($node));
             }

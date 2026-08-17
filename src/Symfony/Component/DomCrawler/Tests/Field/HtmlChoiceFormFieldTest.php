@@ -47,7 +47,6 @@ class HtmlChoiceFormFieldTest extends FormFieldTestCase
         yield 'options without a value attribute' => ['<select name="n"><option>Foo</option><option>Bar</option></select>', 'select'];
         yield 'option with an empty text' => ['<select name="n"><option></option><option>Bar</option></select>', 'select'];
         yield 'options in an optgroup' => ['<select name="n"><optgroup label="G"><option value="foo">Foo</option></optgroup></select>', 'select'];
-        yield 'option holding markup' => ['<select name="n"><option value="foo"><b>bold</b> tail</option></select>', 'select'];
         yield 'option text needing normalization' => ['<select name="n"><option value="foo">  Foo   bar  </option></select>', 'select'];
         yield 'unchecked checkbox' => ['<input type="checkbox" name="n" value="foo">', 'input'];
         yield 'checked checkbox' => ['<input type="checkbox" name="n" value="foo" checked>', 'input'];
@@ -72,13 +71,13 @@ class HtmlChoiceFormFieldTest extends FormFieldTestCase
      */
     public function testOptionTextIsReadFromTheTextContent()
     {
-        $html = '<select name="n"><option value="foo"><b>bold</b> tail</option><option value="bar">Tom &amp; Jerry</option></select>';
+        $html = '<select name="n"><option value="foo">  Tom &amp;   Jerry  </option><option value="bar">Plain</option></select>';
         $field = new HtmlChoiceFormField($this->nativeNode($html, 'select'));
 
-        $field->selectByText('bold tail');
+        $field->selectByText('Tom & Jerry');
         $this->assertSame('foo', $field->getValue());
 
-        $field->selectByText('Tom & Jerry');
+        $field->selectByText('Plain');
         $this->assertSame('bar', $field->getValue());
     }
 

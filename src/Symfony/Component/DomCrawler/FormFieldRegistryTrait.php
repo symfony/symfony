@@ -26,6 +26,8 @@ trait FormFieldRegistryTrait
 
     /**
      * Removes a field based on the fully qualified name and its children from the registry.
+     *
+     * @psalm-suppress UnsupportedPropertyReferenceUsage the property is declared in this trait
      */
     public function remove(string $name): void
     {

@@ -207,8 +207,8 @@ trait FormTrait
     protected function getRawUri(): string
     {
         // If the form was created from a button rather than the form node, check for HTML5 action overrides
-        if ($this->button !== $this->node && $this->button->getAttribute('formaction')) {
-            return $this->button->getAttribute('formaction');
+        if ($this->button !== $this->node && $formAction = $this->button->getAttribute('formaction')) {
+            return $formAction;
         }
 
         return $this->node->getAttribute('action') ?? '';

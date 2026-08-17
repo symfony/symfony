@@ -27,6 +27,12 @@ trait DomTraversalTrait
 {
     /**
      * Returns the closest ancestor with the given tag name, the node itself excluded.
+     *
+     * @template T of \DOMElement|\Dom\Element
+     *
+     * @param T $node
+     *
+     * @return T|null
      */
     private static function findAncestor(\DOMElement|\Dom\Element $node, string $localName): \DOMElement|\Dom\Element|null
     {

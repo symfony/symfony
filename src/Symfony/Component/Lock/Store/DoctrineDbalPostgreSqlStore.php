@@ -302,7 +302,7 @@ class DoctrineDbalPostgreSqlStore implements BlockingSharedLockStoreInterface, B
 
     private function getInternalStore(): SharedLockStoreInterface
     {
-        $namespace = spl_object_hash($this->conn);
+        $namespace = spl_object_id($this->conn);
 
         return self::$storeRegistry[$namespace] ??= new InMemoryStore();
     }

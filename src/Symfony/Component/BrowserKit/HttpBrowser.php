@@ -99,6 +99,8 @@ class HttpBrowser extends AbstractBrowser
                     $v = $vars;
                 } elseif (method_exists($v, '__toString')) {
                     $v = (string) $v;
+                } else {
+                    $v = [];
                 }
             }
         });

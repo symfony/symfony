@@ -52,11 +52,11 @@ class CachingFactoryDecorator implements ChoiceListFactoryInterface, ResetInterf
     public static function generateHash(mixed $value, string $namespace = ''): string
     {
         if (\is_object($value)) {
-            $value = spl_object_hash($value);
+            $value = spl_object_id($value);
         } elseif (\is_array($value)) {
             array_walk_recursive($value, static function (&$v) {
                 if (\is_object($v)) {
-                    $v = spl_object_hash($v);
+                    $v = spl_object_id($v);
                 }
             });
         }

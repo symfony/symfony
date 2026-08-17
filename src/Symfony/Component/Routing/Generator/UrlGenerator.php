@@ -295,6 +295,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                     $v = $vars;
                 } elseif (method_exists($v, '__toString')) {
                     $v = (string) $v;
+                } else {
+                    $v = [];
                 }
             }
         });

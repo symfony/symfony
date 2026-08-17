@@ -12,11 +12,11 @@ CHANGELOG
  * Reject a `Cookie` whose name uses the `__Secure-`/`__Host-` prefix when its attributes break the prefix contract
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore
  * Report the actual header value when the `ResponseHeaderSame` constraint fails
+ * Add `ClearableSessionHandlerInterface` for clearing all session data
 
 8.1
 ---
 
- * Add `ClearableSessionHandlerInterface` for clearing all session data
  * Add `BinaryFileResponse::shouldDeleteFileAfterSend()`
  * Deprecate setting public properties of `Request` and `Response` objects directly; use setters or constructor arguments instead
  * Add `SessionHasFlashMessage` test constraint

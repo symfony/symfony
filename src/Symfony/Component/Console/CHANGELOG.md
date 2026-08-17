@@ -7,13 +7,13 @@ CHANGELOG
  * Add `InputOption::HIDDEN` and `InputOption::DEPRECATED` modes
  * Allow a callable for the `description` and `help` options of `#[AsCommand]`, and for the `description` option of `#[Argument]` and `#[Option]`
  * Add `GitlabCiReporter` to emit reports in the GitLab Code Quality format
+ * Wrap the descriptions in `TextDescriptor` output to the terminal width; pass the `terminal_width` describe option to control it
 
 8.1
 ---
 
  * Add `ConsoleBundle` for console applications with DI, autodiscovery and autowiring
  * Pad styled `SymfonyStyle` blocks with the ECH ANSI sequence on decorated outputs so trailing cells are excluded from copy selections
- * Wrap the descriptions in `TextDescriptor` output to the terminal width; pass the `terminal_width` describe option to control it
  * Add optional `$container` parameter to `Application` for automatic service wiring from a PSR container
  * Add `SymfonyStyle::outlineBlock()` and convenience methods `outlineSuccess()`, `outlineError()`, `outlineWarning()`, `outlineNote()`, `outlineInfo()`, `outlineCaution()` for border-only message blocks with the type label embedded in the top border
  * Add `TraceableValueResolver` to help inspecting value resolvers performances

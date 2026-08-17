@@ -11,6 +11,7 @@ CHANGELOG
  * Add the `message` option to the `Callback` constraint; the callback must then return a boolean, and a violation is raised when it returns `false`
  * Allow passing `int`, `float`, `\Stringable` and `\DateTimeInterface` values to `ConstraintViolationBuilderInterface::setParameter()`
  * Stop narrowing the `File` constraint's `mimeTypes` option with mime types auto-derived from the matched extension when `extensions` is configured
+ * Add support for reading objects properties with `Unique` constraint `fields` option
 
 8.1
 ---
@@ -450,7 +451,6 @@ CHANGELOG
  * Add support for multiple fields containing nested constraints in `Composite` constraints
  * Add the `stopOnFirstError` option to the `Unique` constraint to validate all elements
  * Add support for closures in the `When` constraint
- * Add support for reading objects properties with `Unique` constraint `fields` option
 
 7.2
 ---

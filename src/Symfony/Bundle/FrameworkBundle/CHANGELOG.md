@@ -21,12 +21,14 @@ CHANGELOG
  * Resolve `debug:config` paths whose keys contain dots, e.g. `debug:config framework options.option.main`
  * Add a `priority` option to `framework.messenger.transports` to order the receivers `messenger:consume --all` consumes
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use ESI or inline rendering, or Symfony UX Turbo, instead
+ * Add the `session:clear` command to remove all sessions from the configured handler
+ * Generate JSON schema for YAML configuration of bundles
+ * Add support for rate limited transports
 
 8.1
 ---
 
  * Add `framework.validation.property_metadata_existence_check` config option
- * Add the `session:clear` command to remove all sessions from the configured handler
  * Deprecate `json_streamer.value_transformer.date_time_to_string` and `json_streamer.value_transformer.string_to_date_time` services, date times are handled as value objects
  * Deprecate `json_streamer.value_transformer` tag, use `json_streamer.property_value_transformer` instead
  * Add `marshaller` option to cache pool configuration to allow per-pool marshaller services
@@ -34,7 +36,6 @@ CHANGELOG
  * Add support for configuring JsonStreamer's `default_options`
  * Add project-scoped `flock` and `semaphore` lock store services
  * Add `createFormFlowBuilder` method to `AbstractController` and `ControllerHelper`
- * Generate JSON schema for YAML configuration of bundles
  * Deprecate setting the `framework.profiler.collect_serializer_data` config option
  * Deprecate the `framework.http_cache.terminate_on_cache_hit` config option
  * Add support for `framework.secrets.decryption_env_var` to contain dots
@@ -95,7 +96,6 @@ CHANGELOG
  * Deprecate `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
  * Add support for selecting the appropriate error renderer based on the `APP_RUNTIME_MODE` env var
  * Add `KernelInterface::getShareDir()`, `APP_SHARE_DIR` and `%kernel.share_dir%` to store application data that are shared between all front-end servers
- * Add support for rate limited transports
 
 7.3
 ---

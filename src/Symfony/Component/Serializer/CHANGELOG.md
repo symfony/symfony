@@ -13,6 +13,8 @@ CHANGELOG
  * Add the `XmlEncoder::BOOLEAN_REPR` context option to choose the strings representing booleans when encoding, e.g. `['true', 'false']`
  * Add support for denormalizing arrays of union types, e.g. `array<Foo|Bar>`
  * Add support for configuring serialized names and paths per group, with repeatable `#[SerializedName]` and `#[SerializedPath]` attributes, a `serialized` key in YAML and a `<serialized>` element in XML
+ * Enable using `#[WithAccessors]` from the PropertyInfo component with the serializer
+ * Add `AbstractNormalizer::ENABLE_DEFAULT_GROUPS` context option to opt into implicit `Default` and class-short-name groups for attributes without explicit `#[Groups]`, mirroring Validator group conventions
 
 8.1
 ---
@@ -22,8 +24,6 @@ CHANGELOG
  * Add `AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION` for scalar type transformation
  * Add `COLLECT_EXTRA_ATTRIBUTES_ERRORS` option to `Serializer` to collect extra-attributes errors during denormalization
  * Deprecate `PartialDenormalizationException::getErrors()`, use `getNotNormalizableValueErrors()` instead
- * Enable using `#[WithAccessors]` from the PropertyInfo component with the serializer
- * Add `AbstractNormalizer::ENABLE_DEFAULT_GROUPS` context option to opt into implicit `Default` and class-short-name groups for attributes without explicit `#[Groups]`, mirroring Validator group conventions
 
 8.0
 ---

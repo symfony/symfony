@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T13:42:20Z
+
+Rebased on 8.2.
+
+While reviewing this I noticed the moved condition also fixes a second, unrelated bug: since 8.1 a mapped route parameter overwrote an explicit `#[MapEntity(mapping: ...)]`, because `7008e30e661` moved the `$options->mapping` check into `findById()` where it no longer guards the `_route_mapping` loop. Your `!$options->mapping` covers that case too.
+
+That half applied to 8.1, so I sent it there separately in #65379 with its own test, and it has been merged up. The rebase therefore drops the guarded loop that 8.2 now carries, and keeps your moved block, which still holds the guard in its condition. Behaviour is unchanged and the test that came up with #65379 passes against the moved code.
+
+What is left here is only the array fix, which is what the PR is about.
+
+One thing to add: a mapped route parameter whose value is null now resolves to `findBy([... => null])` for an array argument, where it used to be a near miss. That looks right and matches the scalar path, but it has no test yet.

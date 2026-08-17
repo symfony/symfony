@@ -424,6 +424,16 @@ diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/Migrat
 +    public function create_sid(): string
      {
          return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/SessionHandlerProxy.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/SessionHandlerProxy.php
+--- a/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/SessionHandlerProxy.php
++++ b/src/Symfony/Component/HttpFoundation/Session/Storage/Proxy/SessionHandlerProxy.php
+@@ -66,5 +66,5 @@ class SessionHandlerProxy extends AbstractProxy implements \SessionHandlerInter
+      * @return string
+      */
+-    public function create_sid()
++    public function create_sid(): string
+     {
+         return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php

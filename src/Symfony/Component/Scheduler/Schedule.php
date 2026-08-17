@@ -33,8 +33,13 @@ final class Schedule implements ScheduleProviderInterface
     ) {
     }
 
+    /**
+     * @deprecated since Symfony 8.2, clone the schedule or use "add()" on a new Schedule instead
+     */
     public function with(RecurringMessage $message, RecurringMessage ...$messages): static
     {
+        trigger_deprecation('symfony/scheduler', '8.2', 'The "%s()" method is deprecated and will be removed in 9.0, clone the schedule or use "add()" on a new "%s" instead.', __METHOD__, self::class);
+
         return static::doAdd(new self($this->dispatcher), $message, ...$messages);
     }
 

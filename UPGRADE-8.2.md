@@ -134,6 +134,30 @@ Notifier
 
  * Deprecate `NovuSubscriberRecipient::getOverrides()` and its `$overrides` constructor parameter, pass overrides to `NovuOptions` instead
 
+Scheduler
+---------
+
+ * Deprecate `Schedule::with()`. It returns a schedule that keeps only the event dispatcher, so a lock or a
+   state set on the original schedule is silently dropped, and the resulting schedule then runs unlocked.
+
+   To derive a schedule from another one, clone it. The clone shares the dispatcher, the lock and the state,
+   and its list of messages is independent, so adding to one does not affect the other:
+
+   ```php
+   $new = clone $schedule;
+   $new->add($message);
+   ```
+
+   To build an unrelated schedule, which is what `with()` actually did, construct one:
+
+   ```php
+   // before
+   $new = $schedule->with($message);
+
+   // after
+   $new = (new Schedule($dispatcher))->add($message);
+   ```
+
 Security
 --------
 

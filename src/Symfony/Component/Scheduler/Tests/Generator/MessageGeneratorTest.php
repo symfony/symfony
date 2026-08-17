@@ -110,7 +110,7 @@ class MessageGeneratorTest extends TestCase
 
             public function __construct(array $schedule)
             {
-                $this->schedule = (new Schedule())->with(...$schedule);
+                $this->schedule = (new Schedule())->add(...$schedule);
                 $this->schedule->stateful(new ArrayAdapter());
             }
 

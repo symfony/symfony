@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-17T16:20:37Z
+
+The red jobs all fail while downloading dependencies, with HTTP 429 from codeload.github.com. Every pull request opened today shows the same thing, so it is not caused by this change.

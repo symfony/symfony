@@ -68,6 +68,7 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private TickScheduler $tickScheduler;
     private AdaptativeTicker $adaptativeTicker;
     private EventDispatcherInterface $eventDispatcher;
+    private readonly TerminalInterface $terminal;
 
     /** @var (\Closure(TickEvent): mixed)|null */
     private ?\Closure $onTick = null;
@@ -87,18 +88,19 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
      */
     public function __construct(
         ?StyleSheet $styleSheet = null,
-        private readonly TerminalInterface $terminal = new Terminal(),
+        ?TerminalInterface $terminal = null,
         ?Keybindings $keybindings = null,
         ?FontRegistry $fontRegistry = null,
         ?Renderer $renderer = null,
         ?EventDispatcherInterface $eventDispatcher = null,
     ) {
+        $this->eventDispatcher = $eventDispatcher ?? new EventDispatcher();
+        $this->terminal = $terminal ?? new Terminal($this->eventDispatcher);
         $this->keybindings = $keybindings ?? new Keybindings();
         $this->root = new ContainerWidget();
         $this->root->expandVertically(true);
         $this->renderer = $renderer ?? new Renderer($styleSheet, $fontRegistry);
-        $this->screenWriter = new ScreenWriter($terminal);
-        $this->eventDispatcher = $eventDispatcher ?? new EventDispatcher();
+        $this->screenWriter = new ScreenWriter($this->terminal);
 
         // Share the KeyParser so Kitty protocol state is consistent
         $this->focusManager = new FocusManager(

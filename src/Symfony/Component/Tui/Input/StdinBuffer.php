@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Tui\Input;
 
+use Symfony\Component\Tui\Event\PasteCompletedEvent;
+use Symfony\Component\Tui\Event\PasteStartedEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 /**
  * Buffers and splits batched stdin input into individual sequences.
  *
@@ -40,6 +44,11 @@ final class StdinBuffer
     private bool $inPaste = false;
     private bool $pasteOverflowed = false;
     private string $pasteBuffer = '';
+
+    public function __construct(
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
+    ) {
+    }
 
     /**
      * Set callback for individual key sequences.
@@ -85,6 +94,7 @@ final class StdinBuffer
                 $this->inPaste = true;
                 $this->pasteBuffer = '';
                 $this->buffer = substr($this->buffer, 6);
+                $this->eventDispatcher?->dispatch(new PasteStartedEvent());
                 continue;
             }
 
@@ -103,9 +113,7 @@ final class StdinBuffer
                     $this->pasteOverflowed = false;
                     $this->pasteBuffer = '';
 
-                    if (null !== $content && null !== $this->onPaste) {
-                        ($this->onPaste)($content);
-                    }
+                    $this->completePaste($content);
                 } else {
                     // Still waiting for the end marker. A read can split it, so
                     // hold back a trailing part of it instead of moving it into
@@ -190,10 +198,15 @@ final class StdinBuffer
      */
     public function clear(): void
     {
+        $wasInPaste = $this->inPaste;
         $this->buffer = '';
         $this->pasteBuffer = '';
         $this->inPaste = false;
         $this->pasteOverflowed = false;
+
+        if ($wasInPaste) {
+            $this->completePaste(null);
+        }
     }
 
     /**
@@ -211,6 +224,14 @@ final class StdinBuffer
             ($this->onData)("\x1b");
             $this->buffer = '';
         }
+    }
+
+    private function completePaste(?string $content): void
+    {
+        if (null !== $content && null !== $this->onPaste) {
+            ($this->onPaste)($content);
+        }
+        $this->eventDispatcher?->dispatch(new PasteCompletedEvent());
     }
 
     /**

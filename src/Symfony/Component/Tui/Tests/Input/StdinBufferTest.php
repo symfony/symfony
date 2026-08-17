@@ -13,6 +13,9 @@ namespace Symfony\Component\Tui\Tests\Input;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Tui\Event\PasteCompletedEvent;
+use Symfony\Component\Tui\Event\PasteStartedEvent;
 use Symfony\Component\Tui\Input\StdinBuffer;
 
 class StdinBufferTest extends TestCase
@@ -342,6 +345,87 @@ class StdinBufferTest extends TestCase
         $buffer->process("\x1b[201~");
         $this->assertSame(1, $pasteCount);
         $this->assertSame('Hello World', $pastedContent);
+    }
+
+    public function testPasteLifecycleEventsAreDispatched()
+    {
+        $dispatcher = new EventDispatcher();
+        $buffer = new StdinBuffer($dispatcher);
+        $events = [];
+        $pastedContent = null;
+
+        $dispatcher->addListener(PasteStartedEvent::class, static function () use (&$events) {
+            $events[] = 'started';
+        });
+        $dispatcher->addListener(PasteCompletedEvent::class, static function () use (&$events) {
+            $events[] = 'completed';
+        });
+        $buffer->onPaste(static function (string $content) use (&$pastedContent) {
+            $pastedContent = $content;
+        });
+
+        $buffer->process("\x1b[200~Hello");
+
+        $this->assertSame(['started'], $events);
+        $this->assertNull($pastedContent);
+
+        $buffer->process(" World\x1b[201~");
+
+        $this->assertSame(['started', 'completed'], $events);
+        $this->assertSame('Hello World', $pastedContent);
+    }
+
+    public function testPasteLifecycleEventsAreDispatchedOnOverflow()
+    {
+        $dispatcher = new EventDispatcher();
+        $buffer = new StdinBuffer($dispatcher);
+        $events = [];
+
+        $dispatcher->addListener(PasteStartedEvent::class, static function () use (&$events) {
+            $events[] = 'started';
+        });
+        $dispatcher->addListener(PasteCompletedEvent::class, static function () use (&$events) {
+            $events[] = 'completed';
+        });
+        $buffer->onData(static function (string $data) {});
+        $buffer->onPaste(static function (string $content) {});
+
+        $buffer->process("\x1b[200~");
+        $buffer->process(str_repeat('A', 17 * 1024 * 1024));
+
+        $this->assertSame(['started'], $events);
+
+        $buffer->process("\x1b[201~");
+
+        $this->assertSame(['started', 'completed'], $events);
+    }
+
+    public function testClearMidPasteDispatchesPasteCompleted()
+    {
+        $dispatcher = new EventDispatcher();
+        $buffer = new StdinBuffer($dispatcher);
+        $events = [];
+        $pastes = [];
+
+        $dispatcher->addListener(PasteStartedEvent::class, static function () use (&$events) {
+            $events[] = 'started';
+        });
+        $dispatcher->addListener(PasteCompletedEvent::class, static function () use (&$events) {
+            $events[] = 'completed';
+        });
+        $buffer->onPaste(static function (string $content) use (&$pastes) {
+            $pastes[] = $content;
+        });
+
+        $buffer->process("\x1b[200~partial");
+        $buffer->clear();
+
+        $this->assertSame(['started', 'completed'], $events);
+        $this->assertSame([], $pastes, 'A discarded paste must not reach the paste callback');
+
+        $buffer->clear();
+
+        $this->assertSame(['started', 'completed'], $events, 'Clearing outside a paste must not dispatch events');
     }
 
     public function testDataAfterPasteEndIsProcessed()

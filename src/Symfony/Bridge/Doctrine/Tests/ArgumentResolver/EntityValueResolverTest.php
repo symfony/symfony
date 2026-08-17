@@ -291,6 +291,39 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], $resolver->resolve($request, $argument));
     }
 
+    public function testResolveWithExplicitMappingTakesPrecedenceOverRouteMapping()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('post', 'abc');
+        $request->attributes->set('_route_mapping', ['ref' => 'post']);
+
+        $argument = $this->createArgument(
+            'stdClass',
+            new MapEntity(mapping: ['post' => 'reference']),
+            'post'
+        );
+
+        $manager->expects($this->never())
+            ->method('getClassMetadata');
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['reference' => 'abc'])
+            ->willReturn($object = new \stdClass());
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with('stdClass')
+            ->willReturn($repository);
+
+        $this->assertSame([$object], $resolver->resolve($request, $argument));
+    }
+
     public function testResolveWithRouteMapping()
     {
         $manager = $this->createMock(ObjectManager::class);

@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -70,6 +71,12 @@ final class RequestAttributeValueResolver implements ValueResolverInterface
             } catch (\TypeError) {
                 throw new NotFoundHttpException(\sprintf('The value for the "%s" route parameter is invalid.', $name));
             }
+        } elseif (null !== $value && !\is_object($value) && (class_exists($type) || interface_exists($type))) {
+            // A non-object can never satisfy a class-typed parameter; abstain so that the failure
+            // is reported as an unresolvable argument instead of a TypeError in the controller.
+            // Mismatching objects are passed through: a listener on kernel.controller_arguments
+            // may still replace them, as ErrorListener does for FlattenException.
+            throw new NearMissValueResolverException(\sprintf('The "%s" request attribute holds a "%s", which cannot be passed to a parameter typed "%s".', $name, get_debug_type($value), $type));
         }
 
         return [$value];

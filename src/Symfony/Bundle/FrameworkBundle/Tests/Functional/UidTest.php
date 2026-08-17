@@ -28,8 +28,8 @@ class UidTest extends AbstractWebTestCase
         $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_disabled.yml']);
         $client->catchExceptions(false);
 
-        $this->expectException(\TypeError::class);
-        $this->expectExceptionMessage('Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController::anyFormat(): Argument #1 ($userId) must be of type Symfony\Component\Uid\UuidV1, string given');
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Controller "Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\UidController::anyFormat" requires the "$userId" argument that could not be resolved. The "userId" request attribute holds a "string", which cannot be passed to a parameter typed "Symfony\Component\Uid\UuidV1".');
 
         $client->request('GET', '/1/uuid-v1/'.new UuidV1());
     }

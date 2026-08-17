@@ -17,13 +17,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Symfony\Component\HttpKernel\Attribute\MapDateTime;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DateTimeValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\ResolverNotFoundException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ExtendingRequest;
@@ -326,6 +333,148 @@ class ArgumentResolverTest extends TestCase
         $this->assertSame([1], $resolver->getArguments($request, $controller));
     }
 
+    public function testSourceResolverStagesTheValueForATypeResolver()
+    {
+        $resolver = self::getResolver(
+            [new DateTimeValueResolver(), new RequestAttributeValueResolver(), new DefaultValueResolver()],
+            [QueryParameterValueResolver::class => new QueryParameterValueResolver()],
+        );
+
+        $request = Request::create('/?from=2026-01-15');
+        $controller = (new ArgumentResolverTestController())->controllerWithQueryDateTime(...);
+
+        $arguments = $resolver->getArguments($request, $controller);
+
+        $this->assertCount(1, $arguments);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $arguments[0]);
+        $this->assertSame('2026-01-15', $arguments[0]->format('Y-m-d'));
+    }
+
+    public function testSourceResolverStagesTheValueUnderTheArgumentName()
+    {
+        $resolver = self::getResolver(
+            [new DateTimeValueResolver(), new RequestAttributeValueResolver(), new DefaultValueResolver()],
+            [QueryParameterValueResolver::class => new QueryParameterValueResolver()],
+        );
+
+        $request = Request::create('/?d=2026-01-15');
+        $controller = (new ArgumentResolverTestController())->controllerWithRenamedQueryDateTime(...);
+
+        $arguments = $resolver->getArguments($request, $controller);
+
+        $this->assertCount(1, $arguments);
+        $this->assertSame('2026-01-15', $arguments[0]->format('Y-m-d'));
+    }
+
+    public function testHeaderSourceResolverStagesTheValueForATypeResolver()
+    {
+        $resolver = self::getResolver(
+            [new DateTimeValueResolver(), new RequestAttributeValueResolver(), new DefaultValueResolver()],
+            [RequestHeaderValueResolver::class => new RequestHeaderValueResolver()],
+        );
+
+        $request = Request::create('/');
+        $request->headers->set('x-since', '2026-01-15');
+        $controller = (new ArgumentResolverTestController())->controllerWithHeaderDateTime(...);
+
+        $arguments = $resolver->getArguments($request, $controller);
+
+        $this->assertCount(1, $arguments);
+        $this->assertSame('2026-01-15', $arguments[0]->format('Y-m-d'));
+    }
+
+    public function testSourceResolverStillReportsWhenNothingTypesTheValue()
+    {
+        $resolver = self::getResolver(
+            [new RequestAttributeValueResolver(), new DefaultValueResolver()],
+            [QueryParameterValueResolver::class => new QueryParameterValueResolver()],
+        );
+
+        $request = Request::create('/?from=2026-01-15');
+        $controller = (new ArgumentResolverTestController())->controllerWithQueryDateTime(...);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/no resolver converted the staged value/');
+
+        $resolver->getArguments($request, $controller);
+    }
+
+    public function testSourceResolverRunsFirstWhenPinnedTogetherWithATypeResolver()
+    {
+        $resolver = self::getResolver(
+            [new RequestAttributeValueResolver(), new DefaultValueResolver()],
+            [
+                QueryParameterValueResolver::class => new QueryParameterValueResolver(),
+                DateTimeValueResolver::class => new DateTimeValueResolver(),
+            ],
+        );
+
+        $request = Request::create('/?to=15/01/2026');
+        $controller = (new ArgumentResolverTestController())->controllerWithFormattedQueryDateTime(...);
+
+        $arguments = $resolver->getArguments($request, $controller);
+
+        $this->assertCount(1, $arguments);
+        $this->assertSame('2026-01-15', $arguments[0]->format('Y-m-d'));
+    }
+
+    public function testPinningTwoSourceResolversIsRejected()
+    {
+        $resolver = self::getResolver(
+            [new DefaultValueResolver()],
+            [
+                QueryParameterValueResolver::class => new QueryParameterValueResolver(),
+                RequestHeaderValueResolver::class => new RequestHeaderValueResolver(),
+            ],
+        );
+
+        $request = Request::create('/?from=2026-01-15');
+        $controller = (new ArgumentResolverTestController())->controllerWithTwoSourceResolvers(...);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageMatches('/You can only pin one resolver per argument/');
+
+        $resolver->getArguments($request, $controller);
+    }
+
+    public function testPinningTwoNonSourceResolversIsRejected()
+    {
+        $resolver = self::getResolver(
+            [new DefaultValueResolver()],
+            [
+                DateTimeValueResolver::class => new DateTimeValueResolver(),
+                TestEntityValueResolver::class => new TestEntityValueResolver(),
+            ],
+        );
+
+        $request = Request::create('/');
+        $controller = (new ArgumentResolverTestController())->controllerWithTwoNonSourceResolvers(...);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageMatches('/You can only pin one resolver per argument/');
+
+        $resolver->getArguments($request, $controller);
+    }
+
+    public function testSourceResolverRejectsAnArrayForASingleValueArgument()
+    {
+        $resolver = self::getResolver(
+            [new DateTimeValueResolver(), new RequestAttributeValueResolver(), new DefaultValueResolver()],
+            [QueryParameterValueResolver::class => new QueryParameterValueResolver()],
+        );
+
+        $request = Request::create('/?from[]=2026-01-15');
+        $controller = (new ArgumentResolverTestController())->controllerWithQueryDateTime(...);
+
+        try {
+            $resolver->getArguments($request, $controller);
+            $this->fail(HttpException::class.' was not thrown.');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+            $this->assertSame('Invalid query parameter "from".', $e->getMessage());
+        }
+    }
+
     public function testManyTargetedResolvers()
     {
         $resolver = self::getResolver(namedResolvers: []);
@@ -454,6 +603,30 @@ class ArgumentResolverTestController
     }
 
     public function controllerTargetingResolver(#[ValueResolver(DefaultValueResolver::class)] int $foo = 1)
+    {
+    }
+
+    public function controllerWithQueryDateTime(#[MapQueryParameter] \DateTimeImmutable $from)
+    {
+    }
+
+    public function controllerWithRenamedQueryDateTime(#[MapQueryParameter('d')] \DateTimeImmutable $from)
+    {
+    }
+
+    public function controllerWithHeaderDateTime(#[MapRequestHeader('x-since')] \DateTimeImmutable $since)
+    {
+    }
+
+    public function controllerWithFormattedQueryDateTime(#[MapDateTime(format: 'd/m/Y')] #[MapQueryParameter] \DateTimeImmutable $to)
+    {
+    }
+
+    public function controllerWithTwoSourceResolvers(#[MapQueryParameter] #[MapRequestHeader] \DateTimeImmutable $from)
+    {
+    }
+
+    public function controllerWithTwoNonSourceResolvers(#[MapDateTime] #[ValueResolver(TestEntityValueResolver::class)] \DateTimeImmutable $from)
     {
     }
 

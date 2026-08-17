@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 use Symfony\Component\Uid\Ulid;
@@ -47,11 +48,45 @@ class QueryParameterValueResolverTest extends TestCase
         $this->assertEquals($expected, $this->resolver->resolve($request, $metadata));
     }
 
-    #[DataProvider('invalidArgumentTypeProvider')]
-    public function testResolvingWithInvalidArgumentType(Request $request, ArgumentMetadata $metadata, string $exceptionMessage)
+    public function testStagingArgumentTypesItCannotBuild()
     {
+        $request = Request::create('/', 'GET', ['standardClass' => 'test']);
+        $metadata = new ArgumentMetadata('standardClass', \stdClass::class, false, false, false, false, [new MapQueryParameter()]);
+
+        try {
+            $this->resolver->resolve($request, $metadata);
+            $this->fail(NearMissValueResolverException::class.' was not thrown.');
+        } catch (NearMissValueResolverException $e) {
+            $this->assertSame('#[MapQueryParameter] cannot build controller argument "$standardClass" of type "stdClass" by itself; no resolver converted the staged value.', $e->getMessage());
+        }
+
+        // the raw value is left in the attributes for a type-aware resolver further down the chain
+        $this->assertSame('test', $request->attributes->get($metadata->getName()));
+    }
+
+    public function testStagingRejectsAnArrayValue()
+    {
+        $request = Request::create('/', 'GET', ['standardClass' => ['test']]);
+        $metadata = new ArgumentMetadata('standardClass', \stdClass::class, false, false, false, false, [new MapQueryParameter()]);
+
+        try {
+            $this->resolver->resolve($request, $metadata);
+            $this->fail(HttpException::class.' was not thrown.');
+        } catch (HttpException $e) {
+            $this->assertSame(404, $e->getStatusCode());
+            $this->assertSame('Invalid query parameter "standardClass".', $e->getMessage());
+        }
+
+        $this->assertFalse($request->attributes->has($metadata->getName()));
+    }
+
+    public function testResolvingVariadicOfUnsupportedType()
+    {
+        $request = Request::create('/', 'GET', ['standardClass' => 'test']);
+        $metadata = new ArgumentMetadata('standardClass', \stdClass::class, true, false, false, false, [new MapQueryParameter()]);
+
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage($exceptionMessage);
+        $this->expectExceptionMessage('#[MapQueryParameter] cannot be used on controller argument "...$standardClass" of type "stdClass"; one of array, string, int, float, bool, uid or \BackedEnum should be used.');
 
         $this->resolver->resolve($request, $metadata);
     }
@@ -232,28 +267,6 @@ class QueryParameterValueResolverTest extends TestCase
             Request::create('/', 'GET', ['groupId' => '01E439TP9XJZ9RPFH3T1PYBCR8']),
             new ArgumentMetadata('groupId', Ulid::class, false, true, false, false, [new MapQueryParameter()]),
             [Ulid::fromString('01E439TP9XJZ9RPFH3T1PYBCR8')],
-        ];
-    }
-
-    /**
-     * @return iterable<string, array{
-     *   Request,
-     *   ArgumentMetadata,
-     *   string,
-     * }>
-     */
-    public static function invalidArgumentTypeProvider(): iterable
-    {
-        yield 'unsupported type' => [
-            Request::create('/', 'GET', ['standardClass' => 'test']),
-            new ArgumentMetadata('standardClass', \stdClass::class, false, false, false, false, [new MapQueryParameter()]),
-            '#[MapQueryParameter] cannot be used on controller argument "$standardClass" of type "stdClass"; one of array, string, int, float, bool, uid or \BackedEnum should be used.',
-        ];
-
-        yield 'unsupported type variadic' => [
-            Request::create('/', 'GET', ['standardClass' => 'test']),
-            new ArgumentMetadata('standardClass', \stdClass::class, true, false, false, false, [new MapQueryParameter()]),
-            '#[MapQueryParameter] cannot be used on controller argument "...$standardClass" of type "stdClass"; one of array, string, int, float, bool, uid or \BackedEnum should be used.',
         ];
     }
 

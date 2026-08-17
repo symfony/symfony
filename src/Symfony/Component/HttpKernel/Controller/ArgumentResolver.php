@@ -56,27 +56,42 @@ final class ArgumentResolver implements ArgumentResolverInterface
             $disabledResolvers = [];
 
             if ($this->namedResolvers && $attributes = $metadata->getAttributesOfType(ValueResolver::class, $metadata::IS_INSTANCEOF)) {
-                $resolverName = null;
+                $resolverNames = [];
                 foreach ($attributes as $attribute) {
                     if ($attribute->disabled) {
                         $disabledResolvers[$attribute->resolver] = true;
-                    } elseif ($resolverName) {
-                        throw new \LogicException(\sprintf('You can only pin one resolver per argument, but argument "$%s" of "%s()" has more.', $metadata->getName(), $metadata->getControllerName()));
                     } else {
-                        $resolverName = $attribute->resolver;
+                        $resolverNames[] = $attribute->resolver;
                     }
                 }
 
-                if ($resolverName) {
-                    if (!$this->namedResolvers->has($resolverName)) {
-                        throw new ResolverNotFoundException($resolverName, $this->namedResolvers instanceof ServiceProviderInterface ? array_keys($this->namedResolvers->getProvidedServices()) : []);
+                if ($resolverNames) {
+                    // Several resolvers can be pinned when exactly one of them selects the source of
+                    // the value: that one runs first, the others convert what it stages.
+                    $sourceNames = array_values(array_filter($resolverNames, fn ($name) => $this->namedResolvers->has($name) && $this->namedResolvers->get($name) instanceof SourceValueResolverInterface));
+
+                    if (1 < \count($resolverNames) && 1 !== \count($sourceNames)) {
+                        throw new \LogicException(\sprintf('You can only pin one resolver per argument, but argument "$%s" of "%s()" has more.', $metadata->getName(), $metadata->getControllerName()));
                     }
 
-                    $argumentValueResolvers = [
-                        $this->namedResolvers->get($resolverName),
-                        new RequestAttributeValueResolver(),
-                        new DefaultValueResolver(),
-                    ];
+                    $pinnedResolvers = [];
+                    foreach ([...$sourceNames, ...array_diff($resolverNames, $sourceNames)] as $resolverName) {
+                        if (!$this->namedResolvers->has($resolverName)) {
+                            throw new ResolverNotFoundException($resolverName, $this->namedResolvers instanceof ServiceProviderInterface ? array_keys($this->namedResolvers->getProvidedServices()) : []);
+                        }
+
+                        $pinnedResolvers[] = $this->namedResolvers->get($resolverName);
+                    }
+
+                    // A source resolver only selects where the value comes from: keep the whole chain
+                    // behind it so that the resolver able to build the argument type still runs.
+                    $argumentValueResolvers = $sourceNames
+                        ? [...$pinnedResolvers, ...$this->argumentValueResolvers]
+                        : [
+                            $pinnedResolvers[0],
+                            new RequestAttributeValueResolver(),
+                            new DefaultValueResolver(),
+                        ];
                 }
             }
 

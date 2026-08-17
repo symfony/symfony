@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder as BaseNodeBuilder;
@@ -94,6 +95,23 @@ class NodeBuilderTest extends TestCase
 
         $node = $builder->stringNode('foo bar');
         $this->assertInstanceOf(StringNodeDefinition::class, $node);
+    }
+
+    public function testAppendFromCallback()
+    {
+        $builder = new BaseNodeBuilder();
+        $builder->setParent($parent = new ArrayNodeDefinition('root'));
+
+        $builder->appendFromCallback(static function (BaseNodeBuilder $callbackBuilder) use ($builder): void {
+            self::assertSame($builder, $callbackBuilder);
+
+            $builder
+                ->scalarNode('foo')->end()
+                ->integerNode('bar')->end()
+            ;
+        });
+
+        $this->assertSame(['foo', 'bar'], array_keys($parent->getChildNodeDefinitions()));
     }
 }
 

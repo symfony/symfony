@@ -33,7 +33,7 @@ and one per data key with a data key store.
 DSN schemes
 -----------
 
-When the FrameworkBundle is installed and `framework.key_management` is configured,
+When `KeyManagementBundle` is registered and `key_management` is configured,
 this bridge exposes three DSN schemes: one per local backend: that read
 keys through Flysystem:
 
@@ -52,10 +52,9 @@ flysystem:
             adapter: 'asyncaws'
             options: { client: 'app.s3_client', bucket: 'kms-keys' }
 
-framework:
-    key_management:
-        clients:
-            app: 'sodium+fly://keys.storage/keys?ext=.key'
+key_management:
+    clients:
+        app: 'sodium+fly://keys.storage/keys?ext=.key'
 ```
 
 A Flysystem instance registered by hand, or one that has to answer to another

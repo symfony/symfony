@@ -186,10 +186,10 @@ such as `order` or a hyphenated name, is not supported, as for the Lock and
 Messenger stores. `configureSchema()` declares the table alongside the ones
 Doctrine generates, the way the Lock and Messenger tables are picked up:
 `symfony/doctrine-orm-key-management` ships the listener that calls it, and the
-FrameworkBundle registers it beside the store. Outside that wiring, create the
+`KeyManagementBundle` registers it beside the store. Outside that wiring, create the
 table with `createTable()` or with your own migration.
 
-In a Symfony application, `framework.key_management.store` wires all of this: the
+In a Symfony application, `key_management.store` wires all of this: the
 store is what `DataKeyStoreInterface` resolves to, and the store-backed encrypter
 becomes what `EnvelopeEncrypterInterface` injects, with the default client's
 encrypter behind it so the payloads written before the store keep being read. The
@@ -337,7 +337,7 @@ Requirements
   * Doctrine DBAL >= 4.3, which lifted the `final` constructor on `Type` that
     the encrypted type needs
   * An `EnvelopeEncrypterInterface` configured by the application (typically
-    via `framework.key_management`)
+    via the `key_management` configuration of `KeyManagementBundle`)
 
 Trade-offs
 ----------

@@ -64,6 +64,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgume
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonPath\JsonPathBundle;
 use Symfony\Component\JsonStreamer\JsonStreamerBundle;
+use Symfony\Component\KeyManagement\KeyManagementBundle;
 use Symfony\Component\Lock\LockBundle;
 use Symfony\Component\Mailer\MailerBundle;
 use Symfony\Component\Messenger\MessengerBundle;
@@ -140,6 +141,7 @@ class_exists(Registry::class);
 #[RequiredBundle(JsonPathBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(MimeBundle::class, ignoreOnInvalid: true)]
 #[RequiredBundle(ObjectMapperBundle::class, ignoreOnInvalid: true)]
+#[RequiredBundle(KeyManagementBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void

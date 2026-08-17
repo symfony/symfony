@@ -58,6 +58,22 @@ class FormFieldTest extends FormFieldTestCase
         $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
     }
 
+    /**
+     * @dataProvider getIdsWithQuotes
+     */
+    public function testLabelIsAssignedByForAttributeWithQuotesInId(string $id)
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML(\sprintf('<html><form>
+            <label for="%1$s">Foo label</label>
+            <input type="text" id="%1$s" name="foo" value="foo" />
+            <input type="submit" />
+        </form></html>', htmlspecialchars($id, \ENT_QUOTES)));
+
+        $field = new InputFormField($dom->getElementById($id));
+        $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the associated label');
+    }
+
     public function testLabelIsAssignedByParentingRelation()
     {
         $dom = new \DOMDocument();
@@ -68,5 +84,12 @@ class FormFieldTest extends FormFieldTestCase
 
         $field = new InputFormField($dom->getElementById('foo'));
         $this->assertEquals('Foo label', $field->getLabel()->textContent, '->getLabel() returns the parent label');
+    }
+
+    public static function getIdsWithQuotes()
+    {
+        yield 'double quote' => ['a"b'];
+        yield 'single quote' => ["a'b"];
+        yield 'both quotes' => ['a\'b"c'];
     }
 }

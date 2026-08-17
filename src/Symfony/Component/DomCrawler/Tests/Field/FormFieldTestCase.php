@@ -26,4 +26,22 @@ class FormFieldTestCase extends TestCase
 
         return $node;
     }
+
+    /**
+     * The native parser has no way to build an element out of a document, so the
+     * node is parsed instead of created, then given its attributes. The closing
+     * tag is left out because the parser rejects one on a void element such as
+     * input, and closes every other element on its own.
+     */
+    protected function createHtmlNode(string $tag, string $value = '', array $attributes = []): \Dom\Element
+    {
+        $document = \Dom\HTMLDocument::createFromString(\sprintf('<!doctype html><body><%s>%s', $tag, $value), 0);
+        $node = $document->querySelector($tag);
+
+        foreach ($attributes as $name => $attributeValue) {
+            $node->setAttribute($name, $attributeValue);
+        }
+
+        return $node;
+    }
 }

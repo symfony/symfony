@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by beryllium at 2026-08-16T22:37:17Z
+
+Thanks for taking this on! I had started on getting DependencyInjection fixed, but got derailed by having to chase down issues with composer as well as the testGetReflectionClass test failing (but it seems to fail on multiple versions of PHP, so it doesn't pertain to this fix).

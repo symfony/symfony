@@ -59,6 +59,15 @@ final class EntityValueResolver implements ValueResolverInterface
             return [];
         }
 
+        if (!$options->mapping && !$options->id && !\is_array($request->attributes->get($name = $argument->getName()))) {
+            foreach ($request->attributes->get('_route_mapping') ?? [] as $parameter => $attribute) {
+                if ($name === $attribute) {
+                    $options->mapping = [$name => $parameter];
+                    break;
+                }
+            }
+        }
+
         $message = '';
         if ($options->expr instanceof \Closure) {
             if (null === $object = $this->findViaClosure($manager, $options, $request)) {
@@ -119,16 +128,6 @@ final class EntityValueResolver implements ValueResolverInterface
         if ($request->attributes->has($name)) {
             if (\is_array($id = $request->attributes->get($name))) {
                 return false;
-            }
-
-            if (!$options->mapping) {
-                foreach ($request->attributes->get('_route_mapping') ?? [] as $parameter => $attribute) {
-                    if ($name === $attribute) {
-                        $options->mapping = [$name => $parameter];
-
-                        return false;
-                    }
-                }
             }
 
             return $id ?? ($options->stripNull ? false : null);

@@ -97,8 +97,8 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
-                spl_object_hash($this->childForm) => $childFormData,
+                spl_object_id($this->form) => $formData,
+                spl_object_id($this->childForm) => $childFormData,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -128,7 +128,7 @@ class FormDataCollectorTest extends TestCase
                 'form1' => $form1Data,
             ],
             'forms_by_hash' => [
-                spl_object_hash($form1) => $form1Data,
+                spl_object_id($form1) => $form1Data,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -151,8 +151,8 @@ class FormDataCollectorTest extends TestCase
                 'form2' => $form2Data,
             ],
             'forms_by_hash' => [
-                spl_object_hash($form1) => $form1Data,
-                spl_object_hash($form2) => $form2Data,
+                spl_object_id($form1) => $form1Data,
+                spl_object_id($form2) => $form2Data,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -178,7 +178,7 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
+                spl_object_id($this->form) => $formData,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -205,7 +205,7 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
+                spl_object_id($this->form) => $formData,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -224,7 +224,7 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
+                spl_object_id($this->form) => $formData,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -293,8 +293,8 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
-                spl_object_hash($this->childForm) => $childFormData,
+                spl_object_id($this->form) => $formData,
+                spl_object_id($this->childForm) => $childFormData,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -363,9 +363,9 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
-                spl_object_hash($child1) => $child1Data,
-                spl_object_hash($child2) => $child2Data,
+                spl_object_id($this->form) => $formData,
+                spl_object_id($child1) => $child1Data,
+                spl_object_id($child2) => $child2Data,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -384,9 +384,9 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
-                spl_object_hash($child1) => $child1Data,
-                spl_object_hash($child2) => $child2Data,
+                spl_object_id($this->form) => $formData,
+                spl_object_id($child1) => $child1Data,
+                spl_object_id($child2) => $child2Data,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));
@@ -426,7 +426,7 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
+                spl_object_id($this->form) => $formData,
                 // no child entry
             ],
             'nb_errors' => 0,
@@ -475,8 +475,8 @@ class FormDataCollectorTest extends TestCase
                 'name' => $formData,
             ],
             'forms_by_hash' => [
-                spl_object_hash($this->form) => $formData,
-                spl_object_hash($this->childForm) => $childFormData,
+                spl_object_id($this->form) => $formData,
+                spl_object_id($this->childForm) => $childFormData,
             ],
             'nb_errors' => 0,
         ], self::removeClosures($this->dataCollector->getData()));

@@ -397,6 +397,33 @@ diff --git a/src/Symfony/Component/Form/Test/TypeTestCase.php b/src/Symfony/Comp
 +    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual): void
      {
          self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/AbstractSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/AbstractSessionHandler.php
+--- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/AbstractSessionHandler.php
+@@ -42,5 +42,5 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
+      * @return string
+      */
+-    public function create_sid()
++    public function create_sid(): string
+     {
+         return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MarshallingSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MarshallingSessionHandler.php
+--- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MarshallingSessionHandler.php
+@@ -38,5 +38,5 @@ class MarshallingSessionHandler implements \SessionHandlerInterface, \SessionUpd
+      * @return string
+      */
+-    public function create_sid()
++    public function create_sid(): string
+     {
+         return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
+diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php
+--- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/MigratingSessionHandler.php
+@@ -42,5 +42,5 @@ class MigratingSessionHandler implements \SessionHandlerInterface, \SessionUpdat
+      * @return string
+      */
+-    public function create_sid()
++    public function create_sid(): string
+     {
+         return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
 diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 --- a/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php
 +++ b/src/Symfony/Component/HttpFoundation/Session/Storage/Handler/PdoSessionHandler.php

@@ -204,7 +204,7 @@ class ContainerAwareEventManager extends EventManager
             return '_service_'.$listener;
         }
 
-        return spl_object_hash($listener);
+        return spl_object_id($listener);
     }
 
     private function getMethod(object $listener, string $event): string

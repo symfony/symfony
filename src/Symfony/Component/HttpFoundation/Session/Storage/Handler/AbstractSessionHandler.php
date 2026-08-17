@@ -38,6 +38,14 @@ abstract class AbstractSessionHandler implements \SessionHandlerInterface, \Sess
         return true;
     }
 
+    /**
+     * @return string
+     */
+    public function create_sid()
+    {
+        return session_create_id() ?: throw new \RuntimeException('Unable to create a session ID.');
+    }
+
     abstract protected function doRead(#[\SensitiveParameter] string $sessionId): string;
 
     abstract protected function doWrite(#[\SensitiveParameter] string $sessionId, string $data): bool;

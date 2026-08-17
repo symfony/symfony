@@ -71,6 +71,14 @@ class HttpClientTraitTest extends TestCase
         $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
     }
 
+    public function testNormalizeBodyWithObjectWithoutPublicProperties()
+    {
+        $headers = [];
+        $body = self::normalizeBody(['foo' => 'bar', 'baz' => json_decode('{}')], $headers);
+
+        $this->assertSame('foo=bar', $body);
+    }
+
     public function testNormalizeBodyMultipart()
     {
         $file = fopen('php://memory', 'r+');

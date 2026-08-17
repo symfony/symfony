@@ -49,6 +49,6 @@ final class TestRepositoryFactory implements RepositoryFactory
 
     private function getRepositoryHash(EntityManagerInterface $entityManager, string $entityName): string
     {
-        return $entityManager->getClassMetadata($entityName)->getName().spl_object_hash($entityManager);
+        return $entityManager->getClassMetadata($entityName)->getName()."\0".spl_object_id($entityManager);
     }
 }

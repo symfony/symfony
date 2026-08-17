@@ -353,6 +353,8 @@ trait HttpClientTrait
                         $v = $vars;
                     } elseif ($v instanceof \Stringable) {
                         $v = (string) $v;
+                    } else {
+                        $v = [];
                     }
                 }
             });

@@ -49,7 +49,7 @@ class ProxyAdapter implements AdapterInterface, NamespacedPoolInterface, CacheIn
             }
         }
         $this->pool = $pool;
-        $this->poolHash = spl_object_hash($pool);
+        $this->poolHash = spl_object_id($pool);
         $this->namespaceLen = \strlen($namespace);
         $this->defaultLifetime = $defaultLifetime;
         self::$createCacheItem ??= \Closure::bind(

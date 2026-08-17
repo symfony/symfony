@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-17T10:48:17Z
+
+The two red jobs (Unit Tests 8.6 and 8.2 low-deps) fail on the 6.4 branch itself at the same base commit, in the Twig bridge and Translation test suites. They are not related to this change.

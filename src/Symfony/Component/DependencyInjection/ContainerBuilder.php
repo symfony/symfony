@@ -1339,11 +1339,13 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
             }
             $value = new ServiceLocator($this->resolveServices(...), $refs, $types);
         } elseif ($value instanceof LazyProxyArgument) {
-            [$reference, $interfaces] = $value->getValues();
+            [$reference, $interfaces, $resolvedReference] = $value->getValues();
 
-            $value = ($definition = ResolveLazyProxyPass::createProxyDefinition($this, $reference, $interfaces))
-                ? $this->createService($definition->setShared(false), $inlineServices, $isConstructorArgument, '.lazy.'.$reference)
-                : $this->doResolveServices($reference, $inlineServices, $isConstructorArgument);
+            $value = null !== $resolvedReference
+                ? $this->doResolveServices($resolvedReference, $inlineServices, $isConstructorArgument)
+                : (($definition = ResolveLazyProxyPass::createProxyDefinition($this, $reference, $interfaces))
+                    ? $this->createService($definition->setShared(false), $inlineServices, $isConstructorArgument, '.lazy.'.$reference)
+                    : $this->doResolveServices($reference, $inlineServices, $isConstructorArgument));
         } elseif ($value instanceof Reference) {
             $value = $this->doGet((string) $value, $value->getInvalidBehavior(), $inlineServices, $isConstructorArgument);
         } elseif ($value instanceof Definition) {

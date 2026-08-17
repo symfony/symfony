@@ -12,9 +12,12 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInvalidReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -174,6 +177,45 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->process($container);
 
         $this->assertSame([null], $container->getDefinition('bar')->getArguments());
+    }
+
+    public function testProcessExcludedServiceBehindLazyProxyAndNullOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \stdClass::class)->addTag('container.excluded');
+        $container->register('bar', \stdClass::class)
+            ->setArguments([new LazyProxyArgument(new Reference('foo', $container::NULL_ON_INVALID_REFERENCE)), 'tail']);
+
+        (new ResolveLazyProxyPass())->process($container);
+        $this->process($container);
+
+        $this->assertSame([null, 'tail'], $container->getDefinition('bar')->getArguments());
+    }
+
+    public function testProcessExcludedServiceBehindLazyProxyAndIgnoreOnInvalid()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \stdClass::class)->addTag('container.excluded');
+        $container->register('bar', \stdClass::class)
+            ->setArguments([new LazyProxyArgument(new Reference('foo', $container::IGNORE_ON_INVALID_REFERENCE)), 'tail']);
+
+        (new ResolveLazyProxyPass())->process($container);
+        $this->process($container);
+
+        $this->assertSame([null, 'tail'], $container->getDefinition('bar')->getArguments());
+    }
+
+    public function testProcessExcludedServiceBehindLazyProxyInCollectionArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', \stdClass::class)->addTag('container.excluded');
+        $container->register('bar', \stdClass::class)
+            ->setArguments([new IteratorArgument([new LazyProxyArgument(new Reference('foo', $container::IGNORE_ON_INVALID_REFERENCE))])]);
+
+        (new ResolveLazyProxyPass())->process($container);
+        $this->process($container);
+
+        $this->assertSame([], $container->getDefinition('bar')->getArgument(0)->getValues());
     }
 
     protected function process(ContainerBuilder $container)

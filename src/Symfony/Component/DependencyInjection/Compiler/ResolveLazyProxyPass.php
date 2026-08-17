@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
 /**
- * Turns lazy proxy arguments into references to generated lazy-loading definitions.
+ * Resolves lazy proxy arguments by generating the lazy-loading definitions that implement them.
  *
  * @author HypeMC <hypemc@gmail.com>
  */
@@ -49,7 +49,9 @@ class ResolveLazyProxyPass extends AbstractRecursivePass
         }
         $this->container->setDefinition($id = '.lazy.'.$id, $definition);
 
-        return new Reference($id);
+        $value->setValues([$reference, $interfaces, new Reference($id)]);
+
+        return $value;
     }
 
     /**

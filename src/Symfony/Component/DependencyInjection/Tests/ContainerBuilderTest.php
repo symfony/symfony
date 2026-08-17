@@ -937,6 +937,25 @@ class ContainerBuilderTest extends TestCase
         $this->assertNull($builder->resolveServices(new LazyProxyArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE))));
     }
 
+    public function testResolveServicesWithLazyProxyArgumentOnCompiledContainer()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('bar', 'BarClass')->setPublic(true);
+        $builder->register('foo', 'Bar\FooClass')
+            ->setPublic(true)
+            ->addArgument([new LazyProxyArgument(new Reference('bar'))]);
+        $builder->compile();
+
+        $proxy = $builder->get('foo')->arguments[0];
+
+        $this->assertInstanceOf(\BarClass::class, $proxy);
+        $this->assertFalse($builder->initialized('bar'), 'The proxied service is not instantiated upfront');
+
+        $builder->get('bar')->foo = 'mutated';
+
+        $this->assertSame('mutated', $proxy->foo, 'The proxy resolves to the shared service');
+    }
+
     public function testResolveServices()
     {
         $builder = new ContainerBuilder();

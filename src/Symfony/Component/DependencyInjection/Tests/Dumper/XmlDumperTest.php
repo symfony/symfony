@@ -17,6 +17,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -285,6 +286,35 @@ class XmlDumperTest extends TestCase
 
         $dumper = new XmlDumper($container);
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_service_closure.xml', $dumper->dump());
+    }
+
+    public function testLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+        $container->register('foo', 'Foo')
+            ->addArgument(new LazyProxyArgument(new Reference('bar', ContainerInterface::IGNORE_ON_INVALID_REFERENCE)))
+            ->addArgument(new LazyProxyArgument(new Reference('bar'), 'BarInterface'))
+            ->addArgument(new LazyProxyArgument(new Reference('bar'), ['BarInterface', 'BazInterface']))
+        ;
+
+        $dumper = new XmlDumper($container);
+        $this->assertXmlStringEqualsGeneratedXmlFile('services_with_lazy_proxy_argument.xml', $dumper->dump());
+    }
+
+    public function testLazyProxyArgumentOnCompiledContainer()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar', 'stdClass');
+        $container->register('foo', 'stdClass')
+            ->setPublic(true)
+            ->addArgument(new LazyProxyArgument(new Reference('bar')))
+        ;
+        $container->compile();
+
+        $dump = (new XmlDumper($container))->dump();
+
+        $this->assertStringContainsString('<argument type="lazy_proxy" id="bar"/>', $dump);
+        $this->assertStringContainsString('<service id=".lazy.bar.', $dump);
     }
 
     public function testEnvClosure()

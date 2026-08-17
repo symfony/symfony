@@ -1543,8 +1543,9 @@ class AutowirePassTest extends TestCase
 
         (new ResolveLazyProxyPass())->process($container);
 
-        $expected = new Reference('.lazy.'.A::class);
+        $expected->setValues([new TypedReference(A::class, A::class), [], new Reference('.lazy.'.A::class)]);
         $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
+        $this->assertTrue($container->getDefinition('.lazy.'.A::class)->isLazy());
     }
 
     public function testLazyServiceAttributeOnAlreadyLazyService()
@@ -1577,7 +1578,7 @@ class AutowirePassTest extends TestCase
 
         (new ResolveLazyProxyPass())->process($container);
 
-        $definition = $container->getDefinition((string) $container->getDefinition('foo')->getArgument(0));
+        $definition = $container->getDefinition((string) $container->getDefinition('foo')->getArgument(0)->getValues()[2]);
 
         $this->assertTrue($definition->isLazy());
         $this->assertSame([['interface' => LazyProxyTestInterface::class]], $definition->getTag('proxy'));

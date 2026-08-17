@@ -27,14 +27,14 @@ class LazyProxyArgumentTest extends TestCase
     {
         $argument = new LazyProxyArgument($reference = new Reference('a'), $interfaces);
 
-        self::assertSame([$reference, $expectedInterfaces], $argument->getValues());
+        self::assertSame([$reference, $expectedInterfaces, null], $argument->getValues());
     }
 
     public function testGetValuesDefaultsToNoInterface()
     {
         $argument = new LazyProxyArgument($reference = new Reference('a'));
 
-        self::assertSame([$reference, []], $argument->getValues());
+        self::assertSame([$reference, [], null], $argument->getValues());
     }
 
     public function testSetValues()
@@ -42,7 +42,7 @@ class LazyProxyArgumentTest extends TestCase
         $argument = new LazyProxyArgument(new Reference('a'));
         $argument->setValues([$reference = new Reference('b'), 'SomeInterface']);
 
-        self::assertSame([$reference, ['SomeInterface']], $argument->getValues());
+        self::assertSame([$reference, ['SomeInterface'], null], $argument->getValues());
     }
 
     public function testSetValuesKeepsInterfacesWhenNotProvided()
@@ -50,7 +50,15 @@ class LazyProxyArgumentTest extends TestCase
         $argument = new LazyProxyArgument(new Reference('a'), ['SomeInterface']);
         $argument->setValues([$reference = new Reference('b')]);
 
-        self::assertSame([$reference, ['SomeInterface']], $argument->getValues());
+        self::assertSame([$reference, ['SomeInterface'], null], $argument->getValues());
+    }
+
+    public function testSetValuesWithResolvedReference()
+    {
+        $argument = new LazyProxyArgument($reference = new Reference('a'), ['SomeInterface']);
+        $argument->setValues([$reference, ['SomeInterface'], $resolvedReference = new Reference('.lazy.a')]);
+
+        self::assertSame([$reference, ['SomeInterface'], $resolvedReference], $argument->getValues());
     }
 
     #[TestWith([''], 'empty string')]

@@ -13,8 +13,10 @@ namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveLazyProxyPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -773,6 +775,33 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
         $container->register('bar', BarMethodCall::class)
             ->addMethodCall('setCallable', [new ServiceClosureArgument(new Reference('foo'))]);
+
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', \stdClass::class);
+        $container->register('bar', Bar::class)
+            ->addArgument(new LazyProxyArgument(new Reference('foo')));
+
+        (new ResolveLazyProxyPass())->process($container);
+        (new CheckTypeDeclarationsPass(true))->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testProcessSuccessWhenPassingUnresolvedLazyProxyArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', \stdClass::class);
+        $container->register('bar', Bar::class)
+            ->addArgument(new LazyProxyArgument(new Reference('foo')));
 
         (new CheckTypeDeclarationsPass(true))->process($container);
 

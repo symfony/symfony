@@ -16,6 +16,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -448,6 +449,17 @@ class XmlDescriptor extends Descriptor
 
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom, $container) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);
+                }
+            } elseif ($argument instanceof LazyProxyArgument) {
+                [$reference, $interfaces] = $argument->getValues();
+
+                $argumentXML->setAttribute('type', 'lazy_proxy');
+                $argumentXML->setAttribute('id', (string) $reference);
+
+                foreach ($interfaces as $interface) {
+                    $interfaceXML = $dom->createElement('interface');
+                    $interfaceXML->appendChild(new \DOMText($interface));
+                    $argumentXML->appendChild($interfaceXML);
                 }
             } elseif ($argument instanceof Definition) {
                 $argumentXML->appendChild($dom->importNode($this->getContainerDefinitionDocument($argument, null, false, $container)->childNodes->item(0), true));

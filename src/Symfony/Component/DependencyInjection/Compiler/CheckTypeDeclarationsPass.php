@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Argument\EnvClosure;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -191,6 +192,12 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         }
 
         $type = $reflectionType->getName();
+
+        if ($value instanceof LazyProxyArgument) {
+            if (!$value = $value->getValues()[2]) {
+                return;
+            }
+        }
 
         if ($value instanceof Reference) {
             if (!$this->container->has($value = (string) $value)) {

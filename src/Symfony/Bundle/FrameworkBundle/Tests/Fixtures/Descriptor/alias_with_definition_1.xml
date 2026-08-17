@@ -20,8 +20,14 @@
   <argument type="iterator">
     <argument type="service" id="definition_1"/>
     <argument type="service" id=".definition_2"/>
+    <argument type="lazy_proxy" id=".definition_2"/>
   </argument>
   <argument type="abstract">placeholder</argument>
+  <argument type="lazy_proxy" id=".definition_2"/>
+  <argument type="lazy_proxy" id=".definition_2">
+    <interface>Full\Qualified\Interface1</interface>
+    <interface>Full\Qualified\Interface2</interface>
+  </argument>
   <usages>
     <usage>alias_1</usage>
   </usages>

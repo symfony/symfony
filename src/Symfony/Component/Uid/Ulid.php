@@ -20,7 +20,7 @@ use Symfony\Component\Uid\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class Ulid extends AbstractUid implements TimeBasedUidInterface
+class Ulid extends AbstractUid implements TimeOrderedUidInterface
 {
     public const FORMAT_BINARY = 1;
     public const FORMAT_BASE_32 = 1 << 1;
@@ -31,6 +31,9 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
 
     protected const NIL = '00000000000000000000000000';
     protected const MAX = '7ZZZZZZZZZZZZZZZZZZZZZZZZZ';
+
+    private const RANDOM_MIN = '0000000000000000';
+    private const RANDOM_MAX = 'ZZZZZZZZZZZZZZZZ';
 
     private static string $time = '';
     private static array $rand = [];
@@ -184,6 +187,30 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -3, 0));
     }
 
+    /**
+     * Returns the lowest and highest ULIDs sharing the timestamp, for range comparisons.
+     *
+     * Every ULID created during the given millisecond sorts between the two bounds:
+     *
+     *     [$min, $max] = Ulid::createBoundaries($time);
+     *     // WHERE ulid BETWEEN :min AND :max
+     *
+     * @return array{static, static}
+     */
+    public static function createBoundaries(?\DateTimeInterface $time = null): array
+    {
+        if (null === $time) {
+            $time = microtime(false);
+            $time = substr($time, 11).substr($time, 2, 3);
+        } elseif (0 > $time = $time->format('Uv')) {
+            throw new InvalidArgumentException('The timestamp must be positive.');
+        }
+
+        $time = self::timestampToBase32($time);
+
+        return [static::fromString($time.self::RANDOM_MIN), static::fromString($time.self::RANDOM_MAX)];
+    }
+
     public static function generate(?\DateTimeInterface $time = null): string
     {
         if (null === $mtime = $time) {
@@ -222,19 +249,7 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
             $time = self::$time;
         }
 
-        if (\PHP_INT_SIZE >= 8) {
-            $time = base_convert($time, 10, 32);
-        } else {
-            $time = str_pad(bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10)), 12, '0', \STR_PAD_LEFT);
-            $time = \sprintf('%s%04s%04s',
-                base_convert(substr($time, 0, 2), 16, 32),
-                base_convert(substr($time, 2, 5), 16, 32),
-                base_convert(substr($time, 7, 5), 16, 32)
-            );
-        }
-
-        return strtr(\sprintf('%010s%04s%04s%04s%04s',
-            $time,
+        return self::timestampToBase32($time).strtr(\sprintf('%04s%04s%04s%04s',
             base_convert(self::$rand[1], 10, 32),
             base_convert(self::$rand[2], 10, 32),
             base_convert(self::$rand[3], 10, 32),
@@ -268,6 +283,25 @@ class Ulid extends AbstractUid implements TimeBasedUidInterface
         }
 
         return $ulid;
+    }
+
+    /**
+     * @param string $time A timestamp in milliseconds since the Unix epoch
+     */
+    private static function timestampToBase32(string $time): string
+    {
+        if (\PHP_INT_SIZE >= 8) {
+            $time = base_convert($time, 10, 32);
+        } else {
+            $time = str_pad(bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10)), 12, '0', \STR_PAD_LEFT);
+            $time = \sprintf('%s%04s%04s',
+                base_convert(substr($time, 0, 2), 16, 32),
+                base_convert(substr($time, 2, 5), 16, 32),
+                base_convert(substr($time, 7, 5), 16, 32)
+            );
+        }
+
+        return strtr(\sprintf('%010s', $time), 'abcdefghijklmnopqrstuv', 'ABCDEFGHJKMNPQRSTVWXYZ');
     }
 
     private static function binaryToBase32(string $ulid): string

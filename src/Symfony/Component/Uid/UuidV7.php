@@ -22,7 +22,7 @@ use Symfony\Component\Uid\Exception\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class UuidV7 extends Uuid implements TimeBasedUidInterface
+class UuidV7 extends Uuid implements TimeOrderedUidInterface
 {
     protected const TYPE = 7;
 
@@ -53,6 +53,31 @@ class UuidV7 extends Uuid implements TimeBasedUidInterface
         $time .= substr(1000 + (hexdec(substr($this->uid, 14, 4)) >> 2 & 0x3FF), -3);
 
         return \DateTimeImmutable::createFromFormat('U.u', substr_replace($time, '.', -6, 0));
+    }
+
+    /**
+     * Returns the lowest and highest UUIDs sharing the millisecond, for range comparisons.
+     *
+     * Every UUIDv7 created during the given millisecond sorts between the two bounds:
+     *
+     *     [$min, $max] = UuidV7::createBoundaries($time);
+     *     // WHERE uuid BETWEEN :min AND :max
+     *
+     * @return array{static, static}
+     */
+    public static function createBoundaries(?\DateTimeInterface $time = null): array
+    {
+        if (null === $time) {
+            $time = microtime(false);
+            $time = substr($time, 11).substr($time, 2, 3);
+        } elseif (0 > $time = $time->format('Uv')) {
+            throw new InvalidArgumentException('The timestamp must be positive.');
+        }
+
+        $time = \PHP_INT_SIZE >= 8 ? \sprintf('%012x', $time) : str_pad(bin2hex(BinaryUtil::fromBase($time, BinaryUtil::BASE10)), 12, '0', \STR_PAD_LEFT);
+        $time = substr_replace($time, '-', 8, 0);
+
+        return [static::fromString($time.'-7000-8000-000000000000'), static::fromString($time.'-7fff-bfff-ffffffffffff')];
     }
 
     public static function generate(?\DateTimeInterface $time = null): string

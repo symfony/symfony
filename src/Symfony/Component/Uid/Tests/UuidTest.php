@@ -20,6 +20,8 @@ use Symfony\Component\Uid\Exception\InvalidArgumentException;
 use Symfony\Component\Uid\MaxUuid;
 use Symfony\Component\Uid\NilUuid;
 use Symfony\Component\Uid\Tests\Fixtures\CustomUuid;
+use Symfony\Component\Uid\TimeBasedUidInterface;
+use Symfony\Component\Uid\TimeOrderedUidInterface;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV1;
@@ -567,5 +569,50 @@ class UuidTest extends TestCase
         $uuid = UuidV7::fromString(UuidV7::generate(\DateTimeImmutable::createFromFormat('U.u', $time)));
 
         $this->assertSame($time, $uuid->getDateTime()->format('U.u'));
+    }
+
+    public function testUuidV7Boundaries()
+    {
+        // 0x017F22E279B0 is the RFC 9562 example timestamp for UUIDv7
+        $time = \DateTimeImmutable::createFromFormat('U.v', '1645557742.000');
+        [$min, $max] = UuidV7::createBoundaries($time);
+
+        $this->assertSame('017f22e2-79b0-7000-8000-000000000000', (string) $min);
+        $this->assertSame('017f22e2-79b0-7fff-bfff-ffffffffffff', (string) $max);
+
+        $inside = new UuidV7(UuidV7::generate($time));
+        $this->assertLessThan(0, $min->compare($inside));
+        $this->assertGreaterThan(0, $max->compare($inside));
+        $this->assertSame($time->format('Uv'), $min->getDateTime()->format('Uv'));
+    }
+
+    public function testUuidV6Boundaries()
+    {
+        $time = new \DateTimeImmutable('2026-04-13 09:30:00.123456 UTC');
+        [$min, $max] = UuidV6::createBoundaries($time);
+
+        $this->assertSame('1f1371b5-7c2f-6280-8000-000000000000', (string) $min);
+        $this->assertSame('1f1371b5-7c2f-6280-bfff-ffffffffffff', (string) $max);
+
+        $inside = new UuidV6(UuidV6::generate($time));
+        $this->assertLessThan(0, $min->compare($inside));
+        $this->assertGreaterThan(0, $max->compare($inside));
+        $this->assertSame($time->format('Uv'), $min->getDateTime()->format('Uv'));
+    }
+
+    public function testCreateBoundariesLeavesTheGeneratorClockAlone()
+    {
+        UuidV7::createBoundaries(new \DateTimeImmutable('@4102444800'));
+
+        $this->assertLessThan(new \DateTimeImmutable('+1 day'), new UuidV7()->getDateTime());
+    }
+
+    public function testTimeOrderedUids()
+    {
+        $this->assertInstanceOf(TimeOrderedUidInterface::class, new UuidV6());
+        $this->assertInstanceOf(TimeOrderedUidInterface::class, new UuidV7());
+
+        $this->assertInstanceOf(TimeBasedUidInterface::class, new UuidV1());
+        $this->assertNotInstanceOf(TimeOrderedUidInterface::class, new UuidV1());
     }
 }

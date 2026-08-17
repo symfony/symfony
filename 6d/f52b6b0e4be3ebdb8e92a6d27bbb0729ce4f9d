@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T12:17:06Z
+
+Thanks for spotting this. I pushed two small changes on top: I put back the blank line before `$willBeInlined`, and I extended `testDumpSimpleHashesInSequences` so it pins both forms. It now checks the expanded output with no flag, and the compact output with `Yaml::DUMP_COMPACT_NESTED_MAPPING`. Before, only the expanded form was checked, so the test could not catch the flag turning into a no-op.
+
+I compared the output against 8.0 on 11 structures at inline levels 0 to 4. It is byte-identical. I also retitled the PR: what this restores is the default output, the flag itself never changed.
+
+The merge-up to 8.2 is clean. Both files are byte-identical on 8.1 and 8.2.

@@ -2,3 +2,9 @@
 # These are vendor-internal: ORM has not yet migrated SchemaTool to the DBAL
 # Schema/Table editor API. Symfony's own schema code already uses the editor API.
 %^Doctrine\\DBAL\\Schema\\(Table|Schema)::\w+\(?\)? is deprecated%
+
+# spl_object_hash() is deprecated as of PHP 8.6. Symfony's own code uses
+# spl_object_id() but some dependencies still call it: masterminds/html5,
+# doctrine/collections, doctrine/dbal and the sebastian/* packages that ship
+# with PHPUnit.
+%^Function spl_object_hash\(\) is deprecated%

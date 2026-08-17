@@ -142,10 +142,20 @@ class SmtpTransport extends AbstractTransport
             $message = parent::send($message, $envelope);
         } catch (TransportExceptionInterface $e) {
             if ($this->started) {
-                try {
-                    $this->executeCommand("RSET\r\n", [250]);
-                } catch (TransportExceptionInterface) {
-                    // ignore this exception as it probably means that the server error was final
+                if ($e instanceof UnexpectedResponseException) {
+                    // The server replied with an unexpected code: the connection is
+                    // still in sync, so it can be reused after resetting the session.
+                    try {
+                        $this->executeCommand("RSET\r\n", [250]);
+                    } catch (TransportExceptionInterface) {
+                        // ignore this exception as it probably means that the server error was final
+                    }
+                } else {
+                    // Any other failure (timeout, broken pipe, ...) may have left an
+                    // unread reply in the socket buffer. Reusing the connection would
+                    // desync every following command, so close it and reconnect on the
+                    // next message.
+                    $this->stop();
                 }
             }
 

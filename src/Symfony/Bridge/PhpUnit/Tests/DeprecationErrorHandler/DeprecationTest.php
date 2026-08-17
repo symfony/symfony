@@ -75,6 +75,20 @@ class DeprecationTest extends TestCase
         $this->assertTrue($deprecation->isLegacy('whatever'));
     }
 
+    public function testMethodInheritedFromAnInternalClassIsNotLegacy()
+    {
+        $object = new class extends \ArrayObject {
+        };
+        $deprecation = new Deprecation('💩', [
+            [],
+            [],
+            [],
+            ['class' => \ArrayObject::class, 'function' => 'count', 'object' => $object, 'file' => __FILE__],
+        ], __FILE__);
+
+        $this->assertFalse($deprecation->isLegacy());
+    }
+
     public function testItCanBeConvertedToAString()
     {
         $deprecation = new Deprecation('💩', $this->debugBacktrace(), __FILE__);

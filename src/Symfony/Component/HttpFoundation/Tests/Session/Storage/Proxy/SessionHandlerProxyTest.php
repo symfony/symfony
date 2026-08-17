@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
+use Symfony\Component\HttpFoundation\Tests\Fixtures\BareSessionHandler;
 
 /**
  * Tests for SessionHandlerProxy class.
@@ -30,7 +31,7 @@ class SessionHandlerProxyTest extends TestCase
 {
     public function testOpenTrue()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('open')
@@ -43,7 +44,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testOpenFalse()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('open')
@@ -56,7 +57,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testClose()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('close')
@@ -69,7 +70,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testCloseFalse()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('close')
@@ -82,7 +83,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testRead()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('read')
@@ -94,7 +95,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testWrite()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('write')
@@ -106,7 +107,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testDestroy()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('destroy')
@@ -118,7 +119,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testGc()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $proxy = new SessionHandlerProxy($handler);
         $handler->expects($this->once())
             ->method('gc')
@@ -130,7 +131,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testValidateIdWithoutUpdateTimestampHandler()
     {
-        $proxy = new SessionHandlerProxy($this->createStub(\SessionHandlerInterface::class));
+        $proxy = new SessionHandlerProxy($this->createStub(BareSessionHandler::class));
 
         $this->assertTrue($proxy->validateId('id'));
     }
@@ -173,7 +174,7 @@ class SessionHandlerProxyTest extends TestCase
 
     public function testUpdateTimestampWithoutUpdateTimestampHandler()
     {
-        $handler = $this->createMock(\SessionHandlerInterface::class);
+        $handler = $this->createMock(BareSessionHandler::class);
         $handler->expects($this->once())
             ->method('write')
             ->willReturn(true);
@@ -199,6 +200,6 @@ class SessionHandlerProxyTest extends TestCase
     }
 }
 
-abstract class TestSessionHandler implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+abstract class TestSessionHandler extends BareSessionHandler implements \SessionUpdateTimestampHandlerInterface
 {
 }

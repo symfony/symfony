@@ -88,12 +88,12 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function associateFormWithView(FormInterface $form, FormView $view): void
     {
-        $this->formsByView[spl_object_hash($view)] = spl_object_hash($form);
+        $this->formsByView[spl_object_id($view)] = spl_object_id($form);
     }
 
     public function collectConfiguration(FormInterface $form): void
     {
-        $hash = spl_object_hash($form);
+        $hash = spl_object_id($form);
 
         if (!isset($this->dataByForm[$hash])) {
             $this->dataByForm[$hash] = [];
@@ -111,7 +111,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function collectDefaultData(FormInterface $form): void
     {
-        $hash = spl_object_hash($form);
+        $hash = spl_object_id($form);
 
         if (!isset($this->dataByForm[$hash])) {
             // field was created by form event
@@ -130,7 +130,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function collectSubmittedData(FormInterface $form): void
     {
-        $hash = spl_object_hash($form);
+        $hash = spl_object_id($form);
 
         if (!isset($this->dataByForm[$hash])) {
             // field was created by form event
@@ -153,7 +153,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
             // Expand current form if there are children with errors
             if (empty($this->dataByForm[$hash]['has_children_error'])) {
-                $childData = $this->dataByForm[spl_object_hash($child)];
+                $childData = $this->dataByForm[spl_object_id($child)];
                 $this->dataByForm[$hash]['has_children_error'] = !empty($childData['has_children_error']) || !empty($childData['errors']);
             }
         }
@@ -161,7 +161,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     public function collectViewVariables(FormView $view): void
     {
-        $hash = spl_object_hash($view);
+        $hash = spl_object_id($view);
 
         if (!isset($this->dataByView[$hash])) {
             $this->dataByView[$hash] = [];
@@ -236,7 +236,7 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     private function &recursiveBuildPreliminaryFormTree(FormInterface $form, array &$outputByHash): array
     {
-        $hash = spl_object_hash($form);
+        $hash = spl_object_id($form);
 
         $output = &$outputByHash[$hash];
         $output = $this->dataByForm[$hash]
@@ -253,11 +253,11 @@ class FormDataCollector extends DataCollector implements FormDataCollectorInterf
 
     private function &recursiveBuildFinalFormTree(?FormInterface $form, FormView $view, array &$outputByHash): array
     {
-        $viewHash = spl_object_hash($view);
+        $viewHash = spl_object_id($view);
         $formHash = null;
 
         if (null !== $form) {
-            $formHash = spl_object_hash($form);
+            $formHash = spl_object_id($form);
         } elseif (isset($this->formsByView[$viewHash])) {
             // The FormInterface instance of the CSRF token is never contained in
             // the FormInterface tree of the form, so we need to get the

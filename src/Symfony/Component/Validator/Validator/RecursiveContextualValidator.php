@@ -448,7 +448,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             // Replace the "Default" group by the group sequence defined
             // for the class, if applicable.
             // This is done after checking the cache, so that
-            // spl_object_hash() isn't called for this sequence and
+            // spl_object_id() isn't called for this sequence and
             // "Default" is used instead in the cache. This is useful
             // if the getters below return different group sequences in
             // every call.
@@ -790,11 +790,11 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         if ($this->context instanceof ExecutionContext) {
             $cacheKey = $this->context->generateCacheKey($object);
         } else {
-            $cacheKey = spl_object_hash($object);
+            $cacheKey = spl_object_id($object);
         }
 
         if ($dependsOnPropertyPath) {
-            $cacheKey .= $this->context->getPropertyPath();
+            $cacheKey .= "\0".$this->context->getPropertyPath();
         }
 
         return $cacheKey;

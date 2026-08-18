@@ -169,4 +169,16 @@ trait RouteTrait
 
         return $this;
     }
+
+    /**
+     * Adds the "_firewall" entry to defaults.
+     *
+     * @return $this
+     */
+    final public function firewall(string $firewall): static
+    {
+        $this->route->addDefaults(['_firewall' => $firewall]);
+
+        return $this;
+    }
 }

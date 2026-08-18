@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add a `firewall` option to route definitions, exposed as the `_firewall` route default
  * Allow defining default query parameters with the `_query` route default
  * Add `RequestContext::runWith()` to generate and match URLs for another host, scheme or base URL without leaking the change
 

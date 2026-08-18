@@ -1,6 +1,7 @@
 blog_show:
     path:         /blog/{slug}
     defaults:     { _controller: "MyBundle:Blog:show", _stateless: true }
+    firewall:     api
     host:         "{locale}.example.com"
     requirements: { 'locale': '\w+' }
     methods:      ['GET','POST','put','OpTiOnS']

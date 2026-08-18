@@ -40,6 +40,7 @@ class RouteTest extends TestCase
             ['host', 'host', '{locale}.example.com'],
             ['condition', 'condition', 'context.getMethod() == \'GET\''],
             ['alias', 'aliases', ['alias', 'completely_different_name']],
+            ['firewall', 'defaults', ['_firewall' => 'api']],
         ];
     }
 }

@@ -45,6 +45,7 @@ class Route
      * @param string|null                                       $format       The format returned by the route (i.e. "json", "xml")
      * @param bool|null                                         $utf8         Whether the route accepts UTF-8 in its parameters
      * @param bool|null                                         $stateless    Whether the route is defined as stateless or stateful, @see https://symfony.com/doc/current/routing.html#stateless-routes
+     * @param string|null                                       $firewall     The firewall name to use for matching this route
      * @param string|string[]|null                              $env          The env(s) in which the route is defined (i.e. "dev", "test", "prod", ["dev", "test"])
      * @param string|DeprecatedAlias|(string|DeprecatedAlias)[] $alias        The list of aliases for this route
      */
@@ -63,6 +64,7 @@ class Route
         ?string $format = null,
         ?bool $utf8 = null,
         ?bool $stateless = null,
+        ?string $firewall = null,
         string|array|null $env = null,
         string|DeprecatedAlias|array $alias = [],
     ) {
@@ -86,6 +88,10 @@ class Route
 
         if (null !== $stateless) {
             $this->defaults['_stateless'] = $stateless;
+        }
+
+        if (null !== $firewall) {
+            $this->defaults['_firewall'] = $firewall;
         }
     }
 }

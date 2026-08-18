@@ -35,7 +35,7 @@ class RouteCompiler implements RouteCompilerInterface
     public const VARIABLE_MAXIMUM_LENGTH = 32;
 
     /**
-     * @throws \InvalidArgumentException if a path variable is named _fragment
+     * @throws \InvalidArgumentException if a path variable is named _fragment or _firewall
      * @throws \LogicException           if a variable is referenced more than once
      * @throws \DomainException          if a variable name starts with a digit or if it is too long to be successfully used as
      *                                   a PCRE subpattern
@@ -74,8 +74,9 @@ class RouteCompiler implements RouteCompilerInterface
         $pathVariables = $result['variables'];
 
         foreach ($pathVariables as $pathParam) {
-            if ('_fragment' === $pathParam) {
-                throw new \InvalidArgumentException(\sprintf('Route pattern "%s" cannot contain "_fragment" as a path parameter.', $route->getPath()));
+            // "_firewall" selects the firewall handling the route; as a path parameter it would let the URL choose it
+            if ('_fragment' === $pathParam || '_firewall' === $pathParam) {
+                throw new \InvalidArgumentException(\sprintf('Route pattern "%s" cannot contain "%s" as a path parameter.', $route->getPath(), $pathParam));
             }
         }
 

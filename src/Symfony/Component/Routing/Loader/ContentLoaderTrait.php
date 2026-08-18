@@ -29,7 +29,7 @@ trait ContentLoaderTrait
      * Config keys accepted at the route or import level by {@see validate()}.
      */
     private const AVAILABLE_KEYS = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
+        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
     ];
 
     /**
@@ -103,6 +103,9 @@ trait ContentLoaderTrait
         if (isset($config['stateless'])) {
             $defaults['_stateless'] = $config['stateless'];
         }
+        if (isset($config['firewall'])) {
+            $defaults['_firewall'] = $config['firewall'];
+        }
 
         $routes = $this->createLocalizedRoute(new RouteCollection(), $name, $config['path']);
         $routes->addDefaults($defaults);
@@ -151,6 +154,9 @@ trait ContentLoaderTrait
         }
         if (isset($config['stateless'])) {
             $defaults['_stateless'] = $config['stateless'];
+        }
+        if (isset($config['firewall'])) {
+            $defaults['_firewall'] = $config['firewall'];
         }
 
         $this->setCurrentDir(\dirname($path));
@@ -219,6 +225,9 @@ trait ContentLoaderTrait
         }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
+        }
+        if (isset($config['firewall']) && isset($config['defaults']['_firewall'])) {
+            throw new \InvalidArgumentException(\sprintf('The routing file "%s" must not specify both the "firewall" key and the defaults key "_firewall" for "%s".', $path, $name));
         }
     }
 

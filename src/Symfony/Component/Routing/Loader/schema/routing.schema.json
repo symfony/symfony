@@ -63,6 +63,7 @@
         "format": { "type": "string" },
         "utf8": { "type": "boolean" },
         "stateless": { "type": "boolean" },
+        "firewall": { "type": "string" },
         "deprecated": {
           "type": "object",
           "properties": {
@@ -134,6 +135,7 @@
         "utf8": { "type": "boolean" },
         "exclude": { "oneOf": [ { "type": "string" }, { "type": "array", "items": { "type": "string" } } ] },
         "stateless": { "type": "boolean" },
+        "firewall": { "type": "string" },
         "controller": { "type": "string" }
       },
       "required": ["resource"],

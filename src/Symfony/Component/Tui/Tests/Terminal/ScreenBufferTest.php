@@ -587,4 +587,40 @@ class ScreenBufferTest extends TestCase
         yield 'private mode set/reset' => ["Hello\x1b[?25h\x1b[?25l World", 'Hello World'];
         yield 'standard mode set/reset' => ["Hello\x1b[25h\x1b[25l World", 'Hello World'];
     }
+
+    /**
+     * A repeat count of 0 means the same as an omitted one, so both move a
+     * single position.
+     */
+    #[DataProvider('zeroRepeatCountProvider')]
+    public function testAZeroRepeatCountMovesOnePosition(string $sequence, int $expectedRow, int $expectedCol)
+    {
+        $buffer = new ScreenBuffer(20, 6);
+        $buffer->write("\x1b[3;5H");
+        $buffer->write($sequence);
+        $buffer->write('X');
+
+        foreach ($buffer->getLines() as $row => $line) {
+            if (false !== $col = strpos($line, 'X')) {
+                $this->assertSame([$expectedRow, $expectedCol], [$row, $col]);
+
+                return;
+            }
+        }
+
+        $this->fail('The written character was not found on the screen.');
+    }
+
+    /**
+     * @return iterable<string, array{string, int, int}>
+     */
+    public static function zeroRepeatCountProvider(): iterable
+    {
+        yield 'no move' => ['', 2, 4];
+        yield 'up, default count' => ["\x1b[A", 1, 4];
+        yield 'up, zero count' => ["\x1b[0A", 1, 4];
+        yield 'down, zero count' => ["\x1b[0B", 3, 4];
+        yield 'forward, zero count' => ["\x1b[0C", 2, 5];
+        yield 'back, zero count' => ["\x1b[0D", 2, 3];
+    }
 }

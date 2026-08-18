@@ -20,7 +20,9 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
+use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
 use Symfony\Component\AssetMapper\ImportMap\RemotePackageDownloader;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\PackageResolverInterface;
 use Symfony\Component\AssetMapper\ImportMap\Resolver\ResolvedImportMapPackage;
@@ -29,6 +31,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapManagerTest extends TestCase
 {
+    private const MINIMUM_RELEASE_AGE = 604800;
+
     private AssetMapperInterface $assetMapper;
     private PackageResolverInterface $packageResolver;
     private ImportMapConfigReader&MockObject $configReader;
@@ -315,6 +319,125 @@ class ImportMapManagerTest extends TestCase
         $manager->update(['cowsay']);
     }
 
+    public function testUpdateUsesAvailableUpdateVersion()
+    {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $manager = $this->createImportMapManager($updateChecker);
+        $this->mockImportMap([
+            self::createRemoteEntry('bootstrap', version: '5.3.1'),
+        ]);
+
+        $updateChecker->method('getMinimumReleaseAge')->willReturn(self::MINIMUM_RELEASE_AGE);
+        $updateChecker->expects($this->once())
+            ->method('getAvailableUpdates')
+            ->willReturn([
+                'bootstrap' => new PackageUpdateInfo('bootstrap', '5.3.1', '5.3.2', PackageUpdateInfo::UPDATE_TYPE_PATCH),
+            ])
+        ;
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->with($this->callback(function (array $packages) {
+                $this->assertCount(1, $packages);
+                $this->assertSame('5.3.2', $packages[0]->versionConstraint);
+
+                return true;
+            }))
+            ->willReturn([
+                self::resolvedPackage('bootstrap', '5.3.2'),
+            ])
+        ;
+
+        $this->remotePackageDownloader->expects($this->once())
+            ->method('downloadPackages');
+
+        $this->configReader->expects($this->once())
+            ->method('writeEntries')
+        ;
+
+        $manager->update();
+    }
+
+    public function testUpdateKeepsCurrentVersionWhenMinimumReleaseAgeOnlyOffersADowngrade()
+    {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $manager = $this->createImportMapManager($updateChecker);
+        $this->mockImportMap([
+            self::createRemoteEntry('bootstrap', version: '5.3.8'),
+        ]);
+
+        $updateChecker->method('getMinimumReleaseAge')->willReturn(self::MINIMUM_RELEASE_AGE);
+        $updateChecker->expects($this->once())
+            ->method('getAvailableUpdates')
+            ->willReturn([
+                'bootstrap' => new PackageUpdateInfo('bootstrap', '5.3.8', '5.3.7', PackageUpdateInfo::UPDATE_TYPE_DOWNGRADE),
+            ])
+        ;
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->with($this->callback(function (array $packages) {
+                $this->assertCount(1, $packages);
+                // The eligible version is older than the current one: keep the current
+                // version instead of downgrading (or jumping to the latest via null).
+                $this->assertSame('5.3.8', $packages[0]->versionConstraint);
+
+                return true;
+            }))
+            ->willReturn([
+                self::resolvedPackage('bootstrap', '5.3.8'),
+            ])
+        ;
+
+        $this->remotePackageDownloader->expects($this->once())
+            ->method('downloadPackages');
+        $this->configReader->expects($this->once())
+            ->method('writeEntries');
+
+        $manager->update();
+    }
+
+    public function testUpdateDoesNotConsultCheckerWhenMinimumReleaseAgeDisabled()
+    {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
+        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $manager = $this->createImportMapManager($updateChecker);
+        $this->mockImportMap([
+            self::createRemoteEntry('bootstrap', version: '5.3.1'),
+        ]);
+
+        $updateChecker->method('getMinimumReleaseAge')->willReturn(0);
+        $updateChecker->expects($this->never())
+            ->method('getAvailableUpdates')
+        ;
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->with($this->callback(function (array $packages) {
+                $this->assertCount(1, $packages);
+                // Feature off: fall back to the previous behavior (let the resolver pick the latest).
+                $this->assertNull($packages[0]->versionConstraint);
+
+                return true;
+            }))
+            ->willReturn([
+                self::resolvedPackage('bootstrap', '5.3.9'),
+            ])
+        ;
+
+        $this->remotePackageDownloader->expects($this->once())
+            ->method('downloadPackages');
+        $this->configReader->expects($this->once())
+            ->method('writeEntries');
+
+        $manager->update();
+    }
+
     #[DataProvider('getPackageNameTests')]
     public function testParsePackageName(string $packageName, array $expectedReturn)
     {
@@ -457,7 +580,7 @@ class ImportMapManagerTest extends TestCase
         $manager->update();
     }
 
-    private function createImportMapManager(): ImportMapManager
+    private function createImportMapManager(?ImportMapUpdateChecker $updateChecker = null): ImportMapManager
     {
         $this->assetMapper = $this->createStub(AssetMapperInterface::class);
         $this->configReader = $this->createMock(ImportMapConfigReader::class);
@@ -478,6 +601,7 @@ class ImportMapManagerTest extends TestCase
             $this->configReader,
             $this->remotePackageDownloader,
             $this->packageResolver,
+            $updateChecker,
         );
     }
 

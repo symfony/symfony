@@ -13,18 +13,23 @@ namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapUpdateChecker;
 use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 class ImportMapUpdateCheckerTest extends TestCase
 {
+    private const SEVEN_DAYS_IN_SECONDS = 604800;
+    private const NOW = '2026-01-20T00:00:00Z';
+
     private ImportMapConfigReader $importMapConfigReader;
     private ImportMapUpdateChecker $updateChecker;
 
@@ -108,6 +113,157 @@ class ImportMapUpdateCheckerTest extends TestCase
                 'up-to-date'
             ),
         ], $updates);
+    }
+
+    public function testGetAvailableUpdatesHonorsMinimumReleaseAge()
+    {
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            'bootstrap' => self::createRemoteEntry(
+                importName: 'bootstrap',
+                version: '5.3.1',
+                packageSpecifier: 'bootstrap',
+            ),
+        ]));
+
+        // Boundary is NOW - 7 days = 2026-01-13: 5.3.3 (1 day old) is too recent, 5.3.2 (10 days old) wins
+        // and 5.3.3 is reported as withheld.
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse([
+                'dist-tags' => ['latest' => '5.3.3'],
+                'versions' => ['5.3.1' => [], '5.3.2' => [], '5.3.3' => []],
+                'time' => [
+                    'created' => '2024-01-01T00:00:00.000Z',
+                    'modified' => self::NOW,
+                    '5.3.1' => '2025-12-21T00:00:00Z',
+                    '5.3.2' => '2026-01-10T00:00:00Z',
+                    '5.3.3' => '2026-01-19T00:00:00Z',
+                ],
+            ]),
+        ]);
+        $updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient, new MockClock(self::NOW), self::SEVEN_DAYS_IN_SECONDS);
+
+        $this->assertEquals([
+            'bootstrap' => new PackageUpdateInfo(
+                'bootstrap',
+                '5.3.1',
+                '5.3.2',
+                'patch',
+                '5.3.3'
+            ),
+        ], $updateChecker->getAvailableUpdates());
+    }
+
+    public function testGetAvailableUpdatesSkipsPrereleasesAndUnpublishedVersions()
+    {
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            'bootstrap' => self::createRemoteEntry(
+                importName: 'bootstrap',
+                version: '5.3.1',
+                packageSpecifier: 'bootstrap',
+            ),
+        ]));
+
+        // Newest eligible-by-age entries must all be rejected: 5.4.0 is inside the cooldown,
+        // 5.4.0-rc.1 is a prerelease, 5.3.9-canary.1 is a prerelease that sorts BELOW latest
+        // (which `parseStability()` alone would accept), 6.0.0-canary.1 sorts above the
+        // declared latest, and 9.9.9 is unpublished. Only the stable 5.3.2 survives.
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse([
+                'dist-tags' => ['latest' => '5.4.0'],
+                'versions' => ['5.3.1' => [], '5.3.2' => [], '5.3.9-canary.1' => [], '5.4.0' => [], '5.4.0-rc.1' => [], '6.0.0-canary.1' => []],
+                'time' => [
+                    'created' => '2024-01-01T00:00:00.000Z',
+                    'modified' => self::NOW,
+                    '5.3.1' => '2025-12-20T00:00:00Z',
+                    '5.3.2' => '2025-12-25T00:00:00Z',
+                    '5.3.9-canary.1' => '2026-01-01T00:00:00Z',
+                    '5.4.0-rc.1' => '2026-01-02T00:00:00Z',
+                    '6.0.0-canary.1' => '2026-01-03T00:00:00Z',
+                    '9.9.9' => '2026-01-04T00:00:00Z', // unpublished: present in time, absent from versions
+                    '5.4.0' => '2026-01-19T00:00:00Z', // stable but inside the cooldown window
+                ],
+            ]),
+        ]);
+        $updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient, new MockClock(self::NOW), self::SEVEN_DAYS_IN_SECONDS);
+
+        $this->assertEquals([
+            'bootstrap' => new PackageUpdateInfo(
+                'bootstrap',
+                '5.3.1',
+                '5.3.2',
+                'patch',
+                '5.4.0'
+            ),
+        ], $updateChecker->getAvailableUpdates());
+    }
+
+    public function testGetAvailableUpdatesReportsPackageWithNoEligibleVersionAsUpToDateAndWarns()
+    {
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            'bootstrap' => self::createRemoteEntry(
+                importName: 'bootstrap',
+                version: '5.3.1',
+                packageSpecifier: 'bootstrap',
+            ),
+        ]));
+
+        // Every published stable version is inside the cooldown window: nothing is eligible.
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse([
+                'dist-tags' => ['latest' => '5.3.2'],
+                'versions' => ['5.3.1' => [], '5.3.2' => []],
+                'time' => [
+                    'created' => '2024-01-01T00:00:00.000Z',
+                    'modified' => self::NOW,
+                    '5.3.1' => '2026-01-18T00:00:00Z',
+                    '5.3.2' => '2026-01-19T00:00:00Z',
+                ],
+            ]),
+        ]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
+            ->method('warning')
+            ->with($this->stringContains('minimum release age'), $this->arrayHasKey('package'));
+
+        $updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient, new MockClock(self::NOW), self::SEVEN_DAYS_IN_SECONDS, $logger);
+
+        $this->assertEquals([
+            'bootstrap' => new PackageUpdateInfo(
+                'bootstrap',
+                '5.3.1',
+                '5.3.1',
+                'up-to-date',
+                '5.3.2'
+            ),
+        ], $updateChecker->getAvailableUpdates());
+    }
+
+    public function testGetAvailableUpdatesSkipsPackageWhenLatestTagIsMissing()
+    {
+        $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
+            'bootstrap' => self::createRemoteEntry(
+                importName: 'bootstrap',
+                version: '5.3.1',
+                packageSpecifier: 'bootstrap',
+            ),
+        ]));
+
+        // Without a declared `dist-tags.latest` there is no safe upper bound: skip the package.
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse([
+                'versions' => ['5.3.1' => [], '5.3.2' => []],
+                'time' => [
+                    'created' => '2024-01-01T00:00:00.000Z',
+                    'modified' => self::NOW,
+                    '5.3.1' => '2025-12-20T00:00:00Z',
+                    '5.3.2' => '2025-12-25T00:00:00Z',
+                ],
+            ]),
+        ]);
+        $updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient, new MockClock(self::NOW), self::SEVEN_DAYS_IN_SECONDS);
+
+        $this->assertSame([], $updateChecker->getAvailableUpdates());
     }
 
     /**

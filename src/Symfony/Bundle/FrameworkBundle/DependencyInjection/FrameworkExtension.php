@@ -1525,6 +1525,10 @@ class FrameworkExtension extends Extension
             ->replaceArgument(3, $config['importmap_polyfill'])
             ->replaceArgument(4, $config['importmap_script_attributes'])
         ;
+        $container
+            ->getDefinition('asset_mapper.importmap.update_checker')
+            ->replaceArgument(3, $config['minimum_release_age'])
+        ;
 
         $compressors = [];
         foreach ($config['precompress']['formats'] as $format) {

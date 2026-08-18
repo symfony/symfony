@@ -28,6 +28,7 @@ class ImportMapManager
         private readonly ImportMapConfigReader $importMapConfigReader,
         private readonly RemotePackageDownloader $packageDownloader,
         private readonly PackageResolverInterface $resolver,
+        private readonly ?ImportMapUpdateChecker $updateChecker = null,
     ) {
     }
 
@@ -102,15 +103,29 @@ class ImportMapManager
         }
 
         if ($update) {
+            // Only consult the update checker when a minimum release age is configured;
+            // otherwise keep the previous behavior and let the resolver pick the latest version.
+            $minimumReleaseAgeEnabled = $this->updateChecker && 0 < $this->updateChecker->getMinimumReleaseAge();
+            $updates = $minimumReleaseAgeEnabled ? $this->updateChecker->getAvailableUpdates($packagesToUpdate) : [];
+
             foreach ($currentEntries as $entry) {
                 $importName = $entry->importName;
                 if (!$entry->isRemotePackage() || ($packagesToUpdate && !\in_array($importName, $packagesToUpdate, true))) {
                     continue;
                 }
 
+                if ($minimumReleaseAgeEnabled) {
+                    // Pin the eligible version on a real update; otherwise keep the current
+                    // version so the release age can neither downgrade nor jump to the latest.
+                    $updateInfo = $updates[$importName] ?? null;
+                    $version = $updateInfo?->hasUpdate() ? $updateInfo->latestVersion : $entry->version;
+                } else {
+                    $version = null;
+                }
+
                 $packagesToRequire[] = new PackageRequireOptions(
                     $entry->packageModuleSpecifier,
-                    null,
+                    $version,
                     $importName,
                     null,
                     $entry->isEntrypoint,

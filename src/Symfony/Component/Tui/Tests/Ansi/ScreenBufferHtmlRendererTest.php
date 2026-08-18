@@ -270,4 +270,36 @@ class ScreenBufferHtmlRendererTest extends TestCase
 
         return new ScreenBufferHtmlRenderer()->convert($screen);
     }
+
+    /**
+     * The sequences come from whatever program's output is being replayed, so
+     * a parameter Color would reject must not fail the conversion.
+     */
+    #[DataProvider('outOfRangeColorProvider')]
+    public function testAnOutOfRangeExtendedColorIsSkipped(string $sequence)
+    {
+        $screen = new ScreenBuffer(10, 2);
+        $screen->write($sequence.'X');
+
+        $this->assertSame('X', (new ScreenBufferHtmlRenderer())->convert($screen));
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function outOfRangeColorProvider(): iterable
+    {
+        yield 'palette index above 255' => ["\x1b[38;5;999m"];
+        yield 'background palette index above 255' => ["\x1b[48;5;300m"];
+        yield 'rgb component above 255' => ["\x1b[38;2;300;0;0m"];
+        yield 'underline color out of range' => ["\x1b[58;5;300m"];
+    }
+
+    public function testAnInRangeExtendedColorStillRenders()
+    {
+        $screen = new ScreenBuffer(10, 2);
+        $screen->write("\x1b[38;5;120mX");
+
+        $this->assertSame('<span style="color: #87ff87;">X</span>', (new ScreenBufferHtmlRenderer())->convert($screen));
+    }
 }

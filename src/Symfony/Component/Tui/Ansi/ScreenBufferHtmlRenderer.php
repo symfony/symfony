@@ -177,11 +177,22 @@ final class ScreenBufferHtmlRenderer
                     48 => 'background-color',
                     58 => 'text-decoration-color',
                 };
+                // Color and its factories reject a value out of range. The
+                // sequences here come from whatever program's output is being
+                // replayed, so an out-of-range component is input to skip like
+                // any other code this method does not understand, not a
+                // reason to fail the whole conversion. Either way the
+                // parameters are consumed, or they would be read back as
+                // codes of their own.
                 if (isset($params[$i + 1]) && 5 === $params[$i + 1] && isset($params[$i + 2])) {
-                    $css[$cssProp] = Color::palette($params[$i + 2])->toHex();
+                    if (self::isColorComponent($params[$i + 2])) {
+                        $css[$cssProp] = Color::palette($params[$i + 2])->toHex();
+                    }
                     $i += 2;
                 } elseif (isset($params[$i + 1]) && 2 === $params[$i + 1] && isset($params[$i + 4])) {
-                    $css[$cssProp] = Color::rgb($params[$i + 2], $params[$i + 3], $params[$i + 4])->toHex();
+                    if (self::isColorComponent($params[$i + 2]) && self::isColorComponent($params[$i + 3]) && self::isColorComponent($params[$i + 4])) {
+                        $css[$cssProp] = Color::rgb($params[$i + 2], $params[$i + 3], $params[$i + 4])->toHex();
+                    }
                     $i += 4;
                 }
             } elseif (59 === $code) {
@@ -218,5 +229,10 @@ final class ScreenBufferHtmlRenderer
         }
 
         return rtrim($cssStr);
+    }
+
+    private static function isColorComponent(int $value): bool
+    {
+        return $value >= 0 && $value <= 255;
     }
 }

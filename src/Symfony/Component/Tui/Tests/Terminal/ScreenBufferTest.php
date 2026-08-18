@@ -623,4 +623,30 @@ class ScreenBufferTest extends TestCase
         yield 'forward, zero count' => ["\x1b[0C", 2, 5];
         yield 'back, zero count' => ["\x1b[0D", 2, 3];
     }
+
+    /**
+     * An erase unsets cells in the middle of a row, so the number of cells in
+     * that row no longer matches the columns they sit in.
+     */
+    public function testWritingRightOfAnErasedRangeKeepsTheCharactersInBetween()
+    {
+        $buffer = new ScreenBuffer(20, 3);
+        $buffer->write('abcdefghij');
+        $buffer->write("\x1b[1;5H");  // row 1, column 5
+        $buffer->write("\x1b[1K");    // erase from the start of the line to the cursor
+        $buffer->write("\x1b[1;13H"); // row 1, column 13
+        $buffer->write('X');
+
+        $this->assertSame('     fghij  X', $buffer->getLines()[0]);
+    }
+
+    public function testWritingRightOfAnErasedRangeKeepsTheirStyles()
+    {
+        $buffer = new ScreenBuffer(20, 3);
+        $buffer->write("\x1b[31mabcdefghij\x1b[0m");
+        $buffer->write("\x1b[1;5H\x1b[1K");
+        $buffer->write("\x1b[1;13HX");
+
+        $this->assertStringContainsString("\x1b[31mfghij", $buffer->getStyledScreen());
+    }
 }

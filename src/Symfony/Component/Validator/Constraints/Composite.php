@@ -137,8 +137,10 @@ abstract class Composite extends Constraint
      */
     public function getNestedConstraints(): array
     {
-        /** @var Constraint[] $nestedConstraints */
-        return $this->{$this->getCompositeOption()};
+        /* @var Constraint[] $nestedConstraints */
+        $nestedConstraints = $this->{$this->getCompositeOption()};
+
+        return $nestedConstraints;
     }
 
     /**

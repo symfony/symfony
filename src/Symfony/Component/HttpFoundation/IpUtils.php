@@ -19,30 +19,30 @@ namespace Symfony\Component\HttpFoundation;
 class IpUtils
 {
     public const PRIVATE_SUBNETS = [
-        '127.0.0.0/8',    // RFC1700 (Loopback)
-        '10.0.0.0/8',     // RFC1918
-        '192.168.0.0/16', // RFC1918
-        '192.0.2.0/24',   // Documentation Ranges TEST-NET-1 (RFC 5737)
-        '198.51.100.0/24',// Documentation Ranges TEST-NET-2 (RFC 5737)
-        '203.0.113.0/24', // Documentation Ranges TEST-NET-3 (RFC 5737)
-        '172.16.0.0/12',  // RFC1918
-        '169.254.0.0/16', // RFC3927
-        '198.18.0.0/15',  // IPv4 Benchmarking (RFC 2544)
-        '0.0.0.0/8',      // RFC5735
-        '240.0.0.0/4',    // RFC1112
-        '100.64.0.0/10',  // RFC6598
-        '::1/128',        // Loopback
-        'fc00::/7',       // Unique Local Address
-        'fe80::/10',      // Link Local Address
-        '::ffff:0:0/96',  // IPv4-mapped IPv6 addresses (RFC 4291 section 2.5.5.2)
-        '::/128',         // Unspecified address
-        '::/96',          // IPv4-compatible IPv6 addresses (RFC 4291 section 2.5.5.1)
-        '2002::/16',      // 6to4 (RFC 3056)
-        '2001::/32',      // Teredo tunneling (RFC 4380)
-        '2001:db8::/32',  // Documentation Ranges (RFC 3849)
-        '2001:0002::/48', // IPv6 Benchmarking (RFC 5180 and corrections)
-        '64:ff9b::/96',   // NAT64 well-known prefix (RFC 6052)
-        '64:ff9b:1::/48', // NAT64 local-use prefix (RFC 8215)
+        '127.0.0.0/8',     // RFC1700 (Loopback)
+        '10.0.0.0/8',      // RFC1918
+        '192.168.0.0/16',  // RFC1918
+        '192.0.2.0/24',    // Documentation Ranges TEST-NET-1 (RFC 5737)
+        '198.51.100.0/24', // Documentation Ranges TEST-NET-2 (RFC 5737)
+        '203.0.113.0/24',  // Documentation Ranges TEST-NET-3 (RFC 5737)
+        '172.16.0.0/12',   // RFC1918
+        '169.254.0.0/16',  // RFC3927
+        '198.18.0.0/15',   // IPv4 Benchmarking (RFC 2544)
+        '0.0.0.0/8',       // RFC5735
+        '240.0.0.0/4',     // RFC1112
+        '100.64.0.0/10',   // RFC6598
+        '::1/128',         // Loopback
+        'fc00::/7',        // Unique Local Address
+        'fe80::/10',       // Link Local Address
+        '::ffff:0:0/96',   // IPv4-mapped IPv6 addresses (RFC 4291 section 2.5.5.2)
+        '::/128',          // Unspecified address
+        '::/96',           // IPv4-compatible IPv6 addresses (RFC 4291 section 2.5.5.1)
+        '2002::/16',       // 6to4 (RFC 3056)
+        '2001::/32',       // Teredo tunneling (RFC 4380)
+        '2001:db8::/32',   // Documentation Ranges (RFC 3849)
+        '2001:0002::/48',  // IPv6 Benchmarking (RFC 5180 and corrections)
+        '64:ff9b::/96',    // NAT64 well-known prefix (RFC 6052)
+        '64:ff9b:1::/48',  // NAT64 local-use prefix (RFC 8215)
     ];
 
     private static array $checkedIps = [];

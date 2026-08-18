@@ -171,13 +171,15 @@ class OutputFormatterTest extends TestCase
         $styleString = substr($tag, 1, -1);
         $formatter = new OutputFormatter(true);
         $method = new \ReflectionMethod($formatter, 'createStyleFromString');
+
+        /** @var OutputFormatterStyle|null $result */
         $result = $method->invoke($formatter, $styleString);
+
         if (null === $expected) {
             $this->assertNull($result);
             $expected = $tag.$input.'</'.$styleString.'>';
             $this->assertSame($expected, $formatter->format($expected));
         } else {
-            /** @var OutputFormatterStyle $result */
             $this->assertInstanceOf(OutputFormatterStyle::class, $result);
             $this->assertSame($expected, $formatter->format($tag.$input.'</>'));
             $this->assertSame($expected, $formatter->format($tag.$input.'</'.$styleString.'>'));

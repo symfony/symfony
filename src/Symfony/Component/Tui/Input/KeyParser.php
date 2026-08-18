@@ -626,11 +626,13 @@ final class KeyParser
                         || (!$this->kittyProtocolActive && "\n" === $data)
                         || "\x1bOM" === $data
                         || $this->matchesKittySequence($data, self::CODEPOINTS['enter'], 0)
-                        || $this->matchesKittySequence($data, self::CODEPOINTS['kp_enter'], 0);
+                        || $this->matchesKittySequence($data, self::CODEPOINTS['kp_enter'], 0)
+                        || $this->matchesModifyOtherKeys($data, self::CODEPOINTS['enter'], 0);
                 }
 
                 return $this->matchesKittySequence($data, self::CODEPOINTS['enter'], $modifier)
-                    || $this->matchesKittySequence($data, self::CODEPOINTS['kp_enter'], $modifier);
+                    || $this->matchesKittySequence($data, self::CODEPOINTS['kp_enter'], $modifier)
+                    || $this->matchesModifyOtherKeys($data, self::CODEPOINTS['enter'], $modifier);
 
             case 'backspace':
                 if ($alt && !$ctrl && !$shift) {

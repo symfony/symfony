@@ -54,17 +54,38 @@ final class EditorRenderer
         $result[] = $this->renderFrameRow($viewport['lines_above'], '↑', $columns, $frameStyle);
 
         // Render visible lines
-        $displayRowsRendered = 0;
+        $contentRows = [];
+        $cursorRow = null;
         for ($i = 0; $i < $viewport['visible_line_count']; ++$i) {
             $lineIndex = $viewport['scroll_offset'] + $i;
             $line = $lines[$lineIndex] ?? '';
             $isCursorLine = $lineIndex === $cursorLine;
 
-            $renderedLines = $this->renderLine($line, $isCursorLine, $cursorCol, $columns, $cursorShape, $focused);
-            foreach ($renderedLines as $renderedLine) {
-                $result[] = $renderedLine;
+            $rendered = $this->renderLine($line, $isCursorLine, $cursorCol, $columns, $cursorShape, $focused);
+            if (null !== $rendered['cursor_row']) {
+                $cursorRow = \count($contentRows) + $rendered['cursor_row'];
             }
-            $displayRowsRendered += \count($renderedLines);
+            foreach ($rendered['lines'] as $renderedLine) {
+                $contentRows[] = $renderedLine;
+            }
+        }
+
+        // The viewport hands back whole logical lines and always keeps at
+        // least one, so the cursor line is drawn even when it wraps to more
+        // rows than the editor was given. Show the window of rows the cursor
+        // is in rather than every one of them, which would run the editor
+        // past its own frame and push whatever is laid out below off screen.
+        if (\count($contentRows) > $maxDisplayRows) {
+            $start = 0;
+            if (null !== $cursorRow && $cursorRow >= $maxDisplayRows) {
+                $start = min($cursorRow - $maxDisplayRows + 1, \count($contentRows) - $maxDisplayRows);
+            }
+            $contentRows = \array_slice($contentRows, $start, $maxDisplayRows);
+        }
+
+        $displayRowsRendered = \count($contentRows);
+        foreach ($contentRows as $contentRow) {
+            $result[] = $contentRow;
         }
 
         // In fill mode, pad with empty rows to fill the allocated space
@@ -108,13 +129,16 @@ final class EditorRenderer
     /**
      * Render a logical line, possibly wrapped into multiple display lines.
      *
-     * @return string[] Array of display lines (one or more if wrapped)
+     * @return array{lines: string[], cursor_row: int|null} The display lines
+     *                                                      (one or more if wrapped), and which of
+     *                                                      them carries the cursor
      */
     private function renderLine(string $line, bool $isCursorLine, int $cursorCol, int $columns, CursorShape $cursorShape, bool $focused): array
     {
         $chunks = TextWrapper::wrapLineIntoChunks($line, $columns);
 
         $result = [];
+        $cursorRow = null;
         $chunkCount = \count($chunks);
 
         foreach ($chunks as $i => $chunk) {
@@ -139,6 +163,7 @@ final class EditorRenderer
             }
 
             if ($hasCursor) {
+                $cursorRow ??= \count($result);
                 $displayLine = $this->renderCursorInChunk($chunkText, $cursorPosInChunk, $columns, $cursorShape, $focused);
             }
 
@@ -158,7 +183,7 @@ final class EditorRenderer
             $result[] = $displayLine.str_repeat(' ', $padding);
         }
 
-        return $result;
+        return ['lines' => $result, 'cursor_row' => $cursorRow];
     }
 
     /**

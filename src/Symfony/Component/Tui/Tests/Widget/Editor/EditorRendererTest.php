@@ -144,6 +144,43 @@ class EditorRendererTest extends TestCase
     }
 
     /**
+     * The scroll indicator is thirteen columns of its own before any frame is
+     * drawn around it, and a pane can be narrower than that.
+     */
+    public function testTheScrollIndicatorIsCutToTheWidth()
+    {
+        $docLines = ['one', 'two', 'three', 'four', 'five', 'six'];
+        $viewport = [
+            'scroll_offset' => 2,
+            'visible_line_count' => 2,
+            'lines_above' => 2,
+            'lines_below' => 2,
+        ];
+
+        foreach ([40, 14, 13, 12, 8, 5, 1] as $columns) {
+            foreach ($this->renderWithViewport($docLines, $viewport, 2, 0, $columns, 10) as $line) {
+                $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every row fits in %d columns.', $columns));
+            }
+        }
+    }
+
+    public function testTheScrollIndicatorStillFillsTheFrameWhenItFits()
+    {
+        $docLines = ['one', 'two', 'three', 'four'];
+        $viewport = [
+            'scroll_offset' => 1,
+            'visible_line_count' => 1,
+            'lines_above' => 1,
+            'lines_below' => 2,
+        ];
+
+        $lines = $this->renderWithViewport($docLines, $viewport, 1, 0, 20, 10);
+
+        $this->assertSame('─── ↑ 1 more ───────', AnsiUtils::stripAnsiCodes($lines[0]));
+        $this->assertSame('─── ↓ 2 more ───────', AnsiUtils::stripAnsiCodes($lines[\count($lines) - 1]));
+    }
+
+    /**
      * @param string[] $docLines
      *
      * @return string[]

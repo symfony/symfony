@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\AhaSend\Event\AhaSendDeliveryEvent;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
@@ -32,15 +33,25 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class AhaSendApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'send.ahasend.com';
+    private const HOST = 'api.ahasend.com';
+    private const LEGACY_HOST = 'send.ahasend.com';
+
+    private bool $legacy;
 
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,
         ?HttpClientInterface $client = null,
         private ?EventDispatcherInterface $dispatcher = null,
         ?LoggerInterface $logger = null,
+        private readonly ?string $accountId = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
+
+        $this->legacy = !$accountId;
+
+        if ($this->legacy && str_starts_with($apiKey, 'aha-sk-')) {
+            throw new IncompleteDsnException('A v2 AhaSend API key requires an account id: use the "ahasend+api://API_KEY:ACCOUNT_ID@default" DSN.');
+        }
     }
 
     public function __toString(): string
@@ -50,8 +61,53 @@ final class AhaSendApiTransport extends AbstractApiTransport
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1/email/send', [
+        if ($this->legacy) {
+            return $this->doSendLegacyApi($sentMessage, $email, $envelope);
+        }
+
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v2/accounts/'.$this->accountId.'/messages', [
             'json' => $this->getPayload($email, $envelope),
+            'headers' => [
+                'Authorization' => 'Bearer '.$this->apiKey,
+            ],
+        ]);
+
+        try {
+            $statusCode = $response->getStatusCode();
+            $result = $response->toArray(false);
+        } catch (DecodingExceptionInterface) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
+        } catch (TransportExceptionInterface $e) {
+            throw new HttpTransportException('Could not reach the remote AhaSend server.', $response, 0, $e);
+        }
+
+        if (202 !== $statusCode) {
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
+        }
+
+        // one entry per recipient, each with its own generated Message-ID
+        $messageId = null;
+        foreach ($result['data'] ?? [] as $message) {
+            if (null === $messageId && !empty($message['id'])) {
+                $messageId = $message['id'];
+            }
+            if (null !== $this->dispatcher && !empty($message['error'])) {
+                $this->dispatcher->dispatch(new AhaSendDeliveryEvent($message['error']));
+            }
+        }
+        if (null !== $messageId) {
+            $sentMessage->setMessageId($messageId);
+        }
+
+        return $response;
+    }
+
+    private function doSendLegacyApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
+    {
+        trigger_deprecation('symfony/aha-send-mailer', '8.2', 'Sending through the legacy AhaSend v1 API is deprecated, use a v2 API key and add your account id to the DSN.');
+
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1/email/send', [
+            'json' => $this->getLegacyPayload($email, $envelope),
             'headers' => [
                 'X-Api-Key' => $this->apiKey,
             ],
@@ -70,11 +126,9 @@ final class AhaSendApiTransport extends AbstractApiTransport
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
         }
 
-        if ($result['fail_count'] > 0) {
-            if (null !== $this->dispatcher) {
-                foreach ($result['errors'] as $error) {
-                    $this->dispatcher->dispatch(new AhaSendDeliveryEvent($error));
-                }
+        if (null !== $this->dispatcher && \array_key_exists('fail_count', $result) && $result['fail_count'] > 0) {
+            foreach ($result['errors'] as $error) {
+                $this->dispatcher->dispatch(new AhaSendDeliveryEvent($error));
             }
         }
 
@@ -84,7 +138,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
     /**
      * @param Address[] $addresses
      *
-     * @return list<string>
+     * @return list<array{email: string, name?: string}>
      */
     private function formatAddresses(array $addresses): array
     {
@@ -97,28 +151,62 @@ final class AhaSendApiTransport extends AbstractApiTransport
         $payload = [
             'recipients' => $this->formatAddresses($envelope->getRecipients()),
             'from' => $this->formatAddress($envelope->getSender()),
+            'subject' => $email->getSubject(),
+        ];
+
+        if ($text = $email->getTextBody()) {
+            $payload['text_content'] = $text;
+        }
+        if ($html = $email->getHtmlBody()) {
+            $payload['html_content'] = $html;
+        }
+        if ($replyTo = $email->getReplyTo()) {
+            $payload['reply_to'] = $this->formatAddress(array_pop($replyTo));
+        }
+
+        [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        if ($headers) {
+            $payload['headers'] = $headers;
+        }
+        if ($tags) {
+            $payload['tags'] = $tags;
+        }
+
+        if ($email->getAttachments()) {
+            $payload['attachments'] = $this->getAttachments($email);
+        }
+
+        return $payload;
+    }
+
+    private function getLegacyPayload(Email $email, Envelope $envelope): array
+    {
+        // "From" and "Subject" headers are handled by the message itself
+        $payload = [
+            'recipients' => $this->formatAddresses($envelope->getRecipients()),
+            'from' => $this->formatAddress($envelope->getSender()),
             'content' => [
                 'subject' => $email->getSubject(),
             ],
         ];
 
-        $text = $email->getTextBody();
-        if (!empty($text)) {
+        if ($text = $email->getTextBody()) {
             $payload['content']['text_body'] = $text;
         }
-        $html = $email->getHtmlBody();
-        if (!empty($html)) {
+        if ($html = $email->getHtmlBody()) {
             $payload['content']['html_body'] = $html;
         }
-
-        $replyTo = $email->getReplyTo();
-        if ($replyTo) {
-            $replyTo = array_pop($replyTo);
-            $payload['content']['reply_to'] = $this->formatAddress($replyTo);
+        if ($replyTo = $email->getReplyTo()) {
+            $payload['content']['reply_to'] = $this->formatAddress(array_pop($replyTo));
         }
 
-        $headers = $this->prepareHeaders($email->getHeaders());
-        if (!empty($headers)) {
+        [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        if ($tags) {
+            $tagsStr = implode(',', $tags);
+            $email->getHeaders()->addTextHeader('AhaSend-Tags', $tagsStr);
+            $headers['AhaSend-Tags'] = $tagsStr;
+        }
+        if ($headers) {
             $payload['content']['headers'] = $headers;
         }
 
@@ -129,6 +217,9 @@ final class AhaSendApiTransport extends AbstractApiTransport
         return $payload;
     }
 
+    /**
+     * @return array{0: array<string, string>, 1: list<string>}
+     */
     private function prepareHeaders(Headers $headers): array
     {
         $headersPrepared = [];
@@ -147,13 +238,8 @@ final class AhaSendApiTransport extends AbstractApiTransport
 
             $headersPrepared[$header->getName()] = $header->getBodyAsString();
         }
-        if (!empty($tags)) {
-            $tagsStr = implode(',', $tags);
-            $headers->addTextHeader('AhaSend-Tags', $tagsStr);
-            $headersPrepared['AhaSend-Tags'] = $tagsStr;
-        }
 
-        return $headersPrepared;
+        return [$headersPrepared, $tags];
     }
 
     private function getAttachments(Email $email): array
@@ -173,7 +259,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
             }
 
             $att = [
-                'content_type' => $headers->get('Content-Type')->getBody(),
+                'content_type' => $contentType,
                 'file_name' => $attachment->getFilename(),
                 'data' => $body,
                 'base64' => $base64,
@@ -202,8 +288,8 @@ final class AhaSendApiTransport extends AbstractApiTransport
         return $formattedAddress;
     }
 
-    private function getEndpoint(): ?string
+    private function getEndpoint(): string
     {
-        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+        return ($this->host ?: ($this->legacy ? self::LEGACY_HOST : self::HOST)).($this->port ? ':'.$this->port : '');
     }
 }

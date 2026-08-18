@@ -10,13 +10,17 @@ Configuration example:
 MAILER_DSN=ahasend+smtp://USERNAME:PASSWORD@default
 
 # API
+MAILER_DSN=ahasend+api://API_KEY:ACCOUNT_ID@default
+
+# API (legacy v1, deprecated)
 MAILER_DSN=ahasend+api://API_KEY@default
 ```
 
 where:
  - `USERNAME` is your AhaSend SMTP Credentials username
  - `PASSWORD` is your AhaSend SMTP Credentials password
- - `API_KEY` is your AhaSend API Key credential
+ - `API_KEY` is your AhaSend API key
+ - `ACCOUNT_ID` is your AhaSend account ID; without it, the key is used with the legacy v1 API
 
 Sponsor
 -------

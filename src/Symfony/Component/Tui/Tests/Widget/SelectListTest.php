@@ -242,6 +242,43 @@ class SelectListTest extends TestCase
     }
 
     /**
+     * The selected row is prefixed with an arrow: three bytes, two columns.
+     * Budgeting in bytes cost that row two columns of description.
+     */
+    public function testSelectedRowGetsTheSameWidthBudgetAsTheOthers()
+    {
+        $description = str_repeat('D', 120);
+        $list = new SelectListWidget([
+            ['value' => 'alpha', 'label' => 'alpha', 'description' => $description],
+            ['value' => 'beta', 'label' => 'beta', 'description' => $description],
+        ]);
+
+        $lines = $list->render(new RenderContext(60, 24));
+
+        $this->assertSame(
+            AnsiUtils::visibleWidth($lines[1]),
+            AnsiUtils::visibleWidth($lines[0]),
+            'The selected row is truncated to the same width as the others.',
+        );
+    }
+
+    public function testSelectedRowWithoutDescriptionGetsTheSameWidthBudget()
+    {
+        $label = str_repeat('L', 120);
+        $list = new SelectListWidget([
+            ['value' => 'alpha', 'label' => $label],
+            ['value' => 'beta', 'label' => $label],
+        ]);
+
+        $lines = $list->render(new RenderContext(60, 24));
+
+        $this->assertSame(
+            AnsiUtils::visibleWidth($lines[1]),
+            AnsiUtils::visibleWidth($lines[0]),
+        );
+    }
+
+    /**
      * @return array{SelectListWidget, Tui}
      */
     private function createTestListWithTui(): array

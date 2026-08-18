@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T12:24:52Z
+
+Thanks @mp3000mp, the feature follows the Twig and routing precedent and the wiring was done right, the reserved `validator.expression_language_provider` slot stays free for applications. I rebased on 8.2, squashed with your authorship and fixed one real defect.
+
+The compiler closures emitted `$auth_checker` and `$token` variable references that do not exist in the validator expression language scope, so any compiled expression would have been fatally wrong code. Evaluation was fine, since the evaluator closures capture the services. The compilers now throw `The "is_granted()" function cannot be compiled, it can only be evaluated.`, with a test per function.
+
+I also added a test pinning the no-token behaviour: with an empty token storage every function returns `false`, so a `When(is_granted(...))` constraint is silently inactive when the same entity is validated in a worker. That matches Twig's `is_granted()` outside a request, but since validation gates are security-adjacent it is now stated in the description and pinned by a test rather than implied. A security-team ack on that semantic would be welcome before merge.
+
+FrameworkBundle validator tests are green at 13, and restoring your original provider fails the 4 compile tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T06:51:12Z
+
+Pushed a behaviour change on top, plus the paperwork. Worth a look before this goes further, @mp3000mp.
+
+The four functions now throw when evaluated outside a request:
+
+```
+LogicException: The "is_granted()" function cannot be evaluated outside of a request.
+```
+
+The reason is `Assert\When`. In a console command or a Messenger worker there is no security context, and returning `false` there means the guarded constraints are silently skipped: validation passes and nothing reports why. `Assert\Expression` had the opposite problem, it produced a violation. Throwing makes both say the same thing, which is that the rule cannot be evaluated here.
+
+Note this is deliberately keyed on the request, not on the token. A null token is normal inside a request, it just means nobody is logged in, and `is_granted()` must answer `false` for an anonymous visitor rather than blow up. `AuthorizationChecker::isGranted()` substitutes a `NullToken` for exactly that case. So the provider now takes a `RequestStack` and only throws when there is no main request. `testTheFunctionsReturnFalseWithoutAnyToken` covers the anonymous case and is the regression guard for it.
+
+Nothing here is a BC break: `is_granted()` in a validator expression is a `SyntaxError` on every released branch, so there is no existing behaviour to preserve. That also means the choice is free, and if you or the security team prefer `false` over throwing, say so and I will revert this part.
+
+The rest is paperwork:
+
+- moved the CHANGELOG entry from the released 8.1 section to 8.2
+- `testIsGrantedReturnsFalseWithoutAnyToken` used a stubbed `AccessDecisionManagerInterface`, which returns `false` whatever the token is, so it passed with a token too. It now uses a real `AccessDecisionManager` with `AuthenticatedVoter` and `RoleVoter`, covers all four functions, and fails if the functions stop denying.
+- added `AddValidatorSecurityExpressionLanguageProviderPassTest`, covering both services present, security absent, and validator absent. The wiring had no test at all.
+
+One thing for the description rather than the code: it says the `validator.expression_language_provider` id stays free for applications. That id is already `Validator\Constraints\ExpressionLanguageProvider`, and defining it drops `is_valid()` from the function list. Worth correcting before the docs PR picks it up.

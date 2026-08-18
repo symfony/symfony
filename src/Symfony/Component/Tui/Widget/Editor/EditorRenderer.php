@@ -130,8 +130,17 @@ final class EditorRenderer
                 $displayLine = $this->renderCursorInChunk($chunkText, $cursorPosInChunk, $columns, $cursorShape, $focused);
             }
 
-            // Pad to width
+            // A grapheme cannot be split, so a chunk still overflows when one
+            // character is wider than the whole box (a CJK glyph in a
+            // one-column pane, a joined emoji in four). The Renderer rejects
+            // an over-wide line, so cut what does not fit.
             $visibleWidth = AnsiUtils::visibleWidth($displayLine);
+            if ($visibleWidth > $columns) {
+                $displayLine = AnsiUtils::truncateToWidth($displayLine, $columns, '');
+                $visibleWidth = AnsiUtils::visibleWidth($displayLine);
+            }
+
+            // Pad to width
             $padding = max(0, $columns - $visibleWidth);
 
             $result[] = $displayLine.str_repeat(' ', $padding);

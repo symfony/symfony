@@ -454,11 +454,29 @@ class MarkdownWidget extends AbstractWidget
                 $columnWidths[] = max(1, (int) floor($proportion * $availableForCells));
             }
 
-            $allocated = array_sum($columnWidths);
-            $remaining = $availableForCells - $allocated;
+            $remaining = $availableForCells - array_sum($columnWidths);
             for ($i = 0; $remaining > 0 && $i < $numCols; ++$i) {
                 ++$columnWidths[$i];
                 --$remaining;
+            }
+
+            // Flooring each share and then lifting the empty ones back to a
+            // single column can spend more than the budget, and the borders
+            // are sized from these widths: the row would run past the widget
+            // and get wrapped, breaking the table apart. Take the excess off
+            // the widest columns, which have the most to spare.
+            while ($remaining < 0) {
+                $widest = null;
+                foreach ($columnWidths as $i => $width) {
+                    if ($width > 1 && (null === $widest || $width > $columnWidths[$widest])) {
+                        $widest = $i;
+                    }
+                }
+                if (null === $widest) {
+                    break;
+                }
+                --$columnWidths[$widest];
+                ++$remaining;
             }
         }
 

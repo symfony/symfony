@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2026-02-05T17:47:01Z
+
+Hi
+Is it possible to have examples on how to use it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T11:38:47Z
+
+I rebased on 8.2, finished the PR and rewrote the description with the examples @Spomky asked for. @tilaven, your work and authorship are preserved; please shout if you disagree with any of the following.
+
+What I added on top, closing the "careful specs" @stof asked for in the issue:
+
+* **an unknown firewall name now throws.** The branch silently fell back to the request matchers, so a typo like `firewall: 'mian'` authenticated with whatever firewall matched the path. That was the one hole I considered blocking;
+* **`_firewall` is rejected as a path parameter**, exactly like `_fragment` in `RouteCompiler`. Route parameters land in request attributes, so `/x/{_firewall}` would have let the URL choose the firewall;
+* non-string or empty values throw with a clear message;
+* verified that every configured firewall gets a `security.firewall.map.context.*` service, including `security: false` ones, so the thrown error really does mean "not configured" and unsecured firewalls are addressable by routes.
+
+@Spomky, on your two concerns from the issue: routes without the option keep today's matcher behaviour byte for byte, so a forgotten attribute falls back to the central config rather than to nothing; and the audit story is that the firewall shows in the route definition and in `debug:router`, next to the existing `debug:firewall`.
+
+@derrabus @stof @Spomky this now matches the shape sketched in #62703; review welcome. Routing is green at 1197 tests, SecurityBundle at 450, and reverting either half fails its tests.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-15T11:59:04Z
+
+Thanks @nicolas-grekas
+I will take time to review it this afternoon.
+Quick question : if I understand correctly the firewall set in the attribute or via the `firewall` method takes precedence over the one in the configuration. Am I right?

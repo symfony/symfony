@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T17:19:50Z
+
+Thank you for this fix, it is correct and well targeted. I amended the commit while reviewing:
+
+- rebased on the current 6.4 tip; the PHPStan/Psalm and low-deps failures came from the previous base, which predated the `cache/integration-tests` pin
+- normalized the new regexes to `[ \t]+#`, the exact scan `Inline::parseScalar()` already uses
+- added tests pinning comments inside flow collections that span multiple lines, since they sit right next to this code path and had no coverage
+- updated the description: a tab worked before by the same one-whitespace accident as a single space, and a `#` without preceding whitespace is now part of the reference name, as the spec defines

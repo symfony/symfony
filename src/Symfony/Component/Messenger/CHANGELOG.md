@@ -13,6 +13,7 @@ CHANGELOG
  * Allow prioritizing receivers so that `messenger:consume --all` consumes receivers in a predefined order
  * Add an optional `extra` key to the encoded envelope passed to `SerializerInterface::decode()`, holding metadata added by the receiving transport
  * Add an optional `LoggingMiddleware` logging the processing time and memory usage of each message
+ * Add the `messenger:show` command to list and inspect pending messages of a transport
 
 8.1
 ---

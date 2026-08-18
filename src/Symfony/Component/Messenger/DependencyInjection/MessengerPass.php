@@ -343,6 +343,11 @@ class MessengerPass implements CompilerPassInterface
                 ->replaceArgument(1, array_values($receiverNames));
         }
 
+        if ($container->hasDefinition('console.command.messenger_show')) {
+            $container->getDefinition('console.command.messenger_show')
+                ->replaceArgument(1, array_values($receiverNames));
+        }
+
         $container->getDefinition('messenger.receiver_locator')->replaceArgument(0, $receiverMapping);
 
         $failureTransportsLocator = ServiceLocatorTagPass::register($container, $failureTransportsMap);

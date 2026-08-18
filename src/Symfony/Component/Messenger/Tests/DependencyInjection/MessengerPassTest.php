@@ -30,6 +30,7 @@ use Symfony\Component\Messenger\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
+use Symfony\Component\Messenger\Command\ShowMessagesCommand;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Envelope;
@@ -475,6 +476,23 @@ class MessengerPassTest extends TestCase
         (new MessengerPass())->process($container);
 
         $this->assertSame(['doctrine', 'amqp', 'dummy'], $container->getDefinition('console.command.messenger_setup_transports')->getArgument(1));
+    }
+
+    public function testItSetsTheReceiverNamesOnTheShowMessagesCommand()
+    {
+        $container = $this->getContainerBuilder();
+        $container->register('console.command.messenger_show', ShowMessagesCommand::class)->setArguments([
+            new Reference('messenger.receiver_locator'),
+            null,
+            null,
+        ]);
+
+        $container->register(AmqpReceiver::class, AmqpReceiver::class)->addTag('messenger.receiver', ['alias' => 'amqp']);
+        $container->register(DummyReceiver::class, DummyReceiver::class)->addTag('messenger.receiver', ['alias' => 'dummy']);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertSame(['amqp', 'dummy'], $container->getDefinition('console.command.messenger_show')->getArgument(1));
     }
 
     public function testOnlyConsumableTransportsAreAddedToConsumeCommand()

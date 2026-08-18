@@ -123,6 +123,7 @@ use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\Bridge as MessengerBridge;
+use Symfony\Component\Messenger\Command\ShowMessagesCommand;
 use Symfony\Component\Messenger\EventListener\ReleaseDeduplicationLockOnFailureListener;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\MessageBus;
@@ -586,6 +587,7 @@ class FrameworkExtension extends Extension
         } else {
             $container->removeDefinition('console.command.messenger_consume_messages');
             $container->removeDefinition('console.command.messenger_stats');
+            $container->removeDefinition('console.command.messenger_show');
             $container->removeDefinition('console.command.messenger_debug');
             $container->removeDefinition('console.command.messenger_stop_workers');
             $container->removeDefinition('console.command.messenger_setup_transports');
@@ -2448,6 +2450,10 @@ class FrameworkExtension extends Extension
 
         if (!$this->hasConsole()) {
             $container->removeDefinition('console.command.messenger_stats');
+        }
+
+        if (!class_exists(ShowMessagesCommand::class)) {
+            $container->removeDefinition('console.command.messenger_show');
         }
 
         $loader->load('messenger.php');

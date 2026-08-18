@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-03T07:27:19Z
+
+This must target 7.1, due to feature freeze period.
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2023-11-03T11:03:35Z
+
+> This must target 7.1, due to feature freeze period.
+
+Thank you, where is this documented please? I can't find any information on the [Release Process](https://symfony.com/doc/current/contributing/community/releases.html) page nor on the [Releases](https://symfony.com/releases) page. Googling only gives me blog entries for older Symfony releases.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-03T11:12:28Z
+
+It should be mentioned [here](https://symfony.com/doc/current/contributing/code/pull_requests.html#choose-the-right-branch) IMHO, which is not the case.
+The feature freeze period is just a small timeframe, IIRC it started around mid October and will end end November when Symfony 6.4 and 7 gets released.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-11-03T11:20:21Z
+
+I added some info
+* https://github.com/symfony/symfony-docs/pull/19110
+
+---------------------------------------------------------------------------
+
+by BenMorel at 2023-11-29T21:36:58Z
+
+I've just rebased this PR against the new 7.1 branch. Is there something I can do to get it merged?
+
+As it stands, there are a few points in the comments that would need to be ruled on. Ideally I'd like to keep this PR simple for now, but keep things extendable if someone else wants to build extra features on top of it.
+
+---------------------------------------------------------------------------
+
+by Jeroeny at 2023-12-09T17:37:35Z
+
+What if the callHandler method was moved to an interface (HandlerExecutor) ? Then there can also be a Traceable version of it to measure and debug handling per handler.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-12-11T15:23:49Z
+
+> What if the callHandler method was moved to an interface (HandlerExecutor) ? Then there can also be a Traceable version of it to measure and debug handling per handler.
+
+I like this a lot 🙌
+
+It makes a lot of sense to be able to probe execution of the handler(s). This makes #50980 and #50998 absolute. As with this interface, I can now create my own HandlerExecutor middleware that to do transaction wrapping or exception ignoring.
+
+---------------------------------------------------------------------------
+
+by jerowork at 2023-12-15T15:13:09Z
+
+> What if the callHandler method was moved to an interface (HandlerExecutor) ? Then there can also be a Traceable version of it to measure and debug handling per handler.
+
+Exactly what I was thinking (its in the name I guess 😉 ).
+Making `callHandler` protected would solve it, but extracting the calling handler to a separate class makes it more flexible and open for extension for everybody who wants to change the calling handler for whatever reason (for me I would like to have a upgraded way of injecting other (optional) parameters in a handler)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T16:59:26Z
+
+Thanks for your patience @BenMorel, and for the clear write-up of the auditing gymnastics this removes. The feature is wanted, I rebased on 8.2 and pushed with one behavioral fix.
+
+**Batch handlers got a wrong success event.** As submitted, the outcome event was dispatched right after `callHandler()`. For a batch handler that call only *enqueues* the message, so `HandlerSuccessEvent` fired before the handler had run, and the real outcome at flush time produced no event at all. For an auditing feature, that is the case that cannot be wrong. The outcome events now come from the acknowledger callback, which is where the result or error actually lands, whether the handler acknowledges synchronously or at a later flush. `HandlerStartingEvent` stays at invoke time, which is honest for batch handlers too since `__invoke()` does run to enqueue. Every handler run gets exactly one outcome event; three tests cover queued-then-flushed success, a nacked batch, and the no-double-dispatch guarantee.
+
+**The test needed rebuilding anyway**: it used `withConsecutive()`, which no longer exists in the PHPUnit in use, so it errored rather than ran. It now records events with a small PSR-14 dispatcher fixture and asserts the sequence.
+
+On @Jeroeny's `HandlerExecutor` suggestion, which several people liked: a traceable executor wrapping `callHandler()` would hit exactly the bug fixed above, because `callHandler()` on a batch handler returns at enqueue, and the execution happens in `flush()` and resolves through the `Acknowledger`, neither of which passes through `callHandler()`. So an executor interface is not a substitute for these events, and per-handler timing for the profiler can still be built on top of them later.
+
+Also rebased around the new `ClockInterface` constructor argument (the dispatcher is the fourth parameter now), moved the changelog entry to 8.2, and dropped the empty `HandlerStartingEvent`/`HandlerSuccessEvent` bodies into place unchanged. Messenger is green apart from the pre-existing `WorkerTest` parallel failures my local checkout has without `amphp/parallel`; the middleware test file runs 19 green, and reverting the middleware while keeping the tests fails the three event tests.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-14T17:06:21Z
+
+Dropped `AbstractHandlerEvent`: Symfony's dispatcher matches listeners by concrete class, so an abstract base is not a subscription point, and sharing two promoted properties did not justify a fourth API class. The three events are now self-contained finals. 7 files, +264/-1, still one commit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T16:47:16Z
+
+Pushed one more fix on top of my rebase, to the batch guard I introduced there.
+
+`$outcomeDispatched` was captured by reference in each acknowledger closure, and PHP closures share the enclosing function's variable slot, not the loop iteration's. So when a batch handler's acknowledger resolved during a later handler's run in the same loop, which is exactly what a flush does, the flag was already true and that later handler's own outcome event was suppressed.
+
+Replaced the flag with `$ack?->isAcknowledged()` on the per-iteration acknowledger, which cannot cross iterations. Regression test added: a batch handler plus a second handler that forces a flush; it fails with 3 events instead of 4 before the fix. Messenger middleware suite green, CS clean.

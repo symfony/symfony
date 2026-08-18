@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Tests\Widget;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Tui\Event\SubmitEvent;
 use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\Renderer;
@@ -154,5 +155,80 @@ class WidgetTreeTest extends TestCase
         $input->handleInput("\r");
 
         $this->assertSame(1, $submits);
+    }
+
+    public function testOffRemovesASingleListener()
+    {
+        $tui = new Tui(terminal: new VirtualTerminal(40, 10));
+        $input = new InputWidget();
+
+        $first = 0;
+        $second = 0;
+        $one = static function () use (&$first) { ++$first; };
+        $two = static function () use (&$second) { ++$second; };
+        $input->on(SubmitEvent::class, $one);
+        $input->on(SubmitEvent::class, $two);
+
+        $tui->add($input);
+        $input->handleInput("\r");
+        $this->assertSame([1, 1], [$first, $second]);
+
+        $input->off(SubmitEvent::class, $one);
+        $input->handleInput("\r");
+
+        $this->assertSame([1, 2], [$first, $second], 'Only the listener that was passed is released.');
+    }
+
+    public function testOffRemovesAFirstClassCallable()
+    {
+        $tui = new Tui(terminal: new VirtualTerminal(40, 10));
+        $input = new InputWidget();
+
+        $counter = new class {
+            public int $count = 0;
+
+            public function increment(): void
+            {
+                ++$this->count;
+            }
+        };
+        $input->on(SubmitEvent::class, $counter->increment(...));
+
+        $tui->add($input);
+        $input->handleInput("\r");
+        $this->assertSame(1, $counter->count);
+
+        $input->off(SubmitEvent::class, $counter->increment(...));
+        $input->handleInput("\r");
+
+        $this->assertSame(1, $counter->count);
+        $this->assertFalse($input->hasListeners(SubmitEvent::class));
+    }
+
+    public function testOffWithoutAListenerRemovesThemAll()
+    {
+        $tui = new Tui(terminal: new VirtualTerminal(40, 10));
+        $input = new InputWidget();
+
+        $submits = 0;
+        $input->onSubmit(static function () use (&$submits) { ++$submits; });
+        $input->onSubmit(static function () use (&$submits) { ++$submits; });
+
+        $tui->add($input);
+        $input->handleInput("\r");
+        $this->assertSame(2, $submits);
+
+        $input->off(SubmitEvent::class);
+        $input->handleInput("\r");
+
+        $this->assertSame(2, $submits);
+    }
+
+    public function testOffIsAcceptedForAnEventTypeThatWasNeverListenedTo()
+    {
+        $input = new InputWidget();
+
+        $this->assertSame($input, $input->off(SubmitEvent::class));
+        $this->assertSame($input, $input->off(SubmitEvent::class, static function () {}));
     }
 }

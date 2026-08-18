@@ -1,0 +1,60 @@
+---------------------------------------------------------------------------
+
+by janklan at 2026-05-18T07:43:13Z
+
+The Scheduler component doesn't have a CHANGELONG.md. Shall I just create one or do we not track this kind of change?
+
+---------------------------------------------------------------------------
+
+by MrYamous at 2026-05-18T19:07:27Z
+
+> The Scheduler component doesn't have a CHANGELONG.md. Shall I just create one or do we not track this kind of change?
+
+[The file seems to be present](https://github.com/symfony/symfony/blob/8.1/src/Symfony/Component/Scheduler/CHANGELOG.md) to me
+
+I think thats a good improvement 👍
+
+---------------------------------------------------------------------------
+
+by janklan at 2026-05-18T21:00:43Z
+
+> [The file seems to be present](https://github.com/symfony/symfony/blob/8.1/src/Symfony/Component/Scheduler/CHANGELOG.md) to me
+
+Doh, I can't tell you why I didn't see it. It's updated with the change description.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T09:20:50Z
+
+Heads up: this branch had been force-pushed to an unrelated commit. Since 2026-06-10 `scheduler-debug` pointed at "[Security] Allow passing extra parameters in the login link URL", so the PR showed eight Security files and no Scheduler ones, and the CI run said nothing about this feature. The login link work is safe, it lives on your `login-link-argument` branch in #64271.
+
+Your Scheduler commit was still reachable as `2c9608f5f6e`, so I recovered it, rebased it on 8.2 and pushed it back here. The feature is unchanged, but I fixed two things in it.
+
+Overdue runs were indistinguishable from upcoming ones. `DateInterval::$invert` was discarded, so a run 2 hours in the past printed exactly like one 2 hours away. A negative interval is now rendered with a leading `-`, which is also what `Helper::formatTime` does.
+
+The column measured from the wrong instant. 8.2 gained a stateful checkpoint path after you opened this, and `$effectiveDate` is the stored checkpoint, so the interval was computed from the checkpoint rather than from now. On a schedule whose checkpoint is old, a run overdue by two and a half years displayed as `1 hour`. `getNextRunDate()` still uses the checkpoint, which is correct, but the interval now uses the reference date, so the same case reads `-2 years, 7 months, ...`.
+
+Also updated: the entry went to a new `8.2` section, since the top of the Scheduler changelog is `8.1` and that shipped in v8.1.0. The conflicting copy of the `--sort` line, which named `debug:command` rather than `debug:scheduler`, is gone. `testExecuteWithSortAndAllListsNullNextRunFirst` was added after you opened this and still expected the three column header, so its expectation now matches the four column output. And the commit subject had a curly apostrophe in it.
+
+Tests cover the overdue case through the stateful schedule and the ordinary case through `--date`. Scheduler is green at 169 tests, php-cs-fixer is clean, and the parent is the current 8.2 tip.
+
+Two things left for you. On the formatter, I kept yours rather than switching to `Helper::formatTime`, because that one caps at days and renders three months as `92 d`, which is not useful for yearly cron triggers. It does handle sub-second, where this returns `0 seconds` for anything under a second, so borrowing that part may be worth it. And @MrYamous asked about separators earlier and the thread was never closed, so if you want a different rendering than `2 hours, 5 minutes` now is the time.
+
+The `Q/A` table also needs `New feature? yes`, and this will want a docs PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T09:26:51Z
+
+Switched the column to abbreviated units, so it now reads `2 y, 1 mo`, `-2 h, 5 min`, `1 min`, `0 s`.
+
+The vocabulary matches `Helper::formatTime()`, which uses `ms`, `s`, `min`, `h` and `d` joined with commas. It stops at days, so `y` and `mo` are the only additions.
+
+```
+overdue 2h5m   -2 h, 5 min
+in 3 months     3 mo
+in 2y1m         2 y, 1 mo
+overdue 2.5y   -2 y, 7 mo, 1 h
+```
+
+The table expectations moved with it. Trigger descriptions such as `every 2 minutes` are the trigger's own string and are untouched, I checked they still match the base file exactly.

@@ -30,7 +30,8 @@
                 tabNavigation.classList.add('tab-navigation');
                 tabNavigation.setAttribute('role', 'tablist');
 
-                let selectedTabId = `tab-${i}-0`; /* select the first tab by default */
+                let selectedTabId = null;
+                let firstEnabledTabId = null;
                 tabs.forEach((tab, j) => {
                     const tabId = `tab-${i}-${j}`;
                     const tabTitle = tab.querySelector('.tab-title').innerHTML;
@@ -43,6 +44,8 @@
                     if (tab.classList.contains('active')) { selectedTabId = tabId; }
                     if (tab.classList.contains('disabled')) {
                         tabNavigationItem.classList.add('disabled');
+                    } else if (null === firstEnabledTabId) {
+                        firstEnabledTabId = tabId;
                     }
                     tabNavigationItem.innerHTML = tabTitle;
                     tabNavigation.appendChild(tabNavigationItem);
@@ -52,6 +55,7 @@
                 });
 
                 tabGroup.insertBefore(tabNavigation, tabGroup.firstChild);
+                selectedTabId = selectedTabId || firstEnabledTabId || `tab-${i}-0`;
                 document.querySelector('[data-tab-id="' + selectedTabId + '"]').classList.add('active');
             });
 

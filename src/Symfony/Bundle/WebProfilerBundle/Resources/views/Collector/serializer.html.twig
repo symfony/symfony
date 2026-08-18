@@ -202,7 +202,7 @@
             {% else %}
                 {{ caller.name }}
             {% endif %}
-            line <a class="text-small sf-toggle" data-toggle-selector="#{{ trace_id }}">{{ caller.line }}</a>
+            line <button type="button" class="btn-link text-small sf-toggle" data-toggle-selector="#{{ trace_id }}">{{ caller.line }}</button>
         </span>
 
         <div class="sf-serializer-compact hidden" id="{{ trace_id }}">
@@ -302,7 +302,7 @@
     <span class="nowrap">{{ item.dataType }}</span>
 
     <div>
-        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ data_id }}" data-toggle-alt-content="Hide contents">Show contents</a>
+        <button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ data_id }}" data-toggle-alt-content="Hide contents">Show contents</button>
         <div id="{{ data_id }}" class="context sf-toggle-content sf-toggle-hidden">
             {{ profiler_dump(item.data) }}
         </div>
@@ -320,7 +320,7 @@
     {% endif %}
 
     <div>
-        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</a>
+        <button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide context">Show context</button>
         <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
             {{ profiler_dump(item.context) }}
         </div>
@@ -336,7 +336,7 @@
 
     {% if item.normalization|length > 1 %}
         <div>
-            <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ nested_normalizers_id }}" data-toggle-alt-content="Hide nested normalizers">Show nested normalizers</a>
+            <button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ nested_normalizers_id }}" data-toggle-alt-content="Hide nested normalizers">Show nested normalizers</button>
             <div id="{{ nested_normalizers_id }}" class="context sf-toggle-content sf-toggle-hidden">
                 <ul class="text-small sf-serializer-compact-list">
                     {% for normalizer in item.normalization %}
@@ -357,7 +357,7 @@
 
     {% if item.encoding|length > 1 %}
         <div>
-            <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ nested_encoders_id }}" data-toggle-alt-content="Hide nested encoders">Show nested encoders</a>
+            <button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ nested_encoders_id }}" data-toggle-alt-content="Hide nested encoders">Show nested encoders</button>
             <div id="{{ nested_encoders_id }}" class="context sf-toggle-content sf-toggle-hidden">
                 <ul class="text-small sf-serializer-compact-list">
                     {% for encoder in item.encoding %}

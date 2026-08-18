@@ -220,6 +220,10 @@ trait RedisTrait
             $params['auth'] = $auth ?? $params['auth'];
         }
 
+        if (\is_array($params['auth']) && (!array_is_list($params['auth']) || 2 !== \count($params['auth']))) {
+            throw new InvalidArgumentException('Invalid Redis DSN: the "auth" parameter must be a string, or a list of exactly two elements for ACL, "[username, password]".');
+        }
+
         foreach (['lazy', 'persistent', 'cluster'] as $option) {
             if (!\is_bool($params[$option] ?? false)) {
                 $params[$option] = filter_var($params[$option], \FILTER_VALIDATE_BOOLEAN);

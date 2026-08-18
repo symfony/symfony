@@ -12,7 +12,11 @@
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\HandlerFailureEvent;
+use Symfony\Component\Messenger\Event\HandlerStartingEvent;
+use Symfony\Component\Messenger\Event\HandlerSuccessEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
@@ -438,6 +442,195 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $middleware->handle($envelope, $this->getStackMock());
     }
+
+    public function testDispatchHandlerEvents()
+    {
+        $message = new DummyMessage('Hey');
+        $envelope = new Envelope($message);
+
+        $successHandler = $this->createMock(HandleMessageMiddlewareTestCallable::class);
+        $successHandler->expects($this->once())->method('__invoke');
+
+        $failureHandler = $this->createMock(HandleMessageMiddlewareTestCallable::class);
+        $failureHandler->expects($this->once())->method('__invoke')->willThrowException(
+            $exception = new \RuntimeException('Handler failed'),
+        );
+
+        $handlersLocator = new HandlersLocator([
+            DummyMessage::class => [
+                $successHandlerDescriptor = new HandlerDescriptor($successHandler, ['alias' => 'successHandler']),
+                $failureHandlerDescriptor = new HandlerDescriptor($failureHandler, ['alias' => 'failureHandler']),
+            ],
+        ]);
+
+        $dispatcher = new RecordingHandlerEventDispatcher();
+        $middleware = new HandleMessageMiddleware($handlersLocator, dispatcher: $dispatcher);
+
+        try {
+            $middleware->handle($envelope, new StackMiddleware());
+            $this->fail('The failing handler should bubble up as a HandlerFailedException.');
+        } catch (HandlerFailedException) {
+        }
+
+        $events = $dispatcher->events;
+        $this->assertCount(4, $events);
+
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[0]);
+        $this->assertSame($successHandlerDescriptor, $events[0]->handlerDescriptor);
+
+        $this->assertInstanceOf(HandlerSuccessEvent::class, $events[1]);
+        $this->assertSame($successHandlerDescriptor, $events[1]->handlerDescriptor);
+        $this->assertSame($successHandlerDescriptor->getName(), $events[1]->envelope->last(HandledStamp::class)->getHandlerName());
+
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[2]);
+        $this->assertSame($failureHandlerDescriptor, $events[2]->handlerDescriptor);
+
+        $this->assertInstanceOf(HandlerFailureEvent::class, $events[3]);
+        $this->assertSame($failureHandlerDescriptor, $events[3]->handlerDescriptor);
+        $this->assertSame($exception, $events[3]->exception);
+    }
+
+    public function testBatchHandlerOutcomeEventsAreDispatchedWhenTheBatchIsFlushed()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 2;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]), dispatcher: $dispatcher = new RecordingHandlerEventDispatcher());
+
+        $first = new DummyMessage('Hey');
+        $second = new DummyMessage('Bob');
+        $ack = static function () {};
+
+        $middleware->handle(new Envelope($first, [new AckStamp($ack)]), new StackMiddleware());
+
+        // the message is only queued at this point: no outcome yet
+        $this->assertCount(1, $dispatcher->events);
+        $this->assertInstanceOf(HandlerStartingEvent::class, $dispatcher->events[0]);
+
+        // the second message fills the batch, which flushes both
+        $middleware->handle(new Envelope($second, [new AckStamp($ack)]), new StackMiddleware());
+
+        $events = $dispatcher->events;
+        $this->assertCount(4, $events);
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[1]);
+        $this->assertInstanceOf(HandlerSuccessEvent::class, $events[2]);
+        $this->assertSame($first, $events[2]->envelope->getMessage());
+        $this->assertSame($first, $events[2]->envelope->last(HandledStamp::class)->getResult());
+        $this->assertInstanceOf(HandlerSuccessEvent::class, $events[3]);
+        $this->assertSame($second, $events[3]->envelope->getMessage());
+    }
+
+    public function testBatchHandlerFailureIsDispatchedOnceWithTheHandlerException()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 1;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->nack(new \RuntimeException('nacked'));
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]), dispatcher: $dispatcher = new RecordingHandlerEventDispatcher());
+
+        try {
+            $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function () {})]), new StackMiddleware());
+            $this->fail('The nacked batch should bubble up as a HandlerFailedException.');
+        } catch (HandlerFailedException) {
+        }
+
+        $events = $dispatcher->events;
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[0]);
+        $this->assertInstanceOf(HandlerFailureEvent::class, $events[1]);
+        $this->assertSame('nacked', $events[1]->exception->getMessage());
+    }
+
+    public function testHandlerOutcomeEventIsDispatchedWhenAPreviousBatchIsFlushedMeanwhile()
+    {
+        $batchHandler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 2;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $flushingHandler = static function (DummyMessage $message) use ($batchHandler) {
+            $batchHandler->flush(true);
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                $batchDescriptor = new HandlerDescriptor($batchHandler, ['alias' => 'batchHandler']),
+                $flushingDescriptor = new HandlerDescriptor($flushingHandler, ['alias' => 'flushingHandler']),
+            ],
+        ]), dispatcher: $dispatcher = new RecordingHandlerEventDispatcher());
+
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp(static function () {})]), new StackMiddleware());
+
+        $events = $dispatcher->events;
+        $this->assertCount(4, $events);
+
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[0]);
+        $this->assertSame($batchDescriptor, $events[0]->handlerDescriptor);
+
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[1]);
+        $this->assertSame($flushingDescriptor, $events[1]->handlerDescriptor);
+
+        $this->assertInstanceOf(HandlerSuccessEvent::class, $events[2]);
+        $this->assertSame($batchDescriptor, $events[2]->handlerDescriptor);
+
+        $this->assertInstanceOf(HandlerSuccessEvent::class, $events[3]);
+        $this->assertSame($flushingDescriptor, $events[3]->handlerDescriptor);
+    }
 }
 
 class HandleMessageMiddlewareTestCallable
@@ -451,5 +644,16 @@ class HandleMessageMiddlewareNamedArgumentTestCallable
 {
     public function __invoke(object $message, $namedArgument)
     {
+    }
+}
+
+class RecordingHandlerEventDispatcher implements EventDispatcherInterface
+{
+    /** @var list<object> */
+    public array $events = [];
+
+    public function dispatch(object $event): object
+    {
+        return $this->events[] = $event;
     }
 }

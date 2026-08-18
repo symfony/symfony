@@ -12,8 +12,12 @@
 namespace Symfony\Component\Messenger\Middleware;
 
 use Psr\Clock\ClockInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\HandlerFailureEvent;
+use Symfony\Component\Messenger\Event\HandlerStartingEvent;
+use Symfony\Component\Messenger\Event\HandlerSuccessEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Exception\NoHandlerForMessageException;
@@ -37,6 +41,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
         private HandlersLocatorInterface $handlersLocator,
         private bool $allowNoHandlers = false,
         private ?ClockInterface $clock = null,
+        private ?EventDispatcherInterface $dispatcher = null,
     ) {
     }
 
@@ -60,16 +65,25 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 continue;
             }
 
+            $this->dispatcher?->dispatch(new HandlerStartingEvent($envelope, $handlerDescriptor));
+
+            $e = null;
+            $ack = null;
+            $ackPending = false;
+
             try {
                 $handler = $handlerDescriptor->getHandler();
                 $batchHandler = $handlerDescriptor->getBatchHandler();
 
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
-                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
+                    $dispatcher = $this->dispatcher;
+                    $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor, $dispatcher) {
                         if (null !== $e) {
+                            $dispatcher?->dispatch(new HandlerFailureEvent($envelope, $handlerDescriptor, $e));
                             $e = new HandlerFailedException($envelope, [$handlerDescriptor->getName() => $e]);
                         } else {
                             $envelope = $envelope->with(HandledStamp::fromDescriptor($handlerDescriptor, $result));
+                            $dispatcher?->dispatch(new HandlerSuccessEvent($envelope, $handlerDescriptor));
                         }
 
                         $ackStamp->ack($envelope, $e);
@@ -82,6 +96,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                     }
 
                     if (!$ack->isAcknowledged()) {
+                        $ackPending = true;
                         $envelope = $envelope->with(new NoAutoAckStamp($handlerDescriptor));
                     } elseif ($ack->getError()) {
                         throw $ack->getError();
@@ -97,6 +112,16 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $this->logger?->info('Message {class} handled by {handler}', $context + ['handler' => $handledStamp->getHandlerName()]);
             } catch (\Throwable $e) {
                 $exceptions[$handlerDescriptor->getName()] = $e;
+            }
+
+            // a batch handler resolves its outcome through the acknowledger, at flush time
+            // at the earliest, and the event is then dispatched by the callback above
+            if (null !== $this->dispatcher && !$ack?->isAcknowledged()) {
+                if (null !== $e) {
+                    $this->dispatcher->dispatch(new HandlerFailureEvent($envelope, $handlerDescriptor, $e));
+                } elseif (!$ackPending) {
+                    $this->dispatcher->dispatch(new HandlerSuccessEvent($envelope, $handlerDescriptor));
+                }
             }
         }
 

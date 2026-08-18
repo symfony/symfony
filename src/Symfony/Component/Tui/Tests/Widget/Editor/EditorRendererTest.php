@@ -127,6 +127,23 @@ class EditorRendererTest extends TestCase
     }
 
     /**
+     * A grapheme cannot be split, so the wrapper hands back a chunk wider
+     * than the width whenever one character does not fit in the whole box.
+     */
+    public function testACharacterWiderThanTheBoxDoesNotOverflowTheLine()
+    {
+        $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}";
+
+        foreach ([['日本'], ['x'.$family.'y'], [$family]] as $docLines) {
+            foreach ([1, 2, 3, 4] as $columns) {
+                foreach ($this->renderSimple($docLines, 0, 0, $columns, 10) as $line) {
+                    $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every rendered row fits in %d columns.', $columns));
+                }
+            }
+        }
+    }
+
+    /**
      * @param string[] $docLines
      *
      * @return string[]

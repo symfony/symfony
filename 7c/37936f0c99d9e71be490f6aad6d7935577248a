@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by Kocal at 2026-08-04T12:34:09Z
+
+Since the JS ecosystem introduced this feature, can't we use a name closer to [pnpm's `minimumReleaseAge`](https://pnpm.io/fr/settings/dependency-resolution#minimumreleaseage), [yarn's `npmMinimalAgeGate`](https://yarnpkg.com/configuration/yarnrc#npmMinimalAgeGate) and [npm's `before`](https://docs.npmjs.com/cli/v11/using-npm/config#before), to prevent _fragmentation_?
+
+I really like the option name from pnpm, it's very clear.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-08-10T16:07:00Z
+
+Thanks @nicolas-grekas, all four bugs confirmed and will be fixed (prerelease filtering via `composer/semver` `VersionParser::parseStability()` + `dist-tags.latest`, no-downgrade via `hasUpdate()`, gate on `> 0`, `install-v1+json` content type), plus a `ClockInterface` for deterministic tests and the CHANGELOG moved to the FrameworkBundle entry naming both new constructor arguments.
+
+On the four public-surface questions, before I push the rework:
+
+1. **Rename** `dependency_cooldown` → `minimum_release_age` — matches pnpm's term and @Kocal's request, and reads noun-first like the existing `default_ttl` / `cookie_lifetime` options.
+2. **Unit → integer seconds** rather than days (or pnpm's minutes): every time option in FrameworkBundle (`expiration`, `default_ttl`, `metadata_update_threshold`) is integer seconds, and it makes "6 hours" expressible (`21600`) without a duration parser. Happy to use minutes instead if you prefer strict pnpm parity.
+3. **No `--force`**: `importmap:require pkg@latest` already bypasses the checker (the require path never consults it), so a second escape hatch seems redundant — I'll document that one instead. I'll add the flag if you'd rather have it explicit.
+4. **Skip the ineligible package with a warning and continue**, mirroring `importmap:outdated`'s per-package filter, instead of aborting the whole run.
+
+Rebase onto 8.2 is included. I'll push the reworked branch once you confirm the naming/unit direction.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T13:03:58Z
+
+Confirming all four: `minimum_release_age`, integer seconds, no `--force`, skip with a warning. Go ahead and push.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-08-12T14:46:57Z
+
+Thanks for the thorough review @nicolas-grekas — reworked the branch to address all four bugs and the public-surface points we agreed on.
+
+- Prereleases/canaries/unpublished: selection walks `time` newest-first but only keeps versions that are published (present in `versions`), at or below `dist-tags.latest`, and strictly stable — rejected if it carries any SemVer prerelease suffix (`-`) or `VersionParser::parseStability()` is non-stable, so `canary`/`next` no longer slip through. A missing `dist-tags.latest` yields no candidate.
+- No downgrade / no jump: `importmap:update` pins the eligible version on a real update and otherwise keeps the current version.
+- Off by default: the checker is only consulted when `minimum_release_age > 0`; no extra registry request otherwise.
+- Content type: full packument (`application/json`) only when the option is on, abbreviated document otherwise.
+- One ineligible package is skipped with a logged warning instead of aborting the run.
+- `ClockInterface` injected for deterministic boundary tests; option renamed to `minimum_release_age` (integer seconds); CHANGELOG entries split (FrameworkBundle option / AssetMapper constructor args).
+
+Rebased onto the latest `8.2`. Reproduced each counterexample RED first (downgrade -> 5.3.7, feature-off registry call, canary selection) then GREEN after the fix. Local run: AssetMapper importmap suite 29 tests / 142 assertions, FrameworkBundle asset-mapper config tests green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T15:42:28Z
+
+Thanks for the rework, the four bugs and the four naming points are all settled. I pushed one change on top and rebased on 8.2.
+
+The cooldown was invisible where users look. With the option on and every newer version inside the window, `getAvailableUpdates()` dropped the package, so `importmap:outdated` printed "No updates found." while an update was being deliberately held back. The only trace was a warning on the `asset_mapper` monolog channel, which the console never shows. In the partial case the command reported the eligible version in the `Latest` column with nothing to say it was not the registry's latest.
+
+So the checker now keeps the package in its result and records the held back version in a new `PackageUpdateInfo::$withheldVersion`, and `importmap:outdated` renders a `Withheld` column plus a matching `withheld` key in `--format=json`. Both only appear when the option is enabled, so output is unchanged for projects that leave it off. A package whose only newer version is withheld is listed with `Latest` equal to `Current` and does not make the command exit with a failure, since there is nothing to act on. `importmap:update` behaves exactly as before, because such an entry reports no update.
+
+I tried this with the existing API first: there was no way for the command to learn that a version had been held back, which is what justifies the new property.
+
+Also in this push: the warning message no longer says "Skipping package", since the package is no longer skipped; the `minimum_release_age` info text now mentions that enabling it makes update checks download the full npm metadata document; the changelog gained the `$logger` argument and the new property; the two commits are squashed into one with your authorship.
+
+The description is rewritten as a first draft for the documentation, with the selection rules, the public API and the traps at the end.

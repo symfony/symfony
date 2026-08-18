@@ -120,10 +120,12 @@ class PostmarkApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $payload['TrackOpens'] = $track;
-                $payload['TrackLinks'] = $track ? 'HtmlAndText' : 'None';
+                if (null !== $header->getOpens()) {
+                    $payload['TrackOpens'] = $header->getOpens();
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['TrackLinks'] = $header->getClicks() ? 'HtmlAndText' : 'None';
+                }
 
                 continue;
             }

@@ -518,7 +518,7 @@ class InfobipApiTransportTest extends TestCase
     public function testTrackingHeaderMapsToTrackOpensAndTrackClicks()
     {
         $enabled = $this->basicValidEmail();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
 
         $this->transport->send($enabled);
         $body = $this->response->getRequestOptions()['body'];
@@ -526,7 +526,7 @@ class InfobipApiTransportTest extends TestCase
         $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rtrue\R/s', $body);
 
         $disabled = $this->basicValidEmail();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
 
         $this->transport->send($disabled);
         $body = $this->response->getRequestOptions()['body'];
@@ -534,16 +534,25 @@ class InfobipApiTransportTest extends TestCase
         $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rfalse\R/s', $body);
     }
 
-    public function testExplicitInfobipTrackingHeadersOverrideGenericTrackingHeader()
+    public function testExplicitInfobipTrackingHeadersOverrideGenericTrackingHeaderRegardlessOfOrder()
     {
-        $email = $this->basicValidEmail();
-        $email->getHeaders()
-            ->add(new TrackingHeader(true))
+        $trackingHeaderFirst = $this->basicValidEmail();
+        $trackingHeaderFirst->getHeaders()
+            ->add(new TrackingHeader(opens: true, clicks: true))
             ->addTextHeader('X-Infobip-TrackClicks', 'false');
 
-        $this->transport->send($email);
+        $this->transport->send($trackingHeaderFirst);
         $body = $this->response->getRequestOptions()['body'];
+        $this->assertMatchesRegularExpression('/name="trackOpens"\R\Rtrue\R/s', $body);
+        $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rfalse\R/s', $body);
 
+        $nativeHeaderFirst = $this->basicValidEmail();
+        $nativeHeaderFirst->getHeaders()
+            ->addTextHeader('X-Infobip-TrackClicks', 'false')
+            ->add(new TrackingHeader(opens: true, clicks: true));
+
+        $this->transport->send($nativeHeaderFirst);
+        $body = $this->response->getRequestOptions()['body'];
         $this->assertMatchesRegularExpression('/name="trackOpens"\R\Rtrue\R/s', $body);
         $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rfalse\R/s', $body);
     }

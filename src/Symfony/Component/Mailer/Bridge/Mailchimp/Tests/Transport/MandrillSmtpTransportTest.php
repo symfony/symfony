@@ -45,13 +45,25 @@ class MandrillSmtpTransportTest extends TestCase
         $method = new \ReflectionMethod(MandrillSmtpTransport::class, 'addMandrillHeaders');
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $method->invoke($transport, $enabled);
         $this->assertSame('X-MC-Track: opens,clicks', $enabled->getHeaders()->get('X-MC-Track')->toString());
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $method->invoke($transport, $disabled);
         $this->assertSame('X-MC-Track: none', $disabled->getHeaders()->get('X-MC-Track')->toString());
+    }
+
+    public function testTrackingHeaderOnlyEnablesExplicitAspects()
+    {
+        $transport = new MandrillSmtpTransport('user', 'password');
+        $method = new \ReflectionMethod(MandrillSmtpTransport::class, 'addMandrillHeaders');
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true));
+        $method->invoke($transport, $email);
+
+        $this->assertSame('X-MC-Track: opens', $email->getHeaders()->get('X-MC-Track')->toString());
     }
 }

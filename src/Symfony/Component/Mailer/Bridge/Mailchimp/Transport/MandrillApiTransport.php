@@ -150,10 +150,12 @@ class MandrillApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $payload['message']['track_opens'] = $track;
-                $payload['message']['track_clicks'] = $track;
+                if (null !== $header->getOpens()) {
+                    $payload['message']['track_opens'] = $header->getOpens();
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['message']['track_clicks'] = $header->getClicks();
+                }
 
                 continue;
             }

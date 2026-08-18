@@ -52,15 +52,28 @@ class AhaSendSmtpTransportTest extends TestCase
         $method = new \ReflectionMethod(AhaSendSmtpTransport::class, 'addAhaSendHeaders');
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $method->invoke($transport, $enabled);
         $this->assertSame('AhaSend-Track-Opens: true', $enabled->getHeaders()->get('AhaSend-Track-Opens')->toString());
         $this->assertSame('AhaSend-Track-Clicks: true', $enabled->getHeaders()->get('AhaSend-Track-Clicks')->toString());
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $method->invoke($transport, $disabled);
         $this->assertSame('AhaSend-Track-Opens: false', $disabled->getHeaders()->get('AhaSend-Track-Opens')->toString());
         $this->assertSame('AhaSend-Track-Clicks: false', $disabled->getHeaders()->get('AhaSend-Track-Clicks')->toString());
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new AhaSendSmtpTransport('USERNAME', 'PASSWORD');
+        $method = new \ReflectionMethod(AhaSendSmtpTransport::class, 'addAhaSendHeaders');
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(clicks: false));
+        $method->invoke($transport, $email);
+
+        $this->assertNull($email->getHeaders()->get('AhaSend-Track-Opens'));
+        $this->assertSame('AhaSend-Track-Clicks: false', $email->getHeaders()->get('AhaSend-Track-Clicks')->toString());
     }
 }

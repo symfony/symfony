@@ -78,15 +78,28 @@ class PostmarkSmtpTransportTest extends TestCase
         $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $method->invoke($transport, $enabled);
         $this->assertSame('X-PM-TrackOpens: true', $enabled->getHeaders()->get('X-PM-TrackOpens')->toString());
         $this->assertSame('X-PM-TrackLinks: HtmlAndText', $enabled->getHeaders()->get('X-PM-TrackLinks')->toString());
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $method->invoke($transport, $disabled);
         $this->assertSame('X-PM-TrackOpens: false', $disabled->getHeaders()->get('X-PM-TrackOpens')->toString());
         $this->assertSame('X-PM-TrackLinks: None', $disabled->getHeaders()->get('X-PM-TrackLinks')->toString());
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new PostmarkSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
+        $method->invoke($transport, $email);
+
+        $this->assertSame('X-PM-TrackOpens: false', $email->getHeaders()->get('X-PM-TrackOpens')->toString());
+        $this->assertNull($email->getHeaders()->get('X-PM-TrackLinks'));
     }
 }

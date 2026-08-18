@@ -148,12 +148,12 @@ class SendgridApiTransport extends AbstractApiTransport
                     $payload['asm']['groups_to_display'] = $groupsToDisplay;
                 }
             } elseif ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $payload['tracking_settings'] = [
-                    'open_tracking' => ['enable' => $track],
-                    'click_tracking' => ['enable' => $track, 'enable_text' => $track],
-                ];
+                if (null !== $header->getOpens()) {
+                    $payload['tracking_settings']['open_tracking'] = ['enable' => $header->getOpens()];
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['tracking_settings']['click_tracking'] = ['enable' => $header->getClicks(), 'enable_text' => $header->getClicks()];
+                }
 
                 continue;
             } else {

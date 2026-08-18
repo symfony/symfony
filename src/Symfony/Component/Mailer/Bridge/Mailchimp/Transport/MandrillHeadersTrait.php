@@ -48,9 +48,17 @@ trait MandrillHeadersTrait
                 $metadata[$header->getKey()] = $header->getValue();
                 $headers->remove($name);
             } elseif ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
+                $enabledAspects = [];
+                if (true === $header->getOpens()) {
+                    $enabledAspects[] = 'opens';
+                }
+                if (true === $header->getClicks()) {
+                    $enabledAspects[] = 'clicks';
+                }
 
-                $headers->addTextHeader('X-MC-Track', $track ? 'opens,clicks' : 'none');
+                // X-MC-Track only lists the aspects to enable; Mandrill disables tracking for any
+                // other value, so "none" is used deliberately when no aspect is explicitly enabled.
+                $headers->addTextHeader('X-MC-Track', $enabledAspects ? implode(',', $enabledAspects) : 'none');
                 $headers->remove($name);
             }
         }

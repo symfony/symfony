@@ -524,29 +524,51 @@ class MailjetApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
         $this->assertSame('enabled', $enabledPayload['Messages'][0]['TrackClicks']);
         $this->assertSame('enabled', $enabledPayload['Messages'][0]['TrackOpens']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
         $this->assertSame('disabled', $disabledPayload['Messages'][0]['TrackClicks']);
         $this->assertSame('disabled', $disabledPayload['Messages'][0]['TrackOpens']);
     }
 
-    public function testExplicitMailjetTrackingHeadersOverrideTrackingHeader()
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
     {
         $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
         $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $email = new Email();
-        $email->getHeaders()->add(new TrackingHeader(false));
-        $email->getHeaders()->addTextHeader('X-Mailjet-TrackClick', 'account_default');
-
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
         $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('disabled', $payload['Messages'][0]['TrackOpens']);
+        $this->assertArrayNotHasKey('TrackClicks', $payload['Messages'][0]);
+    }
+
+    public function testExplicitMailjetTrackingHeadersOverrideTrackingHeaderRegardlessOfOrder()
+    {
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $trackingHeaderFirst = new Email();
+        $trackingHeaderFirst->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
+        $trackingHeaderFirst->getHeaders()->addTextHeader('X-Mailjet-TrackClick', 'account_default');
+
+        $payload = $method->invoke($transport, $trackingHeaderFirst, $envelope);
+        $this->assertSame('account_default', $payload['Messages'][0]['TrackClicks']);
+        $this->assertSame('disabled', $payload['Messages'][0]['TrackOpens']);
+
+        $nativeHeaderFirst = new Email();
+        $nativeHeaderFirst->getHeaders()->addTextHeader('X-Mailjet-TrackClick', 'account_default');
+        $nativeHeaderFirst->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
+
+        $payload = $method->invoke($transport, $nativeHeaderFirst, $envelope);
         $this->assertSame('account_default', $payload['Messages'][0]['TrackClicks']);
         $this->assertSame('disabled', $payload['Messages'][0]['TrackOpens']);
     }

@@ -121,12 +121,12 @@ final class MailerSendApiTransport extends AbstractApiTransport
 
         foreach ($email->getHeaders()->all() as $header) {
             if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $payload['settings'] = [
-                    'track_opens' => $track,
-                    'track_clicks' => $track,
-                ];
+                if (null !== $header->getOpens()) {
+                    $payload['settings']['track_opens'] = $header->getOpens();
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['settings']['track_clicks'] = $header->getClicks();
+                }
             }
         }
 

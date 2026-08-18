@@ -250,15 +250,29 @@ class PostmarkApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
         $this->assertTrue($enabledPayload['TrackOpens']);
         $this->assertSame('HtmlAndText', $enabledPayload['TrackLinks']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
         $this->assertFalse($disabledPayload['TrackOpens']);
         $this->assertSame('None', $disabledPayload['TrackLinks']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new PostmarkApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertFalse($payload['TrackOpens']);
+        $this->assertArrayNotHasKey('TrackLinks', $payload);
     }
 }

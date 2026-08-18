@@ -55,10 +55,12 @@ class AhaSendSmtpTransport extends EsmtpTransport
             }
 
             if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $headers->addTextHeader('AhaSend-Track-Opens', $track ? 'true' : 'false');
-                $headers->addTextHeader('AhaSend-Track-Clicks', $track ? 'true' : 'false');
+                if (null !== $header->getOpens()) {
+                    $headers->addTextHeader('AhaSend-Track-Opens', $header->getOpens() ? 'true' : 'false');
+                }
+                if (null !== $header->getClicks()) {
+                    $headers->addTextHeader('AhaSend-Track-Clicks', $header->getClicks() ? 'true' : 'false');
+                }
                 $headers->remove($name);
             }
         }

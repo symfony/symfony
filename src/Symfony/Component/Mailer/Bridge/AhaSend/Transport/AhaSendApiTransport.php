@@ -103,14 +103,14 @@ final class AhaSendApiTransport extends AbstractApiTransport
             ],
         ];
 
-        foreach ($email->getHeaders()->all() as $name => $header) {
+        foreach ($email->getHeaders()->all() as $header) {
             if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $payload['tracking'] = [
-                    'open' => $track,
-                    'click' => $track,
-                ];
+                if (null !== $header->getOpens()) {
+                    $payload['tracking']['open'] = $header->getOpens();
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['tracking']['click'] = $header->getClicks();
+                }
             }
         }
 

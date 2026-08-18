@@ -117,8 +117,20 @@ class MailgunApiTransport extends AbstractApiTransport
             $payload['html'] = $html;
         }
 
+        // resolve the generic header first, so a native o:/h:/t:/v: header always wins regardless of iteration order
+        foreach ($headers->all() as $header) {
+            if ($header instanceof TrackingHeader) {
+                if (null !== $header->getOpens()) {
+                    $payload['o:tracking-opens'] = $header->getOpens() ? 'yes' : 'no';
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['o:tracking-clicks'] = $header->getClicks() ? 'yes' : 'no';
+                }
+            }
+        }
+
         foreach ($headers->all() as $name => $header) {
-            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'], true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-track'], true)) {
                 continue;
             }
 
@@ -130,14 +142,6 @@ class MailgunApiTransport extends AbstractApiTransport
 
             if ($header instanceof MetadataHeader) {
                 $payload['v:'.$header->getKey()] = $header->getValue();
-
-                continue;
-            }
-
-            if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $payload['o:tracking'] = $track ? 'true' : 'false';
 
                 continue;
             }

@@ -47,9 +47,12 @@ trait MailgunHeadersTrait
                 $metadata[$header->getKey()] = $header->getValue();
                 $headers->remove($name);
             } elseif ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $headers->addTextHeader('X-Mailgun-Track', $track ? 'yes' : 'no');
+                if (null !== $header->getOpens()) {
+                    $headers->addTextHeader('X-Mailgun-Track-Opens', $header->getOpens() ? 'yes' : 'no');
+                }
+                if (null !== $header->getClicks()) {
+                    $headers->addTextHeader('X-Mailgun-Track-Clicks', $header->getClicks() ? 'yes' : 'no');
+                }
                 $headers->remove($name);
             }
         }

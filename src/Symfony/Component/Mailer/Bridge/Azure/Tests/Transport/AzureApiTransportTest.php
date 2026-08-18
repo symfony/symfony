@@ -170,15 +170,28 @@ class AzureApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
         $this->assertFalse($enabledPayload['userEngagementTrackingDisabled']);
         $this->assertNull($enabledPayload['headers']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
         $this->assertTrue($disabledPayload['userEngagementTrackingDisabled']);
         $this->assertNull($disabledPayload['headers']);
+    }
+
+    public function testTrackingHeaderDisablesCombinedFlagWhenEitherAspectIsFalse()
+    {
+        $transport = new AzureApiTransport('KEY', 'ACS_RESOURCE_NAME', false);
+        $method = new \ReflectionMethod(AzureApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true, clicks: false));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertTrue($payload['userEngagementTrackingDisabled']);
     }
 }

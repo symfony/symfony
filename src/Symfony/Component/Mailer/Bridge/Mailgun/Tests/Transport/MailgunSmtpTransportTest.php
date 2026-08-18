@@ -47,13 +47,28 @@ class MailgunSmtpTransportTest extends TestCase
         $method = new \ReflectionMethod(MailgunSmtpTransport::class, 'addMailgunHeaders');
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $method->invoke($transport, $enabled);
-        $this->assertSame('X-Mailgun-Track: yes', $enabled->getHeaders()->get('X-Mailgun-Track')->toString());
+        $this->assertSame('X-Mailgun-Track-Opens: yes', $enabled->getHeaders()->get('X-Mailgun-Track-Opens')->toString());
+        $this->assertSame('X-Mailgun-Track-Clicks: yes', $enabled->getHeaders()->get('X-Mailgun-Track-Clicks')->toString());
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $method->invoke($transport, $disabled);
-        $this->assertSame('X-Mailgun-Track: no', $disabled->getHeaders()->get('X-Mailgun-Track')->toString());
+        $this->assertSame('X-Mailgun-Track-Opens: no', $disabled->getHeaders()->get('X-Mailgun-Track-Opens')->toString());
+        $this->assertSame('X-Mailgun-Track-Clicks: no', $disabled->getHeaders()->get('X-Mailgun-Track-Clicks')->toString());
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new MailgunSmtpTransport('user', 'password');
+        $method = new \ReflectionMethod(MailgunSmtpTransport::class, 'addMailgunHeaders');
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(clicks: false));
+        $method->invoke($transport, $email);
+
+        $this->assertNull($email->getHeaders()->get('X-Mailgun-Track-Opens'));
+        $this->assertSame('X-Mailgun-Track-Clicks: no', $email->getHeaders()->get('X-Mailgun-Track-Clicks')->toString());
     }
 }

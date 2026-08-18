@@ -258,12 +258,26 @@ final class AzureApiTransport extends AbstractApiTransport
         return $headers;
     }
 
+    /**
+     * Azure only exposes a single combined tracking toggle, so an explicit false on either
+     * flag disables it and an explicit true on either flag enables it.
+     */
     private function getTracking(Email $email): ?bool
     {
         foreach ($email->getHeaders()->all() as $header) {
-            if ($header instanceof TrackingHeader) {
-                return 'true' === $header->getValue();
+            if (!$header instanceof TrackingHeader) {
+                continue;
             }
+
+            if (false === $header->getOpens() || false === $header->getClicks()) {
+                return false;
+            }
+
+            if (true === $header->getOpens() || true === $header->getClicks()) {
+                return true;
+            }
+
+            return null;
         }
 
         return null;

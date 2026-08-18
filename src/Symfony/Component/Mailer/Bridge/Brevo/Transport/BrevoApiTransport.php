@@ -177,12 +177,27 @@ final class BrevoApiTransport extends AbstractApiTransport
         return $headersAndTags;
     }
 
+    /**
+     * Brevo only exposes a single combined "tracking consent" flag which anonymises the open/click
+     * events rather than disabling them, so an explicit false on either aspect anonymises both, and
+     * an explicit true on either aspect grants consent for both.
+     */
     private function getTracking(Headers $headers): ?bool
     {
         foreach ($headers->all() as $header) {
-            if ($header instanceof TrackingHeader) {
-                return 'true' === $header->getValue();
+            if (!$header instanceof TrackingHeader) {
+                continue;
             }
+
+            if (false === $header->getOpens() || false === $header->getClicks()) {
+                return false;
+            }
+
+            if (true === $header->getOpens() || true === $header->getClicks()) {
+                return true;
+            }
+
+            return null;
         }
 
         return null;

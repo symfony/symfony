@@ -311,17 +311,31 @@ class AhaSendApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
         $this->assertTrue($enabledPayload['tracking']['open']);
         $this->assertTrue($enabledPayload['tracking']['click']);
         $this->assertArrayNotHasKey('headers', $enabledPayload['content']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
         $this->assertFalse($disabledPayload['tracking']['open']);
         $this->assertFalse($disabledPayload['tracking']['click']);
         $this->assertArrayNotHasKey('headers', $disabledPayload['content']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new AhaSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertFalse($payload['tracking']['open']);
+        $this->assertArrayNotHasKey('click', $payload['tracking']);
     }
 }

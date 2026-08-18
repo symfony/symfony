@@ -70,10 +70,12 @@ class PostmarkSmtpTransport extends EsmtpTransport
             }
 
             if ($header instanceof TrackingHeader) {
-                $track = 'true' === $header->getValue();
-
-                $headers->addTextHeader('X-PM-TrackOpens', $track ? 'true' : 'false');
-                $headers->addTextHeader('X-PM-TrackLinks', $track ? 'HtmlAndText' : 'None');
+                if (null !== $header->getOpens()) {
+                    $headers->addTextHeader('X-PM-TrackOpens', $header->getOpens() ? 'true' : 'false');
+                }
+                if (null !== $header->getClicks()) {
+                    $headers->addTextHeader('X-PM-TrackLinks', $header->getClicks() ? 'HtmlAndText' : 'None');
+                }
                 $headers->remove($name);
             }
         }

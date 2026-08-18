@@ -337,18 +337,32 @@ class SendgridApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
         $this->assertTrue($enabledPayload['tracking_settings']['open_tracking']['enable']);
         $this->assertTrue($enabledPayload['tracking_settings']['click_tracking']['enable']);
         $this->assertTrue($enabledPayload['tracking_settings']['click_tracking']['enable_text']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
         $this->assertFalse($disabledPayload['tracking_settings']['open_tracking']['enable']);
         $this->assertFalse($disabledPayload['tracking_settings']['click_tracking']['enable']);
         $this->assertFalse($disabledPayload['tracking_settings']['click_tracking']['enable_text']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertFalse($payload['tracking_settings']['open_tracking']['enable']);
+        $this->assertArrayNotHasKey('click_tracking', $payload['tracking_settings']);
     }
 
     public function testTrackingHeaderIsNotForwardedAsCustomHeader()
@@ -358,7 +372,7 @@ class SendgridApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $email = new Email();
-        $email->getHeaders()->add(new TrackingHeader(true));
+        $email->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
 
         $payload = $method->invoke($transport, $email, $envelope);
         $this->assertArrayNotHasKey('headers', $payload);

@@ -6,7 +6,7 @@ CHANGELOG
 
  * Add a `rate_limiter` option to mailer transports
  * Reorder EsmtpTransport authenticators to prefer PLAIN over obsolete LOGIN
- * Add `TrackingHeader` for per-message open/click tracking across bridges and map it to provider-specific settings in Brevo, MailerSend, Postmark, AhaSend, Mandrill/Mailchimp, Azure, Infobip, Mailgun, Mailjet and Sendgrid transports
+ * Add `TrackingHeader` for per-message open/click tracking and map it to provider-specific settings in the AhaSend, Azure, Brevo, Infobip, Mailchimp/Mandrill, MailerSend, Mailgun, Mailjet, Postmark and Sendgrid transports
 
 8.0
 ---

@@ -243,15 +243,29 @@ class MandrillApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
         $this->assertTrue($enabledPayload['message']['track_opens']);
         $this->assertTrue($enabledPayload['message']['track_clicks']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
         $this->assertFalse($disabledPayload['message']['track_opens']);
         $this->assertFalse($disabledPayload['message']['track_clicks']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertTrue($payload['message']['track_opens']);
+        $this->assertArrayNotHasKey('track_clicks', $payload['message']);
     }
 }

@@ -315,27 +315,52 @@ class MailgunApiTransportTest extends TestCase
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $enabled = new Email();
-        $enabled->getHeaders()->add(new TrackingHeader(true));
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
         $enabledPayload = $method->invoke($transport, $enabled, $envelope);
-        $this->assertSame('true', $enabledPayload['o:tracking']);
+        $this->assertSame('yes', $enabledPayload['o:tracking-opens']);
+        $this->assertSame('yes', $enabledPayload['o:tracking-clicks']);
 
         $disabled = new Email();
-        $disabled->getHeaders()->add(new TrackingHeader(false));
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
         $disabledPayload = $method->invoke($transport, $disabled, $envelope);
-        $this->assertSame('false', $disabledPayload['o:tracking']);
+        $this->assertSame('no', $disabledPayload['o:tracking-opens']);
+        $this->assertSame('no', $disabledPayload['o:tracking-clicks']);
     }
 
-    public function testExplicitMailgunTrackingHeaderOverridesTrackingHeader()
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
     {
         $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
         $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
         $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $email = new Email();
-        $email->getHeaders()->add(new TrackingHeader(true));
-        $email->getHeaders()->addTextHeader('o:tracking', 'false');
-
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
         $payload = $method->invoke($transport, $email, $envelope);
-        $this->assertSame('false', $payload['o:tracking']);
+
+        $this->assertSame('no', $payload['o:tracking-opens']);
+        $this->assertArrayNotHasKey('o:tracking-clicks', $payload);
+    }
+
+    public function testExplicitMailgunTrackingHeaderOverridesTrackingHeaderRegardlessOfOrder()
+    {
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $trackingHeaderFirst = new Email();
+        $trackingHeaderFirst->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
+        $trackingHeaderFirst->getHeaders()->addTextHeader('o:tracking-clicks', 'no');
+
+        $payload = $method->invoke($transport, $trackingHeaderFirst, $envelope);
+        $this->assertSame('yes', $payload['o:tracking-opens']);
+        $this->assertSame('no', $payload['o:tracking-clicks']);
+
+        $nativeHeaderFirst = new Email();
+        $nativeHeaderFirst->getHeaders()->addTextHeader('o:tracking-clicks', 'no');
+        $nativeHeaderFirst->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
+
+        $payload = $method->invoke($transport, $nativeHeaderFirst, $envelope);
+        $this->assertSame('yes', $payload['o:tracking-opens']);
+        $this->assertSame('no', $payload['o:tracking-clicks']);
     }
 }

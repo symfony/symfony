@@ -194,6 +194,10 @@ trait RedisTrait
 
         if (!isset($params['redis_sentinel'])) {
             $params['auth'] ??= $auth;
+        }
+
+        if (\is_array($params['auth']) && (!array_is_list($params['auth']) || 2 !== \count($params['auth']))) {
+            throw new InvalidArgumentException('Invalid Redis DSN: the "auth" parameter must be a string, or a list of exactly two elements for ACL, "[username, password]".');
         } elseif (!class_exists(\Predis\Client::class) && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
             throw new CacheException('Redis Sentinel support requires one of: "predis/predis", "ext-redis >= 5.2", "ext-relay".');
         }
@@ -230,7 +234,7 @@ trait RedisTrait
         if ($isRedisExt || $isRelayExt) {
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
 
-            $initializer = static function () use ($class, $isRedisExt, $connect, $params, $auth, $hosts, $tls) {
+            $initializer = static function () use ($class, $isRedisExt, $connect, $params, $hosts, $tls) {
                 $sentinelClass = $isRedisExt ? \RedisSentinel::class : Sentinel::class;
                 $redis = new $class();
                 $hostIndex = 0;
@@ -310,7 +314,7 @@ trait RedisTrait
                         $redis->setOption($isRedisExt ? \Redis::OPT_TCP_KEEPALIVE : Relay::OPT_TCP_KEEPALIVE, $params['tcp_keepalive']);
                     }
 
-                    if ((!\defined('Redis::SCAN_PREFIX') && null !== $auth && $isRedisExt && !$redis->auth($auth)) || !$redis->select($params['dbindex'])) {
+                    if ((!\defined('Redis::SCAN_PREFIX') && null !== $params['auth'] && $isRedisExt && !$redis->auth($params['auth'])) || !$redis->select($params['dbindex'])) {
                         $e = preg_replace('/^ERR /', '', $redis->getLastError());
                         throw new InvalidArgumentException('Redis connection failed: '.$e.'.');
                     }
@@ -393,12 +397,12 @@ trait RedisTrait
             if ($params['dbindex']) {
                 $params['parameters']['database'] = $params['dbindex'];
             }
-            if (\is_array($auth)) {
+            if (\is_array($params['auth'])) {
                 // ACL
-                $params['parameters']['username'] = $auth[0];
-                $params['parameters']['password'] = $auth[1];
-            } elseif (null !== $auth) {
-                $params['parameters']['password'] = $auth;
+                $params['parameters']['username'] = $params['auth'][0];
+                $params['parameters']['password'] = $params['auth'][1];
+            } elseif (null !== $params['auth']) {
+                $params['parameters']['password'] = $params['auth'];
             }
 
             if (isset($params['ssl'])) {

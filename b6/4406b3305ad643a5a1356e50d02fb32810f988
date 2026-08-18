@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T15:57:08Z
+
+Thanks for this, and thanks for your patience. Nice piece of work: the routing, the `InputMedia` building and the explicit error for local uploads are all right, and the scope you left out is stated in the description.
+
+I pushed one fix and rebased on 8.2, so this should be ready now.
+
+`message_id` was dropped from `EXCLUSIVE_OPTIONS` to let `edit()` combine with a media option, but that also allowed the combinations that guard exists for. Since `message_id` is first in the `getPath()` match, `edit()` with `answerCallbackQuery()`, `location()`, `venue()`, `contact()` or `sticker()` silently sent an edit and dropped the other payload, where it used to throw. `edit()` with two media types slipped through as well, because the exclusivity check ran after `buildInputMedia()` had already removed the first media key.
+
+`message_id` is back in the list, the check now runs before the payload is rewritten, and it makes one exception: `message_id` together with exactly one media type. Four rows were added to `exclusiveOptionsDataProvider`, covering the callback query, a location, a sticker and two media at once. All four fail with "Telegram API should not be called" without the fix.
+
+Telegram bridge: 98 tests, 214 assertions, green. Notifier: 2549 tests, green.

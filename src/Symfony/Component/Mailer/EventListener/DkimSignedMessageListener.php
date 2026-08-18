@@ -23,6 +23,8 @@ use Symfony\Component\Mime\Message;
  */
 class DkimSignedMessageListener implements EventSubscriberInterface
 {
+    public const PRIORITY = -228;
+
     public function __construct(
         private DkimSigner $signer,
     ) {
@@ -40,7 +42,7 @@ class DkimSignedMessageListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MessageEvent::class => ['onMessage', -128],
+            MessageEvent::class => ['onMessage', self::PRIORITY],
         ];
     }
 }

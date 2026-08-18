@@ -78,6 +78,7 @@ use Symfony\Component\JsonPath\FunctionReturnType;
 use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -2732,6 +2733,51 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $l = $container->getDefinition('mailer.message_listener');
         $h = $l->getArgument(0);
         $this->assertCount(3, $h->getMethodCalls());
+    }
+
+    public function testMailerSmimeEncrypterWithCertificates()
+    {
+        $container = $this->createContainerFromFile('mailer_with_smime_certificates');
+
+        $this->assertTrue($container->hasDefinition('mailer.smime_encrypter.repository'));
+        $definition = $container->getDefinition('mailer.smime_encrypter.repository');
+        $this->assertSame(InMemorySmimeCertificateRepository::class, $definition->getClass());
+        $this->assertSame([
+            'r1@example.com' => '/path/to/r1.crt',
+            'r2@example.com' => '/path/to/r2.crt',
+        ], $definition->getArgument(0));
+
+        $listener = $container->getDefinition('mailer.smime_encrypter.listener');
+        $this->assertSame('fail', $listener->getArgument(2));
+        $this->assertTrue($listener->getArgument(3));
+    }
+
+    public function testMailerSmimeEncrypterDefaultsToTheDeprecatedBehaviorAndNoSenderEncryption()
+    {
+        $container = $this->createContainerFromFile('mailer_with_smime_repository');
+
+        $this->assertTrue($container->hasAlias('mailer.smime_encrypter.repository'));
+        $this->assertSame('my_repository', (string) $container->getAlias('mailer.smime_encrypter.repository'));
+
+        $listener = $container->getDefinition('mailer.smime_encrypter.listener');
+        $this->assertSame('send_unencrypted', $listener->getArgument(2));
+        $this->assertFalse($listener->getArgument(3));
+    }
+
+    public function testMailerSmimeEncrypterRejectsBothRepositoryAndCertificates()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You cannot use both "smime_encrypter.repository" and "smime_encrypter.certificates" at the same time.');
+
+        $this->createContainerFromFile('mailer_with_smime_repository_and_certificates');
+    }
+
+    public function testMailerSmimeEncrypterRequiresARepositoryOrCertificates()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must configure either "smime_encrypter.repository" or "smime_encrypter.certificates".');
+
+        $this->createContainerFromFile('mailer_with_smime_without_source');
     }
 
     public function testMailerWithDisabledMessageBus()

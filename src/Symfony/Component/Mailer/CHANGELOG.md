@@ -6,6 +6,11 @@ CHANGELOG
 
  * Add a `rate_limiter` option to mailer transports
  * Reorder EsmtpTransport authenticators to prefer PLAIN over obsolete LOGIN
+ * Add `InMemorySmimeCertificateRepository` to provide recipient S/MIME certificates from a static map
+ * Add a configurable behavior to `SmimeEncryptedMessageListener` when a recipient has no certificate (`send_unencrypted`, `fail`, `encrypt`, `skip`), overridable per message via the `X-SMime-Encrypt` header
+ * Deprecate sending an S/MIME message unencrypted when a recipient has no certificate (the `send_unencrypted` behavior); it will throw in 9.0, use `fail`, `encrypt` or `skip` instead
+ * Add a `$encryptForSender` argument to `SmimeEncryptedMessageListener` to also encrypt for the sender, so it can read the messages it sent
+ * Add `PRIORITY` constants to `DkimSignedMessageListener`, `SmimeSignedMessageListener` and `SmimeEncryptedMessageListener` and order encryption after signing so signed-and-encrypted messages compose deterministically
 
 8.0
 ---

@@ -23,6 +23,8 @@ use Symfony\Component\Mime\Message;
  */
 class SmimeSignedMessageListener implements EventSubscriberInterface
 {
+    public const PRIORITY = -128;
+
     public function __construct(
         private SMimeSigner $signer,
     ) {
@@ -41,7 +43,7 @@ class SmimeSignedMessageListener implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            MessageEvent::class => ['onMessage', -128],
+            MessageEvent::class => ['onMessage', self::PRIORITY],
         ];
     }
 }

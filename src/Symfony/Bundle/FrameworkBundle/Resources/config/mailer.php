@@ -115,8 +115,12 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('mailer.smime_encrypter.repository'),
                 param('mailer.smime_encrypter.cipher'),
+                abstract_arg('on_missing_certificate'),
+                abstract_arg('encrypt for sender'),
+                service('logger')->ignoreOnInvalid(),
             ])
             ->tag('kernel.event_subscriber')
+            ->tag('monolog.logger', ['channel' => 'mailer'])
 
         ->set('console.command.mailer_test', MailerTestCommand::class)
             ->args([

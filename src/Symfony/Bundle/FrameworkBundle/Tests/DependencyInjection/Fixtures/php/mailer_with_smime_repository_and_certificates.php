@@ -1,0 +1,14 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'mailer' => [
+        'dsn' => 'smtp://example.com',
+        'smime_encrypter' => [
+            'enabled' => true,
+            'repository' => 'my_repository',
+            'certificates' => [
+                'r1@example.com' => '/path/to/r1.crt',
+            ],
+        ],
+    ],
+]);

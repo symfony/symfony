@@ -55,11 +55,29 @@ class AddScheduleMessengerPass implements CompilerPassInterface
             $scheduleProviderIds[$name] = $serviceId;
         }
 
+        $knownEnvs = $container->hasParameter('.container.known_envs') ? $container->getParameter('.container.known_envs') : [];
+        $currentEnv = $container->hasParameter('kernel.environment') ? $container->getParameter('kernel.environment') : null;
+
         $tasksPerSchedule = [];
         foreach ($container->findTaggedServiceIds('scheduler.task') as $serviceId => $tags) {
             foreach ($tags as $tagAttributes) {
-                $serviceDefinition = $container->getDefinition($serviceId);
                 $scheduleName = $tagAttributes['schedule'] ?? 'default';
+
+                // keep the schedule known even when every one of its tasks is filtered out,
+                // so that its receiver still exists and workers can be started in any environment
+                $tasksPerSchedule[$scheduleName] ??= [];
+
+                if ($envs = (array) ($tagAttributes['env'] ?? [])) {
+                    if ($knownEnvs && $unknownEnvs = array_diff($envs, $knownEnvs)) {
+                        $container->log($this, \sprintf('Task "%s" is restricted to environment(s) "%s", which are not among the known ones ("%s"); check for a typo.', $serviceId, implode('", "', $unknownEnvs), implode('", "', $knownEnvs)));
+                    }
+
+                    if (null !== $currentEnv && !\in_array($currentEnv, $envs, true)) {
+                        continue;
+                    }
+                }
+
+                $serviceDefinition = $container->getDefinition($serviceId);
 
                 if ($commandTags = $serviceDefinition->getTag('console.command')) {
                     /** @var AsCommand|null $attribute */
@@ -108,7 +126,11 @@ class AddScheduleMessengerPass implements CompilerPassInterface
 
         foreach ($tasksPerSchedule as $scheduleName => $tasks) {
             $id = "scheduler.provider.$scheduleName";
-            $schedule = (new Definition(Schedule::class))->addMethodCall('add', $tasks);
+            $schedule = new Definition(Schedule::class);
+
+            if ($tasks) {
+                $schedule->addMethodCall('add', $tasks);
+            }
 
             if (isset($scheduleProviderIds[$scheduleName])) {
                 $schedule

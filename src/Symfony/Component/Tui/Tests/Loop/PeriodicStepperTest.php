@@ -54,4 +54,11 @@ class PeriodicStepperTest extends TestCase
         $this->assertSame(0, $stepper->advance(0.1));
         $this->assertSame(1, $stepper->advance(0.1));
     }
+
+    public function testTheRejectedIntervalIsReported()
+    {
+        $this->expectExceptionMessage('Interval must be greater than 0, got "-0.25".');
+
+        new PeriodicStepper(-0.25);
+    }
 }

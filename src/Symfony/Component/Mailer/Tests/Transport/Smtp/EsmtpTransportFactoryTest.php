@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Test\AbstractTransportFactoryTestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
@@ -158,6 +160,22 @@ class EsmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
             $transport,
         ];
 
+        $transport = new EsmtpTransport('example.com', 465, true, null, $logger);
+        $transport->getStream()->setTimeout(10.0);
+
+        yield [
+            Dsn::fromString('smtps://:@example.com:465?timeout=10'),
+            $transport,
+        ];
+
+        $transport = new EsmtpTransport('example.com', 25, false, null, $logger);
+        $transport->getStream()->setTimeout(2.5);
+
+        yield [
+            Dsn::fromString('smtp://:@example.com:25?timeout=2.5'),
+            $transport,
+        ];
+
         $transport = new EsmtpTransport('example.com', 25, false, null, $logger);
         $transport->setAutoTls(false);
 
@@ -211,5 +229,21 @@ class EsmtpTransportFactoryTest extends AbstractTransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield [new Dsn('null', '')];
+    }
+
+    #[DataProvider('invalidTimeoutProvider')]
+    public function testInvalidTimeout(string $timeout)
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The "timeout" option is not valid: it must be a positive number of seconds, "%s" given.', $timeout));
+
+        $this->getFactory()->create(Dsn::fromString('smtp://example.com?timeout='.$timeout));
+    }
+
+    public static function invalidTimeoutProvider(): iterable
+    {
+        yield ['0'];
+        yield ['-1'];
+        yield ['abc'];
     }
 }

@@ -507,17 +507,26 @@ class ProgressBarWidget extends AbstractWidget
 
         // If the line is too wide, shrink the bar to fit
         $lineWidth = AnsiUtils::visibleWidth($line);
-        if ($lineWidth > $availableWidth) {
-            $newBarWidth = $this->barWidth - ($lineWidth - $availableWidth);
-            if ($newBarWidth >= 1) {
-                $savedBarWidth = $this->barWidth;
-                $this->barWidth = $newBarWidth;
-                $line = $this->replacePlaceholders($format);
-                $this->barWidth = $savedBarWidth;
-            }
+        if ($lineWidth <= $availableWidth) {
+            return $line;
         }
 
-        return $line;
+        // Shrink as far as the bar goes, down to a single cell. Giving up
+        // when the overflow is larger than the bar would leave the line at
+        // its full width, so a terminal narrow enough to swallow the whole
+        // bar produced a wider line than a slightly wider one did.
+        $newBarWidth = max(1, $this->barWidth - ($lineWidth - $availableWidth));
+        if ($newBarWidth !== $this->barWidth) {
+            $savedBarWidth = $this->barWidth;
+            $this->barWidth = $newBarWidth;
+            $line = $this->replacePlaceholders($format);
+            $this->barWidth = $savedBarWidth;
+        }
+
+        // The rest of the format (counters, percentage, message) can still
+        // outgrow the available columns on its own; the Renderer rejects an
+        // over-wide line, so cut it instead of aborting the render.
+        return AnsiUtils::truncateToWidth($line, $availableWidth, '');
     }
 
     private function replacePlaceholders(string $format): string

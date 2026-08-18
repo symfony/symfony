@@ -54,7 +54,14 @@ final class Compositor
 
         $base = $layers[0];
         $height = $base->height ?? \count($base->lines);
-        $width = $base->width ?? (!$base->lines ? 0 : AnsiUtils::visibleWidth($base->lines[0]));
+        $width = $base->width ?? self::widestLine($base->lines);
+
+        if ($width < 1 || $height < 1) {
+            // Nothing to draw on. CellBuffer rejects an empty canvas, and a
+            // base layer with no lines is degenerate input in the same way an
+            // empty layer list is.
+            return [];
+        }
 
         $buffer = new CellBuffer($width, $height);
 
@@ -68,5 +75,18 @@ final class Compositor
         }
 
         return $buffer->toLines();
+    }
+
+    /**
+     * @param string[] $lines
+     */
+    private static function widestLine(array $lines): int
+    {
+        $width = 0;
+        foreach ($lines as $line) {
+            $width = max($width, AnsiUtils::visibleWidth($line));
+        }
+
+        return $width;
     }
 }

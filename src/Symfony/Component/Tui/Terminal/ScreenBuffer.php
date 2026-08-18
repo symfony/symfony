@@ -471,23 +471,26 @@ final class ScreenBuffer
         $nums = '' !== $paramStr ? array_map('intval', explode(';', $paramStr)) : [];
 
         switch ($finalByte) {
+            // The cursor moves take a repeat count whose default is 1, and a
+            // count of 0 is read as 1 rather than as "stay put": an omitted
+            // and an explicit zero parameter mean the same thing.
             case 'A': // Cursor Up
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorRow = max(0, $this->cursorRow - $n);
                 break;
 
             case 'B': // Cursor Down
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorRow = min($this->height - 1, $this->cursorRow + $n);
                 break;
 
             case 'C': // Cursor Forward
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorCol = min($this->width - 1, $this->cursorCol + $n);
                 break;
 
             case 'D': // Cursor Back
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorCol = max(0, $this->cursorCol - $n);
                 break;
 

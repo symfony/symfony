@@ -1192,6 +1192,24 @@ class ParserTest extends TestCase
         ));
     }
 
+    public function testParseAliasFollowedByAComment()
+    {
+        $this->assertSame([
+            'var' => 'var-value',
+            'scalar' => 'var-value',
+            'list' => ['var-value'],
+            'map' => ['key' => 'var-value', 'other' => 'plain'],
+        ], $this->parser->parse(<<<'EOF'
+            var: &var var-value
+            scalar: *var  # a comment
+            list:
+              - *var   # another comment
+            map: { key: *var,  # a comment inside a flow collection
+              other: plain }
+            EOF
+        ));
+    }
+
     public function testYamlDirective()
     {
         $yaml = <<<'EOF'
@@ -2390,6 +2408,22 @@ class ParserTest extends TestCase
                     param: "some"
                     YAML,
             ],
+            'mixed mapping with inline notation having separated lines with comments' => [
+                [
+                    'map' => [
+                        'key' => 'value',
+                        'a' => 'b',
+                    ],
+                    'param' => 'some',
+                ],
+                <<<YAML
+                    map: {  # a comment
+                        key: "value",  # another comment
+                        a: "b"
+                    }
+                    param: "some"
+                    YAML,
+            ],
             'mixed mapping with compact inline notation on one line' => [
                 [
                     'map' => [
@@ -2910,6 +2944,21 @@ class ParserTest extends TestCase
         ];
 
         $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public function testParseMergeKeyAliasFollowedByAComment()
+    {
+        $this->assertSame([
+            'base' => ['a' => 'foo'],
+            'derived' => ['a' => 'foo', 'b' => 'bar'],
+        ], $this->parser->parse(<<<'EOF'
+            base: &base
+                a: foo
+            derived:
+                <<: *base # a comment
+                b: bar
+            EOF
+        ));
     }
 
     public function testParseReferencesOnMergeKeysWithMappingsParsedAsObjects()

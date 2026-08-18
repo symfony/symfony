@@ -76,7 +76,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $response->getStatusCode()), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote AhaSend server.', $response, 0, $e);
         }
@@ -117,7 +117,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
         } catch (DecodingExceptionInterface) {
-            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $statusCode), $response);
+            throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).\sprintf(' (code %d).', $response->getStatusCode()), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote AhaSend server.', $response, 0, $e);
         }

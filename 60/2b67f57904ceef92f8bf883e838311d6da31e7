@@ -1,0 +1,61 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T13:30:40Z
+
+Thanks for this, and for the care that went into the MIME side. I checked the output rather than just reading it: I pulled the inner part out of a real sign-then-encrypt message between the boundaries and ran an independent `gpg --verify` on it, and it comes back `GOODSIG`. Structure matches RFC 3156, CRLF is preserved, trailing whitespace is protected by quoted-printable, and signing over the memoized boundary bytes is right. Key handling is careful too: the passphrase goes to a 0600 temp file and never onto the command line, and after five signs plus a wrong-passphrase failure there were no leftover ephemeral homes, no leftover passphrase files and no gpg-agent left behind.
+
+Three things block it.
+
+**A message can go out in plaintext.** With `on_missing_key: encrypt` and no key for any recipient, `PgpMimeEncryptedMessageListener` returns early at lines 107-109 and the mail is sent unencrypted. Only a generic warning is logged, and it does not say that encryption was skipped. `testMessageNotEncryptedWhenNoRecipientHasKeyAndOnMissingKeyEncrypt` currently asserts this as the intended behaviour.
+
+**The policy can be downgraded from a message header.** `resolveOnMissingKey()` accepts any value, so `X-Pgp-Encrypt: encrypt` turns a configured `fail` into `encrypt`, which then reaches the case above. #64541 forbids exactly this for S/MIME.
+
+Because of those two, ordering matters: **#64541 can land on its own, but this one must not land first.** Otherwise 8.2 ships a brand new API carrying the hole that #64541 exists to close, and we cannot fix it before 9.0.
+
+**Bcc key IDs are disclosed whenever the message is also signed**, which is the default framework wiring. `PgpSigner::sign()` returns a `new Message(...)`, so `PgpEncrypter::resolveHiddenRecipients()` fails its `instanceof Email` check and returns an empty list. Measured with `gpg --list-packets`: encrypt only gives keyid `0000000000000000`, sign plus encrypt gives `96588BB831407682`.
+
+Smaller ones:
+
+- `pgp_signer: {enabled: true}` with no `secret_key` compiles. `defaultValue('')` with `cannotBeEmpty()` only fires when `''` is written explicitly, so every send fails at runtime instead of at build time.
+- `cipher_algorithm` and `digest_algorithm` are free-form strings with no allow-list. `IDEA` and `MD5` both pass validation.
+- `createTemporaryGnupgHome()` accepts a pre-existing directory, because of `!mkdir(...) && !is_dir(...)`. It should fail instead.
+- The Mailer listener tests carry `#[RequiresPhpExtension('openssl')]`, copied from S/MIME and irrelevant here.
+- Untested: hidden recipient key IDs after signing, the fail to encrypt downgrade, and algorithm validation.
+
+Two notes for the description rather than the code. Only the body is protected: `Subject`, `From` and `To` stay in the outer cleartext headers, which is inherent to RFC 3156 but worth stating. And the feature is reachable today in about 60 lines of user land, with two `AbstractMultipartPart` subclasses, one `AbstractPart` and a `MessageEvent` listener at -200. I ran it and the result verifies. That does not argue against merging, since boundary memoization, `--textmode`, the trailing whitespace handling, the sign-before-encrypt ordering and hidden recipients are all easy to get wrong, but the description should be making that argument rather than implying it is otherwise impossible.
+
+Good news on testing: because this drives the `gpg` binary rather than an extension, the tests really run in CI. Locally with gpg 2.4.4, Mime is 436/436, Mailer 219/219 and FrameworkBundle 1416/1416, and all 13 checks are green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T14:22:10Z
+
+Rebased on 8.2 now that #64541 is in, and pushed the fixes for what the review turned up. The two crypto stacks are aligned again.
+
+The blocking one: with `on_missing_key: encrypt` and no key for any recipient, the listener returned early and the mail went out in plaintext. `testMessageNotEncryptedWhenNoRecipientHasKeyAndOnMissingKeyEncrypt` asserted that as intended behavior. It now throws, in every mode, and the test asserts the throw. This is the hole #64541 exists to close for S/MIME, so it could not ship here.
+
+The rest:
+
+- `X-Pgp-Encrypt` is no longer removed before the throwing paths, so catching the exception and resending keeps the policy override.
+- `fail` collects every recipient without a key before throwing, instead of naming the first one only.
+- Encrypt-to-self is opt-in, `encrypt_for_sender`, default `false`, same as the S/MIME listener. A sender key alone no longer makes an otherwise-keyless message encryptable.
+- Bcc key IDs leaked whenever the message was also signed, which is the default framework wiring. `PgpSigner::sign()` returns a `new Message(...)`, so the `instanceof Email` test in `resolveHiddenRecipients()` failed and the Bcc list came back empty. Measured with `gpg --list-packets`: encrypt only gave `keyid 0000000000000000`, sign plus encrypt gave `96588BB831407682`. It now reads the `Bcc` header, which survives the conversion. Test added and revert-verified.
+- `pgp_signer: {enabled: true}` with no `secret_key` compiled and failed at every send. `defaultValue('')` with `cannotBeEmpty()` only fires when `''` is written explicitly, so it is a `validate()` rule now.
+- `digest_algorithm` and `cipher_algorithm` were free-form strings: `MD5` and `IDEA` both passed. They are enums now.
+- `createTemporaryGnupgHome()` accepted a pre-existing directory through `!mkdir(...) && !is_dir(...)`. It fails instead.
+- `PRIORITY` constants on both listeners, matching what landed for DKIM and S/MIME.
+- The Mailer PGP tests carried `#[RequiresPhpExtension('openssl')]`, copied from S/MIME and irrelevant here. Removed. They drive the `gpg` binary through the Process component, so `symfony/process` is now in the Mailer `require-dev` and the tests skip when `gpg` is absent instead of failing.
+- FrameworkBundle DI coverage for the new config: the keys map building `InMemoryPgpPublicKeyRepository`, the repository alias, the signer arguments, the encrypter options, both validate() rules and both listener arguments. In `php` and `yml`.
+- `timeout` is a `floatNode` whose default was the integer `60`.
+
+The description is rewritten as documentation rather than a change log, and states two things it did not: only the body is protected, `Subject` and `To` stay in the clear, and `skip` is overridden by `framework.mailer.envelope.recipients`. It also says plainly what this buys over a hand-written listener, since the feature is reachable in about 60 lines of user land and the argument for having it in core is the details that are easy to get wrong, not impossibility.
+
+Local: Mime 440, Mailer 1034, FrameworkBundle 1537, all green, php-cs-fixer clean.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-18T16:06:55Z
+
+Hi @nicolas-grekas,
+Tested and approved.
+Thanks for the last minutes modifications.

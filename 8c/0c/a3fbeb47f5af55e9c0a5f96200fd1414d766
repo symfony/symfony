@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T13:58:36Z
+
+Thanks, this is a good alignment. I pushed the fixes for what came out of the review, rebased on 8.2, so the PR should be green now:
+
+- `ON_MISSING_CERTIFICATE_SEND_UNENCRYPTED` had `@deprecated` on the constant itself, which fails PHPStan on every internal comparison against it. The docblock now says the behavior is deprecated, and the constant stays usable.
+- Encrypt-to-self is now opt-in, `encrypt_for_sender`, defaulting to `false`. Turning it on silently widens who can decrypt a message, and an application that has a certificate for its own `From` address would have got that on upgrade without asking.
+- `X-SMime-Encrypt` was removed from the headers before the throwing paths, so a caught `RuntimeException` followed by a resend lost the policy override. The removal now only happens on the paths that actually go through.
+- `#[IgnoreDeprecations]` was missing its `#[Group('legacy')]`, which makes the deprecation count as a failure in CI even though it passes locally.
+- Added the FrameworkBundle DI coverage: the certificates map building `InMemorySmimeCertificateRepository`, the repository alias, both-configured and neither-configured rejected, plus the two new listener arguments. In `php` and `yml`, since both variants run the same tests.
+- `encrypt_for_sender` CHANGELOG and config entries, and an UPGRADE note for the DKIM priority move from `-128` to `-228`, which changes what DKIM signs for anyone already combining it with S/MIME encryption.
+
+Two things in the description were half true and I edited them rather than leave them:
+
+The header "can only select a stricter behavior" does not hold. `policy=fail` with `X-SMime-Encrypt: skip` returns an encrypted message with a recipient silently dropped, which is looser than what the policy asked for. Only the plaintext downgrade is actually blocked.
+
+And `skip` interacts with `framework.mailer.envelope.recipients`: that option is applied after this listener, so a configured recipient list puts back the addresses `skip` just removed. Documented in the option's `info()` too.
+
+Left as is, for you: the 9.0 fate of `send_unencrypted`. I lean towards keeping the constant and flipping the default to `fail`, but that is a separate discussion and does not block this.

@@ -483,8 +483,8 @@ final class EditorDocument
                     grapheme_extract($line, 1, \GRAPHEME_EXTR_COUNT, $nextByteOffset, $nextByteOffset);
                     $idx = strpos($line, $char, $nextByteOffset);
                 } else {
-                    $searchIn = 0 === $this->cursorCol ? false : substr($line, 0, $this->cursorCol);
-                    $idx = false !== $searchIn ? strrpos($searchIn, $char) : false;
+                    $haystack = 0 === $this->cursorCol ? false : substr($line, 0, $this->cursorCol);
+                    $idx = false !== $haystack ? strrpos($haystack, $char) : false;
                 }
             } else {
                 $idx = $isForward ? strpos($line, $char) : strrpos($line, $char);

@@ -31,7 +31,7 @@ final class FixedStepAccumulator
         private int $maxStepsPerUpdate = 5,
     ) {
         if ($stepsPerSecond <= 0.0) {
-            throw new InvalidArgumentException(\sprintf('Steps per second must be greater than 0, got %d.', $stepsPerSecond));
+            throw new InvalidArgumentException(\sprintf('Steps per second must be greater than 0, got "%s".', $stepsPerSecond));
         }
 
         if ($maxStepsPerUpdate < 1) {
@@ -46,8 +46,15 @@ final class FixedStepAccumulator
     {
         $this->accumulator += max(0.0, $deltaTime) * $this->stepsPerSecond;
 
-        if (0 < $steps = min($this->maxStepsPerUpdate, (int) floor($this->accumulator))) {
+        if (0 < $steps = (int) floor($this->accumulator)) {
+            // Take every whole step out of the accumulator, keeping only the
+            // fraction. Capping the count without clearing the rest turns a
+            // stall into a backlog that is paid back at cap speed over the
+            // following updates -- ten idle seconds run the animation at
+            // full tilt for the next two -- when the point of the cap is to
+            // drop the time that was missed.
             $this->accumulator -= $steps;
+            $steps = min($this->maxStepsPerUpdate, $steps);
         }
 
         return $steps;
@@ -56,7 +63,7 @@ final class FixedStepAccumulator
     public function setStepsPerSecond(float $stepsPerSecond): void
     {
         if ($stepsPerSecond <= 0.0) {
-            throw new InvalidArgumentException(\sprintf('Steps per second must be greater than 0, got %d.', $stepsPerSecond));
+            throw new InvalidArgumentException(\sprintf('Steps per second must be greater than 0, got "%s".', $stepsPerSecond));
         }
 
         $this->stepsPerSecond = $stepsPerSecond;

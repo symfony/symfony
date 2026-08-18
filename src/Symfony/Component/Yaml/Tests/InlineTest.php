@@ -269,6 +269,7 @@ class InlineTest extends TestCase
             'map' => ['{ key: *var }', ['key' => 'var-value']],
             'list-in-map' => ['{ key: [*var] }', ['key' => ['var-value']]],
             'map-in-map' => ['{ foo: { bar: *var } }', ['foo' => ['bar' => 'var-value']]],
+            'map-followed-by-a-comment' => ['{ key: *var  # comment }', ['key' => 'var-value']],
         ];
     }
 

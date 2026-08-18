@@ -19,6 +19,7 @@ use Symfony\Component\Tui\Render\RenderRequestorInterface;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\ContainerWidget;
+use Symfony\Component\Tui\Widget\InputWidget;
 use Symfony\Component\Tui\Widget\TextWidget;
 use Symfony\Component\Tui\Widget\WidgetContext;
 use Symfony\Component\Tui\Widget\WidgetTree;
@@ -108,5 +109,31 @@ class WidgetTreeTest extends TestCase
         $this->tree->detach($child);
 
         $this->assertNull($child->getParent());
+    }
+
+    /**
+     * The listeners live on the widget and are dispatched from it, so taking
+     * it out of the tree and putting it back must not unhook them.
+     */
+    public function testListenersSurviveBeingRemovedFromTheTree()
+    {
+        $terminal = new VirtualTerminal(40, 10);
+        $tui = new Tui(terminal: $terminal);
+        $input = new InputWidget();
+
+        $submits = 0;
+        $input->onSubmit(static function () use (&$submits) {
+            ++$submits;
+        });
+
+        $tui->add($input);
+        $input->handleInput("\r");
+        $this->assertSame(1, $submits);
+
+        $tui->remove($input);
+        $tui->add($input);
+        $input->handleInput("\r");
+
+        $this->assertSame(2, $submits);
     }
 }

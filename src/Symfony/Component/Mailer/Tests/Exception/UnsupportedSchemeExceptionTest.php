@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Bridge\Cloudflare\Transport\CloudflareTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
@@ -48,6 +49,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
             AhaSendTransportFactory::class => false,
             AzureTransportFactory::class => false,
             BrevoTransportFactory::class => false,
+            CloudflareTransportFactory::class => false,
             GmailTransportFactory::class => false,
             InfobipTransportFactory::class => false,
             MailPaceTransportFactory::class => false,
@@ -84,6 +86,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['ahasend', 'symfony/aha-send-mailer'];
         yield ['azure', 'symfony/azure-mailer'];
         yield ['brevo', 'symfony/brevo-mailer'];
+        yield ['cloudflare', 'symfony/cloudflare-mailer'];
         yield ['gmail', 'symfony/google-mailer'];
         yield ['infobip', 'symfony/infobip-mailer'];
         yield ['mailersend', 'symfony/mailersend-mailer'];

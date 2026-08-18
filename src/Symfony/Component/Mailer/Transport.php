@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Brevo\Transport\BrevoTransportFactory;
+use Symfony\Component\Mailer\Bridge\Cloudflare\Transport\CloudflareTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
@@ -62,6 +63,7 @@ final class Transport
         AhaSendTransportFactory::class,
         AzureTransportFactory::class,
         BrevoTransportFactory::class,
+        CloudflareTransportFactory::class,
         GmailTransportFactory::class,
         InfobipTransportFactory::class,
         MailerSendTransportFactory::class,

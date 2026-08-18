@@ -47,6 +47,7 @@
         "amazon-mailer": "src/Symfony/Component/Mailer/Bridge/Amazon",
         "azure-mailer": "src/Symfony/Component/Mailer/Bridge/Azure",
         "brevo-mailer": "src/Symfony/Component/Mailer/Bridge/Brevo",
+        "cloudflare-mailer": "src/Symfony/Component/Mailer/Bridge/Cloudflare",
         "google-mailer": "src/Symfony/Component/Mailer/Bridge/Google",
         "infobip-mailer": "src/Symfony/Component/Mailer/Bridge/Infobip",
         "mail-pace-mailer": "src/Symfony/Component/Mailer/Bridge/MailPace",

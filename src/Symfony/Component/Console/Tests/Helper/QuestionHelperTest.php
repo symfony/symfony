@@ -263,6 +263,28 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('F⭐Y', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
+    public function testAskWithAutocompleteIgnoresParameterizedEscapeSequences()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // Zzz<DELETE><NEWLINE>
+        // Zzz<PAGE UP><NEWLINE>
+        // Zzz<CTRL+LEFT><NEWLINE>
+        $inputStream = $this->getInputStream("Zzz\033[3~\nZzz\033[5~\nZzz\033[1;5D\n");
+
+        $dialog = new QuestionHelper();
+        $dialog->setHelperSet(new HelperSet([new FormatterHelper()]));
+
+        $question = new Question('Please select a bundle', 'FrameworkBundle');
+        $question->setAutocompleterValues(['AcmeDemoBundle', 'AsseticBundle', 'SecurityBundle', 'FooBundle']);
+
+        $this->assertSame('Zzz', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertSame('Zzz', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+        $this->assertSame('Zzz', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
     public function testAskWithAutocompleteTrimmable()
     {
         if (!Terminal::hasSttyAvailable()) {

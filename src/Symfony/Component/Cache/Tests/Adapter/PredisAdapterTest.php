@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\Attributes\Group;
 use Predis\Connection\StreamConnection;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 #[Group('integration')]
 class PredisAdapterTest extends AbstractRedisAdapterTestCase
@@ -53,6 +54,35 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         }
 
         $this->assertSame($params, $connectionParameters);
+    }
+
+    public function testCreateConnectionWithAuthFromQueryString()
+    {
+        $redisHost = getenv('REDIS_HOST');
+
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/1?auth=p4ssw0rd', ['class' => \Predis\Client::class]);
+
+        $this->assertSame('p4ssw0rd', $redis->getConnection()->getParameters()->toArray()['password'] ?? null);
+    }
+
+    public function testCreateConnectionWithAclAuthFromOptions()
+    {
+        $redisHost = getenv('REDIS_HOST');
+
+        $redis = RedisAdapter::createConnection('redis://'.$redisHost.'/1', ['class' => \Predis\Client::class, 'auth' => ['user', 'p4ssw0rd']]);
+
+        $parameters = $redis->getConnection()->getParameters()->toArray();
+
+        $this->assertSame('user', $parameters['username'] ?? null);
+        $this->assertSame('p4ssw0rd', $parameters['password'] ?? null);
+    }
+
+    public function testCreateConnectionWithAnInvalidAuthShape()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid Redis DSN: the "auth" parameter must be a string, or a list of exactly two elements for ACL, "[username, password]".');
+
+        RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST').'/1?auth[user]=u&auth[pass]=p', ['class' => \Predis\Client::class]);
     }
 
     public function testCreateSslConnection()

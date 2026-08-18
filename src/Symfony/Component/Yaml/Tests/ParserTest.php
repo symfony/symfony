@@ -1256,6 +1256,16 @@ class ParserTest extends TestCase
         $this->parser->parse($yaml);
     }
 
+    public function testUppercaseHexadecimalPrefixKeys()
+    {
+        $yaml = <<<'EOF'
+            0X4D2: foo
+            0x4D2: bar
+            EOF;
+
+        $this->assertSame(['0X4D2' => 'foo', 1234 => 'bar'], $this->parser->parse($yaml));
+    }
+
     public function testExplicitStringCasting()
     {
         $yaml = <<<'EOF'

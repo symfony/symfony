@@ -271,7 +271,7 @@
             </div>
         </div>
 
-        <div class="tab {{ collector.sessionmetadata is empty ? 'disabled' }}">
+        <div class="tab {{ collector.sessionmetadata is empty and collector.sessionusages is empty ? 'disabled' }}">
             <h3 class="tab-title">Session{% if collector.sessionusages is not empty %} <span class="badge">{{ collector.sessionusages|length }}</span>{% endif %}</h3>
 
             <div class="tab-content">
@@ -331,7 +331,7 @@
                                     {%- if link %}</a>{% else %}</span>{% endif %}
                                     <div class="text-small font-normal">
                                         {% set usage_id = 'session-usage-trace-' ~ key %}
-                                        <a class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ usage_id }}" data-toggle-alt-content="Hide trace">Show trace</a>
+                                        <button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ usage_id }}" data-toggle-alt-content="Hide trace">Show trace</button>
                                     </div>
                                     <div id="{{ usage_id }}" class="context sf-toggle-content sf-toggle-hidden">
                                         {{ profiler_dump(usage.trace, maxDepth=2) }}

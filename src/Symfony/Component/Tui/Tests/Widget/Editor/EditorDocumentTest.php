@@ -497,6 +497,41 @@ class EditorDocumentTest extends TestCase
         $this->assertSame([], $doc->getPasteMarkers());
     }
 
+    public function testMultiLinePasteIsASingleUndoStep()
+    {
+        $doc = new EditorDocument();
+        $doc->insertText('start');
+        $doc->handlePaste("line 1\nline 2\nline 3");
+        $this->assertSame("startline 1\nline 2\nline 3", $doc->getText());
+
+        $this->assertTrue($doc->undo());
+        $this->assertSame('start', $doc->getText());
+        $this->assertSame(0, $doc->getCursorLine());
+        $this->assertSame(5, $doc->getCursorCol());
+    }
+
+    public function testMultiLinePasteIsRedoneInOneStep()
+    {
+        $doc = new EditorDocument();
+        $doc->handlePaste("line 1\nline 2\nline 3");
+        $doc->undo();
+
+        $this->assertTrue($doc->redo());
+        $this->assertSame("line 1\nline 2\nline 3", $doc->getText());
+    }
+
+    public function testPasteInTheMiddleOfALine()
+    {
+        $doc = new EditorDocument();
+        $doc->setText('ab');
+        $doc->setCursorCol(1);
+        $doc->handlePaste("X\nY");
+
+        $this->assertSame("aX\nYb", $doc->getText());
+        $this->assertSame(1, $doc->getCursorLine());
+        $this->assertSame(1, $doc->getCursorCol());
+    }
+
     public function testPasteStripsControlBytesToPreventTerminalInjection()
     {
         $doc = new EditorDocument();

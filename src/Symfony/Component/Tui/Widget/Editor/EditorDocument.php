@@ -483,8 +483,8 @@ final class EditorDocument
                     grapheme_extract($line, 1, \GRAPHEME_EXTR_COUNT, $nextByteOffset, $nextByteOffset);
                     $idx = strpos($line, $char, $nextByteOffset);
                 } else {
-                    $searchIn = 0 === $this->cursorCol ? false : substr($line, 0, $this->cursorCol);
-                    $idx = false !== $searchIn ? strrpos($searchIn, $char) : false;
+                    $haystack = 0 === $this->cursorCol ? false : substr($line, 0, $this->cursorCol);
+                    $idx = false !== $haystack ? strrpos($haystack, $char) : false;
                 }
             } else {
                 $idx = $isForward ? strpos($line, $char) : strrpos($line, $char);
@@ -619,14 +619,12 @@ final class EditorDocument
             return;
         }
 
-        // Insert first line at cursor
-        $this->insertText($lines[0]);
+        // One paste is one edit: take a single snapshot and insert the whole
+        // content in one go, so a later undo takes all of it back at once.
+        $this->pushUndoSnapshot();
+        $this->killRing->resetAction();
 
-        // Insert remaining lines
-        for ($i = 1; $i < \count($lines); ++$i) {
-            $this->insertNewLine();
-            $this->insertText($lines[$i]);
-        }
+        $this->insertTextAtCursor($content);
     }
 
     // --- Internal ---

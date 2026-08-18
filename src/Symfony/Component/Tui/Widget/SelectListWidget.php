@@ -219,7 +219,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         // No items match filter
         if (!$this->filteredItems) {
             $line = $this->applyElement('no-match', '  No matching items');
-            $lines[] = $line;
+            $lines[] = AnsiUtils::truncateToWidth($line, $columns, '');
 
             return $lines;
         }
@@ -247,7 +247,10 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             $isSelected = $i === $this->selectedIndex;
             $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
             $line = $this->renderItem($item, $isSelected, $description, $columns, $labelColumnWidth);
-            $lines[] = $line;
+            // renderItem() budgets the label against the columns left after
+            // its prefix, but the prefix itself is emitted unconditionally
+            // and is wider than the widget once the pane gets narrow enough.
+            $lines[] = AnsiUtils::truncateToWidth($line, $columns, '');
         }
 
         // Add scroll indicator if needed

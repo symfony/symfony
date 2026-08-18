@@ -241,6 +241,32 @@ class SelectListTest extends TestCase
         return new SelectListWidget($items, 5);
     }
 
+    public function testNoMatchLineIsTruncatedToTheWidth()
+    {
+        $list = new SelectListWidget([['value' => 'alpha', 'label' => 'alpha']]);
+        $list->setFilter('zzz');
+
+        foreach ([40, 19, 10, 5, 1] as $columns) {
+            $lines = $list->render(new RenderContext($columns, 24));
+
+            $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($lines[0]), \sprintf('The no-match line fits in %d columns.', $columns));
+        }
+    }
+
+    public function testItemsAreTruncatedToTheWidth()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'alpha', 'description' => 'the first one'],
+            ['value' => 'b', 'label' => 'beta', 'description' => 'the second one'],
+        ]);
+
+        foreach ([60, 40, 20, 6, 4, 2, 1] as $columns) {
+            foreach ($list->render(new RenderContext($columns, 24)) as $line) {
+                $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every row fits in %d columns.', $columns));
+            }
+        }
+    }
+
     /**
      * @return array{SelectListWidget, Tui}
      */

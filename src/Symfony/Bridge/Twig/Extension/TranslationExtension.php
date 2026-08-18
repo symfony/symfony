@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Extension;
 
+use Symfony\Bridge\Twig\NodeVisitor\TransDefaultDomainRegistry;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationDefaultDomainNodeVisitor;
 use Symfony\Bridge\Twig\NodeVisitor\TranslationNodeVisitor;
 use Symfony\Bridge\Twig\TokenParser\TransDefaultDomainTokenParser;
@@ -37,6 +38,7 @@ final class TranslationExtension extends AbstractExtension
     public function __construct(
         private ?TranslatorInterface $translator = null,
         private ?TranslationNodeVisitor $translationNodeVisitor = null,
+        private readonly TransDefaultDomainRegistry $transDefaultDomainRegistry = new TransDefaultDomainRegistry(),
     ) {
     }
 
@@ -76,13 +78,13 @@ final class TranslationExtension extends AbstractExtension
             new TransTokenParser(),
 
             // {% trans_default_domain "foobar" %}
-            new TransDefaultDomainTokenParser(),
+            new TransDefaultDomainTokenParser($this->transDefaultDomainRegistry),
         ];
     }
 
     public function getNodeVisitors(): array
     {
-        return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor()];
+        return [$this->getTranslationNodeVisitor(), new TranslationDefaultDomainNodeVisitor($this->transDefaultDomainRegistry)];
     }
 
     public function getTranslationNodeVisitor(): TranslationNodeVisitor

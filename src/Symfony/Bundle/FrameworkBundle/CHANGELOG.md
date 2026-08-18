@@ -8,6 +8,7 @@ CHANGELOG
  * Add `framework.asset_mapper.importmap_integrity_algorithms` option to add integrity metadata to importmaps
  * Add `framework.asset_mapper.minimum_release_age` option to delay JavaScript package updates until a version reaches a minimum age
  * Add `framework.mailer.smime_encrypter.certificates`, `on_missing_certificate` and `encrypt_for_sender` options
+ * Add `framework.mailer.pgp_signer` and `framework.mailer.pgp_encrypter` options to sign and encrypt messages with PGP/MIME
  * Add `framework.cache.default_provider` to configure `cache.app` with a DSN
  * Add `framework.messenger.reject_redelivered_messages` to allow disabling the `RejectRedeliveredMessageMiddleware`
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration

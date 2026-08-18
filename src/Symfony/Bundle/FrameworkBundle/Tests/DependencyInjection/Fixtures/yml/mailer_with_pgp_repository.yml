@@ -1,0 +1,11 @@
+services:
+    my_pgp_repository:
+        class: Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository
+        arguments: [[]]
+
+framework:
+    mailer:
+        dsn: 'smtp://example.com'
+        pgp_encrypter:
+            enabled: true
+            repository: 'my_pgp_repository'

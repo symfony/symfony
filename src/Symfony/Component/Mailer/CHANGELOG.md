@@ -11,6 +11,9 @@ CHANGELOG
  * Deprecate sending an S/MIME message unencrypted when a recipient has no certificate (the `send_unencrypted` behavior); it will throw in 9.0, use `fail`, `encrypt` or `skip` instead
  * Add a `$encryptForSender` argument to `SmimeEncryptedMessageListener` to also encrypt for the sender, so it can read the messages it sent
  * Add `PRIORITY` constants to `DkimSignedMessageListener`, `SmimeSignedMessageListener` and `SmimeEncryptedMessageListener` and order encryption after signing so signed-and-encrypted messages compose deterministically
+ * Add `PgpMimeSignedMessageListener` and `PgpMimeEncryptedMessageListener`
+ * Add `InMemoryPgpPublicKeyRepository` to provide recipient PGP public keys from a static map
+ * Add a configurable behavior to `PgpMimeEncryptedMessageListener` when a recipient has no key (`fail`, `encrypt`, `skip`), overridable per message via the `X-Pgp-Encrypt` header
 
 8.0
 ---

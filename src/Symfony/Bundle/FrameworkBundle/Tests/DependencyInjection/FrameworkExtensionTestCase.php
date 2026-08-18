@@ -78,6 +78,7 @@ use Symfony\Component\JsonPath\FunctionReturnType;
 use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
@@ -2778,6 +2779,63 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->expectExceptionMessage('You must configure either "smime_encrypter.repository" or "smime_encrypter.certificates".');
 
         $this->createContainerFromFile('mailer_with_smime_without_source');
+    }
+
+    public function testMailerPgp()
+    {
+        $container = $this->createContainerFromFile('mailer_with_pgp');
+
+        $signer = $container->getDefinition('mailer.pgp_signer');
+        $this->assertSame('/path/to/secret.asc', $signer->getArgument(0));
+        $this->assertSame('/path/to/public.asc', $signer->getArgument(1));
+        $this->assertSame('passphrase', $signer->getArgument(2));
+        $this->assertSame(['binary' => 'gpg', 'digest_algorithm' => 'SHA256'], $signer->getArgument(3));
+
+        $repository = $container->getDefinition('mailer.pgp_encrypter.repository');
+        $this->assertSame(InMemoryPgpPublicKeyRepository::class, $repository->getClass());
+        $this->assertSame([
+            'r1@example.com' => '/path/to/r1.asc',
+            'r2@example.com' => '/path/to/r2.asc',
+        ], $repository->getArgument(0));
+
+        $this->assertSame([
+            'binary' => 'gpg',
+            'cipher_algorithm' => 'AES192',
+            'timeout' => 60.0,
+            'hide_recipients' => true,
+        ], $container->getDefinition('mailer.pgp_encrypter')->getArgument(0));
+
+        $listener = $container->getDefinition('mailer.pgp_encrypter.listener');
+        $this->assertSame('skip', $listener->getArgument(2));
+        $this->assertTrue($listener->getArgument(3));
+    }
+
+    public function testMailerPgpEncrypterFailsAndDoesNotEncryptForTheSenderByDefault()
+    {
+        $container = $this->createContainerFromFile('mailer_with_pgp_repository');
+
+        $this->assertSame('my_pgp_repository', (string) $container->getAlias('mailer.pgp_encrypter.repository'));
+        $this->assertFalse($container->hasDefinition('mailer.pgp_signer'));
+
+        $listener = $container->getDefinition('mailer.pgp_encrypter.listener');
+        $this->assertSame('fail', $listener->getArgument(2));
+        $this->assertFalse($listener->getArgument(3));
+    }
+
+    public function testMailerPgpSignerRequiresASecretKey()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must configure "pgp_signer.secret_key".');
+
+        $this->createContainerFromFile('mailer_with_pgp_signer_without_secret_key');
+    }
+
+    public function testMailerPgpEncrypterRequiresARepositoryOrKeys()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You must configure either "pgp_encrypter.repository" or "pgp_encrypter.keys".');
+
+        $this->createContainerFromFile('mailer_with_pgp_without_source');
     }
 
     public function testMailerWithDisabledMessageBus()

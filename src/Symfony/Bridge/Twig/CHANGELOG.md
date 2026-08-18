@@ -10,6 +10,7 @@ CHANGELOG
  * Render an `id` attribute on the `<form>` element when a child uses `form_attr`, so that the reference resolves
  * Render the `name` attribute of the `<form>` element through `attr`, so that `attr: {name: false}` disables it and `attr: {name: '...'}` overrides it
  * Render `<optgroup>` labels from `ChoiceGroupView::$label`, which allows translatable choice group labels
+ * Allow passing a null user to the `is_granted_for_user()` and `access_decision_for_user()` functions to check guest permissions
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or Symfony UX Turbo, instead
  * Add a `for _self` modifier to the `trans_default_domain` tag to apply the domain to the whole template, `embed` bodies included
 

@@ -18,6 +18,7 @@ use Symfony\Bridge\Twig\Extension\SecurityExtension;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -84,6 +85,27 @@ class SecurityExtensionTest extends TestCase
         $securityExtension = new SecurityExtension($securityChecker);
         $this->assertTrue($securityExtension->isGrantedForUser($user, 'ROLE', $object, $field));
         $this->assertSame($user, $securityChecker->user);
+        $this->assertSame('ROLE', $securityChecker->attribute);
+
+        if (null === $field) {
+            $this->assertSame($object, $securityChecker->subject);
+        } else {
+            $this->assertEquals($expectedSubject, $securityChecker->subject);
+        }
+    }
+
+    #[DataProvider('provideObjectFieldAclCases')]
+    public function testIsGrantedForGuestCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject)
+    {
+        if (!interface_exists(GuestAuthorizationCheckerInterface::class)) {
+            $this->markTestSkipped('This test requires symfony/security-core 8.2 or superior.');
+        }
+
+        $securityChecker = $this->createMockAuthorizationChecker();
+
+        $securityExtension = new SecurityExtension($securityChecker);
+        $this->assertTrue($securityExtension->isGrantedForUser(null, 'ROLE', $object, $field));
+        $this->assertNull($securityChecker->user);
         $this->assertSame('ROLE', $securityChecker->attribute);
 
         if (null === $field) {
@@ -219,6 +241,24 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals(new FieldVote('object', 'field'), $securityChecker->subject);
     }
 
+    public function testAccessDecisionForGuestWithField()
+    {
+        if (!interface_exists(GuestAuthorizationCheckerInterface::class)) {
+            $this->markTestSkipped('This test requires symfony/security-core 8.2 or superior.');
+        }
+
+        $securityChecker = $this->createMockAuthorizationChecker();
+
+        $securityExtension = new SecurityExtension($securityChecker);
+        $accessDecision = $securityExtension->getAccessDecisionForUser(null, 'ROLE', 'object', 'field');
+
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertTrue($accessDecision->isGranted);
+        $this->assertNull($securityChecker->user);
+        $this->assertSame('ROLE', $securityChecker->attribute);
+        $this->assertEquals(new FieldVote('object', 'field'), $securityChecker->subject);
+    }
+
     public function testAccessDecisionForUserThrowsWhenAccessDecisionClassDoesNotExist()
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class)) {
@@ -236,30 +276,61 @@ class SecurityExtensionTest extends TestCase
         $securityExtension->getAccessDecisionForUser(new InMemoryUser('john', 'password'), 'ROLE', 'object');
     }
 
-    private function createMockAuthorizationChecker(): AuthorizationCheckerInterface&UserAuthorizationCheckerInterface
+    public function testFunctionsForUserAreRegisteredWithAGuestChecker()
     {
-        return new class implements AuthorizationCheckerInterface, UserAuthorizationCheckerInterface {
-            public UserInterface $user;
-            public mixed $attribute;
-            public mixed $subject;
+        if (!interface_exists(GuestAuthorizationCheckerInterface::class)) {
+            $this->markTestSkipped('This test requires symfony/security-core 8.2 or superior.');
+        }
 
+        $securityChecker = new class implements AuthorizationCheckerInterface, GuestAuthorizationCheckerInterface {
             public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
             {
                 throw new \BadMethodCallException('This method should not be called.');
             }
 
-            public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+            public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
             {
-                $this->user = $user;
-                $this->attribute = $attribute;
-                $this->subject = $subject;
-
-                if ($accessDecision) {
-                    $accessDecision->isGranted = true;
-                }
-
-                return true;
+                throw new \BadMethodCallException('This method should not be called.');
             }
         };
+
+        $functions = array_map(static fn ($function) => $function->getName(), (new SecurityExtension($securityChecker))->getFunctions());
+
+        $this->assertContains('is_granted_for_user', $functions);
+        $this->assertContains('access_decision_for_user', $functions);
+    }
+
+    private function createMockAuthorizationChecker(): MockAuthorizationChecker
+    {
+        if (interface_exists(GuestAuthorizationCheckerInterface::class)) {
+            return new class extends MockAuthorizationChecker implements GuestAuthorizationCheckerInterface {};
+        }
+
+        return new class extends MockAuthorizationChecker {};
+    }
+}
+
+class MockAuthorizationChecker implements AuthorizationCheckerInterface, UserAuthorizationCheckerInterface
+{
+    public ?UserInterface $user;
+    public mixed $attribute;
+    public mixed $subject;
+
+    public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+    {
+        throw new \BadMethodCallException('This method should not be called.');
+    }
+
+    public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+    {
+        $this->user = $user;
+        $this->attribute = $attribute;
+        $this->subject = $subject;
+
+        if ($accessDecision) {
+            $accessDecision->isGranted = true;
+        }
+
+        return true;
     }
 }

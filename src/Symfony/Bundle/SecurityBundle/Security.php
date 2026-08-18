@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\Exception\LogoutException;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -41,7 +41,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  *
  * @final
  */
-class Security implements AuthorizationCheckerInterface, UserAuthorizationCheckerInterface
+class Security implements AuthorizationCheckerInterface, GuestAuthorizationCheckerInterface
 {
     public function __construct(
         private readonly ContainerInterface $container,
@@ -79,14 +79,15 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
      * Checks if the attribute is granted against the user and optionally supplied subject.
      *
      * This should be used over isGranted() when checking permissions against a user that is not currently logged in or while in a CLI context.
+     * A null user means a guest: the attribute is voted on with no user and no roles.
      */
-    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+    public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
     {
         return $this->container->get('security.user_authorization_checker')
             ->isGrantedForUser($user, $attribute, $subject, $accessDecision);
     }
 
-    public function getAccessDecisionForUser(UserInterface $user, mixed $attributes, mixed $subject = null): AccessDecision
+    public function getAccessDecisionForUser(?UserInterface $user, mixed $attributes, mixed $subject = null): AccessDecision
     {
         $accessDecision = new AccessDecision();
         $this->isGrantedForUser($user, $attributes, $subject, $accessDecision);

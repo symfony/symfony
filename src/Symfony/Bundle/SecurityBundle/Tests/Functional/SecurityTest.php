@@ -66,6 +66,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertFalse($security->isGranted('ROLE_BAR'));
         $this->assertTrue($security->isGrantedForUser($offlineUser, 'ROLE_BAR'));
         $this->assertFalse($security->isGrantedForUser($offlineUser, 'ROLE_FOO'));
+        $this->assertFalse($security->isGrantedForUser(null, 'ROLE_BAR'));
     }
 
     #[DataProvider('userWillBeMarkedAsChangedIfRolesHasChangedProvider')]

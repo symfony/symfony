@@ -33,6 +33,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\ClosureVoter;
@@ -77,6 +78,7 @@ return static function (ContainerConfigurator $container) {
             ])
         ->alias(AuthorizationCheckerInterface::class, 'security.authorization_checker')
         ->alias(UserAuthorizationCheckerInterface::class, 'security.authorization_checker')
+        ->alias(GuestAuthorizationCheckerInterface::class, 'security.authorization_checker')
 
         ->set('security.token_storage', UsageTrackingTokenStorage::class)
             ->args([

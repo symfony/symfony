@@ -27,6 +27,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -135,6 +136,28 @@ class SecurityTest extends TestCase
 
         $security = new Security($container);
         $accessDecision = $security->getAccessDecisionForUser($user, 'SOME_ATTRIBUTE', 'SOME_SUBJECT');
+
+        $this->assertInstanceOf(AccessDecision::class, $accessDecision);
+        $this->assertFalse($accessDecision->isGranted);
+    }
+
+    public function testAccessDecisionForGuest()
+    {
+        $userAuthorizationChecker = $this->createMock(GuestAuthorizationCheckerInterface::class);
+
+        $userAuthorizationChecker->expects($this->once())
+            ->method('isGrantedForUser')
+            ->with(null, 'SOME_ATTRIBUTE', 'SOME_SUBJECT', $this->isInstanceOf(AccessDecision::class))
+            ->willReturnCallback(static function ($user, $attribute, $subject, $accessDecision) {
+                $accessDecision->isGranted = false;
+
+                return false;
+            });
+
+        $container = $this->createContainer('security.user_authorization_checker', $userAuthorizationChecker);
+
+        $security = new Security($container);
+        $accessDecision = $security->getAccessDecisionForUser(null, 'SOME_ATTRIBUTE', 'SOME_SUBJECT');
 
         $this->assertInstanceOf(AccessDecision::class, $accessDecision);
         $this->assertFalse($accessDecision->isGranted);

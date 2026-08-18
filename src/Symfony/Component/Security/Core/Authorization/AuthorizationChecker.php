@@ -29,7 +29,7 @@ class_exists(OfflineTokenInterface::class);
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthorizationCheckerInterface
+class AuthorizationChecker implements AuthorizationCheckerInterface, GuestAuthorizationCheckerInterface
 {
     private array $tokenStack = [];
     private array $accessDecisionStack = [];
@@ -42,10 +42,12 @@ class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthori
 
     final public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
     {
-        $token = end($this->tokenStack) ?: $this->tokenStorage->getToken();
+        if (!$token = end($this->tokenStack)) {
+            $token = $this->tokenStorage->getToken();
 
-        if (!$token || !$token->getUser()) {
-            $token = new NullToken();
+            if (!$token || !$token->getUser()) {
+                $token = new NullToken();
+            }
         }
         $accessDecision ??= end($this->accessDecisionStack) ?: new AccessDecision();
         $this->accessDecisionStack[] = $accessDecision;
@@ -57,10 +59,14 @@ class AuthorizationChecker implements AuthorizationCheckerInterface, UserAuthori
         }
     }
 
-    final public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+    final public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
     {
-        $token = new class($user->getRoles()) extends AbstractToken implements OfflineTokenInterface {};
-        $token->setUser($user);
+        $token = new class($user?->getRoles() ?? []) extends AbstractToken implements OfflineTokenInterface {};
+
+        if ($user) {
+            $token->setUser($user);
+        }
+
         $this->tokenStack[] = $token;
 
         try {

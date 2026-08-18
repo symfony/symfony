@@ -51,13 +51,7 @@ final class EditorRenderer
         $result = [];
 
         // Top border (with scroll indicator if scrolled down)
-        if ($viewport['lines_above'] > 0) {
-            $indicator = "─── ↑ {$viewport['lines_above']} more ";
-            $remaining = $columns - AnsiUtils::visibleWidth($indicator);
-            $result[] = $frameStyle->apply($indicator.str_repeat('─', max(0, $remaining)));
-        } else {
-            $result[] = $frameStyle->apply(str_repeat('─', $columns));
-        }
+        $result[] = $this->renderFrameRow($viewport['lines_above'], '↑', $columns, $frameStyle);
 
         // Render visible lines
         $displayRowsRendered = 0;
@@ -82,15 +76,33 @@ final class EditorRenderer
         }
 
         // Bottom border (with scroll indicator if more content below)
-        if ($viewport['lines_below'] > 0) {
-            $indicator = "─── ↓ {$viewport['lines_below']} more ";
-            $remaining = $columns - AnsiUtils::visibleWidth($indicator);
-            $result[] = $frameStyle->apply($indicator.str_repeat('─', max(0, $remaining)));
-        } else {
-            $result[] = $frameStyle->apply(str_repeat('─', $columns));
-        }
+        $result[] = $this->renderFrameRow($viewport['lines_below'], '↓', $columns, $frameStyle);
 
         return $result;
+    }
+
+    /**
+     * Render one frame row, carrying the count of lines hidden in that
+     * direction when there are any.
+     */
+    private function renderFrameRow(int $hiddenLines, string $arrow, int $columns, Style $frameStyle): string
+    {
+        if ($hiddenLines < 1) {
+            return $frameStyle->apply(str_repeat('─', max(0, $columns)));
+        }
+
+        // The indicator has a width of its own, and a pane can be narrower
+        // than that. Padding it out to the frame is only half the job: what
+        // does not fit has to come off, or the row runs past the box and the
+        // Renderer rejects it.
+        $indicator = \sprintf('─── %s %d more ', $arrow, $hiddenLines);
+        $indicatorWidth = AnsiUtils::visibleWidth($indicator);
+
+        if ($indicatorWidth > $columns) {
+            return $frameStyle->apply(AnsiUtils::truncateToWidth($indicator, $columns, ''));
+        }
+
+        return $frameStyle->apply($indicator.str_repeat('─', $columns - $indicatorWidth));
     }
 
     /**

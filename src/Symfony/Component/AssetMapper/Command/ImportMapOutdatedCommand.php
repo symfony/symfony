@@ -74,8 +74,10 @@ final class ImportMapOutdatedCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $packages = $input->getArgument('packages');
+        $withheldColumn = 0 < $this->updateChecker->getMinimumReleaseAge();
         $packagesUpdateInfos = $this->updateChecker->getAvailableUpdates($packages);
-        $packagesUpdateInfos = array_filter($packagesUpdateInfos, static fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
+        $availableUpdates = array_filter($packagesUpdateInfos, static fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
+        $packagesUpdateInfos = array_filter($packagesUpdateInfos, static fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate() || null !== $packageUpdateInfo->withheldVersion);
         if (!$packagesUpdateInfos) {
             if ('json' === $input->getOption('format')) {
                 $io->writeln('[]');
@@ -86,30 +88,53 @@ final class ImportMapOutdatedCommand extends Command
             return Command::SUCCESS;
         }
 
-        $displayData = array_map(static fn (string $importName, PackageUpdateInfo $packageUpdateInfo) => [
-            'name' => $importName,
-            'current' => $packageUpdateInfo->currentVersion,
-            'latest' => $packageUpdateInfo->latestVersion,
-            'latest-status' => PackageUpdateInfo::UPDATE_TYPE_MAJOR === $packageUpdateInfo->updateType ? 'update-possible' : 'semver-safe-update',
-        ], array_keys($packagesUpdateInfos), $packagesUpdateInfos);
+        $displayData = array_map(static function (string $importName, PackageUpdateInfo $packageUpdateInfo) use ($withheldColumn) {
+            $datum = [
+                'name' => $importName,
+                'current' => $packageUpdateInfo->currentVersion,
+                'latest' => $packageUpdateInfo->latestVersion,
+            ];
+
+            if ($withheldColumn) {
+                $datum['withheld'] = $packageUpdateInfo->withheldVersion;
+            }
+
+            if (!$packageUpdateInfo->hasUpdate()) {
+                $datum['latest-status'] = 'withheld';
+            } else {
+                $datum['latest-status'] = PackageUpdateInfo::UPDATE_TYPE_MAJOR === $packageUpdateInfo->updateType ? 'update-possible' : 'semver-safe-update';
+            }
+
+            return $datum;
+        }, array_keys($packagesUpdateInfos), $packagesUpdateInfos);
 
         if ('json' === $input->getOption('format')) {
             $io->writeln(json_encode($displayData, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
         } else {
             $table = $io->createTable();
-            $table->setHeaders(['Package', 'Current', 'Latest']);
+            $table->setHeaders($withheldColumn ? ['Package', 'Current', 'Latest', 'Withheld'] : ['Package', 'Current', 'Latest']);
             foreach ($displayData as $datum) {
                 $color = self::COLOR_MAPPING[$datum['latest-status']] ?? 'default';
-                $table->addRow([
+                $row = [
                     \sprintf('<fg=%s>%s</>', $color, $datum['name']),
                     $datum['current'],
                     \sprintf('<fg=%s>%s</>', $color, $datum['latest']),
-                ]);
+                ];
+
+                if ($withheldColumn) {
+                    $row[] = $datum['withheld'] ?? '';
+                }
+
+                $table->addRow($row);
             }
             $table->render();
+
+            if ($withheldColumn) {
+                $io->comment('Versions in the "Withheld" column are published but too recent for "framework.asset_mapper.minimum_release_age".');
+            }
         }
 
-        return Command::FAILURE;
+        return $availableUpdates ? Command::FAILURE : Command::SUCCESS;
     }
 
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void

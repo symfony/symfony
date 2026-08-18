@@ -19,11 +19,15 @@ class PackageUpdateInfo
     public const UPDATE_TYPE_MINOR = 'minor';
     public const UPDATE_TYPE_PATCH = 'patch';
 
+    /**
+     * @param ?string $withheldVersion The version published by the registry that the minimum release age keeps out of reach, if any
+     */
     public function __construct(
         public readonly string $packageName,
         public readonly string $currentVersion,
         public ?string $latestVersion = null,
         public ?string $updateType = null,
+        public ?string $withheldVersion = null,
     ) {
     }
 

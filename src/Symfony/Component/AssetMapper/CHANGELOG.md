@@ -7,6 +7,8 @@ CHANGELOG
  * Defined stable alphabetical order of importmap entries
  * Add support for adding integrity metadata to importmaps
  * Add a `--no-esm` option to `importmap:require` and an `esm` option to importmap entries
+ * Add `$clock`, `$minimumReleaseAge` and `$logger` arguments to `ImportMapUpdateChecker` and a `$updateChecker` argument to `ImportMapManager` to delay JavaScript package updates
+ * Add `PackageUpdateInfo::$withheldVersion` to report a version that the minimum release age keeps out of reach
 
 8.0
 ---

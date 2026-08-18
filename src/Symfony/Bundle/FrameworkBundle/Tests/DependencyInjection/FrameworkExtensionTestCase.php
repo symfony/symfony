@@ -3380,6 +3380,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame($expectedPrefix, $container->getDefinition('asset_mapper.asset_package')->getArgument(3));
     }
 
+    public function testAssetMapperMinimumReleaseAge()
+    {
+        $container = $this->createContainerFromFile('asset_mapper_minimum_release_age');
+
+        $this->assertSame(604800, $container->getDefinition('asset_mapper.importmap.update_checker')->getArgument(3));
+    }
+
     public function testDefaultLock()
     {
         $container = $this->createContainerFromFile('lock');

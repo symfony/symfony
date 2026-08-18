@@ -18,6 +18,8 @@
     "require": {
         "php": ">=8.4.1",
         "composer/semver": "^3.0",
+        "psr/log": "^1|^2|^3",
+        "symfony/clock": "^7.4|^8.0",
         "symfony/filesystem": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0"
     },

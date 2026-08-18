@@ -149,14 +149,8 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
         try {
             // Handle bracketed paste mode
-            $pastedText = $this->processBracketedPaste($data);
-            if (null !== $pastedText) {
+            if (null !== $pastedText = $this->processBracketedPaste($data)) {
                 $this->handlePaste($pastedText);
-                if ('' === $data) {
-                    return;
-                }
-            } elseif ('' === $data && $this->isBufferingPaste()) {
-                return;
             }
 
             // Nothing left to route once the paste bytes are peeled off; an

@@ -307,13 +307,17 @@ final class ScreenBuffer
             $this->cells[$this->cursorRow] = [];
         }
 
-        // Fill any gaps with spaces. Which columns are missing has to be
-        // asked column by column: an erase unsets cells in the middle of the
-        // row, so the number of cells stops matching the columns they sit in
-        // and counting them walks the fill straight over live characters.
-        for ($col = 0; $col < $this->cursorCol; ++$col) {
-            if (!isset($this->cells[$this->cursorRow][$col])) {
-                $this->cells[$this->cursorRow][$col] = ['char' => ' ', 'style' => ''];
+        // Fill any gaps with spaces. A row that has as many cells as the
+        // cursor has columns to its left is contiguous, and the common case
+        // of appending to it needs no fill at all. Once the counts disagree
+        // -- an erase unsets cells in the middle of the row -- the missing
+        // columns have to be asked for one by one, because counting them
+        // walks the fill straight over live characters.
+        if (\count($this->cells[$this->cursorRow]) !== $this->cursorCol) {
+            for ($col = 0; $col < $this->cursorCol; ++$col) {
+                if (!isset($this->cells[$this->cursorRow][$col])) {
+                    $this->cells[$this->cursorRow][$col] = ['char' => ' ', 'style' => ''];
+                }
             }
         }
 

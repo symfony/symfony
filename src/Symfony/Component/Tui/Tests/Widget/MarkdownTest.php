@@ -220,6 +220,26 @@ class MarkdownTest extends TestCase
     }
 
     /**
+     * The borders are drawn from the computed column widths, so those widths
+     * have to add up to the space the table was given.
+     */
+    public function testTableWithOneVeryWideColumnStaysInsideTheWidth()
+    {
+        $wide = str_repeat('W', 60);
+        $markdown = "| $wide | b | c |\n|---|---|---|\n| ".str_repeat('X', 60)." | y | z |\n";
+
+        $md = $this->createMarkdown($markdown);
+
+        foreach ([14, 16, 20, 30] as $columns) {
+            $lines = $md->render(new RenderContext($columns, 60));
+            $this->assertStringStartsWith('┌', AnsiUtils::stripAnsiCodes($lines[0]));
+            foreach ($lines as $line) {
+                $this->assertSame($columns, AnsiUtils::visibleWidth($line), \sprintf('Every table row fills exactly %d columns.', $columns));
+            }
+        }
+    }
+
+    /**
      * Render a widget through the Renderer pipeline to get full chrome applied.
      *
      * @return string[]

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-06-19T11:06:19Z
+
+Hasn’t an empty array the same semantics than `null`? If yes `$env` type doesn’t need to include `null`.
+
+---------------------------------------------------------------------------
+
+by lacatoire at 2026-06-22T12:43:44Z
+
+The difference is that #[When] removes the service entirely in other environments, so the command couldn't even be run manually there. Here the service stays registered everywhere, env only skips adding the task to the schedule. That matches the issue: run it periodically in prod, but keep it runnable manually in staging.
+
+---------------------------------------------------------------------------
+
+by tjveldhuizen at 2026-07-27T20:07:16Z
+
+Also, using `#[When]` on the class would not allow this:
+
+```php
+#[AsPeriodicTask('1 hour', env: 'prod')]
+#[AsPeriodicTask('1 day', env: 'staging')]
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T12:21:49Z
+
+Thanks for your patience, and to @kbond for the `#[When]` question, which is worth answering on the record.
+
+`#[When]` does stop the scheduling, so it covers most of this. Two cases it cannot express, both of which I verified running:
+
+- keeping the service registered while unscheduling the task. `#[AsPeriodicTask('2 minutes', env: 'prod')]` in dev gives a service you can still call, with the task absent from the schedule. `#[When]` removes the service entirely.
+- two frequencies for one class. `#[AsPeriodicTask('6 minutes', env: 'prod')]` next to `#[AsPeriodicTask('7 minutes', env: 'dev')]` gives 6 minutes in prod and 7 in dev, which a single class-level `#[When]` cannot do.
+
+That is enough to justify the option, so I pushed the rest rather than asking for another round.
+
+Three changes on top of your work:
+
+**A filtered schedule no longer disappears.** This was the one real bug. With `#[AsPeriodicTask('10 minutes', schedule: 'nightly', env: 'prod')]`, running `messenger:consume scheduler_nightly` in dev exited 1 with `The receiver "scheduler_nightly" does not exist`. Schedule names are now collected before the environment filter, so the provider and its receiver always exist and the schedule is simply empty in environments where no task applies. A worker command shared across environments keeps working.
+
+**A typo is now reported.** `env: 'porduction'` used to mean the task silently never ran, in any environment. The pass now compares against `.container.known_envs` and writes to the compiler log, which `debug:container` shows. It is a log rather than an exception because that parameter is best effort: it is authoritative when the kernel declares `getAllowedEnvs()`, but otherwise it is derived from `bundles.php`, the `when@` blocks in config and the running environment, so a legitimate environment can be missing from it. Throwing would break those applications. When the parameter is absent entirely, nothing is reported.
+
+This also covers negation: `env: '!dev'` is not supported, and instead of silently matching nothing it now shows up in the log as an unknown environment. If you want real negation, that is worth doing separately, mirroring `#[WhenNot]`.
+
+**@MatTheCat's point applied**: `array|string|null $env = null` became `array|string $env = []`, since `null` and `[]` both meant "all environments".
+
+On tests, four of the five original ones passed against the unmodified pass, so they were not proving much. The suite now covers the surviving receiver, the reported typo, and the case where nothing is known and nothing should be reported. Three of the four fail against the previous version of the pass. Scheduler is green at 178 tests, FrameworkBundle DI at 595.
+
+Rebased on 8.2, which meanwhile gained the "Next Run In" column, so the changelog carries both entries.

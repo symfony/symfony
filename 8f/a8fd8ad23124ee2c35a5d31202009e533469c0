@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-07-13T07:59:14Z
+
+Looks good and I like the idea! If I may bikeshed on the name, would `appendFromCallback()` sound more natural?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-07-13T08:30:37Z
+
+@alexandre-daubois Yes, now that you've pointed it out, the name could be better: https://github.com/symfony/symfony/compare/7c785da8502b13127b271cae81ed006d2f436625..f7f8ae26d4649cf5177f03d13991e70b355cfc95
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T15:05:06Z
+
+Thanks for your patience on the annotation question. I don't think it needs solving: I'd rather cut the scope so it goes away.
+
+Drop `ArrayNodeDefinition::appendFromCallback()` and keep only the one on `NodeBuilder`. That method is a two-line wrapper over `children()`, which is already on the interface, and it is the only thing producing the Psalm error at `ArrayNodeDefinition.php:479`. Removing it also removes the `@method` line on `ParentNodeDefinitionInterface` and the deprecation that comes with it. Nothing in the monorepo calls that method through the interface, and `ArrayNodeDefinition` is its only implementor, so the deprecation is churn for third parties with no consumer here.
+
+That leaves one new method plus its test.
+
+For the remaining method to argue for itself, please apply it to the duplication you cite. In `addHttpClientSection()`, `default_options` and `scoped_clients` declare 25 of the same nodes inline, twice:
+
+```
+bindto cafile capath ciphers crypto_method extra headers http_version local_cert
+local_pk max_connect_duration max_duration max_redirects md5 mock_response_factory
+no_proxy passphrase peer_fingerprint proxy rate_limiter resolve sha1 timeout
+verify_host verify_peer
+```
+
+That is around 200 duplicated lines. The section already uses `append()` for the caching and retry blocks, and that is exactly why those 25 are inline instead: `append()` takes one built `NodeDefinition`, so a flat block needs one factory method per node. Your method is the piece that is missing, and the refactor is the evidence for it.
+
+One thing to weigh while you are there. A `NodeBuilder` subclass installed with `setBuilder()` already does this today, and I checked it produces byte-identical output from `YamlReferenceDumper`, `XmlReferenceDumper`, `ArrayShapeGenerator` and `JsonSchemaDumper`. The real argument for your method over that is that `children()` is typed `NodeBuilder`, so static analysis cannot see a subclass method. Worth putting in the description, because it is a better argument than the line count.
+
+No impact on the generated config reference either way: `PhpConfigReferenceDumpPass` builds `AppReference` from the finished tree through `ArrayShapeGenerator`, and the tree is identical whichever way it was assembled.
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-08-17T18:28:26Z
+
+@nicolas-grekas Done. `ArrayNodeDefinition::appendFromCallback()` is removed along with the `@method` annotation on `ParentNodeDefinitionInterface` and the deprecation, so only the `NodeBuilder` method and its test remain.
+
+The refactor is applied: `appendHttpClientCommonOptions()` declares the shared nodes once and is used by both `default_options` and `scoped_clients` in `addHttpClientSection()`. `createHttpClientCachingSection()`/`createHttpClientRetrySection()` are inlined into it as well. `symfony/framework-bundle` now requires `symfony/config ^8.2`.
+
+The PHPStan failure is not related to my changes.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T19:05:15Z
+
+Thanks, this is the shape I was hoping for. Rebased on 8.2 and pushed.
+
+The PHPStan failure was real, but not caused by your patch. That job analyses the PR head as it is, without merging the base, and your branch predated the `TextareaFormField` fix on 8.2, so the `DOMNode::$wholeText` error came from DomCrawler code your branch still carried. The rebase removes it. The other two red jobs reproduce identically on 8.2 itself: low-deps fails on `LazyProxyArgument` not found, because FrameworkBundle asks for `symfony/dependency-injection: ^8.1.2` while the class landed in 8.2, and the 8.6 job fails 1534 Twig bridge form tests.
+
+On the `http_client` refactor, I checked that the tree does not change. Walking both trees node by node and comparing every setting of every node (class, type, default, info, example, attributes, nullability, min and max, key normalisation, deep merging, plus the number of normalisation and final validation closures) leaves a single difference: `ciphers` carried two different `info` strings, the one under `default_options` without a trailing period and the one under `scoped_clients` with it. The shared block keeps the `scoped_clients` wording. Beyond that, only sibling order moves, `headers` and `vars` in `default_options` and `mock_response_factory` in `scoped_clients`, which shows up in the dumped reference and nowhere else.

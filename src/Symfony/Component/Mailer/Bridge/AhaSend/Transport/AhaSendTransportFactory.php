@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\AhaSend\Transport;
 
+use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -28,10 +29,16 @@ final class AhaSendTransportFactory extends AbstractTransportFactory
         $user = $this->getUser($dsn);
 
         if ('ahasend+api' === $scheme) {
+            try {
+                $password = $this->getPassword($dsn);
+            } catch (IncompleteDsnException) {
+                $password = null;
+            }
+
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
 
-            $transport = (new AhaSendApiTransport($user, $this->client, $this->dispatcher, $this->logger))->setHost($host)->setPort($port);
+            $transport = (new AhaSendApiTransport($user, $this->client, $this->dispatcher, $this->logger, $password))->setHost($host)->setPort($port);
         }
 
         if ('ahasend+smtp' === $scheme || 'ahasend' === $scheme) {

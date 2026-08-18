@@ -63,6 +63,11 @@ class AhaSendTransportFactoryTest extends AbstractTransportFactoryTestCase
         ];
 
         yield [
+            new Dsn('ahasend+api', 'default', self::USER, 'ACCOUNT_ID'),
+            new AhaSendApiTransport(self::USER, new MockHttpClient(), null, $logger, 'ACCOUNT_ID'),
+        ];
+
+        yield [
             new Dsn('ahasend+api', 'example.com', self::USER, '', 8080),
             (new AhaSendApiTransport(self::USER, new MockHttpClient(), null, $logger))->setHost('example.com')->setPort(8080),
         ];

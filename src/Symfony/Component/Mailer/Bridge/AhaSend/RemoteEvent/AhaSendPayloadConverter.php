@@ -21,13 +21,20 @@ final class AhaSendPayloadConverter implements PayloadConverterInterface
 {
     public function convert(array $payload): AbstractMailerEvent
     {
+        if (!isset($payload['data']['message_id_header'], $payload['data']['recipient'])) {
+            throw new ParseException('The payload is malformed.');
+        }
+
+        // "data.id" is AhaSend's internal event id; "data.message_id_header" carries the
+        // Message-ID that the v2 send API returned, so it is what matches sent emails
+
         if (\in_array($payload['type'], ['message.clicked', 'message.opened'], true)) {
             $name = match ($payload['type']) {
                 'message.clicked' => MailerEngagementEvent::CLICK,
                 'message.opened' => MailerEngagementEvent::OPEN,
                 default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type'])),
             };
-            $event = new MailerEngagementEvent($name, $payload['data']['id'], $payload);
+            $event = new MailerEngagementEvent($name, $payload['data']['message_id_header'], $payload);
         } elseif (str_starts_with($payload['type'], 'message.')) {
             $name = match ($payload['type']) {
                 'message.reception' => MailerDeliveryEvent::RECEIVED,
@@ -37,7 +44,7 @@ final class AhaSendPayloadConverter implements PayloadConverterInterface
                 'message.suppressed' => MailerDeliveryEvent::DROPPED,
                 default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type'])),
             };
-            $event = new MailerDeliveryEvent($name, $payload['data']['id'], $payload);
+            $event = new MailerDeliveryEvent($name, $payload['data']['message_id_header'], $payload);
         } else {
             // suppressions and domain DNS problem webhooks. Ignore them for now.
             throw new ParseException(\sprintf('Unsupported event "%s".', $payload['type']));

@@ -96,6 +96,7 @@ Loco Translation Provider
 Mailer
 ------
 
+ * [AhaSend] Deprecate sending through the legacy v1 API, use a v2 API key and add your account id to the DSN
  * Deprecate sending an S/MIME message unencrypted when a recipient has no certificate (the default
    `SmimeEncryptedMessageListener::ON_MISSING_CERTIFICATE_SEND_UNENCRYPTED` behavior); it will throw in 9.0.
    Set the `on_missing_certificate` option (or the `X-SMime-Encrypt` header) to `fail`, `encrypt` or `skip`:

@@ -1,0 +1,48 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-04-27T19:31:37Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.1 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T07:37:25Z
+
+Thanks for this, and for your patience waiting on a review. The transport itself maps the Cloudflare API accurately, so most of what I pushed is registration and conventions.
+
+The one real bug: `getPayload()` read `$email->getTo()` instead of the inherited `getRecipients($email, $envelope)`, which 16 sibling transports use. That bypasses `framework.mailer.envelope.recipients` and `EnvelopeListener`, so an application redirecting all mail in dev would still have delivered to the real recipients. There is a test for it now, and it fails against the old code with `to@example.com` where `redirected@example.com` is expected.
+
+The bridge was also unreachable and unpublishable as it stood. I added the four missing registrations: `splitsh.json`, `Transport::FACTORY_CLASSES`, `mailer_transports.php` and the `FrameworkExtension` factory map. Before that, `Transport::fromDsn('cloudflare+api://...')` threw `UnsupportedSchemeException` even with the package installed, and the package would never have been split out. The `UnsupportedSchemeException` entry pointed at the transport rather than the factory, so I fixed that and added the scheme to its test.
+
+Other changes:
+
+- renamed `CloudflareApiTransportFactory` to `CloudflareTransportFactory`. Every bridge uses `<Vendor>TransportFactory`, including single-transport ones like Azure and Postal.
+- `composer.json` aligned with the siblings: `php >=8.4.1`, `symfony/mailer: ^8.2`, added `psr/event-dispatcher` and `psr/log` which the transport imports, dropped `symfony/polyfill-php85`, added `keywords` and `homepage`, 4 space indent.
+- dropped the `array_first()` call, so the polyfill is not needed. It also only sent the first `Reply-To` silently; it still sends one, since the API takes a single value, but without the polyfill dependency.
+- CHANGELOG moved from 8.1 to 8.2.
+- removed the `.github/` directory. No component or bridge under `src/` ships one.
+- added tests for the envelope recipients, multiple to/cc/bcc and reply-to, inline attachments with `content_id`, and the custom host and port endpoint.
+- squashed to one commit and rebased on 8.2.
+
+Two things left for you. Display names are dropped for `to`, `cc` and `bcc` even though the API accepts `{address, name}` objects, so worth deciding whether to send them. And the service is in public beta rather than generally available, which is a question for the team rather than for the code.

@@ -509,6 +509,150 @@ final class AnsiUtils
     }
 
     /**
+     * Split a rendered line into escape sequences and visible cells.
+     *
+     * Walks the line in one pass and yields one token per escape sequence
+     * and per grapheme cluster. Concatenating the "text" of every token
+     * gives back the original line, so a caller can rebuild a line while
+     * changing only the cells it cares about: mask a region, recolor a
+     * column, overlay another line cell by cell.
+     *
+     * Each token carries:
+     *
+     *   - "text": the grapheme, or the escape sequence
+     *   - "col": the column the token starts at
+     *   - "width": the display width of the cell, 0 for escape sequences
+     *   - "bg": whether an SGR background is active at this point
+     *
+     * Escape sequences that are not SGR (cursor moves, erase, OSC
+     * hyperlinks, APC markers) never affect "bg" and pass through like any
+     * other zero-width token.
+     *
+     * @return \Generator<int, array{text: string, col: int, width: int, bg: bool}>
+     */
+    public static function walkCells(string $line): \Generator
+    {
+        $i = 0;
+        $col = 0;
+        $len = \strlen($line);
+        $bg = false;
+
+        while ($i < $len) {
+            if ("\x1b" === $line[$i]) {
+                if (null !== $ansi = self::extractAnsiCode($line, $i)) {
+                    $bg = self::sgrSetsBackground($ansi['code'], $bg);
+                    yield ['text' => $ansi['code'], 'col' => $col, 'width' => 0, 'bg' => $bg];
+                    $i += $ansi['length'];
+                    continue;
+                }
+
+                // ESC byte that opens no complete sequence: pass it through
+                yield ['text' => "\x1b", 'col' => $col, 'width' => 0, 'bg' => $bg];
+                ++$i;
+                continue;
+            }
+
+            if (false === $textEnd = strpos($line, "\x1b", $i)) {
+                $textEnd = $len;
+            }
+            $segment = substr($line, $i, $textEnd - $i);
+
+            if (preg_match('/^[\x20-\x7E]*+$/', $segment)) {
+                // ASCII fast path: every byte is one cell of one column
+                for ($j = 0, $segLen = \strlen($segment); $j < $segLen; ++$j) {
+                    yield ['text' => $segment[$j], 'col' => $col, 'width' => 1, 'bg' => $bg];
+                    ++$col;
+                }
+            } elseif (false !== $graphemes = grapheme_str_split($segment)) {
+                foreach ($graphemes as $grapheme) {
+                    $width = "\t" === $grapheme ? self::TAB_WIDTH : self::graphemeWidth($grapheme);
+                    yield ['text' => $grapheme, 'col' => $col, 'width' => $width, 'bg' => $bg];
+                    $col += $width;
+                }
+            } else {
+                // Invalid UTF-8: emit the bytes one by one so the line still rebuilds
+                for ($j = 0, $segLen = \strlen($segment); $j < $segLen; ++$j) {
+                    yield ['text' => $segment[$j], 'col' => $col, 'width' => 1, 'bg' => $bg];
+                    ++$col;
+                }
+            }
+
+            $i = $textEnd;
+        }
+    }
+
+    /**
+     * Extract a range of columns from a line, exactly $length columns wide.
+     *
+     * Unlike sliceByColumn(), the result always measures exactly $length
+     * columns: a wide character cut by a boundary becomes spaces for the
+     * columns that fall inside the range, and a line shorter than the range
+     * is padded with spaces. Adjacent slices of the same line therefore
+     * cover every column exactly once, which is what composing fixed-width
+     * regions out of slices requires.
+     *
+     * Escape sequences before the range are carried into the slice so the
+     * active style is preserved; sequences past the range are dropped.
+     */
+    public static function sliceToWidth(string $line, int $startCol, int $length): string
+    {
+        if ($length <= 0) {
+            return '';
+        }
+
+        // Fast path: pure printable ASCII maps one byte to one column
+        if (!str_contains($line, "\x1b") && preg_match('/^[\x20-\x7E]*+$/', $line)) {
+            return str_pad(substr($line, $startCol, $length), $length);
+        }
+
+        $endCol = $startCol + $length;
+        $result = '';
+        $resultWidth = 0;
+        $pendingAnsi = '';
+
+        foreach (self::walkCells($line) as $token) {
+            if ($token['col'] >= $endCol) {
+                break;
+            }
+
+            if (0 === $token['width']) {
+                if ($token['col'] >= $startCol) {
+                    $result .= $pendingAnsi.$token['text'];
+                    $pendingAnsi = '';
+                } else {
+                    $pendingAnsi .= $token['text'];
+                }
+                continue;
+            }
+
+            $cellEnd = $token['col'] + $token['width'];
+            if ($cellEnd <= $startCol) {
+                continue;
+            }
+
+            $result .= $pendingAnsi;
+            $pendingAnsi = '';
+
+            if ($token['col'] >= $startCol && $cellEnd <= $endCol) {
+                $result .= $token['text'];
+                $resultWidth += $token['width'];
+            } else {
+                // The cell straddles a boundary of the range: it cannot be
+                // split, so its columns inside the range become spaces
+                $overlap = min($cellEnd, $endCol) - max($token['col'], $startCol);
+                $result .= str_repeat(' ', $overlap);
+                $resultWidth += $overlap;
+            }
+        }
+
+        if ($resultWidth < $length) {
+            $result .= str_repeat(' ', $length - $resultWidth);
+        }
+
+        return $result;
+    }
+
+    /**
      * Calculate the display width of a single grapheme in terminal columns.
      *
      * Uses mb_strwidth() for single-codepoint graphemes (fast C-level call),
@@ -654,5 +798,59 @@ final class AnsiUtils
         }
 
         return $result;
+    }
+
+    /**
+     * Parse an SGR sequence to determine the new background-active state.
+     *
+     * Returns true when the sequence sets a background color, false when it
+     * resets it, and $current unchanged for anything that is not an SGR
+     * sequence or does not touch the background.
+     */
+    private static function sgrSetsBackground(string $seq, bool $current): bool
+    {
+        // Only SGR sequences (CSI ... m) touch colors
+        if (\strlen($seq) < 3 || "\x1b[" !== substr($seq, 0, 2) || !str_ends_with($seq, 'm')) {
+            return $current;
+        }
+
+        if ('' === $params = substr($seq, 2, -1)) {
+            return false; // bare ESC [ m is SGR 0, a full reset
+        }
+
+        $state = $current;
+        $parts = explode(';', $params);
+        $count = \count($parts);
+        $idx = 0;
+
+        while ($idx < $count) {
+            $n = (int) $parts[$idx];
+
+            if (38 === $n || 48 === $n || 58 === $n) {
+                // Extended color: N;5;I (256-color) or N;2;R;G;B (truecolor).
+                // Only 48 sets a background, but the payload of 38 (foreground)
+                // and 58 (underline) has to be skipped just the same: a zero
+                // channel would otherwise be read as SGR 0
+                if (48 === $n) {
+                    $state = true;
+                }
+                if ($idx + 1 < $count) {
+                    if ('5' === $parts[$idx + 1]) {
+                        $idx += 2; // skip N and 5; ++$idx below advances past I
+                    } elseif ('2' === $parts[$idx + 1]) {
+                        $idx += 4; // skip N, 2, R and G; ++$idx below advances past B
+                    }
+                }
+            } elseif (0 === $n || 49 === $n) {
+                // SGR 0 (full reset) or SGR 49 (default background)
+                $state = false;
+            } elseif (($n >= 40 && $n <= 47) || ($n >= 100 && $n <= 107)) {
+                // Standard (40-47) and bright (100-107) background colors
+                $state = true;
+            }
+            ++$idx;
+        }
+
+        return $state;
     }
 }

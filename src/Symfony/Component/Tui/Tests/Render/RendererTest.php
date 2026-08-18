@@ -1356,6 +1356,88 @@ class RendererTest extends TestCase
         $this->assertSame('        hi', $lines[0]);
         $this->assertTrue($widget->beforeRenderRan);
     }
+    // ---------------------------------------------------------------
+    // postRender hook
+    // ---------------------------------------------------------------
+
+    private static function newPostRenderWidget(): AbstractWidget
+    {
+        return new class extends AbstractWidget {
+            public array $seenLines = [];
+            public int $calls = 0;
+
+            public function render(RenderContext $context): array
+            {
+                return ['ab'];
+            }
+
+            public function postRender(array $lines, RenderContext $context): array
+            {
+                ++$this->calls;
+                $this->seenLines = $lines;
+
+                return array_map(strtoupper(...), $lines);
+            }
+        };
+    }
+
+    public function testPostRenderReceivesTheFinishedBoxAndItsResultIsRendered()
+    {
+        $renderer = new Renderer();
+        $widget = self::newPostRenderWidget();
+        $widget->setStyle(new Style(border: Border::all(1, 'none')));
+        $root = new ContainerWidget();
+        $root->add($widget);
+
+        $frame = implode("\n", $renderer->renderFrame($root, 10, 5)->toArray());
+
+        // The hook saw the box with its border already drawn, not the raw content
+        $this->assertCount(3, $widget->seenLines);
+        $this->assertStringContainsString('ab', $widget->seenLines[1]);
+        $this->assertStringNotContainsString('ab', $widget->seenLines[0]);
+
+        // What the hook returned is what the frame carries
+        $this->assertStringContainsString('AB', $frame);
+        $this->assertStringNotContainsString('ab', $frame);
+    }
+
+    public function testPostRenderResultIsCachedUntilTheWidgetIsInvalidated()
+    {
+        $renderer = new Renderer();
+        $widget = self::newPostRenderWidget();
+        $root = new ContainerWidget();
+        $root->add($widget);
+
+        $renderer->renderFrame($root, 10, 5);
+        $renderer->renderFrame($root, 10, 5);
+        $this->assertSame(1, $widget->calls);
+
+        $widget->invalidate();
+        $renderer->renderFrame($root, 10, 5);
+        $this->assertSame(2, $widget->calls);
+    }
+
+    public function testPostRenderLinesKeepTheWidthContract()
+    {
+        $renderer = new Renderer();
+        $widget = new class extends AbstractWidget {
+            public function render(RenderContext $context): array
+            {
+                return ['ab'];
+            }
+
+            public function postRender(array $lines, RenderContext $context): array
+            {
+                return [str_repeat('x', 100)];
+            }
+        };
+        $root = new ContainerWidget();
+        $root->add($widget);
+
+        $this->expectException(RenderException::class);
+
+        $renderer->renderFrame($root, 10, 5);
+    }
 }
 
 /**

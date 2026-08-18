@@ -16,8 +16,6 @@ namespace Symfony\Component\Tui\Loop;
  *
  * @experimental
  *
- * @internal
- *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class LoopClock

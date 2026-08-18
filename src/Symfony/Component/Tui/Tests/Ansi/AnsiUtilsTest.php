@@ -588,4 +588,181 @@ class AnsiUtilsTest extends TestCase
         // the space at column 5 must not surface where "京" was dropped.
         $this->assertSame("\x1b[31m東\x1b[0m…", AnsiUtils::truncateToWidth("\x1b[31m東京\x1b[0m OK", 4, '…'));
     }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function walkCellsLosslessProvider(): iterable
+    {
+        yield 'plain ascii' => ['hello world'];
+        yield 'empty string' => [''];
+        yield 'csi colors' => ["\x1b[1;31mred\x1b[0m plain"];
+        yield 'wide characters' => ['日本語テキスト'];
+        yield 'mixed widths' => ["a\x1b[42m日b本\x1b[49mc"];
+        yield 'combining mark' => ["e\u{0301}cole"];
+        yield 'osc 8 hyperlink' => ["\x1b]8;;https://symfony.com\x07link\x1b]8;;\x07 after"];
+        yield 'apc cursor marker' => [AnsiUtils::cursorMarker().'ab'];
+        yield 'tab' => ["a\tb"];
+        yield 'emoji' => ['😀x'];
+        yield 'trailing escape' => ["ab\x1b[0m"];
+        yield 'lone trailing esc byte' => ["ab\x1b"];
+        yield 'charset designation' => ["\x1b(Bab"];
+    }
+
+    #[DataProvider('walkCellsLosslessProvider')]
+    public function testWalkCellsRebuildsTheLine(string $line)
+    {
+        $rebuilt = '';
+        foreach (AnsiUtils::walkCells($line) as $token) {
+            $rebuilt .= $token['text'];
+        }
+
+        $this->assertSame($line, $rebuilt);
+    }
+
+    public function testWalkCellsReportsColumnsAndWidths()
+    {
+        $tokens = iterator_to_array(AnsiUtils::walkCells('a日b'), false);
+
+        $this->assertSame([
+            ['text' => 'a', 'col' => 0, 'width' => 1, 'bg' => false],
+            ['text' => '日', 'col' => 1, 'width' => 2, 'bg' => false],
+            ['text' => 'b', 'col' => 3, 'width' => 1, 'bg' => false],
+        ], $tokens);
+    }
+
+    public function testWalkCellsKeepsACombiningMarkWithItsBase()
+    {
+        $tokens = iterator_to_array(AnsiUtils::walkCells("e\u{0301}c"), false);
+
+        $this->assertSame([
+            ['text' => "e\u{0301}", 'col' => 0, 'width' => 1, 'bg' => false],
+            ['text' => 'c', 'col' => 1, 'width' => 1, 'bg' => false],
+        ], $tokens);
+    }
+
+    public function testWalkCellsYieldsEscapeSequencesAsZeroWidthTokens()
+    {
+        $line = "\x1b]8;;https://symfony.com\x07li\x1b]8;;\x07".AnsiUtils::cursorMarker().'nk';
+        $cells = [];
+        $escapes = 0;
+        foreach (AnsiUtils::walkCells($line) as $token) {
+            if (0 === $token['width']) {
+                ++$escapes;
+                continue;
+            }
+            $cells[] = [$token['text'], $token['col']];
+        }
+
+        $this->assertSame(3, $escapes);
+        $this->assertSame([['l', 0], ['i', 1], ['n', 2], ['k', 3]], $cells);
+    }
+
+    public function testWalkCellsCountsATabAsTabWidthColumns()
+    {
+        $tokens = iterator_to_array(AnsiUtils::walkCells("a\tb"), false);
+
+        $this->assertSame([
+            ['text' => 'a', 'col' => 0, 'width' => 1, 'bg' => false],
+            ['text' => "\t", 'col' => 1, 'width' => AnsiUtils::TAB_WIDTH, 'bg' => false],
+            ['text' => 'b', 'col' => 1 + AnsiUtils::TAB_WIDTH, 'width' => 1, 'bg' => false],
+        ], $tokens);
+    }
+
+    public function testWalkCellsTracksTheActiveBackground()
+    {
+        $line = "a\x1b[41mb\x1b[49mc\x1b[48;2;10;20;30md\x1b[0me\x1b[38;2;0;0;0mf\x1b[107mg\x1b[mh";
+        $bgByCell = [];
+        foreach (AnsiUtils::walkCells($line) as $token) {
+            if (0 !== $token['width']) {
+                $bgByCell[$token['text']] = $token['bg'];
+            }
+        }
+
+        $this->assertSame([
+            'a' => false, // nothing set yet
+            'b' => true,  // standard bg color
+            'c' => false, // SGR 49 resets the background
+            'd' => true,  // truecolor bg
+            'e' => false, // SGR 0 full reset
+            'f' => false, // truecolor fg: the 0 channels are payload, not SGR 0
+            'g' => true,  // bright bg color
+            'h' => false, // bare ESC[m is SGR 0
+        ], $bgByCell);
+    }
+
+    public function testWalkCellsLeavesTheBackgroundUntouchedForNonSgrSequences()
+    {
+        // ESC[2K and ESC[0K are erase sequences, not SGR: their parameters
+        // must not be read as color codes even though 0 would mean a reset
+        $line = "\x1b[41ma\x1b[2Kb\x1b[0Kc\x1b]8;;x\x07d";
+        $bgByCell = [];
+        foreach (AnsiUtils::walkCells($line) as $token) {
+            if (0 !== $token['width']) {
+                $bgByCell[$token['text']] = $token['bg'];
+            }
+        }
+
+        $this->assertSame(['a' => true, 'b' => true, 'c' => true, 'd' => true], $bgByCell);
+    }
+
+    /**
+     * @return iterable<string, array{string, int, int, string}>
+     */
+    public static function sliceToWidthProvider(): iterable
+    {
+        yield 'ascii inner range' => ['abcdef', 1, 3, 'bcd'];
+        yield 'ascii full line' => ['abc', 0, 3, 'abc'];
+        yield 'short line is padded' => ['ab', 0, 5, 'ab   '];
+        yield 'range past the end is spaces' => ['ab', 4, 3, '   '];
+        yield 'zero length' => ['abc', 0, 0, ''];
+        yield 'wide char fully inside' => ['a日b', 1, 2, '日'];
+        yield 'wide char cut at the right edge' => ['a日b', 0, 2, 'a '];
+        yield 'wide char cut at the left edge' => ['a日b', 2, 2, ' b'];
+        yield 'wide char cut on both sides' => ['日本語', 1, 2, '  '];
+        yield 'ansi codes before the range still apply' => ["\x1b[31mabc\x1b[0mdef", 1, 2, "\x1b[31mbc"];
+        yield 'ansi codes inside the range are kept' => ["ab\x1b[31mcd", 1, 2, "b\x1b[31mc"];
+        yield 'tab cut at the right edge' => ["\tx", 0, 2, '  '];
+    }
+
+    #[DataProvider('sliceToWidthProvider')]
+    public function testSliceToWidth(string $line, int $startCol, int $length, string $expected)
+    {
+        $this->assertSame($expected, AnsiUtils::sliceToWidth($line, $startCol, $length));
+    }
+
+    public function testSliceToWidthAlwaysReturnsTheRequestedWidth()
+    {
+        $lines = [
+            '日本語テキスト',
+            'a日b本c語d',
+            "\x1b[31m日本\x1b[42m語テ\x1b[0mキ",
+            '😀😀😀',
+            "e\u{0301}日e\u{0301}本",
+            "ab\tcd日",
+        ];
+
+        foreach ($lines as $line) {
+            $lineWidth = AnsiUtils::visibleWidth($line);
+            for ($startCol = 0; $startCol <= $lineWidth + 2; ++$startCol) {
+                for ($length = 1; $length <= 6; ++$length) {
+                    $slice = AnsiUtils::sliceToWidth($line, $startCol, $length);
+                    $this->assertSame($length, AnsiUtils::visibleWidth($slice), \sprintf('sliceToWidth(%s, %d, %d) returned %s', json_encode($line), $startCol, $length, json_encode($slice)));
+                }
+            }
+        }
+    }
+
+    public function testSlicesToWidthComposeIntoTheFullLine()
+    {
+        // Cutting a line into adjacent fixed-width slices must cover every
+        // column exactly once: this is what a transition or a split-screen
+        // widget relies on to keep neighbouring regions aligned.
+        $line = 'a日b本c';
+        foreach ([1, 2, 3, 4] as $split) {
+            $left = AnsiUtils::sliceToWidth($line, 0, $split);
+            $right = AnsiUtils::sliceToWidth($line, $split, 7 - $split);
+            $this->assertSame(7, AnsiUtils::visibleWidth($left.$right), \sprintf('split at %d', $split));
+        }
+    }
 }

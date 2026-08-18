@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Transport\Smtp;
 
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -41,6 +42,13 @@ final class EsmtpTransportFactory extends AbstractTransportFactory
         $stream = $transport->getStream();
         if ('' !== $sourceIp = $dsn->getOption('source_ip', '')) {
             $stream->setSourceIp($sourceIp);
+        }
+
+        if (null !== ($timeout = $dsn->getOption('timeout'))) {
+            if (!is_numeric($timeout) || (float) $timeout <= 0) {
+                throw new InvalidArgumentException(\sprintf('The "timeout" option is not valid: it must be a positive number of seconds, "%s" given.', $timeout));
+            }
+            $stream->setTimeout((float) $timeout);
         }
         $streamOptions = $stream->getStreamOptions();
 

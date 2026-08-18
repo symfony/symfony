@@ -309,7 +309,6 @@ class MarkdownWidget extends AbstractWidget
     private function renderList(ListBlock $list, int $columns): array
     {
         $lines = [];
-        $itemColumns = max(1, $columns - 2);
         $isOrdered = 'ordered' === $list->getListData()->type;
         $index = $list->getListData()->start ?? 1;
         $listBulletStyle = $this->resolveElement('list-bullet');
@@ -319,11 +318,17 @@ class MarkdownWidget extends AbstractWidget
                 continue;
             }
 
-            $bullet = $listBulletStyle->apply($isOrdered ? $index.'. ' : '• ').$this->restoreContext;
+            // The marker is not always two columns wide: an ordered list
+            // reaching 10 needs four, and the content has to be wrapped and
+            // indented to whatever this item's marker actually takes.
+            $marker = $isOrdered ? $index.'. ' : '• ';
+            $markerWidth = AnsiUtils::visibleWidth($marker);
+            $bullet = $listBulletStyle->apply($marker).$this->restoreContext;
+            $continuation = str_repeat(' ', $markerWidth);
 
-            $content = $this->renderListItemContent($item, $itemColumns);
+            $content = $this->renderListItemContent($item, max(1, $columns - $markerWidth));
             foreach ($content as $i => $line) {
-                $lines[] = (0 === $i ? $bullet : '  ').$line;
+                $lines[] = (0 === $i ? $bullet : $continuation).$line;
             }
 
             ++$index;

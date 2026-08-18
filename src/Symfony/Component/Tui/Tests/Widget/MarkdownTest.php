@@ -220,6 +220,29 @@ class MarkdownTest extends TestCase
     }
 
     /**
+     * A two-digit marker is four columns wide, so the item's text has four
+     * fewer columns to wrap into and its continuation lines line up under it.
+     */
+    public function testOrderedListWithTwoDigitMarkers()
+    {
+        $markdown = '';
+        for ($i = 1; $i <= 11; ++$i) {
+            $markdown .= $i.". item text that is fairly long here\n";
+        }
+
+        $md = $this->createMarkdown($markdown);
+        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $md->render(new RenderContext(20, 60)));
+
+        foreach ($lines as $line) {
+            $this->assertLessThanOrEqual(20, AnsiUtils::visibleWidth($line));
+        }
+
+        $tenth = array_search('10. item text that', $lines, true);
+        $this->assertNotFalse($tenth, 'The tenth item starts a line of its own: '.implode(' / ', $lines));
+        $this->assertStringStartsWith('    ', $lines[$tenth + 1], 'Continuation lines are indented under the text, not under the marker.');
+    }
+
+    /**
      * Render a widget through the Renderer pipeline to get full chrome applied.
      *
      * @return string[]

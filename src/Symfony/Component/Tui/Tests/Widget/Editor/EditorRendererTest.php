@@ -164,6 +164,49 @@ class EditorRendererTest extends TestCase
     }
 
     /**
+     * The viewport measures in logical lines and keeps at least one so the
+     * cursor line is drawn; a single line can wrap to more rows than the
+     * editor has.
+     */
+    public function testAWrappedLineDoesNotRenderMoreRowsThanTheEditorHas()
+    {
+        $docLines = [str_repeat('word ', 40), 'second line', 'third line'];
+
+        foreach ([40, 20, 10, 6] as $columns) {
+            foreach ([1, 3, 5] as $maxDisplayRows) {
+                $viewport = [
+                    'scroll_offset' => 0,
+                    'visible_line_count' => 1,
+                    'lines_above' => 0,
+                    'lines_below' => 2,
+                ];
+
+                $lines = $this->renderWithViewport($docLines, $viewport, 0, 0, $columns, $maxDisplayRows);
+
+                // Two frame rows on top of the content.
+                $this->assertLessThanOrEqual($maxDisplayRows + 2, \count($lines), \sprintf('%d columns, %d rows allowed.', $columns, $maxDisplayRows));
+            }
+        }
+    }
+
+    public function testTheCursorStaysOnScreenWhenItsLineIsCutDown()
+    {
+        $docLines = [str_repeat('word ', 40)];
+        $viewport = [
+            'scroll_offset' => 0,
+            'visible_line_count' => 1,
+            'lines_above' => 0,
+            'lines_below' => 0,
+        ];
+
+        // The cursor sits at the very end, which wraps far past the third row.
+        $lines = $this->renderWithViewport($docLines, $viewport, 0, \strlen($docLines[0]) - 1, 10, 3, false, true);
+
+        $this->assertCount(5, $lines);
+        $this->assertStringContainsString(AnsiUtils::CURSOR_MARKER_PREFIX, implode('', $lines), 'The window follows the cursor instead of showing the top of the line.');
+    }
+
+    /**
      * @param string[] $docLines
      *
      * @return string[]

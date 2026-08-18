@@ -229,8 +229,10 @@ abstract class AbstractWidget
             $context->getFocusManager()->remove($this);
         }
 
-        $this->listeners = [];
-
+        // The listeners stay. They live on this widget and are dispatched
+        // from it, so there is nothing registered elsewhere to unwind, and
+        // dropping them silently unhooks the callbacks a caller registered
+        // on a widget it still holds and may add back.
         $this->onDetach();
         $this->parent = null;
         $this->context = null;

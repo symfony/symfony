@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\AccessToken\TokenHandlerFactoryInterface;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -52,9 +53,6 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->defaultValue(['security.access_token_extractor.header'])
                 ->scalarPrototype()->end()
             ->end()
-        ;
-
-        $tokenHandlerNodeBuilder = $builder
             ->arrayNode('token_handler')
                 ->example(['id' => 'App\Security\CustomTokenHandler'])
                 ->acceptAndWrap(['string'], 'id')
@@ -72,13 +70,14 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
                 ->end()
 
                 ->children()
+                    ->appendFromCallback(function (NodeBuilder $tokenHandlerNodeBuilder) {
+                        foreach ($this->tokenHandlerFactories as $factory) {
+                            $factory->addConfiguration($tokenHandlerNodeBuilder);
+                        }
+                    })
+                ->end()
+            ->end()
         ;
-
-        foreach ($this->tokenHandlerFactories as $factory) {
-            $factory->addConfiguration($tokenHandlerNodeBuilder);
-        }
-
-        $tokenHandlerNodeBuilder->end();
     }
 
     public function getPriority(): int

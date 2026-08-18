@@ -223,6 +223,33 @@ class NodeBuilder implements NodeParentInterface
     }
 
     /**
+     * Appends node definitions via a callback.
+     *
+     * The callback receives a node builder and is expected to append child nodes
+     * using the regular builder methods.
+     *
+     * Usage:
+     *
+     *     $node = $parentNode
+     *         ->children()
+     *             ->appendFromCallback($this->addCommonChildDefinitions(...))
+     *         ->end()
+     *     ;
+     *
+     * @param callable(NodeBuilder $builder): void $callback
+     *
+     * @param-immediately-invoked-callable $callback
+     *
+     * @return $this
+     */
+    public function appendFromCallback(callable $callback): static
+    {
+        $callback($this);
+
+        return $this;
+    }
+
+    /**
      * Adds or overrides a node Type.
      *
      * @param string                       $type  The name of the type

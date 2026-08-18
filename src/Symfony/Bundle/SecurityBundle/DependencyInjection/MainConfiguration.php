@@ -14,6 +14,7 @@ namespace Symfony\Bundle\SecurityBundle\DependencyInjection;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -404,17 +405,15 @@ class MainConfiguration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->appendFromCallback(function (NodeBuilder $builder) {
+                    foreach ($this->userProviderFactories as $factory) {
+                        $name = str_replace('-', '_', $factory->getKey());
+                        $factoryNode = $builder->arrayNode($name)->canBeUnset();
+
+                        $factory->addConfiguration($factoryNode);
+                    }
+                })
             ->end()
-        ;
-
-        foreach ($this->userProviderFactories as $factory) {
-            $name = str_replace('-', '_', $factory->getKey());
-            $factoryNode = $providerNodeBuilder->children()->arrayNode($name)->canBeUnset();
-
-            $factory->addConfiguration($factoryNode);
-        }
-
-        $providerNodeBuilder
             ->validate()
                 ->ifTrue(static fn ($v) => \count($v) > 1)
                 ->thenInvalid('You cannot set multiple provider types for the same provider')

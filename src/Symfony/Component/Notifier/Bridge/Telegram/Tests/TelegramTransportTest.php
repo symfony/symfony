@@ -16,8 +16,11 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\Button\InlineKeyboardButton;
+use Symfony\Component\Notifier\Bridge\Telegram\Reply\Markup\InlineKeyboardMarkup;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransport;
+use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\MultipleExclusiveOptionsUsedException;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -148,8 +151,14 @@ final class TelegramTransportTest extends TransportTestCase
             ],
         ]);
 
-        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
             $this->assertStringEndsWith('/editMessageText', $url);
+            $this->assertEqualsCanonicalizing([
+                'chat_id' => 'testChannel',
+                'message_id' => 123,
+                'text' => 'testMessage',
+                'parse_mode' => 'MarkdownV2',
+            ], json_decode($options['body'], true));
 
             return $response;
         });
@@ -158,6 +167,215 @@ final class TelegramTransportTest extends TransportTestCase
         $transport->send(new ChatMessage(
             'testMessage',
             (new TelegramOptions())->edit(123)
+        ));
+    }
+
+    /**
+     * @return iterable<string, array{messageOptions: TelegramOptions, expectedMedia: array<string, string>}>
+     */
+    public static function editMessageMediaProvider(): iterable
+    {
+        $types = [
+            'photo' => (new TelegramOptions())->edit(123)->photo('https://localhost/photo.png'),
+            'video' => (new TelegramOptions())->edit(123)->video('https://localhost/video.mp4'),
+            'document' => (new TelegramOptions())->edit(123)->document('https://localhost/document.odt'),
+            'audio' => (new TelegramOptions())->edit(123)->audio('https://localhost/audio.ogg'),
+            'animation' => (new TelegramOptions())->edit(123)->animation('https://localhost/animation.gif'),
+        ];
+
+        foreach ($types as $type => $messageOptions) {
+            $media = $messageOptions->toArray()[$type];
+
+            yield $type.' by http url' => [
+                'messageOptions' => $messageOptions,
+                'expectedMedia' => [
+                    'type' => $type,
+                    'media' => $media,
+                    'caption' => 'testMessage',
+                    'parse_mode' => 'MarkdownV2',
+                ],
+            ];
+
+            yield $type.' by file id' => [
+                'messageOptions' => (new TelegramOptions())->edit(123)->{$type}('ABCDEF'),
+                'expectedMedia' => [
+                    'type' => $type,
+                    'media' => 'ABCDEF',
+                    'caption' => 'testMessage',
+                    'parse_mode' => 'MarkdownV2',
+                ],
+            ];
+        }
+    }
+
+    #[DataProvider('editMessageMediaProvider')]
+    public function testSendWithOptionForEditMessageMedia(TelegramOptions $messageOptions, array $expectedMedia)
+    {
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => ['message_id' => 123],
+        ]);
+
+        $expectedBody = [
+            'chat_id' => 'testChannel',
+            'message_id' => 123,
+            'media' => $expectedMedia,
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertStringEndsWith('/editMessageMedia', $url);
+            $this->assertEqualsCanonicalizing($expectedBody, json_decode($options['body'], true));
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $transport->send(new ChatMessage('testMessage', $messageOptions));
+    }
+
+    public function testSendWithOptionForEditMessageMediaEscapesCaptionOnce()
+    {
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => ['message_id' => 123],
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+            $this->assertStringEndsWith('/editMessageMedia', $url);
+            $body = json_decode($options['body'], true);
+            $this->assertSame('I contain a \\. and a \\!', $body['media']['caption']);
+            $this->assertArrayNotHasKey('caption', $body);
+            $this->assertArrayNotHasKey('photo', $body);
+            $this->assertArrayNotHasKey('parse_mode', $body);
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $transport->send(new ChatMessage(
+            'I contain a . and a !',
+            (new TelegramOptions())->edit(123)->photo('https://localhost/photo.png')
+        ));
+    }
+
+    public function testSendWithOptionForEditMessageCaption()
+    {
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => ['message_id' => 123],
+        ]);
+
+        $expectedBody = [
+            'chat_id' => 'testChannel',
+            'message_id' => 123,
+            'caption' => 'testMessage',
+            'parse_mode' => 'MarkdownV2',
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $expectedBody): ResponseInterface {
+            $this->assertStringEndsWith('/editMessageCaption', $url);
+            $this->assertEqualsCanonicalizing($expectedBody, json_decode($options['body'], true));
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())->editCaption(123)
+        ));
+    }
+
+    public function testSendWithOptionForEditMessageMediaWithSpoiler()
+    {
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => ['message_id' => 123],
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+            $this->assertStringEndsWith('/editMessageMedia', $url);
+            $body = json_decode($options['body'], true);
+            $this->assertTrue($body['media']['has_spoiler']);
+            $this->assertArrayNotHasKey('has_spoiler', $body);
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())->edit(123)->photo('https://localhost/photo.png')->hasSpoiler(true)
+        ));
+    }
+
+    public function testSendWithOptionForEditMessageMediaKeepsReplyMarkupTopLevel()
+    {
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => ['message_id' => 123],
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+            $this->assertStringEndsWith('/editMessageMedia', $url);
+            $body = json_decode($options['body'], true);
+            $this->assertArrayHasKey('reply_markup', $body);
+            $this->assertArrayNotHasKey('reply_markup', $body['media']);
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())
+                ->edit(123)
+                ->photo('https://localhost/photo.png')
+                ->replyMarkup((new InlineKeyboardMarkup())->inlineKeyboard([
+                    (new InlineKeyboardButton('Click'))->callbackData('click'),
+                ]))
+        ));
+    }
+
+    public function testSendWithOptionForEditMessageCaptionWithHtmlParseModeDoesNotEscape()
+    {
+        $response = new JsonMockResponse([
+            'ok' => true,
+            'result' => ['message_id' => 123],
+        ]);
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+            $this->assertStringEndsWith('/editMessageCaption', $url);
+            $this->assertEqualsCanonicalizing([
+                'chat_id' => 'testChannel',
+                'message_id' => 123,
+                'caption' => 'I contain a . and a !',
+                'parse_mode' => 'HTML',
+            ], json_decode($options['body'], true));
+
+            return $response;
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+        $transport->send(new ChatMessage(
+            'I contain a . and a !',
+            (new TelegramOptions())->parseMode(TelegramOptions::PARSE_MODE_HTML)->editCaption(123)
+        ));
+    }
+
+    public function testSendWithOptionForEditMessageMediaByLocalUploadThrows()
+    {
+        $client = new MockHttpClient(static function (): ResponseInterface {
+            self::fail('Telegram API should not be called');
+        });
+
+        $transport = $this->createTransport($client, 'testChannel');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Editing a message with a locally uploaded media is not supported yet');
+        $transport->send(new ChatMessage(
+            'testMessage',
+            (new TelegramOptions())->edit(123)->uploadPhoto(self::FIXTURE_FILE)
         ));
     }
 
@@ -1038,7 +1256,10 @@ final class TelegramTransportTest extends TransportTestCase
     public static function exclusiveOptionsDataProvider(): array
     {
         return [
-            'edit' => [(new TelegramOptions())->edit(1)->video('')],
+            'edit and answerCallbackQuery' => [(new TelegramOptions())->edit(1)->answerCallbackQuery('')],
+            'edit and location' => [(new TelegramOptions())->edit(1)->location(48.8566, 2.3522)],
+            'edit and sticker' => [(new TelegramOptions())->edit(1)->sticker('')],
+            'edit and two media' => [(new TelegramOptions())->edit(1)->photo('')->video('')],
             'answerCallbackQuery' => [(new TelegramOptions())->answerCallbackQuery('')->video('')],
             'photo' => [(new TelegramOptions())->photo('')->video('')],
             'location' => [(new TelegramOptions())->location(48.8566, 2.3522)->video('')],

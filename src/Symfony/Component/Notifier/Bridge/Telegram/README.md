@@ -319,6 +319,35 @@ $telegramOptions = (new TelegramOptions())
     );
 ```
 
+To edit a message that contains media, combine `edit()` with a media option
+(`photo()`, `video()`, `document()`, `audio()` or `animation()`). The media and
+its caption are replaced through the `editMessageMedia` API method.
+
+```php
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('My updated caption');
+$telegramOptions = (new TelegramOptions())
+    ->chatId($chatId)
+    ->edit($messageId)
+    ->photo('https://localhost/new-photo.png');
+```
+
+To update only the caption of an existing media message without re-sending the
+media, use `editCaption()`, which calls `editMessageCaption`. The subject of the
+message is used as the new caption.
+
+```php
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage('My updated caption');
+$telegramOptions = (new TelegramOptions())
+    ->chatId($chatId)
+    ->editCaption($messageId);
+```
+
 Answering Callback Queries
 --------------------------
 

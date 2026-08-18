@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for editing media messages via the `editMessageMedia` and `editMessageCaption` API methods
+
 8.1
 ---
 

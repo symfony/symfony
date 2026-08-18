@@ -68,6 +68,26 @@ final class TelegramOptionsTest extends TestCase
         yield 'cache time equals -10' => [-10];
     }
 
+    public function testEdit()
+    {
+        $options = new TelegramOptions();
+
+        $returnedOptions = $options->edit(123);
+
+        $this->assertSame($options, $returnedOptions);
+        $this->assertSame(['message_id' => 123], $options->toArray());
+    }
+
+    public function testEditCaption()
+    {
+        $options = new TelegramOptions();
+
+        $returnedOptions = $options->editCaption(123);
+
+        $this->assertSame($options, $returnedOptions);
+        $this->assertSame(['message_id' => 123, 'edit_caption' => true], $options->toArray());
+    }
+
     public function testTelegramOptions()
     {
         $options = new TelegramOptions([

@@ -32,6 +32,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Brevo\Transport\BrevoTransportFactory::class,
             'package' => 'symfony/brevo-mailer',
         ],
+        'cloudflare' => [
+            'class' => Bridge\Cloudflare\Transport\CloudflareTransportFactory::class,
+            'package' => 'symfony/cloudflare-mailer',
+        ],
         'gmail' => [
             'class' => Bridge\Google\Transport\GmailTransportFactory::class,
             'package' => 'symfony/google-mailer',

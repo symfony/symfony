@@ -1,0 +1,34 @@
+{
+    "name": "symfony/cloudflare-mailer",
+    "type": "symfony-mailer-bridge",
+    "description": "Symfony Cloudflare Mailer Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "vadage",
+            "homepage": "https://github.com/vadage"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "psr/event-dispatcher": "^1",
+        "psr/log": "^1|^2|^3",
+        "symfony/mailer": "^8.2"
+    },
+    "require-dev": {
+        "symfony/http-client": "^8.2"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Cloudflare\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

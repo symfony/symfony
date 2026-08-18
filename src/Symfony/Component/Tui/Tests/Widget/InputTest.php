@@ -532,6 +532,21 @@ class InputTest extends TestCase
         $this->assertSame(0, $changes);
     }
 
+    public function testEmptyInputChunkIsIgnored()
+    {
+        $changes = 0;
+        $input = new InputWidget();
+        $input->setValue('hello');
+        $input->onChange(static function () use (&$changes) {
+            ++$changes;
+        });
+
+        $input->handleInput('');
+
+        $this->assertSame('hello', $input->getValue());
+        $this->assertSame(0, $changes, 'An empty chunk is not a keystroke.');
+    }
+
     private function assertValidUtf8(string $value, string $message = ''): void
     {
         $this->assertTrue(mb_check_encoding($value, 'UTF-8'), $message ?: 'Value should be valid UTF-8');

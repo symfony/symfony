@@ -207,6 +207,12 @@ class EditorWidget extends AbstractWidget implements FocusableInterface, Vertica
             return;
         }
 
+        // Nothing left to route once the paste bytes are peeled off, and the
+        // handling below reads $data[0].
+        if ('' === $data) {
+            return;
+        }
+
         $kb = $this->getKeybindings();
 
         // Handle character jump mode (awaiting next character to jump to)

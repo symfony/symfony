@@ -159,6 +159,12 @@ class InputWidget extends AbstractWidget implements FocusableInterface
                 return;
             }
 
+            // Nothing left to route once the paste bytes are peeled off; an
+            // empty chunk is not a keystroke and not text to insert.
+            if ('' === $data) {
+                return;
+            }
+
             $kb = $this->getKeybindings();
 
             // Cancel

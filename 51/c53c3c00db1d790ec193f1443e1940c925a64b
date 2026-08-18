@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T16:12:10Z
+
+Thanks for your patience on this one. I rebased the branch on 8.2 and made one change, so it is ready as far as I am concerned.
+
+The change: an asynchronous message was logged as `"{class}" message successfully handled.` on the dispatching side, where `SendMessageMiddleware` only hands it to the transport and stops the stack. The `duration_ms` measured the send, and the worker then logged the same message a second time. A dashboard built on that counts every message twice and reads send latency as handling time. Sending now logs `"{class}" message sent to transport.`, decided from the `SentStamp` on the returned envelope, which never travels to the transport. There is a test for it.
+
+Everything else is yours, unchanged. The description is rewritten to serve as the basis for the documentation, with the points it should carry listed at the end.

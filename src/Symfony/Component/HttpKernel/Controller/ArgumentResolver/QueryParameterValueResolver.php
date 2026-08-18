@@ -13,20 +13,25 @@ namespace Symfony\Component\HttpKernel\Controller\ArgumentResolver;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
+use Symfony\Component\HttpKernel\Controller\SourceValueResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\Uid\AbstractUid;
 
 /**
  * Resolve arguments of type: array, string, int, float, bool, \BackedEnum from query parameters.
+ *
+ * Arguments of any other class type are staged in the request attributes so that a type-aware
+ * resolver further down the chain can convert them.
  *
  * @author Ruud Kamphuis <ruud@ticketswap.com>
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Mateusz Anders <anders_mateusz@outlook.com>
  * @author Ionut Enache <i.ovidiuenache@yahoo.com>
  */
-final class QueryParameterValueResolver implements ValueResolverInterface
+final class QueryParameterValueResolver implements ValueResolverInterface, SourceValueResolverInterface
 {
     public function resolve(Request $request, ArgumentMetadata $argument): array
     {
@@ -78,6 +83,24 @@ final class QueryParameterValueResolver implements ValueResolverInterface
         if (is_subclass_of($type, AbstractUid::class)) {
             $uidType = $type;
             $type = 'uid';
+        }
+
+        if (null === $uidType
+            && null !== $type
+            && !$argument->isVariadic()
+            && !\in_array($type, ['array', 'string', 'int', 'float', 'bool'], true)
+            && !is_subclass_of($type, \BackedEnum::class)
+            && (class_exists($type) || interface_exists($type))
+        ) {
+            if (\is_array($value)) {
+                throw HttpException::fromStatusCode($validationFailedCode, \sprintf('Invalid query parameter "%s".', $name));
+            }
+
+            // Stage the raw value under the argument name so that a resolver able to build this type,
+            // such as DateTimeValueResolver or EntityValueResolver, picks it up from the attributes.
+            $request->attributes->set($argument->getName(), $value);
+
+            throw new NearMissValueResolverException(\sprintf('#[MapQueryParameter] cannot build controller argument "$%s" of type "%s" by itself; no resolver converted the staged value.', $argument->getName(), $type));
         }
 
         $enumType = null;

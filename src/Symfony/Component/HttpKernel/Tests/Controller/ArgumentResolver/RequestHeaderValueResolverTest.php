@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestHeader;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 
 class RequestHeaderValueResolverTest extends TestCase
 {
@@ -219,5 +220,55 @@ class RequestHeaderValueResolverTest extends TestCase
         $arguments = $resolver->resolve(Request::create('/'), $metadata);
 
         self::assertEquals([[]], $arguments);
+    }
+
+    public function testStagingArgumentTypesItCannotBuild()
+    {
+        $metadata = new ArgumentMetadata('since', \DateTimeImmutable::class, false, false, null, false, [
+            new MapRequestHeader('x-since'),
+        ]);
+
+        $request = Request::create('/');
+        $request->headers->set('x-since', '2026-01-15');
+
+        $resolver = new RequestHeaderValueResolver();
+
+        try {
+            $resolver->resolve($request, $metadata);
+            $this->fail(NearMissValueResolverException::class.' was not thrown.');
+        } catch (NearMissValueResolverException $e) {
+            $this->assertSame('#[MapRequestHeader] cannot build controller argument "$since" of type "DateTimeImmutable" by itself; no resolver converted the staged value.', $e->getMessage());
+        }
+
+        // the raw value is left in the attributes for a type-aware resolver further down the chain
+        $this->assertSame('2026-01-15', $request->attributes->get('since'));
+    }
+
+    public function testMissingHeaderForAStagedArgumentType()
+    {
+        $metadata = new ArgumentMetadata('since', \DateTimeImmutable::class, false, false, null, false, [
+            new MapRequestHeader('x-since'),
+        ]);
+
+        $resolver = new RequestHeaderValueResolver();
+
+        try {
+            $resolver->resolve(Request::create('/'), $metadata);
+            $this->fail(HttpException::class.' was not thrown.');
+        } catch (HttpException $e) {
+            $this->assertSame(400, $e->getStatusCode());
+            $this->assertSame('Missing header "x-since".', $e->getMessage());
+        }
+    }
+
+    public function testMissingHeaderForANullableStagedArgumentType()
+    {
+        $metadata = new ArgumentMetadata('since', \DateTimeImmutable::class, false, false, null, true, [
+            new MapRequestHeader('x-since'),
+        ]);
+
+        $resolver = new RequestHeaderValueResolver();
+
+        $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
     }
 }

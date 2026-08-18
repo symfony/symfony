@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestAttributeValueResolver;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class RequestAttributeValueResolverTest extends TestCase
@@ -166,5 +167,56 @@ class RequestAttributeValueResolverTest extends TestCase
 
         $this->expectException(NotFoundHttpException::class);
         iterator_to_array($resolver->resolve($request, $metadata));
+    }
+
+    public function testInstanceOfClassTypeIsReturned()
+    {
+        $resolver = new RequestAttributeValueResolver();
+        $request = new Request();
+        $value = new \ArrayObject();
+        $request->attributes->set('dto', $value);
+        $metadata = new ArgumentMetadata('dto', \ArrayObject::class, false, false, null);
+
+        $this->assertSame([$value], iterator_to_array($resolver->resolve($request, $metadata)));
+    }
+
+    public function testInstanceOfInterfaceTypeIsReturned()
+    {
+        $resolver = new RequestAttributeValueResolver();
+        $request = new Request();
+        $value = new \ArrayObject();
+        $request->attributes->set('dto', $value);
+        $metadata = new ArgumentMetadata('dto', \Countable::class, false, false, null);
+
+        $this->assertSame([$value], iterator_to_array($resolver->resolve($request, $metadata)));
+    }
+
+    public function testNonObjectForClassTypeAbstains()
+    {
+        $resolver = new RequestAttributeValueResolver();
+        $request = new Request();
+        $request->attributes->set('dto', 'abc');
+        $metadata = new ArgumentMetadata('dto', \stdClass::class, false, false, null);
+
+        $this->expectException(NearMissValueResolverException::class);
+        $this->expectExceptionMessage('The "dto" request attribute holds a "string", which cannot be passed to a parameter typed "stdClass".');
+
+        iterator_to_array($resolver->resolve($request, $metadata));
+    }
+
+    /**
+     * A mismatching object must be passed through: a listener on kernel.controller_arguments
+     * can still replace it, as ErrorListener does when it turns the "exception" attribute
+     * into the FlattenException the error controller expects.
+     */
+    public function testObjectOfAnotherClassIsReturned()
+    {
+        $resolver = new RequestAttributeValueResolver();
+        $request = new Request();
+        $value = new \Exception('foo');
+        $request->attributes->set('exception', $value);
+        $metadata = new ArgumentMetadata('exception', \stdClass::class, false, false, null);
+
+        $this->assertSame([$value], iterator_to_array($resolver->resolve($request, $metadata)));
     }
 }

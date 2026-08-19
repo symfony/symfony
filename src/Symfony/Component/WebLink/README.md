@@ -12,6 +12,12 @@ Hints](https://www.w3.org/TR/resource-hints/) W3C's specifications. It can also
 be used with extensions defined in the [HTML5 link type extensions
 wiki](http://microformats.org/wiki/existing-rel-values#HTML5_link_type_extensions).
 
+It also implements [Web Linking](https://www.rfc-editor.org/rfc/rfc8288.html)
+(RFC 8288), the two link set document formats defined by
+[Linkset](https://www.rfc-editor.org/rfc/rfc9264.html) (RFC 9264) and the
+[Link-Template](https://www.rfc-editor.org/rfc/rfc9652.html) HTTP header field
+(RFC 9652).
+
 Getting Started
 ---------------
 

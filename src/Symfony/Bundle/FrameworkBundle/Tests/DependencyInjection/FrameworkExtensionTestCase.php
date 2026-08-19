@@ -1066,6 +1066,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
     {
         $container = $this->createContainerFromFile('web_link');
         $this->assertTrue($container->hasDefinition('web_link.add_link_header_listener'));
+        $this->assertTrue($container->hasDefinition('web_link.http_header_serializer'));
+        $this->assertTrue($container->hasDefinition('web_link.http_header_parser'));
+        $this->assertTrue($container->hasDefinition('web_link.link_template_header_serializer'));
+        $this->assertTrue($container->hasDefinition('web_link.link_template_header_parser'));
+        $this->assertTrue($container->hasDefinition('web_link.json_linkset_serializer'));
+        $this->assertTrue($container->hasDefinition('web_link.json_linkset_parser'));
+
+        $listener = $container->getDefinition('web_link.add_link_header_listener');
+        $this->assertSame('web_link.http_header_serializer', (string) $listener->getArgument(0));
+        $this->assertSame('web_link.link_template_header_serializer', (string) $listener->getArgument(1));
     }
 
     public function testMessengerServicesRemovedWhenDisabled()

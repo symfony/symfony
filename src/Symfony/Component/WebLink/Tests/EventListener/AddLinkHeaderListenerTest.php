@@ -46,10 +46,61 @@ class AddLinkHeaderListenerTest extends TestCase
         ];
 
         $this->assertEquals($expected, $response->headers->all()['link']);
+        $this->assertFalse($response->headers->has('Link-Template'));
+    }
+
+    public function testOnKernelResponseSendsTemplatedLinksInTheLinkTemplateHeader()
+    {
+        $links = new GenericLinkProvider([
+            new Link('preload', '/foo'),
+            new Link('item', '/users/{id}'),
+        ]);
+        $response = $this->dispatch($links);
+
+        $this->assertSame('</foo>; rel="preload"', $response->headers->get('Link'));
+        $this->assertSame('"/users/{id}"; rel="item"', $response->headers->get('Link-Template'));
+    }
+
+    public function testOnKernelResponseDoesNotSendAnEmptyLinkHeader()
+    {
+        $response = $this->dispatch(new GenericLinkProvider([new Link('item', '/users/{id}')]));
+
+        $this->assertFalse($response->headers->has('Link'));
+        $this->assertSame('"/users/{id}"; rel="item"', $response->headers->get('Link-Template'));
+    }
+
+    public function testOnKernelResponseWithoutLinks()
+    {
+        $response = $this->dispatch(new GenericLinkProvider());
+
+        $this->assertFalse($response->headers->has('Link'));
+        $this->assertFalse($response->headers->has('Link-Template'));
+    }
+
+    public function testOnKernelResponseIgnoresSubRequests()
+    {
+        $request = new Request([], [], ['_links' => new GenericLinkProvider([new Link('preload', '/foo')])]);
+        $response = new Response();
+
+        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::SUB_REQUEST, $response);
+        (new AddLinkHeaderListener())->onKernelResponse($event);
+
+        $this->assertFalse($response->headers->has('Link'));
     }
 
     public function testSubscribedEvents()
     {
         $this->assertEquals([KernelEvents::RESPONSE => 'onKernelResponse'], AddLinkHeaderListener::getSubscribedEvents());
+    }
+
+    private function dispatch(GenericLinkProvider $links): Response
+    {
+        $request = new Request([], [], ['_links' => $links]);
+        $response = new Response();
+
+        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        (new AddLinkHeaderListener())->onKernelResponse($event);
+
+        return $response;
     }
 }

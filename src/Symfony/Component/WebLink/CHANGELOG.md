@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `JsonLinksetSerializer` and `JsonLinksetParser` to write and read `application/linkset+json` documents (RFC 9264)
+ * Add `LinkTemplateHeaderSerializer` and `LinkTemplateHeaderParser` to write and read `Link-Template` headers (RFC 9652)
+ * Make `AddLinkHeaderListener` send templated links in a `Link-Template` header instead of dropping them
+
 8.1
 ---
 

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-19T08:40:46Z
+
+While re-checking this before review, I found a corner where collecting errors changed the outcome: for a property typed `int[]|string[]`, denormalizing `['nope']` without the collect option fails over to the `string[]` member and succeeds, but with `COLLECT_DENORMALIZATION_ERRORS` the `int[]` member recorded the element error and kept a result with the element dropped, so the `string[]` member was never tried.
+
+The last push fixes that: element errors are collected only when the union has a single non-null member, and rethrown otherwise so the union keeps trying its other members. `int[]|null` still collects per element, `int[]|string[]|null` fails over. A test covers the fallback, and the branch is rebased on current 8.1. No other behavior changed.

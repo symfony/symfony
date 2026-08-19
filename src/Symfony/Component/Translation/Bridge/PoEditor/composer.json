@@ -1,0 +1,31 @@
+{
+    "name": "symfony/po-editor-translation-provider",
+    "type": "symfony-translation-bridge",
+    "description": "Symfony POEditor Translation Provider Bridge",
+    "keywords": ["poeditor", "translation", "provider"],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mathieu Santostefano",
+            "homepage": "https://github.com/welcomattic"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Translation\\Bridge\\PoEditor\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

@@ -190,6 +190,7 @@
         "loco-translation-provider": "src/Symfony/Component/Translation/Bridge/Loco",
         "lokalise-translation-provider": "src/Symfony/Component/Translation/Bridge/Lokalise",
         "phrase-translation-provider": "src/Symfony/Component/Translation/Bridge/Phrase",
+        "po-editor-translation-provider": "src/Symfony/Component/Translation/Bridge/PoEditor",
         "type-info": "src/Symfony/Component/TypeInfo",
         "uid": "src/Symfony/Component/Uid",
         "validator": "src/Symfony/Component/Validator",

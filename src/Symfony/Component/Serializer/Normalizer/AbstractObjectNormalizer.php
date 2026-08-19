@@ -579,11 +579,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         $context['key_type'] = $collectionKeyType;
                         $context['value_type'] = $collectionValueType;
                     } elseif (\is_array($data) && $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
-                        // elements of a scalar collection are converted with the very same rules as any other value
+                        // elements of a scalar collection are converted and enforced with the very same rules as any other value
                         $result = [];
                         $childContext = null;
                         $valueTypeIdentifier = $collectionValueBaseType->getTypeIdentifier();
                         $valueIsNullable = $collectionValueType->isNullable();
+                        // a union that still has another viable member must fail over to it instead of reporting elements
+                        $collectElementErrors = isset($context['not_normalizable_value_exceptions']) && 1 === \count(array_filter($types, static fn (Type $t) => !$t->isIdentifiedBy(TypeIdentifier::NULL)));
 
                         foreach ($data as $key => $value) {
                             // values that already have the expected type are the common case, keep them as is
@@ -603,9 +605,13 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             try {
                                 // the wrapped type is passed on so that a nullable element type keeps accepting null
                                 $result[$key] = $this->validateAndDenormalize($collectionValueType, $currentClass, $attribute, $value, $format, $childContext);
-                            } catch (NotNormalizableValueException) {
-                                // elements that cannot be converted are left untouched, as they have always been
-                                $result[$key] = $value;
+                            } catch (NotNormalizableValueException $exception) {
+                                if (!$collectElementErrors) {
+                                    throw $exception;
+                                }
+
+                                // report every offending element, the way nested objects already do
+                                $context['not_normalizable_value_exceptions'][] = $exception;
                             }
                         }
 

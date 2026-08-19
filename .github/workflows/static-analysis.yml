@@ -61,8 +61,9 @@ jobs:
           # update dependencies when the PR changes composer.json so that packages it adds are resolvable
           if ! git diff --quiet "$base_sha" HEAD -- composer.json; then
             export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+            rm composer.lock
             composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-            composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
+            composer require --no-progress --ansi --no-plugins psalm/phar:@stable phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb jetbrains/phpstorm-stubs
           fi
 
       - name: Psalm
@@ -114,8 +115,9 @@ jobs:
           # update dependencies when the PR changes composer.json so that packages it adds are resolvable
           if ! git diff --quiet "$base_sha" HEAD -- composer.json; then
             export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+            rm composer.lock
             composer remove --dev --no-update --no-interaction symfony/phpunit-bridge
-            composer require --no-progress --ansi --no-plugins phpstan/phpstan:@stable phpstan/phpstan-deprecation-rules:@stable phpunit/phpunit:^11.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
+            composer require --no-progress --ansi --no-plugins phpstan/phpstan:@stable phpstan/phpstan-deprecation-rules:@stable phpunit/phpunit:^9.5 php-http/discovery psr/event-dispatcher mongodb/mongodb
           fi
 
       - name: PHPStan

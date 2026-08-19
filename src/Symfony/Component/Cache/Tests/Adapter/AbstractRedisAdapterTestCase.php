@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 
 abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testExpiration' => 'Testing expiration slows down the test suite',
         'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',

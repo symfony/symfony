@@ -198,7 +198,16 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
         $tagVersions = null;
 
-        return (self::$setCacheItemTags)($bufferedItems, $itemTags);
+        $items = (self::$setCacheItemTags)($bufferedItems, $itemTags);
+
+        foreach ($keys as $key) {
+            // PHP casts numeric strings to integers when they are used as array keys
+            if (\is_string($key) && $key === (string) (int) $key) {
+                return $this->yieldRequestedKeys($keys, $items);
+            }
+        }
+
+        return $items;
     }
 
     public function clear(string $prefix = ''): bool
@@ -386,5 +395,14 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         }
 
         return $tagVersions;
+    }
+
+    private function yieldRequestedKeys(array $keys, array $items): \Generator
+    {
+        $keys = array_combine($keys, $keys);
+
+        foreach ($items as $key => $item) {
+            yield ($keys[$key] ?? $key) => $item;
+        }
     }
 }

@@ -80,6 +80,23 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($pool->getItem('foo')->isHit()); // known tag version has expired
     }
 
+    public function testGetItemsWithNumericStringKeys()
+    {
+        $adapter = new TagAwareAdapter(new ArrayAdapter());
+
+        $item = $adapter->getItem('123');
+        $item->set('foo-val');
+        $adapter->save($item);
+
+        $keys = [];
+        foreach ($adapter->getItems(['123', '456']) as $key => $item) {
+            $keys[] = $key;
+            $this->assertSame($key, $item->getKey());
+        }
+
+        $this->assertSame(['123', '456'], $keys);
+    }
+
     public function testInvalidateTagsWithArrayAdapter()
     {
         $adapter = new TagAwareAdapter(new ArrayAdapter());

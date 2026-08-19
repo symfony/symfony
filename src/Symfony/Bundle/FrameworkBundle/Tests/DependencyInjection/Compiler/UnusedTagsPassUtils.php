@@ -19,6 +19,7 @@ class UnusedTagsPassUtils
     {
         $tags = [
             'container.tracked_for_reset' => true,
+            'doctrine.orm.entity' => true,
             'proxy' => true,
             'routing.controller' => true,
         ];

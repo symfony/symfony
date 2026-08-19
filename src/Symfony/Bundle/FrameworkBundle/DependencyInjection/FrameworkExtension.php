@@ -166,6 +166,7 @@ use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\LimiterInterface;
+use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
 use Symfony\Component\RemoteEvent\Attribute\AsRemoteEventConsumer;
@@ -3721,6 +3722,38 @@ class FrameworkExtension extends Extension
             ;
 
             $container->registerAliasForArgument($limiterId, RateLimiterFactoryInterface::class, $name.'.limiter', $name);
+        }
+
+        if (class_exists(RateLimiterBuilder::class)) {
+            $builderConfig = $config['builder'];
+
+            if ('auto' === $builderConfig['lock_factory']) {
+                $builderConfig['lock_factory'] = $this->isInitializedConfigEnabled('lock') ? 'lock.factory' : null;
+            }
+
+            $builder = $container->getDefinition('limiter_builder');
+
+            if (null === $storageId = $builderConfig['storage_service']) {
+                $container->register($storageId = 'limiter_builder.storage', CacheStorage::class)->addArgument(new Reference($builderConfig['cache_pool']));
+            }
+
+            $builder->replaceArgument(0, new Reference($storageId));
+
+            if ($builderConfig['lock_factory']) {
+                if (!interface_exists(LockInterface::class)) {
+                    throw new LogicException('Rate Limiter Builder requires the Lock component to be installed. Try running "composer require symfony/lock".');
+                }
+
+                if (!$this->isInitializedConfigEnabled('lock')) {
+                    throw new LogicException('Rate Limiter Builder requires the Lock component to be configured.');
+                }
+
+                $builder->replaceArgument(1, new Reference($builderConfig['lock_factory']));
+            }
+
+            $container->setAlias(RateLimiterBuilder::class, 'limiter_builder');
+        } else {
+            $container->removeDefinition('limiter_builder');
         }
     }
 

@@ -21,7 +21,8 @@
     ],
     "require": {
         "php": ">=8.4.1",
-        "symfony/clock": "^7.4|^8.0"
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
         "dragonmantank/cron-expression": "^3.1",

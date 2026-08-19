@@ -12,13 +12,16 @@
 namespace Symfony\Component\Cache\Tests;
 
 use Cache\IntegrationTests\SimpleCacheTest;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Psr16Cache;
+use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 
 #[Group('time-sensitive')]
 class Psr16CacheTest extends SimpleCacheTest
@@ -196,6 +199,40 @@ class Psr16CacheTest extends SimpleCacheTest
         $this->assertSame('bar-val', $cache->get('bar'));
 
         $this->assertSame(['foo' => 'foo-val', 'bar' => 'bar-val'], $cache->getMultiple(['foo', 'bar']));
+    }
+
+    #[DataProvider('providePools')]
+    public function testGetMultipleWithNumericStringKeys(CacheItemPoolInterface $pool)
+    {
+        $cache = new Psr16Cache($pool);
+        $cache->set('123', 'foo-val');
+
+        $values = [];
+        foreach ($cache->getMultiple(['123', '456']) as $key => $value) {
+            $values[] = [$key, $value];
+        }
+
+        $this->assertSame([['123', 'foo-val'], ['456', null]], $values);
+    }
+
+    #[DataProvider('providePools')]
+    public function testGetMultipleReturnsUsableKeys(CacheItemPoolInterface $pool)
+    {
+        $cache = new Psr16Cache($pool);
+        $cache->set('123', 'foo-val');
+
+        $keys = [];
+        foreach ($cache->getMultiple(['123']) as $key => $value) {
+            $keys[] = $key;
+        }
+
+        $this->assertSame('foo-val', $cache->get($keys[0]));
+    }
+
+    public static function providePools(): iterable
+    {
+        yield 'adapter' => [new ArrayAdapter()];
+        yield 'external pool' => [new ExternalAdapter()];
     }
 }
 

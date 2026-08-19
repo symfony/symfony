@@ -403,7 +403,7 @@ class ControllerHelper implements ServiceSubscriberInterface
     /**
      * Adds a Link HTTP header to the current response.
      *
-     * @see https://tools.ietf.org/html/rfc5988
+     * @see https://www.rfc-editor.org/rfc/rfc8288.html
      */
     public function addLink(Request $request, LinkInterface $link): void
     {

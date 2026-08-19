@@ -16,7 +16,7 @@ use Psr\Link\LinkInterface;
 /**
  * Serializes a list of Link instances to an HTTP Link header.
  *
- * @see https://tools.ietf.org/html/rfc5988
+ * @see https://www.rfc-editor.org/rfc/rfc8288.html
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */

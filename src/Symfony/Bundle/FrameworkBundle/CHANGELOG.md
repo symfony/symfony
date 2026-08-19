@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `cache.adapter.pdo_tag_aware` cache pool adapter
+ * Register the `web_link.json_linkset_serializer`, `web_link.json_linkset_parser`, `web_link.link_template_header_serializer` and `web_link.link_template_header_parser` services
  * Add `framework.asset_mapper.importmap_integrity_algorithms` option to add integrity metadata to importmaps
  * Add `framework.asset_mapper.minimum_release_age` option to delay JavaScript package updates until a version reaches a minimum age
  * Add `framework.mailer.smime_encrypter.certificates`, `on_missing_certificate` and `encrypt_for_sender` options

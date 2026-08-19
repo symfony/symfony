@@ -28,7 +28,7 @@ use Symfony\Component\Cache\Adapter\CouchbaseBucketAdapter;
 #[RequiresPhpExtension('couchbase', '>=2.6.0')]
 class CouchbaseBucketAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testClearPrefix' => 'Couchbase cannot clear by prefix',
         'testClearPrefixWithUnderscore' => 'Couchbase cannot clear by prefix',
         'testClearWithInvalidPrefix' => 'Couchbase cannot clear by prefix',

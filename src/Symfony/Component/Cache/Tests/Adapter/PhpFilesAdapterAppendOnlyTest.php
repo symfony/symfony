@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 #[Group('time-sensitive')]
 class PhpFilesAdapterAppendOnlyTest extends PhpFilesAdapterTest
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
         'testExpiration' => 'PhpFilesAdapter in append-only mode does not expiration.',
     ];

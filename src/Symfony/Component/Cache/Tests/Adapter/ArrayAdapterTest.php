@@ -20,7 +20,7 @@ use Symfony\Component\Clock\MockClock;
 #[Group('time-sensitive')]
 class ArrayAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testGetMetadata' => 'ArrayAdapter does not keep metadata.',
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which ArrayAdapter is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which ArrayAdapter is not.',

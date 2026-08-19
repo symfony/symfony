@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Group('time-sensitive')]
 class PhpArrayAdapterWithFallbackTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testGetItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testGetItemsInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',
         'testHasItemInvalidKeys' => 'PhpArrayAdapter does not throw exceptions on invalid key.',

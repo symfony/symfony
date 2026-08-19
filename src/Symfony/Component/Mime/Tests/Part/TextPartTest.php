@@ -240,4 +240,28 @@ class TextPartTest extends TestCase
         $this->assertEquals($expected->toString(), $p->toString());
         $this->assertEquals($expected->toString(), $n->toString());
     }
+
+    public function testSetContentTypeParameter()
+    {
+        $p = (new TextPart('BEGIN:VCALENDAR', 'utf-8', 'calendar', '8bit'))
+            ->setContentTypeParameter('method', 'REQUEST')
+            ->setContentTypeParameter('component', 'VEVENT');
+
+        $this->assertSame('calendar', $p->getMediaSubtype());
+        $this->assertSame(
+            'Content-Type: text/calendar; method=REQUEST; component=VEVENT; charset=utf-8',
+            $p->getPreparedHeaders()->get('Content-Type')->toString()
+        );
+    }
+
+    public function testSetContentTypeParameterOverwritesAndSurvivesSerialization()
+    {
+        $p = (new TextPart('content'))->setContentTypeParameter('method', 'PUBLISH');
+        $p->setContentTypeParameter('method', 'REQUEST');
+
+        $n = unserialize(serialize($p));
+
+        $this->assertStringContainsString('method=REQUEST', $n->getPreparedHeaders()->get('Content-Type')->toString());
+        $this->assertStringNotContainsString('PUBLISH', $n->getPreparedHeaders()->get('Content-Type')->toString());
+    }
 }

@@ -82,8 +82,8 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
                     // A closure attribute-set cannot be expressed in YAML and must not go
                     // through the loader below; it is resolved per concrete class later, in
                     // ResolveInstanceofConditionalsPass.
-                    if ('tags' === $type && \is_array($tag) && 1 === \count($tag) && current($tag) instanceof \Closure) {
-                        $closureTags[] = [key($tag), current($tag)];
+                    if (\is_array($tag) && 1 === \count($tag) && current($tag) instanceof \Closure) {
+                        $closureTags[] = [$type, key($tag), current($tag)];
                         unset($attribute[$type][$i]);
                     }
                 }
@@ -108,8 +108,12 @@ final class RegisterAutoconfigureAttributesPass implements CompilerPassInterface
 
             // The closure is wrapped in an array so addTag() keeps an array attribute-set;
             // ResolveInstanceofConditionalsPass unwraps and resolves it per concrete class.
-            foreach ($closureTags as [$name, $closure]) {
-                $container->registerForAutoconfiguration($class->name)->addTag($name, [$closure]);
+            foreach ($closureTags as [$type, $name, $closure]) {
+                $abstract = $container->registerForAutoconfiguration($class->name);
+                match ($type) {
+                    'tags' => $abstract->addTag($name, [$closure]),
+                    'resourceTags' => $abstract->addResourceTag($name, [$closure]),
+                };
             }
         };
 

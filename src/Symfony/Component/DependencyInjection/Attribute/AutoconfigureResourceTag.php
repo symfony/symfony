@@ -18,10 +18,13 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class AutoconfigureResourceTag extends Autoconfigure
 {
     /**
-     * @param string|null  $name       The resource tag name to add
-     * @param array<mixed> $attributes The attributes to attach to the resource tag
+     * @param string|null           $name       The resource tag name to add
+     * @param array<mixed>|\Closure $attributes The attributes to attach to the resource tag. To compute them per
+     *                                          tagged class, pass a closure receiving the concrete class-string
+     *                                          (requires PHP 8.5), or a [class-string, method] callable whose static
+     *                                          method is called on each concrete class (works on PHP 8.4)
      */
-    public function __construct(?string $name = null, array $attributes = [])
+    public function __construct(?string $name = null, array|\Closure $attributes = [])
     {
         parent::__construct(
             resourceTags: [

@@ -10,6 +10,7 @@ CHANGELOG
  * Write a `CACHEDIR.TAG` file in the cache and build directories so backup tools can skip them
  * Add a `factory` argument to the `#[Autoconfigure]` attribute, and support the `factory` key under `_instanceof`
  * Add `Preloader::ignore()` to exclude classes or namespace prefixes from preloading
+ * Allow computing resource tag attributes per tagged class when using `#[AutoconfigureResourceTag]`, `#[Autoconfigure]` or `_instanceof`, like for regular tags
 
 8.1
 ---

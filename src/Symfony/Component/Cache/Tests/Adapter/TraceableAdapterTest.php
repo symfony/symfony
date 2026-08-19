@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\TraceableAdapter;
 #[Group('time-sensitive')]
 class TraceableAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testPrune' => 'TraceableAdapter just proxies',
     ];
 

@@ -155,6 +155,10 @@ class ArrayAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
     public function deleteItems(array $keys): bool
     {
         foreach ($keys as $key) {
+            \assert('' !== CacheItem::validateKey($key));
+        }
+
+        foreach ($keys as $key) {
             $this->deleteItem($key);
         }
 

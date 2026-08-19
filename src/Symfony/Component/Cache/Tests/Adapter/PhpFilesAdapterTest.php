@@ -19,7 +19,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Group('time-sensitive')]
 class PhpFilesAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testDefaultLifeTime' => 'PhpFilesAdapter does not allow configuring a default lifetime.',
     ];
 

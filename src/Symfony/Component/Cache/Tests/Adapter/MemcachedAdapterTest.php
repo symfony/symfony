@@ -22,7 +22,7 @@ use Symfony\Component\Cache\Exception\CacheException;
 #[Group('integration')]
 class MemcachedAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Testing expiration slows down the test suite',
         'testDefaultLifeTime' => 'Testing expiration slows down the test suite',
         'testClearPrefix' => 'Memcached cannot clear by prefix',

@@ -23,7 +23,7 @@ use Symfony\Component\Filesystem\Filesystem;
 #[Group('time-sensitive')]
 class PhpArrayAdapterTest extends AdapterTestCase
 {
-    protected $skippedTests = [
+    protected array $skippedTests = [
         'testGet' => 'PhpArrayAdapter is read-only.',
         'testDontSaveWhenAskedNotTo' => 'PhpArrayAdapter is read-only.',
         'testRecursiveGet' => 'PhpArrayAdapter is read-only.',
@@ -86,6 +86,11 @@ class PhpArrayAdapterTest extends AdapterTestCase
         }
 
         return new PhpArrayAdapterWrapper(self::$file, new NullAdapter());
+    }
+
+    public function testDeleteItemsValidatesEveryKeyBeforeMutation()
+    {
+        $this->markTestSkipped('PhpArrayAdapter does not throw exceptions on invalid key.');
     }
 
     public function testStore()

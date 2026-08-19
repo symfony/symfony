@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
+use Symfony\Component\Serializer\Exception\PartialDenormalizationException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
@@ -1463,13 +1464,52 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame([1, 2], $dummy->ints);
     }
 
-    public function testDenormalizeLeavesUnconvertibleScalarCollectionElementsUntouched()
+    public function testDenormalizeEnforcesScalarCollectionElementType()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
 
-        $dummy = $normalizer->denormalize(['ints' => [1, 'nope', ['a' => 1]]], ScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+        try {
+            $normalizer->denormalize(['ints' => [1, 'nope']], ScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+            $this->fail(\sprintf('A "%s" should have been thrown.', NotNormalizableValueException::class));
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('The type of the "ints" attribute for class "'.ScalarCollectionsDummy::class.'" must be int ("nope" given).', $e->getMessage());
+            $this->assertSame('ints[1]', $e->getPath());
+        }
+    }
 
-        $this->assertSame([1, 'nope', ['a' => 1]], $dummy->ints);
+    public function testDenormalizeCollectsScalarCollectionElementErrors()
+    {
+        $serializer = new Serializer([new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors()]);
+
+        try {
+            $serializer->denormalize(['ints' => ['nope', 2, ['a' => 1]]], ScalarCollectionsDummy::class, null, [
+                DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
+            ]);
+            $this->fail(\sprintf('A "%s" should have been thrown.', PartialDenormalizationException::class));
+        } catch (PartialDenormalizationException $e) {
+            $this->assertSame(['ints[0]', 'ints[2]'], array_map(static fn (NotNormalizableValueException $e) => $e->getPath(), $e->getNotNormalizableValueErrors()));
+            $this->assertSame([1 => 2], $e->getData()->ints);
+        }
+    }
+
+    public function testDenormalizeCollectingErrorsKeepsUnionCollectionFallback()
+    {
+        $serializer = new Serializer([new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors()]);
+
+        $dummy = $serializer->denormalize(['intsOrStrings' => ['nope']], ScalarCollectionsDummy::class, null, [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]);
+
+        $this->assertSame(['nope'], $dummy->intsOrStrings);
+    }
+
+    public function testDenormalizeKeepsScalarCollectionElementsWhenTypeEnforcementIsDisabled()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize(['ints' => [1, 'nope']], ScalarCollectionsDummy::class, null, [
+            AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
+        ]);
+
+        $this->assertSame([1, 'nope'], $dummy->ints);
     }
 
     public function testDenormalizeCollectionOfUnionTypesPropertyWithPhpDocExtractor()
@@ -2247,6 +2287,9 @@ class ScalarCollectionsDummy
 
     /** @var array<string, bool> */
     public array $bools = [];
+
+    /** @var int[]|string[] */
+    public array $intsOrStrings = [];
 }
 
 class UnionCollectionDocBlockDummy

@@ -13,6 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Tests\Fixtures\TestEnum;
 
 /**
@@ -30,6 +31,21 @@ class ArrayAdapterTest extends AdapterTestCase
     public function createCachePool(int $defaultLifetime = 0): CacheItemPoolInterface
     {
         return new ArrayAdapter($defaultLifetime);
+    }
+
+    public function testDeleteItemsValidatesEveryKeyBeforeDeleting()
+    {
+        $cache = $this->createCachePool();
+        $item = $cache->getItem('key1');
+        $cache->save($item->set('value'));
+
+        try {
+            $cache->deleteItems(['key1', 'invalid{key']);
+            $this->fail(InvalidArgumentException::class.' expected.');
+        } catch (InvalidArgumentException) {
+        }
+
+        $this->assertTrue($cache->hasItem('key1'));
     }
 
     public function testGetValuesHitAndMiss()

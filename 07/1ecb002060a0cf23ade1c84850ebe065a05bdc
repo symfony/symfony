@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-19T07:44:59Z
+
+Thank you for this very complete implementation. The claims in the description check out: I verified that figures 1 to 6 of RFC 9264 round trip byte-identically through the parser and serializer, and that the figure 8 `application/linkset` document transcodes to figure 10 with the existing `HttpHeaderParser`.
+
+I amended a few edge cases into the commit, with tests:
+
+- `LinkTemplateHeaderSerializer` now throws when a non-ASCII value is not valid UTF-8. It used to emit a Display String that conforming parsers, including `LinkTemplateHeaderParser` itself, must ignore together with the whole header. RFC 9651 requires failing serialization instead, and `JsonLinksetSerializer` already throws for the same input.
+- `JsonLinksetSerializer` now throws for links with the `anchor` relation type, which the JSON format cannot represent: they used to lose their target silently when an anchor attribute was set, or to produce a document that fails parsing otherwise.
+- `LinkTemplateHeaderParser` no longer turns a non-string `rel` parameter (e.g. `rel=42`) into a `rel` target attribute that a later serialize/parse cycle would promote to a real relation type; RFC 9652 requires a string, so the parameter is now dropped, as `HttpHeaderParser` does for a valueless `rel`.
+- The number grammar now matches RFC 9651 exactly: decimals are limited to 12 integer digits.
+- `JsonLinksetSerializer` treats a `false` anchor attribute as absent, like `false` target attributes elsewhere, and now throws its documented `InvalidArgumentException` even when `\JSON_THROW_ON_ERROR` is passed in `$flags`.
+- Docblock and README wording touch-ups.
+
+Note: figure 10 of RFC 9264 shows `"datetime"` as a plain string, which contradicts the RFC's own section 4.2.4.3 (extension attributes MUST be arrays); no erratum is filed. The lenient parser accepts both forms and the serializer emits the conformant one, so nothing to do here.

@@ -86,18 +86,18 @@ final class CloudflareApiTransport extends AbstractApiTransport
         $payload = [
             'from' => $this->formatAddress($envelope->getSender()),
             'subject' => $email->getSubject(),
-            'to' => array_map($this->formatPlainAddress(...), $this->getRecipients($email, $envelope)),
+            'to' => array_map($this->formatAddress(...), $this->getRecipients($email, $envelope)),
         ];
 
         if ($headers = $this->prepareHeaders($email->getHeaders())) {
             $payload['headers'] = $headers;
         }
 
-        if ($cc = array_map($this->formatPlainAddress(...), $email->getCc())) {
+        if ($cc = array_map($this->formatAddress(...), $email->getCc())) {
             $payload['cc'] = $cc;
         }
 
-        if ($bcc = array_map($this->formatPlainAddress(...), $email->getBcc())) {
+        if ($bcc = array_map($this->formatAddress(...), $email->getBcc())) {
             $payload['bcc'] = $bcc;
         }
 
@@ -128,11 +128,6 @@ final class CloudflareApiTransport extends AbstractApiTransport
             'address' => $address->getAddress(),
             'name' => $address->getName(),
         ];
-    }
-
-    private function formatPlainAddress(Address $address): string
-    {
-        return $address->getAddress();
     }
 
     private function formatAttachment(DataPart $attachment): array

@@ -167,6 +167,8 @@ Security
    extends `AuthenticationException`. The firewall no longer turns the failure into a login redirect or a 401, and
    code catching the `Security\Core` exception for this case must catch the `Security\Http` one instead
  * Add argument `$targetUri` to `ImpersonateUrlGenerator::generateImpersonationPath()` and `ImpersonateUrlGenerator::generateImpersonationUrl()`
+ * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()`
+ * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `SignatureHasher::acceptSignatureHash()` and `SignatureHasher::verifySignatureHash()`
 
 SecurityBundle
 --------------

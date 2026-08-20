@@ -29,6 +29,8 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
  */
 final class LoginLinkHandler implements LoginLinkHandlerInterface
 {
+    private const RESERVED_PARAMETERS = ['user', 'expires', 'hash', 'hash_parameters'];
+
     private array $options;
 
     public function __construct(
@@ -43,15 +45,34 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         ], $options);
     }
 
-    public function createLoginLink(UserInterface $user, ?Request $request = null, ?int $lifetime = null): LoginLinkDetails
+    /**
+     * @param array<string, \Stringable|scalar> $parameters Extra query parameters to add to the link and cover with its signature
+     */
+    public function createLoginLink(UserInterface $user, ?Request $request = null, ?int $lifetime = null, array $parameters = []): LoginLinkDetails
     {
+        foreach ($parameters as $name => $value) {
+            if (!\is_string($name) || !preg_match('/^[A-Za-z0-9_.-]++$/', $name)) {
+                throw new \InvalidArgumentException(\sprintf('Login link parameter names must match "[A-Za-z0-9_.-]+", "%s" given.', $name));
+            }
+
+            if (\in_array($name, self::RESERVED_PARAMETERS, true)) {
+                throw new \InvalidArgumentException(\sprintf('Login link parameter name "%s" is reserved.', $name));
+            }
+        }
+
         $expires = time() + ($lifetime ?: $this->options['lifetime']);
         $expiresAt = new \DateTimeImmutable('@'.$expires);
 
+        if ($parameters) {
+            ksort($parameters);
+            $parameters['hash_parameters'] = implode(',', array_keys($parameters));
+        }
+
         $parameters = [
+            ...$parameters,
             'user' => $user->getUserIdentifier(),
             'expires' => $expires,
-            'hash' => $this->signatureHasher->computeSignatureHash($user, $expires),
+            'hash' => $this->signatureHasher->computeSignatureHash($user, $expires, $parameters),
         ];
 
         if ($request) {
@@ -102,12 +123,36 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
             throw new InvalidLoginLinkException('Invalid "expires" parameter.');
         }
 
+        $parameters = [];
+        if (null !== $names = ParameterBagUtils::getRequestParameterValue($request, 'hash_parameters')) {
+            if (!\is_string($names)) {
+                throw new InvalidLoginLinkException('Invalid "hash_parameters" parameter.');
+            }
+
+            foreach (explode(',', $names) as $name) {
+                if (!preg_match('/^[A-Za-z0-9_.-]++$/', $name)) {
+                    throw new InvalidLoginLinkException(\sprintf('Invalid "%s" parameter.', $name));
+                }
+
+                if (null === $value = ParameterBagUtils::getRequestParameterValue($request, $name)) {
+                    throw new InvalidLoginLinkException(\sprintf('Missing "%s" parameter.', $name));
+                }
+                if (!\is_string($value)) {
+                    throw new InvalidLoginLinkException(\sprintf('Invalid "%s" parameter.', $name));
+                }
+
+                $parameters[$name] = $value;
+            }
+
+            $parameters['hash_parameters'] = $names;
+        }
+
         try {
-            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash);
+            $this->signatureHasher->acceptSignatureHash($userIdentifier, $expires, $hash, $parameters);
 
             $user = $this->userProvider->loadUserByIdentifier($userIdentifier);
 
-            $this->signatureHasher->verifySignatureHash($user, $expires, $hash);
+            $this->signatureHasher->verifySignatureHash($user, $expires, $hash, $parameters);
         } catch (UserNotFoundException $e) {
             throw new InvalidLoginLinkException('User not found.', 0, $e);
         } catch (ExpiredSignatureException $e) {
@@ -115,6 +160,9 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
         } catch (InvalidSignatureException $e) {
             throw new InvalidLoginLinkException(ucfirst(str_ireplace('signature', 'login link', $e->getMessage())), 0, $e);
         }
+
+        unset($parameters['hash_parameters']);
+        $request->attributes->set('_login_link_parameters', $parameters);
 
         return $user;
     }

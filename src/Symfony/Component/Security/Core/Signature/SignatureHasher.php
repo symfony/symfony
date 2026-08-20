@@ -47,19 +47,22 @@ class SignatureHasher
      *
      * This method must be called before the user object is loaded from a provider.
      *
-     * @param int    $expires The expiry time as a unix timestamp
-     * @param string $hash    The plaintext hash provided by the request
+     * @param int                               $expires    The expiry time as a unix timestamp
+     * @param string                            $hash       The plaintext hash provided by the request
+     * @param array<string, \Stringable|scalar> $parameters Extra values covered by the signature
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
      */
-    public function acceptSignatureHash(string $userIdentifier, int $expires, string $hash): void
+    public function acceptSignatureHash(string $userIdentifier, int $expires, string $hash/* , array $parameters = [] */): void
     {
+        $parameters = 3 < \func_num_args() ? func_get_arg(3) : [];
+
         if ($expires < time()) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
         $hmac = substr($hash, 0, 44);
-        $payload = substr($hash, 44).':'.$expires.':'.$userIdentifier;
+        $payload = substr($hash, 44).':'.$expires.':'.$userIdentifier.self::squashParameters($parameters);
 
         if (!hash_equals($hmac, $this->generateHash($payload))) {
             throw new InvalidSignatureException('Invalid or expired signature.');
@@ -69,19 +72,22 @@ class SignatureHasher
     /**
      * Verifies the hash using the provided user and expire time.
      *
-     * @param int    $expires The expiry time as a unix timestamp
-     * @param string $hash    The plaintext hash provided by the request
+     * @param int                               $expires    The expiry time as a unix timestamp
+     * @param string                            $hash       The plaintext hash provided by the request
+     * @param array<string, \Stringable|scalar> $parameters Extra values covered by the signature
      *
      * @throws InvalidSignatureException If the signature does not match the provided parameters
      * @throws ExpiredSignatureException If the signature is no longer valid
      */
-    public function verifySignatureHash(UserInterface $user, int $expires, string $hash): void
+    public function verifySignatureHash(UserInterface $user, int $expires, string $hash/* , array $parameters = [] */): void
     {
+        $parameters = 3 < \func_num_args() ? func_get_arg(3) : [];
+
         if ($expires < time()) {
             throw new ExpiredSignatureException('Signature has expired.');
         }
 
-        if (!hash_equals($hash, $this->computeSignatureHash($user, $expires))) {
+        if (!hash_equals($hash, $this->computeSignatureHash($user, $expires, $parameters))) {
             throw new InvalidSignatureException('Invalid or expired signature.');
         }
 
@@ -97,10 +103,12 @@ class SignatureHasher
     /**
      * Computes the secure hash for the provided user and expire time.
      *
-     * @param int $expires The expiry time as a unix timestamp
+     * @param int                               $expires    The expiry time as a unix timestamp
+     * @param array<string, \Stringable|scalar> $parameters Extra values covered by the signature
      */
-    public function computeSignatureHash(UserInterface $user, int $expires): string
+    public function computeSignatureHash(UserInterface $user, int $expires/* , array $parameters = [] */): string
     {
+        $parameters = 2 < \func_num_args() ? func_get_arg(2) : [];
         $userIdentifier = $user->getUserIdentifier();
         $fieldsHash = hash_init('sha256');
 
@@ -119,9 +127,38 @@ class SignatureHasher
             hash_update($fieldsHash, ':'.$value);
         }
 
+        hash_update($fieldsHash, self::squashParameters($parameters));
+
         $fieldsHash = strtr(base64_encode(hash_final($fieldsHash, true)), '+/=', '-_~');
 
-        return $this->generateHash($fieldsHash.':'.$expires.':'.$userIdentifier).$fieldsHash;
+        return $this->generateHash($fieldsHash.':'.$expires.':'.$userIdentifier.self::squashParameters($parameters)).$fieldsHash;
+    }
+
+    /**
+     * Renders extra parameters as a single string that can take part in the signature.
+     *
+     * @param array<string, \Stringable|scalar> $parameters
+     */
+    private static function squashParameters(array $parameters): string
+    {
+        if (!$parameters) {
+            return '';
+        }
+
+        ksort($parameters);
+
+        $result = '';
+
+        foreach ($parameters as $key => $value) {
+            if (!\is_scalar($value) && !$value instanceof \Stringable) {
+                throw new \InvalidArgumentException(\sprintf('Login link parameter "%s" must be a scalar or a stringable object, "%s" given.', $key, get_debug_type($value)));
+            }
+
+            // booleans travel in the query string as "0" and "1", sign them the same way
+            $result .= ':'.base64_encode($key).'_'.base64_encode(\is_bool($value) ? (string) (int) $value : (string) $value);
+        }
+
+        return $result;
     }
 
     private function generateHash(string $tokenValue): string

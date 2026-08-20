@@ -293,12 +293,221 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    private function createSignatureHash(string $username, int $expires, array $extraFields = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash']): string
+    public function testCreateLoginLinkWithExtraParameters()
+    {
+        $this->router = $this->createMock(UrlGeneratorInterface::class);
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(
+                'app_check_login_link_route',
+                $this->callback(function ($parameters) {
+                    $signed = ['hash_parameters' => 'foo,ref', 'foo' => 'bar', 'ref' => '42'];
+
+                    return 'weaverryan' === $parameters['user']
+                        && 'bar' === $parameters['foo']
+                        && '42' === $parameters['ref']
+                        && 'foo,ref' === $parameters['hash_parameters']
+                        && $parameters['hash'] === $this->createSignatureHash('weaverryan', $parameters['expires'], ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $signed);
+                }),
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
+            ->willReturn('https://example.com/login/verify');
+
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+
+        $this->createLinker()->createLoginLink($user, null, null, ['ref' => '42', 'foo' => 'bar']);
+    }
+
+    /**
+     * @param scalar $value
+     */
+    #[DataProvider('provideExtraParameterValues')]
+    public function testConsumeLoginLinkWithExtraParameters($value, string $expected)
+    {
+        $expires = time() + 500;
+        $signed = ['hash_parameters' => 'ref', 'ref' => $value];
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $signed);
+
+        $request = Request::create('/login/verify?'.http_build_query([
+            'ref' => $value,
+            'hash_parameters' => 'ref',
+            'user' => 'weaverryan',
+            'expires' => $expires,
+            'hash' => $signature,
+        ]));
+
+        $this->assertSame($expected, $request->query->get('ref'));
+
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+
+        $this->assertEquals($user, $this->createLinker()->consumeLoginLink($request));
+    }
+
+    public static function provideExtraParameterValues(): iterable
+    {
+        yield 'string' => ['bar', 'bar'];
+        yield 'zero int' => [0, '0'];
+        yield 'zero string' => ['0', '0'];
+        yield 'empty string' => ['', ''];
+        yield 'false' => [false, '0'];
+        yield 'true' => [true, '1'];
+    }
+
+    public function testConsumeLoginLinkRejectsATamperedExtraParameter()
+    {
+        $expires = time() + 500;
+        $signed = ['hash_parameters' => 'ref', 'ref' => 'good'];
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $signed);
+
+        $request = Request::create('/login/verify?'.http_build_query([
+            'ref' => 'tampered',
+            'hash_parameters' => 'ref',
+            'user' => 'weaverryan',
+            'expires' => $expires,
+            'hash' => $signature,
+        ]));
+
+        $this->userProvider->createUser(new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'));
+
+        $this->expectException(InvalidLoginLinkException::class);
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkRejectsAStrippedExtraParameter()
+    {
+        $expires = time() + 500;
+        $signed = ['hash_parameters' => 'ref', 'ref' => 'good'];
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $signed);
+
+        $request = Request::create('/login/verify?'.http_build_query([
+            'hash_parameters' => 'ref',
+            'user' => 'weaverryan',
+            'expires' => $expires,
+            'hash' => $signature,
+        ]));
+
+        $this->userProvider->createUser(new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'));
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Missing "ref" parameter.');
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkRejectsAnAppendedParameterWithAnArrayValue()
+    {
+        $expires = time() + 500;
+        $signature = $this->createSignatureHash('weaverryan', $expires);
+
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&expires=%d&hash=%s&hash_parameters=x&x[]=1', $expires, $signature));
+
+        $this->userProvider->createUser(new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'));
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "x" parameter.');
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkRejectsASignedParameterSentAsAnArray()
+    {
+        $expires = time() + 500;
+        $signed = ['hash_parameters' => 'ref', 'ref' => 'good'];
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $signed);
+
+        $request = Request::create(\sprintf('/login/verify?ref[]=evil&hash_parameters=ref&user=weaverryan&expires=%d&hash=%s', $expires, $signature));
+
+        $this->userProvider->createUser(new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'));
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "ref" parameter.');
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkRejectsAMalformedParameterName()
+    {
+        $expires = time() + 500;
+        $signature = $this->createSignatureHash('weaverryan', $expires);
+
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&expires=%d&hash=%s&hash_parameters=a[b&a[x]=1', $expires, $signature));
+
+        $this->userProvider->createUser(new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash'));
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "a[b" parameter.');
+
+        $this->createLinker()->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkExposesTheVerifiedParameters()
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+        $linker = $this->createLinker();
+
+        $expires = time() + 500;
+        $signed = ['hash_parameters' => 'foo,ref', 'foo' => 'bar', 'ref' => '42'];
+        $signature = $this->createSignatureHash('weaverryan', $expires, ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], $signed);
+
+        $request = Request::create('/login/verify?'.http_build_query([
+            'foo' => 'bar',
+            'ref' => '42',
+            'hash_parameters' => 'foo,ref',
+            'user' => 'weaverryan',
+            'expires' => $expires,
+            'hash' => $signature,
+        ]));
+
+        $linker->consumeLoginLink($request);
+        $this->assertSame(['foo' => 'bar', 'ref' => '42'], $request->attributes->get('_login_link_parameters'));
+
+        $signature = $this->createSignatureHash('weaverryan', $expires);
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&expires=%d&hash=%s', $expires, $signature));
+
+        $linker->consumeLoginLink($request);
+        $this->assertSame([], $request->attributes->get('_login_link_parameters'));
+    }
+
+    #[DataProvider('provideRejectedParameterNames')]
+    public function testCreateLoginLinkRejectsReservedAndMalformedParameterNames(string $name, string $expectedMessage)
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $this->createLinker()->createLoginLink($user, null, null, [$name => 'value']);
+    }
+
+    public static function provideRejectedParameterNames(): iterable
+    {
+        yield 'user' => ['user', 'Login link parameter name "user" is reserved.'];
+        yield 'expires' => ['expires', 'Login link parameter name "expires" is reserved.'];
+        yield 'hash' => ['hash', 'Login link parameter name "hash" is reserved.'];
+        yield 'listing' => ['hash_parameters', 'Login link parameter name "hash_parameters" is reserved.'];
+        yield 'comma' => ['a,b', 'Login link parameter names must match "[A-Za-z0-9_.-]+", "a,b" given.'];
+        yield 'brackets' => ['a[b]', 'Login link parameter names must match "[A-Za-z0-9_.-]+", "a[b]" given.'];
+    }
+
+    public function testCreateLoginLinkRejectsAnUnstringableParameterValue()
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Login link parameter "ref" must be a scalar or a stringable object, "stdClass" given.');
+
+        $this->createLinker()->createLoginLink($user, null, null, ['ref' => new \stdClass()]);
+    }
+
+    private function createSignatureHash(string $username, int $expires, array $extraFields = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'], array $parameters = []): string
     {
         $hasher = new SignatureHasher($this->propertyAccessor, array_keys($extraFields), 's3cret');
         $user = new TestLoginLinkHandlerUser($username, $extraFields['emailProperty'] ?? '', $extraFields['passwordProperty'] ?? '', $extraFields['lastAuthenticatedAt'] ?? null);
 
-        return $hasher->computeSignatureHash($user, $expires);
+        return $hasher->computeSignatureHash($user, $expires, $parameters);
     }
 
     private function createLinker(array $options = [], array $extraProperties = ['emailProperty', 'passwordProperty']): LoginLinkHandler

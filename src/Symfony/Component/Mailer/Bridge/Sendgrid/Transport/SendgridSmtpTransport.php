@@ -69,13 +69,15 @@ class SendgridSmtpTransport extends EsmtpTransport
                 if ($groupsToDisplay = $header->getGroupsToDisplay()) {
                     $payload['asm']['groups_to_display'] = $groupsToDisplay;
                 }
-            } elseif ($header instanceof TrackingHeader) {
-                if (null !== $header->getOpens()) {
-                    $payload['filters']['opentrack']['settings']['enable'] = (int) $header->getOpens();
-                }
-                if (null !== $header->getClicks()) {
-                    $payload['filters']['clicktrack']['settings'] = ['enable' => (int) $header->getClicks(), 'enable_text' => $header->getClicks()];
-                }
+            }
+        }
+
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            if (null !== $tracking->getOpens()) {
+                $payload['filters']['opentrack']['settings']['enable'] = (int) $tracking->getOpens();
+            }
+            if (null !== $tracking->getClicks()) {
+                $payload['filters']['clicktrack']['settings'] = ['enable' => (int) $tracking->getClicks(), 'enable_text' => $tracking->getClicks()];
             }
         }
 

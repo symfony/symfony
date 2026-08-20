@@ -68,17 +68,17 @@ class PostmarkSmtpTransport extends EsmtpTransport
                 $headers->addTextHeader('X-PM-Metadata-'.$header->getKey(), $header->getValue());
                 $headers->remove($name);
             }
+        }
 
-            if ($header instanceof TrackingHeader) {
-                // an explicit X-PM-Track* header wins over the generic one
-                if (null !== $header->getOpens() && !$headers->has('X-PM-TrackOpens')) {
-                    $headers->addTextHeader('X-PM-TrackOpens', $header->getOpens() ? 'true' : 'false');
-                }
-                if (null !== $header->getClicks() && !$headers->has('X-PM-TrackLinks')) {
-                    $headers->addTextHeader('X-PM-TrackLinks', $header->getClicks() ? 'HtmlAndText' : 'None');
-                }
-                $headers->remove($name);
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            // an explicit X-PM-Track* header wins over the generic one
+            if (null !== $tracking->getOpens() && !$headers->has('X-PM-TrackOpens')) {
+                $headers->addTextHeader('X-PM-TrackOpens', $tracking->getOpens() ? 'true' : 'false');
             }
+            if (null !== $tracking->getClicks() && !$headers->has('X-PM-TrackLinks')) {
+                $headers->addTextHeader('X-PM-TrackLinks', $tracking->getClicks() ? 'HtmlAndText' : 'None');
+            }
+            $headers->remove(TrackingHeader::NAME);
         }
 
         if (null !== $this->messageStream && !$message->getHeaders()->has('X-PM-Message-Stream')) {

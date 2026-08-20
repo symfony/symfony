@@ -118,14 +118,12 @@ class MailgunApiTransport extends AbstractApiTransport
         }
 
         // resolve the generic header first, so a native o:/h:/t:/v: header always wins regardless of iteration order
-        foreach ($headers->all() as $header) {
-            if ($header instanceof TrackingHeader) {
-                if (null !== $header->getOpens()) {
-                    $payload['o:tracking-opens'] = $header->getOpens() ? 'yes' : 'no';
-                }
-                if (null !== $header->getClicks()) {
-                    $payload['o:tracking-clicks'] = $header->getClicks() ? 'yes' : 'no';
-                }
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            if (null !== $tracking->getOpens()) {
+                $payload['o:tracking-opens'] = $tracking->getOpens() ? 'yes' : 'no';
+            }
+            if (null !== $tracking->getClicks()) {
+                $payload['o:tracking-clicks'] = $tracking->getClicks() ? 'yes' : 'no';
             }
         }
 

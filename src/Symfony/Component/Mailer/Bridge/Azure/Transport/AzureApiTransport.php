@@ -264,20 +264,14 @@ final class AzureApiTransport extends AbstractApiTransport
      */
     private function getTracking(Email $email): ?bool
     {
-        foreach ($email->getHeaders()->all() as $header) {
-            if (!$header instanceof TrackingHeader) {
-                continue;
-            }
+        $tracking = TrackingHeader::fromHeaders($email->getHeaders());
 
-            if (false === $header->getOpens() || false === $header->getClicks()) {
-                return false;
-            }
+        if (false === $tracking?->getOpens() || false === $tracking?->getClicks()) {
+            return false;
+        }
 
-            if (true === $header->getOpens() || true === $header->getClicks()) {
-                return true;
-            }
-
-            return null;
+        if (true === $tracking?->getOpens() || true === $tracking?->getClicks()) {
+            return true;
         }
 
         return null;

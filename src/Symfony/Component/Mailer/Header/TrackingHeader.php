@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Header;
 
+use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 /**
@@ -26,14 +27,50 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
  * provider-specific header or setting always wins over this one. On transports that don't support
  * this header (plain SMTP, SES, Resend, ...), it is sent as a literal `X-Track` header and has no
  * effect.
+ *
+ * The header is resolved by name, so an application-wide default can be configured as a plain
+ * header, e.g. `framework.mailer.headers: { 'X-Track': 'opens=false; clicks=false' }`; a
+ * TrackingHeader set on the message itself wins over such a default.
  */
 final class TrackingHeader extends UnstructuredHeader
 {
+    public const NAME = 'X-Track';
+
     public function __construct(
         private readonly ?bool $opens = null,
         private readonly ?bool $clicks = null,
     ) {
-        parent::__construct('X-Track', self::formatValue($opens, $clicks));
+        parent::__construct(self::NAME, self::formatValue($opens, $clicks));
+    }
+
+    /**
+     * Resolves the tracking flags carried by a set of headers.
+     *
+     * The header is looked up by name and can be a plain text header, as produced by the
+     * "headers" option of the mailer configuration or by a MIME round trip.
+     */
+    public static function fromHeaders(Headers $headers): ?self
+    {
+        if (null === $header = $headers->get(self::NAME)) {
+            return null;
+        }
+
+        if ($header instanceof self) {
+            return $header;
+        }
+
+        $flags = ['opens' => null, 'clicks' => null];
+        foreach (explode(';', $header->getBody()) as $part) {
+            if (2 === \count($part = explode('=', trim($part), 2)) && \array_key_exists($part[0], $flags)) {
+                $flags[$part[0]] = match (trim($part[1])) {
+                    'true' => true,
+                    'false' => false,
+                    default => null,
+                };
+            }
+        }
+
+        return new self($flags['opens'], $flags['clicks']);
     }
 
     public function getOpens(): ?bool

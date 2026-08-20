@@ -235,4 +235,18 @@ class BrevoApiTransportTest extends TestCase
         $payload = $method->invoke($transport, $email, $envelope);
         $this->assertArrayNotHasKey('headers', $payload);
     }
+
+    public function testPlainTextTrackingHeaderIsResolved()
+    {
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('X-Track', 'opens=false; clicks=false');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertFalse($payload['to'][0]['contactPixelTrackingConsent']);
+        $this->assertArrayNotHasKey('headers', $payload);
+    }
 }

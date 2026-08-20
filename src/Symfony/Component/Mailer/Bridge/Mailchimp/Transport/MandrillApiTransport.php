@@ -129,8 +129,17 @@ class MandrillApiTransport extends AbstractApiTransport
             }
         }
 
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $payload['message']['track_opens'] = $tracking->getOpens();
+            }
+            if (null !== $tracking->getClicks()) {
+                $payload['message']['track_clicks'] = $tracking->getClicks();
+            }
+        }
+
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount', 'x-mc-returnpathdomain'], true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount', 'x-mc-returnpathdomain', 'x-track'], true)) {
                 continue;
             }
 
@@ -145,17 +154,6 @@ class MandrillApiTransport extends AbstractApiTransport
 
             if ($header instanceof MetadataHeader) {
                 $payload['message']['metadata'][$header->getKey()] = $header->getValue();
-
-                continue;
-            }
-
-            if ($header instanceof TrackingHeader) {
-                if (null !== $header->getOpens()) {
-                    $payload['message']['track_opens'] = $header->getOpens();
-                }
-                if (null !== $header->getClicks()) {
-                    $payload['message']['track_clicks'] = $header->getClicks();
-                }
 
                 continue;
             }

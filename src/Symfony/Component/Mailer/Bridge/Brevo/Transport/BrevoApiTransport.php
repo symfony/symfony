@@ -167,7 +167,7 @@ final class BrevoApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if ($header instanceof TrackingHeader) {
+            if (0 === strcasecmp($header->getName(), TrackingHeader::NAME)) {
                 continue;
             }
 
@@ -184,20 +184,14 @@ final class BrevoApiTransport extends AbstractApiTransport
      */
     private function getTracking(Headers $headers): ?bool
     {
-        foreach ($headers->all() as $header) {
-            if (!$header instanceof TrackingHeader) {
-                continue;
-            }
+        $tracking = TrackingHeader::fromHeaders($headers);
 
-            if (false === $header->getOpens() || false === $header->getClicks()) {
-                return false;
-            }
+        if (false === $tracking?->getOpens() || false === $tracking?->getClicks()) {
+            return false;
+        }
 
-            if (true === $header->getOpens() || true === $header->getClicks()) {
-                return true;
-            }
-
-            return null;
+        if (true === $tracking?->getOpens() || true === $tracking?->getClicks()) {
+            return true;
         }
 
         return null;

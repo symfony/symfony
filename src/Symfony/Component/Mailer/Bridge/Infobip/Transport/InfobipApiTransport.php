@@ -137,14 +137,12 @@ final class InfobipApiTransport extends AbstractApiTransport
         $this->attachmentsFormData($fields, $email);
 
         // resolve the generic header first, so a native X-Infobip-Track* header always wins regardless of iteration order
-        foreach ($email->getHeaders()->all() as $header) {
-            if ($header instanceof TrackingHeader) {
-                if (null !== $header->getOpens()) {
-                    $fields['trackOpens'] = $header->getOpens() ? 'true' : 'false';
-                }
-                if (null !== $header->getClicks()) {
-                    $fields['trackClicks'] = $header->getClicks() ? 'true' : 'false';
-                }
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $fields['trackOpens'] = $tracking->getOpens() ? 'true' : 'false';
+            }
+            if (null !== $tracking->getClicks()) {
+                $fields['trackClicks'] = $tracking->getClicks() ? 'true' : 'false';
             }
         }
 

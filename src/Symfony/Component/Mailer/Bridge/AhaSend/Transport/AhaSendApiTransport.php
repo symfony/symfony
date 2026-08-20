@@ -165,7 +165,8 @@ final class AhaSendApiTransport extends AbstractApiTransport
             $payload['reply_to'] = $this->formatAddress(array_pop($replyTo));
         }
 
-        [$headers, $tags, $tracking] = $this->prepareHeaders($email->getHeaders());
+        [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        $tracking = TrackingHeader::fromHeaders($email->getHeaders());
         if ($headers) {
             $payload['headers'] = $headers;
         }
@@ -207,7 +208,8 @@ final class AhaSendApiTransport extends AbstractApiTransport
             $payload['content']['reply_to'] = $this->formatAddress(array_pop($replyTo));
         }
 
-        [$headers, $tags, $tracking] = $this->prepareHeaders($email->getHeaders());
+        [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        $tracking = TrackingHeader::fromHeaders($email->getHeaders());
         if ($tags) {
             $tagsStr = implode(',', $tags);
             $email->getHeaders()->addTextHeader('AhaSend-Tags', $tagsStr);
@@ -232,7 +234,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
     }
 
     /**
-     * @return array{0: array<string, string>, 1: list<string>, 2: ?TrackingHeader}
+     * @return array{0: array<string, string>, 1: list<string>}
      */
     private function prepareHeaders(Headers $headers): array
     {
@@ -240,7 +242,6 @@ final class AhaSendApiTransport extends AbstractApiTransport
         // AhaSend API does not accept these headers.
         $headersToBypass = ['To', 'From', 'Subject', 'Reply-To'];
         $tags = [];
-        $tracking = null;
         foreach ($headers->all() as $header) {
             if (\in_array($header->getName(), $headersToBypass, true)) {
                 continue;
@@ -251,15 +252,14 @@ final class AhaSendApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if ($header instanceof TrackingHeader) {
-                $tracking = $header;
+            if (0 === strcasecmp($header->getName(), TrackingHeader::NAME)) {
                 continue;
             }
 
             $headersPrepared[$header->getName()] = $header->getBodyAsString();
         }
 
-        return [$headersPrepared, $tags, $tracking];
+        return [$headersPrepared, $tags];
     }
 
     private function getAttachments(Email $email): array

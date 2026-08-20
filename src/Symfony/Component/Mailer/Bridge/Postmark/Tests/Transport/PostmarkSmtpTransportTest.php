@@ -118,4 +118,18 @@ class PostmarkSmtpTransportTest extends TestCase
         $this->assertSame('X-PM-TrackLinks: HtmlAndText', $email->getHeaders()->get('X-PM-TrackLinks')->toString());
         $this->assertFalse($email->getHeaders()->has('X-Track'));
     }
+
+    public function testPlainTextTrackingHeaderIsResolved()
+    {
+        $transport = new PostmarkSmtpTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(PostmarkSmtpTransport::class, 'addPostmarkHeaders');
+
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('X-Track', 'opens=false; clicks=false');
+        $method->invoke($transport, $email);
+
+        $this->assertSame('X-PM-TrackOpens: false', $email->getHeaders()->get('X-PM-TrackOpens')->toString());
+        $this->assertSame('X-PM-TrackLinks: None', $email->getHeaders()->get('X-PM-TrackLinks')->toString());
+        $this->assertFalse($email->getHeaders()->has('X-Track'));
+    }
 }

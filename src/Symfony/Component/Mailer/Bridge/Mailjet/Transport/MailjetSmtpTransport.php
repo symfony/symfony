@@ -44,17 +44,15 @@ class MailjetSmtpTransport extends EsmtpTransport
     {
         $headers = $message->getHeaders();
 
-        foreach ($headers->all() as $name => $header) {
-            if ($header instanceof TrackingHeader) {
-                // an explicit X-Mailjet-Track* header wins over the generic one
-                if (null !== $header->getOpens() && !$headers->has('X-Mailjet-TrackOpen')) {
-                    $headers->addTextHeader('X-Mailjet-TrackOpen', $header->getOpens() ? '1' : '0');
-                }
-                if (null !== $header->getClicks() && !$headers->has('X-Mailjet-TrackClick')) {
-                    $headers->addTextHeader('X-Mailjet-TrackClick', $header->getClicks() ? '1' : '0');
-                }
-                $headers->remove($name);
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            // an explicit X-Mailjet-Track* header wins over the generic one
+            if (null !== $tracking->getOpens() && !$headers->has('X-Mailjet-TrackOpen')) {
+                $headers->addTextHeader('X-Mailjet-TrackOpen', $tracking->getOpens() ? '1' : '0');
             }
+            if (null !== $tracking->getClicks() && !$headers->has('X-Mailjet-TrackClick')) {
+                $headers->addTextHeader('X-Mailjet-TrackClick', $tracking->getClicks() ? '1' : '0');
+            }
+            $headers->remove(TrackingHeader::NAME);
         }
     }
 }

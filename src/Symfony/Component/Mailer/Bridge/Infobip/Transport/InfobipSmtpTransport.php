@@ -44,17 +44,15 @@ final class InfobipSmtpTransport extends EsmtpTransport
     {
         $headers = $message->getHeaders();
 
-        foreach ($headers->all() as $name => $header) {
-            if ($header instanceof TrackingHeader) {
-                // an explicit X-Infobip-Track* header wins over the generic one
-                if (null !== $header->getOpens() && !$headers->has('X-Infobip-TrackOpens')) {
-                    $headers->addTextHeader('X-Infobip-TrackOpens', $header->getOpens() ? 'true' : 'false');
-                }
-                if (null !== $header->getClicks() && !$headers->has('X-Infobip-TrackClicks')) {
-                    $headers->addTextHeader('X-Infobip-TrackClicks', $header->getClicks() ? 'true' : 'false');
-                }
-                $headers->remove($name);
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            // an explicit X-Infobip-Track* header wins over the generic one
+            if (null !== $tracking->getOpens() && !$headers->has('X-Infobip-TrackOpens')) {
+                $headers->addTextHeader('X-Infobip-TrackOpens', $tracking->getOpens() ? 'true' : 'false');
             }
+            if (null !== $tracking->getClicks() && !$headers->has('X-Infobip-TrackClicks')) {
+                $headers->addTextHeader('X-Infobip-TrackClicks', $tracking->getClicks() ? 'true' : 'false');
+            }
+            $headers->remove(TrackingHeader::NAME);
         }
     }
 }

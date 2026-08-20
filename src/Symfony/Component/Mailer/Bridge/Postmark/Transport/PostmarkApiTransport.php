@@ -114,19 +114,17 @@ class PostmarkApiTransport extends AbstractApiTransport
             'Attachments' => $this->getAttachments($email),
         ];
 
-        foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to', 'date'], true)) {
-                continue;
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $payload['TrackOpens'] = $tracking->getOpens();
             }
+            if (null !== $tracking->getClicks()) {
+                $payload['TrackLinks'] = $tracking->getClicks() ? 'HtmlAndText' : 'None';
+            }
+        }
 
-            if ($header instanceof TrackingHeader) {
-                if (null !== $header->getOpens()) {
-                    $payload['TrackOpens'] = $header->getOpens();
-                }
-                if (null !== $header->getClicks()) {
-                    $payload['TrackLinks'] = $header->getClicks() ? 'HtmlAndText' : 'None';
-                }
-
+        foreach ($email->getHeaders()->all() as $name => $header) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to', 'date', 'x-track'], true)) {
                 continue;
             }
 

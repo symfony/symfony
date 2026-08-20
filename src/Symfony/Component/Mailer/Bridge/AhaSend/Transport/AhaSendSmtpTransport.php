@@ -53,17 +53,17 @@ class AhaSendSmtpTransport extends EsmtpTransport
                 $tags[] = $header->getValue();
                 $headers->remove($name);
             }
+        }
 
-            if ($header instanceof TrackingHeader) {
-                // an explicit AhaSend-Track-* header wins over the generic one
-                if (null !== $header->getOpens() && !$headers->has('AhaSend-Track-Opens')) {
-                    $headers->addTextHeader('AhaSend-Track-Opens', $header->getOpens() ? 'true' : 'false');
-                }
-                if (null !== $header->getClicks() && !$headers->has('AhaSend-Track-Clicks')) {
-                    $headers->addTextHeader('AhaSend-Track-Clicks', $header->getClicks() ? 'true' : 'false');
-                }
-                $headers->remove($name);
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            // an explicit AhaSend-Track-* header wins over the generic one
+            if (null !== $tracking->getOpens() && !$headers->has('AhaSend-Track-Opens')) {
+                $headers->addTextHeader('AhaSend-Track-Opens', $tracking->getOpens() ? 'true' : 'false');
             }
+            if (null !== $tracking->getClicks() && !$headers->has('AhaSend-Track-Clicks')) {
+                $headers->addTextHeader('AhaSend-Track-Clicks', $tracking->getClicks() ? 'true' : 'false');
+            }
+            $headers->remove(TrackingHeader::NAME);
         }
         if (!empty($tags)) {
             $headers->addTextHeader('AhaSend-Tags', implode(',', $tags));

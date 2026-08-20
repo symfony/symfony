@@ -363,4 +363,19 @@ class MailgunApiTransportTest extends TestCase
         $this->assertSame('yes', $payload['o:tracking-opens']);
         $this->assertSame('no', $payload['o:tracking-clicks']);
     }
+
+    public function testPlainTextTrackingHeaderIsResolved()
+    {
+        $transport = new MailgunApiTransport('ACCESS_KEY', 'DOMAIN');
+        $method = new \ReflectionMethod(MailgunApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('X-Track', 'opens=false; clicks=default');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('no', $payload['o:tracking-opens']);
+        $this->assertArrayNotHasKey('o:tracking-clicks', $payload);
+        $this->assertArrayNotHasKey('h:X-Track', $payload);
+    }
 }

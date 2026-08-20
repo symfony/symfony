@@ -141,14 +141,12 @@ class MailjetApiTransport extends AbstractApiTransport
         }
 
         // resolve the generic header first, so a native x-mailjet-track* header always wins regardless of iteration order
-        foreach ($email->getHeaders()->all() as $header) {
-            if ($header instanceof TrackingHeader) {
-                if (null !== $header->getOpens()) {
-                    $message['TrackOpens'] = $header->getOpens() ? 'enabled' : 'disabled';
-                }
-                if (null !== $header->getClicks()) {
-                    $message['TrackClicks'] = $header->getClicks() ? 'enabled' : 'disabled';
-                }
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $message['TrackOpens'] = $tracking->getOpens() ? 'enabled' : 'disabled';
+            }
+            if (null !== $tracking->getClicks()) {
+                $message['TrackClicks'] = $tracking->getClicks() ? 'enabled' : 'disabled';
             }
         }
 
@@ -158,7 +156,7 @@ class MailjetApiTransport extends AbstractApiTransport
                 continue;
             }
 
-            if ($header instanceof TrackingHeader) {
+            if (0 === strcasecmp($headerName, TrackingHeader::NAME)) {
                 continue;
             }
 

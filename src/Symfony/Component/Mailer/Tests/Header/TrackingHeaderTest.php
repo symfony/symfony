@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mime\Header\Headers;
 
 class TrackingHeaderTest extends TestCase
 {
@@ -33,5 +34,38 @@ class TrackingHeaderTest extends TestCase
         $this->assertTrue($header->getOpens());
         $this->assertFalse($header->getClicks());
         $this->assertSame('X-Track: opens=true; clicks=false', $header->toString());
+    }
+
+    public function testFromHeadersReturnsNullWithoutHeader()
+    {
+        $this->assertNull(TrackingHeader::fromHeaders(new Headers()));
+    }
+
+    public function testFromHeadersReturnsTheInstance()
+    {
+        $headers = new Headers();
+        $headers->add($header = new TrackingHeader(opens: true));
+
+        $this->assertSame($header, TrackingHeader::fromHeaders($headers));
+    }
+
+    public function testFromHeadersParsesAPlainTextHeader()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('X-Track', 'opens=false; clicks=default');
+
+        $header = TrackingHeader::fromHeaders($headers);
+        $this->assertFalse($header->getOpens());
+        $this->assertNull($header->getClicks());
+    }
+
+    public function testFromHeadersToleratesMalformedValues()
+    {
+        $headers = new Headers();
+        $headers->addTextHeader('X-Track', 'yes please');
+
+        $header = TrackingHeader::fromHeaders($headers);
+        $this->assertNull($header->getOpens());
+        $this->assertNull($header->getClicks());
     }
 }

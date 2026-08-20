@@ -157,7 +157,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                     if (null === $definition->getDecoratedService() || $interface === $definition->getClass() || \in_array($k, $tagsToKeep, true)) {
                         foreach ($v as $v) {
                             if (self::isLazyTagAttributes($v)) {
-                                if (!($r = $container->getReflectionClass($class, false)) || !$r->isInstantiable()) {
+                                if (!($r = $container->getReflectionClass($class, false)) || !self::canComputeTagAttributes($r, $v)) {
                                     continue;
                                 }
                                 $v = self::resolveTagAttributes($v, $class, $k, $interface);
@@ -297,5 +297,20 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
         }
 
         return $resolved;
+    }
+
+    /**
+     * Whether lazily-computed attributes can be resolved for a class: being instantiable is not required
+     * (private constructors and enums are fine), but a closure cannot run on an abstract class or an
+     * interface, and a [class-string, method] callable cannot when the method resolves to an abstract
+     * declaration there. Skipping beats throwing because base types legitimately match the instanceof rules.
+     */
+    private static function canComputeTagAttributes(\ReflectionClass $r, array $attributes): bool
+    {
+        if ($attributes[0] instanceof \Closure) {
+            return !$r->isAbstract();
+        }
+
+        return !$r->hasMethod($attributes[1]) || !$r->getMethod($attributes[1])->isAbstract();
     }
 }

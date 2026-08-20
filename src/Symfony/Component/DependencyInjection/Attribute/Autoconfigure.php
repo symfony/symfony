@@ -30,7 +30,7 @@ class Autoconfigure
      * @param array<string, mixed>|null              $properties   The properties to define when creating the service
      * @param array{string, string}|string|null      $configurator A PHP function, reference or an array containing a class/reference and a method to call after the service is fully initialized
      * @param string|null                            $constructor  The public static method to use to instantiate the service
-     * @param array<array<mixed>>|string[]|null      $resourceTags The resource tags to add to the service
+     * @param array<array<mixed>>|string[]|null      $resourceTags The resource tags to add to the service; a tag's attributes may be a \Closure or a [class-string, method] callable that computes them from each tagged class's class-string
      * @param array{string|null, string}|string|null $factory      A reference, an expression, or an array containing a class/reference and a method to call to create the service
      */
     public function __construct(

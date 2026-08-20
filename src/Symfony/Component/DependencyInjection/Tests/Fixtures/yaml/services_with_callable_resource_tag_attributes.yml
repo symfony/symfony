@@ -1,0 +1,11 @@
+services:
+    _instanceof:
+        Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithCallableInterface:
+            resource_tags:
+                - foo_bar: [Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithCallableInterface, getTagAttributes]
+
+    foo:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\FooResourceTaggedWithCallable
+
+    bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\BarResourceTaggedWithCallable

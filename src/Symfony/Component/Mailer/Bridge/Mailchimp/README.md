@@ -19,6 +19,20 @@ MAILER_DSN=mandrill+api://KEY@default
 where:
  - `KEY` is your Mailchimp API key
 
+Custom Return Path Domains
+--------------------------
+
+When using the `mandrill+api` transport, you can set a custom domain for the
+return path of the message (which Mandrill uses to handle bounces) by adding
+the `X-MC-ReturnPathDomain` header to the email:
+
+```php
+$email->getHeaders()->addTextHeader('X-MC-ReturnPathDomain', 'example.com');
+```
+
+> [!NOTE]
+> Support for the `X-MC-ReturnPathDomain` header was introduced in Symfony 8.2.
+
 Sponsor
 -------
 

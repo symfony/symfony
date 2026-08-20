@@ -11,6 +11,7 @@ CHANGELOG
  * Render the `name` attribute of the `<form>` element through `attr`, so that `attr: {name: false}` disables it and `attr: {name: '...'}` overrides it
  * Render `<optgroup>` labels from `ChoiceGroupView::$label`, which allows translatable choice group labels
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or Symfony UX Turbo, instead
+ * Add a `for _self` modifier to the `trans_default_domain` tag to apply the domain to the whole template, `embed` bodies included
 
 8.1
 ---

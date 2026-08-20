@@ -46,7 +46,7 @@
                     tabNavigationItem.setAttribute('aria-controls', tabId);
                     if (tab.classList.contains('active')) { selectedTabId = tabId; }
                     if (tab.classList.contains('disabled')) {
-                        tabNavigationItem.classList.add('disabled');
+                        tabNavigationItem.disabled = true;
                     } else if (null === firstEnabledTabId) {
                         firstEnabledTabId = tabId;
                     }
@@ -62,15 +62,35 @@
                 document.querySelector('[data-tab-id="' + selectedTabId + '"]').classList.add('active');
             });
 
+            /* activates a tab: shows its panel and hides the others in the same group */
+            const activateTab = (tab) => {
+                Array.from(tab.parentNode.children).forEach((tabOfGroup) => {
+                    const tabId = tabOfGroup.getAttribute('data-tab-id');
+                    document.getElementById(tabId).className = 'hidden';
+                    tabOfGroup.classList.remove('active');
+                    tabOfGroup.removeAttribute('aria-selected');
+                    tabOfGroup.setAttribute('tabindex', '-1');
+                });
+
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                tab.removeAttribute('tabindex');
+                const activeTabId = tab.getAttribute('data-tab-id');
+                document.getElementById(activeTabId).className = 'block';
+            };
+
             /* display the active tab and add the 'click' event listeners */
             tabGroups.forEach((tabGroup) => {
                 const tabs = tabGroup.querySelectorAll(':scope > .tab-navigation .tab-control');
                 tabs.forEach((tab) => {
                     const tabId = tab.getAttribute('data-tab-id');
                     const tabPanel = document.getElementById(tabId);
+                    const tabPanelTitle = tabPanel.querySelector('.tab-title');
                     tabPanel.setAttribute('role', 'tabpanel');
-                    tabPanel.setAttribute('aria-labelledby', tabId);
-                    tabPanel.querySelector('.tab-title').className = 'hidden';
+                    tabPanel.setAttribute('tabindex', '0');
+                    tabPanelTitle.id = `${tabId}-label`;
+                    tabPanel.setAttribute('aria-labelledby', tabPanelTitle.id);
+                    tabPanelTitle.classList.add('hidden');
 
                     if (tab.classList.contains('active')) {
                         tabPanel.className = 'block';
@@ -91,21 +111,30 @@
                             activeTab = activeTab.parentNode;
                         }
 
-                        /* get the full list of tabs through the parent of the active tab element */
-                        const tabs = Array.from(activeTab.parentNode.children);
-                        tabs.forEach((tab) => {
-                            const tabId = tab.getAttribute('data-tab-id');
-                            document.getElementById(tabId).className = 'hidden';
-                            tab.classList.remove('active');
-                            tab.removeAttribute('aria-selected');
-                            tab.setAttribute('tabindex', '-1');
-                        });
+                        activateTab(activeTab);
+                    });
 
-                        activeTab.classList.add('active');
-                        activeTab.setAttribute('aria-selected', 'true');
-                        activeTab.removeAttribute('tabindex');
-                        const activeTabId = activeTab.getAttribute('data-tab-id');
-                        document.getElementById(activeTabId).className = 'block';
+                    /* left/right arrow keys move focus to the previous/next tab and activate it */
+                    /* (www.w3.org/WAI/ARIA/apg/patterns/tabs/#keyboardinteraction) */
+                    tab.addEventListener('keydown', function(e) {
+                        const key = e.key;
+                        if ('ArrowLeft' !== key && 'ArrowRight' !== key) {
+                            return;
+                        }
+
+                        e.preventDefault();
+
+                        const tabsOfGroup = Array.from(this.parentNode.children);
+                        const currentIndex = tabsOfGroup.indexOf(this);
+                        let newIndex = currentIndex;
+                        /* skip disabled tabs, without looping forever if they all are */
+                        do {
+                            newIndex = (newIndex + ('ArrowRight' === key ? 1 : -1) + tabsOfGroup.length) % tabsOfGroup.length;
+                        } while (tabsOfGroup[newIndex].disabled && newIndex !== currentIndex);
+
+                        const newTab = tabsOfGroup[newIndex];
+                        activateTab(newTab);
+                        newTab.focus();
                     });
                 });
 
@@ -171,12 +200,42 @@
 
                 element.classList.add('sf-toggle-content');
 
+                /* some toggles are just icons with no accessible name of their own (e.g. the */
+                /* stack trace expand/collapse controls): wrap those in a real <button> so they */
+                /* get one; toggles that already have visible text (most of them) keep using */
+                /* themselves as the control, since they're already a real <a>/<button> */
+                const iconClose = toggle.querySelector('.icon-close');
+                const iconOpen = toggle.querySelector('.icon-open');
+                let toggleControl = toggle;
+                const firstIcon = iconClose || iconOpen;
+                if (firstIcon) {
+                    /* a button may already wrap the icons in the markup; reuse it instead of */
+                    /* nesting a new one inside it, which would produce invalid, broken HTML */
+                    const existingButton = firstIcon.closest('button');
+                    if (existingButton && toggle.contains(existingButton)) {
+                        toggleControl = existingButton;
+                    } else {
+                        toggleControl = document.createElement('button');
+                        toggleControl.type = 'button';
+                        toggleControl.classList.add('sf-toggle-button');
+                        firstIcon.parentNode.insertBefore(toggleControl, firstIcon);
+                        if (iconClose) { toggleControl.appendChild(iconClose); }
+                        if (iconOpen) { toggleControl.appendChild(iconOpen); }
+                    }
+                    /* fixed label: the toggle's own text is read again right after as normal */
+                    /* content, so reusing it as the button's name would repeat it twice */
+                    toggleControl.setAttribute('aria-label', toggle.getAttribute('data-toggle-label') || 'Toggle details');
+                }
+                toggleControl.setAttribute('aria-controls', element.id);
+
                 if (toggle.hasAttribute('data-toggle-initial') && 'display' === toggle.getAttribute('data-toggle-initial')) {
                     toggle.classList.add('sf-toggle-on');
                     element.classList.add('sf-toggle-visible');
+                    toggleControl.setAttribute('aria-expanded', 'true');
                 } else {
                     toggle.classList.add('sf-toggle-off');
                     element.classList.add('sf-toggle-hidden');
+                    toggleControl.setAttribute('aria-expanded', 'false');
                 }
 
                 toggle.addEventListener('click', (e) => {
@@ -199,6 +258,7 @@
                     toggle.classList.toggle('sf-toggle-off');
                     element.classList.toggle('sf-toggle-hidden');
                     element.classList.toggle('sf-toggle-visible');
+                    toggleControl.setAttribute('aria-expanded', toggle.classList.contains('sf-toggle-on') ? 'true' : 'false');
 
                     /* the toggle doesn't change its contents when clicking on it */
                     if (!toggle.hasAttribute('data-toggle-alt-content')) {

@@ -1685,8 +1685,9 @@ tr.status-warning td {
     text-align: center;
     white-space: nowrap;
 }
-.tab-navigation .tab-control.disabled {
+.tab-navigation .tab-control:disabled {
     color: var(--tab-disabled-color);
+    cursor: default;
 }
 .tab-navigation .tab-control.active {
     background-color: var(--tab-active-background);
@@ -1727,6 +1728,18 @@ tr.status-warning td {
 }
 .sf-toggle-content.sf-toggle-visible {
     display: block;
+}
+/* wraps the open/close icons (see #createToggles() in base_js.html.twig); block avoids the empty */
+/* inline-block "strut" height that would otherwise push the content down */
+.sf-toggle-button {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    display: block;
+    font-size: 0;
+    line-height: 0;
 }
 
 {# Badges

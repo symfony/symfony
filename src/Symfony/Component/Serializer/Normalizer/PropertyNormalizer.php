@@ -118,7 +118,7 @@ class PropertyNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
-        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($classOrObject)?->getTypeProperty() === $attribute) {
+        if ($this->isDiscriminatorTypeProperty($classOrObject, $attribute)) {
             return true;
         }
 

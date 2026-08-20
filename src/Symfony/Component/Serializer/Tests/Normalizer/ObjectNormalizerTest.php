@@ -1507,6 +1507,18 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame('FOO', $denormalized->foo);
         $this->assertSame('BAR', $denormalized->bar);
     }
+
+    public function testDenormalizeNestedDiscriminatorMapWithoutExtraAttributes()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['type' => 'sub', 'nested_type' => 'sub_sub', 'foo' => 'FOO', 'bar' => 'BAR', 'baz' => 'BAZ'], NestedDiscriminatorBase::class, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
+
+        $this->assertInstanceOf(NestedDiscriminatorSubSub::class, $denormalized);
+        $this->assertSame('FOO', $denormalized->foo);
+        $this->assertSame('BAR', $denormalized->bar);
+        $this->assertSame('BAZ', $denormalized->baz);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -2247,4 +2259,27 @@ class ObjectNormalizerDiscriminatorSub extends ObjectNormalizerDiscriminatorBase
     public const BAR = 'bar';
 
     public string $bar = self::BAR;
+}
+
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'base' => NestedDiscriminatorBase::class,
+    'sub' => NestedDiscriminatorSub::class,
+])]
+class NestedDiscriminatorBase
+{
+    public string $foo = 'foo';
+}
+
+#[DiscriminatorMap(typeProperty: 'nested_type', mapping: [
+    'sub' => NestedDiscriminatorSub::class,
+    'sub_sub' => NestedDiscriminatorSubSub::class,
+])]
+class NestedDiscriminatorSub extends NestedDiscriminatorBase
+{
+    public string $bar = 'bar';
+}
+
+class NestedDiscriminatorSubSub extends NestedDiscriminatorSub
+{
+    public string $baz = 'baz';
 }

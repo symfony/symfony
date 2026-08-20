@@ -572,6 +572,25 @@ class PropertyNormalizerTest extends TestCase
         $this->assertInstanceOf(PropertyDiscriminatedDummyOne::class, $obj);
     }
 
+    public function testDenormalizeNestedDiscriminatorMapWithAllowExtraAttributesFalse()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $obj = $normalizer->denormalize(
+            ['type' => 'sub', 'nested_type' => 'sub_sub', 'foo' => 'FOO', 'bar' => 'BAR', 'baz' => 'BAZ'],
+            PropertyNestedDiscriminatorBase::class,
+            null,
+            [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]
+        );
+
+        $this->assertInstanceOf(PropertyNestedDiscriminatorSubSub::class, $obj);
+        $this->assertSame('FOO', $obj->foo);
+        $this->assertSame('BAR', $obj->bar);
+        $this->assertSame('BAZ', $obj->baz);
+    }
+
     /**
      * @dataProvider provideTypedPropertyDummies
      */
@@ -758,4 +777,27 @@ class PropertyDiscriminatedDummyOne implements PropertyDummyInterface
 class PropertyDiscriminatedDummyTwo implements PropertyDummyInterface
 {
     public $url = 'URL_TWO';
+}
+
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'base' => PropertyNestedDiscriminatorBase::class,
+    'sub' => PropertyNestedDiscriminatorSub::class,
+])]
+class PropertyNestedDiscriminatorBase
+{
+    public string $foo = 'foo';
+}
+
+#[DiscriminatorMap(typeProperty: 'nested_type', mapping: [
+    'sub' => PropertyNestedDiscriminatorSub::class,
+    'sub_sub' => PropertyNestedDiscriminatorSubSub::class,
+])]
+class PropertyNestedDiscriminatorSub extends PropertyNestedDiscriminatorBase
+{
+    public string $bar = 'bar';
+}
+
+class PropertyNestedDiscriminatorSubSub extends PropertyNestedDiscriminatorSub
+{
+    public string $baz = 'baz';
 }

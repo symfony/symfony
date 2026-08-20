@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T15:15:18Z
+
+I reworked this in place to move it forward, in the hope it helps. Squashed to one commit, your authorship kept. Please double check. What changed on top of your work:
+
+- The command is now registered as `console.command.messenger_show` next to the other messenger commands and wired like `messenger:stats` and the failed-messages ones: receiver locator, receiver names injected by `MessengerPass`, and the PhpSerializer to tolerate incomplete classes. The definition is removed when messenger is disabled, which fixes the container compile failure behind the red Integration and low-deps jobs, and also when the installed messenger predates the class (FrameworkBundle allows 7.4/8.0, and the console pass fails on a missing command class).
+- The transport is now an argument instead of a required option, asked interactively when missing and completed from the configured transport names.
+- Unknown transports and unknown ids throw instead of returning success; the transport error lists the valid names.
+- The single-message view uses the Console `Dumper` helper with `-vv`, like `messenger:failed:show`, instead of `print_r`.
+- `--stats` and `--class-filter` follow the `messenger:failed:show` semantics: exact class match, per-class count table, `--stats` scans all messages unless `--max` is passed, and filters cannot be combined with an id.
+- I removed `QueuedAtStamp`: nothing ever applied it, so the column always printed N/A. Such a stamp needs its own PR, wired end to end.
+- Tests rewritten on the model of `FailedMessagesShowCommandTest`, wiring tests added for the compiler pass and the disabled case, changelog entry moved to the 8.2 section.

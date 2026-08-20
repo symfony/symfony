@@ -1533,6 +1533,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('default_memcached_provider')->defaultValue('memcached://localhost')->end()
                         ->scalarNode('default_doctrine_dbal_provider')->defaultValue('database_connection')->end()
                         ->scalarNode('default_pdo_provider')->defaultValue($willBeAvailable('doctrine/dbal', Connection::class) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null)->end()
+                        ->scalarNode('default_mongodb_provider')->end()
                         ->arrayNode('pools', 'pool')
                             ->useAttributeAsKey('name')
                             ->prototype('array')

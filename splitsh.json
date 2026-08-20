@@ -13,7 +13,10 @@
         "asset": "src/Symfony/Component/Asset",
         "asset-mapper": "src/Symfony/Component/AssetMapper",
         "browser-kit": "src/Symfony/Component/BrowserKit",
-        "cache": "src/Symfony/Component/Cache",
+        "cache": {
+            "prefixes": [{ "from": "src/Symfony/Component/Cache", "to": "", "excludes": ["Bridge"] }]
+        },
+        "mongodb-cache": "src/Symfony/Component/Cache/Bridge/MongoDb",
         "clock": "src/Symfony/Component/Clock",
         "config": "src/Symfony/Component/Config",
         "console": "src/Symfony/Component/Console",

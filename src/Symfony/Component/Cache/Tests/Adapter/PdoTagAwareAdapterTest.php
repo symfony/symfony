@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
+use Symfony\Component\Cache\Test\TagAwareTestTrait;
 
 #[RequiresPhpExtension('pdo_sqlite')]
 #[Group('time-sensitive')]

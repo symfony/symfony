@@ -15,6 +15,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 class ApcuAdapterTest extends AdapterTestCase
 {

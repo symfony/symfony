@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('time-sensitive')]

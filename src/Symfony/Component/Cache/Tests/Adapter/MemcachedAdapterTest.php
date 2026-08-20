@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Symfony\Component\Cache\Exception\CacheException;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 #[Group('integration')]
 class MemcachedAdapterTest extends AdapterTestCase

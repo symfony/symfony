@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 /**
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>

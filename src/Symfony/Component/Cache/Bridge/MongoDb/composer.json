@@ -1,0 +1,36 @@
+{
+    "name": "symfony/mongodb-cache",
+    "type": "symfony-cache-bridge",
+    "description": "Symfony MongoDB Cache Bridge",
+    "keywords": [],
+    "homepage": "https://symfony.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jérôme Tamarelle",
+            "email": "jerome@tamarelle.net"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.1",
+        "ext-mongodb": "^1.21|^2.0",
+        "mongodb/mongodb": "^1.21|^2.0",
+        "psr/clock": "^1.0",
+        "symfony/cache": "^8.2"
+    },
+    "require-dev": {
+        "cache/integration-tests": "^1.0.5",
+        "symfony/clock": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": { "Symfony\\Component\\Cache\\Bridge\\MongoDb\\": "" },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

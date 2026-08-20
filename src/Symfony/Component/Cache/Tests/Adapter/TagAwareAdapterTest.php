@@ -20,6 +20,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\PruneableInterface;
+use Symfony\Component\Cache\Test\AdapterTestCase;
+use Symfony\Component\Cache\Test\TagAwareTestTrait;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 

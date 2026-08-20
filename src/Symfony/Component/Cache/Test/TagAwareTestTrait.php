@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Adapter;
+namespace Symfony\Component\Cache\Test;
 
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Cache\CacheItem;

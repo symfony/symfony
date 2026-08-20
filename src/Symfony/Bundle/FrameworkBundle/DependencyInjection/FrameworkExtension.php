@@ -39,6 +39,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Bridge\MongoDb\Adapter\MongoDbAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\FileLocator;
@@ -2766,7 +2767,12 @@ class FrameworkExtension extends Extension
             // Inline any env vars referenced in the parameter
             $container->setParameter('cache.prefix.seed', $container->resolveEnvPlaceholders($container->getParameter('cache.prefix.seed'), true));
         }
-        foreach (['psr6', 'redis', 'valkey', 'memcached', 'doctrine_dbal', 'pdo'] as $name) {
+        if (!ContainerBuilder::willBeAvailable('symfony/mongodb-cache', MongoDbAdapter::class, ['symfony/framework-bundle', 'symfony/cache'])) {
+            $container->removeDefinition('cache.adapter.mongodb');
+            $container->removeDefinition('cache.adapter.mongodb_tag_aware');
+        }
+
+        foreach (['psr6', 'redis', 'valkey', 'memcached', 'doctrine_dbal', 'pdo', 'mongodb'] as $name) {
             if (isset($config[$name = 'default_'.$name.'_provider'])) {
                 $container->setAlias('cache.'.$name, new Alias(CachePoolPass::getServiceProvider($container, $config[$name]), false));
             }
@@ -2780,7 +2786,7 @@ class FrameworkExtension extends Extension
                 'tags' => false,
             ];
         }
-        $nativeTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware'], ['cache.adapter.pdo_tag_aware']];
+        $nativeTagAwareAdapters = [['cache.adapter.redis_tag_aware'], ['cache.adapter.valkey_tag_aware'], ['cache.adapter.pdo_tag_aware'], ['cache.adapter.mongodb_tag_aware']];
         foreach ($config['pools'] as $name => $pool) {
             if (null === ($pool['provider'] ??= null)) {
                 unset($pool['provider']);

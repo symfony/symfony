@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Adapter;
+namespace Symfony\Component\Cache\Test;
 
 use Cache\IntegrationTests\CachePoolTest;
 use PHPUnit\Framework\Assert;
@@ -21,6 +21,16 @@ use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
 use Symfony\Contracts\Cache\NamespacedPoolInterface;
 
+/**
+ * Base test case for validating a PSR-6 cache adapter implementation.
+ *
+ * Extend this class (and use TagAwareTestTrait for a tag aware adapter) and
+ * implement createCachePool() to return the adapter under test. Requires the
+ * "cache/integration-tests" package as a dev dependency.
+ *
+ * New test methods may be added here in patch (bugfix) releases, so an
+ * adapter extending this class is expected to keep passing them.
+ */
 abstract class AdapterTestCase extends CachePoolTest
 {
     protected function setUp(): void
@@ -438,13 +448,5 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $derived = $cache->withSubNamespace('derived');
         $this->assertTrue($derived->getItem('foo')->isHit());
-    }
-}
-
-class NotUnserializable
-{
-    public function __unserialize(array $data): void
-    {
-        throw new \Exception(__CLASS__);
     }
 }

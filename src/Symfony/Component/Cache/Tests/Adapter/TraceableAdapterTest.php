@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TraceableAdapter;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 #[Group('time-sensitive')]
 class TraceableAdapterTest extends AdapterTestCase

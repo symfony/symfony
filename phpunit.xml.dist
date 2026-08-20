@@ -75,7 +75,7 @@
 
     <extensions>
         <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
-            <parameter name="clock-mock-namespaces" value="Cache\IntegrationTests,Symfony\Bridge\Doctrine\Middleware\Debug,Symfony\Bridge\Doctrine\Middleware\IdleConnection,Symfony\Component\Cache,Symfony\Component\Cache\Tests\Fixtures,Symfony\Component\Cache\Tests\Traits,Symfony\Component\Cache\Traits,Symfony\Component\Console,Symfony\Component\HttpFoundation,Symfony\Component\Uid" />
+            <parameter name="clock-mock-namespaces" value="Cache\IntegrationTests,Symfony\Bridge\Doctrine\Middleware\Debug,Symfony\Bridge\Doctrine\Middleware\IdleConnection,Symfony\Component\Cache,Symfony\Component\Cache\Test,Symfony\Component\Cache\Tests\Fixtures,Symfony\Component\Cache\Tests\Traits,Symfony\Component\Cache\Traits,Symfony\Component\Console,Symfony\Component\HttpFoundation,Symfony\Component\Uid" />
         </bootstrap>
     </extensions>
 </phpunit>

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
+use Symfony\Component\Cache\Test\TagAwareTestTrait;
 use Symfony\Component\Cache\Traits\RelayClusterProxy;
 
 #[RequiresPhpExtension('relay')]

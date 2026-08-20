@@ -18,6 +18,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 #[RequiresPhpExtension('pdo_sqlite')]
 #[Group('time-sensitive')]

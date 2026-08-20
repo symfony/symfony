@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 use Symfony\Component\Cache\Tests\Fixtures\TestEnum;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\VarExporter\DeepCloner;

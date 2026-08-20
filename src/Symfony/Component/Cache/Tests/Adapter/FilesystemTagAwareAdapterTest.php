@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter;
+use Symfony\Component\Cache\Test\TagAwareTestTrait;
 use Symfony\Component\Cache\Tests\Fixtures\FailingTagFilesystemAdapter;
 
 #[Group('time-sensitive')]

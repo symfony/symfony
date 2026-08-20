@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 #[Group('time-sensitive')]
 class ProxyAdapterTest extends AdapterTestCase

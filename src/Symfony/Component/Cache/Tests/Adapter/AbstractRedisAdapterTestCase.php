@@ -16,6 +16,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
 {

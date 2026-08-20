@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Component\Cache\Psr16Cache;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 
 #[Group('time-sensitive')]
 class Psr16AdapterTest extends AdapterTestCase

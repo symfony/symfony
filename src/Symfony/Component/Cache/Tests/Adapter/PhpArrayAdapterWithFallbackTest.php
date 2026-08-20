@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\Cache\Test\AdapterTestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 #[Group('time-sensitive')]

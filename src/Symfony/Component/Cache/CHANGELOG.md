@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `AbstractAdapter::createAdapter()` to create the adapter matching a connection
+ * Support the `mongodb:` and `mongodb+srv:` DSN in `AbstractAdapter::createConnection()` through the `symfony/mongodb-cache` bridge
+ * Move `AdapterTestCase` and `TagAwareTestTrait` to the `Symfony\Component\Cache\Test` namespace so they can be reused by cache bridges
  * Implement `PruneableInterface` on `RedisTagAwareAdapter` to garbage-collect its tag Sets
  * Add `PdoTagAwareAdapter`
 

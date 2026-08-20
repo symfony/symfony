@@ -1,0 +1,18 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'http_method_override' => false,
+    'handle_all_throwables' => true,
+    'php_errors' => ['log' => true],
+    'cache' => [
+        'default_mongodb_provider' => 'mongodb://localhost:27017/db?collection_name=cache',
+        'pools' => [
+            'cache.mongodb_tag_aware' => [
+                'adapter' => 'cache.adapter.mongodb_tag_aware',
+            ],
+            'my_mongodb_pool' => [
+                'provider' => 'mongodb://localhost:27017/db?collection_name=pool',
+            ],
+        ],
+    ],
+]);

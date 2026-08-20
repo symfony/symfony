@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T20:22:25Z
+
+Reviewed and rebased on 6.4. What I changed on top of your commit:
+
+- Split the comma splice in the exception message: `... does not move the run date forward. Consider using a cron expression instead.`
+- The test asserts the full message instead of a fragment, and gained a `Monday, Thursday, Saturday` case. That one is #60745: `DateInterval::createFromDateString()` keeps only the last weekday, so the period stalls on it and hangs the same way.
+- Intervals resolving to zero seconds (`PT0S`, `P0D`, `0 seconds`, `new \DateInterval('PT0S')`) reached `getNextRunDate()` with `$interval` never assigned, and failed with `Typed property ... must not be accessed before initialization`. They are now rejected in the constructor, in `calcInterval()`, with the existing "must be greater than zero" message.
+- An `InvalidArgumentException` thrown inside the constructor's try block is no longer re-wrapped by the catch below it. It used to come out with a doubled prefix: `Invalid interval "wrong": Invalid interval "wrong": ...`.
+
+Verified: with the fix reverted and the tests kept, the run hangs and gets killed at 60s. The component suite is green on 8.1, 8.2 and 8.4. The red jobs are unrelated: the Twig bridge lexer errors and a `MonotonicClockTest::testSleep` float flake.
+
+Thanks Wolfgang.

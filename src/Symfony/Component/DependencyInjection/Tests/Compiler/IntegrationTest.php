@@ -52,6 +52,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooResourceTaggedWithCallable;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooResourceTaggedWithClosure;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\FooResourceTaggedWithClosureMarker;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedWithCallable;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTaggedWithClosure;
@@ -60,6 +61,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\PrivateConstructorResou
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrivateConstructorTaggedWithCallable;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithCallableInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithClosureInterface;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ResourceTaggedWithClosureMarkerInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticMethodTag;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedIteratorConsumer;
@@ -468,6 +470,26 @@ class IntegrationTest extends TestCase
         // closures cannot be introspected: abstract classes are skipped, only the marker tag is added
         $this->assertFalse($container->getDefinition('abstract')->hasTag('foo_bar'));
         $this->assertTrue($container->getDefinition('abstract')->hasTag('container.excluded'));
+    }
+
+    public function testAutoconfiguredResourceTagWithClosureAttributesOnMarkerInterface()
+    {
+        if (\PHP_VERSION_ID < 80500) {
+            $this->markTestSkipped('Closures in constant expressions require PHP 8.5.');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register('foo', FooResourceTaggedWithClosureMarker::class)->setAutoconfigured(true);
+        $container->register('interface', ResourceTaggedWithClosureMarkerInterface::class)->setAutoconfigured(true);
+
+        (new RegisterAutoconfigureAttributesPass())->processClass($container, new \ReflectionClass(ResourceTaggedWithClosureMarkerInterface::class));
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $this->assertSame([['class' => FooResourceTaggedWithClosureMarker::class]], $container->getDefinition('foo')->getTag('foo_bar'));
+
+        // an interface without methods is not reported abstract by reflection, closures must not run on it either
+        $this->assertFalse($container->getDefinition('interface')->hasTag('foo_bar'));
+        $this->assertTrue($container->getDefinition('interface')->hasTag('container.excluded'));
     }
 
     public function testAutoconfiguredResourceTagWithCallableArrayAttributes()

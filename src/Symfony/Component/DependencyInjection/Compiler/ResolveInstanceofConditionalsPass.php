@@ -304,9 +304,14 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
      * (private constructors and enums are fine), but a closure cannot run on an abstract class or an
      * interface, and a [class-string, method] callable cannot when the method resolves to an abstract
      * declaration there. Skipping beats throwing because base types legitimately match the instanceof rules.
+     * Interfaces need their own check: ReflectionClass::isAbstract() misses those declaring no methods.
      */
     private static function canComputeTagAttributes(\ReflectionClass $r, array $attributes): bool
     {
+        if ($r->isInterface()) {
+            return false;
+        }
+
         if ($attributes[0] instanceof \Closure) {
             return !$r->isAbstract();
         }

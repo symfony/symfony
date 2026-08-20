@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T19:02:19Z
+
+Thanks for this, and thanks for your patience, it should not have taken six months to get a first review.
+
+The gap is real and the precedent is on your side: `UniqueEntity` already queries the database from a constraint in this bridge, so that part is not the question.
+
+One thing about the example though. `AssignUserCommand` with a `public string $userId` is already mapped and validated by machinery we ship: `#[MapRequestPayload]` and `#[MapQueryString]` in HTTP, and `#[MapInput]` in Console since 8.1, which runs the validator and throws `InputValidationFailedException`. So the constraint does not need to justify the mapping, only being a violation source, and that is the one thing those resolvers cannot give you: a missing row reported as a violation on `userId`, aggregated with the other violations, translated, and surfaced through whatever failure path the caller already has.
+
+Which is why the error path is what needs to be right, and today it is misleading in three places:
+
+ * `catch (TypesException $e) {}` swallows the exception and leaves `$data` null, so a type conversion failure is reported as "entity does not exist". Passing `abc` for an integer id gives the wrong message, and the message is the whole point of the constraint.
+ * `$repository->{$constraint->repositoryMethod}($value)` has no `method_exists()` check, so a typo in the option is a PHP `Error` and a 500, instead of a `ConstraintDefinitionException` raised where the mistake is.
+ * validity is decided by `\is_object($data) || 1 === \count($data)`. That holds for the `identifierField` path since `resolveField()` forces an identifier, but `repositoryMethod` is unconstrained: a method returning `0`, `null`, `[]` or two rows all collapse to "does not exist".
+
+Distant fourth, `findBy()` hydrates a whole entity to answer a yes or no question, where a `COUNT` or a `SELECT 1` would do. That is a performance nit rather than a correctness one, but it runs once per validated property.
+
+Are you still up for working on it?
+
+---------------------------------------------------------------------------
+
+by evgenij-vy at 2026-08-14T09:30:16Z
+
+Hi @nicolas-grekas thank you for the review and your time. I will gladly continue the work.
+
+Regarding the use of `count()` instead of `findBy()`: the idea was to preload the target entity, since there is a probability that it will be loaded for use anyway. However, I will consider this point during implementation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T14:55:20Z
+
+Thanks for the round 2, the previous findings are all addressed. I reviewed it, found a few more things and pushed the fixes directly, squashed into your commit (`40bd3ce589a`, rebased on the current 8.2). What changed and why:
+
+**Conversion failures are now a violation, not an exception.** The round 2 code turned a value the field type cannot convert into a `ConstraintDefinitionException`, which is a 500 for user input. The tests could not see it for two reasons: the test entity manager maps the uuid fixture's id to a plain `string` column, so nothing ever failed conversion, and `'not-a-valid-uuid'` is exactly 16 bytes, which `Uuid::fromString()` accepts as a binary uuid, so it converts fine even on the real `UuidType`. The new tests register the real `UuidType` on a `#[Column(type: 'uuid')]` entity: a non-convertible value now raises a violation with the `invalidMessage` option and `INVALID_VALUE_ERROR`, which wires up the constants that were already on the constraint but unused. `'This value is not valid.'` is used as the default because it is already translated everywhere.
+
+**`normalizeValue()` is gone.** `findOneBy()` converts the value to the field's type itself, inside the manager and against the manager's own connection. Pre-converting duplicated that work and had two bugs: it used `registry->getConnection()`, the default connection, so a second manager on a different platform converted against the wrong platform; and for an association field, `getTypeOfField()` returns null and `Type::getType(null)` is a `TypeError`, so the `hasAssociation()` acceptance added in round 2 could never work. Both are covered by tests now, and the association lookup works.
+
+**`''` is skipped again.** Most constraints treat null and the empty string as valid and leave emptiness to `NotBlank`; raising "entity does not exist" for an empty optional field breaks that composition.
+
+**`useCount` is removed.** `findOneBy()` caps the query at one row, so the hydration cost the option avoided is a single entity, and skipping it also loses the identity-map warm-up. A count-style check stays expressible through `repositoryMethod`, since its contract is truthiness. The option also silently did nothing for non-ORM repositories.
+
+Smaller: the constructor guard throws `ConstraintDefinitionException` instead of `InvalidArgumentException`, `resolveField()` is private and returns `string`, `INVALID_VALUE_ERROR` got a real random uuid and an `ERROR_NAMES` entry, and the new default message has its `validators.en.xlf` entry.
+
+One thing this PR cannot solve alone: nothing registers the validator as a service, and it needs the `ManagerRegistry`, so on a full-stack app the constraint currently fails at `ConstraintValidatorFactory`. DoctrineBundle registers the bridge validators (`doctrine.orm.validator.unique`), so this needs a small companion PR there once this merges. I noted it in the description.

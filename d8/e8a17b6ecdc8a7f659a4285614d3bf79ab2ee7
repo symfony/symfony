@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T14:53:41Z
+
+Thanks for this. Three of your commits fix defects that exist on 6.4 on their own, so I extracted them to #65423, with your authorship: the Session tab disabled while showing usages, the default tab selection landing on a disabled tab, and the href-less `<a>` toggles. Please rebase and drop them here once that one lands.
+
+The fourth one, "Reuse an existing icon-only toggle button", stays here: the button it reuses is created by an earlier commit of this branch, so there is nothing to fix on the maintained branches.
+
+One thing to correct in the framing. Inside the profiler, the exception panel is rendered by `web_profiler.controller.exception_panel::body`, that is by ErrorHandler's own renderer, so its DOM is unchanged by this branch and nothing here needs to stay in sync with `exception.js`. What the rest of the branch actually improves is the profiler's generic tab machinery and four collector panels, which applies to every panel. Could you retitle and rewrite the description accordingly, and adjust the commit subjects that say "exception page"? That will make the remaining work much easier to review.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T16:28:26Z
+
+Rebased on 8.2 and prepared for merge. What changed here:
+
+- Dropped the three commits that went to 6.4 in #65423, and rebased the rest on top of the merge-up, so the disabled-tab handling of that branch and the `disabled` property of this one now coexist.
+- Squashed "Reuse an existing icon-only toggle button" into the commit that creates the button, since it fixed that commit.
+- Reworded the commit subjects that said "exception page": they change the profiler's shared tab machinery, not the exception page.
+- `aria-expanded` on click now uses the `toggleControl` already in scope instead of looking the button up again through the icons.
+- Dropped `#updateSelectionLabel()`. Rewriting the tree's own `aria-label` with the selected path is not announced when the selection changes, since the container's name is not a live region, and `aria-selected` plus the moving focus already carry it. `#getParentTreeItem()` stays, the left arrow uses it.
+- Rewrote the title and the description around what the branch does.
+
+Also checked, and left alone: removing `target.classList.add('hidden')` from `#initTrees()` is safe, `form_tree_details` already renders every panel but the first one hidden.
+
+WebProfilerBundle suite passes (180 tests, 509 assertions) and the four changed templates parse.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T16:33:12Z
+
+@Nitram1123 could you please double check this version?

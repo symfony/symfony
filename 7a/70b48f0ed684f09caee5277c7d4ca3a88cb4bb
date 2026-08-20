@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:26:07Z
+
+Thank you for this @michaelthieulin. The empty-by-default design answers the concerns from #63942, and the coverage at the unit, config and functional layers made the rework easy to verify. I pushed a rebase on current 8.2 with the following changes, the description is updated to match:
+
+- `$excludedHttpCodes` is now a plain map of status code to path patterns (`[404 => [], 400 => ['^/foo']]`) instead of a list of `code`/`paths` entries. The list shape allowed duplicated codes, and the `??=` guard broke the documented "first exclusion wins" rule when the first entry had no paths: the stored `null` looked unset, so a later entry for the same code overrode the wildcard. With a map, duplicated codes cannot exist, and the `code`/`paths` key checks disappear.
+- `excluded_http_codes: { 404: '^/foo' }` was silently dropped by the normalization, which only handled numeric, array, `true` and `null` values. A single path given as a string is now wrapped into a list.
+- The new config shape is the first in the codebase to reach a latent PHP 8.5 "null as array offset" deprecation in `XmlReferenceDumper`, reported when dumping the framework reference in XML. It is fixed in a separate first commit; the dumped output is unchanged.
+- The expanded `[{code: 404, paths: [...]}]` input form is dropped, the mapping form covers it. `schema.json` is regenerated for the new shape.
+
+The red CI on the previous push was not caused by this PR: the same jobs fail on the 8.2 base, and the high-deps failure came from a fixture that moved after this branch was created, which the rebase resolves.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:47:00Z
+
+The low-deps job caught a real gap in my previous push: FrameworkBundle allows `symfony/http-kernel: ^6.4`, and an older `ProfilerListener` silently ignores the two new constructor arguments, so the exclusions were configured but did nothing. The new push makes this loud: configuring `excluded_paths` or `excluded_http_codes` with a `ProfilerListener` that does not support them now throws a compile-time `LogicException` asking to upgrade `symfony/http-kernel`, the same pattern the PGP mailer options use for `symfony/mime`. The wiring and functional tests skip in that situation.
+
+Correcting my previous comment about the remaining red, which is all on the 8.2 base:
+- the Twig Bootstrap form-layout failures on every unit job are a base regression;
+- the high-deps `PhpConfigReferenceDumpPassTest` failure is not resolved by rebasing after all: the committed reference fixture now contains the routing `firewall` option while high-deps installs the released `symfony/routing`, which does not have it, so the job is red for every 8.2 PR;
+- the low-deps `testMailerPgp*` errors are the PGP feature throwing its upgrade exception on old `symfony/mime` in tests that do not skip;
+- the x86 `UnusedTagsPassTest` failure is a missing `HttpKernel/Tests/Fixtures/var` directory on the Windows checkout, and the `UidTest` and descriptor failures were already red before this PR.

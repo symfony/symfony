@@ -237,7 +237,6 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException         When process is already running
      * @throws ProcessTimedOutException When process timed out
      * @throws ProcessSignaledException When process stopped after receiving signal
-     * @throws LogicException           In case a callback is provided and output has been disabled
      *
      * @final
      */
@@ -261,7 +260,6 @@ class Process implements \IteratorAggregate
      * @throws RuntimeException         When process is already running
      * @throws ProcessTimedOutException When process timed out
      * @throws ProcessSignaledException When process stopped after receiving signal
-     * @throws LogicException           In case a callback is provided and output has been disabled
      *
      * @final
      */
@@ -293,7 +291,6 @@ class Process implements \IteratorAggregate
      *
      * @throws RuntimeException When process can't be launched
      * @throws RuntimeException When process is already running
-     * @throws LogicException   In case a callback is provided and output has been disabled
      */
     public function start(?callable $callback = null, array $env = [])
     {

@@ -24,10 +24,10 @@ final class CloudflareTransportFactory extends AbstractTransportFactory
     public function create(Dsn $dsn): TransportInterface
     {
         $scheme = $dsn->getScheme();
-        $accountId = $this->getUser($dsn);
-        $apiToken = $this->getPassword($dsn);
 
         if ('cloudflare+api' === $scheme || 'cloudflare' === $scheme) {
+            $accountId = $this->getUser($dsn);
+            $apiToken = $this->getPassword($dsn);
             $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
             $port = $dsn->getPort();
 
@@ -36,11 +36,15 @@ final class CloudflareTransportFactory extends AbstractTransportFactory
                 ->setPort($port);
         }
 
+        if ('cloudflare+smtp' === $scheme) {
+            return new CloudflareSmtpTransport($this->getPassword($dsn), $this->dispatcher, $this->logger);
+        }
+
         throw new UnsupportedSchemeException($dsn, 'cloudflare', $this->getSupportedSchemes());
     }
 
     protected function getSupportedSchemes(): array
     {
-        return ['cloudflare', 'cloudflare+api'];
+        return ['cloudflare', 'cloudflare+api', 'cloudflare+smtp'];
     }
 }

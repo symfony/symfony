@@ -42,7 +42,7 @@ final class TranslatableMessageVisitor extends AbstractVisitor implements NodeVi
 
         // the name resolver gives a fully qualified name; templates without a "use"
         // statement resolve to the global namespace, which is accepted as well
-        if (!\in_array($className->name, [TranslatableMessage::class, 'TranslatableMessage'], true)) {
+        if (!\in_array($className->toString(), [TranslatableMessage::class, 'TranslatableMessage'], true)) {
             return null;
         }
 

@@ -172,6 +172,12 @@ class DateTimeToLocalizedStringTransformer extends BaseDateTimeTransformer
         $calendar = $this->calendar;
         $pattern = $this->pattern;
 
+        if (\IntlDateFormatter::GREGORIAN === $calendar && class_exists(\IntlGregorianCalendar::class, false)) {
+            // ICU uses the Julian calendar before October 1582, PHP always uses the Gregorian one
+            $calendar = new \IntlGregorianCalendar($timezone, \Locale::getDefault());
+            $calendar->setGregorianChange(-\PHP_FLOAT_MAX);
+        }
+
         $intlDateFormatter = new \IntlDateFormatter(\Locale::getDefault(), $dateFormat, $timeFormat, $timezone, $calendar, $pattern ?? '');
 
         // new \intlDateFormatter may return null instead of false in case of failure, see https://bugs.php.net/66323

@@ -570,6 +570,14 @@
                 <source>This value is not a valid cron expression.</source>
                 <target state="needs-review-translation">Ez az érték nem érvényes cron kifejezés.</target>
             </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target state="needs-review-translation">A hivatkozott entitás nem létezik.</target>
+            </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target state="needs-review-translation">Ez az érték nem érvényes ULID.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

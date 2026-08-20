@@ -14,9 +14,12 @@ namespace MongoDB;
 use MongoDB\Driver\Manager;
 
 /*
- * Stubs for the mongodb/mongodb library version ~1.16
+ * Stub for the mongodb/mongodb library, declared only when the real class
+ * cannot be autoloaded, so that it never shadows the library for other tests
+ * running in the same process. The autoload attempt is gated on the extension
+ * being loaded, as the library classes cannot be loaded without it.
  */
-if (!class_exists(Client::class, false)) {
+if (!class_exists(Client::class, \extension_loaded('mongodb'))) {
     abstract class Client
     {
         abstract public function getManager(): Manager;

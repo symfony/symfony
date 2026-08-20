@@ -22,6 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -100,7 +101,9 @@ final class ContainerLintCommand extends Command
             $refl->setValue($parameterBag, true);
 
             $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
-            $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass()]);
+            // the XML dump doesn't keep the services matched by tagged iterators,
+            // resolving them again keeps the removing passes from dropping them
+            $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass(), new ResolveTaggedIteratorArgumentPass()]);
             $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
         }
 

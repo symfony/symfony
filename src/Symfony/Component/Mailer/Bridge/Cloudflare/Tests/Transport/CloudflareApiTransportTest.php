@@ -78,16 +78,16 @@ final class CloudflareApiTransportTest extends TestCase
 
             $this->assertSame('Test subject', $body['subject']);
 
-            $this->assertSame('to@example.com', $body['to'][0]);
+            $this->assertSame('to@example.com', $body['to'][0]['address']);
 
             $this->assertSame('Zm9v', $body['attachments'][0]['content']);
             $this->assertSame('attachment', $body['attachments'][0]['disposition']);
             $this->assertSame('example.txt', $body['attachments'][0]['filename']);
             $this->assertSame('text/plain', $body['attachments'][0]['type']);
 
-            $this->assertSame('bcc@example.com', $body['bcc'][0]);
+            $this->assertSame('bcc@example.com', $body['bcc'][0]['address']);
 
-            $this->assertSame('cc@example.com', $body['cc'][0]);
+            $this->assertSame('cc@example.com', $body['cc'][0]['address']);
 
             $this->assertArrayHasKey('X-Metadata-Custom-Header', $body['headers']);
             $this->assertsame('value', $body['headers']['X-Metadata-Custom-Header']);
@@ -122,7 +122,7 @@ final class CloudflareApiTransportTest extends TestCase
             $body = json_decode($options['body'], true);
 
             $this->assertSame('sender@example.com', $body['from']['address']);
-            $this->assertSame(['redirected@example.com'], $body['to']);
+            $this->assertSame('redirected@example.com', $body['to'][0]['address']);
 
             return new JsonMockResponse([], ['http_code' => 200]);
         });
@@ -143,10 +143,84 @@ final class CloudflareApiTransportTest extends TestCase
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $body = json_decode($options['body'], true);
 
-            $this->assertSame(['first@example.com', 'second@example.com'], $body['to']);
-            $this->assertSame(['cc1@example.com', 'cc2@example.com'], $body['cc']);
-            $this->assertSame(['bcc1@example.com', 'bcc2@example.com'], $body['bcc']);
+            $this->assertSame('first@example.com', $body['to'][0]['address']);
+            $this->assertSame('second@example.com', $body['to'][1]['address']);
+
+            $this->assertSame('cc1@example.com', $body['cc'][0]['address']);
+            $this->assertSame('cc2@example.com', $body['cc'][1]['address']);
+
+            $this->assertSame('bcc1@example.com', $body['bcc'][0]['address']);
+            $this->assertSame('bcc2@example.com', $body['bcc'][1]['address']);
+
             $this->assertSame('reply1@example.com', $body['reply_to']['address']);
+
+            return new JsonMockResponse([], ['http_code' => 200]);
+        });
+
+        new CloudflareApiTransport('ACCOUNT_ID', 'API_TOKEN', $client)->send($email);
+    }
+
+    public function testSendWithUnnamedAddresses()
+    {
+        $email = new Email()
+            ->from('from@example.com')
+            ->to('to@example.com')
+            ->cc('cc@example.com')
+            ->bcc('bcc@example.com')
+            ->replyTo('reply@example.com')
+            ->text('Test text');
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $body = json_decode($options['body'], true);
+
+            $this->assertSame('from@example.com', $body['from']['address']);
+            $this->assertSame('', $body['from']['name']);
+
+            $this->assertSame('to@example.com', $body['to'][0]['address']);
+            $this->assertSame('', $body['to'][0]['name']);
+
+            $this->assertSame('cc@example.com', $body['cc'][0]['address']);
+            $this->assertSame('', $body['cc'][0]['name']);
+
+            $this->assertSame('bcc@example.com', $body['bcc'][0]['address']);
+            $this->assertSame('', $body['bcc'][0]['name']);
+
+            $this->assertSame('reply@example.com', $body['reply_to']['address']);
+            $this->assertSame('', $body['reply_to']['name']);
+
+            return new JsonMockResponse([], ['http_code' => 200]);
+        });
+
+        new CloudflareApiTransport('ACCOUNT_ID', 'API_TOKEN', $client)->send($email);
+    }
+
+    public function testSendWithNamedAddresses()
+    {
+        $email = new Email()
+            ->from(new Address('from@example.com', 'From'))
+            ->to(new Address('to@example.com', 'To'))
+            ->cc(new Address('cc@example.com', 'Cc'))
+            ->bcc(new Address('bcc@example.com', 'Bcc'))
+            ->replyTo(new Address('reply@example.com', 'Reply'))
+            ->text('Test text');
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $body = json_decode($options['body'], true);
+
+            $this->assertSame('from@example.com', $body['from']['address']);
+            $this->assertSame('From', $body['from']['name']);
+
+            $this->assertSame('to@example.com', $body['to'][0]['address']);
+            $this->assertSame('To', $body['to'][0]['name']);
+
+            $this->assertSame('cc@example.com', $body['cc'][0]['address']);
+            $this->assertSame('Cc', $body['cc'][0]['name']);
+
+            $this->assertSame('bcc@example.com', $body['bcc'][0]['address']);
+            $this->assertSame('Bcc', $body['bcc'][0]['name']);
+
+            $this->assertSame('reply@example.com', $body['reply_to']['address']);
+            $this->assertSame('Reply', $body['reply_to']['name']);
 
             return new JsonMockResponse([], ['http_code' => 200]);
         });

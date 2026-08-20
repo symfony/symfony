@@ -35,7 +35,7 @@ class RouteCompiler implements RouteCompilerInterface
     public const VARIABLE_MAXIMUM_LENGTH = 32;
 
     /**
-     * @throws \InvalidArgumentException if a path variable is named _fragment or _firewall
+     * @throws \InvalidArgumentException if a path variable is named _fragment or _firewall, or a host variable is named _firewall
      * @throws \LogicException           if a variable is referenced more than once
      * @throws \DomainException          if a variable name starts with a digit or if it is too long to be successfully used as
      *                                   a PCRE subpattern
@@ -52,6 +52,13 @@ class RouteCompiler implements RouteCompilerInterface
 
             $hostVariables = $result['variables'];
             $variables = $hostVariables;
+
+            foreach ($hostVariables as $hostParam) {
+                // "_firewall" selects the firewall handling the route; as a host parameter it would let the Host header choose it
+                if ('_firewall' === $hostParam) {
+                    throw new \InvalidArgumentException(\sprintf('Route host "%s" cannot contain "%s" as a host parameter.', $host, $hostParam));
+                }
+            }
 
             $hostTokens = $result['tokens'];
             $hostRegex = $result['regex'];

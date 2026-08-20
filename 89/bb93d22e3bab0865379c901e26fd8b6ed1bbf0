@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T08:13:38Z
+
+Thank you for extracting this, it stands well on its own.
+
+While reviewing, I checked the PR's tests against the base branch: the two `[class-string, method]` tests pass there already, because the resolution from #64652 is shared by both tag flavors. So the closure form is the actual new part, and the callable tests give the existing behavior the coverage it was missing. Both are worth having.
+
+I also compared the set of classes tagged by computed attributes with the set a static attribute array tags, using `resource:` discovery and a pass calling `findTaggedResourceIds()`. The static flavor tags concrete classes, classes with a private constructor, enums and abstract classes. The lazy flavor skipped everything not instantiable, silently. For resource tags that gap matters: these classes are never instantiated by the container, and a message class with a private constructor plus a named constructor is a common shape. A class silently missing from `findTaggedResourceIds()` is hard to debug.
+
+I pushed a second commit that replaces the `isInstantiable()` check in `ResolveInstanceofConditionalsPass` with "can the computation run": the `[class-string, method]` form now runs unless the method resolves to an abstract declaration, and closures run on any non-abstract class. Private constructors, enums, and (for the callable form) abstract classes implementing the method are now tagged like with static attributes. Interfaces stay out, since computing anything on them cannot work. This also applies to regular tags from #64652; both features are unreleased, so nothing released changes. I updated the description accordingly and rebased on current 8.2.
+
+Side finding, out of scope here: with static attributes, a resource tag on a discovered interface or abstract class also tags its own `.abstract.` definition, which makes `findTaggedResourceIds()` throw with the default `$throwOnAbstract = true`. This reproduces down to 7.4, so it needs a separate fix on that branch.

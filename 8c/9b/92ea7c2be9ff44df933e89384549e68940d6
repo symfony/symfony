@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T04:14:44Z
+
+Nice.
+I'm surprised by the number of patched files.
+Maybe something to address?
+Also priority might be trivial to add now?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-08-17T08:02:50Z
+
+@nicolas-grekas
+
+> Nice. I'm surprised by the number of patched files. Maybe something to address?
+
+It's almost identical to #65361. It depends on whether we want the output to be declarative here as well.
+
+> Also priority might be trivial to add now?
+
+Done, see: [the diff](https://github.com/symfony/symfony/compare/5486380948b27fc9921f1e9920edc71351216dab..eebb01526b57ffec9488692e14110b909cbe14e8).
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:06:05Z
+
+I reviewed the PR and prepared it for merge:
+
+- rebased it twice, after #65434 and after #65443 merged; the extracted content deduplicated cleanly (the overlapping files dropped out of the diff net-zero), and both the DependencyInjection and FrameworkBundle suites are green on top of the current 8.2 tip;
+- checked the resolution logic against `PriorityTaggedServiceTrait::findAndSortTaggedServices()`: the port is faithful, including the `#[AsTaggedItem]` index/priority fallbacks, the repeated-attribute splice, and the tie-breaking order. Highest priority wins on duplicate indexes, then registration order;
+- the interplay with the lazy attribute gates from #65434/#65443 is covered: computed tags that land on abstract definitions are skipped by the pass, so the map only ever contains concrete classes;
+- the `XmlDumper` addition is write-only debug output on 8.x (there is no XML loader anymore), and `debug:container` reloads the builder from the serialized dump, which the new argument survives as it holds only strings and arrays;
+- `resolveServices()` returning the stored values before the pass has run is covered by a test and matches how `ServiceLocatorArgument` behaves, so I left it as is;
+- I updated the description: the priority paragraph was stale (priority support was added on request during the review), and the doc points are now listed at the end.
+
+Good to merge on my side once CI confirms.
+
+Thank you @HypeMC for the feature and for keeping the extraction in sync, that made the deduplication painless.

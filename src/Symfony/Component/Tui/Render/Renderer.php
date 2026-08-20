@@ -48,6 +48,9 @@ final class Renderer implements WidgetRendererInterface
     private LayoutEngine $layoutEngine;
     private ChromeApplier $chromeApplier;
 
+    /** @var array<class-string, bool> */
+    private array $postRenderOverridden = [];
+
     /** Current terminal columns, set during render() for breakpoint resolution */
     private ?int $currentColumns = null;
 
@@ -154,6 +157,12 @@ final class Renderer implements WidgetRendererInterface
         } else {
             $innerContext = $this->chromeApplier->computeInnerContext($styledContext, $resolvedStyle);
             $lines = $this->chromeApplier->apply(new ArrayLineBuffer($widget->render($innerContext)), $context->getColumns(), $resolvedStyle, $widget);
+        }
+
+        // Reflection once per class: the hook costs nothing to widgets that
+        // do not override it, since only then do the lines need materializing
+        if ($this->postRenderOverridden[$widget::class] ??= AbstractWidget::class !== new \ReflectionMethod($widget, 'postRender')->getDeclaringClass()->name) {
+            $lines = new ArrayLineBuffer($widget->postRender($lines->toArray(), $context));
         }
 
         $this->validateLines($widget, $lines, $context->getColumns());

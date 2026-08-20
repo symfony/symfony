@@ -390,6 +390,28 @@ abstract class AbstractWidget
     abstract public function render(RenderContext $context): array;
 
     /**
+     * Post-process the widget's finished lines, chrome included.
+     *
+     * The Renderer calls this with the fully rendered box: content, padding,
+     * border and background are already applied. Override it to rewrite the
+     * box as a whole, e.g. to paint a layer under it, dim it or mask it,
+     * something render() cannot do because chrome is applied after it.
+     *
+     * The result is cached with the render, so a widget that animates its
+     * post-processing must call invalidate() to produce a new frame.
+     *
+     * The width contract of render() applies to the returned lines too.
+     *
+     * @param list<string> $lines One element per terminal row
+     *
+     * @return list<string>
+     */
+    public function postRender(array $lines, RenderContext $context): array
+    {
+        return $lines;
+    }
+
+    /**
      * Makes a widget a child of this one, so it takes part in the render tree.
      *
      * Call it from a widget that owns other widgets, once the child is stored.

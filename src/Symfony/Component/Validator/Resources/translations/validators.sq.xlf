@@ -583,6 +583,10 @@
                 <source>The referenced entity does not exist.</source>
                 <target state="needs-review-translation">Entiteti i referuar nuk ekziston.</target>
             </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target state="needs-review-translation">Kjo vlerë nuk është një ULID e vlefshme.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

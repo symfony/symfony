@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-20T13:49:40Z
+
+None of these unit test failures come from this change. The same Twig bridge and Translation tests already fail on 6.4 at f867eae4, which this branch is based on, and the low-deps job died on a composer cache error.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T13:55:02Z
+
+Thank you for the fix, the analysis in #65447 made it easy to verify.
+
+I reproduced the race with a probe that runs 16 concurrent cold-cache warmups against a shared log: on 6.4 it aborts boots in 16 out of 20 rounds with the exact errors from the issue, with your patch it stays clean over 30 rounds. The lock also fixes a silent data loss the issue did not mention: without it, the rounds that happened to not corrupt the file still kept only 0 to 4 of the 8 distinct deprecation payloads, while the locked merge keeps all 8.
+
+I found one gap and pushed a rework for it, squashed into your commit: a log that is already corrupted still aborted every boot, because the `unserialize()` warning throws before `ftruncate()` can repair the file. That covers files corrupted before this fix is deployed, and files left behind by a process killed between `ftruncate()` and `fwrite()`, which is not atomic; worker managers that kill workers on timeout make that a real path. The read now discards invalid content under a silencing error handler, so the file is rewritten and boots self-heal.
+
+That scenario is deterministic, so it also gave us the test that was missing: it boots `warmUp()` in a child PHP process, since `PHPUNIT_COMPOSER_INSTALL` disables the collect path in-process. It fails on the previous head of this PR and passes now.
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-20T14:05:46Z
+
+Verified your rework locally: the new test fails on the previous head with `unserialize(): Extra data starting at offset 6 of 35 bytes` and passes on yours, and the self-healing rewrite leaves a valid `a:0:{}` behind.
+
+One thing the SA jobs caught on the pushed head: `set_error_handler(static fn () => null)` is a new error for both PHPStan (`expects (callable(int, string, string, int): bool)|null, Closure(): null given`) and Psalm at `CacheWarmerAggregate.php:126`. The same idiom elsewhere in the tree (e.g. `Cache/LockRegistry.php:183`) is only clean because it is in the baseline. I pushed `=> true` on top, which is behaviourally identical since any non-`false` return suppresses the internal handler. Happy to squash or drop it if you would rather fold it in yourself.
+
+The remaining red jobs are the Twig bridge and Translation failures that already exist on 6.4 at the base commit.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T14:09:58Z
+
+I kept your `static fn () => true` change (it is behavior-equal to `null` here, and more explicit) and squashed the branch back to a single commit, now b26638a181b. The PR is ready as far as I am concerned, so no further push is needed; if you do want to change something else, please pull the branch first so we stop overwriting each other.

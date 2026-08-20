@@ -18,6 +18,7 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendApiTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -188,5 +189,38 @@ class MailerSendApiTransportTest extends TestCase
         $this->expectException(HttpTransportException::class);
         $this->expectExceptionMessage('Unable to send an email: "test" (code 202).');
         $transport->send($mail);
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new MailerSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
+        $envelope = new \Symfony\Component\Mailer\Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $enabledEmail = (new Email())->from('from@example.com')->to('to@example.com');
+        $enabledEmail->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
+        $enabledPayload = $method->invoke($transport, $enabledEmail, $envelope);
+        $this->assertTrue($enabledPayload['settings']['track_opens']);
+        $this->assertTrue($enabledPayload['settings']['track_clicks']);
+
+        $disabledEmail = (new Email())->from('from@example.com')->to('to@example.com');
+        $disabledEmail->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
+        $disabledPayload = $method->invoke($transport, $disabledEmail, $envelope);
+        $this->assertFalse($disabledPayload['settings']['track_opens']);
+        $this->assertFalse($disabledPayload['settings']['track_clicks']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new MailerSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
+        $envelope = new \Symfony\Component\Mailer\Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = (new Email())->from('from@example.com')->to('to@example.com');
+        $email->getHeaders()->add(new TrackingHeader(clicks: false));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('track_opens', $payload['settings']);
+        $this->assertFalse($payload['settings']['track_clicks']);
     }
 }

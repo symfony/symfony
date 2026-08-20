@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -164,12 +165,18 @@ final class AhaSendApiTransport extends AbstractApiTransport
             $payload['reply_to'] = $this->formatAddress(array_pop($replyTo));
         }
 
-        [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        [$headers, $tags, $tracking] = $this->prepareHeaders($email->getHeaders());
         if ($headers) {
             $payload['headers'] = $headers;
         }
         if ($tags) {
             $payload['tags'] = $tags;
+        }
+        if (null !== $tracking?->getOpens()) {
+            $payload['tracking']['open'] = $tracking->getOpens();
+        }
+        if (null !== $tracking?->getClicks()) {
+            $payload['tracking']['click'] = $tracking->getClicks();
         }
 
         if ($email->getAttachments()) {
@@ -200,11 +207,18 @@ final class AhaSendApiTransport extends AbstractApiTransport
             $payload['content']['reply_to'] = $this->formatAddress(array_pop($replyTo));
         }
 
-        [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        [$headers, $tags, $tracking] = $this->prepareHeaders($email->getHeaders());
         if ($tags) {
             $tagsStr = implode(',', $tags);
             $email->getHeaders()->addTextHeader('AhaSend-Tags', $tagsStr);
             $headers['AhaSend-Tags'] = $tagsStr;
+        }
+        // the v1 API reads tracking settings from the message headers, not from a payload field
+        if (null !== $tracking?->getOpens() && !$email->getHeaders()->has('AhaSend-Track-Opens')) {
+            $headers['AhaSend-Track-Opens'] = $tracking->getOpens() ? 'true' : 'false';
+        }
+        if (null !== $tracking?->getClicks() && !$email->getHeaders()->has('AhaSend-Track-Clicks')) {
+            $headers['AhaSend-Track-Clicks'] = $tracking->getClicks() ? 'true' : 'false';
         }
         if ($headers) {
             $payload['content']['headers'] = $headers;
@@ -218,7 +232,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
     }
 
     /**
-     * @return array{0: array<string, string>, 1: list<string>}
+     * @return array{0: array<string, string>, 1: list<string>, 2: ?TrackingHeader}
      */
     private function prepareHeaders(Headers $headers): array
     {
@@ -226,6 +240,7 @@ final class AhaSendApiTransport extends AbstractApiTransport
         // AhaSend API does not accept these headers.
         $headersToBypass = ['To', 'From', 'Subject', 'Reply-To'];
         $tags = [];
+        $tracking = null;
         foreach ($headers->all() as $header) {
             if (\in_array($header->getName(), $headersToBypass, true)) {
                 continue;
@@ -236,10 +251,15 @@ final class AhaSendApiTransport extends AbstractApiTransport
                 continue;
             }
 
+            if ($header instanceof TrackingHeader) {
+                $tracking = $header;
+                continue;
+            }
+
             $headersPrepared[$header->getName()] = $header->getBodyAsString();
         }
 
-        return [$headersPrepared, $tags];
+        return [$headersPrepared, $tags, $tracking];
     }
 
     private function getAttachments(Email $email): array

@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -233,5 +234,38 @@ class MandrillApiTransportTest extends TestCase
         // The HTML references "cid:logo.png" and no Content-ID was set, so the image
         // "name" must keep matching the filename rather than an auto-generated Content-ID.
         $this->assertSame('logo.png', $payload['message']['images'][0]['name']);
+    }
+
+    public function testTrackingHeader()
+    {
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertTrue($enabledPayload['message']['track_opens']);
+        $this->assertTrue($enabledPayload['message']['track_clicks']);
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertFalse($disabledPayload['message']['track_opens']);
+        $this->assertFalse($disabledPayload['message']['track_clicks']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependently()
+    {
+        $transport = new MandrillApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertTrue($payload['message']['track_opens']);
+        $this->assertArrayNotHasKey('track_clicks', $payload['message']);
     }
 }

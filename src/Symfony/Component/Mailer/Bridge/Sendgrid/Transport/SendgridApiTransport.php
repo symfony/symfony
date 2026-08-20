@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -146,6 +147,15 @@ class SendgridApiTransport extends AbstractApiTransport
                 if ($groupsToDisplay = $header->getGroupsToDisplay()) {
                     $payload['asm']['groups_to_display'] = $groupsToDisplay;
                 }
+            } elseif ($header instanceof TrackingHeader) {
+                if (null !== $header->getOpens()) {
+                    $payload['tracking_settings']['open_tracking'] = ['enable' => $header->getOpens()];
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['tracking_settings']['click_tracking'] = ['enable' => $header->getClicks(), 'enable_text' => $header->getClicks()];
+                }
+
+                continue;
             } else {
                 $payload['headers'][$header->getName()] = $header->getBodyAsString();
             }

@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -74,13 +75,13 @@ final class BrevoApiTransport extends AbstractApiTransport
     }
 
     /**
-     * @return list<array{email: string, name?: string}>
+     * @return list<array{email: string, name?: string, contactPixelTrackingConsent?: bool}>
      */
-    private function formatAddresses(array $addresses): array
+    private function formatAddresses(array $addresses, ?bool $tracking = null): array
     {
         $formattedAddresses = [];
         foreach ($addresses as $address) {
-            $formattedAddresses[] = $this->formatAddress($address);
+            $formattedAddresses[] = $this->formatAddress($address, $tracking);
         }
 
         return $formattedAddresses;
@@ -88,9 +89,11 @@ final class BrevoApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
+        $tracking = $this->getTracking($email->getHeaders());
+
         $payload = [
             'sender' => $this->formatAddress($envelope->getSender()),
-            'to' => $this->formatAddresses($this->getRecipients($email, $envelope)),
+            'to' => $this->formatAddresses($this->getRecipients($email, $envelope), $tracking),
             'subject' => $email->getSubject(),
         ];
         if ($attachments = $this->prepareAttachments($email)) {
@@ -100,10 +103,10 @@ final class BrevoApiTransport extends AbstractApiTransport
             $payload['replyTo'] = current($this->formatAddresses($emails));
         }
         if ($emails = $email->getCc()) {
-            $payload['cc'] = $this->formatAddresses($emails);
+            $payload['cc'] = $this->formatAddresses($emails, $tracking);
         }
         if ($emails = $email->getBcc()) {
-            $payload['bcc'] = $this->formatAddresses($emails);
+            $payload['bcc'] = $this->formatAddresses($emails, $tracking);
         }
         if ($email->getTextBody()) {
             $payload['textContent'] = $email->getTextBody();
@@ -163,18 +166,53 @@ final class BrevoApiTransport extends AbstractApiTransport
 
                 continue;
             }
+
+            if ($header instanceof TrackingHeader) {
+                continue;
+            }
+
             $headersAndTags['headers'][$header->getName()] = $header->getBodyAsString();
         }
 
         return $headersAndTags;
     }
 
-    private function formatAddress(Address $address): array
+    /**
+     * Brevo only exposes a single combined "tracking consent" flag which anonymises the open/click
+     * events rather than disabling them, so an explicit false on either aspect anonymises both, and
+     * an explicit true on either aspect grants consent for both.
+     */
+    private function getTracking(Headers $headers): ?bool
+    {
+        foreach ($headers->all() as $header) {
+            if (!$header instanceof TrackingHeader) {
+                continue;
+            }
+
+            if (false === $header->getOpens() || false === $header->getClicks()) {
+                return false;
+            }
+
+            if (true === $header->getOpens() || true === $header->getClicks()) {
+                return true;
+            }
+
+            return null;
+        }
+
+        return null;
+    }
+
+    private function formatAddress(Address $address, ?bool $tracking = null): array
     {
         $formattedAddress = ['email' => $address->getEncodedAddress()];
 
         if ($address->getName()) {
             $formattedAddress['name'] = $address->getName();
+        }
+
+        if (null !== $tracking) {
+            $formattedAddress['contactPixelTrackingConsent'] = $tracking;
         }
 
         return $formattedAddress;

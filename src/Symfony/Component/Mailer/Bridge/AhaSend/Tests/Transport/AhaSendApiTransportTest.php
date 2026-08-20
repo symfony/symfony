@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\Bridge\AhaSend\Transport\AhaSendApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -506,5 +507,78 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame('content-identifier@symfony', $payload['attachments'][0]['content_id']);
         $this->assertTrue($payload['attachments'][1]['base64']);
         $this->assertSame(base64_encode('image-contents'), $payload['attachments'][1]['data']);
+    }
+
+    public function testTrackingHeaderV2()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true, clicks: false));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new AhaSendApiTransport('aha-sk-ACCESS_KEY', accountId: 'ACCOUNT_ID');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertTrue($payload['tracking']['open']);
+        $this->assertFalse($payload['tracking']['click']);
+        $this->assertArrayNotHasKey('headers', $payload);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependentlyV2()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: false));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new AhaSendApiTransport('aha-sk-ACCESS_KEY', accountId: 'ACCOUNT_ID');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertFalse($payload['tracking']['open']);
+        $this->assertArrayNotHasKey('click', $payload['tracking']);
+    }
+
+    public function testTrackingHeaderV1()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true, clicks: false));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new AhaSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getLegacyPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('tracking', $payload);
+        $this->assertSame('true', $payload['content']['headers']['AhaSend-Track-Opens']);
+        $this->assertSame('false', $payload['content']['headers']['AhaSend-Track-Clicks']);
+        $this->assertArrayNotHasKey('X-Track', $payload['content']['headers']);
+    }
+
+    public function testTrackingHeaderControlsOpensAndClicksIndependentlyV1()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(clicks: false));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new AhaSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getLegacyPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('AhaSend-Track-Opens', $payload['content']['headers']);
+        $this->assertSame('false', $payload['content']['headers']['AhaSend-Track-Clicks']);
+    }
+
+    public function testExplicitAhaSendTrackingHeaderWinsOverTrackingHeaderV1()
+    {
+        $email = new Email();
+        $email->getHeaders()->addTextHeader('AhaSend-Track-Opens', 'false');
+        $email->getHeaders()->add(new TrackingHeader(opens: true));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new AhaSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(AhaSendApiTransport::class, 'getLegacyPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('false', $payload['content']['headers']['AhaSend-Track-Opens']);
     }
 }

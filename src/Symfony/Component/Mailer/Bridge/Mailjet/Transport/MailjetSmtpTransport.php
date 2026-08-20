@@ -13,7 +13,12 @@ namespace Symfony\Component\Mailer\Bridge\Mailjet\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\RawMessage;
 
 class MailjetSmtpTransport extends EsmtpTransport
 {
@@ -23,5 +28,33 @@ class MailjetSmtpTransport extends EsmtpTransport
 
         $this->setUsername($username);
         $this->setPassword($password);
+    }
+
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
+    {
+        if ($message instanceof Message) {
+            $message = clone $message;
+            $this->addMailjetHeaders($message);
+        }
+
+        return parent::send($message, $envelope);
+    }
+
+    private function addMailjetHeaders(Message $message): void
+    {
+        $headers = $message->getHeaders();
+
+        foreach ($headers->all() as $name => $header) {
+            if ($header instanceof TrackingHeader) {
+                // an explicit X-Mailjet-Track* header wins over the generic one
+                if (null !== $header->getOpens() && !$headers->has('X-Mailjet-TrackOpen')) {
+                    $headers->addTextHeader('X-Mailjet-TrackOpen', $header->getOpens() ? '1' : '0');
+                }
+                if (null !== $header->getClicks() && !$headers->has('X-Mailjet-TrackClick')) {
+                    $headers->addTextHeader('X-Mailjet-TrackClick', $header->getClicks() ? '1' : '0');
+                }
+                $headers->remove($name);
+            }
+        }
     }
 }

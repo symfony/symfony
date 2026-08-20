@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -144,6 +145,17 @@ class MandrillApiTransport extends AbstractApiTransport
 
             if ($header instanceof MetadataHeader) {
                 $payload['message']['metadata'][$header->getKey()] = $header->getValue();
+
+                continue;
+            }
+
+            if ($header instanceof TrackingHeader) {
+                if (null !== $header->getOpens()) {
+                    $payload['message']['track_opens'] = $header->getOpens();
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['message']['track_clicks'] = $header->getClicks();
+                }
 
                 continue;
             }

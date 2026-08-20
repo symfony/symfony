@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -115,6 +116,17 @@ class PostmarkApiTransport extends AbstractApiTransport
 
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender', 'reply-to', 'date'], true)) {
+                continue;
+            }
+
+            if ($header instanceof TrackingHeader) {
+                if (null !== $header->getOpens()) {
+                    $payload['TrackOpens'] = $header->getOpens();
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['TrackLinks'] = $header->getClicks() ? 'HtmlAndText' : 'None';
+                }
+
                 continue;
             }
 

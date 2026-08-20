@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -116,8 +117,20 @@ class MailgunApiTransport extends AbstractApiTransport
             $payload['html'] = $html;
         }
 
+        // resolve the generic header first, so a native o:/h:/t:/v: header always wins regardless of iteration order
+        foreach ($headers->all() as $header) {
+            if ($header instanceof TrackingHeader) {
+                if (null !== $header->getOpens()) {
+                    $payload['o:tracking-opens'] = $header->getOpens() ? 'yes' : 'no';
+                }
+                if (null !== $header->getClicks()) {
+                    $payload['o:tracking-clicks'] = $header->getClicks() ? 'yes' : 'no';
+                }
+            }
+        }
+
         foreach ($headers->all() as $name => $header) {
-            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type'], true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-track'], true)) {
                 continue;
             }
 

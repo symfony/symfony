@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipApiTransport;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -512,6 +513,48 @@ class InfobipApiTransportTest extends TestCase
         $this->expectException(HttpTransportException::class);
         $this->expectExceptionMessage('Could not reach the remote Infobip server.');
         $this->transport->send($email);
+    }
+
+    public function testTrackingHeaderMapsToTrackOpensAndTrackClicks()
+    {
+        $enabled = $this->basicValidEmail();
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
+
+        $this->transport->send($enabled);
+        $body = $this->response->getRequestOptions()['body'];
+        $this->assertMatchesRegularExpression('/name="trackOpens"\R\Rtrue\R/s', $body);
+        $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rtrue\R/s', $body);
+
+        $disabled = $this->basicValidEmail();
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
+
+        $this->transport->send($disabled);
+        $body = $this->response->getRequestOptions()['body'];
+        $this->assertMatchesRegularExpression('/name="trackOpens"\R\Rfalse\R/s', $body);
+        $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rfalse\R/s', $body);
+    }
+
+    public function testExplicitInfobipTrackingHeadersOverrideGenericTrackingHeaderRegardlessOfOrder()
+    {
+        $trackingHeaderFirst = $this->basicValidEmail();
+        $trackingHeaderFirst->getHeaders()
+            ->add(new TrackingHeader(opens: true, clicks: true))
+            ->addTextHeader('X-Infobip-TrackClicks', 'false');
+
+        $this->transport->send($trackingHeaderFirst);
+        $body = $this->response->getRequestOptions()['body'];
+        $this->assertMatchesRegularExpression('/name="trackOpens"\R\Rtrue\R/s', $body);
+        $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rfalse\R/s', $body);
+
+        $nativeHeaderFirst = $this->basicValidEmail();
+        $nativeHeaderFirst->getHeaders()
+            ->addTextHeader('X-Infobip-TrackClicks', 'false')
+            ->add(new TrackingHeader(opens: true, clicks: true));
+
+        $this->transport->send($nativeHeaderFirst);
+        $body = $this->response->getRequestOptions()['body'];
+        $this->assertMatchesRegularExpression('/name="trackOpens"\R\Rtrue\R/s', $body);
+        $this->assertMatchesRegularExpression('/name="trackClicks"\R\Rfalse\R/s', $body);
     }
 
     private function basicValidEmail(): Email

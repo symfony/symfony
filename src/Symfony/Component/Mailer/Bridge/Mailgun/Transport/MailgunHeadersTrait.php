@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailgun\Transport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
@@ -44,6 +45,15 @@ trait MailgunHeadersTrait
                 $headers->remove($name);
             } elseif ($header instanceof MetadataHeader) {
                 $metadata[$header->getKey()] = $header->getValue();
+                $headers->remove($name);
+            } elseif ($header instanceof TrackingHeader) {
+                // an explicit X-Mailgun-Track-* header wins over the generic one
+                if (null !== $header->getOpens() && !$headers->has('X-Mailgun-Track-Opens')) {
+                    $headers->addTextHeader('X-Mailgun-Track-Opens', $header->getOpens() ? 'yes' : 'no');
+                }
+                if (null !== $header->getClicks() && !$headers->has('X-Mailgun-Track-Clicks')) {
+                    $headers->addTextHeader('X-Mailgun-Track-Clicks', $header->getClicks() ? 'yes' : 'no');
+                }
                 $headers->remove($name);
             }
         }

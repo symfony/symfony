@@ -570,6 +570,14 @@
                 <source>This value is not a valid cron expression.</source>
                 <target state="needs-review-translation">Гэта значэнне не з'яўляецца сапраўдным выразам cron.</target>
             </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target state="needs-review-translation">Сутнасць, на якую спасылаюцца, не існуе.</target>
+            </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target state="needs-review-translation">Гэта значэнне не з'яўляецца сапраўдным ULID.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -97,6 +97,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestHeaderValueR
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\EventListener\ControllerAttributesListener;
+use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\Log\DebugLoggerConfigurator;
 use Symfony\Component\JsonPath\Attribute\AsJsonPathFunction;
 use Symfony\Component\JsonPath\JsonPathCrawler;
@@ -1018,8 +1019,14 @@ class FrameworkExtension extends Extension
             ->addArgument($config['collect'])
             ->addTag('kernel.reset', ['method' => 'reset']);
 
+        if (($config['excluded_paths'] || $config['excluded_http_codes']) && 8 > (new \ReflectionMethod(ProfilerListener::class, '__construct'))->getNumberOfParameters()) {
+            throw new LogicException('Excluding requests from the profiler cannot be enabled as this version of the HttpKernel component does not support it. Try upgrading "symfony/http-kernel".');
+        }
+
         $container->getDefinition('profiler_listener')
-            ->addArgument($config['collect_parameter']);
+            ->addArgument($config['collect_parameter'])
+            ->addArgument($config['excluded_paths'])
+            ->addArgument($config['excluded_http_codes']);
 
         if (!$container->getParameter('kernel.debug') || !$this->hasConsole() || !$container->has('debug.stopwatch')) {
             $container->removeDefinition('console_profiler_listener');

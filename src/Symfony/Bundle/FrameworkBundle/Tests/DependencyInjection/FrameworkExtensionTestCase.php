@@ -70,6 +70,7 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -387,6 +388,20 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->hasDefinition('profiler'));
         $this->assertTrue($container->hasDefinition('serializer.data_collector'));
         $this->assertTrue($container->hasDefinition('debug.serializer'));
+    }
+
+    public function testProfilerExclusions()
+    {
+        if (8 > (new \ReflectionMethod(ProfilerListener::class, '__construct'))->getNumberOfParameters()) {
+            $this->markTestSkipped('This test requires symfony/http-kernel 8.2 or higher.');
+        }
+
+        $container = $this->createContainerFromFile('profiler_exclusions');
+
+        $definition = $container->getDefinition('profiler_listener');
+
+        $this->assertSame(['^/\.well-known/'], $definition->getArgument(6));
+        $this->assertSame([404 => [], 400 => ['^/foo', '^/bar']], $definition->getArgument(7));
     }
 
     public function testWorkflows()

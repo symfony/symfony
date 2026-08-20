@@ -1,0 +1,69 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-04-08T13:57:26Z
+
+I'd prefer a solution that doesn't create a new sibling concept that's hard to grasp vs "factory".
+Can't we have something like a wither API on the factory class?
+
+---------------------------------------------------------------------------
+
+by kbond at 2025-04-08T14:17:10Z
+
+> Can't we have something like a wither API on the factory class?
+
+Can you describe what you're thinking here a bit more? Feels like this ship has sailed as we now have 2 `RateLimiterFactoryInterface` implementations.
+
+I guess you mean something like:
+
+```php
+$factory->slidingWindow(...)->create(...);
+$factory->fixedWindow(...)->create(...);
+```
+
+It wouldn't make sense to add these methods to the `RateLimiterFactoryInterface` (because `$compoundFactory->slidingWindow()->create()` doesn't make sense) - so it'd have to be another implementation... which sort of brings us back to the same problem. But I guess we could continue using the name `*RateLimiterFactory` - `ManualRateLimiterFactory` or `CustomRateLimiterFactory` maybe?
+
+---------------------------------------------------------------------------
+
+by kaznovac at 2025-04-09T20:32:09Z
+
+maybe something like this:
+
+```php
+$factory->createBuilder(): RateLimiterBuilderInterface
+
+interface RateLimiterBuilderInterface {
+  function setLock(?LockInterface $lock): self; /** if desired to allow changing of factory provided services */
+  function setStorage(StorageInterface $storage): self;
+
+  function setId(string $id): self; /** or better setName */
+  /** @param 'fixed_window'|'token_bucket'|'sliding_window'|'no_limit' $policy */
+  function setPolicy(string $policy): self;
+
+  function setLimit(int $limit): self;
+  function setInterval(string $interval): self;
+  function setRate(string $interval, int $amount): self; /** these can be noop where not-applicable to policy */
+
+  function reset(): self; /** optional */
+
+  function build(): LimiterInterface;
+}
+```
+
+If you want to follow dogmatic Builder pattern - for each Limiter class a dedicated builder class should be crated; strenuous, but allows nice strategy pattern in the new factory's `createBuilder(string $policy): RateLimiterBuilderInterface`
+(this aproach fully satisfies `O` - `open` for extension - new builders can be registered per policy, and factory is `closed` for modification as it's explicitly `final`; and typehint it is through phpstan conditional types)
+
+Regarding `CompoundLimiterBuilder`, it can have `addLimiter(LimiterInterface $limiter): self` and just wrap all provided limiters in adequate `CompoundLimiter` instance on `build`.
+
+---------------------------------------------------------------------------
+
+by kbond at 2026-08-19T02:19:12Z
+
+Thanks for the review @nicolas-grekas. I've made the changes you asked for!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T14:36:26Z
+
+Thank you @kbond, the rework addresses everything. All findings from the previous round are verified fixed; `testLockIsCreatedPerKey` now covers the lock path at the right layer.
+
+Prep pushed on top: rebased onto the current 8.2 tip (one CHANGELOG conflict), added the missing RateLimiter changelog line for `\DateInterval` being accepted by `RateLimiterFactory`'s `interval`/`rate.interval` options, and refreshed the description. Ready on my side once CI is green.

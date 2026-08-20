@@ -290,6 +290,59 @@ class MessengerPassTest extends TestCase
         $this->assertEquals([new Reference(TaggedDummyBatchHandler::class), '__invoke'], $container->getDefinition((string) $handlerDescriptorDefinition->getArgument(0))->getArgument(0));
     }
 
+    public function testHandlersOfTheSameClassAreAliasedByServiceId()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->register('handler_a', DummyHandler::class)->addTag('messenger.message_handler');
+        $container->register('handler_b', DummyHandler::class)->addTag('messenger.message_handler');
+
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, ['handler_a', 'handler_b'], [['alias' => 'handler_a'], ['alias' => 'handler_b']]);
+    }
+
+    public function testHandlersOfTheSameClassHandlingDifferentMessagesAreNotAliased()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->register('handler_a', DummyHandler::class)->addTag('messenger.message_handler', ['handles' => DummyMessage::class]);
+        $container->register('handler_b', DummyHandler::class)->addTag('messenger.message_handler', ['handles' => SecondMessage::class]);
+
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, ['handler_a']);
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, SecondMessage::class, ['handler_b']);
+    }
+
+    public function testHandlersOfTheSameClassOnDifferentBusesAreNotAliased()
+    {
+        $container = $this->getContainerBuilder($commandBusId = 'command_bus');
+        $container->register($queryBusId = 'query_bus', MessageBusInterface::class)->setArgument(0, [])->addTag('messenger.bus');
+        $container->register('handler_a', DummyHandler::class)->addTag('messenger.message_handler', ['bus' => $commandBusId]);
+        $container->register('handler_b', DummyHandler::class)->addTag('messenger.message_handler', ['bus' => $queryBusId]);
+
+        (new MessengerPass())->process($container);
+
+        $this->assertHandlerDescriptor($container, $container->getDefinition($commandBusId.'.messenger.handlers_locator')->getArgument(0), DummyMessage::class, ['handler_a'], [['bus' => $commandBusId]]);
+        $this->assertHandlerDescriptor($container, $container->getDefinition($queryBusId.'.messenger.handlers_locator')->getArgument(0), DummyMessage::class, ['handler_b'], [['bus' => $queryBusId]]);
+    }
+
+    public function testUserDefinedHandlerAliasIsKept()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->register('handler_a', DummyHandler::class)->addTag('messenger.message_handler', ['alias' => 'first']);
+        $container->register('handler_b', DummyHandler::class)->addTag('messenger.message_handler');
+
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertHandlerDescriptor($container, $handlerDescriptionMapping, DummyMessage::class, ['handler_a', 'handler_b'], [['alias' => 'first'], ['alias' => 'handler_b']]);
+    }
+
     public function testProcessHandlersByBus()
     {
         $container = $this->getContainerBuilder($commandBusId = 'command_bus');

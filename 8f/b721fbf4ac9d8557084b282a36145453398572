@@ -1,0 +1,241 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-17T16:05:12Z
+
+Cases to consider (behavior that should be properly defined and tested):
+
+- file scope tag with trans usages that have an explicit domain
+- file scope tag not at the root of a template
+- multiple file scope tags in the same template
+- file scope tag at the root of an embedded template
+- file scope tag and normal `trans_default_domain` tags in the same template
+- file scope tag in the main template with `{% embed %}` tags
+- file scope tag in the main template with nested `{% embed %}` tags
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-04-17T16:10:31Z
+
+Is my understanding correct that the `TranslationDefaultDomainNodeVisitor` needs to deal with one value in the `$fileScopeDomain` property only, because it will not be called in a nested manner across multiple `ModuleNodes`?
+
+It will be called for embedded templates first and see enterNode/leaveNode on those ModuleNodes, before it will enter the main template?
+
+If so, it's ok to set $fileScopeDomain on `enterNode` and leave it alone at `leaveNode`.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-04-17T16:48:47Z
+
+Test cases added, failures seem unrelated
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-04-18T13:58:16Z
+
+I agree that the issue reported in #63978 is very annoying, so thanks for trying to fix it here.
+
+-----
+
+I'm not a big fan of the proposed syntax. Using `file_scope` feels a bit rough and could look odd to designers working with Twig:
+
+```twig
+{% trans_default_domain 'mydomain' file_scope %}
+```
+Here are two alternative proposals for your consideration:
+
+**(1)** Use `for file` or `for all`. It's common in Twig to use two words like `ignore missing`, `with ... only`, `as macros`, etc.
+
+```twig
+{% extends 'layout.html.twig' %}
+{% trans_default_domain 'Blog' for file %}
+{% trans_default_domain 'Blog' for all %}
+
+<h1>{{ 'page.headline'|trans }}</h1>
+
+<twig:Blog:Card>
+    {{ 'promotion.headline'|trans }}
+</twig:Blog:Card>
+```
+
+**(2)** Add a new `trans_domain` tag to replace `trans_default_domain`:
+
+```twig
+{% extends 'layout.html.twig' %}
+{% trans_domain 'Blog' %}
+
+<h1>{{ 'page.headline'|trans }}</h1>
+
+<twig:Blog:Card>
+    {{ 'promotion.headline'|trans }}
+</twig:Blog:Card>
+```
+
+We could use the same tag inside embeds/components to override the global one:
+
+```twig
+{% extends 'layout.html.twig' %}
+{% trans_domain 'Blog' %}
+
+{# ... #}
+
+<twig:Blog:Card>
+    {% trans_domain 'User' %}
+    {{ 'promotion.headline'|trans }}
+</twig:Blog:Card>
+```
+
+This new tag could add an `only` modifier (same as `include ... only`) to apply the current `trans_default_domain` behavior and apply the trans domain only to the main page contents, not embeds or components:
+
+```twig
+{% extends 'layout.html.twig' %}
+{% trans_domain 'Blog' only %}
+
+{# ... #}
+```
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-04-18T15:05:09Z
+
+@javiereguiluz thank you for your feedback!
+
+I like your suggestion from (1). As an alternative to `for file`, we could also use `for template`.
+
+Would you also go this way if there is no other option, like `for scope` or similar?
+
+Regarding (2), I am afraid I do not understand the idea. Could you please try to explain where the difference is (or how one maps to the other) when using `trans_default_domain … [for file]` vs. `trans_domain … [only]`?
+
+Thank you!
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-04-18T15:08:24Z
+
+Btw. I assume `trans_default_domain` was chosen because it does not strictly set the domain, but only provides the default for usages where no explicit domain is given. Also this PR does not enforce anything, only makes it possible to set the default for a broader scope than before.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-04-18T16:43:08Z
+
+@mpdude my message was about two different approaches. We could add new features to the exsiting `trans_default_domain` tag or create a new tag called `trans_domain` that already has the behavior that we want.
+
+I'd prefer the new tag because, in my experience, I always want my components to use the same trans domain I set up in `trans_default_domain` (maybe for others the experience is different). So, having to add something else when using `trans_default_domain` to get the right behavior is a bit annoying.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-04-20T08:31:38Z
+
+@javiereguiluz I have changed the modifier to read `for file`. Also, I have been thinking about your suggestions for a while.
+
+To me, having two different tags seems to make it more complicated to explain how the two interact with each other, and that one acts as the file-wide "fallback-fallback" for the other one.
+
+So, my suggestion would still be to go with `trans_default_domain ... for file` for the new mode. But I would definietely like to hear more opinions on this.
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-04-20T08:44:06Z
+
+I explained myself so bad here 🤦
+
+What I meant is:
+
+* In my experience, the current behavior of `trans_default_domain` is wrong
+* If you define a default domain for some template, you probably want it applied to all: body contents, components, embeds
+* We can't change the behavior of `trans_default_domain` for BC reasons
+* We could add a new option to it (e.g. `for file`) but that's a bit annoying/cumbersome because you (probably) want to use this option always
+* So, why not deprecate (and remove later) the `trans_default_domain` tag and replace it by a new `trans_domain` tag that behaves as we want
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-04-20T11:06:13Z
+
+Now _that_ totally makes sense 😁
+
+I'll leave it to others to decide whether we want to go that way to deprecate and eventually remove the old mode (also see #64001 for another observation of quirky behaviour).
+
+Since I find the `trans_default_domain` name intention-revealing, we could also deprecate _not_ adding the `for file` modifier, and make that the default mode in the next major (possibly making `for file` optional and/or deprecated then).
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-05-10T09:41:16Z
+
+So how we gonna proceed here?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T06:25:11Z
+
+I pushed a commit that reworks the implementation. Sorry for the size of it, but I think the angle is worth it.
+
+**Parse time instead of AST post-processing.** An `embed` body is parsed from the same `TokenStream`, and its anonymous `ModuleNode` carries the very same `Twig\Source` *instance* as the enclosing template. So if the token parser records the domain when it parses the tag, the value is already there a few tokens later when the embedded template is parsed and traversed. No need to reach into `embedded_templates` afterwards.
+
+What that buys:
+* `TranslationFileScopeScannerNodeVisitor` is gone, the remaining visitor only seeds the scope on `enterNode(ModuleNode)`;
+* no manual recursive AST walks;
+* `TranslationNodeVisitor` is back to its 8.2 state: `translation:extract` reports the right domain for `embed` bodies because the domain is injected during their own traversal, before messages are collected, so the `spl_object_id` dedup isn't needed either;
+* it covers anything that recursively parses the same stream, so UX Twig Components come along too, not only what lands in `embedded_templates`.
+
+Shared state between the token parser and the visitor lives in a `TransDefaultDomainRegistry` holding two `WeakMap`s keyed by `Source`. Since each parse gets a fresh `Source`, nothing can go stale across recompilations in dev.
+
+**`for file` -> `for _self`.** Not all templates are files: `getPath()` is empty for array/string/DB-backed loaders. `_self` is what Twig already calls the current template, and inside an `embed` body it resolves to the *enclosing* template name, which is exactly the scope we're defining here.
+
+**New restriction:** the tag must come before any `embed` in the template, otherwise that embed has already been parsed. Rejected with a clear `SyntaxError` rather than silently skipped.
+
+Your list is covered @stof, plus macros, `extends`, `include` not leaking, `{% trans %}` and extraction.
+
+Separately: #64001 is real, the current scope isn't lexical at all, it's traversal order. Suggested path is to deprecate in 8.2 the two ambiguous cases only (a top-level `trans_default_domain` without `for _self` in a template that also has an `embed`, and one inside a `macro`), and make top-level mean whole-template in 9.0, with `for _self` staying accepted as self-documentation. That gets @javiereguiluz what he asked for without a second tag, and no need for an `only` modifier since declaring the domain inside the `embed` body already wins.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-02T07:23:01Z
+
+Two more commits, implementing the deprecation path I sketched above. Happy to drop them from this PR and move them to a separate one if you prefer to keep the feature clean, but I'd rather we settle the target semantics now.
+
+**The 9.0 model they encode**, at the top level of a template:
+
+* a **constant** `trans_default_domain` becomes a declaration for the whole template, i.e. what `for _self` does today: one per template, before any `embed`, applying to everything written in the source;
+* a **dynamic** one is unchanged and keeps applying from the point where it is declared. It can't be inlined into the separately compiled class of an `embed` body, so it can't be a template-wide property. Nothing about it is deprecated.
+
+Deprecated, all constant-only, all triggered only when they'd actually change something:
+
+* the tag inside a `macro`, which is #64001: the visitor's scope follows traversal order, not lexical position, so the domain leaks into the macros declared after it and misses the ones before. Scoped to the enclosing macro in 9.0;
+* a top-level declaration in a template that also has an `embed` whose body holds a domain-less `trans` call;
+* a domain-less `trans` call preceding the declaration;
+* more than one top-level declaration.
+
+Also in there: `for _self` inside a macro is now a `SyntaxError`. It was accepted and silently applied to the whole template, a macro isn't a `BlockNode` so the block-depth guard didn't catch it.
+
+Known imprecision, flagging it rather than papering over it: the last two fire per `ModuleNode`, and an `embed` body is its own module, so the odd template that puts two top-level declarations inside one `embed` body gets deprecated even though embed bodies keep positional semantics in 9.0. There's no way to tell "this module is an embed body" during traversal, the enclosing one is traversed last and `index` is only set afterwards. Deferring emission to the parent's `leaveNode` would fix it but the outermost module has no parent to defer to. Both shapes are rare and the suggested fix still applies, so I left it.
+
+Side note, unrelated and pre-existing on 8.2: a block whose only content is the tag doesn't compile, `{% block a %}{% trans_default_domain 'x' %}{% endblock %}` gives `Node "body" does not exist for Node "Twig\Node\BlockNode"`, because the visitor removes the node and leaves the block empty.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T13:46:12Z
+
+I split the deprecations out and pushed the feature on its own, rebased on 8.2.
+
+The reason for splitting: one of the four deprecations cannot be delivered as announced. For `{% embed %}...{% endembed %}{% trans_default_domain 'D' %}`, the message tells you to add `for _self`, but doing that throws `The "trans_default_domain" tag must be used with "for _self" before any "embed" tag`. And the 9.0 semantics the deprecation announces, a top-level declaration applying to the whole template, cannot be reached for that shape through this mechanism, so 9.0 would have to turn it into a syntax error, which the deprecation does not say. That needs its own discussion, and it should not hold up the feature.
+
+I also fixed one bug. `TranslationDefaultDomainNodeVisitor::$scope` is instance state, pushed on entering a `ModuleNode` and popped on leaving it, so when a template throws the stack is never unwound and the domain survives into the next template compiled by the same `Environment`. That matters for `cache:warmup` and for dev-mode recompiles, where many templates go through one `Environment`. Before the fix, compiling a broken template and then an unrelated one gave:
+
+```
+caught: The "trans_default_domain" tag cannot be used with "for _self" inside a block in "bad" at line 1.
+INNOCENT[from-D]      <- expected INNOCENT[from-messages]
+```
+
+A `ModuleNode` is always the root of a traversal, and embedded templates are traversed as separate top-level passes rather than nested inside the parent, so entering one now starts from a fresh `Scope`. There is a regression test.
+
+Smaller things: the changelog entry moved from 8.1 to 8.2, and I dropped two unrelated hunks in `TranslationExtensionTest` that removed a trailing period from the expected messages of `testTransUnknownKeyword` and `testTransComplexBody`, since 8.2 passes with the period. The nine commits are squashed into one, with you as the author.
+
+The rest verifies. I checked the scoping matrix against 8.2 for top level, inside a block, `extends`, `include`, `embed`, nested `embed` and macros, and there is no leakage: an `include`d template keeps `messages`, a parent body keeps `messages`, a separate template embedded in a `for _self` template keeps its own domain, and an `embed` body declaring its own domain wins. Extraction agrees with rendering, which is the part I most expected to be wrong: a `for _self` fixture yields `[Blog] promotion.headline, page.headline, page.intro, macro.key`, `[Other] explicit.key` and `[messages] card.default`.
+
+TwigBridge is green at 2090 tests. The one Translation failure, `TranslationLintCommandTest::testLintMalformedIcuTranslations`, reproduces with this branch's TwigBridge reverted to 8.2, so it is pre-existing.
+
+CI never ran on the old head, so this is also the first real run.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-08-20T13:30:56Z
+
+Thank you @nicolas-grekas for the work you put into this!

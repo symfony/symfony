@@ -570,6 +570,14 @@
                 <source>This value is not a valid cron expression.</source>
                 <target state="needs-review-translation">Este valor non é unha expresión cron válida.</target>
             </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target state="needs-review-translation">A entidade referenciada non existe.</target>
+            </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target state="needs-review-translation">Este valor non é un ULID válido.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

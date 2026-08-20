@@ -21,6 +21,7 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -38,12 +39,15 @@ class Serializer implements SerializerInterface
     private SymfonySerializerInterface $serializer;
     private string $format;
     private array $context;
+    private array $stampContext;
 
     public function __construct(?SymfonySerializerInterface $serializer = null, string $format = 'json', array $context = [])
     {
         $this->serializer = $serializer ?? self::create()->serializer;
         $this->format = $format;
         $this->context = $context + [self::MESSENGER_SERIALIZATION_CONTEXT => true];
+        // stamps have no serialization metadata, so selecting the attributes of the message would encode them empty
+        $this->stampContext = array_diff_key($this->context, array_flip([AbstractNormalizer::ATTRIBUTES, AbstractNormalizer::GROUPS, AbstractNormalizer::IGNORED_ATTRIBUTES]));
     }
 
     public static function create(): self
@@ -120,7 +124,7 @@ class Serializer implements SerializerInterface
             }
 
             try {
-                $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
+                $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->stampContext);
             } catch (ExceptionInterface $e) {
                 throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
             }
@@ -140,7 +144,7 @@ class Serializer implements SerializerInterface
 
         $headers = [];
         foreach ($allStamps as $class => $stamps) {
-            $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->context);
+            $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->stampContext);
         }
 
         return $headers;

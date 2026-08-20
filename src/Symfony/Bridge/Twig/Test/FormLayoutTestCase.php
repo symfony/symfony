@@ -51,18 +51,22 @@ abstract class FormLayoutTestCase extends FormIntegrationTestCase
 
     protected function assertMatchesXpath($html, $expression, $count = 1): void
     {
-        $dom = new \DOMDocument('UTF-8');
+        $dom = new \DOMDocument('1.0', 'UTF-8');
 
         try {
             // Wrap in <root> node so we can load HTML with multiple tags at
             // the top level
-            $dom->loadXML('<root>'.$html.'</root>');
+            $loaded = $dom->loadXML('<root>'.$html.'</root>');
         } catch (\Exception $e) {
             $this->fail(\sprintf(
                 "Failed loading HTML:\n\n%s\n\nError: %s",
                 $html,
                 $e->getMessage()
             ));
+        }
+
+        if (!$loaded) {
+            $this->fail(\sprintf("Failed loading HTML:\n\n%s", $html));
         }
         $xpath = new \DOMXPath($dom);
         $nodeList = $xpath->evaluate('/root'.$expression);

@@ -485,6 +485,23 @@ class AutowirePassTest extends TestCase
         $this->assertSame('b', (string) $definition->getArgument(0));
     }
 
+    public function testNullableIntersectionTypedReferenceIsAutowired()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('b', \stdClass::class);
+        $container->setAlias(CollisionInterface::class, 'b');
+        $container->setAlias(AnotherInterface::class, 'b');
+
+        $container->register('some_locator', 'stdClass')
+            ->addArgument(new TypedReference($type = '('.CollisionInterface::class.'&'.AnotherInterface::class.')|null', $type, ContainerBuilder::IGNORE_ON_INVALID_REFERENCE))
+            ->addTag('container.service_locator');
+
+        (new AutowirePass())->process($container);
+
+        $this->assertSame('b', (string) $container->getDefinition('some_locator')->getArgument(0));
+    }
+
     public function testParameterWithNullUnionIsAutowired()
     {
         $container = new ContainerBuilder();

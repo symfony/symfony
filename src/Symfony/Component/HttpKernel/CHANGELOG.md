@@ -13,6 +13,7 @@ CHANGELOG
  * Prefix the property path to each violation message reported by `RequestPayloadValueResolver`
  * Add `SourceValueResolverInterface` to let a value resolver stage a raw value for the resolvers that follow it, so `#[MapQueryParameter]` accepts any type another resolver can build
  * Deprecate the `HIncludeFragmentRenderer` class, use the `EsiFragmentRenderer` or `InlineFragmentRenderer`, or Symfony UX Turbo, instead
+ * Allow union and intersection type-hints when autowiring controller arguments
 
 8.1
 ---

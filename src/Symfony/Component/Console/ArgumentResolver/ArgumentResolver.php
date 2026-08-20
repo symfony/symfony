@@ -129,7 +129,7 @@ final class ArgumentResolver implements ArgumentResolverInterface
 
             $reasons = array_map(static fn (NearMissValueResolverException $e) => $e->getMessage(), $valueResolverExceptions);
             if (!$reasons) {
-                $reasons[] = \sprintf('The parameter has no #[Argument], #[Option], or #[MapInput] attribute, and its type "%s" cannot be auto-resolved.', $typeName ?? 'unknown');
+                $reasons[] = \sprintf('The parameter has no #[Argument], #[Option], or #[MapInput] attribute, and its type "%s" cannot be auto-resolved.', $typeName ?? self::formatType($type));
                 $reasons[] = 'Add an attribute to map this parameter to command input.';
             }
 
@@ -159,5 +159,15 @@ final class ArgumentResolver implements ArgumentResolverInterface
             new Resolver\DefaultValueResolver(),
             new Resolver\VariadicValueResolver(),
         ];
+    }
+
+    private static function formatType(?\ReflectionType $type): string
+    {
+        return match (true) {
+            $type instanceof \ReflectionNamedType => $type->getName(),
+            $type instanceof \ReflectionUnionType => implode('|', array_map(static fn ($t) => $t instanceof \ReflectionIntersectionType ? '('.self::formatType($t).')' : self::formatType($t), $type->getTypes())),
+            $type instanceof \ReflectionIntersectionType => implode('&', array_map(self::formatType(...), $type->getTypes())),
+            default => 'unknown',
+        };
     }
 }

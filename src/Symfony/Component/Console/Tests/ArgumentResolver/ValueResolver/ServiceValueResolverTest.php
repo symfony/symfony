@@ -186,6 +186,47 @@ class ServiceValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('dummy', $input, $member));
     }
 
+    public function testCompositeTypeIsResolvedThroughServiceLocator()
+    {
+        $service = new DummyCompositeService();
+
+        $resolver = new ServiceValueResolver(new ServiceLocator([
+            'app:test' => static fn () => new ServiceLocator([
+                'dummy' => static fn () => $service,
+            ]),
+        ]));
+
+        $input = new ArrayInput(['app:test'], new InputDefinition([
+            new InputArgument('command'),
+        ]));
+
+        $function = static fn (DummyServiceInterfaceA&DummyServiceInterfaceB $dummy) => null;
+        $reflection = new \ReflectionFunction($function);
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $this->assertSame([$service], $resolver->resolve('dummy', $input, $member));
+    }
+
+    public function testDoesNotFallBackToTypeNameForCompositeTypes()
+    {
+        $resolver = new ServiceValueResolver(new ServiceLocator([
+            DummyServiceInterfaceA::class => static fn () => new DummyCompositeService(),
+            DummyServiceInterfaceB::class => static fn () => new DummyCompositeService(),
+        ]));
+
+        $input = new ArrayInput(['app:test'], new InputDefinition([
+            new InputArgument('command'),
+        ]));
+
+        $function = static fn (DummyServiceInterfaceA&DummyServiceInterfaceB $dummy) => null;
+        $reflection = new \ReflectionFunction($function);
+        $parameter = $reflection->getParameters()[0];
+        $member = new ReflectionMember($parameter);
+
+        $this->assertSame([], $resolver->resolve('dummy', $input, $member));
+    }
+
     public function testDoesNotResolveWhenNoCommandArgument()
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
@@ -208,5 +249,17 @@ class ServiceValueResolverTest extends TestCase
 }
 
 class DummyService
+{
+}
+
+interface DummyServiceInterfaceA
+{
+}
+
+interface DummyServiceInterfaceB
+{
+}
+
+class DummyCompositeService implements DummyServiceInterfaceA, DummyServiceInterfaceB
 {
 }

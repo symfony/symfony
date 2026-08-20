@@ -244,6 +244,61 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(NullLogger::class, $locator->get('logger'));
     }
 
+    public function testProcessCompositeTypeArguments()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.argument_resolver.service')->addArgument(null);
+
+        $command = new Definition(CommandWithCompositeTypes::class);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+        $pass->process($container);
+
+        $serviceResolverDef = $container->getDefinition('console.argument_resolver.service');
+        $commands = $container->getDefinition((string) $serviceResolverDef->getArgument(0))->getArgument(0);
+        $locator = $container->getDefinition((string) $commands['test:command']->getValues()[0]);
+        $locator = $container->getDefinition((string) $locator->getFactory()[0]);
+
+        $expected = [
+            'intersection' => new ServiceClosureArgument(new TypedReference($type = CombinedTypeA::class.'&'.CombinedTypeB::class, $type, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'intersection')),
+            'union' => new ServiceClosureArgument(new TypedReference($type = CombinedTypeA::class.'|'.CombinedTypeB::class, $type, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'union')),
+            'nullableIntersection' => new ServiceClosureArgument(new TypedReference($type = '('.CombinedTypeA::class.'&'.CombinedTypeB::class.')|null', $type, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'nullableIntersection')),
+        ];
+        $this->assertEquals($expected, $locator->getArgument(0));
+    }
+
+    public function testProcessCompositeTypesAreAutowired()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('console.argument_resolver.service', 'stdClass')->addArgument(null);
+
+        $container->register('combined', CombinedTypeService::class);
+        $container->setAlias(CombinedTypeA::class, 'combined');
+        $container->setAlias(CombinedTypeB::class, 'combined');
+
+        $command = new Definition(CommandWithCompositeTypes::class);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+        $pass->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $locator = $container->get($locatorId)->get('test:command');
+
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('intersection'));
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('union'));
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('nullableIntersection'));
+    }
+
     public function testProcessThrowsOnMissingArgumentAttribute()
     {
         $container = new ContainerBuilder();
@@ -320,6 +375,28 @@ class CommandWithTarget
     public function __invoke(
         #[Target('request.logger')]
         LoggerInterface $logger,
+    ): void {
+    }
+}
+
+interface CombinedTypeA
+{
+}
+
+interface CombinedTypeB
+{
+}
+
+class CombinedTypeService implements CombinedTypeA, CombinedTypeB
+{
+}
+
+class CommandWithCompositeTypes
+{
+    public function __invoke(
+        CombinedTypeA&CombinedTypeB $intersection,
+        CombinedTypeA|CombinedTypeB $union,
+        (CombinedTypeA&CombinedTypeB)|null $nullableIntersection,
     ): void {
     }
 }

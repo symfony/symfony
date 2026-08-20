@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -648,6 +649,176 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
 
         $this->assertSame([['allowControllers', [[RegisterTestController::class]]]], $controllerResolver->getMethodCalls());
     }
+
+    public function testCompositeTypeArguments()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service')->addArgument([]);
+
+        $container->register('foo', WithCompositeTypes::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locator = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
+
+        $expected = [
+            'foo::intersectionAction' => new TypedReference($type = CombinedTypeA::class.'&'.CombinedTypeB::class, $type, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service'),
+            'foo::unionAction' => new TypedReference($type = CombinedTypeA::class.'|'.CombinedTypeB::class, $type, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service'),
+            'foo::nullableUnionAction' => new TypedReference($type = CombinedTypeA::class.'|'.CombinedTypeB::class.'|null', $type, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'service'),
+            'foo::nullableIntersectionAction' => new TypedReference($type = '('.CombinedTypeA::class.'&'.CombinedTypeB::class.')|null', $type, ContainerInterface::IGNORE_ON_INVALID_REFERENCE, 'service'),
+            'foo::dnfAction' => new TypedReference($type = '('.CombinedTypeA::class.'&'.CombinedTypeB::class.')|'.ControllerDummy::class, $type, ContainerInterface::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE, 'service'),
+        ];
+
+        foreach ($expected as $key => $reference) {
+            $methodLocator = $container->getDefinition((string) $locator[$key]->getValues()[0]);
+            $methodLocator = $container->getDefinition((string) $methodLocator->getFactory()[0]);
+
+            $this->assertEquals(['service' => new ServiceClosureArgument($reference)], $methodLocator->getArgument(0), $key);
+        }
+    }
+
+    public function testCompositeTypesAreAutowired()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('combined', CombinedTypeService::class);
+        $container->setAlias(CombinedTypeA::class, 'combined');
+        $container->setAlias(CombinedTypeB::class, 'combined');
+
+        $container->register('foo', WithCompositeTypes::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $locator = $container->get($locatorId);
+
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('foo::intersectionAction')->get('service'));
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('foo::unionAction')->get('service'));
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('foo::nullableUnionAction')->get('service'));
+        $this->assertInstanceOf(CombinedTypeService::class, $locator->get('foo::nullableIntersectionAction')->get('service'));
+    }
+
+    public function testMixedDnfTypeIsNotAutowired()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('combined', CombinedTypeService::class);
+        $container->setAlias(CombinedTypeA::class, 'combined');
+        $container->setAlias(CombinedTypeB::class, 'combined');
+
+        $container->register('foo', WithCompositeTypes::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot autowire service "service" required by "foo::dnfAction()": it has type "(%s&%s)|%s" but this class was not found.', CombinedTypeA::class, CombinedTypeB::class, ControllerDummy::class));
+
+        $container->get($locatorId)->get('foo::dnfAction')->get('service');
+    }
+
+    public function testCompositeTypeWithoutMatchingAlias()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('combined', CombinedTypeService::class);
+        $container->setAlias(CombinedTypeA::class, 'combined');
+
+        $container->register('foo', WithCompositeTypes::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $locator = $container->get($locatorId);
+
+        $this->assertFalse($locator->get('foo::nullableUnionAction')->has('service'));
+        $this->assertFalse($locator->get('foo::nullableIntersectionAction')->has('service'));
+    }
+
+    public function testIntersectionTypeWithoutMatchingAliasThrows()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('combined', CombinedTypeService::class);
+        $container->setAlias(CombinedTypeA::class, 'combined');
+
+        $container->register('foo', WithCompositeTypes::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot autowire service "service" required by "foo::intersectionAction()": it has type "%s&%s" but this class was not found.', CombinedTypeA::class, CombinedTypeB::class));
+
+        $container->get($locatorId)->get('foo::intersectionAction')->get('service');
+    }
+
+    public function testTargetedCompositeTypeIsAutowired()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('combined', CombinedTypeService::class);
+        $container->setAlias('.'.CombinedTypeA::class.' $some.service', 'combined');
+        $container->setAlias('.'.CombinedTypeB::class.' $some.service', 'combined');
+
+        $container->register('foo', WithTargetedIntersection::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $this->assertInstanceOf(CombinedTypeService::class, $container->get($locatorId)->get('foo::fooAction')->get('service'));
+    }
+
+    public function testUnionTypeWithBuiltinIsAutowired()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register(ControllerDummy::class, ControllerDummy::class);
+
+        $container->register('foo', WithUnionWithBuiltinType::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $container->compile();
+
+        $this->assertInstanceOf(ControllerDummy::class, $container->get($locatorId)->get('foo::fooAction')->get('service'));
+    }
 }
 
 class RegisterTestController
@@ -830,5 +1001,56 @@ class WithAutowireIteratorAndAutowireLocator
         #[AutowireLocator(['bar', 'baz'])] ContainerInterface $container1,
         #[AutowireLocator(['foo' => new Autowire('%some.parameter%')])] ContainerInterface $container2,
     ) {
+    }
+}
+
+interface CombinedTypeA
+{
+}
+
+interface CombinedTypeB
+{
+}
+
+class CombinedTypeService implements CombinedTypeA, CombinedTypeB
+{
+}
+
+class WithCompositeTypes
+{
+    public function intersectionAction(CombinedTypeA&CombinedTypeB $service)
+    {
+    }
+
+    public function unionAction(CombinedTypeA|CombinedTypeB $service)
+    {
+    }
+
+    public function nullableUnionAction(CombinedTypeA|CombinedTypeB|null $service)
+    {
+    }
+
+    public function nullableIntersectionAction((CombinedTypeA&CombinedTypeB)|null $service)
+    {
+    }
+
+    public function dnfAction((CombinedTypeA&CombinedTypeB)|ControllerDummy $service)
+    {
+    }
+}
+
+class WithTargetedIntersection
+{
+    public function fooAction(
+        #[Target('some.service')]
+        CombinedTypeA&CombinedTypeB $service,
+    ) {
+    }
+}
+
+class WithUnionWithBuiltinType
+{
+    public function fooAction(ControllerDummy|string $service)
+    {
     }
 }

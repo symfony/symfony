@@ -153,7 +153,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         $args[$p->name] = $bindingValue;
 
                         continue;
-                    } elseif (!$autowire || (!($autowireAttributes = $p->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF)) && (!$type || '\\' !== $target[0]))) {
+                    } elseif (!$autowire || (!($autowireAttributes = $p->getAttributes(Autowire::class, \ReflectionAttribute::IS_INSTANCEOF)) && (!$type || !\in_array($target[0], ['\\', '('], true)))) {
                         continue;
                     } elseif (!$autowireAttributes && is_subclass_of($type, \UnitEnum::class)) {
                         // do not attempt to register enum typed arguments if not already present in bindings
@@ -185,7 +185,9 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                         continue;
                     }
 
-                    if ($type && !$p->isOptional() && !$p->allowsNull() && !class_exists($type) && !interface_exists($type, false)) {
+                    $types = $type ? array_diff(preg_split('/[()|&]++/', $type, -1, \PREG_SPLIT_NO_EMPTY), ['int', 'string', 'array', 'bool', 'float', 'iterable', 'object', 'callable', 'null']) : [];
+
+                    if ($types && !$p->isOptional() && !$p->allowsNull() && $types !== array_filter($types, static fn ($t) => class_exists($t) || interface_exists($t, false))) {
                         $message = \sprintf('Cannot determine controller argument for "%s::%s()": the $%s argument is type-hinted with the non-existent class or interface: "%s".', $class, $r->name, $p->name, $type);
 
                         // see if the type-hint lives in the same namespace as the controller

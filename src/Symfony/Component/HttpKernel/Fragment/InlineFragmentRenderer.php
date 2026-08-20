@@ -111,13 +111,21 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $cookies = $request->cookies->all();
         $server = $request->server->all();
 
+        // Request::create() derives headers from $server, so headers set on the request must be copied there
+        foreach ($request->headers->all() as $key => $value) {
+            $key = strtoupper(str_replace('-', '_', $key));
+
+            if (\in_array($key, ['CONTENT_TYPE', 'CONTENT_LENGTH', 'CONTENT_MD5'], true)) {
+                $server[$key] = implode(', ', $value);
+            } else {
+                $server['HTTP_'.$key] = implode(', ', $value);
+            }
+        }
+
         unset($server['HTTP_IF_MODIFIED_SINCE']);
         unset($server['HTTP_IF_NONE_MATCH']);
 
         $subRequest = Request::create($uri, 'get', [], $cookies, [], $server);
-        if ($request->headers->has('Surrogate-Capability')) {
-            $subRequest->headers->set('Surrogate-Capability', $request->headers->get('Surrogate-Capability'));
-        }
 
         static $setSession;
 

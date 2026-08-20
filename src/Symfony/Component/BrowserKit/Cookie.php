@@ -62,7 +62,7 @@ class Cookie
     {
         if ($encodedValue) {
             $this->rawValue = $value ?? '';
-            $this->value = urldecode($this->rawValue);
+            $this->value = rawurldecode($this->rawValue);
         } else {
             $this->value = $value ?? '';
             $this->rawValue = rawurlencode($this->value);

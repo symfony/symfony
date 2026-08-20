@@ -22,7 +22,7 @@
         "symfony/http-kernel": "^8.1",
         "symfony/polyfill-mbstring": "^1.0",
         "symfony/property-access": "^7.4|^8.0",
-        "symfony/security-core": "^7.4|^8.0",
+        "symfony/security-core": "^8.2",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {

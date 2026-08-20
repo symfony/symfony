@@ -1,0 +1,125 @@
+---------------------------------------------------------------------------
+
+by janklan at 2026-05-19T04:57:04Z
+
+> You are targeting branch "8.1" but it seems your PR description refers to branch "8.2". Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+I'm targeting version 8.2 in pursuit of Javier's instructions. The 8.2 branch doesn't exist yet, but this PR arrived too late to squash it in 8.1.
+
+Once 8.2 appears, I'll rebase & update the target.
+
+<img width="1191" height="781" alt="image" src="https://github.com/user-attachments/assets/d1ef0aa2-c8e4-494a-a971-316355114982" />
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-06-04T17:22:14Z
+
+While at it since we're adding new parameter, it could be interesting to add a $version argument like done in https://github.com/symfony/symfony/pull/64408?
+Aka something that's part of the signature but not visible on the result?
+
+---------------------------------------------------------------------------
+
+by janklan at 2026-08-17T20:55:19Z
+
+Thanks for your patience, I can now continue working on this and am reviewing the feedback I got.
+
+---------------------------------------------------------------------------
+
+by janklan at 2026-08-17T22:18:27Z
+
+> please rebase to get rid of the merge commit
+
+> While at it since we're adding new parameter, it could be interesting to add a $version argument like done in #64408? Aka something that's part of the signature but not visible on the result?
+
+Not a problem, but I lack a bit of context. Where should the version value come from: The framework? The enviornment? The developer? I assume all of the above, driven by the code calling the sign() method, ie. "the signer doesn't care, it just takes the value and doesn't include it in the URL, but uses it to calculate the hash". Is that right?
+
+---------------------------------------------------------------------------
+
+by janklan at 2026-08-17T23:13:12Z
+
+I processed most of the feedback (the underscores being the last thing being discussed), fixed CS and ran the test suite.
+It seems (a) the PHP CS Fixer fixes a ton of things in files I didn't touch and (b) the test suite fails a lot on things I didn't touch. I don't know if I'm doing it wrong, or the 8.1 branch is not passing and holds wrong CS. I'd love to know...
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T08:32:22Z
+
+Thanks for your patience here. I pushed a rework rather than another round of comments, since most of it follows from dropping the rename.
+
+The rename had to go: `_hash` is reserved by `UriSigner`, so `$uriSigner->sign($loginLink->getUrl())` threw `URI query parameter conflict: parameter name "_hash" is reserved`. Dropping it also removed the deprecation, the BC layer, and two regressions that came with the hand-rolled `getRequestParameterValue()`. That method read only `$request->query` or `$request->request`, so a route like `/login/{user}/check` stopped working, and POST stopped working. Restoring `ParameterBagUtils::getRequestParameterValue()` fixes both, and the low-deps failure goes away with the rename.
+
+The feature is unchanged in spirit. Extra parameters are signed, the signed set is listed in `hash_parameters`, and unlisted parameters appended by mail proxies are still tolerated. Naming follows the existing `user`/`expires`/`hash`.
+
+What I changed beyond that:
+
+- Reserved and malformed names now throw instead of silently corrupting the link. `user`, `expires`, `hash` and `hash_parameters` are rejected, and names must match `[A-Za-z0-9_.-]+`, so a comma cannot break the listing and brackets cannot be read as a property path.
+- Falsy values work. `empty()` was dropped in favour of `null` checks, so `0`, `'0'`, `''` and `false` round-trip. Booleans are normalised to `0` and `1` when signed, because that is how they travel through `http_build_query`; before this, `false` signed as an empty string and the link never validated.
+- An unstringable value now reports `get_debug_type()` instead of interpolating the value, which used to emit `Array to string conversion` or fatal on an object.
+- `LoginLinkHandler` and `FirewallAwareLoginLinkHandler` declare the new argument for real, so `DebugClassLoader` only warns third-party implementors.
+- Added `Security` and `Security\Core` changelog entries, and moved the UPGRADE note under `Security`, since the interface lives there rather than in SecurityBundle.
+
+Tests cover the signed round-trip, tampering, stripping, reserved and malformed names, the unstringable value, and the falsy and boolean values. Security\Http 674, Security\Core 407 and SecurityBundle 450 are green with no deprecations.
+
+One thing I did not change, and it is worth deciding before this merges. `DefaultAuthenticationSuccessHandler::determineTargetUrl()` reads `_target_path` from the request unconditionally, so an attacker-appended `_target_path` is honoured exactly like a signed one. Signing it here does not protect it. If `_target_path` is the motivating use case, the success handler has to prefer the signed value, and `consumeLoginLink()` currently returns only a `UserInterface`, so there is no supported way for an application to read back which parameters were signed.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T08:50:43Z
+
+One more thing, since it came up while I was checking whether this feature is needed at all.
+
+There is an alternative that works on 8.2 today: decorate `LoginLinkHandlerInterface`, append the extra parameters to the generated URL, run it through `UriSigner::sign()`, and call `UriSigner::checkRequest()` before delegating to `consumeLoginLink()`. About 25 lines. I ran it: untouched accepted, tampered value rejected, stripped parameter rejected, appended parameter rejected, and falsy values work.
+
+It is strictly stronger than what this PR does, because `UriSigner::doVerify()` removes only `_hash` and hashes the rest of the query, so nothing can be added, removed or altered. Here, only the names listed in `hash_parameters` are covered.
+
+I am not proposing we do that instead, because it fails in the one environment login links actually live in. Mail security products and clients routinely append tracking parameters or rewrite URLs, and any single appended parameter makes the whole `UriSigner` signature invalid. The user then gets an invalid link with nothing in the logs explaining it. Selective signing is the right answer to that, and it is the reason this PR is worth having.
+
+But it does mean the boundary has to be documented rather than left implicit: parameters that are not declared are not protected, by design.
+
+Which brings me back to `_target_path`. It is the example everyone will copy, and it is the parameter an attacker most wants to control. `DefaultAuthenticationSuccessHandler::determineTargetUrl()` reads it straight from the request, so passing it through `createLoginLink()` does not make it trustworthy. Two ways out:
+
+1. the success handler prefers the signed value over the raw request parameter, which needs `consumeLoginLink()` to expose which parameters were signed, since it currently returns only a `UserInterface`
+2. or we document that signing a parameter here protects it against tampering in transit, and nothing more, and we do not use `_target_path` as the example
+
+I lean towards the first, but the second is defensible if the docs are explicit. What do you think?
+
+---------------------------------------------------------------------------
+
+by janklan at 2026-08-18T09:08:08Z
+
+> Thanks for your patience here. I pushed a rework rather than another round of comments, since most of it follows from dropping the rename.
+
+Marvelous, thank you for that.
+
+I have no objections.
+
+> Which brings me back to _target_path. It is the example everyone will copy, and it is the parameter an attacker most wants to control. DefaultAuthenticationSuccessHandler::determineTargetUrl() reads it straight from the request, so passing it through createLoginLink() does not make it trustworthy. Two ways out:
+> 1. the success handler prefers the signed value over the raw request parameter, which needs consumeLoginLink() to expose which parameters were signed, since it currently returns only a UserInterface
+> 2. or we document that signing a parameter here protects it against tampering in transit, and nothing more, and we do not use _target_path as the example
+> I lean towards the first, but the second is defensible if the docs are explicit. What do you think?
+
+I agree with the problem you describe, _target_path is a high-value target, and should not be _up to the user to secure_ if possible.
+
+I'm not convinced it should be part of this PR as it's not really realted to the high-level objective of allowing extra parameters to be passed along with the signature.
+
+Let me think what the real answer is.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T14:19:44Z
+
+Jan and I discussed the `_target_path` question out of band; recording the resolution here.
+
+We agree that Symfony should not decide what a signed parameter means, and that the success handler must stay authenticator-agnostic. Concretely:
+
+- The feature stays as in this PR: extra parameters are opt-in at `createLoginLink()`, signed, and validated on consume. Capturing a value (like the originally requested URL) cannot be automated anyway: links are generated in controllers handling a posted form, in message handlers or in commands, where no "current URL" exists.
+- No automation for `_target_path`. Redirecting after a same-browser login link already works with no parameter at all: the target path saved in the session when the anonymous visitor hits the protected page is picked up by the success handler. In-link values only matter for cross-device clicks and stateless firewalls, and there only the app knows what to do with them.
+- What was missing was a safe way to read the values back. The query string cannot tell a signed parameter from an appended one, since unlisted parameters are tolerated by design. `consumeLoginLink()` now sets the verified extra parameters on the `_login_link_parameters` request attribute; read them there.
+
+I also considered promoting the verified values into the request so that `_target_path` handling would work transparently, and rejected it: request attributes win over query parameters everywhere `ParameterBagUtils` is used, so signed parameters could shadow routing attributes such as `_controller`. Not worth the risk.
+
+While probing this I found three requests that crashed with a 500 instead of being rejected as an invalid link: appending `hash_parameters=x&x[]=1` to any login link, sending a signed parameter as an array (`ref[]=evil`), and listing a malformed name such as `a[b`. The consume loop now validates listed names against the same `[A-Za-z0-9_.-]+` rule used at generation and requires string values, throwing `InvalidLoginLinkException` for all three. Tests cover them.
+
+Two similar crashes predate this PR: `expires[]=1` and a missing `user` parameter both produce a TypeError. Both exist on 6.4 already (`Request::get()` returns arrays as-is when the query uses the `foo[]=` syntax); fixed by #65422.
+
+The description is updated accordingly and lists what the documentation should carry. From my side the open questions are resolved.

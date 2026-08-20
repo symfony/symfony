@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
@@ -441,6 +442,39 @@ class YamlFileLoaderTest extends TestCase
 
         $taggedIterator = new TaggedIteratorArgument('foo', null, true);
         $this->assertEquals(new ServiceLocatorArgument($taggedIterator), $container->getDefinition('bar_service_tagged_locator')->getArgument(0));
+    }
+
+    public function testTaggedClassMapArguments()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_tagged_class_map_argument.yml');
+
+        $this->assertEquals(new TaggedClassMapArgument('foo'), $container->getDefinition('foo_service_tagged_class_map')->getArgument(0));
+        $this->assertEquals(new TaggedClassMapArgument('foo', 'key', ['Baz']), $container->getDefinition('foo2_service_tagged_class_map')->getArgument(0));
+        $this->assertEquals(new TaggedClassMapArgument('foo', null, ['Baz', 'Qux']), $container->getDefinition('foo3_service_tagged_class_map')->getArgument(0));
+    }
+
+    public function testTaggedClassMapArgumentWithUnsupportedKey()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"!tagged_class_map" tag contains unsupported key "index_attribute"; supported ones are "tag", "index_by", "exclude".');
+
+        $loader->load('bad_tagged_class_map.yml');
+    }
+
+    public function testTaggedClassMapArgumentWithInvalidArgument()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"!tagged_class_map" tags only accept a non empty string or an array with a key "tag" in');
+
+        $loader->load('bad_empty_tagged_class_map.yml');
     }
 
     #[IgnoreDeprecations]

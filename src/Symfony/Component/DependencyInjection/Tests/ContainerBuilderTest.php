@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -963,6 +964,18 @@ class ContainerBuilderTest extends TestCase
         $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Reference('foo')), '->resolveServices() resolves service references to service instances');
         $this->assertEquals(['foo' => ['foo', $builder->get('foo')]], $builder->resolveServices(['foo' => ['foo', new Reference('foo')]]), '->resolveServices() resolves service references to service instances in nested arrays');
         $this->assertEquals($builder->get('foo'), $builder->resolveServices(new Expression('service("foo")')), '->resolveServices() resolves expressions');
+    }
+
+    public function testResolveServicesWithTaggedClassMapArgument()
+    {
+        $builder = new ContainerBuilder();
+        $argument = new TaggedClassMapArgument('foo');
+
+        $this->assertSame([], $builder->resolveServices($argument), '->resolveServices() resolves tagged class maps to their values');
+
+        $argument->setValues(['key' => 'Foo']);
+
+        $this->assertSame(['key' => 'Foo'], $builder->resolveServices($argument));
     }
 
     public function testResolveServicesWithDecoratedDefinition()

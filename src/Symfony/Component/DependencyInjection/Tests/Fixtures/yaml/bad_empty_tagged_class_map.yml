@@ -1,0 +1,4 @@
+services:
+    foo_service:
+        class: Foo
+        arguments: [!tagged_class_map '']

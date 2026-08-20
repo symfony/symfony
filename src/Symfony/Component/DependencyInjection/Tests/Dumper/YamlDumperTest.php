@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -137,6 +138,18 @@ class YamlDumperTest extends TestCase
 
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsGeneratedFile('services_with_tagged_argument.yml', $dumper->dump());
+    }
+
+    public function testTaggedClassMapArguments()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo_service_tagged_class_map', 'Bar')->addArgument(new TaggedClassMapArgument('foo'));
+        $container->register('foo2_service_tagged_class_map', 'Bar')->addArgument(new TaggedClassMapArgument('foo', 'key', ['Baz']));
+        $container->register('foo3_service_tagged_class_map', 'Bar')->addArgument(new TaggedClassMapArgument('foo', null, ['Baz', 'Qux']));
+
+        $dumper = new YamlDumper($container);
+        $this->assertStringEqualsGeneratedFile('services_with_tagged_class_map_argument.yml', $dumper->dump());
     }
 
     #[IgnoreDeprecations]

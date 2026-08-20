@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphNode;
@@ -1956,6 +1957,10 @@ class PhpDumper extends Dumper
                     $code = \sprintf('new \\%s(%s, %s)', EnvClosure::class, $closure, $this->export($value->getDefault()));
 
                     return $value->isStringable() ? $code : (null !== $value->getDefault() ? $code.'->__invoke(...)' : $closure);
+                }
+
+                if ($value instanceof TaggedClassMapArgument) {
+                    return $this->dumpValue($value->getValues(), $interpolate);
                 }
 
                 if ($value instanceof IteratorArgument) {

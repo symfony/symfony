@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -365,6 +366,26 @@ class XmlDumper extends Dumper
                 }
                 if (!$tag->excludeSelf()) {
                     $xmlAttr .= ' exclude-self="false"';
+                }
+
+                if (1 < \count($excludes)) {
+                    yield \sprintf('<%s%s>', $type, $xmlAttr);
+                    foreach ($excludes as $exclude) {
+                        yield \sprintf('  <exclude>%s</exclude>', $this->encode($exclude, 0));
+                    }
+                    yield \sprintf('</%s>', $type);
+                } else {
+                    yield \sprintf('<%s%s/>', $type, $xmlAttr);
+                }
+            } elseif ($value instanceof TaggedClassMapArgument) {
+                $xmlAttr .= \sprintf(' type="tagged_class_map" tag="%s"', $this->encode($value->getTag()));
+
+                $defaultIndexAttribute = preg_match('/[^.]++$/', $value->getTag(), $matches) ? $matches[0] : $value->getTag();
+                if ($defaultIndexAttribute !== $value->getIndexAttribute()) {
+                    $xmlAttr .= \sprintf(' index-by="%s"', $this->encode($value->getIndexAttribute()));
+                }
+                if (1 === \count($excludes = $value->getExclude())) {
+                    $xmlAttr .= \sprintf(' exclude="%s"', $this->encode($excludes[0]));
                 }
 
                 if (1 < \count($excludes)) {

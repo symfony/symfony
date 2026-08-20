@@ -11,6 +11,7 @@ CHANGELOG
  * Add a `factory` argument to the `#[Autoconfigure]` attribute, and support the `factory` key under `_instanceof`
  * Add `Preloader::ignore()` to exclude classes or namespace prefixes from preloading
  * Allow computing resource tag attributes per tagged class when using `#[AutoconfigureResourceTag]`, `#[Autoconfigure]` or `_instanceof`, like for regular tags
+ * Add `#[AutowireClassMap]` attribute, `TaggedClassMapArgument`, the `!tagged_class_map` YAML tag and the `tagged_class_map()` PHP-DSL function to inject a map of classes found by resource tag name
 
 8.1
 ---

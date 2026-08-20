@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -448,6 +449,10 @@ class JsonDescriptor extends Descriptor
 
         if ($value instanceof AbstractArgument) {
             return ['type' => 'abstract', 'text' => $value->getText()];
+        }
+
+        if ($value instanceof TaggedClassMapArgument) {
+            return ['type' => 'tagged_class_map', 'tag' => $value->getTag(), 'map' => $value->getValues()];
         }
 
         if ($value instanceof LazyProxyArgument) {

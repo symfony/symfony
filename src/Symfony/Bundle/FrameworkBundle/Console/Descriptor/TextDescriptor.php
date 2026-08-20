@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -412,6 +413,12 @@ class TextDescriptor extends Descriptor
 
                     foreach ($argument->getValues() as $ref) {
                         $argumentsInformation[] = '- '.($ref instanceof LazyProxyArgument ? self::formatLazyProxyArgument($ref) : \sprintf('Service(%s)', $ref));
+                    }
+                } elseif ($argument instanceof TaggedClassMapArgument) {
+                    $argumentsInformation[] = \sprintf('Tagged class map for "%s"%s', $argument->getTag(), $options['is_debug'] ? '' : \sprintf(' (%d element(s))', \count($argument->getValues())));
+
+                    foreach ($argument->getValues() as $key => $class) {
+                        $argumentsInformation[] = \sprintf('- %s => %s', $key, $class);
                     }
                 } elseif ($argument instanceof ServiceLocatorArgument) {
                     $argumentsInformation[] = \sprintf('Service locator (%d element(s))', \count($argument->getValues()));

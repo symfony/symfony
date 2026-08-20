@@ -1,0 +1,23 @@
+{
+    "class": "Full\\Qualified\\Class1",
+    "public": true,
+    "synthetic": false,
+    "lazy": false,
+    "shared": true,
+    "abstract": false,
+    "autowire": false,
+    "autoconfigure": false,
+    "deprecated": false,
+    "arguments": [
+        {
+            "type": "tagged_class_map",
+            "tag": "app.message",
+            "map": {
+                "foo": "Full\\Qualified\\FooMessage"
+            }
+        }
+    ],
+    "file": null,
+    "tags": [],
+    "usages": []
+}

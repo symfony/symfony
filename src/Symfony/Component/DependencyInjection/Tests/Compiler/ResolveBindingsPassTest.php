@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
@@ -302,6 +303,19 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertInstanceOf(TaggedIteratorArgument::class, $container->getDefinition('bar')->getArgument(0));
 
         spl_autoload_unregister($autoloader);
+    }
+
+    public function testTaggedClassMapBinding()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('bar', NamedIterableArgumentDummy::class);
+        $definition->setBindings([
+            '$items' => new TaggedClassMapArgument('foo'),
+        ]);
+
+        (new ResolveBindingsPass())->process($container);
+
+        $this->assertInstanceOf(TaggedClassMapArgument::class, $container->getDefinition('bar')->getArgument(0));
     }
 
     public function testBindWithTarget()

@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -446,6 +447,13 @@ class XmlDescriptor extends Descriptor
                 $argumentXML->setAttribute('id', (string) $argument);
             } elseif ($argument instanceof IteratorArgument || $argument instanceof ServiceLocatorArgument) {
                 $argumentXML->setAttribute('type', $argument instanceof IteratorArgument ? 'iterator' : 'service_locator');
+
+                foreach ($this->getArgumentNodes($argument->getValues(), $dom, $container) as $childArgumentXML) {
+                    $argumentXML->appendChild($childArgumentXML);
+                }
+            } elseif ($argument instanceof TaggedClassMapArgument) {
+                $argumentXML->setAttribute('type', 'tagged_class_map');
+                $argumentXML->setAttribute('tag', $argument->getTag());
 
                 foreach ($this->getArgumentNodes($argument->getValues(), $dom, $container) as $childArgumentXML) {
                     $argumentXML->appendChild($childArgumentXML);

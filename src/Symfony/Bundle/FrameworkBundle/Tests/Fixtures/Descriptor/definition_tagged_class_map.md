@@ -1,0 +1,11 @@
+- Class: `Full\Qualified\Class1`
+- Public: yes
+- Synthetic: no
+- Lazy: no
+- Shared: yes
+- Abstract: no
+- Autowired: no
+- Autoconfigured: no
+- Deprecated: no
+- Arguments: yes
+- Usages: none

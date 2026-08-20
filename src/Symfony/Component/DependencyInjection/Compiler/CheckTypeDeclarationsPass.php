@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Argument\LazyProxyArgument;
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
+use Symfony\Component\DependencyInjection\Argument\TaggedClassMapArgument;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -274,6 +275,8 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
                 $class = $value->isStringable() ? EnvClosure::class : \Closure::class;
             } elseif ($value instanceof ServiceLocatorArgument) {
                 $class = ServiceLocator::class;
+            } elseif ($value instanceof TaggedClassMapArgument) {
+                $class = 'array';
             } elseif (\is_object($value)) {
                 $class = $value::class;
             } else {

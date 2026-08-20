@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -70,6 +71,34 @@ class CachingHttpClientTest extends TestCase
             'accept-language: de',
             'accept-language: fr',
         ], $capturedHeaders['accept-language']);
+    }
+
+    public function testTrustedHostsDoNotAlterRequestedUrls()
+    {
+        $requestedUrls = [];
+
+        $mockClient = new MockHttpClient(static function (string $method, string $url) use (&$requestedUrls) {
+            $requestedUrls[] = $url;
+
+            return new MockResponse('hello', ['response_headers' => ['Cache-Control' => 'public, max-age=60']]);
+        });
+
+        $cacheDir = sys_get_temp_dir().'/sf_http_cache_'.uniqid('', true);
+        $client = new CachingHttpClient($mockClient, new Store($cacheDir));
+
+        Request::setTrustedHosts(['^example\.org$']);
+
+        try {
+            $first = $client->request('GET', 'https://example.com/foo')->getContent();
+            $second = $client->request('GET', 'https://example.com/foo')->getContent();
+        } finally {
+            Request::setTrustedHosts([]);
+            $this->removeDir($cacheDir);
+        }
+
+        self::assertSame(['https://example.com/foo'], $requestedUrls);
+        self::assertSame('hello', $first);
+        self::assertSame('hello', $second);
     }
 
     public function testDoesNotEvaluateResponseBody()

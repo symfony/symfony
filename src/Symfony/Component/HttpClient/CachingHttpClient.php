@@ -11,9 +11,9 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Symfony\Component\HttpClient\Internal\OutgoingRequest;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Response\ResponseStream;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\StoreInterface;
 use Symfony\Component\HttpKernel\HttpClientKernel;
@@ -74,7 +74,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             return $this->client->request($method, $url, $options);
         }
 
-        $request = Request::create($url, $method);
+        $request = OutgoingRequest::create($url, $method);
         $request->attributes->set('http_client_options', $options);
 
         foreach ($options['normalized_headers'] as $name => $values) {

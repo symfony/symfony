@@ -1,0 +1,131 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-10-22T14:10:36Z
+
+Hey!
+
+To help keep things organized, we don't allow "Draft" pull requests. Could you please click the "ready for review" button or close this PR and open a new one when you are done?
+
+Note that a pull request does not have to be "perfect" or "ready for merge" when you first open it. We just want it to be ready for a first review.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-10-22T15:36:32Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.0" but it seems your PR description refers to branch "8.1".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T10:32:15Z
+
+@Jean85 the bridge is wanted; thanks for your patience, and consider this the green light to finish it, and thanks for offering the package to core in the first place.
+
+On the open boxes of your checklist:
+
+* **integration tests**: no Docker gymnastics needed, `.github/workflows/integration-tests.yml` already runs a `mongodb` service and loads `ext-mongodb` for the Lock and Cache stores, so your integration tests can follow the pattern of `MongoDbStoreTest` and run against it;
+* **monorepo wiring**: the bridge needs an entry in `splitsh.json` next to the existing ones (`"amqp-messenger": "src/Symfony/Component/Messenger/Bridge/Amqp"`), otherwise it never gets published as a package. Nothing guards this in CI, so it is easy to miss;
+* one path nit while you are at it: the directory is `Bridge/MongoDB` while the sibling components use `MongoDbStore`-style casing; `Bridge/MongoDb` would match the existing `Doctrine`/`Redis` naming and the class names inside;
+* **DI sources for the connection** (facile-it bundle, Doctrine ODM, ...): I would keep the first iteration to a plain DSN plus an optional pre-built `MongoDB\Client` service id, and leave bundle-specific integrations to the bundles themselves. Smaller surface, and it does not tie the bridge's API to third-party packages.
+
+Target is 8.2 now, so the header table and the CHANGELOG section want updating from 8.1 when you rebase. Ping me when it is green and I will review promptly.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T11:54:52Z
+
+I pushed a rework to make this merge-ready. @Jean85 please review what I changed, since the branch now differs quite a bit from your last push:
+
+- rebased on 8.2, squashed into a single commit under your authorship;
+- renamed the directory to `Bridge/MongoDb` and aligned class names with the sibling bridges: `MongoDbTransportFactory`, `MongoDbReceiver`, `MongoDbSender`, `MongoDbReceivedStamp`, `MongoDbSessionStamp`;
+- replaced the container-based factory with a plain-DSN one: `Connection::fromDsn()` creates the `MongoDB\Client` itself, and an already-built `Client` can be passed as argument. The `mongodb://` and `mongodb+srv://` schemes are handled, transport settings are skimmed from the query string and everything else is passed through to the driver, following the `MongoDbStore` precedent in the Lock component;
+- removed the DocumentEnhancer feature, as suggested by @GromNaN; it can come back in a dedicated PR;
+- implemented the `$fetchSize` hidden argument of `ReceiverInterface::get()`, which 8.2 deprecates not defining. Messages are still claimed one by one since each claim is an atomic `findOneAndUpdate`;
+- moved the session-stamp lookup into the sender, so `Connection::send()` takes data instead of the envelope;
+- made the clock a nullable PSR-20 `ClockInterface` and used it consistently: `send()` previously created `new \DateTime()` and ignored the injected clock;
+- switched to the Messenger exceptions, stopped emitting `'session' => null` in write options, and dropped the `facile-it_messenger_index` index name;
+- fixed the unit tests (they passed the clock where the enhancer array was expected, so the suite was red) and kept the stubs file: the tests mock the real library classes when they are installed and fall back to the stubs otherwise, like the Lock component does;
+- added `MongoDbTransportIntegrationTest` covering send/get/ack, reject, delay, redelivery, all/find, session and setup; it runs against the `mongodb` service in the integration workflow;
+- wired the monorepo and the framework: `splitsh.json`, factory registration in FrameworkBundle, the "composer require symfony/mongodb-messenger" hint in Messenger's `TransportFactory`, `mongodb` in the unit-test workflow extensions, and the integration workflow now installs `mongodb/mongodb` (the pinned ext-mongodb 1.12.0 could not install the library, so the pin is gone);
+- composer requirements per the review: `ext-mongodb: ^1.21|^2.0` and `mongodb/mongodb: ^1.21|^2.0`, which is what `getCollection()` needs; also LICENSE year, changelog and README.
+
+Left out on purpose: resolving a pre-built `Client` from the container by service id. No other bridge has DI plumbing like that, programmatic reuse is covered by the `$client` argument of `fromDsn()`, and bundle integrations can build on it.
+
+Thanks for offering the package to core, and for your patience.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T12:45:27Z
+
+CI is now green for everything this PR touches; the integration tests run against the real MongoDB service.
+
+Two notes for reviewers:
+- Getting there surfaced a latent bug outside the bridge: the HttpFoundation session-handler test stub declares `MongoDB\Client` with `class_exists(..., false)`, which shadows the installed library for every test in the process, since PHPUnit loads all test files when building the suite. This never showed before because no CI job installed `mongodb/mongodb`. The guard now attempts autoloading when ext-mongodb is loaded, like the stubs of this bridge do.
+- The two remaining red jobs fail on the 8.2 branch itself and are unrelated: `JsonSchemaConfigDumpPassTest` (low-deps) and `DebugRolesCommandTest` (Windows).
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2026-08-17T14:40:41Z
+
+I would like to review, but GitHub is throwing tons of unicorns right now :(
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-18T18:10:36Z
+
+I tested this bridge on the Symfony Demo application (linked against this PR branch) with a real MongoDB replica set, and it works very well.
+
+Setup: created a simple `SendReminder` message and handler, routed it to a MongoDB transport, and configured a dead letter (failure) transport on the same collection with a dedicated `queue_name`. The transport factory was already registered by FrameworkBundle, so no manual wiring was needed. `messenger:setup-transports` created the collection and the compound index, the nominal dispatch/consume/ack flow worked, and failing messages were retried and correctly moved to the failure transport. I also confirmed it works with both the default PHP serializer and the JSON serializer.
+
+Config used:
+
+```yaml
+# config/packages/messenger.yaml
+framework:
+    messenger:
+        failure_transport: failed
+
+        # Optional: store the body as JSON instead of PHP-serialized data
+        serializer:
+            default_serializer: messenger.transport.symfony_serializer
+
+        transports:
+            async:
+                dsn: '%env(MONGODB_URI)%&collection_name=messenger_messages&queue_name=default'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+
+            failed:
+                dsn: '%env(MONGODB_URI)%&collection_name=messenger_messages&queue_name=failed'
+
+        routing:
+            App\Message\SendReminder: async
+```
+
+```dotenv
+# .env
+MONGODB_URI=mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/symfony_demo_messenger?replicaSet=rs0
+```
+
+The DSN being a real MongoDB URI (hosts and database in the path, transport options appended to the query string) is convenient.
+
+One suggestion: even with the JSON serializer, the message body is stored as a JSON string. A BSON serialization option that stores the decoded payload as a native sub-document could be relevant here, since it would make the payload queryable and indexable directly in MongoDB. Nice work!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T11:06:20Z
+
+> A BSON serialization option that stores the decoded payload as a native sub-document could be relevant here
+
+Welcome in a follow up!

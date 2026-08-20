@@ -251,6 +251,155 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertTrue($updateProcessed, 'Translations update was not called.');
     }
 
+    public function testWriteSendsNumericKeysAsStrings()
+    {
+        $getLanguagesResponse = function (string $method, string $url): ResponseInterface {
+            $this->assertSame('GET', $method);
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+
+            return new JsonMockResponse(['languages' => [
+                ['lang_iso' => 'en'],
+                ['lang_iso' => 'fr'],
+            ]]);
+        };
+
+        $getKeysIdsResponse = function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertSame('GET', $method);
+            $this->assertSame(['filter_keys' => '', 'filter_filenames' => 'messages.xliff', 'limit' => 5000, 'page' => 1], $options['query']);
+
+            return new JsonMockResponse(['keys' => []]);
+        };
+
+        $createKeysResponse = function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame(['0', 'young_dog'], array_column(json_decode($options['body'], true)['keys'], 'key_name'));
+
+            return new JsonMockResponse(['keys' => [
+                ['key_name' => ['web' => '0'], 'key_id' => 7],
+                ['key_name' => ['web' => 'young_dog'], 'key_id' => 29],
+            ]]);
+        };
+
+        $updateProcessed = false;
+        $updateTranslationsResponse = function (string $method, string $url, array $options = []) use (&$updateProcessed): ResponseInterface {
+            $updateProcessed = true;
+            $keys = json_decode($options['body'], true)['keys'];
+
+            $this->assertSame('PUT', $method);
+            $this->assertSame([7, 29], array_column($keys, 'key_id'));
+            $this->assertSame([
+                [
+                    ['language_iso' => 'en', 'translation' => 'zero'],
+                    ['language_iso' => 'fr', 'translation' => 'zéro'],
+                ],
+                [
+                    ['language_iso' => 'en', 'translation' => 'puppy'],
+                    ['language_iso' => 'fr', 'translation' => 'chiot'],
+                ],
+            ], array_column($keys, 'translations'));
+
+            return new MockResponse();
+        };
+
+        $provider = self::createProvider((new MockHttpClient([
+            $getLanguagesResponse,
+            $getKeysIdsResponse,
+            $createKeysResponse,
+            $updateTranslationsResponse,
+        ]))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue(new MessageCatalogue('en', [
+            'messages' => ['0' => 'zero', 'young_dog' => 'puppy'],
+        ]));
+        $translatorBag->addCatalogue(new MessageCatalogue('fr', [
+            'messages' => ['0' => 'zéro', 'young_dog' => 'chiot'],
+        ]));
+
+        $provider->write($translatorBag);
+        $this->assertTrue($updateProcessed, 'Translations update was not called.');
+    }
+
+    public function testWriteDoesNotCreateKeysAlreadyExistingOnLokalise()
+    {
+        $getLanguagesResponse = function (string $method, string $url): ResponseInterface {
+            $this->assertSame('GET', $method);
+            $this->assertSame('https://api.lokalise.com/api2/projects/PROJECT_ID/languages', $url);
+
+            return new JsonMockResponse(['languages' => [
+                ['lang_iso' => 'en'],
+                ['lang_iso' => 'fr'],
+            ]]);
+        };
+
+        $getKeysIdsResponse = function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertSame('GET', $method);
+            $this->assertSame(['filter_keys' => '', 'filter_filenames' => 'messages.xliff', 'limit' => 5000, 'page' => 1], $options['query']);
+
+            return new JsonMockResponse(['keys' => [
+                ['key_name' => ['web' => '11'], 'key_id' => 42],
+            ]]);
+        };
+
+        $createKeysResponse = function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame(['10', '12'], array_column(json_decode($options['body'], true)['keys'], 'key_name'));
+
+            return new JsonMockResponse(['keys' => [
+                ['key_name' => ['web' => '10'], 'key_id' => 7],
+                ['key_name' => ['web' => '12'], 'key_id' => 8],
+            ]]);
+        };
+
+        $updateProcessed = false;
+        $updateTranslationsResponse = function (string $method, string $url, array $options = []) use (&$updateProcessed): ResponseInterface {
+            $updateProcessed = true;
+            $keys = json_decode($options['body'], true)['keys'];
+
+            $this->assertSame('PUT', $method);
+            $this->assertSame([7, 8, 42], array_column($keys, 'key_id'));
+            $this->assertSame([
+                [
+                    ['language_iso' => 'en', 'translation' => 'ten'],
+                    ['language_iso' => 'fr', 'translation' => 'dix'],
+                ],
+                [
+                    ['language_iso' => 'en', 'translation' => 'twelve'],
+                ],
+                [
+                    ['language_iso' => 'en', 'translation' => 'eleven'],
+                    ['language_iso' => 'fr', 'translation' => 'onze'],
+                ],
+            ], array_column($keys, 'translations'));
+
+            return new MockResponse();
+        };
+
+        $provider = self::createProvider((new MockHttpClient([
+            $getLanguagesResponse,
+            $getKeysIdsResponse,
+            $createKeysResponse,
+            $updateTranslationsResponse,
+        ]))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), $this->getLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+
+        $translatorBag = new TranslatorBag();
+        $translatorBag->addCatalogue(new MessageCatalogue('en', [
+            'messages' => ['10' => 'ten', '11' => 'eleven', '12' => 'twelve'],
+        ]));
+        $translatorBag->addCatalogue(new MessageCatalogue('fr', [
+            'messages' => ['10' => 'dix', '11' => 'onze'],
+        ]));
+
+        $provider->write($translatorBag);
+        $this->assertTrue($updateProcessed, 'Translations update was not called.');
+    }
+
     public function testUpdateProcessWhenLocalTranslationsMatchLokaliseTranslations()
     {
         $getLanguagesResponse = function (string $method, string $url): ResponseInterface {

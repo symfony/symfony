@@ -70,31 +70,27 @@ final class LokaliseProvider implements ProviderInterface
         }
 
         $this->ensureAllLocalesAreCreated($translatorBag);
-        $existingKeysByDomain = [];
+        $keysByDomain = [];
 
         foreach ($defaultCatalogue->getDomains() as $domain) {
-            if (!\array_key_exists($domain, $existingKeysByDomain)) {
-                $existingKeysByDomain[$domain] = [];
+            if (!\array_key_exists($domain, $keysByDomain)) {
+                $keysByDomain[$domain] = [];
             }
 
-            $existingKeysByDomain[$domain] += $this->getKeysIds([], $domain);
+            $keysByDomain[$domain] += $this->getKeysIds([], $domain);
         }
 
-        $keysToCreate = $createdKeysByDomain = [];
+        $keysToCreate = [];
 
-        foreach ($existingKeysByDomain as $domain => $existingKeys) {
-            $allKeysForDomain = array_keys($defaultCatalogue->all($domain));
-            foreach (array_keys($existingKeys) as $keyName) {
-                unset($allKeysForDomain[$keyName]);
-            }
-            $keysToCreate[$domain] = $allKeysForDomain;
+        foreach ($keysByDomain as $domain => $existingKeys) {
+            $keysToCreate[$domain] = array_diff(array_keys($defaultCatalogue->all($domain)), array_keys($existingKeys));
         }
 
         foreach ($keysToCreate as $domain => $keys) {
-            $createdKeysByDomain[$domain] = $this->createKeys($keys, $domain);
+            $keysByDomain[$domain] = $this->createKeys($keys, $domain) + $keysByDomain[$domain];
         }
 
-        $this->updateTranslations(array_merge_recursive($createdKeysByDomain, $existingKeysByDomain), $translatorBag);
+        $this->updateTranslations($keysByDomain, $translatorBag);
     }
 
     public function read(array $domains, array $locales): TranslatorBag
@@ -296,7 +292,7 @@ final class LokaliseProvider implements ProviderInterface
 
         foreach ($keys as $key) {
             $keysToCreate[] = [
-                'key_name' => $key,
+                'key_name' => (string) $key,
                 'platforms' => ['web'],
                 'filenames' => [
                     'web' => $this->getLokaliseFilenameFromDomain($domain),
@@ -352,6 +348,7 @@ final class LokaliseProvider implements ProviderInterface
 
         foreach ($keysByDomain as $domain => $keys) {
             foreach ($keys as $keyName => $keyId) {
+                $keyName = (string) $keyName;
                 $keysToUpdate[] = [
                     'key_id' => $keyId,
                     'platforms' => ['web'],

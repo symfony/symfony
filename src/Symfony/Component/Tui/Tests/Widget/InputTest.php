@@ -499,6 +499,54 @@ class InputTest extends TestCase
         $this->assertLessThanOrEqual(15, AnsiUtils::visibleWidth($lines[0]));
     }
 
+    public function testPastedEscapeSequencesAreStripped()
+    {
+        $input = new InputWidget();
+        $input->handleInput("\x1b[200~before\x1b]0;title\x07\x1b[31mafter\x1b[201~");
+
+        $this->assertSame('before]0;title[31mafter', $input->getValue());
+        $this->assertStringNotContainsString("\x1b", $input->getValue());
+        $this->assertStringNotContainsString("\x07", $input->getValue());
+        $this->assertStringNotContainsString("\x1b", $input->render(new RenderContext(80, 24))[0]);
+    }
+
+    public function testPastedNewlinesAndControlBytesAreRemoved()
+    {
+        $input = new InputWidget();
+        $input->handleInput("\x1b[200~a\r\nb\x00c\x1b[201~");
+
+        $this->assertSame('abc', $input->getValue());
+    }
+
+    public function testPasteThatSanitizesToNothingIsIgnored()
+    {
+        $changes = 0;
+        $input = new InputWidget();
+        $input->onChange(static function () use (&$changes) {
+            ++$changes;
+        });
+        $input->handleInput("\x1b[200~\x1b[201~");
+        $input->handleInput("\x1b[200~\n\x1b[201~");
+
+        $this->assertSame('', $input->getValue());
+        $this->assertSame(0, $changes);
+    }
+
+    public function testEmptyInputChunkIsIgnored()
+    {
+        $changes = 0;
+        $input = new InputWidget();
+        $input->setValue('hello');
+        $input->onChange(static function () use (&$changes) {
+            ++$changes;
+        });
+
+        $input->handleInput('');
+
+        $this->assertSame('hello', $input->getValue());
+        $this->assertSame(0, $changes, 'An empty chunk is not a keystroke.');
+    }
+
     private function assertValidUtf8(string $value, string $message = ''): void
     {
         $this->assertTrue(mb_check_encoding($value, 'UTF-8'), $message ?: 'Value should be valid UTF-8');

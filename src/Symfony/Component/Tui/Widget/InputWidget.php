@@ -149,13 +149,13 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
         try {
             // Handle bracketed paste mode
-            $pastedText = $this->processBracketedPaste($data);
-            if (null !== $pastedText) {
+            if (null !== $pastedText = $this->processBracketedPaste($data)) {
                 $this->handlePaste($pastedText);
-                if ('' === $data) {
-                    return;
-                }
-            } elseif ('' === $data && $this->isBufferingPaste()) {
+            }
+
+            // Nothing left to route once the paste bytes are peeled off; an
+            // empty chunk is not a keystroke and not text to insert.
+            if ('' === $data) {
                 return;
             }
 
@@ -442,8 +442,16 @@ class InputWidget extends AbstractWidget implements FocusableInterface
 
     private function handlePaste(string $text): void
     {
+        // Pasted bytes are untrusted: a paste can carry escape sequences that
+        // would be replayed verbatim to the terminal on the next render.
+        $cleanText = StringUtils::sanitizeUtf8($text);
         // Clean pasted text - remove newlines
-        $cleanText = str_replace(["\r\n", "\r", "\n"], '', $text);
+        $cleanText = str_replace(["\r\n", "\r", "\n"], '', $cleanText);
+        $cleanText = StringUtils::stripControlBytes($cleanText);
+
+        if ('' === $cleanText) {
+            return;
+        }
 
         $this->line->insert($cleanText);
         $this->notifyChange();

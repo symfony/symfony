@@ -170,9 +170,12 @@ final class AnsiUtils
         }
 
         // mb_strwidth() sums codepoints, so it counts a combining mark as its
-        // own column. Only text that carries marks needs the slower per
-        // grapheme walk.
-        if (preg_match('/\p{M}/u', $clean)) {
+        // own column and a zero-width joiner as one more. Only text that
+        // carries marks or joiners needs the slower per grapheme walk, which
+        // is also the measure the wrapper breaks lines by: the two have to
+        // agree or a wrapped chunk comes back wider than the width it was
+        // wrapped to.
+        if (preg_match('/[\p{M}\p{Cf}]/u', $clean)) {
             $width = 0;
             foreach (grapheme_str_split($clean) ?: [] as $grapheme) {
                 $width += self::graphemeWidth($grapheme);

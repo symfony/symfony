@@ -14,6 +14,7 @@ namespace Symfony\Component\Tui\Tests\Ansi;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
+use Symfony\Component\Tui\Ansi\TextWrapper;
 
 class AnsiUtilsTest extends TestCase
 {
@@ -763,6 +764,39 @@ class AnsiUtilsTest extends TestCase
             $left = AnsiUtils::sliceToWidth($line, 0, $split);
             $right = AnsiUtils::sliceToWidth($line, $split, 7 - $split);
             $this->assertSame(7, AnsiUtils::visibleWidth($left.$right), \sprintf('split at %d', $split));
+        }
+    }
+
+    /**
+     * The wrapper breaks lines by graphemeWidth() and every consumer measures
+     * the result with visibleWidth(); if the two disagree, a chunk comes back
+     * wider than the width it was wrapped to.
+     */
+    public function testVisibleWidthOfAJoinedSequenceMatchesItsGraphemeWidth()
+    {
+        $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}";
+
+        $this->assertSame(AnsiUtils::graphemeWidth($family), AnsiUtils::visibleWidth($family));
+    }
+
+    public function testVisibleWidthIsAdditiveOverGraphemes()
+    {
+        $line = "a\u{1F44B}b\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}c";
+
+        $sum = 0;
+        foreach (grapheme_str_split($line) as $grapheme) {
+            $sum += AnsiUtils::visibleWidth($grapheme);
+        }
+
+        $this->assertSame($sum, AnsiUtils::visibleWidth($line));
+    }
+
+    public function testWrappedChunksNeverExceedTheRequestedWidth()
+    {
+        $line = "a\u{1F44B}b\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}c";
+
+        foreach (TextWrapper::wrapTextWithAnsi($line, 8) as $chunk) {
+            $this->assertLessThanOrEqual(8, AnsiUtils::visibleWidth($chunk));
         }
     }
 }

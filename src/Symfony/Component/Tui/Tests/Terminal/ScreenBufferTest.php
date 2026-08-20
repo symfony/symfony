@@ -587,4 +587,66 @@ class ScreenBufferTest extends TestCase
         yield 'private mode set/reset' => ["Hello\x1b[?25h\x1b[?25l World", 'Hello World'];
         yield 'standard mode set/reset' => ["Hello\x1b[25h\x1b[25l World", 'Hello World'];
     }
+
+    /**
+     * A repeat count of 0 means the same as an omitted one, so both move a
+     * single position.
+     */
+    #[DataProvider('zeroRepeatCountProvider')]
+    public function testAZeroRepeatCountMovesOnePosition(string $sequence, int $expectedRow, int $expectedCol)
+    {
+        $buffer = new ScreenBuffer(20, 6);
+        $buffer->write("\x1b[3;5H");
+        $buffer->write($sequence);
+        $buffer->write('X');
+
+        foreach ($buffer->getLines() as $row => $line) {
+            if (false !== $col = strpos($line, 'X')) {
+                $this->assertSame([$expectedRow, $expectedCol], [$row, $col]);
+
+                return;
+            }
+        }
+
+        $this->fail('The written character was not found on the screen.');
+    }
+
+    /**
+     * @return iterable<string, array{string, int, int}>
+     */
+    public static function zeroRepeatCountProvider(): iterable
+    {
+        yield 'no move' => ['', 2, 4];
+        yield 'up, default count' => ["\x1b[A", 1, 4];
+        yield 'up, zero count' => ["\x1b[0A", 1, 4];
+        yield 'down, zero count' => ["\x1b[0B", 3, 4];
+        yield 'forward, zero count' => ["\x1b[0C", 2, 5];
+        yield 'back, zero count' => ["\x1b[0D", 2, 3];
+    }
+
+    /**
+     * An erase unsets cells in the middle of a row, so the number of cells in
+     * that row no longer matches the columns they sit in.
+     */
+    public function testWritingRightOfAnErasedRangeKeepsTheCharactersInBetween()
+    {
+        $buffer = new ScreenBuffer(20, 3);
+        $buffer->write('abcdefghij');
+        $buffer->write("\x1b[1;5H");  // row 1, column 5
+        $buffer->write("\x1b[1K");    // erase from the start of the line to the cursor
+        $buffer->write("\x1b[1;13H"); // row 1, column 13
+        $buffer->write('X');
+
+        $this->assertSame('     fghij  X', $buffer->getLines()[0]);
+    }
+
+    public function testWritingRightOfAnErasedRangeKeepsTheirStyles()
+    {
+        $buffer = new ScreenBuffer(20, 3);
+        $buffer->write("\x1b[31mabcdefghij\x1b[0m");
+        $buffer->write("\x1b[1;5H\x1b[1K");
+        $buffer->write("\x1b[1;13HX");
+
+        $this->assertStringContainsString("\x1b[31mfghij", $buffer->getStyledScreen());
+    }
 }

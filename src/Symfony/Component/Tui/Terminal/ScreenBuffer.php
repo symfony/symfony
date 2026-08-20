@@ -307,9 +307,18 @@ final class ScreenBuffer
             $this->cells[$this->cursorRow] = [];
         }
 
-        // Fill any gaps with spaces
-        for ($col = \count($this->cells[$this->cursorRow]); $col < $this->cursorCol; ++$col) {
-            $this->cells[$this->cursorRow][$col] = ['char' => ' ', 'style' => ''];
+        // Fill any gaps with spaces. A row that has as many cells as the
+        // cursor has columns to its left is contiguous, and the common case
+        // of appending to it needs no fill at all. Once the counts disagree
+        // -- an erase unsets cells in the middle of the row -- the missing
+        // columns have to be asked for one by one, because counting them
+        // walks the fill straight over live characters.
+        if (\count($this->cells[$this->cursorRow]) !== $this->cursorCol) {
+            for ($col = 0; $col < $this->cursorCol; ++$col) {
+                if (!isset($this->cells[$this->cursorRow][$col])) {
+                    $this->cells[$this->cursorRow][$col] = ['char' => ' ', 'style' => ''];
+                }
+            }
         }
 
         $style = $this->styleTracker->getActiveCodes();
@@ -471,23 +480,26 @@ final class ScreenBuffer
         $nums = '' !== $paramStr ? array_map('intval', explode(';', $paramStr)) : [];
 
         switch ($finalByte) {
+            // The cursor moves take a repeat count whose default is 1, and a
+            // count of 0 is read as 1 rather than as "stay put": an omitted
+            // and an explicit zero parameter mean the same thing.
             case 'A': // Cursor Up
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorRow = max(0, $this->cursorRow - $n);
                 break;
 
             case 'B': // Cursor Down
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorRow = min($this->height - 1, $this->cursorRow + $n);
                 break;
 
             case 'C': // Cursor Forward
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorCol = min($this->width - 1, $this->cursorCol + $n);
                 break;
 
             case 'D': // Cursor Back
-                $n = $nums[0] ?? 1;
+                $n = max(1, $nums[0] ?? 1);
                 $this->cursorCol = max(0, $this->cursorCol - $n);
                 break;
 

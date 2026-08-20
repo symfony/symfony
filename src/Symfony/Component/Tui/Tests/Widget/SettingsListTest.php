@@ -318,4 +318,37 @@ class SettingsListTest extends TestCase
 
         return [$widget, $tui];
     }
+
+    /**
+     * A setting can hold a value that is not one of the ones it offers --
+     * SettingItem takes the current value independently of the list, and
+     * updateValue() accepts anything.
+     */
+    public function testCyclingFromAValueThatIsNotInTheList()
+    {
+        $this->assertSame('light', $this->cycleFromCustomValue("\x1b[C"), 'Right steps onto the first value.');
+        $this->assertSame('dark', $this->cycleFromCustomValue("\x1b[D"), 'Left steps onto the last value.');
+        $this->assertSame('light', $this->cycleFromCustomValue("\r"), 'Enter agrees with Right.');
+    }
+
+    public function testCyclingFromTheFirstValueIsUnchanged()
+    {
+        $item = new SettingItem('theme', 'Theme', 'light', null, ['light', 'dark']);
+        $widget = new SettingsListWidget([$item]);
+
+        $widget->handleInput("\x1b[C");
+        $this->assertSame('dark', $widget->getValue('theme'));
+
+        $widget->handleInput("\x1b[D");
+        $this->assertSame('light', $widget->getValue('theme'));
+    }
+
+    private function cycleFromCustomValue(string $key): string
+    {
+        $item = new SettingItem('theme', 'Theme', 'custom', null, ['light', 'dark']);
+        $widget = new SettingsListWidget([$item]);
+        $widget->handleInput($key);
+
+        return $widget->getValue('theme');
+    }
 }

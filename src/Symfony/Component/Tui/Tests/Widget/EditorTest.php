@@ -1476,4 +1476,27 @@ class EditorTest extends TestCase
 
         return implode("\n", $lines);
     }
+
+    public function testEmptyInputChunkWhileWaitingForAJumpTarget()
+    {
+        $editor = new EditorWidget();
+        $editor->setText('hello world');
+        $editor->handleInput("\x1d"); // ctrl+] starts character jump mode
+
+        $warnings = [];
+        set_error_handler(static function (int $level, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        });
+
+        try {
+            $editor->handleInput('');
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings);
+        $this->assertSame('hello world', $editor->getText());
+    }
 }

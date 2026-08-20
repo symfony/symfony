@@ -32,7 +32,7 @@ final class PeriodicStepper
         int $maxStepsPerUpdate = 8,
     ) {
         if ($intervalSeconds <= 0.0) {
-            throw new InvalidArgumentException(\sprintf('Interval must be greater than 0, got %d.', $intervalSeconds));
+            throw new InvalidArgumentException(\sprintf('Interval must be greater than 0, got "%s".', $intervalSeconds));
         }
 
         $this->accumulator = new FixedStepAccumulator(1.0 / $intervalSeconds, $maxStepsPerUpdate);
@@ -62,7 +62,7 @@ final class PeriodicStepper
     public function setIntervalSeconds(float $intervalSeconds): void
     {
         if ($intervalSeconds <= 0.0) {
-            throw new InvalidArgumentException(\sprintf('Interval must be greater than 0, got %d.', $intervalSeconds));
+            throw new InvalidArgumentException(\sprintf('Interval must be greater than 0, got "%s".', $intervalSeconds));
         }
 
         $this->intervalSeconds = $intervalSeconds;

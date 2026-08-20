@@ -384,6 +384,69 @@ class SelectListTest extends TestCase
         return new SelectListWidget($items, 5, multiselect: $multiselect);
     }
 
+    public function testNoMatchLineIsTruncatedToTheWidth()
+    {
+        $list = new SelectListWidget([['value' => 'alpha', 'label' => 'alpha']]);
+        $list->setFilter('zzz');
+
+        foreach ([40, 19, 10, 5, 1] as $columns) {
+            $lines = $list->render(new RenderContext($columns, 24));
+
+            $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($lines[0]), \sprintf('The no-match line fits in %d columns.', $columns));
+        }
+    }
+
+    public function testItemsAreTruncatedToTheWidth()
+    {
+        $list = new SelectListWidget([
+            ['value' => 'a', 'label' => 'alpha', 'description' => 'the first one'],
+            ['value' => 'b', 'label' => 'beta', 'description' => 'the second one'],
+        ]);
+
+        foreach ([60, 40, 20, 6, 4, 2, 1] as $columns) {
+            foreach ($list->render(new RenderContext($columns, 24)) as $line) {
+                $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every row fits in %d columns.', $columns));
+            }
+        }
+    }
+
+    /**
+     * The selected row is prefixed with an arrow: three bytes, two columns.
+     * Budgeting in bytes cost that row two columns of description.
+     */
+    public function testSelectedRowGetsTheSameWidthBudgetAsTheOthers()
+    {
+        $description = str_repeat('D', 120);
+        $list = new SelectListWidget([
+            ['value' => 'alpha', 'label' => 'alpha', 'description' => $description],
+            ['value' => 'beta', 'label' => 'beta', 'description' => $description],
+        ]);
+
+        $lines = $list->render(new RenderContext(60, 24));
+
+        $this->assertSame(
+            AnsiUtils::visibleWidth($lines[1]),
+            AnsiUtils::visibleWidth($lines[0]),
+            'The selected row is truncated to the same width as the others.',
+        );
+    }
+
+    public function testSelectedRowWithoutDescriptionGetsTheSameWidthBudget()
+    {
+        $label = str_repeat('L', 120);
+        $list = new SelectListWidget([
+            ['value' => 'alpha', 'label' => $label],
+            ['value' => 'beta', 'label' => $label],
+        ]);
+
+        $lines = $list->render(new RenderContext(60, 24));
+
+        $this->assertSame(
+            AnsiUtils::visibleWidth($lines[1]),
+            AnsiUtils::visibleWidth($lines[0]),
+        );
+    }
+
     /**
      * @return array{SelectListWidget, Tui}
      */

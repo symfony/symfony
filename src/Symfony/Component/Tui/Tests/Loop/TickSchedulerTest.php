@@ -38,13 +38,59 @@ class TickSchedulerTest extends TestCase
         $scheduler->runDue($start + 0.10);
         $this->assertSame(0, $calls);
 
+        // Due at 0.50 but the loop only came back at 1.00, so this run is
+        // late; the period it belongs to still ends at 1.00.
         $scheduler->runDue($start + 1.00);
         $this->assertSame(1, $calls);
 
+        // Being served late does not push the following period back.
         $scheduler->runDue($start + 1.20);
-        $this->assertSame(1, $calls);
+        $this->assertSame(2, $calls);
 
         $scheduler->runDue($start + 1.60);
+        $this->assertSame(3, $calls);
+    }
+
+    public function testRunDueDoesNotDriftBehindTheInterval()
+    {
+        $scheduler = new TickScheduler();
+        $calls = 0;
+        $start = microtime(true);
+
+        $scheduler->schedule(static function () use (&$calls): void {
+            ++$calls;
+        }, 0.100);
+
+        // A loop polling every 30 ms cannot land on the 100 ms boundary, but
+        // the rate it serves must still be one call per 100 ms.
+        for ($i = 1; $i <= 200; ++$i) {
+            $scheduler->runDue($start + $i * 0.030);
+        }
+
+        $this->assertSame(60, $calls);
+    }
+
+    public function testRunDueSkipsPeriodsMissedWhileTheLoopWasStalled()
+    {
+        $scheduler = new TickScheduler();
+        $calls = 0;
+        $start = microtime(true);
+
+        $scheduler->schedule(static function () use (&$calls): void {
+            ++$calls;
+        }, 0.100);
+
+        // Ten periods went by unserved while the loop was away.
+        $scheduler->runDue($start + 1.0);
+        $this->assertSame(1, $calls);
+
+        // The loop is back and polling every 10 ms. The missed periods are
+        // dropped, so the next 90 ms hold at most one more call rather than
+        // replaying the backlog one poll at a time.
+        for ($i = 1; $i <= 9; ++$i) {
+            $scheduler->runDue($start + 1.0 + $i * 0.010);
+        }
+
         $this->assertSame(2, $calls);
     }
 

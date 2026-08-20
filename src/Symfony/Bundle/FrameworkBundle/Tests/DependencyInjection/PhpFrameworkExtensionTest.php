@@ -24,6 +24,7 @@ use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Workflow\Definition;
@@ -533,6 +534,134 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             [...PostmarkRequestParser::PROVIDER_IPS, '127.0.0.1'],
             $container->getDefinition('mailer.webhook.request_parser.postmark')->getArgument('$allowedIPs')
         );
+    }
+
+    public function testRateLimiterBuilderDefault()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => true,
+            ]);
+        });
+
+        $this->assertSame('cache.rate_limiter', (string) $container->getDefinition('limiter_builder.storage')->getArgument(0));
+
+        $builder = $container->getDefinition('limiter_builder');
+        $this->assertSame('limiter_builder.storage', (string) $builder->getArgument(0));
+        $this->assertNull($builder->getArgument(1));
+
+        $this->assertSame('limiter_builder', (string) $container->getAlias(RateLimiterBuilder::class));
+    }
+
+    public function testRateLimiterBuilderDefaultWithLock()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'lock' => true,
+                'rate_limiter' => true,
+            ]);
+        });
+
+        $builder = $container->getDefinition('limiter_builder');
+        $this->assertSame('lock.factory', (string) $builder->getArgument(1));
+    }
+
+    public function testRateLimiterBuilderWithCustomCachePool()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'builder' => ['cache_pool' => 'cache.app'],
+                ],
+            ]);
+        });
+
+        $this->assertSame('cache.app', (string) $container->getDefinition('limiter_builder.storage')->getArgument(0));
+        $this->assertSame('limiter_builder.storage', (string) $container->getDefinition('limiter_builder')->getArgument(0));
+    }
+
+    public function testRateLimiterBuilderWithCustomStorageService()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'builder' => ['storage_service' => 'my.storage'],
+                ],
+            ]);
+        });
+
+        $this->assertFalse($container->hasDefinition('limiter_builder.storage'));
+        $this->assertSame('my.storage', (string) $container->getDefinition('limiter_builder')->getArgument(0));
+    }
+
+    public function testRateLimiterBuilderWithCustomLockFactory()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'lock' => true,
+                'rate_limiter' => [
+                    'builder' => ['lock_factory' => 'my.lock_factory'],
+                ],
+            ]);
+        });
+
+        $this->assertSame('my.lock_factory', (string) $container->getDefinition('limiter_builder')->getArgument(1));
+    }
+
+    public function testRateLimiterBuilderLockCanBeDisabledWhileLockIsEnabled()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'lock' => true,
+                'rate_limiter' => [
+                    'builder' => ['lock_factory' => null],
+                ],
+            ]);
+        });
+
+        $this->assertNull($container->getDefinition('limiter_builder')->getArgument(1));
+    }
+
+    public function testRateLimiterBuilderThrowsWhenLockIsNotConfigured()
+    {
+        if (!class_exists(RateLimiterBuilder::class)) {
+            $this->markTestSkipped('RateLimiterBuilder is not available.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Rate Limiter Builder requires the Lock component to be configured.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'builder' => ['lock_factory' => 'lock.factory'],
+                ],
+            ]);
+        });
     }
 }
 

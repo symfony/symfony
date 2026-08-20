@@ -66,6 +66,26 @@ class RateLimiterFactoryTest extends TestCase
             'policy' => 'no_limit',
             'id' => 'test',
         ]];
+        yield 'fixed_window with a DateInterval' => [FixedWindowLimiter::class, [
+            'policy' => 'fixed_window',
+            'id' => 'test',
+            'limit' => 5,
+            'interval' => new \DateInterval('PT5S'),
+        ]];
+        yield 'sliding_window with a DateInterval' => [SlidingWindowLimiter::class, [
+            'policy' => 'sliding_window',
+            'id' => 'test',
+            'limit' => 5,
+            'interval' => new \DateInterval('PT5S'),
+        ]];
+        yield 'token_bucket with a DateInterval' => [TokenBucketLimiter::class, [
+            'policy' => 'token_bucket',
+            'id' => 'test',
+            'limit' => 5,
+            'rate' => [
+                'interval' => new \DateInterval('PT5S'),
+            ],
+        ]];
     }
 
     #[DataProvider('invalidConfigProvider')]

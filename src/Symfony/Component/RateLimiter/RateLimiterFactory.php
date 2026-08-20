@@ -41,6 +41,10 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
 
     public function create(?string $key = null): LimiterInterface
     {
+        if ('no_limit' === $this->config['policy']) {
+            return new NoLimiter();
+        }
+
         $id = $this->config['id'].'-'.$key;
         $lock = $this->lockFactory?->createLock($id);
 
@@ -48,14 +52,17 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
             'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock),
             'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->config['anchor_at']),
             'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
-            'no_limit' => new NoLimiter(),
             default => throw new \LogicException(\sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
         };
     }
 
     private static function configureOptions(OptionsResolver $options): void
     {
-        $intervalNormalizer = static function (Options $options, string $interval): \DateInterval {
+        $intervalNormalizer = static function (Options $options, \DateInterval|string $interval): \DateInterval {
+            if ($interval instanceof \DateInterval) {
+                return $interval;
+            }
+
             // Create DateTimeImmutable from unix timestamp, so the default timezone is ignored and we don't need to
             // deal with quirks happening when modifying dates using a timezone with DST.
             $now = \DateTimeImmutable::createFromFormat('U', (string) time());
@@ -80,12 +87,12 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
                 ->allowedValues('token_bucket', 'fixed_window', 'sliding_window', 'no_limit')
 
             ->define('limit')->allowedTypes('int')
-            ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)
+            ->define('interval')->allowedTypes('string', \DateInterval::class)->normalize($intervalNormalizer)
             ->define('rate')
                 ->options(static function (OptionsResolver $rate) use ($intervalNormalizer) {
                     $rate
                         ->define('amount')->allowedTypes('int')->default(1)
-                        ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)
+                        ->define('interval')->allowedTypes('string', \DateInterval::class)->normalize($intervalNormalizer)
                     ;
                 })
                 ->normalize(static function (Options $options, $value) {

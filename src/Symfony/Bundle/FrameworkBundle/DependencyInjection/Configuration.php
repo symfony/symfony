@@ -2797,9 +2797,13 @@ class Configuration implements ConfigurationInterface
                         ->then(static function ($v) {
                             if (!isset($v['limiters']) && !isset($v['limiter'])) {
                                 $v = ['limiters' => $v];
-                                if (\array_key_exists('enabled', $v['limiters'])) {
-                                    $v['enabled'] = $v['limiters']['enabled'];
-                                    unset($v['limiters']['enabled']);
+
+                                // hoist back the keys the shorthand would otherwise read as limiter names
+                                foreach (['enabled', 'builder'] as $key) {
+                                    if (\array_key_exists($key, $v['limiters'])) {
+                                        $v[$key] = $v['limiters'][$key];
+                                        unset($v['limiters'][$key]);
+                                    }
                                 }
                             }
 
@@ -2807,6 +2811,24 @@ class Configuration implements ConfigurationInterface
                         })
                     ->end()
                     ->children()
+                        ->arrayNode('builder')
+                            ->info('Configuration for the RateLimiterBuilder service.')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('lock_factory')
+                                    ->info('The service ID of the lock factory to use with the RateLimiterBuilder.')
+                                    ->defaultValue('auto')
+                                ->end()
+                                ->scalarNode('cache_pool')
+                                    ->info('The cache pool to use with RateLimiterBuilder.')
+                                    ->defaultValue('cache.rate_limiter')
+                                ->end()
+                                ->scalarNode('storage_service')
+                                    ->info('The service ID of a custom storage implementation, this precedes any configured "cache_pool".')
+                                    ->defaultNull()
+                                ->end()
+                            ->end()
+                        ->end()
                         ->arrayNode('limiters', 'limiter')
                             ->useAttributeAsKey('name')
                             ->arrayPrototype()

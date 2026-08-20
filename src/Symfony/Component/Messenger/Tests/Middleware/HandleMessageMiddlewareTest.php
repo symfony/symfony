@@ -540,6 +540,59 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertSame($second, $events[3]->envelope->getMessage());
     }
 
+    public function testAPendingBatchDoesNotSwallowTheOutcomeOfTheNextHandler()
+    {
+        $batchHandler = new class implements BatchHandlerInterface {
+            use BatchHandlerTrait;
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 2;
+            }
+
+            private function process(array $jobs): void
+            {
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $syncHandler = $this->createMock(HandleMessageMiddlewareTestCallable::class);
+        $syncHandler->expects($this->exactly(2))->method('__invoke');
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [
+                $batchDescriptor = new HandlerDescriptor($batchHandler, ['alias' => 'batchHandler']),
+                $syncDescriptor = new HandlerDescriptor($syncHandler, ['alias' => 'syncHandler']),
+            ],
+        ]), dispatcher: $dispatcher = new RecordingHandlerEventDispatcher());
+
+        $ack = static function () {};
+        $middleware->handle(new Envelope(new DummyMessage('Hey'), [new AckStamp($ack)]), new StackMiddleware());
+
+        // the batch is still pending, but the second handler ran and must report its own outcome
+        $events = $dispatcher->events;
+        $this->assertCount(3, $events);
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[0]);
+        $this->assertSame($batchDescriptor, $events[0]->handlerDescriptor);
+        $this->assertInstanceOf(HandlerStartingEvent::class, $events[1]);
+        $this->assertSame($syncDescriptor, $events[1]->handlerDescriptor);
+        $this->assertInstanceOf(HandlerSuccessEvent::class, $events[2]);
+        $this->assertSame($syncDescriptor, $events[2]->handlerDescriptor);
+
+        // the second message fills the batch: both pending batch outcomes are dispatched
+        $middleware->handle(new Envelope(new DummyMessage('Bob'), [new AckStamp($ack)]), new StackMiddleware());
+
+        $outcomes = array_values(array_filter($dispatcher->events, static fn ($event) => $event instanceof HandlerSuccessEvent && $batchDescriptor === $event->handlerDescriptor));
+        $this->assertCount(2, $outcomes);
+    }
+
     public function testBatchHandlerFailureIsDispatchedOnceWithTheHandlerException()
     {
         $handler = new class implements BatchHandlerInterface {

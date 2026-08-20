@@ -19,6 +19,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AsymmetricVisibility;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
@@ -592,6 +593,19 @@ class ReflectionExtractorTest extends TestCase
             [UnderscoreDummy::class, 'foo_bar', false, null, null, null, null],
             [UnderscoreDummy::class, '_foo_', false, null, null, null, null],
         ];
+    }
+
+    public function testGetReadAccessorPrefersTheGetterSetterOverIsHasCanAccessors()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithGetterSetter::class, 'payments', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('payments', $readAccessor->getName());
+
+        $readAccessor = $this->extractor->getReadInfo(DummyWithGetterSetter::class, 'payments');
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('hasPayments', $readAccessor->getName());
     }
 
     /**

@@ -1050,6 +1050,16 @@ class ObjectNormalizerTest extends TestCase
         $this->assertEquals($expected, $obj);
     }
 
+    public function testDenormalizeWithPropertyPathIndex()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $obj = $normalizer->denormalize(['first_value' => 'foo'], ObjectWithArrayProperty::class, 'json', ['groups' => 'read']);
+
+        $this->assertSame(['first' => 'foo'], $obj->values);
+    }
+
     public function testObjectNormalizerWithAttributeLoaderAndObjectHasStaticProperty()
     {
         $class = new class {
@@ -1670,6 +1680,11 @@ class ObjectInner
 {
     public $foo;
     public $bar;
+}
+
+class ObjectWithArrayProperty
+{
+    public array $values = [];
 }
 
 class LazyObjectInner extends ObjectInner

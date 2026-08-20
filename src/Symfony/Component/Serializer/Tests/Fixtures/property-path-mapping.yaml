@@ -3,3 +3,8 @@ Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter:
         inner.foo:
             serialized_name: inner_foo
             groups: [ 'read' ]
+Symfony\Component\Serializer\Tests\Normalizer\ObjectWithArrayProperty:
+    attributes:
+        values[first]:
+            serialized_name: first_value
+            groups: [ 'read' ]

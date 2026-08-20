@@ -17,6 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\PropertyAccess\PropertyPathBuilder;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\PropertyAccess\PropertyPathIterator;
 use Symfony\Component\PropertyAccess\PropertyPathIteratorInterface;
 use Symfony\Component\Validator\Constraints\File;
@@ -236,6 +237,9 @@ class ViolationMapper implements ViolationMapperInterface
         $target = null;
         $chunk = '';
         $foundAtIndex = null;
+        $camelizedTarget = null;
+        $camelizedChunk = '';
+        $camelizedFoundAtIndex = null;
 
         // Construct mapping rules for the given form
         $rules = [];
@@ -248,12 +252,18 @@ class ViolationMapper implements ViolationMapperInterface
         }
 
         $children = iterator_to_array(new \RecursiveIteratorIterator(new InheritDataAwareIterator($form)), false);
+        $camelizedChildren = $children;
 
         while ($it->valid()) {
+            $index = $it->key();
+            $element = $it->current();
+
             if ($it->isIndex()) {
-                $chunk .= '['.$it->current().']';
+                $chunk .= '['.$element.']';
+                $camelizedChunk .= '['.$element.']';
             } else {
-                $chunk .= ('' === $chunk ? '' : '.').$it->current();
+                $chunk .= ('' === $chunk ? '' : '.').$element;
+                $camelizedChunk .= ('' === $camelizedChunk ? '' : '.').self::camelize($element);
             }
 
             // Test mapping rules as long as we have any
@@ -276,7 +286,7 @@ class ViolationMapper implements ViolationMapperInterface
                 $childPath = (string) $child->getPropertyPath();
                 if ($childPath === $chunk) {
                     $target = $child;
-                    $foundAtIndex = $it->key();
+                    $foundAtIndex = $index;
                 } elseif (str_starts_with($childPath, $chunk)) {
                     continue;
                 }
@@ -284,7 +294,28 @@ class ViolationMapper implements ViolationMapperInterface
                 unset($children[$i]);
             }
 
+            /** @var FormInterface $child */
+            foreach ($camelizedChildren as $i => $child) {
+                $childPath = self::camelizePath($child->getPropertyPath());
+                if ($childPath === $camelizedChunk) {
+                    $camelizedTarget = $child;
+                    $camelizedFoundAtIndex = $index;
+                } elseif (str_starts_with($childPath, $camelizedChunk)) {
+                    continue;
+                }
+
+                unset($camelizedChildren[$i]);
+            }
+
             $it->next();
+        }
+
+        // The property accessor camelizes property paths when it looks for getters and
+        // setters, which makes a child named "discount_price" read and write the
+        // "discountPrice" property the violation points at.
+        if (null === $target) {
+            $target = $camelizedTarget;
+            $foundAtIndex = $camelizedFoundAtIndex;
         }
 
         if (null !== $foundAtIndex) {
@@ -322,7 +353,7 @@ class ViolationMapper implements ViolationMapperInterface
                 // Cut the piece out of the property path and proceed
                 $propertyPathBuilder->remove($i);
             } else {
-                /** @var \Symfony\Component\PropertyAccess\PropertyPathInterface $propertyPath */
+                /** @var PropertyPathInterface $propertyPath */
                 $propertyPath = $scope->getPropertyPath();
 
                 if (null === $propertyPath) {
@@ -344,5 +375,33 @@ class ViolationMapper implements ViolationMapperInterface
     private function acceptsErrors(FormInterface $form): bool
     {
         return $this->allowNonSynchronized || $form->isSynchronized();
+    }
+
+    private static function camelizePath(?PropertyPathInterface $path): string
+    {
+        if (null === $path) {
+            return '';
+        }
+
+        $camelized = '';
+
+        foreach ($path->getElements() as $i => $element) {
+            if ($path->isIndex($i)) {
+                $camelized .= '['.$element.']';
+            } else {
+                $camelized .= ('' === $camelized ? '' : '.').self::camelize($element);
+            }
+        }
+
+        return $camelized;
+    }
+
+    private static function camelize(string $string): string
+    {
+        if ('' === ltrim($string, '_')) {
+            return $string;
+        }
+
+        return str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
     }
 }

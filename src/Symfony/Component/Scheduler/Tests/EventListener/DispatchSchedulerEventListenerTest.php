@@ -18,6 +18,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageReceivedEvent;
+use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 use Symfony\Component\Scheduler\Event\FailureEvent;
 use Symfony\Component\Scheduler\Event\PostRunEvent;
 use Symfony\Component\Scheduler\Event\PreRunEvent;
@@ -60,6 +61,59 @@ class DispatchSchedulerEventListenerTest extends TestCase
         $this->assertTrue($secondListener->preInvoked);
         $this->assertTrue($secondListener->postInvoked);
         $this->assertTrue($secondListener->failureInvoked);
+    }
+
+    public function testCanceledMessageIsRejected()
+    {
+        $trigger = $this->createStub(TriggerInterface::class);
+        $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
+
+        $schedulerProvider = new SomeScheduleProvider([$defaultRecurringMessage]);
+        $scheduleProviderLocator = $this->createMock(ContainerInterface::class);
+        $scheduleProviderLocator->expects($this->any())->method('has')->willReturn(true);
+        $scheduleProviderLocator->expects($this->any())->method('get')->willReturn($schedulerProvider);
+
+        $context = new MessageContext('default', 'default', $trigger, new \DateTimeImmutable());
+        $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('reject')->with($envelope);
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->any())->method('has')->with('async')->willReturn(true);
+        $receiverLocator->expects($this->any())->method('get')->with('async')->willReturn($receiver);
+
+        $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, $eventDispatcher = new EventDispatcher(), $receiverLocator);
+        $eventDispatcher->addListener(PreRunEvent::class, static function (PreRunEvent $event) { $event->shouldCancel(true); });
+
+        $workerReceivedEvent = new WorkerMessageReceivedEvent($envelope, 'async');
+        $listener->onMessageReceived($workerReceivedEvent);
+
+        $this->assertFalse($workerReceivedEvent->shouldHandle());
+    }
+
+    public function testNotCanceledMessageIsNotRejected()
+    {
+        $trigger = $this->createStub(TriggerInterface::class);
+        $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
+
+        $schedulerProvider = new SomeScheduleProvider([$defaultRecurringMessage]);
+        $scheduleProviderLocator = $this->createMock(ContainerInterface::class);
+        $scheduleProviderLocator->expects($this->any())->method('has')->willReturn(true);
+        $scheduleProviderLocator->expects($this->any())->method('get')->willReturn($schedulerProvider);
+
+        $context = new MessageContext('default', 'default', $trigger, new \DateTimeImmutable());
+        $envelope = (new Envelope(new \stdClass()))->with(new ScheduledStamp($context));
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->expects($this->never())->method('has');
+        $receiverLocator->expects($this->never())->method('get');
+
+        $listener = new DispatchSchedulerEventListener($scheduleProviderLocator, new EventDispatcher(), $receiverLocator);
+
+        $workerReceivedEvent = new WorkerMessageReceivedEvent($envelope, 'async');
+        $listener->onMessageReceived($workerReceivedEvent);
+
+        $this->assertTrue($workerReceivedEvent->shouldHandle());
     }
 }
 

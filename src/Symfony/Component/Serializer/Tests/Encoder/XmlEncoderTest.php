@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeNormalizer;
 use Symfony\Component\Serializer\Tests\Fixtures\EnvelopeObject;
 use Symfony\Component\Serializer\Tests\Fixtures\NormalizableTraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\ScalarDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\ScalarTraversableDummy;
 
 class XmlEncoderTest extends TestCase
 {
@@ -438,6 +439,21 @@ class XmlEncoderTest extends TestCase
             XML;
 
         $this->assertEquals($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
+    }
+
+    public function testEncodeNestedTraversableWhenNormalizable()
+    {
+        $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
+
+        $expected = <<<'XML'
+            <?xml version="1.0"?>
+            <response><scalar>normalized</scalar><nested><foo>normalizedFoo</foo><bar>normalizedBar</bar></nested></response>
+
+            XML;
+
+        $data = ['scalar' => new ScalarTraversableDummy(), 'nested' => new NormalizableTraversableDummy()];
+
+        $this->assertSame($expected, $serializer->serialize($data, 'xml'));
     }
 
     public function testDecode()

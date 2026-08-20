@@ -95,6 +95,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Transport\TransportFactory;
+use Symfony\Component\Mime\Crypto\PgpEncrypter;
+use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Notifier\TexterInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -2866,6 +2868,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testMailerPgp()
     {
+        if (!class_exists(PgpSigner::class)) {
+            $this->markTestSkipped('This test requires symfony/mime 8.2 or higher.');
+        }
+
         $container = $this->createContainerFromFile('mailer_with_pgp');
 
         $signer = $container->getDefinition('mailer.pgp_signer');
@@ -2895,6 +2901,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testMailerPgpEncrypterFailsAndDoesNotEncryptForTheSenderByDefault()
     {
+        if (!class_exists(PgpEncrypter::class)) {
+            $this->markTestSkipped('This test requires symfony/mime 8.2 or higher.');
+        }
+
         $container = $this->createContainerFromFile('mailer_with_pgp_repository');
 
         $this->assertSame('my_pgp_repository', (string) $container->getAlias('mailer.pgp_encrypter.repository'));

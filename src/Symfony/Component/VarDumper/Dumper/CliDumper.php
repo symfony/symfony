@@ -537,7 +537,7 @@ class CliDumper extends AbstractDumper
     protected function supportsColors(): bool
     {
         if ($this->outputStream !== static::$defaultOutput) {
-            return $this->hasColorSupport($this->outputStream);
+            return $this->hasColorSupport($this->getColorSupportStream());
         }
         if (isset(static::$defaultColors)) {
             return static::$defaultColors;
@@ -567,10 +567,7 @@ class CliDumper extends AbstractDumper
             }
         }
 
-        $h = stream_get_meta_data($this->outputStream) + ['wrapper_type' => null];
-        $h = 'Output' === $h['stream_type'] && 'PHP' === $h['wrapper_type'] ? fopen('php://stdout', 'w') : $this->outputStream;
-
-        return static::$defaultColors = $this->hasColorSupport($h);
+        return static::$defaultColors = $this->hasColorSupport($this->getColorSupportStream());
     }
 
     /**
@@ -606,6 +603,20 @@ class CliDumper extends AbstractDumper
         }
 
         $this->dumpLine($cursor->depth, true);
+    }
+
+    /**
+     * Returns the stream to probe for color support: on the CLI, php://output is backed by STDOUT.
+     */
+    private function getColorSupportStream(): mixed
+    {
+        if (!\defined('STDOUT') || !\is_resource($this->outputStream) || 'stream' !== get_resource_type($this->outputStream)) {
+            return $this->outputStream;
+        }
+
+        $h = stream_get_meta_data($this->outputStream) + ['wrapper_type' => null];
+
+        return 'Output' === $h['stream_type'] && 'PHP' === $h['wrapper_type'] ? \STDOUT : $this->outputStream;
     }
 
     /**

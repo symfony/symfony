@@ -11,6 +11,8 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\MappedSuperclass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -1161,6 +1163,23 @@ abstract class FrameworkExtensionTestCase extends TestCase
             [['serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
             $definition->getTag('messenger.message')
         );
+    }
+
+    public function testDoctrineMappedClassAttributesAreForwardedToTheTag()
+    {
+        $container = $this->createContainerFromFile('default_config', [], true, false);
+        $container->compile();
+
+        foreach ([Entity::class, MappedSuperclass::class] as $attribute) {
+            $configurators = $container->getAttributeAutoconfigurators()[$attribute] ?? [];
+            $this->assertCount(1, $configurators);
+
+            $definition = new ChildDefinition('');
+            $configurators[0]($definition);
+
+            $this->assertCount(1, $definition->getTag('container.excluded'));
+            $this->assertSame([[]], $definition->getTag('doctrine.orm.entity'));
+        }
     }
 
     public function testMessengerRejectRedeliveredMessagesEnabledByDefault()

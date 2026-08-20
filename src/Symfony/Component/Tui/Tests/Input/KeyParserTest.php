@@ -302,4 +302,33 @@ class KeyParserTest extends TestCase
         $this->assertFalse($this->parser->matches("\x1b[98;7u", 'ctrl+alt+a'));
         $this->assertFalse($this->parser->matches("\x1b[97;5u", 'ctrl+alt+a'));
     }
+
+    /**
+     * xterm's modifyOtherKeys form reports every modifier through the same
+     * `CSI 27 ; mods ; keycode ~` shape, not just shift and alt.
+     */
+    #[DataProvider('modifyOtherKeysEnterProvider')]
+    public function testModifyOtherKeysEnter(string $sequence, string $keyId)
+    {
+        $this->assertTrue($this->parser->matches($sequence, $keyId));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function modifyOtherKeysEnterProvider(): iterable
+    {
+        yield 'enter' => ["\x1b[27;1;13~", 'enter'];
+        yield 'shift+enter' => ["\x1b[27;2;13~", 'shift+enter'];
+        yield 'alt+enter' => ["\x1b[27;3;13~", 'alt+enter'];
+        yield 'ctrl+enter' => ["\x1b[27;5;13~", 'ctrl+enter'];
+        yield 'ctrl+shift+enter' => ["\x1b[27;6;13~", 'ctrl+shift+enter'];
+        yield 'ctrl+alt+enter' => ["\x1b[27;7;13~", 'ctrl+alt+enter'];
+    }
+
+    public function testModifyOtherKeysEnterDoesNotMatchAnotherModifier()
+    {
+        $this->assertFalse($this->parser->matches("\x1b[27;5;13~", 'shift+enter'));
+        $this->assertFalse($this->parser->matches("\x1b[27;5;9~", 'ctrl+enter'));
+    }
 }

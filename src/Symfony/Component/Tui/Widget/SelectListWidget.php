@@ -219,7 +219,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
         // No items match filter
         if (!$this->filteredItems) {
             $line = $this->applyElement('no-match', '  No matching items');
-            $lines[] = $line;
+            $lines[] = AnsiUtils::truncateToWidth($line, $columns, '');
 
             return $lines;
         }
@@ -247,7 +247,10 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             $isSelected = $i === $this->selectedIndex;
             $description = isset($item['description']) ? $this->normalizeDescription($item['description']) : null;
             $line = $this->renderItem($item, $isSelected, $description, $columns, $labelColumnWidth);
-            $lines[] = $line;
+            // renderItem() budgets the label against the columns left after
+            // its prefix, but the prefix itself is emitted unconditionally
+            // and is wider than the widget once the pane gets narrow enough.
+            $lines[] = AnsiUtils::truncateToWidth($line, $columns, '');
         }
 
         // Add scroll indicator if needed
@@ -287,14 +290,17 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
 
         if ($isSelected) {
             $prefix = '→ ';
+            // The arrow is three bytes wide and one column wide; every
+            // budget here is in columns.
+            $prefixWidth = AnsiUtils::visibleWidth($prefix);
             $selectedStyle = $this->resolveElement('selected');
 
             if (null !== $description && $columns > 40) {
-                $maxValueColumns = min($labelColumnWidth, $columns - \strlen($prefix) - 4);
+                $maxValueColumns = min($labelColumnWidth, $columns - $prefixWidth - 4);
                 $truncatedValue = AnsiUtils::truncateToWidth($displayValue, $maxValueColumns, '');
                 $spacing = str_repeat(' ', max(1, $alignedWidth - AnsiUtils::visibleWidth($truncatedValue)));
 
-                $descriptionStart = \strlen($prefix) + AnsiUtils::visibleWidth($truncatedValue) + \strlen($spacing);
+                $descriptionStart = $prefixWidth + AnsiUtils::visibleWidth($truncatedValue) + \strlen($spacing);
                 $remainingColumns = $columns - $descriptionStart - 2;
 
                 if ($remainingColumns > 10) {
@@ -304,20 +310,21 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
                 }
             }
 
-            $maxColumns = $columns - \strlen($prefix) - 2;
+            $maxColumns = $columns - $prefixWidth - 2;
 
             return $selectedStyle->apply($prefix.AnsiUtils::truncateToWidth($displayValue, $maxColumns, ''));
         }
 
         // Non-selected item
         $prefix = '  ';
+        $prefixWidth = AnsiUtils::visibleWidth($prefix);
 
         if (null !== $description && $columns > 40) {
-            $maxValueColumns = min($labelColumnWidth, $columns - \strlen($prefix) - 4);
+            $maxValueColumns = min($labelColumnWidth, $columns - $prefixWidth - 4);
             $truncatedValue = AnsiUtils::truncateToWidth($displayValue, $maxValueColumns, '');
             $spacing = str_repeat(' ', max(1, $alignedWidth - AnsiUtils::visibleWidth($truncatedValue)));
 
-            $descriptionStart = \strlen($prefix) + AnsiUtils::visibleWidth($truncatedValue) + \strlen($spacing);
+            $descriptionStart = $prefixWidth + AnsiUtils::visibleWidth($truncatedValue) + \strlen($spacing);
             $remainingColumns = $columns - $descriptionStart - 2;
 
             if ($remainingColumns > 10) {
@@ -329,7 +336,7 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
             }
         }
 
-        $maxColumns = $columns - \strlen($prefix) - 2;
+        $maxColumns = $columns - $prefixWidth - 2;
 
         return $prefix.AnsiUtils::truncateToWidth($displayValue, $maxColumns, '');
     }

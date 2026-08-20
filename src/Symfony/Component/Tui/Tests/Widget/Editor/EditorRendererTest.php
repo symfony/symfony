@@ -127,6 +127,103 @@ class EditorRendererTest extends TestCase
     }
 
     /**
+     * A grapheme cannot be split, so the wrapper hands back a chunk wider
+     * than the width whenever one character does not fit in the whole box.
+     */
+    public function testACharacterWiderThanTheBoxDoesNotOverflowTheLine()
+    {
+        $family = "\u{1F468}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}";
+
+        foreach ([['日本'], ['x'.$family.'y'], [$family]] as $docLines) {
+            foreach ([1, 2, 3, 4] as $columns) {
+                foreach ($this->renderSimple($docLines, 0, 0, $columns, 10) as $line) {
+                    $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every rendered row fits in %d columns.', $columns));
+                }
+            }
+        }
+    }
+
+    /**
+     * The scroll indicator is thirteen columns of its own before any frame is
+     * drawn around it, and a pane can be narrower than that.
+     */
+    public function testTheScrollIndicatorIsCutToTheWidth()
+    {
+        $docLines = ['one', 'two', 'three', 'four', 'five', 'six'];
+        $viewport = [
+            'scroll_offset' => 2,
+            'visible_line_count' => 2,
+            'lines_above' => 2,
+            'lines_below' => 2,
+        ];
+
+        foreach ([40, 14, 13, 12, 8, 5, 1] as $columns) {
+            foreach ($this->renderWithViewport($docLines, $viewport, 2, 0, $columns, 10) as $line) {
+                $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Every row fits in %d columns.', $columns));
+            }
+        }
+    }
+
+    public function testTheScrollIndicatorStillFillsTheFrameWhenItFits()
+    {
+        $docLines = ['one', 'two', 'three', 'four'];
+        $viewport = [
+            'scroll_offset' => 1,
+            'visible_line_count' => 1,
+            'lines_above' => 1,
+            'lines_below' => 2,
+        ];
+
+        $lines = $this->renderWithViewport($docLines, $viewport, 1, 0, 20, 10);
+
+        $this->assertSame('─── ↑ 1 more ───────', AnsiUtils::stripAnsiCodes($lines[0]));
+        $this->assertSame('─── ↓ 2 more ───────', AnsiUtils::stripAnsiCodes($lines[\count($lines) - 1]));
+    }
+
+    /**
+     * The viewport measures in logical lines and keeps at least one so the
+     * cursor line is drawn; a single line can wrap to more rows than the
+     * editor has.
+     */
+    public function testAWrappedLineDoesNotRenderMoreRowsThanTheEditorHas()
+    {
+        $docLines = [str_repeat('word ', 40), 'second line', 'third line'];
+
+        foreach ([40, 20, 10, 6] as $columns) {
+            foreach ([1, 3, 5] as $maxDisplayRows) {
+                $viewport = [
+                    'scroll_offset' => 0,
+                    'visible_line_count' => 1,
+                    'lines_above' => 0,
+                    'lines_below' => 2,
+                ];
+
+                $lines = $this->renderWithViewport($docLines, $viewport, 0, 0, $columns, $maxDisplayRows);
+
+                // Two frame rows on top of the content.
+                $this->assertLessThanOrEqual($maxDisplayRows + 2, \count($lines), \sprintf('%d columns, %d rows allowed.', $columns, $maxDisplayRows));
+            }
+        }
+    }
+
+    public function testTheCursorStaysOnScreenWhenItsLineIsCutDown()
+    {
+        $docLines = [str_repeat('word ', 40)];
+        $viewport = [
+            'scroll_offset' => 0,
+            'visible_line_count' => 1,
+            'lines_above' => 0,
+            'lines_below' => 0,
+        ];
+
+        // The cursor sits at the very end, which wraps far past the third row.
+        $lines = $this->renderWithViewport($docLines, $viewport, 0, \strlen($docLines[0]) - 1, 10, 3, false, true);
+
+        $this->assertCount(5, $lines);
+        $this->assertStringContainsString(AnsiUtils::CURSOR_MARKER_PREFIX, implode('', $lines), 'The window follows the cursor instead of showing the top of the line.');
+    }
+
+    /**
      * @param string[] $docLines
      *
      * @return string[]

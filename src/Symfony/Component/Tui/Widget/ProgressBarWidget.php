@@ -507,17 +507,26 @@ class ProgressBarWidget extends AbstractWidget
 
         // If the line is too wide, shrink the bar to fit
         $lineWidth = AnsiUtils::visibleWidth($line);
-        if ($lineWidth > $availableWidth) {
-            $newBarWidth = $this->barWidth - ($lineWidth - $availableWidth);
-            if ($newBarWidth >= 1) {
-                $savedBarWidth = $this->barWidth;
-                $this->barWidth = $newBarWidth;
-                $line = $this->replacePlaceholders($format);
-                $this->barWidth = $savedBarWidth;
-            }
+        if ($lineWidth <= $availableWidth) {
+            return $line;
         }
 
-        return $line;
+        // Shrink as far as the bar goes, down to a single cell. Giving up
+        // when the overflow is larger than the bar would leave the line at
+        // its full width, so a terminal narrow enough to swallow the whole
+        // bar produced a wider line than a slightly wider one did.
+        $newBarWidth = max(1, $this->barWidth - ($lineWidth - $availableWidth));
+        if ($newBarWidth !== $this->barWidth) {
+            $savedBarWidth = $this->barWidth;
+            $this->barWidth = $newBarWidth;
+            $line = $this->replacePlaceholders($format);
+            $this->barWidth = $savedBarWidth;
+        }
+
+        // The rest of the format (counters, percentage, message) can still
+        // outgrow the available columns on its own; the Renderer rejects an
+        // over-wide line, so cut it instead of aborting the render.
+        return AnsiUtils::truncateToWidth($line, $availableWidth, '');
     }
 
     private function replacePlaceholders(string $format): string
@@ -558,19 +567,49 @@ class ProgressBarWidget extends AbstractWidget
 
     private function renderBar(): string
     {
-        $completeBars = $this->getBarOffset();
-        $styledComplete = $this->applyElement('bar-fill', str_repeat($this->barChar, $completeBars));
+        // The bar width is a number of columns, so how many times a character
+        // goes into it depends on how wide that character draws. Counting
+        // characters instead makes a bar of wide glyphs twice the width that
+        // was asked for.
+        $completeColumns = $this->getBarOffset();
+        $styledComplete = $this->applyElement('bar-fill', self::repeatToWidth($this->barChar, $completeColumns));
 
-        if ($completeBars < $this->barWidth) {
-            $progressCharLen = mb_strlen($this->progressChar);
-            $emptyBars = $this->barWidth - $completeBars - $progressCharLen;
-            $styledProgress = '' !== $this->progressChar ? $this->applyElement('bar-progress', $this->progressChar) : '';
-            $styledEmpty = $this->applyElement('bar-empty', str_repeat($this->emptyBarChar, max(0, $emptyBars)));
+        if ($completeColumns < $this->barWidth) {
+            $remainingColumns = $this->barWidth - $completeColumns;
+
+            $styledProgress = '';
+            $progressColumns = AnsiUtils::visibleWidth($this->progressChar);
+            if ('' !== $this->progressChar && $progressColumns <= $remainingColumns) {
+                $styledProgress = $this->applyElement('bar-progress', $this->progressChar);
+                $remainingColumns -= $progressColumns;
+            }
+
+            $styledEmpty = $this->applyElement('bar-empty', self::repeatToWidth($this->emptyBarChar, $remainingColumns));
 
             return $styledComplete.$styledProgress.$styledEmpty;
         }
 
         return $styledComplete;
+    }
+
+    /**
+     * Repeat a character to fill exactly the given number of columns, padding
+     * with spaces when it does not divide evenly.
+     */
+    private static function repeatToWidth(string $char, int $columns): string
+    {
+        if ($columns <= 0) {
+            return '';
+        }
+
+        $charColumns = AnsiUtils::visibleWidth($char);
+        if ($charColumns < 1) {
+            return str_repeat(' ', $columns);
+        }
+
+        $count = intdiv($columns, $charColumns);
+
+        return str_repeat($char, $count).str_repeat(' ', $columns - $count * $charColumns);
     }
 
     private static function formatTime(int $secs): string

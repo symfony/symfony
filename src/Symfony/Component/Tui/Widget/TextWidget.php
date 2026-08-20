@@ -58,9 +58,9 @@ use Symfony\Component\Tui\Widget\Figlet\FigletRenderer;
  *  - InputWidget::setPrompt()
  *
  * Sanitizing widgets (which call StringUtils::stripControlBytes on input):
- * InputWidget::setValue, EditorWidget/EditorDocument, MarkdownWidget,
- * SettingItem::$currentValue, ProgressBarWidget::setMessage,
- * LoaderWidget::setMessage.
+ * InputWidget::setValue and pasted content, EditorWidget/EditorDocument,
+ * MarkdownWidget, SettingItem::$currentValue,
+ * ProgressBarWidget::setMessage, LoaderWidget::setMessage.
  *
  * @experimental
  *

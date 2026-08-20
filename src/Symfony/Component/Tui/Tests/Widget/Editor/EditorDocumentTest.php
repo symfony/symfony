@@ -497,6 +497,41 @@ class EditorDocumentTest extends TestCase
         $this->assertSame([], $doc->getPasteMarkers());
     }
 
+    public function testMultiLinePasteIsASingleUndoStep()
+    {
+        $doc = new EditorDocument();
+        $doc->insertText('start');
+        $doc->handlePaste("line 1\nline 2\nline 3");
+        $this->assertSame("startline 1\nline 2\nline 3", $doc->getText());
+
+        $this->assertTrue($doc->undo());
+        $this->assertSame('start', $doc->getText());
+        $this->assertSame(0, $doc->getCursorLine());
+        $this->assertSame(5, $doc->getCursorCol());
+    }
+
+    public function testMultiLinePasteIsRedoneInOneStep()
+    {
+        $doc = new EditorDocument();
+        $doc->handlePaste("line 1\nline 2\nline 3");
+        $doc->undo();
+
+        $this->assertTrue($doc->redo());
+        $this->assertSame("line 1\nline 2\nline 3", $doc->getText());
+    }
+
+    public function testPasteInTheMiddleOfALine()
+    {
+        $doc = new EditorDocument();
+        $doc->setText('ab');
+        $doc->setCursorCol(1);
+        $doc->handlePaste("X\nY");
+
+        $this->assertSame("aX\nYb", $doc->getText());
+        $this->assertSame(1, $doc->getCursorLine());
+        $this->assertSame(1, $doc->getCursorCol());
+    }
+
     public function testPasteStripsControlBytesToPreventTerminalInjection()
     {
         $doc = new EditorDocument();
@@ -567,5 +602,62 @@ class EditorDocumentTest extends TestCase
         yield 'Emoji' => ['hello👋', 'hello'];
         yield 'Japanese' => ['日本', '日'];
         yield 'CJK' => ['中文', '中'];
+    }
+
+    /**
+     * The cursor is a byte offset into one line. Carrying it to another line
+     * clamps it to that line's length, and a length is not a character
+     * boundary.
+     */
+    public function testMovingDownOntoAShorterLineOfWideCharactersKeepsTheDocumentValid()
+    {
+        $doc = new EditorDocument();
+        $doc->setText("abcde\n日本");
+        $doc->setCursorLine(0);
+        $doc->setCursorCol(4);
+
+        $doc->moveCursorDown();
+        $this->assertSame(3, $doc->getCursorCol(), 'The cursor sits between the two characters, not inside the second.');
+
+        $doc->insertText('x');
+        $this->assertSame("abcde\n日x本", $doc->getText());
+        $this->assertTrue(mb_check_encoding($doc->getText(), 'UTF-8'));
+    }
+
+    public function testMovingUpOntoALineOfWideCharactersKeepsTheDocumentValid()
+    {
+        $doc = new EditorDocument();
+        $doc->setText("日本\nabcde");
+        $doc->setCursorLine(1);
+        $doc->setCursorCol(4);
+
+        $doc->moveCursorUp();
+        $this->assertSame(3, $doc->getCursorCol());
+
+        $doc->insertText('x');
+        $this->assertTrue(mb_check_encoding($doc->getText(), 'UTF-8'));
+    }
+
+    public function testSetCursorColLandsOnACharacterBoundary()
+    {
+        $doc = new EditorDocument();
+        $doc->setText('日本語');
+
+        foreach ([0 => 0, 1 => 0, 2 => 0, 3 => 3, 4 => 3, 5 => 3, 6 => 6, 99 => 9] as $asked => $expected) {
+            $doc->setCursorCol($asked);
+            $this->assertSame($expected, $doc->getCursorCol(), \sprintf('Column %d snaps to %d.', $asked, $expected));
+        }
+    }
+
+    public function testDeletingALineLandsTheCursorOnACharacterBoundary()
+    {
+        $doc = new EditorDocument();
+        $doc->setText("abcde\n日本\nlast");
+        $doc->setCursorLine(0);
+        $doc->setCursorCol(4);
+
+        $doc->deleteLine();
+
+        $this->assertSame(3, $doc->getCursorCol());
     }
 }

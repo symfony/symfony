@@ -289,10 +289,19 @@ class SettingsListWidget extends AbstractWidget implements FocusableInterface, P
 
         $values = $item->getValues();
         $valueCount = \count($values);
-        $currentIndex = array_search($item->getCurrentValue(), $values, true) ?: 0;
+        $currentIndex = array_search($item->getCurrentValue(), $values, true);
 
-        // Calculate next index with wrapping
-        $nextIndex = ($currentIndex + $direction + $valueCount) % $valueCount;
+        if (false === $currentIndex) {
+            // The value is not one of the offered ones, so there is no
+            // position to step from: step onto the list instead. Reading the
+            // miss as index 0 sent both directions to the same value and
+            // disagreed with what activating the item does.
+            $nextIndex = $direction > 0 ? 0 : $valueCount - 1;
+        } else {
+            // Calculate next index with wrapping
+            $nextIndex = ($currentIndex + $direction + $valueCount) % $valueCount;
+        }
+
         $newValue = $values[$nextIndex];
 
         $item->setCurrentValue($newValue);

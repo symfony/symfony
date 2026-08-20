@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Tui\Tests\Widget;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\StyleSheet;
@@ -449,6 +451,73 @@ class ProgressBarTest extends TestCase
         // Should not exceed 40 columns
         $visibleWidth = mb_strwidth(preg_replace('/\x1b\[[^m]*m/', '', $content));
         $this->assertLessThanOrEqual(40, $visibleWidth);
+    }
+
+    /**
+     * The bar can only give back as many columns as it owns; anything left
+     * over has to be cut off the line, or the Renderer rejects it.
+     */
+    public function testRenderNeverExceedsTheAvailableWidth()
+    {
+        foreach ([40, 20, 15, 14, 10, 5, 1] as $columns) {
+            $bar = new ProgressBarWidget(10);
+            $bar->setProgress(3);
+
+            $line = $bar->render(new RenderContext($columns, 24))[0];
+
+            $this->assertLessThanOrEqual($columns, AnsiUtils::visibleWidth($line), \sprintf('Line fits in %d columns.', $columns));
+        }
+    }
+
+    public function testRenderInATerminalTooNarrowForTheBar()
+    {
+        $terminal = new VirtualTerminal(12, 6);
+        $tui = new Tui(terminal: $terminal);
+        $bar = new ProgressBarWidget(10);
+        $tui->add($bar);
+        $bar->setProgress(3);
+
+        $tui->processRender();
+
+        $this->assertLessThanOrEqual(12, AnsiUtils::visibleWidth($bar->render(new RenderContext(12, 6))[0]));
+    }
+
+    /**
+     * setBarWidth() is a number of columns, so it has to hold whatever the
+     * bar is drawn with.
+     */
+    #[DataProvider('barCharacterProvider')]
+    public function testTheBarIsAsWideAsItWasAskedToBe(?string $bar, ?string $empty, ?string $progress)
+    {
+        $widget = new ProgressBarWidget(10);
+        $widget->setBarWidth(10);
+        $widget->setProgress(5);
+        if (null !== $bar) {
+            $widget->setBarCharacter($bar);
+        }
+        if (null !== $empty) {
+            $widget->setEmptyBarCharacter($empty);
+        }
+        if (null !== $progress) {
+            $widget->setProgressCharacter($progress);
+        }
+
+        $plain = AnsiUtils::stripAnsiCodes($widget->render(new RenderContext(200, 4))[0]);
+        $this->assertSame(1, preg_match('/\[(.*)\]/u', $plain, $matches));
+        $this->assertSame(10, AnsiUtils::visibleWidth($matches[1]));
+    }
+
+    /**
+     * @return iterable<string, array{?string, ?string, ?string}>
+     */
+    public static function barCharacterProvider(): iterable
+    {
+        yield 'defaults' => [null, null, null];
+        yield 'ascii' => ['=', '-', null];
+        yield 'wide bar characters' => ['日', '本', null];
+        yield 'wide progress character' => [null, null, '👉'];
+        yield 'two-character progress' => [null, null, '=>'];
+        yield 'wide everything' => ['日', '本', '👉'];
     }
 
     public function testMemoryPlaceholder()

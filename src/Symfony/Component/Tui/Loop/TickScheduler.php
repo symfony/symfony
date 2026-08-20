@@ -41,7 +41,7 @@ final class TickScheduler
     public function schedule(callable $callback, float $intervalSeconds): string
     {
         if ($intervalSeconds <= 0) {
-            throw new InvalidArgumentException(\sprintf('Interval must be greater than 0, got %f.', $intervalSeconds));
+            throw new InvalidArgumentException(\sprintf('Interval must be greater than 0, got "%s".', $intervalSeconds));
         }
 
         $id = 'interval-'.(++$this->counter);
@@ -82,7 +82,21 @@ final class TickScheduler
                 continue;
             }
 
-            $this->intervals[$id]['next_run_at'] = $now + $interval['interval'];
+            // Advance from the time this run was due, not from the moment the
+            // loop got round to it. The loop polls on its own cadence, so
+            // restarting the period at $now hands every late wake-up to the
+            // next one and the callback falls further behind for good.
+            $nextRunAt = $interval['next_run_at'] + $interval['interval'];
+
+            if ($nextRunAt <= $now) {
+                // Whole periods went by unserved (a stalled loop, a suspended
+                // process). Skip them and line up on the next one instead of
+                // firing a burst to catch up.
+                $missed = (int) floor(($now - $interval['next_run_at']) / $interval['interval']);
+                $nextRunAt = $interval['next_run_at'] + ($missed + 1) * $interval['interval'];
+            }
+
+            $this->intervals[$id]['next_run_at'] = $nextRunAt;
             ($interval['callback'])();
         }
     }

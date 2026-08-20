@@ -85,7 +85,7 @@ final class EditorDocument
 
     public function setCursorCol(int $col): void
     {
-        $this->cursorCol = $col;
+        $this->cursorCol = $this->columnOnCurrentLine($col);
     }
 
     public function getKillRing(): KillRing
@@ -253,7 +253,7 @@ final class EditorDocument
             $this->lines = [''];
         }
 
-        $this->cursorCol = min($this->cursorCol, \strlen($this->lines[$this->cursorLine]));
+        $this->cursorCol = $this->columnOnCurrentLine($this->cursorCol);
 
         return true;
     }
@@ -358,7 +358,7 @@ final class EditorDocument
     {
         if ($this->cursorLine > 0) {
             --$this->cursorLine;
-            $this->cursorCol = min($this->cursorCol, \strlen($this->lines[$this->cursorLine]));
+            $this->cursorCol = $this->columnOnCurrentLine($this->cursorCol);
 
             return true;
         }
@@ -370,7 +370,7 @@ final class EditorDocument
     {
         if ($this->cursorLine < \count($this->lines) - 1) {
             ++$this->cursorLine;
-            $this->cursorCol = min($this->cursorCol, \strlen($this->lines[$this->cursorLine]));
+            $this->cursorCol = $this->columnOnCurrentLine($this->cursorCol);
 
             return true;
         }
@@ -483,8 +483,8 @@ final class EditorDocument
                     grapheme_extract($line, 1, \GRAPHEME_EXTR_COUNT, $nextByteOffset, $nextByteOffset);
                     $idx = strpos($line, $char, $nextByteOffset);
                 } else {
-                    $searchIn = 0 === $this->cursorCol ? false : substr($line, 0, $this->cursorCol);
-                    $idx = false !== $searchIn ? strrpos($searchIn, $char) : false;
+                    $haystack = 0 === $this->cursorCol ? false : substr($line, 0, $this->cursorCol);
+                    $idx = false !== $haystack ? strrpos($haystack, $char) : false;
                 }
             } else {
                 $idx = $isForward ? strpos($line, $char) : strrpos($line, $char);
@@ -619,14 +619,12 @@ final class EditorDocument
             return;
         }
 
-        // Insert first line at cursor
-        $this->insertText($lines[0]);
+        // One paste is one edit: take a single snapshot and insert the whole
+        // content in one go, so a later undo takes all of it back at once.
+        $this->pushUndoSnapshot();
+        $this->killRing->resetAction();
 
-        // Insert remaining lines
-        for ($i = 1; $i < \count($lines); ++$i) {
-            $this->insertNewLine();
-            $this->insertText($lines[$i]);
-        }
+        $this->insertTextAtCursor($content);
     }
 
     // --- Internal ---
@@ -661,6 +659,39 @@ final class EditorDocument
 
         $this->cursorLine = $lastLineIndex;
         $this->cursorCol = \strlen($lines[\count($lines) - 1] ?? '');
+    }
+
+    /**
+     * Bring a byte offset onto the current line, and onto a character
+     * boundary within it.
+     *
+     * The cursor is a byte offset into one line, so carrying it to another
+     * line means clamping it to that line's length -- and a length is not a
+     * boundary. Landing between the bytes of a character leaves the next
+     * insert or delete free to cut it in half, which takes the whole document
+     * out of UTF-8.
+     */
+    private function columnOnCurrentLine(int $col): int
+    {
+        $line = $this->lines[$this->cursorLine] ?? '';
+
+        if ($col <= 0) {
+            return 0;
+        }
+
+        if ($col >= $length = \strlen($line)) {
+            return $length;
+        }
+
+        $offset = 0;
+        foreach (grapheme_str_split($line) ?: [] as $grapheme) {
+            if ($offset + \strlen($grapheme) > $col) {
+                return $offset;
+            }
+            $offset += \strlen($grapheme);
+        }
+
+        return $offset;
     }
 
     private function currentLine(): Line

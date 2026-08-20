@@ -220,6 +220,49 @@ class MarkdownTest extends TestCase
     }
 
     /**
+     * A two-digit marker is four columns wide, so the item's text has four
+     * fewer columns to wrap into and its continuation lines line up under it.
+     */
+    public function testOrderedListWithTwoDigitMarkers()
+    {
+        $markdown = '';
+        for ($i = 1; $i <= 11; ++$i) {
+            $markdown .= $i.". item text that is fairly long here\n";
+        }
+
+        $md = $this->createMarkdown($markdown);
+        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $md->render(new RenderContext(20, 60)));
+
+        foreach ($lines as $line) {
+            $this->assertLessThanOrEqual(20, AnsiUtils::visibleWidth($line));
+        }
+
+        $tenth = array_search('10. item text that', $lines, true);
+        $this->assertNotFalse($tenth, 'The tenth item starts a line of its own: '.implode(' / ', $lines));
+        $this->assertStringStartsWith('    ', $lines[$tenth + 1], 'Continuation lines are indented under the text, not under the marker.');
+    }
+
+    /**
+     * The borders are drawn from the computed column widths, so those widths
+     * have to add up to the space the table was given.
+     */
+    public function testTableWithOneVeryWideColumnStaysInsideTheWidth()
+    {
+        $wide = str_repeat('W', 60);
+        $markdown = "| $wide | b | c |\n|---|---|---|\n| ".str_repeat('X', 60)." | y | z |\n";
+
+        $md = $this->createMarkdown($markdown);
+
+        foreach ([14, 16, 20, 30] as $columns) {
+            $lines = $md->render(new RenderContext($columns, 60));
+            $this->assertStringStartsWith('┌', AnsiUtils::stripAnsiCodes($lines[0]));
+            foreach ($lines as $line) {
+                $this->assertSame($columns, AnsiUtils::visibleWidth($line), \sprintf('Every table row fills exactly %d columns.', $columns));
+            }
+        }
+    }
+
+    /**
      * Render a widget through the Renderer pipeline to get full chrome applied.
      *
      * @return string[]

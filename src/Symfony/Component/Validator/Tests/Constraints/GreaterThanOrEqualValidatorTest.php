@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqualValidator;
@@ -80,5 +81,90 @@ class GreaterThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCas
             [new \DateTime('2000/01/01 UTC'), self::normalizeIcuSpaces("Jan 1, 2000, 12:00\u{202F}AM"), '2005/01/01 UTC', self::normalizeIcuSpaces("Jan 1, 2005, 12:00\u{202F}AM"), 'DateTime'],
             ['b', '"b"', 'c', '"c"', 'string'],
         ];
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testValidBcMathNumberWithStringValue()
+    {
+        $this->validator->validate(new \BcMath\Number('10.5'), new GreaterThanOrEqual('10'));
+
+        $this->assertNoViolation();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testValidBcMathNumberWithIntValue()
+    {
+        $this->validator->validate(new \BcMath\Number('10.5'), new GreaterThanOrEqual(10));
+
+        $this->assertNoViolation();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testInvalidBcMathNumberFormatsLimitWithoutQuotes()
+    {
+        $this->validator->validate(new \BcMath\Number('9.5'), new GreaterThanOrEqual(value: '10', message: 'myMessage'));
+
+        // The compared string limit must be rendered as "10", not the quoted
+        // string "\"10\"" that a plain string comparison would produce.
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '9.5')
+            ->setParameter('{{ compared_value }}', '10')
+            ->setParameter('{{ compared_value_type }}', 'BcMath\Number')
+            ->setCode(GreaterThanOrEqual::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberComparesWithFullPrecision()
+    {
+        $this->validator->validate(new \BcMath\Number('9.9999999999'), new GreaterThanOrEqual(value: 10, message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '9.9999999999')
+            ->setParameter('{{ compared_value }}', '10')
+            ->setParameter('{{ compared_value_type }}', 'BcMath\Number')
+            ->setCode(GreaterThanOrEqual::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithFloatValue()
+    {
+        // PHP truncates the float to an integer when comparing it with a BcMath\Number,
+        // which would make 10.2 greater than 10.5
+        $this->validator->validate(new \BcMath\Number('10.2'), new GreaterThanOrEqual(value: 10.5, message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '10.2')
+            ->setParameter('{{ compared_value }}', '10.5')
+            ->setParameter('{{ compared_value_type }}', 'BcMath\Number')
+            ->setCode(GreaterThanOrEqual::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithSmallFloatValue()
+    {
+        $this->validator->validate(new \BcMath\Number('0.00000005'), new GreaterThanOrEqual(value: 0.0000001, message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '0.00000005')
+            ->setParameter('{{ compared_value }}', '0.0000001')
+            ->setParameter('{{ compared_value_type }}', 'BcMath\Number')
+            ->setCode(GreaterThanOrEqual::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithExponentNotationStringValue()
+    {
+        $this->validator->validate(new \BcMath\Number('0.00000005'), new GreaterThanOrEqual(value: '1.0E-7', message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '0.00000005')
+            ->setParameter('{{ compared_value }}', '0.0000001')
+            ->setParameter('{{ compared_value_type }}', 'BcMath\Number')
+            ->setCode(GreaterThanOrEqual::TOO_LOW_ERROR)
+            ->assertRaised();
     }
 }

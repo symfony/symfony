@@ -30,6 +30,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 abstract class AbstractComparisonValidator extends ConstraintValidator
 {
+    use BcMathNumberTrait;
+
     public function __construct(
         private ?PropertyAccessorInterface $propertyAccessor = null,
         private ?ClockInterface $clock = null,
@@ -71,6 +73,12 @@ abstract class AbstractComparisonValidator extends ConstraintValidator
             } catch (\Exception) {
                 throw new ConstraintDefinitionException(\sprintf('The compared value "%s" could not be converted to a "%s" instance in the "%s" constraint.', $comparedValue, get_debug_type($value), get_debug_type($constraint)));
             }
+        }
+
+        // The compared value is converted so that the comparison keeps its arbitrary
+        // precision, and so that the violation message renders it without quotes
+        if ($value instanceof \BcMath\Number) {
+            $comparedValue = self::toBcMathNumber($comparedValue);
         }
 
         if (!$this->compareValues($value, $comparedValue)) {

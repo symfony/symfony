@@ -12,6 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 use Symfony\Component\Validator\Constraints\Range;
@@ -154,6 +155,111 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
             ->setParameter('{{ max }}', 20)
             ->setCode(Range::NOT_IN_RANGE_ERROR)
             ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testValidBcMathNumberWithScalarLimits()
+    {
+        $this->validator->validate(new \BcMath\Number('10.5'), new Range(min: 10, max: 20));
+
+        $this->assertNoViolation();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testValidBcMathNumberWithStringLimits()
+    {
+        $this->validator->validate(new \BcMath\Number('10.5'), new Range(min: '10', max: '20'));
+
+        $this->assertNoViolation();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testValidBcMathNumberWithBcMathLimits()
+    {
+        $this->validator->validate(new \BcMath\Number('10.5'), new Range(min: new \BcMath\Number('10'), max: new \BcMath\Number('20')));
+
+        $this->assertNoViolation();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberTooLow()
+    {
+        $this->validator->validate(new \BcMath\Number('9.5'), new Range(min: 10, minMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '9.5')
+            ->setParameter('{{ limit }}', '10')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberTooHigh()
+    {
+        $this->validator->validate(new \BcMath\Number('20.5'), new Range(max: 20, maxMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '20.5')
+            ->setParameter('{{ limit }}', '20')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberNotInRange()
+    {
+        $this->validator->validate(new \BcMath\Number('20.5'), new Range(min: 10, max: 20, notInRangeMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '20.5')
+            ->setParameter('{{ min }}', '10')
+            ->setParameter('{{ max }}', '20')
+            ->setCode(Range::NOT_IN_RANGE_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberComparesWithFullPrecision()
+    {
+        $this->validator->validate(new \BcMath\Number('10.0000000001'), new Range(max: 10, maxMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '10.0000000001')
+            ->setParameter('{{ limit }}', '10')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithFloatLimitTooLow()
+    {
+        // PHP truncates the float to an integer when comparing it with a BcMath\Number,
+        // which would make 10.2 greater than 10.5
+        $this->validator->validate(new \BcMath\Number('10.2'), new Range(min: 10.5, minMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '10.2')
+            ->setParameter('{{ limit }}', '10.5')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testValidBcMathNumberWithFloatLimits()
+    {
+        $this->validator->validate(new \BcMath\Number('10.2'), new Range(min: 9.5, max: 10.5));
+
+        $this->assertNoViolation();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithInfiniteLimitDoesNotThrow()
+    {
+        // INF/NAN cannot be represented as a BcMath\Number; the limit is left
+        // untouched and the native comparison applies, without raising an error.
+        $this->validator->validate(new \BcMath\Number('10.2'), new Range(min: \NAN, max: \INF));
+
+        $this->assertNoViolation();
     }
 
     public static function getTenthToTwentiethMarch2014(): array
@@ -908,6 +1014,42 @@ class RangeValidatorTest extends ConstraintValidatorTestCase
         }
 
         return $value->format('Y-m-d H:i:s');
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithSmallFloatLimitTooLow()
+    {
+        $this->validator->validate(new \BcMath\Number('0.00000005'), new Range(min: 0.0000001, minMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '0.00000005')
+            ->setParameter('{{ limit }}', '0.0000001')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithLargeFloatLimitTooHigh()
+    {
+        $this->validator->validate(new \BcMath\Number('100000000000000000001'), new Range(max: 1.0E+20, maxMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '100000000000000000001')
+            ->setParameter('{{ limit }}', '100000000000000000000')
+            ->setCode(Range::TOO_HIGH_ERROR)
+            ->assertRaised();
+    }
+
+    #[RequiresPhpExtension('bcmath')]
+    public function testBcMathNumberWithExponentNotationStringLimitTooLow()
+    {
+        $this->validator->validate(new \BcMath\Number('0.00000005'), new Range(min: '1.0E-7', minMessage: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', '0.00000005')
+            ->setParameter('{{ limit }}', '0.0000001')
+            ->setCode(Range::TOO_LOW_ERROR)
+            ->assertRaised();
     }
 }
 

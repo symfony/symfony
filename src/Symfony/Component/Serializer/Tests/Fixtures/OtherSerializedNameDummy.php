@@ -22,6 +22,9 @@ class OtherSerializedNameDummy
     #[Groups(['a'])]
     private $buz;
 
+    #[Groups(['a']), SerializedName('quux')]
+    public $qux;
+
     public function setBuz($buz)
     {
         $this->buz = $buz;

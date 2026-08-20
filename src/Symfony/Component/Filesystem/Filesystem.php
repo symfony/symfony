@@ -560,11 +560,7 @@ class Filesystem
 
         // Iterate in destination folder to remove obsolete entries
         if ($this->exists($targetDir) && isset($options['delete']) && $options['delete']) {
-            $deleteIterator = $iterator;
-            if (null === $deleteIterator) {
-                $flags = \FilesystemIterator::SKIP_DOTS;
-                $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, $flags), \RecursiveIteratorIterator::CHILD_FIRST);
-            }
+            $deleteIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
             $targetDirLen = \strlen($targetDir);
             foreach ($deleteIterator as $file) {
                 $origin = $originDir.substr($file->getPathname(), $targetDirLen);

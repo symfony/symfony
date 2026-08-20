@@ -158,6 +158,26 @@ class PeriodicalTriggerTest extends TestCase
         ];
     }
 
+    public function testFrozenIntervalThrows()
+    {
+        $trigger = new PeriodicalTrigger('Monday', '2023-03-20 13:45', '2023-06-19');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The interval of the "every Monday" trigger does not move the run date forward.');
+
+        $trigger->getNextRunDate(new \DateTimeImmutable('2023-03-20 13:45'));
+    }
+
+    public function testBackwardsIntervalThrows()
+    {
+        $trigger = new PeriodicalTrigger('last sunday', '2023-03-20 13:45', '2023-06-19');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The interval of the "every last sunday" trigger does not move the run date forward.');
+
+        $trigger->getNextRunDate(new \DateTimeImmutable('2023-03-20 13:45'));
+    }
+
     /**
      * @dataProvider providerGetNextRunDateAgain
      */

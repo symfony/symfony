@@ -110,7 +110,12 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
         $this->period ??= new \DatePeriod($this->from, $this->interval, $this->until);
         $iterator = $this->period->getIterator();
+        $previous = null;
         while ($run >= $next = $iterator->current()) {
+            if (null !== $previous && $next <= $previous) {
+                throw new InvalidArgumentException(\sprintf('The interval of the "%s" trigger does not move the run date forward.', $this->description));
+            }
+            $previous = $next;
             $iterator->next();
             if (!$iterator->valid()) {
                 return null;

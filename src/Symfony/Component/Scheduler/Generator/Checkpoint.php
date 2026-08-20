@@ -100,7 +100,10 @@ final class Checkpoint implements CheckpointInterface
         if (!$nextTime) {
             $this->lock->release();
         } elseif ($remaining = $this->lock->getRemainingLifetime()) {
-            $this->lock->refresh((float) $nextTime->format('U.u') - (float) $now->format('U.u') + $remaining);
+            // the lock might have expired during a long run; stores reject negative TTLs and some reject TTLs below one second
+            if (1 <= $ttl = (float) $nextTime->format('U.u') - (float) $now->format('U.u') + $remaining) {
+                $this->lock->refresh($ttl);
+            }
         }
     }
 }

@@ -1,0 +1,97 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T07:08:48Z
+
+What changed while preparing this batch, beyond stacking the commits.
+
+Four pull requests conflicted with another one in the set, every time in the same way: two of them
+appended a test method at the same place in a shared test file (`MarkdownTest`, `InputTest`,
+`ScreenBufferTest`, `ProgressBarTest`). Both sides were kept. The production files merged cleanly,
+because the paired pull requests touched different methods.
+
+The last commit is mine and fixes three findings from reviewing the result:
+
+* `ScreenBuffer::putChar()`: the gap fill added with the erase fix scanned every column left of the
+  cursor on each call, so writing a 200x50 screen went from about 1.5s to about 9s. A row whose cell
+  count equals the cursor column has no holes, so the scan now runs only once the two disagree, which is
+  the erased-row case the fill exists for. Output is identical to the unguarded version across 1152
+  cases covering three erase kinds, twelve erase columns, sixteen write columns and both plain and
+  styled text, on the plain, styled and HTML paths. It still differs from unpatched 8.1 in 140 of those
+  cases, so the original fix is intact.
+* `InputWidget` and `EditorWidget`: the unconditional empty-chunk return added by #65402 makes both
+  earlier empty-chunk checks around the paste handling dead. Folded, verified behavior-preserving over
+  21 chunk sequences covering paste-only chunks, split pastes, prefix and suffix bytes, empty chunks
+  with and without a paste in flight, and plain keystrokes.
+* `TickScheduler`: `%f` renders a tiny value as `-0.000000`, hiding it on the guard meant to catch
+  values indistinguishable from zero. It now uses the same form as the sibling guards #65413 corrected.
+
+`ScheduledTickTrait` has the same `%f` defect on a float, but all four callers pass values already
+validated as positive, so the branch is unreachable and it was left alone.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T07:13:59Z
+
+One more pass over the batch with a narrower question: which commits change behavior someone could
+depend on, beyond removing a defect. Six do. I checked what consumes each one inside the component and
+none of them relies on the old behavior, but they are the commits to read twice before merging, so here
+they are with measurements.
+
+**#65406, `TickScheduler`: the delivered rate changes.** Rescheduling from the poll time meant every
+late poll stretched the period for good. Anchoring to the schedule changes how often callbacks fire:
+a 100ms interval polled every 60ms delivers 83 calls in 10s on 8.1 and 99 on this branch. Code that
+counts invocations, or that was tuned against the slower effective rate, sees the difference.
+`ScheduledTickTrait` drives widget animations from it and only redraws, so nothing in the component
+cares, but the class is public.
+
+**#65413, `FixedStepAccumulator`: the meaning of `maxStepsPerUpdate` changes.** It was a rate limiter
+over a preserved backlog; it is now a cap that discards what it rejects. After a 2s stall at 10 steps/s
+with a cap of 5, both versions return 5 steps at the stall, but the following second yields 24 steps on
+8.1 (the backlog paying out) and 9 on this branch. Total steps over time is no longer conserved. For
+animations that is the point; a consumer using it to pace real work would now lose work. `LoaderWidget`
+and `ProgressBarWidget` animations are the only consumers here.
+
+**#65410, `Compositor`: an exception becomes an empty result.** A base layer with no lines made
+`CellBuffer` throw; `composite()` now returns `[]`, and whatever the upper layers contained is silently
+gone. Defensible because the first layer is documented as defining the canvas, and nothing in the
+component calls `composite()` today, but it is an error signal removed from a public method.
+
+**#65411, `ScreenBufferHtmlRenderer`: an exception becomes a skip.** An out-of-range 38/48/58 color
+parameter made the whole conversion throw; it now drops that color and keeps the rest of the sequence. Right for replayed terminal
+output, which is untrusted by nature, but anyone using the exception to validate input loses it.
+
+**#65399, `EditorDocument`: undo granularity.** A multi-line paste was one undo step per line and is now
+a single step. This matches what a user means by "undo the paste", and it is what the commit is for, but
+it is a user-visible change in editing behavior, not a repaired computation.
+
+**#65414, `SettingsListWidget`: cycling forward from a value the list does not offer now lands on the
+first value instead of the second.** The old code read the missed lookup as index 0 and stepped from
+there. The new behavior matches what activating the same item does, which is the argument for it.
+
+The remaining thirteen commits repair computations whose results were plainly wrong (width arithmetic,
+byte and column confusion, missing guards) and change nothing anyone could sensibly depend on.
+
+All of this is on an `@experimental` component, so none of it is a BC promise. My conclusion is that all
+six are correct calls; this comment exists so the decision is made knowingly rather than by merge.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T08:07:36Z
+
+Folded #65417 in: three more editor fixes, one commit each, authorship kept.
+
+All three were verified the same way as the first batch. Each claim in that pull request reproduces on
+unpatched 8.1: the scroll indicator renders a 13-column row in a 5-column pane, arrowing down onto a
+line of wide characters and typing produces a document that is no longer UTF-8, and a single wrapped
+line renders 20 content rows against a budget of 5. Seven of the eight added tests fail on base with the
+expected assertion; the eighth is a control. Edge probes on top: one-column frames stay valid UTF-8, a
+cursor snapped into a combining sequence lands on the grapheme start, and an invalid line degrades to
+the old clamp.
+
+Its fourth commit, a rename that #65399 here already carries, cherry-picks empty and was dropped. The
+one conflict was both batches adding tests at the same anchor in `EditorRendererTest`; both sides kept.
+
+One latent gap, pre-existing rather than introduced: `setCursorCol()` snaps against the current line, so
+calling it before `setCursorLine()` snaps against the wrong line. Both call sites in the component use
+the safe order, and the unsafe order corrupts on unpatched 8.1 as well. Worth closing the day the
+document grows another caller.

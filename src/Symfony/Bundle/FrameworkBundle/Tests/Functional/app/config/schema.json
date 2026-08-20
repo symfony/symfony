@@ -3532,6 +3532,47 @@
                                             ]
                                         }
                                     },
+                                    "tracking": {
+                                        "$ref": "#/$defs/types/object_null",
+                                        "properties": {
+                                            "opens": {
+                                                "anyOf": [
+                                                    {
+                                                        "enum": [
+                                                            true,
+                                                            false,
+                                                            null
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/types/param"
+                                                    }
+                                                ],
+                                                "default": null
+                                            },
+                                            "clicks": {
+                                                "anyOf": [
+                                                    {
+                                                        "enum": [
+                                                            true,
+                                                            false,
+                                                            null
+                                                        ]
+                                                    },
+                                                    {
+                                                        "$ref": "#/$defs/types/param"
+                                                    }
+                                                ],
+                                                "default": null
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "default": {
+                                            "opens": null,
+                                            "clicks": null
+                                        },
+                                        "description": "Default open/click tracking for every message that does not carry an explicit \"X-Track\" header; null keeps each provider's default. An \"X-Track\" entry in the \"headers\" option wins over this one."
+                                    },
                                     "dkim_signer": {
                                         "anyOf": [
                                             {
@@ -3881,6 +3922,10 @@
                             "dsn": null,
                             "transports": [],
                             "headers": [],
+                            "tracking": {
+                                "opens": null,
+                                "clicks": null
+                            },
                             "dkim_signer": {
                                 "enabled": false,
                                 "key": "",
@@ -4057,6 +4102,33 @@
                                         "$ref": "#/$defs/types/boolean",
                                         "default": false
                                     },
+                                    "builder": {
+                                        "$ref": "#/$defs/types/object_null",
+                                        "properties": {
+                                            "lock_factory": {
+                                                "$ref": "#/$defs/types/scalar",
+                                                "default": "auto",
+                                                "description": "The service ID of the lock factory to use with the RateLimiterBuilder."
+                                            },
+                                            "cache_pool": {
+                                                "$ref": "#/$defs/types/scalar",
+                                                "default": "cache.rate_limiter",
+                                                "description": "The cache pool to use with RateLimiterBuilder."
+                                            },
+                                            "storage_service": {
+                                                "$ref": "#/$defs/types/scalar",
+                                                "default": null,
+                                                "description": "The service ID of a custom storage implementation, this precedes any configured \"cache_pool\"."
+                                            }
+                                        },
+                                        "additionalProperties": false,
+                                        "default": {
+                                            "lock_factory": "auto",
+                                            "cache_pool": "cache.rate_limiter",
+                                            "storage_service": null
+                                        },
+                                        "description": "Configuration for the RateLimiterBuilder service."
+                                    },
                                     "limiters": {
                                         "$ref": "#/$defs/types/object_null",
                                         "additionalProperties": {
@@ -4157,6 +4229,11 @@
                         ],
                         "default": {
                             "enabled": false,
+                            "builder": {
+                                "lock_factory": "auto",
+                                "cache_pool": "cache.rate_limiter",
+                                "storage_service": null
+                            },
                             "limiters": []
                         },
                         "description": "Rate limiter configuration"

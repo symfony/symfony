@@ -112,10 +112,36 @@ class ParserTest extends TestCase
             - !text |
               first line
             YAML;
-        // @todo Fix the parser, eliminate this exception.
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 2 (near "!text |").');
-        $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        $data = $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS);
+        $this->assertSameData([new TaggedValue('text', 'first line')], $data);
+    }
+
+    public function testTaggedBlockScalarsAsListItems()
+    {
+        $yml = <<<'YAML'
+            - !text |
+              first line
+              second line
+            - !text >-
+              folded
+              text
+            - !!binary |
+              SGVsbG8=
+            - plain
+            YAML;
+        $expected = [new TaggedValue('text', "first line\nsecond line\n"), new TaggedValue('text', 'folded text'), 'Hello', 'plain'];
+        $this->assertSameData($expected, $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS));
+    }
+
+    public function testTaggedBlockScalarInNestedList()
+    {
+        $yml = <<<'YAML'
+            foo:
+              - !text |
+                a
+                b
+            YAML;
+        $this->assertSameData(['foo' => [new TaggedValue('text', "a\nb")]], $this->parser->parse($yml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     /**

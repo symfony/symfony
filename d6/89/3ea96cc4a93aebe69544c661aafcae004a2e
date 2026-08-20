@@ -1,0 +1,113 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-05T15:53:39Z
+
+Thanks for this. Some things to settle first.
+
+This is a feature, not a bug fix. `Range` currently rejects these types with `invalidMessage`, and the comparison constraints only ever applied PHP's operators to whatever was passed. Nothing here is a regression we introduced.
+
+The feature is not delivered for the case it targets: `Range(min: 10.5)` on `Number('10.2')` still reports no violation. Only int and numeric-string limits are converted, and those already compared correctly. Float limits, the only ones PHP gets wrong, fall through.
+
+It does introduce regressions. Dropping the `is_numeric` guard in `RangeValidator` turns `Range(max: INF)`, `Range(max: 1e30)` and `Range(min: 'abc')` into uncaught `TypeError`/`ValueError` instead of violations. And a `BcMath\Number` limit against a `GMP` value silently returns no violation, because `Number <=> GMP` gives 1 without erroring while the reverse throws.
+
+On the Form side, `input => 'bcmath'` does not keep precision: the view transformer still goes through `NumberFormatter`, so `0,12345678901234567890` comes back as `0.12345678901235`.
+
+I would also rather not take `GmpType` in core. GMP is niche, the type is small enough for an application to own, and in core it costs a theme block, layout tests, docs and a BC commitment.
+
+Note that no CI job installs `gmp` or `bcmath`, so none of the new tests ever run.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-08-05T16:02:48Z
+
+Using `bcmath` as input in `NumberType` also gets a -1 vote from me. this also loses precision, defeating the purpose of using `bcmath` (as already explained by me in the discussion on the issue btw).
+
+---------------------------------------------------------------------------
+
+by stof at 2026-08-05T16:04:08Z
+
+> * `ConstraintValidator::formatValue()` stringifies `GMP` values, which are castable to string but do not implement `\Stringable`.
+
+I would report this to PHP though. It is not consistent. Maybe they can fix it for the next PHP version.
+
+Edit: not sure actually. ext-gmp provides a way to turn a GMP object into a string representation, but it does not expose that through string casting (so there is no inconsistency regarding being castable to string without being `Stringable`)
+
+---------------------------------------------------------------------------
+
+by saifulferoz at 2026-08-06T04:31:43Z
+
+> Using `bcmath` as input in `NumberType` also gets a -1 vote from me. this also loses precision, defeating the purpose of using `bcmath` (as already explained by me in the discussion on the issue btw).
+
+Thanks — this was all correct, and I've reworked the PR to address it. It's now Validator-only.
+
+Feature, not a bug fix: agreed, retitled and reframed as a feature.
+
+Target case now delivered: you were right that only int/numeric-string limits were converted — exactly the ones that already worked — while float limits fell through. toNumber() now converts finite floats too, so Range(min: 10.5) on Number('10.2') reports a violation (was 0 + a precision-loss deprecation on every float compare). Same fix on the comparison side.
+
+Regressions removed: conversion now only happens for values BcMath\Number can represent, with a fallback to the original limit on ValueError:
+
+```php
+if (\is_int($limit) || \is_float($limit) && is_finite($limit) || \is_string($limit) && is_numeric($limit)) {
+    try {
+        return new \BcMath\Number((string) $limit);
+    } catch (\ValueError) {
+        return $limit;
+    }
+}
+```
+So Range(max: INF), Range(max: 1e30) and Range(min: 'abc') no longer throw. GMP is gone from the validators entirely, so the Number <=> GMP asymmetry is moot here.
+
+GmpType: dropped — agreed it's niche enough for an app to own and not worth the theme block / layout tests / docs / BC cost in core.
+
+Form side: dropped — you and stof are right that input => 'bcmath' still round-trips through NumberFormatter and loses precision.
+
+CI not running the tests: good catch — the extensions list has neither. The new tests use #[RequiresPhpExtension('bcmath')] (same as NumberNormalizerTest / JsonStreamer), so they skip rather than run. I can add bcmath to unit-tests.yml if you want them guaranteed to execute — say the word, in this PR or separately.
+
+One open question: Range(min: 'abc') on a Number now produces no violation (native Number < 'abc' is false), vs a float value where PHP's legacy string comparison yields one. I left it to native comparison rather than reproduce that quirk, but I think a ConstraintDefinitionException for a non-numeric limit against a Number would be cleaner — happy to switch.
+
+And if you feel the remaining Validator-only value is too thin to justify the surface, I'm happy to close this — no objection.
+
+---------------------------------------------------------------------------
+
+by saifulferoz at 2026-08-06T04:32:26Z
+
+> Using `bcmath` as input in `NumberType` also gets a -1 vote from me. this also loses precision, defeating the purpose of using `bcmath` (as already explained by me in the discussion on the issue btw).
+
+You're right, and this applies to the whole Form side, not just as you noted on the issue — input => 'bcmath' still goes through NumberFormatter, so 0,12345678901234567890 comes back as 0.12345678901235. I've dropped the Form changes entirely (the bcmath input and GmpType); the PR is now Validator-only.
+
+On the GMP Stringable inconsistency you mentioned — moot now, since GMP is out of this PR too.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-08-06T07:53:39Z
+
+Please update the PR description (and title) to reflect the new scope of the PR.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T10:58:20Z
+
+Thanks for the rework, and for dropping the Form side yourself, that was the right call.
+
+I pushed the last round on top of your branch, rebased on 8.2. What changed:
+
+**Exponent notation was silently comparing the wrong way.** `(string) 0.0000001` is `"1.0E-7"`, which `BcMath\Number` refuses, so the conversion fell back to the native comparison, and the native comparison truncates the float to an integer:
+
+```php
+$validator->validate(new \BcMath\Number('0.00000005'), new GreaterThanOrEqual(0.0000001));
+// no violation, and PHP reports "Implicit conversion from float 1.0E-7 to int loses precision"
+```
+
+Every float below roughly `1e-5` or above `1e15` is written in exponent notation by the string cast, at the default `precision`, and numeric strings such as `'1.0E-7'` hit the same path. The conversion now rewrites those to plain decimal first, so they convert like any other limit. Trailing zeros of the mantissa are trimmed, otherwise the message would read `0.00000010`.
+
+**The two conversions are now one helper.** `RangeValidator::toNumber()` and the inline block in `AbstractComparisonValidator` did the same thing, so both use an `@internal` trait. Five tests were added for the small float, large float and exponent string cases, in both validators.
+
+**Smaller things:** the changelog entry is one line, and two test comments described the native behavior as a coercion. It is a truncation to integer, which is why `Number('10.2') > 10.5` is true, so they now say that.
+
+The description is rewritten as documentation, including what stays out: `DivisibleBy`, the identity constraints and the Form side.
+
+---------------------------------------------------------------------------
+
+by saifulferoz at 2026-08-20T11:19:43Z
+
+Thanks a lot for the rework and the detailed writeup. The exponent-notation bug is a great catch — I hadn't considered that `(string)` cast flipping into `1.0E-7` and then silently falling back to the truncating native path. The `toPlainDecimalNotation()` rewrite (with the trailing-zero trim so messages stay clean) and folding both conversions into the `@internal` trait both read well to me. Happy with the direction, including keeping `DivisibleBy`, the identity constraints and the Form side out of scope. 👍

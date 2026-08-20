@@ -60,6 +60,7 @@ trait PriorityTaggedServiceTrait
 
             $defaultPriority = null;
             $defaultIndex = null;
+            $indexes = [];
             $definition = $container->getDefinition($serviceId);
             $class = $definition->getClass();
             $class = $container->getParameterBag()->resolveValue($class) ?: null;
@@ -104,6 +105,11 @@ trait PriorityTaggedServiceTrait
                 }
                 $decorated = $definition->getTag('container.decorator')[0]['id'] ?? null;
                 $index ??= $defaultIndex ?? $defaultIndex = $decorated ?? $serviceId;
+
+                if (isset($indexes[$index])) {
+                    continue;
+                }
+                $indexes[$index] = true;
 
                 $services[] = [$priority, ++$i, $index, $serviceId, $class];
             }

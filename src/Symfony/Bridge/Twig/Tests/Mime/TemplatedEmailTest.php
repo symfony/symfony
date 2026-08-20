@@ -111,7 +111,8 @@ class TemplatedEmailTest extends TestCase
                         }
                     ]
                 },
-                "body": null
+                "body": null,
+                "class": "Symfony\\\\Bridge\\\\Twig\\\\Mime\\\\TemplatedEmail"
             }
             EOF;
 

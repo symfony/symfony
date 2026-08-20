@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EntityExistsValidatorTest extends ConstraintValidatorTestCase
 {
-    protected ?ObjectManager $em;
+    protected ?ObjectManager $em = null;
     protected ManagerRegistry $registry;
 
     protected function setUp(): void
@@ -263,7 +263,7 @@ class EntityExistsValidatorTest extends ConstraintValidatorTestCase
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Object manager "missing" does not exist.');
 
-        $this->validate(1, new EntityExists(entityClass: SingleIntIdEntity::class, em: 'missing'));
+        $this->validator->validate(1, new EntityExists(entityClass: SingleIntIdEntity::class, em: 'missing'));
     }
 
     public function testThrowsWhenManagerForClassCannotBeResolved()
@@ -274,7 +274,7 @@ class EntityExistsValidatorTest extends ConstraintValidatorTestCase
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('Unable to find the object manager associated with an entity of class "Symfony\\Bridge\\Doctrine\\Tests\\Fixtures\\SingleIntIdEntity".');
 
-        $this->validate(1, new EntityExists(entityClass: SingleIntIdEntity::class));
+        $this->validator->validate(1, new EntityExists(entityClass: SingleIntIdEntity::class));
     }
 
     private function createRegistryMock(?ObjectManager $em, bool $managerForClassExists = true, bool $throwOnGetManager = false): ManagerRegistry

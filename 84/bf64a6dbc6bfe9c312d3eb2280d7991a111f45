@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-08-19T15:38:12Z
+
+Heads-up for reviewers: the Unit Tests (8.5/8.6) and minimal-exts failures are not related to this PR. They come from a twig/twig 4.x-dev regression introduced a few hours ago by twigphp/Twig#4871: the empty comment `{##}` used by the form themes (e.g. `bootstrap_3_horizontal_layout.html.twig`) is now lexed as a documentation comment opening, so every new CI run on 8.2 currently fails the same way. Fix proposed upstream in twigphp/Twig#4891.

@@ -23,6 +23,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderValue;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\MutatorPrefixesDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotAnAccessorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Php71Dummy;
@@ -871,5 +872,26 @@ class ReflectionExtractorTest extends TestCase
     public function testIsserUsedForBoolPropertyWithoutOtherTypeSource()
     {
         $this->assertEquals([new Type(Type::BUILTIN_TYPE_BOOL)], $this->extractor->getTypes(DummyWithHasser::class, 'enabled'));
+    }
+
+    public function testTypeAndWriteInfoUseTheSameMutator()
+    {
+        $setFirstExtractor = new ReflectionExtractor(['set', 'with']);
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_OBJECT, false, \stdClass::class)], $setFirstExtractor->getTypes(MutatorPrefixesDummy::class, 'prop'));
+        $this->assertSame('setProp', $setFirstExtractor->getWriteInfo(MutatorPrefixesDummy::class, 'prop')->getName());
+
+        $withFirstExtractor = new ReflectionExtractor(['with', 'set']);
+
+        $this->assertEquals([new Type(Type::BUILTIN_TYPE_STRING)], $withFirstExtractor->getTypes(MutatorPrefixesDummy::class, 'prop'));
+        $this->assertSame('withProp', $withFirstExtractor->getWriteInfo(MutatorPrefixesDummy::class, 'prop')->getName());
+    }
+
+    public function testSingularPropertyTypeComesFromTheAdder()
+    {
+        $expected = [new Type(Type::BUILTIN_TYPE_ARRAY, false, null, true, new Type(Type::BUILTIN_TYPE_INT), new Type(Type::BUILTIN_TYPE_OBJECT, false, \DateTime::class))];
+
+        $this->assertEquals($expected, $this->extractor->getTypes(MutatorPrefixesDummy::class, 'item'));
+        $this->assertSame('addItem', $this->extractor->getWriteInfo(MutatorPrefixesDummy::class, 'item')->getAdderInfo()->getName());
     }
 }

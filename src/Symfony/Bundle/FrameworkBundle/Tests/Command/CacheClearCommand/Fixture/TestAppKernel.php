@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -42,6 +43,8 @@ class TestAppKernel extends Kernel
         $container->register('logger', NullLogger::class);
         $container->register(DummyFileCacheWarmer::class)
             ->addTag('kernel.cache_warmer');
+        $container->register(TerminateListener::class)
+            ->addTag('kernel.event_listener', ['event' => ConsoleEvents::TERMINATE, 'method' => 'onConsoleTerminate']);
     }
 }
 
@@ -57,5 +60,15 @@ class DummyFileCacheWarmer implements CacheWarmerInterface
         file_put_contents($cacheDir.'/dummy.txt', 'Hello');
 
         return [];
+    }
+}
+
+class TerminateListener
+{
+    public static int $calls = 0;
+
+    public function onConsoleTerminate(): void
+    {
+        ++self::$calls;
     }
 }

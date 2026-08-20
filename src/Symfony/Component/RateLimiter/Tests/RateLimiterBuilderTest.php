@@ -73,7 +73,7 @@ class RateLimiterBuilderTest extends TestCase
     public static function anchorProvider()
     {
         yield 'string' => ['2024-01-01 00:00:00'];
-        yield 'DateTimeImmutable' => [new \DateTimeImmutable('2024-01-01 00:00:00')];
+        yield 'DateTimeImmutable' => [new \DateTimeImmutable('2024-01-01 00:00:00', new \DateTimeZone('UTC'))];
     }
 
     public function testLockIsCreatedPerKey()

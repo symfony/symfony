@@ -61,6 +61,31 @@ class CheckFactoryBuilderCircularReferencePassTest extends TestCase
         $container->compile();
     }
 
+    public function testThrowsWhenBuilderIsSharedWithAnotherConsumer()
+    {
+        // A second consumer keeps the builder out of the produced service: the
+        // factory stays a Reference and the builder is a shared service of its
+        // own. The dumper then shares the builder before running its setters, so
+        // the re-entrant call builds the product from an unconfigured builder.
+        $container = new ContainerBuilder();
+        $container->register('builder', 'stdClass')
+            ->addMethodCall('useExtension', [new Reference('extension')]);
+        $container->register('product', 'stdClass')
+            ->setFactory([new Reference('builder'), 'build'])
+            ->setPublic(true);
+        $container->register('builder_consumer', 'stdClass')
+            ->setPublic(true)
+            ->addArgument(new Reference('builder'));
+        $container->register('extension', 'stdClass')
+            ->setPublic(true)
+            ->addArgument(new Reference('product'));
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "product", path: "product -> builder -> extension -> product"');
+
+        $container->compile();
+    }
+
     public function testAllowsBuilderWithoutSetup()
     {
         // The factory builder has no method calls/properties/configurator, so the

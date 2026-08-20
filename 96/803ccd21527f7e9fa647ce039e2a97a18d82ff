@@ -1,0 +1,164 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-03-30T06:39:17Z
+
+![image](https://github.com/user-attachments/assets/bd7e773f-6752-46ea-8707-656384832752)
+
+Looks like your emailadress is not associated to your GitHub account
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-30T08:54:01Z
+
+Hey @OskarStark! 👋
+
+Thanks a lot for catching that! I really appreciate your vigilance - from my side, I couldn't see anything wrong, so I wouldn't have noticed without your heads up.
+
+I've fixed my git config and force-pushed the commit with the correct email now. Should be properly linked to my GitHub account.
+
+Thanks again for taking the time to point it out! 🙏
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-11T18:39:56Z
+
+Sorry for the long silence @dunglas, and thanks again for the review — just pushed an update.
+
+**Done:** `ndjson` is gone. You were right, it's line-delimited and therefore not valid JSON, so this encoder has no business claiming it. I added a `testDoesNotSupportNdJson()` guard so it doesn't quietly come back.
+
+I also noticed while rebasing that the CHANGELOG entry was sitting under `8.1`, which is already released — it's now under `8.2`, matching the target branch. (The Q/A table above still says 8.1; I'll fix that too.)
+
+**Still open — your main point,** and I'd rather have your call than guess, since it shapes the whole PR:
+
+> A better solution would be to allow passing a media type as format, and at least a basic media type parser to detect the `+json` suffix.
+
+Concretely, that would mean `supportsEncoding()`/`supportsDecoding()` accepting anything whose media type ends with the `+json` structured suffix (RFC 6839), e.g. `application/vnd.api+json` or `application/ld+json`, instead of matching a curated list.
+
+The wrinkle is that Symfony passes *short format aliases* around, not media types: `Request::getContentTypeFormat()` returns `jsonapi`, not `application/vnd.api+json` (that's exactly how #60701 surfaced, via `#[MapRequestPayload]`). So a suffix parser alone wouldn't catch the aliases that the framework actually hands to the encoder — we'd need to support both, or teach the encoder to resolve aliases to media types.
+
+Two options as I see them:
+
+1. **Suffix detection on media types**, and keep a small alias list for the short formats the framework emits (`jsonapi`, `problem`, `hal`) — belt and braces, but no infinite list.
+2. **Media types only** — cleaner, but then `#[MapRequestPayload]` with `application/vnd.api+json` still fails, because what reaches the encoder is the `jsonapi` alias. That would need a change further up the stack.
+
+Happy to implement either — which way would you like to go? 🙂
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-07-12T14:52:03Z
+
+We currently try to deal with the same issue un JsonStreamer: https://github.com/symfony/symfony/pull/64190.
+
+Maybe we can try something similar here?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-12T16:55:15Z
+
+Thanks @mtarld, that's exactly the nudge this PR needed. 🙏
+
+Reworked along the lines of #64190: the hardcoded list is gone. `JsonEncoder` still only knows `json` out of the box, and extra JSON-based formats are opted into through a reserved context key, `JsonEncoder::FORMAT_VARIANTS` (`json_format_variants`):
+
+```yaml
+framework:
+    serializer:
+        default_context:
+            json_format_variants: ['jsonapi', 'problem', 'hal']
+```
+
+No new config node needed — `SerializerPass` already binds `default_context` to every encoder.
+
+Two upsides over the curated list, @dunglas:
+- no infinite list of formats to maintain in core;
+- no shadowing: `serializer.encoder.json` is tagged before userland encoders, so a core `jsonapi`/`hal` claim would quietly win over a third-party encoder registered at the same priority. Opt-in leaves API Platform & co. in charge of their own formats.
+
+The trade-off: #60701 (`#[MapRequestPayload]` + `application/vnd.api+json`) now takes one config line instead of working out of the box. Happy to add a dedicated `framework.serializer.json_format_variants` node, or ship defaults, if you'd rather have it zero-config — the whitelist and I parted on good terms, I can always call it back. 😄
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-07-29T12:53:40Z
+
+Thanks for the fresh pair of eyes on this one, it was gathering dust while waiting for the design call. All the shape issues are fixed and pushed (squashed, rebased onto 8.2):
+
+* `hal` is gone from the CHANGELOG, the description and the tests: as you point out it is not a JSON-only format (`application/hal+xml` exists), so promoting it as the example was a trap. The option docblock now carries an explicit warning about non-JSON-only formats.
+* The `FORMAT_VARIANTS` docblock states it only works in the constructor, like `YamlEncoder::YAML_INDENTATION`, and a test pins that passing it at call time throws `UnsupportedFormatException`.
+* `$formatVariants` defaults to `[]`, so subclasses skipping `parent::__construct()` keep the base behaviour.
+* The option is validated up front: a non-array value or a non-string entry now throws a descriptive `InvalidArgumentException` instead of a raw `TypeError` or silence. Both tested.
+* The key is unset from the context before it reaches `JsonEncode`/`JsonDecode`, same as `YamlEncoder` does.
+* The weak test is replaced: the round-trip now goes through `Serializer::serialize()`/`decode()`, which consults `supportsEncoding()`, so it fails when the feature is reverted.
+
+On the design question for @dunglas, with the fact @nicolas-grekas surfaced: since 8.2, `Request::getFormat()` already resolves any `application/*+json` to `json` through `STRUCTURED_SUFFIX_FORMATS`. So the generic `+json` suffix parser you suggested effectively exists upstream in HttpFoundation, and what still reaches the encoder as a named format is exactly the finite set of aliases with explicit entries in `initializeFormats()` (`jsonapi`, `problem`, ...). That makes the opt-in alias list the missing half rather than a competing design: no infinite list, no parsing in the encoder, and the same approach would fit `XmlEncoder` for `hal+xml`/`atom+xml` as a follow-up. Does that work for you?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T13:18:58Z
+
+Thanks for the rework, all the shape points are addressed.
+
+On the design call, I would rather not add the option.
+
+#64190 as merged is a cache-partition key for the generated JsonStreamer code, not format aliasing, so it is not the precedent it looked like.
+
+More importantly, the encoder never sees the media type, only a format name, so configuring it with a per-app list puts the knowledge in the wrong place. The caller already has it: `RequestPayloadValueResolver::mapRequestPayload()` reads `$request->getContentTypeFormat()` and hands the result straight to the serializer. Normalising the format to its structured suffix there fixes #60701 with no new public option, nothing to misconfigure, and it covers `hal+xml` and `atom+xml` for `XmlEncoder` at the same time. It is also closer to the media type parsing @dunglas asked for in March than the opt-in list is.
+
+Two constraints I checked while looking:
+
+ * Normalise after the `acceptFormat` check, otherwise `acceptFormat: 'jsonapi'` stops matching.
+ * `Request::getFormat()` returns exact `initializeFormats()` entries before falling back to the suffix, so `application/vnd.api+json` yields `jsonapi` and only unregistered `+json` types yield `json`. Getting the suffix format in the resolver will likely need a small helper on `Request`.
+
+Would you take it that way?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-08-17T12:29:19Z
+
+Yes, taking it that way, thanks for laying it out so clearly. Pushed.
+
+The Serializer is untouched now. `mapRequestPayload()` normalizes the format to its structured syntax suffix right after the `acceptFormat` check, via a new `Request::getStructuredSuffixFormat()` helper (`getFormat()` now delegates its suffix handling to it, so the parsing lives in one place). Both constraints you listed are pinned by tests: `acceptFormat: 'jsonapi'` still matches, and the helper ignores registered aliases so `application/vnd.api+json` resolves to `json`.
+
+Nice side effect of your approach: `application/hal+xml` and unregistered `application/*+json` media types now work out of the box too. I added `symfony/http-foundation: <8.2` to the http-kernel conflicts for the low-deps job, and retitled the PR since JsonEncoder is no longer involved.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T16:05:11Z
+
+This is the right shape now, thanks for turning it around so quickly. I checked the risky part: `getFormat()` is unchanged in behaviour. 81 inputs, every `initializeFormats()` entry and all of their mime types plus the edge cases, with `$subtypeFallback` both ways, and `getMimeType()`/`getMimeTypes()` round-trips: identical output before and after. Both constraints hold at both layers.
+
+One blocker left. The normalisation is unconditional, so it also overrides formats the application's own serializer already handles. With an encoder registered for `jsonapi` and a `application/vnd.api+json` body:
+
+```
+base: decoded by the app encoder      price=1050
+PR:   bypassed, built-in JsonEncoder  price=50
+```
+
+Same with `Request::setFormat('acme', 'application/vnd.acme+json')` and an `acme` encoder. It is not only encoders: `Serializer::deserialize()` passes the format to `denormalize()` as well, so format-scoped normalizers stop being selected, which is exactly how API Platform's `jsonld` and `jsonapi` normalizers are wired.
+
+Guarding the line fixes it:
+
+```php
+if (!$this->serializer instanceof DecoderInterface || !$this->serializer->supportsDecoding($format)) {
+    // normalise to the structured suffix format
+}
+```
+
+With that, everything the PR adds still works and the two shadowing cases go back to the app encoder. Please add a test for it, none of the current rows cover an application-registered format.
+
+Smaller ones:
+
+- `composer.json`: `symfony/http-foundation` is the only sibling listed in both `require` and `conflict`. Use `"symfony/http-foundation": "^8.2"` in `require` and drop the conflict line; there are already four such entries on 8.2. It is also out of alphabetical order.
+- The description still documents the `JsonEncoder::FORMAT_VARIANTS` design. Worth rewriting around what the PR does now, including the media types that start working: `hal+xml`, `hal+json`, `atom+xml`, `ld+json`, `problem+json`. Note that `xhtml+xml` moves from `html` to `xml`, which is worth a line.
+- Unregistered `application/*+json` already worked before, `getFormat()` fell through to the suffix map, so that one is not new.
+- Please rebase, the PR is conflicting so CI has not run at all on the current head. The conflict is just both sides appending to the HttpFoundation changelog.
+
+@dunglas your changes-requested review is still formally blocking and it targets the JsonEncoder file, which is no longer in the diff.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-08-18T07:40:42Z
+
+All four points addressed and rebased:
+
+- the normalization is now guarded by `supportsDecoding()`, with a test where a `jsonapi` decoder registered on the serializer keeps winning over the built-in `JsonEncoder` (your price example, ×21 included);
+- `symfony/http-foundation` moved to `require: ^8.2` and the conflict line is gone;
+- the description is rewritten around the current design, including the media types that start working and the `xhtml+xml` note;
+- rebased on 8.2, the changelog conflict is resolved.

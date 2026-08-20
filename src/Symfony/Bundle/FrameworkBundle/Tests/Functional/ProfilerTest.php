@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\HttpKernel\EventListener\ProfilerListener;
 
 class ProfilerTest extends AbstractWebTestCase
 {
@@ -53,6 +54,33 @@ class ProfilerTest extends AbstractWebTestCase
 
         $client->request('GET', '/profiler');
         $this->assertNull($client->getProfile());
+    }
+
+    #[DataProvider('getConfigs')]
+    public function testProfilerExclusions($insulate)
+    {
+        if (8 > (new \ReflectionMethod(ProfilerListener::class, '__construct'))->getNumberOfParameters()) {
+            $this->markTestSkipped('This test requires symfony/http-kernel 8.2 or higher.');
+        }
+
+        $client = $this->createClient(['test_case' => 'ProfilerExclusions', 'root_config' => 'config.yml']);
+        if ($insulate) {
+            $client->insulate();
+        }
+
+        // a request whose path matches "excluded_paths" is not profiled and gets no debug token
+        $client->request('GET', '/session');
+        $this->assertNull($client->getProfile());
+        $this->assertFalse($client->getResponse()->headers->has('X-Debug-Token'));
+
+        // a response whose status code matches "excluded_http_codes" is not profiled either
+        $client->request('GET', '/not-found');
+        $this->assertSame(404, $client->getResponse()->getStatusCode());
+        $this->assertNull($client->getProfile());
+
+        // any other request is still profiled
+        $client->request('GET', '/profiler');
+        $this->assertIsObject($client->getProfile());
     }
 
     public static function getConfigs()

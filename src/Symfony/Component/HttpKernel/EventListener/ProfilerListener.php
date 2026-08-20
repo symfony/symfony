@@ -15,6 +15,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
@@ -37,10 +38,15 @@ class ProfilerListener implements EventSubscriberInterface
     private \SplObjectStorage $profiles;
     /** @var \SplObjectStorage<Request, Request|null> */
     private \SplObjectStorage $parents;
+    private ?string $excludedPathsPattern = null;
+    /** @var array<int, string|null> */
+    private array $excludedHttpCodePatterns = [];
 
     /**
-     * @param bool $onlyException    True if the profiler only collects data when an exception occurs, false otherwise
-     * @param bool $onlyMainRequests True if the profiler only collects data when the request is the main request, false otherwise
+     * @param bool                     $onlyException     True if the profiler only collects data when an exception occurs, false otherwise
+     * @param bool                     $onlyMainRequests  True if the profiler only collects data when the request is the main request, false otherwise
+     * @param list<string>             $excludedPaths     Regular expressions matched against the url-decoded path info of the requests that must not be profiled
+     * @param array<int, list<string>> $excludedHttpCodes Maps HTTP status codes to regular expressions restricting each exclusion to matching path infos; an empty list excludes every response having that status code
      */
     public function __construct(
         private Profiler $profiler,
@@ -49,9 +55,19 @@ class ProfilerListener implements EventSubscriberInterface
         private bool $onlyException = false,
         private bool $onlyMainRequests = false,
         private ?string $collectParameter = null,
+        array $excludedPaths = [],
+        array $excludedHttpCodes = [],
     ) {
         $this->profiles = new \SplObjectStorage();
         $this->parents = new \SplObjectStorage();
+
+        if ($excludedPaths) {
+            $this->excludedPathsPattern = self::compilePattern($excludedPaths, 'excludedPaths');
+        }
+
+        foreach ($excludedHttpCodes as $code => $paths) {
+            $this->excludedHttpCodePatterns[$code] = $paths ? self::compilePattern($paths, 'excludedHttpCodes') : null;
+        }
     }
 
     /**
@@ -80,12 +96,17 @@ class ProfilerListener implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        if (null !== $this->collectParameter && null !== $collectParameterValue = $request->attributes->get($this->collectParameter) ?? $request->query->get($this->collectParameter) ?? $request->request->get($this->collectParameter)) {
-            filter_var($collectParameterValue, \FILTER_VALIDATE_BOOL) ? $this->profiler->enable() : $this->profiler->disable();
-        }
 
         $exception = $this->exception;
         $this->exception = null;
+
+        if ($this->isExcluded($request, $event->getResponse())) {
+            return;
+        }
+
+        if (null !== $this->collectParameter && null !== $collectParameterValue = $request->attributes->get($this->collectParameter) ?? $request->query->get($this->collectParameter) ?? $request->request->get($this->collectParameter)) {
+            filter_var($collectParameterValue, \FILTER_VALIDATE_BOOL) ? $this->profiler->enable() : $this->profiler->disable();
+        }
 
         if (null !== $this->matcher && !$this->matcher->matches($request)) {
             return;
@@ -147,5 +168,40 @@ class ProfilerListener implements EventSubscriberInterface
             KernelEvents::EXCEPTION => ['onKernelException', 0],
             KernelEvents::TERMINATE => ['onKernelTerminate', -1024],
         ];
+    }
+
+    private function isExcluded(Request $request, Response $response): bool
+    {
+        if (null === $this->excludedPathsPattern && !$this->excludedHttpCodePatterns) {
+            return false;
+        }
+
+        $pathInfo = rawurldecode($request->getPathInfo());
+
+        if (null !== $this->excludedPathsPattern && preg_match($this->excludedPathsPattern, $pathInfo)) {
+            return true;
+        }
+
+        if (!\array_key_exists($code = $response->getStatusCode(), $this->excludedHttpCodePatterns)) {
+            return false;
+        }
+
+        $pattern = $this->excludedHttpCodePatterns[$code];
+
+        return null === $pattern || preg_match($pattern, $pathInfo);
+    }
+
+    /**
+     * @param list<string> $regexps
+     */
+    private static function compilePattern(array $regexps, string $argument): string
+    {
+        $pattern = '{('.implode('|', $regexps).')}';
+
+        if (false === @preg_match($pattern, '')) {
+            throw new \LogicException(\sprintf('Invalid regular expression in the "$%s" argument of "%s": "%s".', $argument, self::class, implode('", "', $regexps)));
+        }
+
+        return $pattern;
     }
 }

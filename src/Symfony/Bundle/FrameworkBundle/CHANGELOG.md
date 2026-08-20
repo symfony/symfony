@@ -30,6 +30,7 @@ CHANGELOG
  * Generate JSON schema for YAML configuration of bundles
  * Add support for rate limited transports
  * Register the security functions `is_granted()`, `is_authenticated()`, `is_fully_authenticated()` and `is_remember_me()` in the validator expression language
+ * Add `framework.profiler.excluded_paths` and `framework.profiler.excluded_http_codes` to skip profiling requests matching a path or answered with a given HTTP status code
 
 8.1
 ---

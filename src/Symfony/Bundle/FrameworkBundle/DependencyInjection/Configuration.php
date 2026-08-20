@@ -390,6 +390,59 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('collect_parameter')->defaultNull()->info('The name of the parameter to use to enable or disable collection on a per request basis.')->end()
                         ->booleanNode('only_exceptions')->defaultFalse()->end()
                         ->booleanNode('only_main_requests')->defaultFalse()->end()
+                        ->arrayNode('excluded_paths', 'excluded_path')
+                            ->info('Regular expressions matched against the url-decoded path info of the requests that must not be profiled. Patterns are case-sensitive and must not contain delimiters.')
+                            ->example(['^/\.well-known/', '^/favicon\.ico$'])
+                            ->acceptAndWrap(['string'])
+                            ->scalarPrototype()->cannotBeEmpty()->end()
+                            ->validate()
+                                ->ifTrue(static fn ($v) => $v && false === @preg_match('{('.implode('|', $v).')}', ''))
+                                ->thenInvalid('Invalid regular expression in the "excluded_paths" option: %s.')
+                            ->end()
+                        ->end()
+                        ->arrayNode('excluded_http_codes', 'excluded_http_code')
+                            ->info('Maps HTTP status codes whose responses must not be profiled to regular expressions restricting each exclusion to matching path infos.')
+                            ->example([404 => null, 400 => ['^/foo', '^/bar']])
+                            ->performNoDeepMerging()
+                            ->acceptAndWrap(['int', 'string'])
+                            ->beforeNormalization()
+                                ->ifArray()
+                                ->then(static function ($v) {
+                                    $map = [];
+                                    foreach ($v as $key => $val) {
+                                        if (\is_int($val) || \is_string($val) && is_numeric($val)) {
+                                            $map[$val] = [];
+                                        } elseif (null === $val || true === $val) {
+                                            $map[$key] = [];
+                                        } elseif (false !== $val) {
+                                            $map[$key] = $val;
+                                        }
+                                    }
+
+                                    return $map;
+                                })
+                            ->end()
+                            ->validate()
+                                ->always(static function ($v) {
+                                    foreach (array_keys($v) as $code) {
+                                        if (!\is_int($code) || 100 > $code || 599 < $code) {
+                                            throw new InvalidConfigurationException(\sprintf('The "excluded_http_codes" option only accepts HTTP status codes between 100 and 599, "%s" given.', $code));
+                                        }
+                                    }
+
+                                    return $v;
+                                })
+                            ->end()
+                            ->arrayPrototype()
+                                ->info('Regular expressions matched against the url-decoded path info that restrict the exclusion of this status code. When empty, every response having that status code is excluded.')
+                                ->acceptAndWrap(['string'])
+                                ->scalarPrototype()->cannotBeEmpty()->end()
+                                ->validate()
+                                    ->ifTrue(static fn ($v) => $v && false === @preg_match('{('.implode('|', $v).')}', ''))
+                                    ->thenInvalid('Invalid regular expression in the "excluded_http_codes" option: %s.')
+                                ->end()
+                            ->end()
+                        ->end()
                         ->scalarNode('dsn')->defaultValue('file:%kernel.cache_dir%/profiler')->end()
                         ->enumNode('collect_serializer_data')
                             ->values([true])

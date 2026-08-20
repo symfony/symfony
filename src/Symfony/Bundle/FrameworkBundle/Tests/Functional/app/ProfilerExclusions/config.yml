@@ -1,0 +1,9 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    profiler:
+        enabled: true
+        excluded_paths: ['^/session']
+        excluded_http_codes:
+            404: ~

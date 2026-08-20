@@ -574,6 +574,67 @@
                                         "$ref": "#/$defs/types/boolean",
                                         "default": false
                                     },
+                                    "excluded_paths": {
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "$ref": "#/$defs/types/scalar"
+                                                }
+                                            },
+                                            {
+                                                "type": [
+                                                    "string"
+                                                ]
+                                            }
+                                        ],
+                                        "description": "Regular expressions matched against the url-decoded path info of the requests that must not be profiled. Patterns are case-sensitive and must not contain delimiters.",
+                                        "examples": [
+                                            [
+                                                "^/\\.well-known/",
+                                                "^/favicon\\.ico$"
+                                            ]
+                                        ]
+                                    },
+                                    "excluded_http_codes": {
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/array_null",
+                                                "items": {
+                                                    "anyOf": [
+                                                        {
+                                                            "$ref": "#/$defs/types/array_null",
+                                                            "items": {
+                                                                "$ref": "#/$defs/types/scalar"
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": [
+                                                                "string"
+                                                            ]
+                                                        }
+                                                    ],
+                                                    "description": "Regular expressions matched against the url-decoded path info that restrict the exclusion of this status code. When empty, every response having that status code is excluded."
+                                                }
+                                            },
+                                            {
+                                                "type": [
+                                                    "integer",
+                                                    "string"
+                                                ]
+                                            }
+                                        ],
+                                        "description": "Maps HTTP status codes whose responses must not be profiled to regular expressions restricting each exclusion to matching path infos.",
+                                        "examples": [
+                                            {
+                                                "404": null,
+                                                "400": [
+                                                    "^/foo",
+                                                    "^/bar"
+                                                ]
+                                            }
+                                        ]
+                                    },
                                     "dsn": {
                                         "$ref": "#/$defs/types/scalar",
                                         "default": "file:%kernel.cache_dir%/profiler"
@@ -608,6 +669,8 @@
                             "collect_parameter": null,
                             "only_exceptions": false,
                             "only_main_requests": false,
+                            "excluded_paths": [],
+                            "excluded_http_codes": [],
                             "dsn": "file:%kernel.cache_dir%/profiler",
                             "collect_serializer_data": true
                         },
@@ -1365,6 +1428,12 @@
                                         "default": "%kernel.project_dir%/assets/vendor",
                                         "description": "The directory to store JavaScript vendors."
                                     },
+                                    "minimum_release_age": {
+                                        "$ref": "#/$defs/types/integer",
+                                        "minimum": 0,
+                                        "default": 0,
+                                        "description": "Minimum age in seconds a package version must have to be considered when checking for updates (0 disables the check). Enabling it makes update checks download the full npm metadata document, which is larger than the abbreviated one."
+                                    },
                                     "precompress": {
                                         "anyOf": [
                                             {
@@ -1466,6 +1535,7 @@
                             "importmap_script_attributes": [],
                             "importmap_integrity_algorithms": [],
                             "vendor_dir": "%kernel.project_dir%/assets/vendor",
+                            "minimum_release_age": 0,
                             "precompress": {
                                 "enabled": false,
                                 "formats": [],

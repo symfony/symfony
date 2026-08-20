@@ -292,6 +292,16 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
+    public function testRouteWithFirewallAsHostParameter()
+    {
+        $route = new Route('/admin', [], [], [], '{_firewall}.example.com');
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('cannot contain "_firewall" as a host parameter');
+
+        $route->compile();
+    }
+
     #[DataProvider('getVariableNamesStartingWithADigit')]
     public function testRouteWithVariableNameStartingWithADigit(string $name)
     {

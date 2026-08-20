@@ -164,9 +164,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
 
         if (null !== $this->scale) {
             $formatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, $this->scale);
-            $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         }
 
+        $formatter->setAttribute(\NumberFormatter::ROUNDING_MODE, $this->roundingMode);
         $formatter->setAttribute(\NumberFormatter::GROUPING_USED, $this->grouping);
 
         return $formatter;

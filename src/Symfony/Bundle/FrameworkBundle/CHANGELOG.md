@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `framework.mailer.tracking` option to set default open/click tracking for every outgoing message
  * Add the `doctrine.orm.entity` tag to auto-excluded `#[Entity]` and `#[MappedSuperclass]` classes to allow discovering them
  * Add the `cache.adapter.pdo_tag_aware` cache pool adapter
  * Register the `web_link.json_linkset_serializer`, `web_link.json_linkset_parser`, `web_link.link_template_header_serializer` and `web_link.link_template_header_parser` services

@@ -1,0 +1,6 @@
+framework:
+    mailer:
+        dsn: 'smtp://example.com'
+        tracking:
+            opens: false
+            clicks: false

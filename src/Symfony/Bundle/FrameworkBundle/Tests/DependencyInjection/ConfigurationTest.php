@@ -1265,6 +1265,10 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(Mailer::class),
                 'message_bus' => null,
                 'headers' => [],
+                'tracking' => [
+                    'opens' => null,
+                    'clicks' => null,
+                ],
                 'dkim_signer' => [
                     'enabled' => false,
                     'options' => [],

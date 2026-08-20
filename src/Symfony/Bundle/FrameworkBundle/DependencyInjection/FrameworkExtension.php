@@ -118,6 +118,7 @@ use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
 use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
 use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -3221,8 +3222,18 @@ class FrameworkExtension extends Extension
         $envelopeListener->setArgument(1, $config['envelope']['recipients'] ?? null);
         $envelopeListener->setArgument(2, $config['envelope']['allowed_recipients'] ?? []);
 
-        if ($config['headers']) {
+        $tracking = $config['tracking'];
+        $hasTracking = null !== $tracking['opens'] || null !== $tracking['clicks'];
+
+        if ($hasTracking && !class_exists(TrackingHeader::class)) {
+            throw new LogicException('Configuring "framework.mailer.tracking" requires symfony/mailer 8.2 or higher.');
+        }
+
+        if ($config['headers'] || $hasTracking) {
             $headers = new Definition(Headers::class);
+            if ($hasTracking && !isset(array_change_key_case($config['headers'])['x-track'])) {
+                $headers->addMethodCall('add', [new Definition(TrackingHeader::class, [$tracking['opens'], $tracking['clicks']])]);
+            }
             foreach ($config['headers'] as $name => $data) {
                 $value = $data['value'];
                 if (\in_array(strtolower($name), ['from', 'to', 'cc', 'bcc', 'reply-to'], true)) {

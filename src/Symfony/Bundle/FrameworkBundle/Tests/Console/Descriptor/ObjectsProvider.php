@@ -16,6 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Suit;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -242,6 +243,24 @@ class ObjectsProvider
         ];
     }
 
+    public static function getContainerBuildersWithTaggedItemPriorityTags()
+    {
+        $builder = new ContainerBuilder();
+        $builder->setDefinitions(self::getContainerDefinitionsWithTaggedItemPriorityTags());
+
+        return ['builder_tagged_item' => $builder];
+    }
+
+    public static function getContainerDefinitionsWithTaggedItemPriorityTags()
+    {
+        return [
+            'definition_no_priority' => (new Definition(TaggedItemWithPriorityClass::class))->setPublic(true)->addTag('tag1', ['attr1' => 'val1']),
+            'definition_attribute_priority' => (new Definition(TaggedItemWithPriorityClass::class))->setPublic(true)->setAutoconfigured(true)->addTag('tag1', ['attr1' => 'val1']),
+            'definition_tag_priority' => (new Definition('Full\\Qualified\\Class1'))->setPublic(true)->addTag('tag1', ['priority' => 20]),
+            'definition_method_priority' => (new Definition(TaggedItemWithPriorityMethodClass::class))->setPublic(true)->setAutoconfigured(true)->addTag('tag1')->addTag('tag1', ['priority' => 5]),
+        ];
+    }
+
     public static function getContainerAliases()
     {
         return [
@@ -342,4 +361,18 @@ class ClassWithDocCommentOnMultipleLines
  */
 class ClassWithDocCommentWithoutInitialSpace
 {
+}
+
+#[AsTaggedItem(priority: 30)]
+class TaggedItemWithPriorityClass
+{
+}
+
+#[AsTaggedItem(priority: 99)]
+class TaggedItemWithPriorityMethodClass
+{
+    public static function getDefaultPriority(): int
+    {
+        return 10;
+    }
 }

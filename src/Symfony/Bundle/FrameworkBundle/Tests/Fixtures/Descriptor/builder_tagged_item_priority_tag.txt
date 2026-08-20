@@ -1,0 +1,12 @@
+[33mSymfony Container Services Tagged with "tag1" Tag[39m
+[33m=================================================[39m
+
+ ------------------------------------------ ------- ---------- ------------------------------------------------------------------------------------------- 
+ [32m Service ID                               [39m [32m attr1 [39m [32m priority [39m [32m Class name                                                                                [39m 
+ ------------------------------------------ ------- ---------- ------------------------------------------------------------------------------------------- 
+  definition_attribute_priority              val1    30         Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\TaggedItemWithPriorityClass        
+  definition_tag_priority                            20         Full\Qualified\Class1                                                                      
+  definition_method_priority                         10         Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\TaggedItemWithPriorityMethodClass  
+   (same service as previous, another tag)           5                                                                                                     
+  definition_no_priority                     val1               Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\TaggedItemWithPriorityClass        
+ ------------------------------------------ ------- ---------- -------------------------------------------------------------------------------------------

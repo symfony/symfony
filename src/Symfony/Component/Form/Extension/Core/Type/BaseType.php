@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * Encapsulates common logic of {@link FormType} and {@link ButtonType}.
@@ -63,7 +64,10 @@ abstract class BaseType extends AbstractType
 
             $translationDomain ??= $view->parent->vars['translation_domain'];
 
-            $labelTranslationParameters = array_merge($view->parent->vars['label_translation_parameters'], $labelTranslationParameters);
+            if (!$options['label'] instanceof TranslatableInterface) {
+                $labelTranslationParameters = array_merge($view->parent->vars['label_translation_parameters'], $labelTranslationParameters);
+            }
+
             $attrTranslationParameters = array_merge($view->parent->vars['attr_translation_parameters'], $attrTranslationParameters);
 
             if (!$labelFormat) {

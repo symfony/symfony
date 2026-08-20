@@ -38,6 +38,19 @@ class AddressTest extends TestCase
         new Address('fab   pot@symfony.com');
     }
 
+    public function testConstructorWithUnquotedAtSignInLocalPart()
+    {
+        $this->expectException(RfcComplianceException::class);
+        $this->expectExceptionMessage('Email "em@il@example.test" does not comply with addr-spec of RFC 2822.');
+        new Address('em@il@example.test');
+    }
+
+    public function testConstructorWithQuotedAtSignInLocalPart()
+    {
+        $a = new Address('"em@il"@example.test');
+        $this->assertSame('"em@il"@example.test', $a->getAddress());
+    }
+
     /**
      * @dataProvider provideAddressesWithControlCharacters
      */

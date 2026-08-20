@@ -56,7 +56,7 @@ final class Address
             throw new InvalidArgumentException('Email address contains control characters.');
         }
 
-        if (!self::$validator->isValid($this->address, class_exists(MessageIDValidation::class) ? new MessageIDValidation() : new RFCValidation())) {
+        if (!self::isValidAddrSpec($this->address)) {
             throw new RfcComplianceException(sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
         }
     }
@@ -149,5 +149,20 @@ final class Address
         }
 
         return new self($matches['addrSpec'], trim($matches['displayName'], ' \'"'));
+    }
+
+    private static function isValidAddrSpec(string $address): bool
+    {
+        // the message id validation is needed as this class also holds the ids of the Message-ID,
+        // In-Reply-To and References headers, but it accepts an unquoted "@" in the local part
+        if (!self::$validator->isValid($address, class_exists(MessageIDValidation::class) ? new MessageIDValidation() : new RFCValidation())) {
+            return false;
+        }
+
+        if (substr_count($address, '@') < 2) {
+            return true;
+        }
+
+        return self::$validator->isValid(substr($address, 0, strrpos($address, '@')).'@example.com', new RFCValidation());
     }
 }

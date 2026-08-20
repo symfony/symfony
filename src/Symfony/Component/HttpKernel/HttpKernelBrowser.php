@@ -32,6 +32,8 @@ class HttpKernelBrowser extends AbstractBrowser
 {
     protected $kernel;
     private bool $catchExceptions = true;
+    private ?object $sentResponse = null;
+    private string $sentContent = '';
 
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)
@@ -63,6 +65,15 @@ class HttpKernelBrowser extends AbstractBrowser
     protected function doRequest(object $request)
     {
         $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
+
+        // the content must be sent before the kernel is terminated, as when serving a real request
+        ob_start();
+        try {
+            $response->sendContent();
+        } finally {
+            $this->sentResponse = $response;
+            $this->sentContent = ob_get_clean();
+        }
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($request, $response);
@@ -188,10 +199,16 @@ class HttpKernelBrowser extends AbstractBrowser
      */
     protected function filterResponse(object $response): DomResponse
     {
-        // this is needed to support StreamedResponse
-        ob_start();
-        $response->sendContent();
-        $content = ob_get_clean();
+        if ($response === $this->sentResponse) {
+            $content = $this->sentContent;
+            $this->sentResponse = null;
+            $this->sentContent = '';
+        } else {
+            // this is needed to support StreamedResponse
+            ob_start();
+            $response->sendContent();
+            $content = ob_get_clean();
+        }
 
         return new DomResponse($content, $response->getStatusCode(), $response->headers->all());
     }

@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -165,11 +166,18 @@ final class AhaSendApiTransport extends AbstractApiTransport
         }
 
         [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        $tracking = TrackingHeader::fromHeaders($email->getHeaders());
         if ($headers) {
             $payload['headers'] = $headers;
         }
         if ($tags) {
             $payload['tags'] = $tags;
+        }
+        if (null !== $tracking?->getOpens()) {
+            $payload['tracking']['open'] = $tracking->getOpens();
+        }
+        if (null !== $tracking?->getClicks()) {
+            $payload['tracking']['click'] = $tracking->getClicks();
         }
 
         if ($email->getAttachments()) {
@@ -201,10 +209,18 @@ final class AhaSendApiTransport extends AbstractApiTransport
         }
 
         [$headers, $tags] = $this->prepareHeaders($email->getHeaders());
+        $tracking = TrackingHeader::fromHeaders($email->getHeaders());
         if ($tags) {
             $tagsStr = implode(',', $tags);
             $email->getHeaders()->addTextHeader('AhaSend-Tags', $tagsStr);
             $headers['AhaSend-Tags'] = $tagsStr;
+        }
+        // the v1 API reads tracking settings from the message headers, not from a payload field
+        if (null !== $tracking?->getOpens() && !$email->getHeaders()->has('AhaSend-Track-Opens')) {
+            $headers['AhaSend-Track-Opens'] = $tracking->getOpens() ? 'true' : 'false';
+        }
+        if (null !== $tracking?->getClicks() && !$email->getHeaders()->has('AhaSend-Track-Clicks')) {
+            $headers['AhaSend-Track-Clicks'] = $tracking->getClicks() ? 'true' : 'false';
         }
         if ($headers) {
             $payload['content']['headers'] = $headers;
@@ -233,6 +249,10 @@ final class AhaSendApiTransport extends AbstractApiTransport
 
             if ($header instanceof TagHeader) {
                 $tags[] = $header->getValue();
+                continue;
+            }
+
+            if (0 === strcasecmp($header->getName(), TrackingHeader::NAME)) {
                 continue;
             }
 

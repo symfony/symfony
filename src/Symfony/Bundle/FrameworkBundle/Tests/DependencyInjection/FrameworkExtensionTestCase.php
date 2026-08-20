@@ -83,6 +83,7 @@ use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Mailer\EventListener\InMemoryPgpPublicKeyRepository;
 use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -2784,6 +2785,38 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $l = $container->getDefinition('mailer.message_listener');
         $h = $l->getArgument(0);
         $this->assertCount(3, $h->getMethodCalls());
+    }
+
+    public function testMailerWithTracking()
+    {
+        if (!class_exists(TrackingHeader::class)) {
+            $this->markTestSkipped('This test requires symfony/mailer 8.2 or superior.');
+        }
+
+        $container = $this->createContainerFromFile('mailer_with_tracking');
+
+        $l = $container->getDefinition('mailer.message_listener');
+        $calls = $l->getArgument(0)->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertSame('add', $calls[0][0]);
+        $header = $calls[0][1][0];
+        $this->assertSame(TrackingHeader::class, $header->getClass());
+        $this->assertSame([false, false], $header->getArguments());
+    }
+
+    public function testMailerTrackingYieldsToAnExplicitTrackingHeader()
+    {
+        if (!class_exists(TrackingHeader::class)) {
+            $this->markTestSkipped('This test requires symfony/mailer 8.2 or superior.');
+        }
+
+        $container = $this->createContainerFromFile('mailer_with_tracking_and_header');
+
+        $l = $container->getDefinition('mailer.message_listener');
+        $calls = $l->getArgument(0)->getMethodCalls();
+        $this->assertCount(1, $calls);
+        $this->assertSame('addHeader', $calls[0][0]);
+        $this->assertSame(['X-Track', 'opens=true; clicks=default'], $calls[0][1]);
     }
 
     public function testMailerSmimeEncrypterWithCertificates()

@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -139,9 +140,23 @@ class MailjetApiTransport extends AbstractApiTransport
             $message['HTMLPart'] = $html;
         }
 
+        // resolve the generic header first, so a native x-mailjet-track* header always wins regardless of iteration order
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $message['TrackOpens'] = $tracking->getOpens() ? 'enabled' : 'disabled';
+            }
+            if (null !== $tracking->getClicks()) {
+                $message['TrackClicks'] = $tracking->getClicks() ? 'enabled' : 'disabled';
+            }
+        }
+
         foreach ($email->getHeaders()->all() as $headerName => $header) {
             if ($convertConf = self::HEADER_TO_MESSAGE[$headerName] ?? false) {
                 $message[$convertConf[0]] = $this->castCustomHeader($header->getBodyAsString(), $convertConf[1]);
+                continue;
+            }
+
+            if (0 === strcasecmp($headerName, TrackingHeader::NAME)) {
                 continue;
             }
 

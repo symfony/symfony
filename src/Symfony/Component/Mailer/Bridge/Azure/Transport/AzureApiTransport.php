@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -114,7 +115,7 @@ final class AzureApiTransport extends AbstractApiTransport
             ],
             'senderAddress' => $envelope->getSender()->getAddress(),
             'attachments' => $this->getMessageAttachments($email),
-            'userEngagementTrackingDisabled' => $this->disableTracking,
+            'userEngagementTrackingDisabled' => null !== ($track = $this->getTracking($email)) ? !$track : $this->disableTracking,
             'headers' => ($headers = $this->getMessageCustomHeaders($email)) ? $headers : null,
             'importance' => $this->getPriorityLevel($email->getPriority()),
         ];
@@ -245,7 +246,7 @@ final class AzureApiTransport extends AbstractApiTransport
     {
         $headers = [];
 
-        $headersToBypass = ['x-ms-client-request-id', 'operation-id', 'authorization', 'x-ms-content-sha256', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
+        $headersToBypass = ['x-ms-client-request-id', 'operation-id', 'authorization', 'x-ms-content-sha256', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to', 'x-track'];
 
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {
@@ -255,6 +256,25 @@ final class AzureApiTransport extends AbstractApiTransport
         }
 
         return $headers;
+    }
+
+    /**
+     * Azure only exposes a single combined tracking toggle, so an explicit false on either
+     * flag disables it and an explicit true on either flag enables it.
+     */
+    private function getTracking(Email $email): ?bool
+    {
+        $tracking = TrackingHeader::fromHeaders($email->getHeaders());
+
+        if (false === $tracking?->getOpens() || false === $tracking?->getClicks()) {
+            return false;
+        }
+
+        if (true === $tracking?->getOpens() || true === $tracking?->getClicks()) {
+            return true;
+        }
+
+        return null;
     }
 
     private function getPriorityLevel(string $priority): ?string

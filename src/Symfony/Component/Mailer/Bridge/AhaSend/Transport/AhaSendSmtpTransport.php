@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Message;
@@ -52,6 +53,17 @@ class AhaSendSmtpTransport extends EsmtpTransport
                 $tags[] = $header->getValue();
                 $headers->remove($name);
             }
+        }
+
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            // an explicit AhaSend-Track-* header wins over the generic one
+            if (null !== $tracking->getOpens() && !$headers->has('AhaSend-Track-Opens')) {
+                $headers->addTextHeader('AhaSend-Track-Opens', $tracking->getOpens() ? 'true' : 'false');
+            }
+            if (null !== $tracking->getClicks() && !$headers->has('AhaSend-Track-Clicks')) {
+                $headers->addTextHeader('AhaSend-Track-Clicks', $tracking->getClicks() ? 'true' : 'false');
+            }
+            $headers->remove(TrackingHeader::NAME);
         }
         if (!empty($tags)) {
             $headers->addTextHeader('AhaSend-Tags', implode(',', $tags));

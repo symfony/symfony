@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -160,5 +161,37 @@ class AzureApiTransportTest extends TestCase
         $this->expectExceptionMessage('Resource name must not end with a dot "."');
 
         new AzureApiTransport('KEY', 'ACS_RESOURCE_NAME.');
+    }
+
+    public function testTrackingHeaderOverridesDefaultTrackingAndIsNotForwarded()
+    {
+        $transport = new AzureApiTransport('KEY', 'ACS_RESOURCE_NAME', true);
+        $method = new \ReflectionMethod(AzureApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $enabled = new Email();
+        $enabled->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
+        $enabledPayload = $method->invoke($transport, $enabled, $envelope);
+        $this->assertFalse($enabledPayload['userEngagementTrackingDisabled']);
+        $this->assertNull($enabledPayload['headers']);
+
+        $disabled = new Email();
+        $disabled->getHeaders()->add(new TrackingHeader(opens: false, clicks: false));
+        $disabledPayload = $method->invoke($transport, $disabled, $envelope);
+        $this->assertTrue($disabledPayload['userEngagementTrackingDisabled']);
+        $this->assertNull($disabledPayload['headers']);
+    }
+
+    public function testTrackingHeaderDisablesCombinedFlagWhenEitherAspectIsFalse()
+    {
+        $transport = new AzureApiTransport('KEY', 'ACS_RESOURCE_NAME', false);
+        $method = new \ReflectionMethod(AzureApiTransport::class, 'getPayload');
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $email = new Email();
+        $email->getHeaders()->add(new TrackingHeader(opens: true, clicks: false));
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertTrue($payload['userEngagementTrackingDisabled']);
     }
 }

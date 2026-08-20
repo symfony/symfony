@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -134,6 +135,16 @@ final class InfobipApiTransport extends AbstractApiTransport
         }
 
         $this->attachmentsFormData($fields, $email);
+
+        // resolve the generic header first, so a native X-Infobip-Track* header always wins regardless of iteration order
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $fields['trackOpens'] = $tracking->getOpens() ? 'true' : 'false';
+            }
+            if (null !== $tracking->getClicks()) {
+                $fields['trackClicks'] = $tracking->getClicks() ? 'true' : 'false';
+            }
+        }
 
         foreach ($email->getHeaders()->all() as $header) {
             if ($convertConf = self::HEADER_TO_MESSAGE[$header->getName()] ?? false) {

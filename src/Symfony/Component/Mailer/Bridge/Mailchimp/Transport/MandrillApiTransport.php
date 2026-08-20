@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Email;
@@ -128,8 +129,17 @@ class MandrillApiTransport extends AbstractApiTransport
             }
         }
 
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $payload['message']['track_opens'] = $tracking->getOpens();
+            }
+            if (null !== $tracking->getClicks()) {
+                $payload['message']['track_clicks'] = $tracking->getClicks();
+            }
+        }
+
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount', 'x-mc-returnpathdomain'], true)) {
+            if (\in_array($name, ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'x-mc-subaccount', 'x-mc-returnpathdomain', 'x-track'], true)) {
                 continue;
             }
 

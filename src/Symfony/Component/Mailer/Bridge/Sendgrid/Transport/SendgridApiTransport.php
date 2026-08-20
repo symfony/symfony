@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
@@ -120,10 +121,19 @@ class SendgridApiTransport extends AbstractApiTransport
         $customArguments = [];
         $categories = [];
 
+        if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
+            if (null !== $tracking->getOpens()) {
+                $payload['tracking_settings']['open_tracking'] = ['enable' => $tracking->getOpens()];
+            }
+            if (null !== $tracking->getClicks()) {
+                $payload['tracking_settings']['click_tracking'] = ['enable' => $tracking->getClicks(), 'enable_text' => $tracking->getClicks()];
+            }
+        }
+
         foreach ($email->getHeaders()->all() as $name => $header) {
             // these headers can't be overwritten according to Sendgrid docs
             // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
-            if (\in_array($name, ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'], true)) {
+            if (\in_array($name, ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to', 'x-track'], true)) {
                 continue;
             }
 

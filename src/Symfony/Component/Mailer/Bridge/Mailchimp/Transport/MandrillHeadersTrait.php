@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailchimp\Transport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
@@ -47,6 +48,25 @@ trait MandrillHeadersTrait
                 $metadata[$header->getKey()] = $header->getValue();
                 $headers->remove($name);
             }
+        }
+
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            // an explicit X-MC-Track header wins over the generic one, and a header with
+            // both flags null asks for the account defaults, which need no header at all
+            if ((null !== $tracking->getOpens() || null !== $tracking->getClicks()) && !$headers->has('X-MC-Track')) {
+                $enabledAspects = [];
+                if (true === $tracking->getOpens()) {
+                    $enabledAspects[] = 'opens';
+                }
+                if (true === $tracking->getClicks()) {
+                    $enabledAspects[] = 'clicks';
+                }
+
+                // X-MC-Track only lists the aspects to enable; Mandrill disables tracking for any
+                // other value, so "none" is used deliberately when no aspect is explicitly enabled.
+                $headers->addTextHeader('X-MC-Track', $enabledAspects ? implode(',', $enabledAspects) : 'none');
+            }
+            $headers->remove(TrackingHeader::NAME);
         }
 
         if ($tags) {

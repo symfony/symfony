@@ -15,6 +15,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Header\SuppressionGroupHeader;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Message;
@@ -53,31 +54,39 @@ class SendgridSmtpTransport extends EsmtpTransport
     {
         $headers = $message->getHeaders();
 
+        // an explicit X-SMTPAPI header wins over the generated one
         if ($headers->has('X-SMTPAPI')) {
             return;
         }
 
+        $payload = [];
         foreach ($headers->all() as $header) {
             if ($header instanceof SuppressionGroupHeader) {
-                break;
+                $payload['asm'] = [
+                    'group_id' => $header->getGroupId(),
+                ];
+
+                if ($groupsToDisplay = $header->getGroupsToDisplay()) {
+                    $payload['asm']['groups_to_display'] = $groupsToDisplay;
+                }
             }
         }
 
-        if (!$header instanceof SuppressionGroupHeader) {
-            return;
+        if ($tracking = TrackingHeader::fromHeaders($headers)) {
+            if (null !== $tracking->getOpens()) {
+                $payload['filters']['opentrack']['settings']['enable'] = (int) $tracking->getOpens();
+            }
+            if (null !== $tracking->getClicks()) {
+                $payload['filters']['clicktrack']['settings'] = ['enable' => (int) $tracking->getClicks(), 'enable_text' => $tracking->getClicks()];
+            }
         }
 
-        $payload = [
-            'asm' => [
-                'group_id' => $header->getGroupId(),
-            ],
-        ];
-
-        if ($groupsToDisplay = $header->getGroupsToDisplay()) {
-            $payload['asm']['groups_to_display'] = $groupsToDisplay;
+        if (!$payload) {
+            return;
         }
 
         $headers->addTextHeader('X-SMTPAPI', json_encode($payload, \JSON_UNESCAPED_SLASHES));
         $headers->remove('X-Sendgrid-SuppressionGroup');
+        $headers->remove('X-Track');
     }
 }

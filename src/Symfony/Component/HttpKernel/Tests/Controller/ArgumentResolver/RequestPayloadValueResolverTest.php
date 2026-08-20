@@ -37,6 +37,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Attribute\Buz;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\BasicTypesController;
 use Symfony\Component\HttpKernel\Tests\Fixtures\Controller\ControllerAttributesController;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\Encoder\DecoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
@@ -957,6 +958,92 @@ class RequestPayloadValueResolverTest extends TestCase
             'content' => '{"@context": "https://schema.org", "@type": "FakeType", "price": 50}',
             'expectedExceptionMessage' => 'Unsupported format, expects "json", "xml", but "jsonld" given.',
         ];
+    }
+
+    #[DataProvider('provideStructuredSuffixContext')]
+    public function testPayloadWithStructuredSuffixMediaTypeUsesSuffixFormat(mixed $acceptFormat, string $contentType, string $content)
+    {
+        $encoders = ['json' => new JsonEncoder(), 'xml' => new XmlEncoder()];
+        $serializer = new Serializer([new ObjectNormalizer()], $encoders);
+        $validator = (new ValidatorBuilder())->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => $contentType], $content);
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(acceptFormat: $acceptFormat),
+        ]);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([new RequestPayload(50)], $event->getArguments());
+    }
+
+    public static function provideStructuredSuffixContext(): iterable
+    {
+        yield 'registered +json alias uses the json encoder' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/vnd.api+json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'unregistered +json media type uses the json encoder' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/vnd.acme.error+json',
+            'content' => '{"price": 50}',
+        ];
+
+        yield 'registered +xml alias uses the xml encoder' => [
+            'acceptFormat' => null,
+            'contentType' => 'application/hal+xml',
+            'content' => '<?xml version="1.0"?><request><price>50</price></request>',
+        ];
+
+        yield 'acceptFormat matches the alias before normalization' => [
+            'acceptFormat' => 'jsonapi',
+            'contentType' => 'application/vnd.api+json',
+            'content' => '{"price": 50}',
+        ];
+    }
+
+    public function testPayloadFormatSupportedByTheSerializerIsNotNormalized()
+    {
+        $jsonapiDecoder = new class implements DecoderInterface {
+            public function decode(string $data, string $format, array $context = []): mixed
+            {
+                $decoded = json_decode($data, true);
+                $decoded['price'] *= 21;
+
+                return $decoded;
+            }
+
+            public function supportsDecoding(string $format): bool
+            {
+                return 'jsonapi' === $format;
+            }
+        };
+
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder(), 'jsonapi' => $jsonapiDecoder]);
+        $validator = (new ValidatorBuilder())->getValidator();
+        $resolver = new RequestPayloadValueResolver($serializer, $validator);
+
+        $request = Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/vnd.api+json'], '{"price": 50}');
+
+        $argument = new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
+            MapRequestPayload::class => new MapRequestPayload(),
+        ]);
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $arguments = $resolver->resolve($request, $argument);
+        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $resolver->onKernelControllerArguments($event);
+
+        $this->assertEquals([new RequestPayload(1050)], $event->getArguments());
     }
 
     #[DataProvider('provideValidationGroupsOnManyTypes')]

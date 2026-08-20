@@ -13,6 +13,7 @@ CHANGELOG
  * Deprecate the `Request::$trustedHosts` property, it is never populated anymore
  * Report the actual header value when the `ResponseHeaderSame` constraint fails
  * Add `ClearableSessionHandlerInterface` for clearing all session data
+ * Add `Request::getStructuredSuffixFormat()` to resolve a mime type to the format of its structured syntax suffix, e.g. `application/vnd.api+json` to `json`
 
 8.1
 ---

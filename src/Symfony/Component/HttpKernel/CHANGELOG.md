@@ -15,6 +15,7 @@ CHANGELOG
  * Deprecate the `HIncludeFragmentRenderer` class, use the `EsiFragmentRenderer` or `InlineFragmentRenderer`, or Symfony UX Turbo, instead
  * Allow union and intersection type-hints when autowiring controller arguments
  * Add the `$excludedPaths` and `$excludedHttpCodes` arguments to `ProfilerListener::__construct()` to skip profiling some requests
+ * Make `#[MapRequestPayload]` deserialize any media type carrying a structured syntax suffix with the encoder of the suffix format, e.g. `application/vnd.api+json` with the `json` encoder
 
 8.1
 ---

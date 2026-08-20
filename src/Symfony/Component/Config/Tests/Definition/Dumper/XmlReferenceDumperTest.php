@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Tests\Definition\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Dumper\XmlReferenceDumper;
 use Symfony\Component\Config\Tests\Fixtures\Configuration\ExampleConfiguration;
 
@@ -31,6 +32,36 @@ class XmlReferenceDumperTest extends TestCase
 
         $dumper = new XmlReferenceDumper();
         $this->assertEquals(str_replace('http://example.org/schema/dic/acme_root', 'http://symfony.com/schema/dic/symfony', $this->getConfigurationAsString()), $dumper->dump($configuration, 'http://symfony.com/schema/dic/symfony'));
+    }
+
+    public function testDumpPrototypedArrayOfArraysWithoutKeyAttribute()
+    {
+        $treeBuilder = new TreeBuilder('acme_root');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->arrayNode('codes')
+                    ->arrayPrototype()
+                        ->scalarPrototype()->end()
+                    ->end()
+                ->end()
+            ->end();
+
+        $dumper = new XmlReferenceDumper();
+        $this->assertEquals(str_replace("\n", \PHP_EOL, <<<'EOL'
+            <!-- Namespace: http://example.org/schema/dic/acme_root -->
+            <config>
+
+                <!-- prototype -->
+                <codes>
+
+                    <!-- prototype -->
+                    <>scalar value</>
+
+                </codes>
+
+            </config>
+
+            EOL), $dumper->dumpNode($treeBuilder->buildTree()));
     }
 
     private function getConfigurationAsString()

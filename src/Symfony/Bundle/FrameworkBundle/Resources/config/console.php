@@ -50,6 +50,7 @@ use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesShowCommand;
 use Symfony\Component\Messenger\Command\SetupTransportsCommand;
+use Symfony\Component\Messenger\Command\ShowMessagesCommand;
 use Symfony\Component\Messenger\Command\StatsCommand;
 use Symfony\Component\Messenger\Command\StopWorkersCommand;
 use Symfony\Component\Scheduler\Command\DebugCommand as SchedulerDebugCommand;
@@ -222,6 +223,14 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('messenger.receiver_locator'),
                 abstract_arg('Receivers names'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.messenger_show', ShowMessagesCommand::class)
+            ->args([
+                service('messenger.receiver_locator'),
+                abstract_arg('Receivers names'),
+                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 

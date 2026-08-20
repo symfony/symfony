@@ -1107,6 +1107,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame([], $messengerDefinitions);
         $this->assertFalse($container->hasDefinition('console.command.messenger_consume_messages'));
+        $this->assertFalse($container->hasDefinition('console.command.messenger_show'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_debug'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_stop_workers'));
         $this->assertFalse($container->hasDefinition('console.command.messenger_setup_transports'));

@@ -120,14 +120,27 @@ class CacheWarmerAggregate implements CacheWarmerInterface
             if ($collectDeprecations) {
                 restore_error_handler();
 
-                if (is_file($this->deprecationLogsFilepath)) {
-                    $previousLogs = unserialize(file_get_contents($this->deprecationLogsFilepath), ['allowed_classes' => false]);
+                if ($h = fopen($this->deprecationLogsFilepath, 'c+')) {
+                    flock($h, \LOCK_EX);
+
+                    set_error_handler(static fn () => true);
+                    try {
+                        $previousLogs = unserialize(stream_get_contents($h), ['allowed_classes' => false]);
+                    } finally {
+                        restore_error_handler();
+                    }
                     if (\is_array($previousLogs)) {
                         $collectedLogs = array_merge($previousLogs, $collectedLogs);
                     }
-                }
 
-                file_put_contents($this->deprecationLogsFilepath, serialize(array_values($collectedLogs)));
+                    $serializedLogs = serialize(array_values($collectedLogs));
+
+                    ftruncate($h, 0);
+                    rewind($h);
+                    fwrite($h, $serializedLogs);
+                    flock($h, \LOCK_UN);
+                    fclose($h);
+                }
             }
         }
 

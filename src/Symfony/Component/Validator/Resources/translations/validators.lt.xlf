@@ -570,6 +570,10 @@
                 <source>This value is not a valid cron expression.</source>
                 <target>Ši reikšmė nėra tinkama cron išraiška.</target>
             </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target state="needs-review-translation">Nurodyta esybė neegzistuoja.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

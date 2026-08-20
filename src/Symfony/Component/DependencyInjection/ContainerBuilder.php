@@ -1411,6 +1411,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
                 throw new InvalidArgumentException(\sprintf('The resource "%s" tagged "%s" is missing the "container.excluded" tag; did you mean to use "resource_tags" instead of "tags"?', $id, $tagName));
             }
             $class = $this->parameterBag->resolveValue($definition->getClass());
+            if ($class && $throwOnAbstract && $definition->isAbstract() && ($r = $this->getReflectionClass($class, false)) && ($r->isAbstract() || $r->isInterface())) {
+                // an abstract class or interface matches autoconfiguration rules on behalf
+                // of its subtypes but is not a resource itself: skip it, don't throw
+                continue;
+            }
             if (!$class || $throwOnAbstract && $definition->isAbstract()) {
                 throw new InvalidArgumentException(\sprintf('The resource "%s" tagged "%s" must have a class and not be abstract.', $id, $tagName));
             }

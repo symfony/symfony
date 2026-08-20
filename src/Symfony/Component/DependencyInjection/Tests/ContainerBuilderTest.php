@@ -61,6 +61,8 @@ use Symfony\Component\DependencyInjection\Tests\Compiler\Wither;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CustomDefinition;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooWithAbstractArgument;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\AbstractClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\FooInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ProxyAndInheritance;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\ScalarFactory;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\SimilarArgumentsDummy;
@@ -1315,6 +1317,40 @@ class ContainerBuilderTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The resource "myservice" tagged "foo" is missing the "container.excluded" tag; did you mean to use "resource_tags" instead of "tags"?');
+        $builder->findTaggedResourceIds('foo');
+    }
+
+    public function testFindTaggedResourceIdsSkipsBaseTypes()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('concrete', 'Bar\FooClass')
+            ->addResourceTag('foo', ['foo' => 'concrete']);
+        $builder->register('.abstract.'.FooInterface::class, FooInterface::class)
+            ->setAbstract(true)
+            ->addResourceTag('foo', ['foo' => 'interface']);
+        $builder->register('.abstract.'.AbstractClass::class, AbstractClass::class)
+            ->setAbstract(true)
+            ->addResourceTag('foo', ['foo' => 'abstract']);
+
+        $this->assertSame(['concrete' => [['foo' => 'concrete']]], $builder->findTaggedResourceIds('foo'));
+
+        $expected = [
+            'concrete' => [['foo' => 'concrete']],
+            '.abstract.'.FooInterface::class => [['foo' => 'interface']],
+            '.abstract.'.AbstractClass::class => [['foo' => 'abstract']],
+        ];
+        $this->assertSame($expected, $builder->findTaggedResourceIds('foo', false));
+    }
+
+    public function testFindTaggedResourceIdsThrowsOnAbstractDefinitionWithConcreteClass()
+    {
+        $builder = new ContainerBuilder();
+        $builder->register('myservice', 'Bar\FooClass')
+            ->setAbstract(true)
+            ->addResourceTag('foo', ['foo' => 'foo']);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The resource "myservice" tagged "foo" must have a class and not be abstract.');
         $builder->findTaggedResourceIds('foo');
     }
 

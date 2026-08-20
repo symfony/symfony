@@ -1048,8 +1048,6 @@ class SimpleFormTest extends TestCase
     {
         $config = $this->getBuilder()->setData('DEFAULT')->getFormConfig();
         $form = new Form($config);
-
-        /* @var Form $form */
         $form->initialize();
 
         $this->assertSame('DEFAULT', $form->getData());

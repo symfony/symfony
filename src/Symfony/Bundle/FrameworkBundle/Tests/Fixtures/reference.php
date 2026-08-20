@@ -218,7 +218,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  *     format?: string,
  *     utf8?: bool,
  *     stateless?: bool,
- * }
+ * %A}
  * @psalm-type ImportConfig = array{
  *     resource: string,
  *     type?: string,
@@ -238,7 +238,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  *     format?: string,
  *     utf8?: bool,
  *     stateless?: bool,
- * }
+ * %A}
  * @psalm-type AliasConfig = array{
  *     alias: string,
  *     deprecated?: array{package:string, version:string, message?:string},

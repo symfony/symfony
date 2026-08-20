@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-15T11:51:14Z
+
+Thanks for the idea and the branch @naxvog; the feature is wanted, and I finished it with a different implementation, keeping your authorship. Please shout if you disagree.
+
+The branch changed `ClassMetadata::$defaultGroup` from the short class name to the FQCN for every class, and that silently broke the documented style. Probing both trees with the same fixture:
+
+```php
+#[Assert\GroupSequence(['Payment', 'LegacyStyle'])]   // short name, as documented
+class LegacyStyle
+{
+    #[Assert\NotBlank]
+    public string $name = '';
+}
+```
+
+```
+8.2:    1 violation (name: This value should not be blank.)
+branch: 0 violations
+```
+
+Constraints carried the implicit group `App\LegacyStyle`, the `'LegacyStyle'` step matched nothing, and the class's own constraints were silently skipped: under-validation with no error. The 58 test files the branch had to edit were the symptom.
+
+The final implementation goes the other way: `defaultGroup` stays the short name, and `setGroupSequence()` rewrites a sequence entry equal to the FQCN of the annotated class to its group name. Both probe fixtures now validate with 1 violation, the diff is 3 files and +26, and the Validator suite is green at 5296 tests with no pre-existing expectation touched.
+
+Two scope notes: only the annotated class's own FQCN is rewritten, a foreign `Other::class` in a sequence keeps meaning the literal string, which the guard then rejects as before; and entries inside parallel steps (nested arrays) are left alone, since the class name group has never been supported there, the default-group check only looks at the top level.
+
+---------------------------------------------------------------------------
+
+by naxvog at 2026-08-15T16:01:43Z
+
+Thanks for the review @nicolas-grekas; a much better solution.
+I am totally Ok with your commit and approach.
+
+Looking forward to updating my codebases

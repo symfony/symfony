@@ -28,6 +28,8 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  */
 class HtmlExtension extends AbstractExtension
 {
+    private const DISABLING_FIELDSET = 'ancestor-or-self::*[parent::fieldset[@disabled]][not(self::legend) or preceding-sibling::legend]';
+
     public function __construct(Translator $translator)
     {
         $translator
@@ -91,10 +93,10 @@ class HtmlExtension extends AbstractExtension
                 ." or name(.) = 'button'"
                 ." or name(.) = 'select'"
                 ." or name(.) = 'textarea'"
+                ." or name(.) = 'fieldset'"
             .')'
-            .' and ancestor::fieldset[@disabled]'
+            .' and '.self::DISABLING_FIELDSET
         );
-        // todo: in the second half, add "and is not a descendant of that fieldset element's first legend element child, if any."
     }
 
     public function translateEnabled(XPathExpr $xpath): XPathExpr
@@ -109,7 +111,6 @@ class HtmlExtension extends AbstractExtension
             .') or ('
                 .'('
                     ."name(.) = 'command'"
-                    ." or name(.) = 'fieldset'"
                     ." or name(.) = 'optgroup'"
                 .')'
                 .' and not(@disabled)'
@@ -120,8 +121,9 @@ class HtmlExtension extends AbstractExtension
                     ." or name(.) = 'select'"
                     ." or name(.) = 'textarea'"
                     ." or name(.) = 'keygen'"
+                    ." or name(.) = 'fieldset'"
                 .')'
-                .' and not (@disabled or ancestor::fieldset[@disabled])'
+                .' and not(@disabled or '.self::DISABLING_FIELDSET.')'
             .') or ('
                 ."name(.) = 'option' and not("
                     .'@disabled or ancestor::optgroup[@disabled]'

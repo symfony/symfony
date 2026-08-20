@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidOptionException;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
@@ -25,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -184,6 +186,25 @@ class ConsumeMessagesCommandTest extends TestCase
 
         yield 'Zero second time limit' => ['--time-limit', '0', 'Option "time-limit" must be a positive integer, "0" passed.'];
         yield 'Non-numeric time limit' => ['--time-limit', 'whatever', 'Option "time-limit" must be a positive integer, "whatever" passed.'];
+    }
+
+    public function testRunWithoutReceiverInNonInteractiveMode()
+    {
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new ServiceLocator([]), $eventDispatcher, null, ['dummy-receiver', 'another-receiver']);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Please pass at least one receiver.');
+
+        $tester->execute([], ['interactive' => false]);
     }
 
     public function testRunWithTimeLimit()

@@ -153,17 +153,17 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
             $input->setArgument('receivers', $io->askQuestion($question));
         }
-
-        if (!$input->getArgument('receivers')) {
-            throw new RuntimeException('Please pass at least one receiver.');
-        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$receiverNames = $input->getArgument('receivers')) {
+            throw new RuntimeException('Please pass at least one receiver.');
+        }
+
         $receivers = [];
         $rateLimiters = [];
-        foreach ($receiverNames = $input->getArgument('receivers') as $receiverName) {
+        foreach ($receiverNames as $receiverName) {
             if (!$this->receiverLocator->has($receiverName)) {
                 $message = \sprintf('The receiver "%s" does not exist.', $receiverName);
                 if ($this->receiverNames) {

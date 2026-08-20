@@ -95,7 +95,7 @@ class XmlReferenceDumper
 
                 if ($prototype instanceof PrototypedArrayNode) {
                     $prototype->setName($key ?? '');
-                    $children = [$key => $prototype];
+                    $children = [$key ?? '' => $prototype];
                 } elseif ($prototype instanceof ArrayNode) {
                     $children = $prototype->getChildren();
                 } else {

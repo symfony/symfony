@@ -230,7 +230,7 @@ class ParameterBag implements ParameterBagInterface
 
             $resolving[$key] = true;
 
-            return $this->resolved ? $this->get($key) : $this->resolveValue($this->get($key), $resolving);
+            return $this->resolved ? $this->escapeValue($this->get($key)) : $this->resolveValue($this->get($key), $resolving);
         }
 
         return preg_replace_callback('/%%|%([^%\s]+)%/', function ($match) use ($resolving, $value) {
@@ -253,7 +253,7 @@ class ParameterBag implements ParameterBagInterface
             $resolved = (string) $resolved;
             $resolving[$key] = true;
 
-            return $this->isResolved() ? $resolved : $this->resolveString($resolved, $resolving);
+            return $this->isResolved() ? $this->escapeValue($resolved) : $this->resolveString($resolved, $resolving);
         }, $value);
     }
 

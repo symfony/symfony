@@ -570,6 +570,14 @@
                 <source>This value is not a valid cron expression.</source>
                 <target>Ang halagang ito ay hindi wastong cron expression.</target>
             </trans-unit>
+            <trans-unit id="147">
+                <source>The referenced entity does not exist.</source>
+                <target state="needs-review-translation">Ang tinutukoy na entidad ay hindi umiiral.</target>
+            </trans-unit>
+            <trans-unit id="148" resname="This is not a valid ULID.">
+                <source>This value is not a valid ULID.</source>
+                <target state="needs-review-translation">Ang halagang ito ay hindi isang wastong ULID.</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

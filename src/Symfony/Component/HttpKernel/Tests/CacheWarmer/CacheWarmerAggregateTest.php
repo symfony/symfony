@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Component\Process\Process;
 
 class CacheWarmerAggregateTest extends TestCase
 {
@@ -171,5 +172,41 @@ class CacheWarmerAggregateTest extends TestCase
 
         $aggregate = new CacheWarmerAggregate([$warmer]);
         $aggregate->warmUp(__DIR__, null, $io);
+    }
+
+    public function testWarmupRecoversFromCorruptedDeprecationLog()
+    {
+        $logFile = tempnam(sys_get_temp_dir(), 'sf_deprecations_');
+        file_put_contents($logFile, 'a:0:{}stale-bytes-from-a-torn-write');
+
+        // collecting deprecations is disabled when PHPUNIT_COMPOSER_INSTALL is defined, hence the child process
+        $srcDir = \dirname((new \ReflectionClass(CacheWarmerAggregate::class))->getFileName());
+        $bootCode = <<<'EOPHP'
+            <?php
+            [, $srcDir, $logFile] = $argv;
+            require $srcDir.'/WarmableInterface.php';
+            require $srcDir.'/CacheWarmerInterface.php';
+            require $srcDir.'/CacheWarmerAggregate.php';
+
+            set_error_handler(static function ($type, $message, $file, $line) {
+                throw new \ErrorException($message, 0, $type, $file, $line);
+            });
+
+            (new \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate([], true, $logFile))->warmUp(sys_get_temp_dir());
+
+            echo 'OK';
+            EOPHP;
+
+        $process = new Process([\PHP_BINARY, '--', $srcDir, $logFile]);
+        $process->setInput($bootCode);
+        $process->run();
+
+        try {
+            $this->assertSame('OK', $process->getOutput(), $process->getErrorOutput());
+            $this->assertSame(0, $process->getExitCode());
+            $this->assertSame([], unserialize(file_get_contents($logFile), ['allowed_classes' => false]));
+        } finally {
+            @unlink($logFile);
+        }
     }
 }

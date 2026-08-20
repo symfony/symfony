@@ -1750,6 +1750,7 @@ class FrameworkExtension extends Extension
             TranslationBridge\Loco\LocoProviderFactory::class => ['symfony/loco-translation-provider', ['translation.provider_factory.loco', 'translation.provider_factory.loco.http_client']],
             TranslationBridge\Lokalise\LokaliseProviderFactory::class => ['symfony/lokalise-translation-provider', ['translation.provider_factory.lokalise']],
             TranslationBridge\Phrase\PhraseProviderFactory::class => ['symfony/phrase-translation-provider', ['translation.provider_factory.phrase']],
+            TranslationBridge\PoEditor\PoEditorProviderFactory::class => ['symfony/po-editor-translation-provider', ['translation.provider_factory.poeditor']],
         ];
 
         $parentPackages = ['symfony/framework-bundle', 'symfony/translation', 'symfony/http-client'];

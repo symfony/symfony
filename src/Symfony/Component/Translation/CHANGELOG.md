@@ -6,6 +6,7 @@ CHANGELOG
 
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`
+ * Re-add `PoEditorProvider`
 
 8.1
 ---

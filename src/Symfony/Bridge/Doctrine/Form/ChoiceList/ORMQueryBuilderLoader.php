@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Doctrine\Form\ChoiceList;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\GuidType;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Types\AbstractUidType;
@@ -78,6 +79,12 @@ class ORMQueryBuilderLoader implements EntityLoaderInterface
             // Convert values into right type
             if (Type::hasType($type)) {
                 $doctrineType = Type::getType($type);
+
+                if ($doctrineType instanceof GuidType) {
+                    // This type doesn't check its values, so filter out the ones that databases such as PostgreSQL reject
+                    $values = array_values(array_filter($values, static fn ($v) => preg_match('/^\{[0-9a-f]{4}(?:-?[0-9a-f]{4}){7}\}$|^[0-9a-f]{4}(?:-?[0-9a-f]{4}){7}$/i', (string) $v)));
+                }
+
                 $platform = $qb->getEntityManager()->getConnection()->getDatabasePlatform();
                 foreach ($values as &$value) {
                     try {

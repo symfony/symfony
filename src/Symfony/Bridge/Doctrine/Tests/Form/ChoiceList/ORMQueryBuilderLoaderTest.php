@@ -24,6 +24,7 @@ use Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader;
 use Symfony\Bridge\Doctrine\Tests\DoctrineTestHelper;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\CustomUuidIdType;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\EmbeddedIdentifierEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\GuidIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\LegacyQueryMock;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
@@ -145,6 +146,37 @@ class ORMQueryBuilderLoaderTest extends TestCase
 
         $loader = new ORMQueryBuilderLoader($qb);
         $loader->getEntitiesByIds('id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', '', 'b98e8e11-2897-44df-ad24-d2627eb7f499']);
+    }
+
+    public function testFilterInvalidGuids()
+    {
+        $em = DoctrineTestHelper::createTestEntityManager();
+
+        $query = $this->getQueryMock();
+
+        $query
+            ->method('getResult')
+            ->willReturn([]);
+
+        $query->expects($this->once())
+            ->method('setParameter')
+            ->with('ORMQueryBuilderLoader_getEntitiesByIds_id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', 'B98E8E11289744DFAD24D2627EB7F499', '{4d0a0dcb-2ba2-4b30-b4b5-2b3e26b45ae7}'], class_exists(ArrayParameterType::class) ? ArrayParameterType::STRING : Connection::PARAM_STR_ARRAY)
+            ->willReturn($query);
+
+        $qb = $this->getMockBuilder(QueryBuilder::class)
+            ->setConstructorArgs([$em])
+            ->onlyMethods(['getQuery'])
+            ->getMock();
+
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $qb->select('e')
+            ->from(GuidIdEntity::class, 'e');
+
+        $loader = new ORMQueryBuilderLoader($qb);
+        $loader->getEntitiesByIds('id', ['71c5fd46-3f16-4abb-bad7-90ac1e654a2d', 'foo', 1, 'B98E8E11289744DFAD24D2627EB7F499', '{4d0a0dcb-2ba2-4b30-b4b5-2b3e26b45ae7}', '{4d0a0dcb-2ba2-4b30-b4b5-2b3e26b45ae7']);
     }
 
     /**

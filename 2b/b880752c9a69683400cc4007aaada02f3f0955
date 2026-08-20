@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-08-18T16:02:10Z
+
+Would it be interesting to rely on the TypeInfo component for this?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T10:52:25Z
+
+Thanks @HypeMC for this, and thanks for your patience.
+
+I reviewed it, rebased it on 8.2 and pushed a few changes into your commit:
+
+* `ArgumentResolver` cast the `\ReflectionType` to string, which is what turned the PHPStan job red (`class.toStringDeprecated`). Replaced by a small recursive formatter, so DNF types render as `(A&B)|C`, plus the test that this message never had.
+* The two `InstalledVersions::getVersion('symfony/dependency-injection')` guards were dead in this repository: the root `composer.json` replaces the component, so the call returns `null` and the nullable-intersection assertions never ran. Changing one of them to assert `\DateTime` kept the test green, which is how I found it. Since we also need the `AutowirePass` fix at runtime, I bumped `symfony/dependency-injection` to `^8.2` in Console and HttpKernel and dropped the guards, so the assertions run everywhere.
+* `testCompositeTypesAreAutowired` and `testCompositeTypeWithoutMatchingAlias` ended with `expectException()` after several assertions, so an earlier `RuntimeException` would have made them pass for the wrong reason. Split into their own tests, with the exception message asserted.
+* Renamed `testTypeResolutionReturnsEmptyForCompositeTypes`, which describes the fallback by type name rather than composite types.
+* Rewrote the description as documentation: the resolution rules, the DNF limitation and the points the symfony-docs PR should carry.
+
+@chalasr on TypeInfo: I do not think it fits here. Neither Console nor HttpKernel depends on `symfony/type-info`, and the whole chain (alias ids, binding keys, `TypedReference` types) is built on the exact string form `ProxyHelper::exportType()` emits, which TypeInfo does not produce. The one thing worth doing is sharing the builtin-type list, which now exists in three copies.
+
+Two notes for whoever merges: the Fabbot failure is a false positive, its patch quotes `%s` placeholders on three lines this PR never wrote. The red 8.6 job is the Twig Bridge form-layout regression already present on 8.2.
+
+Status: reviewed.

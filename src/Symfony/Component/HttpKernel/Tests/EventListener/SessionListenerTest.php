@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorageFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\PhpBridgeSessionStorageFactory;
 use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\SessionStorageInterface;
 use Symfony\Component\HttpKernel\DataCollector\RequestDataCollector;
 use Symfony\Component\HttpKernel\Event\FinishRequestEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -219,16 +220,54 @@ class SessionListenerTest extends TestCase
     /**
      * @runInSeparateProcess
      */
+    public function testSessionIdKeptByPhpFromAPreviousRequestIsIgnored()
+    {
+        $previousSessionId = $this->createValidSessionId();
+
+        $this->assertSame($previousSessionId, session_id());
+
+        $request = new Request();
+        $request->cookies->set('PHPSESSID', 'REQUEST-SESSION-ID');
+
+        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+
+        $kernel = $this->createStub(HttpKernelInterface::class);
+        $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertSame('REQUEST-SESSION-ID', $request->getSession()->getId());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
     public function testNewSessionIdIsNotOverwritten()
     {
         $newSessionId = $this->createValidSessionId();
 
         $this->assertNotEmpty($newSessionId);
 
+        // the id comes from the storage factory below, not from the state PHP kept from a previous request
+        session_id('');
+
         $request = new Request();
         $request->cookies->set('PHPSESSID', 'OLD-SESSION-ID');
 
-        $listener = $this->createListener($request, new NativeSessionStorageFactory());
+        $listener = $this->createListener($request, new class($newSessionId) implements SessionStorageFactoryInterface {
+            private $sessionId;
+
+            public function __construct(string $sessionId)
+            {
+                $this->sessionId = $sessionId;
+            }
+
+            public function createStorage(?Request $request): SessionStorageInterface
+            {
+                $storage = new NativeSessionStorage();
+                $storage->setId($this->sessionId);
+
+                return $storage;
+            }
+        });
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $listener->onKernelRequest(new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST));

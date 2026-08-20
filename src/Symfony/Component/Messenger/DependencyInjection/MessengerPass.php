@@ -65,6 +65,11 @@ class MessengerPass implements CompilerPassInterface
         $handlerToOriginalServiceIdMapping = [];
 
         foreach ($container->findTaggedServiceIds('messenger.message_handler', true) as $serviceId => $tags) {
+            // an option-less tag comes from autoconfiguration; it would defeat the configured ones
+            if ($configuredTags = array_filter($tags)) {
+                $tags = $configuredTags;
+            }
+
             foreach ($tags as $tag) {
                 if (isset($tag['bus']) && !\in_array($tag['bus'], $busIds, true)) {
                     throw new RuntimeException(\sprintf('Invalid handler service "%s": bus "%s" specified on the tag "messenger.message_handler" does not exist (known ones are: "%s").', $serviceId, $tag['bus'], implode('", "', $busIds)));

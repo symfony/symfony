@@ -186,12 +186,25 @@ class BracketedPasteTraitTest extends TestCase
         $result = $handler->processBracketedPaste($data);
 
         $this->assertSame('[paste exceeded 16 MiB limit]', $result);
-        $this->assertFalse($handler->isBufferingPaste());
+        $this->assertSame('', $data);
+        $this->assertTrue($handler->isBufferingPaste(), 'The paste stays open until the end marker');
 
+        // The terminal is still sending the paste, so what follows is pasted
+        // content and not typing.
         $data = 'plain';
         $result = $handler->processBracketedPaste($data);
         $this->assertNull($result);
-        $this->assertSame('plain', $data);
+        $this->assertSame('', $data);
+
+        $data = "more\x1b[201~after";
+        $result = $handler->processBracketedPaste($data);
+        $this->assertNull($result, 'The dropped content is not returned');
+        $this->assertSame('after', $data);
+        $this->assertFalse($handler->isBufferingPaste());
+
+        $data = "\x1b[200~next\x1b[201~";
+        $result = $handler->processBracketedPaste($data);
+        $this->assertSame('next', $result, 'The next paste is delivered');
     }
 
     private function createHandler(): BracketedPasteHandler

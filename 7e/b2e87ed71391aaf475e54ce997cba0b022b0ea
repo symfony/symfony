@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-20T08:34:09Z
+
+Looking at the [latest build on 8.1](https://github.com/symfony/symfony/actions/runs/32347984936), I can't figure out which test has been fixed. Could link or quote the failing test?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-08-20T08:35:52Z
+
+Yes! It is the high-deps that is failing here: https://github.com/symfony/symfony/actions/runs/32347984936/job/96360723258#step:8:20342
+
+We need to use `%A` instead of the actual key to support all versions. Placeholders are already used in the file for this reason
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:21:10Z
+
+8.1 and not 7.4 because of some existing version constraint?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-08-20T09:52:46Z
+
+My bad, you're right 7.4 is the correct branch. PR rebased and updated

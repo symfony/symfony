@@ -88,6 +88,7 @@
         "symfony/console": "<8.1.2",
         "symfony/form": "<7.4",
         "symfony/json-streamer": "<7.4",
+        "symfony/mailer": "<7.4.17|>=8.0,<8.1.5",
         "symfony/security-csrf": "<7.4",
         "symfony/serializer": "<7.4",
         "symfony/messenger": "<7.4.10|>=8.0,<8.0.10",

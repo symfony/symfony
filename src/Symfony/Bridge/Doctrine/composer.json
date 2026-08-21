@@ -55,7 +55,8 @@
         "doctrine/dbal": "<4.3",
         "doctrine/lexer": "<1.1",
         "doctrine/orm": "<3.4",
-        "symfony/property-info": "<8.0"
+        "symfony/property-info": "<8.0",
+        "symfony/validator": "<7.4.17|>=8.0,<8.1.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },

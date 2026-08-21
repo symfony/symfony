@@ -12,6 +12,7 @@
 namespace Symfony\Component\Console\ArgumentResolver;
 
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ArgumentResolver\Exception\NearMissValueResolverException;
 use Symfony\Component\Console\ArgumentResolver\Exception\ResolverNotFoundException;
 use Symfony\Component\Console\ArgumentResolver\ValueResolver as Resolver;
@@ -35,6 +36,16 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 final class ArgumentResolver implements ArgumentResolverInterface
 {
+    private const CORE_UTILITY_TYPES = [
+        InputInterface::class,
+        RawInputInterface::class,
+        OutputInterface::class,
+        SymfonyStyle::class,
+        Cursor::class,
+        Application::class,
+        Command::class,
+    ];
+
     /**
      * @param iterable<mixed, ValueResolverInterface> $argumentValueResolvers
      */
@@ -56,6 +67,14 @@ final class ArgumentResolver implements ArgumentResolverInterface
         $arguments = [];
 
         foreach ($argumentReflectors as $argumentName => $member) {
+            $type = $member->getType();
+            $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : null;
+
+            // core utilities are injected by InvokableCommand, so they must not yield an argument here
+            if ($typeName && \in_array($typeName, self::CORE_UTILITY_TYPES, true)) {
+                continue;
+            }
+
             $argumentValueResolvers = $this->argumentValueResolvers;
             $disabledResolvers = [];
 
@@ -109,21 +128,6 @@ final class ArgumentResolver implements ArgumentResolverInterface
 
             // For variadic parameters with explicit input mapping, 0 values is valid
             if ($member->isVariadic() && (Argument::tryFrom($member->getMember()) || Option::tryFrom($member->getMember()))) {
-                continue;
-            }
-
-            $type = $member->getType();
-            $typeName = $type instanceof \ReflectionNamedType ? $type->getName() : null;
-
-            if ($typeName && \in_array($typeName, [
-                InputInterface::class,
-                RawInputInterface::class,
-                OutputInterface::class,
-                SymfonyStyle::class,
-                Cursor::class,
-                \Symfony\Component\Console\Application::class,
-                Command::class,
-            ], true)) {
                 continue;
             }
 

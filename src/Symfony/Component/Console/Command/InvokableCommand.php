@@ -148,10 +148,10 @@ class InvokableCommand implements SignalableCommandInterface
                     Cursor::class => new Cursor($output),
                     Application::class => $this->command->getApplication(),
                     Command::class, self::class => $this->command,
-                    default => null,
+                    default => false,
                 };
 
-                if (null !== $argument) {
+                if (false !== $argument) {
                     $coreUtilities[$index] = $argument;
                     continue;
                 }
@@ -177,7 +177,7 @@ class InvokableCommand implements SignalableCommandInterface
         $resolvedIndex = 0;
 
         foreach ($function->getParameters() as $index => $param) {
-            if (isset($coreUtilities[$index])) {
+            if (\array_key_exists($index, $coreUtilities)) {
                 $parameters[] = $coreUtilities[$index];
             } elseif ($param->isVariadic()) {
                 // Variadic parameters consume all remaining resolved arguments

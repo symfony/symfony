@@ -12,11 +12,13 @@
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\DefaultConfigTestBundle\DefaultConfigTestBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\ExtensionWithoutConfigTestBundle\ExtensionWithoutConfigTestBundle;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\ServicesInBuildTestBundle\ServicesInBuildTestBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestBundle;
 
 return [
     new DefaultConfigTestBundle(),
     new ExtensionWithoutConfigTestBundle(),
     new FrameworkBundle(),
+    new ServicesInBuildTestBundle(),
     new TestBundle(),
 ];

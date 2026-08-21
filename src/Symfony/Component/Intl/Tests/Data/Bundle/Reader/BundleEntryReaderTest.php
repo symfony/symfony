@@ -402,6 +402,62 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($result, $reader->readEntry(self::RES_DIR, 'mo', ['Foo', 'Bar'], true));
     }
 
+    public function testFollowLocaleParents()
+    {
+        $series = [
+            [[self::RES_DIR, 'nb'], new ResourceBundleNotFoundException()],
+            [[self::RES_DIR, 'no'], self::FALLBACK_DATA],
+        ];
+
+        $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
+        $readerImpl->expects($this->exactly(2))
+            ->method('read')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                if ($return instanceof \Exception) {
+                    throw $return;
+                }
+
+                return $return;
+            })
+        ;
+
+        $reader = $this->getReader($readerImpl);
+        $reader->setLocaleParents(['nb' => 'no']);
+
+        $this->assertSame('Lah', $reader->readEntry(self::RES_DIR, 'nb', ['Entries', 'Bam']));
+    }
+
+    public function testDontFollowRootLocaleParents()
+    {
+        $series = [
+            [[self::RES_DIR, 'zh_Hant'], new ResourceBundleNotFoundException()],
+            [[self::RES_DIR, 'zh'], self::FALLBACK_DATA],
+        ];
+
+        $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
+        $readerImpl->expects($this->exactly(2))
+            ->method('read')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                if ($return instanceof \Exception) {
+                    throw $return;
+                }
+
+                return $return;
+            })
+        ;
+
+        $reader = $this->getReader($readerImpl);
+        $reader->setLocaleParents(['zh_Hant' => 'root']);
+
+        $this->assertSame('Lah', $reader->readEntry(self::RES_DIR, 'zh_Hant', ['Entries', 'Bam']));
+    }
+
     private function getReader(?BundleEntryReaderInterface $entryReader = null): BundleEntryReader
     {
         return new BundleEntryReader($entryReader ?? $this->createStub(BundleEntryReaderInterface::class));

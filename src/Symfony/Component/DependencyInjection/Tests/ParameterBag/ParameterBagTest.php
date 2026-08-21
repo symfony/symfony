@@ -370,6 +370,16 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bar' => ['ding' => 'I\'m a bar %foo %bar']], $bag->get('foo'), '->resolveValue() supports % escaping by doubling it');
     }
 
+    public function testResolveValueKeepsEscapingOnAResolvedBag()
+    {
+        $bag = new ParameterBag(['foo' => 'I\'m a %%bar%%']);
+        $bag->resolve();
+
+        $this->assertSame('I\'m a %%bar%%', $bag->resolveValue('%foo%'), '->resolveValue() returns escaped values once the bag is resolved');
+        $this->assertSame('ding I\'m a %%bar%% dong', $bag->resolveValue('ding %foo% dong'), '->resolveValue() returns escaped values once the bag is resolved');
+        $this->assertSame('I\'m a %bar%', $bag->unescapeValue($bag->resolveValue('%foo%')));
+    }
+
     public function testEscapeValue()
     {
         $bag = new ParameterBag();

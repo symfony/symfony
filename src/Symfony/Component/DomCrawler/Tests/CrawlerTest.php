@@ -206,6 +206,10 @@ class CrawlerTest extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addContent($this->getDoctype().'<html><script>var foo = "bär";</script></html>', 'text/html; charset=UTF-8');
         $this->assertEquals('var foo = "bär";', $crawler->filterXPath('//script')->text(), '->addContent() does not interfere with script content');
+
+        $crawler = $this->createCrawler();
+        $crawler->addContent($this->getDoctype().'<html><script>var foo = "charset=utf-16";</script></html>', 'text/html; charset=UTF-8');
+        $this->assertEquals('var foo = "charset=utf-16";', $crawler->filterXPath('//script')->text(), '->addContent() does not rewrite charsets found outside meta tags');
     }
 
     #[RequiresPhpExtension('iconv')]
@@ -214,6 +218,14 @@ class CrawlerTest extends TestCase
         $crawler = $this->createCrawler();
         $crawler->addContent(iconv('UTF-8', 'SJIS', $this->getDoctype().'<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>'));
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
+    }
+
+    #[RequiresPhpExtension('mbstring')]
+    public function testAddContentIgnoresCharsetOutsideMetaTags()
+    {
+        $crawler = $this->createCrawler();
+        $crawler->addContent($this->getDoctype().'<html><head><script charset="utf-8" src="foo.js"></script><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15"></head><body><p>10'."\xA4".'</p></body></html>');
+        $this->assertSame('10€', $crawler->filterXPath('//p')->text(), '->addContent() reads the charset from the meta tag, not from a preceding script tag');
     }
 
     public function testAddDocument()

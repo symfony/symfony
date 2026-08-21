@@ -188,7 +188,7 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
 
         $class = \is_object($classOrObject) ? $classOrObject::class : $classOrObject;
 
-        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($classOrObject)?->getTypeProperty() === $attribute) {
+        if ($this->isDiscriminatorTypeProperty($classOrObject, $attribute)) {
             return true;
         }
 

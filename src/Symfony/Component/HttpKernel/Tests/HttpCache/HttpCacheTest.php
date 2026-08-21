@@ -14,6 +14,7 @@ namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
@@ -531,6 +532,41 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->request('GET', '/');
         $this->assertEquals(200, $this->response->getStatusCode());
         $this->assertTraceNotContains('store');
+    }
+
+    public function testDoesNotCacheBinaryFileResponses()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'sf_binary_file_');
+        file_put_contents($file, 'Hello World');
+
+        $this->kernel = new class($file) extends TestHttpKernel {
+            public function __construct(private string $file)
+            {
+                parent::__construct(null, 200, []);
+            }
+
+            public function callController(Request $request): Response
+            {
+                $this->called = true;
+
+                return (new BinaryFileResponse($this->file, 200, ['Content-Type' => 'text/plain']))->setMaxAge(10);
+            }
+        };
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertEquals(200, $this->response->getStatusCode());
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+        $this->assertTraceNotContains('fresh');
+        $this->assertInstanceOf(BinaryFileResponse::class, $this->response);
+
+        ob_start();
+        $this->response->sendContent();
+        $this->assertSame('Hello World', ob_get_clean());
+
+        unlink($file);
     }
 
     public function testCachesResponsesWithExplicitNoCacheDirective()

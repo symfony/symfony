@@ -45,6 +45,13 @@ class HandlerDescriptorTest extends TestCase
         }, 'class@anonymous%sHandlerDescriptorTest.php%s::__invoke'];
     }
 
+    public function testTheAliasIsPartOfTheName()
+    {
+        $descriptor = new HandlerDescriptor(new DummyCommandHandler(), ['alias' => 'handler_a']);
+
+        $this->assertSame(DummyCommandHandler::class.'::__invoke@handler_a', $descriptor->getName());
+    }
+
     public function testGetOptions()
     {
         $options = ['option1' => 'value1', 'option2' => 'value2'];

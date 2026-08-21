@@ -115,30 +115,35 @@ final class MetadataAwareNameConverter implements AdvancedNameConverterInterface
             return [];
         }
 
-        $classMetadata = $this->metadataFactory->getMetadataFor($class);
+        $attributesMetadata = $this->metadataFactory->getMetadataFor($class)->getAttributesMetadata();
+        $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
 
         $cache = [];
-        foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (null === $metadata->getSerializedName()) {
+        foreach ($attributesMetadata as $name => $metadata) {
+            if (null === $serializedName = $metadata->getSerializedName()) {
                 continue;
             }
 
-            if (null !== $metadata->getSerializedName() && null !== $metadata->getSerializedPath()) {
+            if (null !== $metadata->getSerializedPath()) {
                 throw new LogicException(\sprintf('Found SerializedName and SerializedPath attributes on property "%s" of class "%s".', $name, $class));
             }
 
             $metadataGroups = $metadata->getGroups();
-            $contextGroups = (array) ($context[AbstractNormalizer::GROUPS] ?? []);
 
-            if ($contextGroups && !$metadataGroups) {
+            if (!$contextGroups) {
+                $sameNameMetadata = $attributesMetadata[$serializedName] ?? null;
+
+                // without groups to tell them apart, the attribute using that name for itself wins
+                if ($metadataGroups && $sameNameMetadata && null === $sameNameMetadata->getSerializedName()) {
+                    continue;
+                }
+            } elseif (!$metadataGroups) {
+                continue;
+            } elseif (!array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
                 continue;
             }
 
-            if ($metadataGroups && !array_intersect($metadataGroups, $contextGroups) && !\in_array('*', $contextGroups, true)) {
-                continue;
-            }
-
-            $cache[$metadata->getSerializedName()] = $name;
+            $cache[$serializedName] = $name;
         }
 
         return $cache;

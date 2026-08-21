@@ -169,6 +169,17 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         date_default_timezone_set($tz);
     }
 
+    public function testTransformDateBeforeTheGregorianCutover()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('Dates before 1582 do not fit in a 32 bit timestamp.');
+        }
+
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
+
+        $this->assertSame('1582-01-01', $transformer->transform(new \DateTime('1582-01-01 UTC')));
+    }
+
     public function testTransformWithDifferentPatterns()
     {
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', \IntlDateFormatter::FULL, \IntlDateFormatter::FULL, \IntlDateFormatter::GREGORIAN, 'MM*yyyy*dd HH|mm|ss');
@@ -258,6 +269,17 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $dateTime = new \DateTime('2017-01-10 11:00', new \DateTimeZone('Europe/Berlin'));
 
         $this->assertDateTimeEquals($dateTime, $transformer->reverseTransform('2017-01-10'));
+    }
+
+    public function testReverseTransformDateBeforeTheGregorianCutover()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('Dates before 1582 do not fit in a 32 bit timestamp.');
+        }
+
+        $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC', null, null, \IntlDateFormatter::GREGORIAN, 'yyyy-MM-dd');
+
+        $this->assertDateTimeEquals(new \DateTime('1582-01-01 UTC'), $transformer->reverseTransform('1582-01-01'));
     }
 
     public function testReverseTransformWithDifferentPatterns()

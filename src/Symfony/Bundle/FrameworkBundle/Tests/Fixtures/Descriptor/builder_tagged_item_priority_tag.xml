@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container>
+  <definition id="definition_tag_priority" class="Full\Qualified\Class1" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+    <tags>
+      <tag name="tag1">
+        <parameter name="priority">20</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="definition_method_priority" class="Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\TaggedItemWithPriorityMethodClass" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="true" deprecated="false" file="">
+    <tags>
+      <tag name="tag1">
+        <parameter name="priority">10</parameter>
+      </tag>
+      <tag name="tag1">
+        <parameter name="priority">5</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="definition_no_priority" class="Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\TaggedItemWithPriorityClass" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="false" deprecated="false" file="">
+    <tags>
+      <tag name="tag1">
+        <parameter name="attr1">val1</parameter>
+      </tag>
+    </tags>
+  </definition>
+  <definition id="definition_attribute_priority" class="Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\TaggedItemWithPriorityClass" public="true" synthetic="false" lazy="false" shared="true" abstract="false" autowired="false" autoconfigured="true" deprecated="false" file="">
+    <tags>
+      <tag name="tag1">
+        <parameter name="attr1">val1</parameter>
+        <parameter name="priority">30</parameter>
+      </tag>
+    </tags>
+  </definition>
+</container>

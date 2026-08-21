@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Doctrine\Tests\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\MappedSuperclass]
 class DoctrineLoaderParentEntity
@@ -21,6 +22,9 @@ class DoctrineLoaderParentEntity
 
     #[ORM\Column(length: 30)]
     private $privateParentMaxLength;
+
+    #[ORM\Column(length: 25), Assert\DisableAutoMapping]
+    protected $parentNoAutoMapping;
 
     public function getPrivateParentMaxLength()
     {

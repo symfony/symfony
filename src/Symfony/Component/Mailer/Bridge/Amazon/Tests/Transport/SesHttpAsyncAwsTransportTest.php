@@ -84,6 +84,8 @@ class SesHttpAsyncAwsTransportTest extends TestCase
             $this->assertStringContainsString('Saif Eddin <saif.gmati@symfony.com>', $content);
             $this->assertStringContainsString('Fabien <fabpot@symfony.com>', $content);
             $this->assertStringContainsString('Hello There!', $content);
+            $this->assertStringNotContainsString('X-Metadata-tagName1', $content);
+            $this->assertStringNotContainsString('X-Metadata-tagName2', $content);
             $this->assertSame('aws-configuration-set-name', $body['ConfigurationSetName']);
             $this->assertSame('aws-source-arn', $body['FromEmailAddressIdentityArn']);
             $this->assertSame([['Name' => 'tagName1', 'Value' => 'tag Value1'], ['Name' => 'tagName2', 'Value' => 'tag Value2']], $body['EmailTags']);

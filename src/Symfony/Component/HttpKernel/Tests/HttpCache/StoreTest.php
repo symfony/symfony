@@ -12,9 +12,12 @@
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class StoreTest extends TestCase
@@ -319,6 +322,21 @@ class StoreTest extends TestCase
         $this->store->write($request, $response);
         $this->assertArrayNotHasKey('set-cookie', $this->getStoreMetadata($request)[0][1]);
         $this->assertNotEmpty($response->headers->getCookies());
+    }
+
+    public function testDoesNotStoreResponsesWithUnreadableContent()
+    {
+        $request = Request::create('https://example.com/file');
+        $this->store->write($request, new BinaryFileResponse(__FILE__, 200, ['Cache-Control' => 'max-age=420']));
+
+        $this->assertEmpty($this->getStoreMetadata($request));
+        $this->assertNull($this->store->lookup($request));
+
+        $request = Request::create('https://example.com/stream');
+        $this->store->write($request, new StreamedResponse(static function () { echo 'foo'; }, 200, ['Cache-Control' => 'max-age=420']));
+
+        $this->assertEmpty($this->getStoreMetadata($request));
+        $this->assertNull($this->store->lookup($request));
     }
 
     public function testDiscardsInvalidBodyEval()

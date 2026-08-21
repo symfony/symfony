@@ -1,5 +1,5 @@
 ---
-name: symfony-security-triage
+name: security-triage
 description: >
   Triage a reported security finding into a disposition: a private CVE
   (coordinated disclosure + advisory), a public hardening PR (fix in the open,
@@ -109,7 +109,7 @@ A genuine improvement where a CVE condition fails. Typical shapes:
 
 **Affected branches**: find the oldest version where the vulnerable code exists, intersect
 with `maintained_versions` from `https://symfony.com/releases.json`. Fix on the lowest
-maintained affected branch, then merge up (see the `symfony-merge-up` skill). Record the
+maintained affected branch, then merge up (see the `merge-up` skill). Record the
 oldest exposure even if it predates maintained versions.
 
 ## Step 3 — Route
@@ -124,7 +124,7 @@ the one-line rationale (which decision-tree conditions decided it)**, then route
   before any outward step.
 - **Public hardening**: name the branch `harden-`/`hardening-`/`pin-`/`fix-<slug>`; open a
   normal PR with a CHANGELOG entry; use `symfony-security-review` to confirm the fix and
-  `symfony-hardening-rule` to add a durable gate where the class recurs.
+  `hardening-rule` to add a durable gate where the class recurs.
 - **Not a security issue**: draft a short, factual reply to the reporter explaining why
   (cite the contract/threat-model reason), and optionally a doc clarification or
   low-priority robustness PR. Apply `Not a security issue` / `Won't fix`.

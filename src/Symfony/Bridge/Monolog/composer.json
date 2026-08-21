@@ -29,7 +29,8 @@
         "symfony/var-dumper": "^6.4|^7.0|^8.0",
         "symfony/mailer": "^6.4|^7.0|^8.0",
         "symfony/mime": "^6.4|^7.0|^8.0",
-        "symfony/messenger": "^6.4|^7.0|^8.0"
+        "symfony/messenger": "^6.4|^7.0|^8.0",
+        "symfony/notifier": "^6.4|^7.0|^8.0"
     },
     "conflict": {
         "symfony/console": "<6.4",

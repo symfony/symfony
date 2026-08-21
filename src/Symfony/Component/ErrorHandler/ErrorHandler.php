@@ -145,6 +145,11 @@ class ErrorHandler
                 $prev[0]->setExceptionHandler($p);
             }
         } else {
+            if (!$handlerIsRegistered && null === $prev) {
+                // another error handler is in charge and there is no exception handler to decorate
+                restore_exception_handler();
+            }
+
             $handler->setExceptionHandler($prev ?? [$handler, 'renderException']);
         }
 

@@ -39,6 +39,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\BarTagClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooBarTaggedForDefaultPriorityClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\FooTagClass;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\NestedAutowireLocatorConsumer;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\ServiceSubscriberWithAutowireLocator;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticMethodTag;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedConsumerWithExclude;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\TaggedIteratorConsumer;
@@ -416,6 +418,71 @@ class IntegrationTest extends TestCase
         self::assertFalse($s->locator->has('nullable'));
         self::assertSame('foo', $s->locator->get('subscribed'));
         self::assertSame('foo', $s->locator->get('subscribed1'));
+    }
+
+    public function testNestedLocatorConfiguredViaAttribute()
+    {
+        if (!property_exists(SubscribedService::class, 'attributes')) {
+            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'bar'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'foo'])
+        ;
+        $container->register(NestedAutowireLocatorConsumer::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->compile();
+
+        /** @var NestedAutowireLocatorConsumer $s */
+        $s = $container->get(NestedAutowireLocatorConsumer::class);
+
+        $nestedLocator = $s->locator->get('nested_locator');
+        self::assertSame(['bar', 'foo'], array_keys($nestedLocator->getProvidedServices()));
+        self::assertSame($container->get(BarTagClass::class), $nestedLocator->get('bar'));
+        self::assertSame($container->get(FooTagClass::class), $nestedLocator->get('foo'));
+
+        self::assertSame([$container->get(BarTagClass::class), $container->get(FooTagClass::class)], iterator_to_array($s->locator->get('nested_iterator')));
+    }
+
+    public function testSubscribedServiceWithAutowireLocatorAttribute()
+    {
+        if (!property_exists(SubscribedService::class, 'attributes')) {
+            $this->markTestSkipped('Requires symfony/service-contracts >= 3.2');
+        }
+
+        $container = new ContainerBuilder();
+        $container->register(BarTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'bar'])
+        ;
+        $container->register(FooTagClass::class)
+            ->setPublic(true)
+            ->addTag('foo_bar', ['key' => 'foo'])
+        ;
+        $container->register(ServiceSubscriberWithAutowireLocator::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+            ->addTag('container.service_subscriber')
+        ;
+
+        $container->compile();
+
+        /** @var ServiceSubscriberWithAutowireLocator $s */
+        $s = $container->get(ServiceSubscriberWithAutowireLocator::class);
+
+        $nestedLocator = $s->container->get('nested_locator');
+        self::assertSame(['bar', 'foo'], array_keys($nestedLocator->getProvidedServices()));
+        self::assertSame($container->get(BarTagClass::class), $nestedLocator->get('bar'));
+        self::assertSame($container->get(FooTagClass::class), $nestedLocator->get('foo'));
     }
 
     public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()

@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand;
 
 use Symfony\Bundle\FrameworkBundle\Command\CacheClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TerminateListener;
 use Symfony\Bundle\FrameworkBundle\Tests\Command\CacheClearCommand\Fixture\TestAppKernel;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Config\ConfigCacheFactory;
@@ -98,6 +99,19 @@ class CacheClearCommandTest extends TestCase
             $this->fs->readFile($containerFile),
             'kernel.container_class is properly set on the dumped container'
         );
+    }
+
+    public function testConsoleTerminateListenersAreCalled()
+    {
+        TerminateListener::$calls = 0;
+
+        $input = new ArrayInput(['cache:clear']);
+        $application = new Application($this->kernel);
+        $application->setCatchExceptions(false);
+
+        $application->doRun($input, new NullOutput());
+
+        $this->assertSame(1, TerminateListener::$calls);
     }
 
     public function testCacheIsWarmedWhenCalledTwice()

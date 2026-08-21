@@ -1,5 +1,5 @@
 ---
-name: symfony-hardening-rule
+name: hardening-rule
 description: >
   Decide whether a recurring hardening invariant is worth a CI gate, and add it
   without hitting the traps. Covers PHPStan custom rules (implementation-shape

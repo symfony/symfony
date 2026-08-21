@@ -1345,6 +1345,28 @@ class AutowirePassTest extends TestCase
         $this->assertSame(['foo'], $definition->getArguments());
     }
 
+    public function testAutowireAttributeKeepsPercentEscaping()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', AutowireAttributeNullFallback::class)
+            ->setAutowired(true)
+            ->setPublic(true)
+        ;
+
+        $container->setParameter('required.parameter', 'my friend %%s has %%d dogs');
+        $container->setParameter('optional.parameter', '50%%%% off');
+
+        $container->compile();
+
+        $this->assertSame('my friend %%s has %%d dogs', $container->getDefinition('foo')->getArgument(0));
+
+        $service = $container->get('foo');
+
+        $this->assertSame('my friend %s has %d dogs', $service->required);
+        $this->assertSame('50%% off', $service->optional);
+    }
+
     public function testAsDecoratorAttribute()
     {
         $container = new ContainerBuilder();

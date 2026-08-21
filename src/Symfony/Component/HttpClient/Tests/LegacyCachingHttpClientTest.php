@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpCache\Store;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -139,6 +140,36 @@ class LegacyCachingHttpClientTest extends TestCase
         $headers = $response->getHeaders();
 
         $this->assertArrayNotHasKey('x-content-digest', $headers);
+    }
+
+    public function testTrustedHostsDoNotAlterRequestedUrls()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/http-client 7.4: Passing a "Symfony\Component\HttpKernel\HttpCache\StoreInterface" as constructor\'s 2nd argument of "Symfony\Component\HttpClient\CachingHttpClient" is deprecated, "Symfony\Contracts\Cache\TagAwareCacheInterface" expected.');
+
+        $requestedUrls = [];
+
+        $mockClient = new MockHttpClient(static function (string $method, string $url) use (&$requestedUrls) {
+            $requestedUrls[] = $url;
+
+            return new MockResponse('hello', ['response_headers' => ['Cache-Control' => 'public, max-age=60']]);
+        });
+
+        $cacheDir = sys_get_temp_dir().'/sf_http_cache_'.uniqid('', true);
+        $client = new CachingHttpClient($mockClient, new Store($cacheDir));
+
+        Request::setTrustedHosts(['^example\.org$']);
+
+        try {
+            $first = $client->request('GET', 'https://example.com/foo')->getContent();
+            $second = $client->request('GET', 'https://example.com/foo')->getContent();
+        } finally {
+            Request::setTrustedHosts([]);
+            $this->removeDir($cacheDir);
+        }
+
+        self::assertSame(['https://example.com/foo'], $requestedUrls);
+        self::assertSame('hello', $first);
+        self::assertSame('hello', $second);
     }
 
     private function runRequest(MockResponse $mockResponse): ResponseInterface

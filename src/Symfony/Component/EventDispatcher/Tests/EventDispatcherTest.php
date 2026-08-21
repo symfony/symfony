@@ -376,6 +376,38 @@ class EventDispatcherTest extends TestCase
         $this->assertSame(['bar' => [[$test, 'foo']]], $this->dispatcher->getListeners());
     }
 
+    public function testGetListenersWhenLazyListenerAddsListeners()
+    {
+        $test1 = new TestWithDispatcher();
+        $test2 = new TestWithDispatcher();
+        $test3 = new TestWithDispatcher();
+        $test4 = new TestWithDispatcher();
+        $test1->name = '1';
+        $test2->name = '2';
+        $test3->name = '3';
+        $test4->name = '4';
+        $dispatcher = $this->dispatcher;
+        $factory = static function () use ($dispatcher, $test2, $test3, $test4) {
+            $dispatcher->addListener('foo', [$test3, 'foo'], 5);
+            $dispatcher->addListener('foo', [$test4, 'foo']);
+
+            return $test2;
+        };
+
+        $this->dispatcher->addListener('foo', [$test1, 'foo']);
+        $this->dispatcher->addListener('foo', [$factory, 'foo']);
+
+        $expected = [
+            [$test3, 'foo'],
+            [$test1, 'foo'],
+            [$test2, 'foo'],
+            [$test4, 'foo'],
+        ];
+
+        $this->assertSame($expected, $this->dispatcher->getListeners('foo'));
+        $this->assertSame($expected, $this->dispatcher->getListeners('foo'));
+    }
+
     public function testMutatingWhilePropagationIsStopped()
     {
         $testLoaded = false;

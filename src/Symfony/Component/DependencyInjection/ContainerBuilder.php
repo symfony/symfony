@@ -1153,7 +1153,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (null !== $definition->getFile()) {
-            require_once $parameterBag->resolveValue($definition->getFile());
+            require_once $parameterBag->unescapeValue($parameterBag->resolveValue($definition->getFile()));
         }
 
         $arguments = $definition->getArguments();

@@ -23,6 +23,7 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -38,6 +39,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
     private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
 
     private SymfonySerializerInterface $serializer;
+    private array $stampContext;
 
     public function __construct(
         ?SymfonySerializerInterface $serializer = null,
@@ -46,6 +48,8 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
     ) {
         $this->serializer = $serializer ?? self::create()->serializer;
         $this->context += [self::MESSENGER_SERIALIZATION_CONTEXT => true];
+        // stamps have no serialization metadata, so selecting the attributes of the message would encode them empty
+        $this->stampContext = array_diff_key($this->context, array_flip([AbstractNormalizer::ATTRIBUTES, AbstractNormalizer::GROUPS, AbstractNormalizer::IGNORED_ATTRIBUTES]));
     }
 
     public static function create(): self
@@ -135,7 +139,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
             }
 
             try {
-                $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
+                $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->stampContext);
             } catch (ExceptionInterface $e) {
                 throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
             }
@@ -155,7 +159,7 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         $headers = [];
         foreach ($allStamps as $class => $stamps) {
-            $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->context);
+            $headers[self::STAMP_HEADER_PREFIX.$class] = $this->serializer->serialize($stamps, $this->format, $this->stampContext);
         }
 
         return $headers;

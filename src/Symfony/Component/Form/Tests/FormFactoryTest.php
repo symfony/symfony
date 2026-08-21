@@ -12,7 +12,10 @@
 namespace Symfony\Component\Form\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RangeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormRegistry;
@@ -144,6 +147,64 @@ class FormFactoryTest extends TestCase
         $this->assertSame('firstName', $builder->getName());
         $this->assertSame(['maxlength' => 20, 'pattern' => '.{5,}', 'class' => 'tinymce'], $builder->getOption('attr'));
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
+    }
+
+    public function testCreateBuilderUsesMaxLengthAndPatternForChildrenOfTextType()
+    {
+        $this->guesser1->configureTypeGuess(PasswordType::class, [], Guess::HIGH_CONFIDENCE);
+        $this->guesser1->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
+        $this->guesser2->configurePatternGuess('.{5,}', Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame(['maxlength' => 20, 'pattern' => '.{5,}'], $builder->getOption('attr'));
+        $this->assertInstanceOf(PasswordType::class, $builder->getType()->getInnerType());
+    }
+
+    public function testCreateBuilderIgnoresMaxLengthAndPatternForTypesOtherThanTextInputs()
+    {
+        $this->guesser1->configureTypeGuess(ChoiceType::class, [], Guess::HIGH_CONFIDENCE);
+        $this->guesser1->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
+        $this->guesser2->configurePatternGuess('.{5,}', Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame([], $builder->getOption('attr'));
+        $this->assertInstanceOf(ChoiceType::class, $builder->getType()->getInnerType());
+    }
+
+    public function testCreateBuilderKeepsExplicitAttributesForTypesOtherThanTextInputs()
+    {
+        $this->guesser1->configureTypeGuess(ChoiceType::class, [], Guess::HIGH_CONFIDENCE);
+        $this->guesser1->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName', null, ['attr' => ['maxlength' => 11]]);
+
+        $this->assertSame(['maxlength' => 11], $builder->getOption('attr'));
+    }
+
+    public function testCreateBuilderUsesMaxLengthAndPatternForTypesRenderedAsTextInputs()
+    {
+        $this->guesser1->configureTypeGuess(NumberType::class, [], Guess::HIGH_CONFIDENCE);
+        $this->guesser1->configureMaxLengthGuess(4, Guess::HIGH_CONFIDENCE);
+        $this->guesser2->configurePatternGuess('.{1,}', Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame(['maxlength' => 4, 'pattern' => '.{1,}'], $builder->getOption('attr'));
+        $this->assertInstanceOf(NumberType::class, $builder->getType()->getInnerType());
+    }
+
+    public function testCreateBuilderIgnoresMaxLengthAndPatternForChildrenOfTextTypeRenderedAsOtherInputs()
+    {
+        $this->guesser1->configureTypeGuess(RangeType::class, [], Guess::HIGH_CONFIDENCE);
+        $this->guesser1->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
+        $this->guesser2->configurePatternGuess('.{5,}', Guess::HIGH_CONFIDENCE);
+
+        $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
+
+        $this->assertSame([], $builder->getOption('attr'));
+        $this->assertInstanceOf(RangeType::class, $builder->getType()->getInnerType());
     }
 
     public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()

@@ -1,0 +1,13 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    tagged_consumer:
+        public: true
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedConsumer
+        arguments: [!tagged_iterator app.tagged]
+
+    tagged_item:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedItem
+        arguments: ['not an array']
+        tags: ['app.tagged']

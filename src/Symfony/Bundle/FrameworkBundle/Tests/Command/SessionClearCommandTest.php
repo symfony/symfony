@@ -16,9 +16,21 @@ use Symfony\Bundle\FrameworkBundle\Command\SessionClearCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHandlerInterface;
 
+/**
+ * Mocking \SessionHandlerInterface directly is not an option: PHP 8.6 warns about
+ * any class implementing it without create_sid() and validateId(), which the
+ * generated doubles would not have.
+ */
+abstract class BareSessionHandler implements \SessionHandlerInterface
+{
+    abstract public function create_sid(): string;
+
+    abstract public function validateId(string $id): bool;
+}
+
 // the interface only exists since HttpFoundation 8.2, older versions must not fatal at load time
 if (interface_exists(ClearableSessionHandlerInterface::class)) {
-    abstract class ClearableSessionHandler implements \SessionHandlerInterface, ClearableSessionHandlerInterface
+    abstract class ClearableSessionHandler extends BareSessionHandler implements ClearableSessionHandlerInterface
     {
     }
 }
@@ -46,7 +58,7 @@ class SessionClearCommandTest extends TestCase
 
     public function testUnsupportedHandler()
     {
-        $handler = $this->createStub(\SessionHandlerInterface::class);
+        $handler = $this->createStub(BareSessionHandler::class);
 
         $tester = new CommandTester(new SessionClearCommand($handler));
         $statusCode = $tester->execute([]);

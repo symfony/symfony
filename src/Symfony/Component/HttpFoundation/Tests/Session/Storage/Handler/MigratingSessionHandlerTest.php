@@ -16,11 +16,11 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHan
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\MigratingSessionHandler;
 use Symfony\Component\HttpFoundation\Tests\Fixtures\BareSessionHandler;
 
-abstract class ClearableSessionHandlerAndTimestamp implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface, ClearableSessionHandlerInterface
+abstract class ClearableSessionHandlerAndTimestamp extends BareSessionHandler implements \SessionUpdateTimestampHandlerInterface, ClearableSessionHandlerInterface
 {
 }
 
-abstract class NonClearableSessionHandlerWithTimestamp implements \SessionHandlerInterface, \SessionUpdateTimestampHandlerInterface
+abstract class NonClearableSessionHandlerWithTimestamp extends BareSessionHandler implements \SessionUpdateTimestampHandlerInterface
 {
 }
 

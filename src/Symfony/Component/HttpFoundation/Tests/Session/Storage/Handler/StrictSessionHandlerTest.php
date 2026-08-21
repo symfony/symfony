@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\ClearableSessionHan
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandler;
 use Symfony\Component\HttpFoundation\Tests\Fixtures\BareSessionHandler;
 
-abstract class ClearableInnerSessionHandler implements \SessionHandlerInterface, ClearableSessionHandlerInterface
+abstract class ClearableInnerSessionHandler extends BareSessionHandler implements ClearableSessionHandlerInterface
 {
 }
 
@@ -219,7 +219,7 @@ class StrictSessionHandlerTest extends TestCase
 
     public function testClearThrowsWhenInnerHandlerNotClearable()
     {
-        $handler = $this->createStub(\SessionHandlerInterface::class);
+        $handler = $this->createStub(BareSessionHandler::class);
         $proxy = new StrictSessionHandler($handler);
 
         $this->expectException(\LogicException::class);

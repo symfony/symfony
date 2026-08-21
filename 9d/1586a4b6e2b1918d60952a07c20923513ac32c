@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-21T15:54:07Z
+
+Thank you for the fix. I rebased on 7.4 and dropped the `enum_exists()` part of the guard: `class_exists()` already returns true for enums, so constants declared on an enum resolve correctly on the base branch. Verified with a probe on 7.4:
+
+```
+interface       IWithConst::FOO_* => mixed
+enum            EWithConst::BAR_* => int|string
+```
+
+Only the interface case was broken, so the title and the description now cover interfaces only. The added test rows fail on 7.4 with `mixed` and with `"mixed" is not a valid array key type.` for the `array<...>` row, and pass with the fix.

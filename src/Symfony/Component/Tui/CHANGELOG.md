@@ -8,7 +8,7 @@ CHANGELOG
  * Add `AnsiUtils::sliceToWidth()` to extract a fixed-width range of columns from a line
  * Add `AbstractWidget::postRender()` to post-process a widget's finished lines, chrome included
  * Make `LoopClock` part of the public API
- * Dispatch paste lifecycle events through an optional terminal event dispatcher
+ * Dispatch paste lifecycle events through the terminal event dispatcher
  * Reuse unchanged rendered line segments during differential updates
  * Add `AbstractWidget::attachChild()` and `AbstractWidget::detachChild()` to wire child widgets
  * Add multi-select support to `SelectListWidget`

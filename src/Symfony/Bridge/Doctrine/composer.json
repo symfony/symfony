@@ -64,7 +64,7 @@
         "symfony/property-info": "<6.4",
         "symfony/security-bundle": "<6.4",
         "symfony/security-core": "<6.4",
-        "symfony/validator": "<7.4"
+        "symfony/validator": "<7.4.17|>=8.0,<8.1.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Doctrine\\": "" },

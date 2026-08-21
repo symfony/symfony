@@ -226,18 +226,26 @@ class EventDispatcher implements EventDispatcherInterface
      */
     private function sortListeners(string $eventName): void
     {
-        krsort($this->listeners[$eventName]);
-        $this->sorted[$eventName] = [];
+        do {
+            krsort($this->listeners[$eventName]);
+            // Initializing a lazy listener can add listeners for the same event.
+            // That unsets $this->sorted[$eventName], which is the signal to sort again.
+            $this->sorted[$eventName] = [];
+            $sorted = [];
 
-        foreach ($this->listeners[$eventName] as &$listeners) {
-            foreach ($listeners as &$listener) {
-                if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
-                    $listener[0] = $listener[0]();
-                    $listener[1] ??= '__invoke';
+            foreach ($this->listeners[$eventName] as &$listeners) {
+                foreach ($listeners as &$listener) {
+                    if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
+                        $listener[0] = $listener[0]();
+                        $listener[1] ??= '__invoke';
+                    }
+                    $sorted[] = $listener;
                 }
-                $this->sorted[$eventName][] = $listener;
             }
-        }
+            unset($listeners, $listener);
+        } while (!isset($this->sorted[$eventName]));
+
+        $this->sorted[$eventName] = $sorted;
     }
 
     /**

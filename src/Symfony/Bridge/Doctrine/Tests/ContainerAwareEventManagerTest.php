@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ContainerAwareEventManagerTest extends TestCase
 {
@@ -266,6 +267,28 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->addEventListener('foo', $listener2 = new MyListener());
 
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getAllListeners()['foo']));
+    }
+
+    public function testGetListenersWhenALazyListenerAddsListeners()
+    {
+        $listener1 = new MyListener();
+        $listener2 = new MyListener();
+        $listener3 = new MyListener();
+        $evm = null;
+        $container = new ServiceLocator(['lazy2' => static function () use (&$evm, $listener2, $listener3) {
+            $evm->addEventListener('foo', $listener3);
+
+            return $listener2;
+        }]);
+        $evm = new ContainerAwareEventManager($container);
+
+        $evm->addEventListener('foo', $listener1);
+        $evm->addEventListener('foo', 'lazy2');
+
+        $expected = [$listener1, $listener2, $listener3];
+
+        $this->assertSame($expected, array_values($evm->getListeners('foo')));
+        $this->assertSame($expected, array_values($evm->getListeners('foo')));
     }
 
     public function testRemoveEventListener()

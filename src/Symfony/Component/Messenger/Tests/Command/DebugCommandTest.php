@@ -50,11 +50,11 @@ class DebugCommandTest extends TestCase
             'command_bus' => [
                 DummyCommand::class => [[DummyCommandHandler::class, ['option1' => '1', 'option2' => '2']]],
                 DummyCommandWithDescription::class => [[DummyCommandWithDescriptionHandler::class, []]],
-                MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, []]],
+                MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, ['alias' => MultipleBusesMessageHandler::class]]],
             ],
             'query_bus' => [
                 DummyQuery::class => [[DummyQueryHandler::class, []]],
-                MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, []]],
+                MultipleBusesMessage::class => [[MultipleBusesMessageHandler::class, ['alias' => 'legacy']]],
             ],
         ]);
 
@@ -90,14 +90,14 @@ class DebugCommandTest extends TestCase
 
              The following messages can be dispatched:
 
-             --------------------------------------------------------------------------------------- 
-              Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                  
-                  handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler            
-                                                                                                     
-              Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-                  handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
-                                                                                                     
-             --------------------------------------------------------------------------------------- 
+             ----------------------------------------------------------------------------------------------------------- 
+              Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                                      
+                  handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler                                
+                                                                                                                         
+              Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                                            
+                  handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler (when alias=legacy)  
+                                                                                                                         
+             ----------------------------------------------------------------------------------------------------------- 
 
 
             TXT,
@@ -116,14 +116,14 @@ class DebugCommandTest extends TestCase
 
              The following messages can be dispatched:
 
-             --------------------------------------------------------------------------------------- 
-              Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                  
-                  handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler            
-                                                                                                     
-              Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                        
-                  handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler  
-                                                                                                     
-             --------------------------------------------------------------------------------------- 
+             ----------------------------------------------------------------------------------------------------------- 
+              Symfony\Component\Messenger\Tests\Fixtures\DummyQuery                                                      
+                  handled by Symfony\Component\Messenger\Tests\Fixtures\DummyQueryHandler                                
+                                                                                                                         
+              Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessage                                            
+                  handled by Symfony\Component\Messenger\Tests\Fixtures\MultipleBusesMessageHandler (when alias=legacy)  
+                                                                                                                         
+             ----------------------------------------------------------------------------------------------------------- 
 
 
             TXT,

@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
@@ -62,6 +63,38 @@ class UsageTrackingTokenStorageTest extends TestCase
         $this->assertSame(1, $sessionAccess);
 
         $trackingStorage->disableUsageTracking();
+        $this->assertSame($token, $trackingStorage->getToken());
+        $this->assertSame(1, $sessionAccess);
+    }
+
+    public function testGetTokenTracksUsageEnabledByTheInitializer()
+    {
+        $sessionAccess = 0;
+        $session = $this->createMock(SessionInterface::class);
+        $session->method('getMetadataBag')->willReturnCallback(static function () use (&$sessionAccess) {
+            ++$sessionAccess;
+
+            return new MetadataBag();
+        });
+
+        $request = new Request();
+        $request->setSession($session);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        $locator = new class(['request_stack' => static fn () => $requestStack]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+
+        $tokenStorage = new TokenStorage();
+        $trackingStorage = new UsageTrackingTokenStorage($tokenStorage, $locator);
+        $token = new NullToken();
+
+        $tokenStorage->setInitializer(static function () use ($tokenStorage, $trackingStorage, $token) {
+            $trackingStorage->enableUsageTracking();
+            $tokenStorage->setToken($token);
+        });
+
         $this->assertSame($token, $trackingStorage->getToken());
         $this->assertSame(1, $sessionAccess);
     }

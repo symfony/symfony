@@ -14,6 +14,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 use Symfony\Bundle\FrameworkBundle\Console\Descriptor\TextDescriptor;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 
 class TextDescriptorTest extends AbstractDescriptorTestCase
 {
@@ -31,25 +32,70 @@ class TextDescriptorTest extends AbstractDescriptorTestCase
 
     public static function getDescribeRouteWithControllerLinkTestData()
     {
-        $getDescribeData = static::getDescribeRouteTestData();
-
-        foreach ($getDescribeData as $key => &$data) {
-            $routeStub = $data[0];
-            $routeStub->setDefault('_controller', \sprintf('%s::%s', MyController::class, '__invoke'));
-            $file = $data[2];
-            $file = preg_replace('#(\..*?)$#', '_link$1', $file);
-            $data = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
-            $data = [$routeStub, $data, $file];
-        }
-
-        return $getDescribeData;
+        return static::getDescribeRouteWithControllerTestData('_link');
     }
 
     /** @dataProvider getDescribeRouteWithControllerLinkTestData */
     public function testDescribeRouteWithControllerLink(Route $route, $expectedDescription)
     {
         static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
-        parent::testDescribeRoute($route, str_replace('[:file:]', __FILE__, $expectedDescription));
+        $this->assertDescription(static::expandFixturePlaceholders($expectedDescription), $route, ['raw_text' => false]);
+    }
+
+    public static function getDescribeRouteWithControllerLinkInRawModeTestData()
+    {
+        return static::getDescribeRouteWithControllerTestData('_link_raw');
+    }
+
+    /** @dataProvider getDescribeRouteWithControllerLinkInRawModeTestData */
+    public function testDescribeRouteWithControllerLinkInRawMode(Route $route, $expectedDescription)
+    {
+        static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
+        $this->assertDescription($expectedDescription, $route);
+    }
+
+    public function testDescribeRouteCollectionWithControllerLink()
+    {
+        static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
+        $expectedDescription = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/route_collection_1_link.txt');
+        $this->assertDescription(static::expandFixturePlaceholders($expectedDescription), static::getRouteCollectionWithControllers(), ['show_controllers' => true, 'raw_text' => false]);
+    }
+
+    public function testDescribeRouteCollectionWithControllerLinkInRawMode()
+    {
+        static::$fileLinkFormatter = new FileLinkFormatter('myeditor://open?file=%f&line=%l');
+        $expectedDescription = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/route_collection_1_link_raw.txt');
+        $this->assertDescription($expectedDescription, static::getRouteCollectionWithControllers(), ['show_controllers' => true]);
+    }
+
+    private static function getDescribeRouteWithControllerTestData(string $suffix): array
+    {
+        $getDescribeData = static::getDescribeRouteTestData();
+
+        foreach ($getDescribeData as &$data) {
+            $routeStub = $data[0];
+            $routeStub->setDefault('_controller', \sprintf('%s::%s', MyController::class, '__invoke'));
+            $file = preg_replace('#(\..*?)$#', $suffix.'$1', $data[2]);
+            $data = [$routeStub, file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file), $file];
+        }
+
+        return $getDescribeData;
+    }
+
+    private static function getRouteCollectionWithControllers(): RouteCollection
+    {
+        $collection = new RouteCollection();
+        foreach (ObjectsProvider::getRoutes() as $name => $route) {
+            $route->setDefault('_controller', \sprintf('%s::%s', MyController::class, '__invoke'));
+            $collection->add($name, $route);
+        }
+
+        return $collection;
+    }
+
+    private static function expandFixturePlaceholders(string $expectedDescription): string
+    {
+        return str_replace(['[:file:]', '[:line:]'], [__FILE__, (new \ReflectionMethod(MyController::class, '__invoke'))->getStartLine()], $expectedDescription);
     }
 }
 

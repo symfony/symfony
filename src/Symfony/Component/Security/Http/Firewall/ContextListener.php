@@ -209,8 +209,12 @@ class ContextListener extends AbstractListener
      */
     private function refreshUser(TokenInterface $token): RefreshUserResult
     {
-        if ($token instanceof SwitchUserToken && $token->getOriginalToken()->getUser() && !$this->refreshUser($token->getOriginalToken())) {
-            return null;
+        if ($token instanceof SwitchUserToken && $token->getOriginalToken()->getUser()) {
+            $originalResult = $this->refreshUser($token->getOriginalToken());
+
+            if (!$originalResult->token) {
+                return $originalResult;
+            }
         }
 
         $user = $token->getUser();

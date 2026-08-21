@@ -48,6 +48,6 @@ class FileTypeFilterIterator extends \FilterIterator
             return false;
         }
 
-        return true;
+        return !$fileinfo->isLink() || $fileinfo->isFile() || $fileinfo->isDir();
     }
 }

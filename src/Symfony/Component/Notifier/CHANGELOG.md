@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `AdminRecipientsProviderInterface`
+ * Deprecate declaring `getAdminRecipients()` without implementing `AdminRecipientsProviderInterface`
+
 8.0
 ---
 

@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-final class Notifier implements NotifierInterface
+final class Notifier implements NotifierInterface, AdminRecipientsProviderInterface
 {
     private array $adminRecipients = [];
 
@@ -55,9 +55,6 @@ final class Notifier implements NotifierInterface
         $this->adminRecipients[] = $recipient;
     }
 
-    /**
-     * @return RecipientInterface[]
-     */
     public function getAdminRecipients(): array
     {
         return $this->adminRecipients;

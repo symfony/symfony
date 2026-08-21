@@ -145,8 +145,9 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
         $decodingFailureHeaders = null !== $decodingFailureBody && \is_array($decodingFailure['headers'] ?? null) ? $decodingFailure['headers'] : [];
 
         if ($isDecodingFailure && null === $decodingFailureBody) {
-            // the exception itself is encoded: its stack trace can reference the whole object graph
-            $context[AbstractNormalizer::IGNORED_ATTRIBUTES] = [...$context[AbstractNormalizer::IGNORED_ATTRIBUTES] ?? [], 'trace', 'traceAsString', 'previous'];
+            // the exception itself is encoded: the frames of its stack trace hold the arguments
+            // of every call, which can reference the whole object graph
+            $context[AbstractNormalizer::IGNORED_ATTRIBUTES] = [...$context[AbstractNormalizer::IGNORED_ATTRIBUTES] ?? [], 'trace'];
         }
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);

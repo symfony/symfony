@@ -84,7 +84,8 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     private ?Suspension $runSuspension = null;
 
     /**
-     * @param Renderer|null $renderer @internal Override the default renderer; framework-internal use only
+     * @param Renderer|null                 $renderer        @internal Override the default renderer; framework-internal use only
+     * @param EventDispatcherInterface|null $eventDispatcher Reference dispatcher; the terminal must use the same instance
      */
     public function __construct(
         ?StyleSheet $styleSheet = null,
@@ -94,8 +95,12 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
         ?Renderer $renderer = null,
         ?EventDispatcherInterface $eventDispatcher = null,
     ) {
-        $this->eventDispatcher = $eventDispatcher ?? new EventDispatcher();
+        $this->eventDispatcher = $eventDispatcher ?? $terminal?->getEventDispatcher() ?? new EventDispatcher();
         $this->terminal = $terminal ?? new Terminal($this->eventDispatcher);
+
+        if ($this->eventDispatcher !== $this->terminal->getEventDispatcher()) {
+            throw new InvalidArgumentException('The terminal must use the TUI event dispatcher.');
+        }
         $this->keybindings = $keybindings ?? new Keybindings();
         $this->root = new ContainerWidget();
         $this->root->expandVertically(true);
@@ -323,15 +328,14 @@ class Tui implements RenderRequestorInterface, TickRuntimeInterface
     }
 
     /**
-     * Register a listener for a widget event.
+     * Register a listener for a TUI event.
      *
      * The event class is inferred from the listener's first parameter type hint:
      *
      *     $tui->addListener(function (InputEvent $event) { ... });
      *
-     * This is the primary way to react to widget events (submit, cancel,
-     * change, select, etc.). All events dispatched by any widget in the
-     * tree are routed through this single dispatcher.
+     * This is the primary way to react to widget and lifecycle events. All
+     * events are routed through a single dispatcher.
      *
      * Use {@see AbstractEvent::getTarget()} to filter by source widget when
      * listening for a shared event type like CancelEvent.

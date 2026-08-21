@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Tui\Terminal;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Tui\Input\StdinBuffer;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Virtual terminal for testing.
@@ -41,8 +42,13 @@ final class VirtualTerminal implements TerminalInterface
         private int $columns = 80,
         private int $rows = 24,
         private bool $kittyProtocolActive = false,
-        private readonly ?EventDispatcherInterface $eventDispatcher = null,
+        private readonly EventDispatcherInterface $eventDispatcher = new EventDispatcher(),
     ) {
+    }
+
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
     }
 
     public function start(callable $onInput, callable $onResize, callable $onKittyProtocolActivated): void

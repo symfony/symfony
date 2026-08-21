@@ -13,7 +13,6 @@ namespace Symfony\Component\Tui\Tests\Widget;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\ChangeEvent;
 use Symfony\Component\Tui\Event\PasteCompletedEvent;
@@ -110,9 +109,8 @@ class EditorTest extends TestCase
 
     public function testPasteLifecycleEventsAreDispatchedWhilePasteIsReceived()
     {
-        $dispatcher = new EventDispatcher();
-        $terminal = new VirtualTerminal(80, 24, eventDispatcher: $dispatcher);
-        $tui = new Tui(terminal: $terminal, eventDispatcher: $dispatcher);
+        $terminal = new VirtualTerminal(80, 24);
+        $tui = new Tui(terminal: $terminal);
         $editor = new EditorWidget();
         $events = [];
 

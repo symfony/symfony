@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Tui\Terminal;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 /**
  * Terminal that delegates to multiple terminals simultaneously.
  *
@@ -36,6 +38,11 @@ final class TeeTerminal implements TerminalInterface
         private TerminalInterface $primary,
         private TerminalInterface $secondary,
     ) {
+    }
+
+    public function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->primary->getEventDispatcher();
     }
 
     public function start(callable $onInput, callable $onResize, callable $onKittyProtocolActivated): void

@@ -13,6 +13,7 @@ namespace Symfony\Component\Tui\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\InputEvent;
 use Symfony\Component\Tui\Event\TickEvent;
@@ -31,6 +32,17 @@ use Symfony\Component\Tui\Widget\TextWidget;
 
 class TuiTest extends TestCase
 {
+    public function testRejectsTerminalUsingDifferentEventDispatcher()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The terminal must use the TUI event dispatcher.');
+
+        new Tui(
+            terminal: new VirtualTerminal(),
+            eventDispatcher: new EventDispatcher(),
+        );
+    }
+
     public function testBasicRender()
     {
         $terminal = new VirtualTerminal(40, 10);

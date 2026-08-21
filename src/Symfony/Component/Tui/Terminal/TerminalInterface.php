@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Tui\Terminal;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 /**
  * Interface for terminal implementations.
  *
@@ -34,6 +36,11 @@ interface TerminalInterface
      * @param callable(): void       $onKittyProtocolActivated Called when Kitty keyboard protocol is detected
      */
     public function start(callable $onInput, callable $onResize, callable $onKittyProtocolActivated): void;
+
+    /**
+     * Get the event dispatcher used for terminal events.
+     */
+    public function getEventDispatcher(): EventDispatcherInterface;
 
     /**
      * Stop the terminal and restore original state.

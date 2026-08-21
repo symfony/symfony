@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -256,6 +257,43 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return $sortedTags;
+    }
+
+    protected function resolvePriorityServiceTags(ContainerBuilder $container, Definition $definition, ?string $tagName = null): array
+    {
+        $tags = null !== $tagName ? $definition->getTag($tagName) : $definition->getTags();
+
+        if (!$r = $container->getReflectionClass($definition->getClass(), false)) {
+            return $tags;
+        }
+
+        $priority = null;
+        if ($r->hasMethod('getDefaultPriority')) {
+            $rm = $r->getMethod('getDefaultPriority');
+            if ($rm->isPublic() && $rm->isStatic() && !$rm->isAbstract() && \is_int($defaultPriority = $rm->invoke(null))) {
+                $priority = $defaultPriority;
+            }
+        } elseif ($definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes')) {
+            $priority = ($r->getAttributes(AsTaggedItem::class)[0] ?? null)?->newInstance()->priority;
+        }
+
+        if (!$priority) {
+            return $tags;
+        }
+
+        if (null !== $tagName) {
+            foreach ($tags as &$tag) {
+                $tag['priority'] ??= $priority;
+            }
+        } else {
+            foreach ($tags as &$tagConfigs) {
+                foreach ($tagConfigs as &$tag) {
+                    $tag['priority'] ??= $priority;
+                }
+            }
+        }
+
+        return $tags;
     }
 
     protected function sortByPriority(array $tag): array

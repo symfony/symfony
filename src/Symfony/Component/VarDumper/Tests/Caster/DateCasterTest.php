@@ -423,6 +423,38 @@ class DateCasterTest extends TestCase
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0period"]);
     }
 
+    #[DataProvider('provideNonForwardIntervals')]
+    public function testCastPeriodWithNonForwardInterval($interval, $xDates)
+    {
+        $p = new \DatePeriod(new \DateTimeImmutable('2017-01-01', new \DateTimeZone('UTC')), $interval, new \DateTimeImmutable('2018-01-01', new \DateTimeZone('UTC')));
+        $stub = new Stub();
+
+        $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
+
+        $this->assertSame($xDates, $cast["\0~\0period"]->value);
+    }
+
+    public static function provideNonForwardIntervals()
+    {
+        $sameDate = "1) 2017-01-01 00:00:00.0\n2) 2017-01-01 00:00:00.0\n3) 2017-01-01 00:00:00.0";
+
+        return [
+            [new \DateInterval('PT0S'), $sameDate],
+            [new \DateInterval('P0D'), $sameDate],
+            [\DateInterval::createFromDateString('1 day ago'), "1) 2017-01-01 00:00:00.0\n2) 2016-12-31 00:00:00.0\n3) 2016-12-30 00:00:00.0"],
+        ];
+    }
+
+    public function testCastPeriodWithSubSecondInterval()
+    {
+        $p = new \DatePeriod(new \DateTimeImmutable('2017-01-01', new \DateTimeZone('UTC')), \DateInterval::createFromDateString('500 milliseconds'), new \DateTimeImmutable('2017-01-02', new \DateTimeZone('UTC')));
+        $stub = new Stub();
+
+        $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
+
+        $this->assertSame("1) 2017-01-01 00:00:00.0\n2) 2017-01-01 00:00:00.500\n3) 2017-01-01 00:00:01.0\n172797 more", $cast["\0~\0period"]->value);
+    }
+
     public static function providePeriods()
     {
         $periods = [
@@ -446,6 +478,8 @@ class DateCasterTest extends TestCase
 
             ['2017-01-01', 'P1D', '2017-01-04', \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from ]2017-01-01 00:00:00.0 to 2017-01-04 00:00:00.0[', '1) 2017-01-02%a2) 2017-01-03'],
             ['2017-01-01', 'P1D', 2, \DatePeriod::EXCLUDE_START_DATE, 'every + 1d, from ]2017-01-01 00:00:00.0 recurring 2 time/s', '1) 2017-01-02%a2) 2017-01-03'],
+
+            ['2017-01-01', 'PT0S', '2017-01-05', 0, 'every 0s, from [2017-01-01 00:00:00.0 to 2017-01-05 00:00:00.0[', '1) 2017-01-01%a2) 2017-01-01%a3) 2017-01-01'],
         ];
 
         return $periods;

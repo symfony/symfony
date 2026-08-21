@@ -153,6 +153,43 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
+    public function testRunTwiceInTheSameProcess()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createMock(ContainerInterface::class);
+        $receiverLocator->method('has')->with('dummy-receiver')->willReturn(true);
+        $receiverLocator->method('get')->with('dummy-receiver')->willReturn($receiver);
+
+        $handledMessages = 0;
+        $bus = $this->createMock(RoutableMessageBus::class);
+        $bus->method('dispatch')->willReturnCallback(static function (Envelope $envelope) use (&$handledMessages) {
+            ++$handledMessages;
+
+            return $envelope;
+        });
+
+        $eventDispatcher = new EventDispatcher();
+        $resetServicesListener = new ResetServicesListener(new ServicesResetter(new \ArrayIterator([]), []));
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, $eventDispatcher, null, [], $resetServicesListener);
+
+        $application = new Application();
+        $application->add($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $tester->execute(['receivers' => ['dummy-receiver'], '--limit' => 1]);
+
+        $this->assertSame(1, $handledMessages);
+        $this->assertSame([], $eventDispatcher->getListeners());
+
+        $tester->execute(['receivers' => ['dummy-receiver'], '--limit' => 2]);
+
+        $this->assertSame(3, $handledMessages);
+    }
+
     /**
      * @dataProvider getInvalidOptions
      */

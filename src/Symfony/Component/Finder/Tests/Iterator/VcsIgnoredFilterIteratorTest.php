@@ -358,7 +358,80 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
                 'a/c.txt',
             ],
             [
+                'a',
                 'a/b.txt',
+            ],
+        ];
+
+        yield 'negated pattern re-includes a file excluded by an earlier pattern' => [
+            [
+                '.gitignore' => "*.txt\n!a.txt",
+            ],
+            [
+                'a.txt',
+                'b.txt',
+                'dir/',
+                'dir/a.txt',
+            ],
+            [
+                'a.txt',
+                'dir',
+                'dir/a.txt',
+            ],
+        ];
+
+        yield 'later pattern wins over an earlier negated pattern' => [
+            [
+                '.gitignore' => "!/a.txt\n*.txt",
+            ],
+            [
+                'a.txt',
+                'b.txt',
+            ],
+            [],
+        ];
+
+        yield 'negated directory pattern re-includes the directory content' => [
+            [
+                '.gitignore' => "/b/*\n!/b/foo",
+            ],
+            [
+                'b/',
+                'b/bar/',
+                'b/bar/file.txt',
+                'b/foo/',
+                'b/foo/file.txt',
+            ],
+            [
+                'b',
+                'b/foo',
+                'b/foo/file.txt',
+            ],
+        ];
+
+        yield 'directory content cannot be re-included when the directory is excluded' => [
+            [
+                '.gitignore' => "/a/\n!/a/foo",
+            ],
+            [
+                'a/',
+                'a/foo/',
+                'a/foo/file.txt',
+            ],
+            [],
+        ];
+
+        yield 'file cannot be re-included when its parent directory is excluded' => [
+            [
+                '.gitignore' => "/d/*\n!/d/foo/file.txt",
+            ],
+            [
+                'd/',
+                'd/foo/',
+                'd/foo/file.txt',
+            ],
+            [
+                'd',
             ],
         ];
     }

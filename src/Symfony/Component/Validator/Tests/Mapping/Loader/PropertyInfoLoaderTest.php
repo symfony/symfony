@@ -24,6 +24,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\PropertyInfoLoader;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
+use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderChildEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderEntity;
 use Symfony\Component\Validator\Tests\Fixtures\PropertyInfoLoaderNoAutoMappingEntity;
 use Symfony\Component\Validator\Validation;
@@ -183,6 +184,41 @@ class PropertyInfoLoaderTest extends TestCase
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
         $noAutoMappingConstraints = $noAutoMappingMetadata[0]->getConstraints();
         $this->assertCount(0, $noAutoMappingConstraints, 'DisableAutoMapping constraint is not added in the list');
+    }
+
+    public function testInheritedAutoMappingStrategy()
+    {
+        $propertyInfoStub = $this->createStub(PropertyInfoExtractorInterface::class);
+        $propertyInfoStub
+            ->method('getProperties')
+            ->willReturn(['string', 'parentNoAutoMapping'])
+        ;
+        $propertyInfoStub
+            ->method('getTypes')
+            ->willReturn([new Type(Type::BUILTIN_TYPE_STRING)])
+        ;
+        $propertyInfoStub
+            ->method('isWritable')
+            ->willReturn(true)
+        ;
+
+        $propertyInfoLoader = new PropertyInfoLoader($propertyInfoStub, $propertyInfoStub, $propertyInfoStub, '{.*}');
+        $validator = Validation::createValidatorBuilder()
+            ->enableAttributeMapping()
+            ->addLoader($propertyInfoLoader)
+            ->getValidator()
+        ;
+
+        /** @var ClassMetadata $classMetadata */
+        $classMetadata = $validator->getMetadataFor(new PropertyInfoLoaderChildEntity());
+
+        $this->assertCount(2, $classMetadata->getPropertyMetadata('string')[0]->getConstraints());
+
+        /** @var PropertyMetadata[] $parentNoAutoMappingMetadata */
+        $parentNoAutoMappingMetadata = $classMetadata->getPropertyMetadata('parentNoAutoMapping');
+        $this->assertCount(1, $parentNoAutoMappingMetadata);
+        $this->assertCount(0, $parentNoAutoMappingMetadata[0]->getConstraints());
+        $this->assertSame(AutoMappingStrategy::DISABLED, $parentNoAutoMappingMetadata[0]->getAutoMappingStrategy());
     }
 
     /**

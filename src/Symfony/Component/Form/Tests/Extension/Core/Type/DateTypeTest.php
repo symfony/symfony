@@ -73,6 +73,25 @@ class DateTypeTest extends BaseTypeTestCase
         $this->assertEquals('2010-06-02', $form->getViewData());
     }
 
+    public function testSubmitFromSingleTextDateTimeBeforeTheGregorianCutover()
+    {
+        if (4 === \PHP_INT_SIZE) {
+            $this->markTestSkipped('Dates before 1582 do not fit in a 32 bit timestamp.');
+        }
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'input' => 'datetime',
+        ]);
+
+        $form->submit('1582-01-01');
+
+        $this->assertEquals(new \DateTime('1582-01-01 UTC'), $form->getData());
+        $this->assertSame('1582-01-01', $form->getViewData());
+    }
+
     public function testSubmitFromSingleTextDateTimeWithCustomFormat()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

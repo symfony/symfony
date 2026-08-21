@@ -59,6 +59,24 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals("Foo\nBar\nBaz\nFooBar".\PHP_EOL.\sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
+    public function testMaxHeightAfterClearingMoreLinesThanTheSectionContains()
+    {
+        $sections = [];
+        $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $output->writeln('Hello');
+        $output->clear(2);
+        $output->setMaxHeight(2);
+        $output->writeln('Line1');
+        $output->writeln('Line2');
+        $output->writeln('Line3');
+
+        $expected = 'Hello'.\PHP_EOL."\x1b[2A\x1b[0J".'Line1'.\PHP_EOL.'Line2'.\PHP_EOL."\x1b[2A\x1b[0J".'Line2'.\PHP_EOL.'Line3'.\PHP_EOL;
+
+        rewind($output->getStream());
+        $this->assertSame($expected, stream_get_contents($output->getStream()));
+    }
+
     public function testClearNumberOfLinesWithMultipleSections()
     {
         $output = new StreamOutput($this->stream);

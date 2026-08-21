@@ -1519,6 +1519,27 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame('BAR', $denormalized->bar);
         $this->assertSame('BAZ', $denormalized->baz);
     }
+
+    public function testDenormalizeDiscriminatorMapWithUnrestrictedMappedClass()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['type' => 'plain', 'bar' => 'BAR'], DiscriminatorWithIgnoredAttribute::class);
+
+        $this->assertInstanceOf(DiscriminatorWithoutIgnoredAttribute::class, $denormalized);
+        $this->assertSame('BAR', $denormalized->bar);
+    }
+
+    public function testDenormalizeDiscriminatorMapKeepsIgnoredAttributes()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['type' => 'ignoring', 'foo' => 'FOO', 'hidden' => 'HIDDEN'], DiscriminatorWithIgnoredAttribute::class);
+
+        $this->assertInstanceOf(DiscriminatorWithIgnoredAttribute::class, $denormalized);
+        $this->assertSame('FOO', $denormalized->foo);
+        $this->assertSame('hidden', $denormalized->hidden);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -2282,4 +2303,21 @@ class NestedDiscriminatorSub extends NestedDiscriminatorBase
 class NestedDiscriminatorSubSub extends NestedDiscriminatorSub
 {
     public string $baz = 'baz';
+}
+
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'ignoring' => DiscriminatorWithIgnoredAttribute::class,
+    'plain' => DiscriminatorWithoutIgnoredAttribute::class,
+])]
+class DiscriminatorWithIgnoredAttribute
+{
+    public string $foo = 'foo';
+
+    #[Ignore]
+    public string $hidden = 'hidden';
+}
+
+class DiscriminatorWithoutIgnoredAttribute
+{
+    public string $bar = 'bar';
 }

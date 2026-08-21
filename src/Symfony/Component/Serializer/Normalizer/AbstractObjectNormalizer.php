@@ -815,13 +815,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 $mappedClasses = array_values($discriminatorMapping->getTypesMapping());
                 $visited = [$classOrObject => true];
 
+                // Forcing extra attributes off makes the mapped classes return their attributes instead of false
+                $mappedContext = [self::ALLOW_EXTRA_ATTRIBUTES => false] + $context;
+
                 while (null !== $mappedClass = array_shift($mappedClasses)) {
                     if (isset($visited[$mappedClass])) {
                         continue;
                     }
                     $visited[$mappedClass] = true;
 
-                    $attributes[] = parent::getAllowedAttributes($mappedClass, $context, $attributesAsString);
+                    $attributes[] = parent::getAllowedAttributes($mappedClass, $mappedContext, $attributesAsString);
 
                     // Mapped classes can declare a discriminator map of their own
                     if (null !== $nestedMapping = $this->classDiscriminatorResolver->getMappingForClass($mappedClass)) {

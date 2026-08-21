@@ -403,6 +403,10 @@
                                     "trace_header": {
                                         "$ref": "#/$defs/types/scalar"
                                     },
+                                    "cache_status": {
+                                        "$ref": "#/$defs/types/scalar",
+                                        "description": "Enables the RFC 9211 \"Cache-Status\" response header and names this cache in it, e.g. \"Symfony\". No header is added when null."
+                                    },
                                     "default_ttl": {
                                         "$ref": "#/$defs/types/integer"
                                     },

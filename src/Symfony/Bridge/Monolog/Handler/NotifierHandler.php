@@ -15,6 +15,7 @@ use Monolog\Handler\AbstractHandler;
 use Monolog\Level;
 use Monolog\Logger;
 use Monolog\LogRecord;
+use Symfony\Component\Notifier\AdminRecipientsProviderInterface;
 use Symfony\Component\Notifier\Notification\Notification;
 use Symfony\Component\Notifier\NotifierInterface;
 
@@ -62,7 +63,22 @@ final class NotifierHandler extends AbstractHandler
 
         $notification->importanceFromLogLevelName($record->level->getName());
 
-        $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
+        $this->notifier->send($notification, ...$this->getAdminRecipients());
+    }
+
+    private function getAdminRecipients(): array
+    {
+        if ($this->notifier instanceof AdminRecipientsProviderInterface) {
+            return $this->notifier->getAdminRecipients();
+        }
+
+        if (!method_exists($this->notifier, 'getAdminRecipients')) {
+            return [];
+        }
+
+        trigger_deprecation('symfony/notifier', '8.2', 'Declaring "getAdminRecipients()" on "%s" without implementing "%s" is deprecated.', get_debug_type($this->notifier), AdminRecipientsProviderInterface::class);
+
+        return $this->notifier->getAdminRecipients();
     }
 
     private function getHighestRecord(array $records): array|LogRecord

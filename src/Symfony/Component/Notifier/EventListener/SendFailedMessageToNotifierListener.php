@@ -14,8 +14,9 @@ namespace Symfony\Component\Notifier\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
+use Symfony\Component\Notifier\AdminRecipientsProviderInterface;
 use Symfony\Component\Notifier\Notification\Notification;
-use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\NotifierInterface;
 
 /**
  * Sends a rejected message to the notifier.
@@ -25,7 +26,7 @@ use Symfony\Component\Notifier\Notifier;
 class SendFailedMessageToNotifierListener implements EventSubscriberInterface
 {
     public function __construct(
-        private Notifier $notifier,
+        private NotifierInterface $notifier,
     ) {
     }
 
@@ -44,7 +45,7 @@ class SendFailedMessageToNotifierListener implements EventSubscriberInterface
         $notification = Notification::fromThrowable($throwable)->importance(Notification::IMPORTANCE_HIGH);
         $notification->subject(\sprintf('A "%s" message has just failed: %s.', $envelope->getMessage()::class, $notification->getSubject()));
 
-        $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
+        $this->notifier->send($notification, ...$this->getAdminRecipients());
     }
 
     public static function getSubscribedEvents(): array
@@ -52,5 +53,20 @@ class SendFailedMessageToNotifierListener implements EventSubscriberInterface
         return [
             WorkerMessageFailedEvent::class => 'onMessageFailed',
         ];
+    }
+
+    private function getAdminRecipients(): array
+    {
+        if ($this->notifier instanceof AdminRecipientsProviderInterface) {
+            return $this->notifier->getAdminRecipients();
+        }
+
+        if (!method_exists($this->notifier, 'getAdminRecipients')) {
+            return [];
+        }
+
+        trigger_deprecation('symfony/notifier', '8.2', 'Declaring "getAdminRecipients()" on "%s" without implementing "%s" is deprecated.', get_debug_type($this->notifier), AdminRecipientsProviderInterface::class);
+
+        return $this->notifier->getAdminRecipients();
     }
 }

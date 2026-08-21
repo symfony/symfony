@@ -133,6 +133,7 @@ Notifier
 --------
 
  * Deprecate `NovuSubscriberRecipient::getOverrides()` and its `$overrides` constructor parameter, pass overrides to `NovuOptions` instead
+ * Deprecate declaring `getAdminRecipients()` on a `NotifierInterface` implementation without implementing `AdminRecipientsProviderInterface`
 
 Scheduler
 ---------

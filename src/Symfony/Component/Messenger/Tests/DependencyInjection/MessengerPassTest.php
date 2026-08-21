@@ -34,6 +34,9 @@ use Symfony\Component\Messenger\Command\SetupTransportsCommand;
 use Symfony\Component\Messenger\DataCollector\MessengerDataCollector;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Handler\Acknowledger;
+use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
+use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
 use Symfony\Component\Messenger\Handler\HandlersLocator;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
@@ -250,6 +253,41 @@ class MessengerPassTest extends TestCase
             UnionTypeTwoMessage::class,
             [[TaggedDummyHandlerWithUnionTypes::class, 'handleUnionTypeMessage']]
         );
+    }
+
+    public function testTaggedBatchMessageHandlerIsRegisteredOnce()
+    {
+        $container = $this->getContainerBuilder($busId = 'message_bus');
+        $container->registerForAutoconfiguration(BatchHandlerInterface::class)->addTag('messenger.message_handler');
+        $container->registerAttributeForAutoconfiguration(AsMessageHandler::class, static function (ChildDefinition $definition, AsMessageHandler $attribute, \ReflectionClass|\ReflectionMethod $reflector): void {
+            $tagAttributes = get_object_vars($attribute);
+            $tagAttributes['from_transport'] = $tagAttributes['fromTransport'];
+            unset($tagAttributes['fromTransport']);
+            if ($reflector instanceof \ReflectionMethod) {
+                $tagAttributes['method'] = $reflector->getName();
+            }
+
+            $definition->addTag('messenger.message_handler', $tagAttributes);
+        });
+        $container
+            ->register(TaggedDummyBatchHandler::class, TaggedDummyBatchHandler::class)
+            ->setAutoconfigured(true)
+        ;
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new MessengerPass())->process($container);
+
+        $handlerDescriptionMapping = $container->getDefinition($busId.'.messenger.handlers_locator')->getArgument(0);
+
+        $this->assertCount(1, $handlerDescriptionMapping);
+
+        $handlerDescriptors = $handlerDescriptionMapping[DummyMessage::class]->getValues();
+        $this->assertCount(1, $handlerDescriptors);
+
+        $handlerDescriptorDefinition = $container->getDefinition((string) $handlerDescriptors[0]);
+        $this->assertSame(['from_transport' => 'async'], $handlerDescriptorDefinition->getArgument(1));
+        $this->assertEquals([new Reference(TaggedDummyBatchHandler::class), '__invoke'], $container->getDefinition((string) $handlerDescriptorDefinition->getArgument(0))->getArgument(0));
     }
 
     public function testProcessHandlersByBus()
@@ -970,6 +1008,21 @@ class MessengerPassTest extends TestCase
 class DummyHandler
 {
     public function __invoke(DummyMessage $message): void
+    {
+    }
+}
+
+#[AsMessageHandler(fromTransport: 'async')]
+class TaggedDummyBatchHandler implements BatchHandlerInterface
+{
+    use BatchHandlerTrait;
+
+    public function __invoke(DummyMessage $message, ?Acknowledger $ack = null): mixed
+    {
+        return $this->handle($message, $ack);
+    }
+
+    private function process(array $jobs): void
     {
     }
 }

@@ -141,12 +141,16 @@ class Serializer implements SerializerInterface, MessageTypeAwareSerializerInter
 
         // A decode failure keeps the original encoded envelope: re-emit its body as-is
         // instead of serializing the exception, which cannot be decoded back
-        $decodingFailure = $envelope->getMessage() instanceof MessageDecodingFailedException
-            ? $envelope->getMessage()->encodedEnvelope
-            : [];
+        $isDecodingFailure = $envelope->getMessage() instanceof MessageDecodingFailedException;
+        $decodingFailure = $isDecodingFailure ? $envelope->getMessage()->encodedEnvelope : [];
         $decodingFailureBody = \is_string($decodingFailure['body'] ?? null) ? $decodingFailure['body'] : null;
         // the original headers describe the original body, so they win for "type" and "Content-Type"
         $decodingFailureHeaders = null !== $decodingFailureBody && \is_array($decodingFailure['headers'] ?? null) ? $decodingFailure['headers'] : [];
+
+        if ($isDecodingFailure && null === $decodingFailureBody) {
+            // the exception itself is encoded: its stack trace can reference the whole object graph
+            $context[AbstractNormalizer::IGNORED_ATTRIBUTES] = [...$context[AbstractNormalizer::IGNORED_ATTRIBUTES] ?? [], 'trace', 'traceAsString', 'previous'];
+        }
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
 

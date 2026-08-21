@@ -487,6 +487,7 @@ class SerializerTest extends TestCase
         $this->assertStringContainsString('Could not decode message', $reEncoded['body']);
         $this->assertSame(MessageDecodingFailedException::class, $reEncoded['headers']['type'], 'Without an original body, the headers must describe the body that was actually encoded.');
         $this->assertSame('application/json', $reEncoded['headers']['Content-Type']);
+        $this->assertArrayNotHasKey('trace', json_decode($reEncoded['body'], true), 'The stack trace can reference the whole object graph and must be left out.');
     }
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface

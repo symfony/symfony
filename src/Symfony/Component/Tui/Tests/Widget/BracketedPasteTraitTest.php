@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Tui\Tests\Widget;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Widget\BracketedPasteTrait;
 
@@ -186,12 +187,66 @@ class BracketedPasteTraitTest extends TestCase
         $result = $handler->processBracketedPaste($data);
 
         $this->assertSame('[paste exceeded 16 MiB limit]', $result);
-        $this->assertFalse($handler->isBufferingPaste());
+        $this->assertSame('', $data);
+        $this->assertTrue($handler->isBufferingPaste(), 'The paste stays open until the end marker');
 
+        // The terminal is still sending the paste, so what follows is pasted
+        // content and not typing.
         $data = 'plain';
         $result = $handler->processBracketedPaste($data);
         $this->assertNull($result);
-        $this->assertSame('plain', $data);
+        $this->assertSame('', $data);
+
+        $data = "more\x1b[201~after";
+        $result = $handler->processBracketedPaste($data);
+        $this->assertNull($result, 'The dropped content is not returned');
+        $this->assertSame('after', $data);
+        $this->assertFalse($handler->isBufferingPaste());
+
+        $data = "\x1b[200~next\x1b[201~";
+        $result = $handler->processBracketedPaste($data);
+        $this->assertSame('next', $result, 'The next paste is delivered');
+    }
+
+    public function testPartialPasteEndMarkerIsKeptAsContent()
+    {
+        $handler = $this->createHandler();
+
+        $data = "\x1b[200~AA\x1b[2";
+        $this->assertNull($handler->processBracketedPaste($data));
+
+        $data = "XX\x1b[201~";
+        $this->assertSame("AA\x1b[2XX", $handler->processBracketedPaste($data));
+    }
+
+    #[DataProvider('provideSplitPasteEndMarkers')]
+    public function testOverflowedPasteEndMarkerCanBeSplitAcrossChunks(string $first, string $second)
+    {
+        $handler = $this->createHandler();
+
+        $data = "\x1b[200~";
+        $handler->processBracketedPaste($data);
+
+        $data = str_repeat('A', 17 * 1024 * 1024);
+        $this->assertSame('[paste exceeded 16 MiB limit]', $handler->processBracketedPaste($data));
+
+        $data = 'tail'.$first;
+        $this->assertNull($handler->processBracketedPaste($data));
+        $this->assertSame('', $data);
+
+        $data = $second.'after';
+        $this->assertNull($handler->processBracketedPaste($data));
+        $this->assertSame('after', $data);
+        $this->assertFalse($handler->isBufferingPaste());
+    }
+
+    public static function provideSplitPasteEndMarkers(): iterable
+    {
+        $marker = "\x1b[201~";
+
+        for ($i = 1; $i < \strlen($marker); ++$i) {
+            yield "split after {$i} byte(s)" => [substr($marker, 0, $i), substr($marker, $i)];
+        }
     }
 
     private function createHandler(): BracketedPasteHandler

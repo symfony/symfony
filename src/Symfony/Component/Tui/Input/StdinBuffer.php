@@ -38,6 +38,7 @@ final class StdinBuffer
     private ?\Closure $onPaste = null;
 
     private bool $inPaste = false;
+    private bool $pasteOverflowed = false;
     private string $pasteBuffer = '';
 
     /**
@@ -90,14 +91,21 @@ final class StdinBuffer
             // If in paste mode, accumulate until end marker
             if ($this->inPaste) {
                 if (false !== $endPos = strpos($this->buffer, "\x1b[201~")) {
-                    $this->pasteBuffer .= substr($this->buffer, 0, $endPos);
+                    $content = null;
+
+                    if (!$this->pasteOverflowed) {
+                        $this->pasteBuffer .= substr($this->buffer, 0, $endPos);
+                        $content = $this->pasteBuffer;
+                    }
+
                     $this->buffer = substr($this->buffer, $endPos + 6);
                     $this->inPaste = false;
-
-                    if (null !== $this->onPaste) {
-                        ($this->onPaste)($this->pasteBuffer);
-                    }
+                    $this->pasteOverflowed = false;
                     $this->pasteBuffer = '';
+
+                    if (null !== $content && null !== $this->onPaste) {
+                        ($this->onPaste)($content);
+                    }
                 } else {
                     // Still waiting for the end marker. A read can split it, so
                     // hold back a trailing part of it instead of moving it into
@@ -111,31 +119,35 @@ final class StdinBuffer
                     }
 
                     if (0 < $hold) {
-                        $this->pasteBuffer .= substr($this->buffer, 0, -$hold);
+                        $chunk = substr($this->buffer, 0, -$hold);
                         $this->buffer = substr($this->buffer, -$hold);
                     } else {
-                        $this->pasteBuffer .= $this->buffer;
+                        $chunk = $this->buffer;
                         $this->buffer = '';
                     }
 
-                    // Cap reached without an end marker: discard the partial
-                    // paste and emit a visible overflow notice through the
-                    // paste callback so the user can see why their paste did
-                    // not land. Defense against unbounded buffering from a
-                    // missing/spoofed end marker. This has to run on the held
-                    // path too: a writer that ends every chunk with a byte of
-                    // the end marker would otherwise never reach the check.
-                    if (\strlen($this->pasteBuffer) > self::MAX_PASTE_BYTES) {
-                        $this->pasteBuffer = '';
-                        $this->inPaste = false;
+                    if (!$this->pasteOverflowed) {
+                        $this->pasteBuffer .= $chunk;
 
-                        if (null !== $this->onPaste) {
-                            ($this->onPaste)(self::PASTE_OVERFLOW_MESSAGE);
+                        // Cap reached without an end marker: discard the
+                        // content and stop accumulating, as a defense against
+                        // unbounded buffering from a missing/spoofed end
+                        // marker. The paste stays open, because the terminal
+                        // is still sending it and the rest of it must not be
+                        // delivered as key events. A visible overflow notice
+                        // goes out through the paste callback so the user can
+                        // see why their paste did not land. The check has to
+                        // run on the held path too: a writer that ends every
+                        // chunk with a byte of the end marker would otherwise
+                        // never reach it.
+                        if (\strlen($this->pasteBuffer) > self::MAX_PASTE_BYTES) {
+                            $this->pasteBuffer = '';
+                            $this->pasteOverflowed = true;
+
+                            if (null !== $this->onPaste) {
+                                ($this->onPaste)(self::PASTE_OVERFLOW_MESSAGE);
+                            }
                         }
-
-                        // The paste is over, so the held bytes are no longer a
-                        // partial end marker: parse them as normal input.
-                        continue;
                     }
 
                     if (0 < $hold) {
@@ -181,6 +193,7 @@ final class StdinBuffer
         $this->buffer = '';
         $this->pasteBuffer = '';
         $this->inPaste = false;
+        $this->pasteOverflowed = false;
     }
 
     /**
@@ -191,8 +204,10 @@ final class StdinBuffer
      */
     public function flush(): void
     {
-        // If we have a single ESC waiting, emit it as a standalone Escape key
-        if ("\x1b" === $this->buffer && null !== $this->onData) {
+        // If we have a single ESC waiting, emit it as a standalone Escape key.
+        // While a paste is open that ESC is the start of a held end marker
+        // instead, and emitting it would leave the paste with no way to close.
+        if (!$this->inPaste && "\x1b" === $this->buffer && null !== $this->onData) {
             ($this->onData)("\x1b");
             $this->buffer = '';
         }

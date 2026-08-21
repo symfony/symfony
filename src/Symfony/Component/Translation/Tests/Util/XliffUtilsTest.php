@@ -80,6 +80,95 @@ class XliffUtilsTest extends TestCase
         }
     }
 
+    public function testSchemaValidationInsideAPharDoesNotLeakTemporaryFiles()
+    {
+        if (!\extension_loaded('phar')) {
+            $this->markTestSkipped('The "phar" extension is not loaded.');
+        }
+
+        $workspace = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('symfony_xliff_phar_', false);
+        $tmpDir = $workspace.\DIRECTORY_SEPARATOR.'tmp';
+
+        if (!@mkdir($tmpDir, 0o777, true) && !is_dir($tmpDir)) {
+            $this->markTestSkipped(\sprintf('Could not create tmp dir "%s".', $tmpDir));
+        }
+
+        $code = <<<'EOPHP'
+            <?php
+
+            [, $componentDir, $workspace] = $argv;
+
+            if (!Phar::canWrite()) {
+                echo 'SKIP';
+                exit(0);
+            }
+
+            $phar = new Phar($workspace.'/translation.phar');
+            $phar->addFile($componentDir.'/Util/XliffUtils.php', 'Util/XliffUtils.php');
+            $phar->addFile($componentDir.'/Resources/schemas/xliff-core-1.2-transitional.xsd', 'Resources/schemas/xliff-core-1.2-transitional.xsd');
+            $phar->addFile($componentDir.'/Resources/schemas/xml.xsd', 'Resources/schemas/xml.xsd');
+            $phar->setStub('<?php __HALT_COMPILER();');
+            unset($phar);
+
+            require 'phar://'.$workspace.'/translation.phar/Util/XliffUtils.php';
+
+            $xliff = '<?xml version="1.0"?><xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file source-language="en" datatype="plaintext" original="file.ext"><body><trans-unit id="1"><source>foo</source><target>bar</target></trans-unit></body></file></xliff>';
+
+            $validateAndCountTempFiles = function () use ($xliff) {
+                $dom = new DOMDocument();
+                $dom->loadXML($xliff);
+
+                if ([] !== $errors = Symfony\Component\Translation\Util\XliffUtils::validateSchema($dom)) {
+                    echo 'KO ', json_encode($errors);
+                    exit(1);
+                }
+
+                return count(glob(sys_get_temp_dir().'/symfony*'));
+            };
+
+            $afterOne = $validateAndCountTempFiles();
+
+            for ($i = 0; $i < 4; ++$i) {
+                $afterFive = $validateAndCountTempFiles();
+            }
+
+            echo 'OK ', $afterOne, ' ', $afterFive;
+            EOPHP;
+
+        $command = [\PHP_BINARY, '-d', 'phar.readonly=0', '-d', 'sys_temp_dir="'.$tmpDir.'"', '--', \dirname(__DIR__, 2), $workspace];
+
+        if (!\is_resource($process = @proc_open($command, [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']], $pipes))) {
+            $this->markTestSkipped('Could not start a PHP subprocess.');
+        }
+
+        try {
+            fwrite($pipes[0], $code);
+            fclose($pipes[0]);
+            $output = stream_get_contents($pipes[1]);
+            $error = stream_get_contents($pipes[2]);
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            $this->assertSame(0, proc_close($process), $output.$error);
+
+            if ('SKIP' === $output) {
+                $this->markTestSkipped('Phar archives cannot be created.');
+            }
+
+            [$status, $afterOne, $afterFive] = explode(' ', $output) + [null, null, null];
+            $this->assertSame('OK', $status, $output.$error);
+            $this->assertSame($afterOne, $afterFive, 'Validating more files must not copy the schema again.');
+            $this->assertSame([], glob($tmpDir.'/symfony*'), 'Temporary files must be removed when the process ends.');
+        } finally {
+            foreach (glob($tmpDir.'/*') as $file) {
+                @unlink($file);
+            }
+            @unlink($workspace.'/translation.phar');
+            @rmdir($tmpDir);
+            @rmdir($workspace);
+        }
+    }
+
     /**
      * @return array{php_warnings: list<string>, libxml_errors: list<string>}
      */

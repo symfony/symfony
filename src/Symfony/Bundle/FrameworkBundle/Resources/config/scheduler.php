@@ -33,6 +33,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 tagged_locator('scheduler.schedule_provider', 'name'),
                 service('event_dispatcher'),
+                service('messenger.receiver_locator'),
             ])
             ->tag('kernel.event_subscriber')
         ->set('serializer.normalizer.scheduler_trigger', SchedulerTriggerNormalizer::class)

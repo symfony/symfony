@@ -24,6 +24,7 @@ use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveParameterPlaceHoldersPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\HttpKernel\Kernel;
@@ -99,14 +100,16 @@ final class ContainerLintCommand extends Command
                 throw new RuntimeException(\sprintf('This command does not support the application container: "%s" is not a "%s".', get_debug_type($container), ContainerBuilder::class));
             }
 
+            // the XML dump doesn't keep the services matched by tagged iterators,
+            // resolving them again keeps the removing passes from dropping them
             if ($resolveEnvVars) {
-                $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveParameterPlaceHoldersPass(), new ResolveFactoryClassPass()]);
+                $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveParameterPlaceHoldersPass(), new ResolveFactoryClassPass(), new ResolveTaggedIteratorArgumentPass()]);
             } else {
                 $parameterBag = $container->getParameterBag();
                 $refl = new \ReflectionProperty($parameterBag, 'resolved');
                 $refl->setValue($parameterBag, true);
 
-                $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass()]);
+                $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass(), new ResolveTaggedIteratorArgumentPass()]);
             }
 
             $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);

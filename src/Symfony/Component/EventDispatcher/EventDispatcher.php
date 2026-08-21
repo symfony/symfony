@@ -239,29 +239,38 @@ class EventDispatcher implements EventDispatcherInterface
      */
     private function sortListeners(string $eventName): void
     {
-        krsort($this->listeners[$eventName]);
-        $this->sorted[$eventName] = [];
         $removedListeners = $this->removedListeners[$eventName] ?? null;
         unset($this->removedListeners[$eventName]);
 
-        foreach ($this->listeners[$eventName] as $priority => &$listeners) {
-            foreach ($listeners as $k => &$listener) {
-                if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
-                    $listener[0] = $listener[0]();
-                    $listener[1] ??= '__invoke';
+        do {
+            krsort($this->listeners[$eventName]);
+            // Initializing a lazy listener can add listeners for the same event.
+            // That unsets $this->sorted[$eventName], which is the signal to sort again.
+            $this->sorted[$eventName] = [];
+            $sorted = [];
 
-                    if (isset($removedListeners[$listener[0]][$listener[1]])) {
-                        unset($listeners[$k]);
-                        continue;
+            foreach ($this->listeners[$eventName] as $priority => &$listeners) {
+                foreach ($listeners as $k => &$listener) {
+                    if (\is_array($listener) && isset($listener[0]) && $listener[0] instanceof \Closure && 2 >= \count($listener)) {
+                        $listener[0] = $listener[0]();
+                        $listener[1] ??= '__invoke';
+
+                        if (isset($removedListeners[$listener[0]][$listener[1]])) {
+                            unset($listeners[$k]);
+                            continue;
+                        }
                     }
+                    $sorted[] = $listener;
                 }
-                $this->sorted[$eventName][] = $listener;
-            }
 
-            if (!$listeners) {
-                unset($this->listeners[$eventName][$priority]);
+                if (!$listeners) {
+                    unset($this->listeners[$eventName][$priority]);
+                }
             }
-        }
+            unset($listeners, $listener);
+        } while (!isset($this->sorted[$eventName]));
+
+        $this->sorted[$eventName] = $sorted;
     }
 
     /**

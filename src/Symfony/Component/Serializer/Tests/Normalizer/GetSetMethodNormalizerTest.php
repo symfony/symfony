@@ -653,6 +653,25 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertInstanceOf(GetSetMethodDiscriminatedDummyOne::class, $obj);
     }
 
+    public function testDenormalizeNestedDiscriminatorMapWithAllowExtraAttributesFalse()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new GetSetMethodNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $obj = $normalizer->denormalize(
+            ['type' => 'sub', 'nested_type' => 'sub_sub', 'foo' => 'FOO', 'bar' => 'BAR', 'baz' => 'BAZ'],
+            GetSetMethodNestedDiscriminatorBase::class,
+            null,
+            [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]
+        );
+
+        $this->assertInstanceOf(GetSetMethodNestedDiscriminatorSubSub::class, $obj);
+        $this->assertSame('FOO', $obj->getFoo());
+        $this->assertSame('BAR', $obj->getBar());
+        $this->assertSame('BAZ', $obj->getBaz());
+    }
+
     public function testSkipVoidNeverReturnTypeAccessors()
     {
         $obj = new VoidNeverReturnTypeDummy();
@@ -1151,5 +1170,58 @@ class GetSetDummyWithCanOnly
     public function canWrite(): bool
     {
         return false;
+    }
+}
+
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'base' => GetSetMethodNestedDiscriminatorBase::class,
+    'sub' => GetSetMethodNestedDiscriminatorSub::class,
+])]
+class GetSetMethodNestedDiscriminatorBase
+{
+    private string $foo = 'foo';
+
+    public function getFoo(): string
+    {
+        return $this->foo;
+    }
+
+    public function setFoo(string $foo): void
+    {
+        $this->foo = $foo;
+    }
+}
+
+#[DiscriminatorMap(typeProperty: 'nested_type', mapping: [
+    'sub' => GetSetMethodNestedDiscriminatorSub::class,
+    'sub_sub' => GetSetMethodNestedDiscriminatorSubSub::class,
+])]
+class GetSetMethodNestedDiscriminatorSub extends GetSetMethodNestedDiscriminatorBase
+{
+    private string $bar = 'bar';
+
+    public function getBar(): string
+    {
+        return $this->bar;
+    }
+
+    public function setBar(string $bar): void
+    {
+        $this->bar = $bar;
+    }
+}
+
+class GetSetMethodNestedDiscriminatorSubSub extends GetSetMethodNestedDiscriminatorSub
+{
+    private string $baz = 'baz';
+
+    public function getBaz(): string
+    {
+        return $this->baz;
+    }
+
+    public function setBaz(string $baz): void
+    {
+        $this->baz = $baz;
     }
 }

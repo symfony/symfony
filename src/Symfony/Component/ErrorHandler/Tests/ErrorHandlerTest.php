@@ -72,6 +72,49 @@ class ErrorHandlerTest extends TestCase
         }
     }
 
+    public function testRegisterWithoutReplaceLeavesForeignHandlersInPlace()
+    {
+        $foreignHandler = static fn () => false;
+        set_error_handler($foreignHandler);
+
+        try {
+            $handler = ErrorHandler::register(null, false);
+
+            $errorHandler = set_error_handler('var_dump');
+            restore_error_handler();
+            $exceptionHandler = set_exception_handler('var_dump');
+            restore_exception_handler();
+
+            $this->assertInstanceOf(ErrorHandler::class, $handler);
+            $this->assertSame($foreignHandler, $errorHandler);
+            $this->assertNull($exceptionHandler);
+        } finally {
+            restore_exception_handler();
+            restore_error_handler();
+        }
+    }
+
+    public function testRegisterWithoutReplaceStillDecoratesTheExceptionHandler()
+    {
+        $foreignErrorHandler = static fn () => false;
+        $foreignExceptionHandler = static function (\Throwable $e) {};
+        set_error_handler($foreignErrorHandler);
+        set_exception_handler($foreignExceptionHandler);
+
+        try {
+            $handler = ErrorHandler::register(null, false);
+
+            $exceptionHandler = set_exception_handler('var_dump');
+            restore_exception_handler();
+
+            $this->assertSame([$handler, 'handleException'], $exceptionHandler);
+        } finally {
+            restore_exception_handler();
+            restore_exception_handler();
+            restore_error_handler();
+        }
+    }
+
     #[WithoutErrorHandler]
     public function testErrorGetLast()
     {

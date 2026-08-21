@@ -199,10 +199,6 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
             $input->setArgument('receivers', $io->askQuestion($question));
         }
-
-        if (!$input->getArgument('receivers')) {
-            throw new RuntimeException('Please pass at least one receiver.');
-        }
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -222,6 +218,10 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             }
             $receiverNames = $receiverNames ?: $input->getArgument('receivers');
             $receiverNames = array_unique($receiverNames);
+        }
+
+        if (!$receiverNames) {
+            throw new RuntimeException('Please pass at least one receiver.');
         }
 
         if ($input->getOption('all') && $excludedTransports = $input->getOption('exclude-receivers')) {
@@ -266,9 +266,10 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             throw new InvalidOptionException(\sprintf('Option "no-reset" must be a positive integer, "%s" passed.', $input->getOption('no-reset')));
         }
 
+        $subscribers = [];
         $this->resetServicesListener?->setInterval($resetInterval > 0 ? $resetInterval : 1);
         if ($this->resetServicesListener && $resetInterval > 0) {
-            $this->eventDispatcher->addSubscriber($this->resetServicesListener);
+            $subscribers[] = $this->resetServicesListener;
         }
 
         $stopsWhen = [];
@@ -278,17 +279,17 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             }
 
             $stopsWhen[] = "processed {$limit} messages";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnMessageLimitListener($limit, $this->logger));
+            $subscribers[] = new StopWorkerOnMessageLimitListener($limit, $this->logger);
         }
 
         if ($failureLimit = $input->getOption('failure-limit')) {
             $stopsWhen[] = "reached {$failureLimit} failed messages";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnFailureLimitListener($failureLimit, $this->logger));
+            $subscribers[] = new StopWorkerOnFailureLimitListener($failureLimit, $this->logger);
         }
 
         if ($memoryLimit = $input->getOption('memory-limit')) {
             $stopsWhen[] = "exceeded {$memoryLimit} of memory";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger));
+            $subscribers[] = new StopWorkerOnMemoryLimitListener($this->convertToBytes($memoryLimit), $this->logger);
         }
 
         if (null !== $timeLimit = $input->getOption('time-limit')) {
@@ -352,11 +353,19 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             $options['bus_name'] = $busName;
         }
 
+        foreach ($subscribers as $subscriber) {
+            $this->eventDispatcher->addSubscriber($subscriber);
+        }
+
         try {
             $this->worker->run($options);
         } finally {
             $this->worker = null;
             $messageExecutionStrategy?->shutdown();
+
+            foreach ($subscribers as $subscriber) {
+                $this->eventDispatcher->removeSubscriber($subscriber);
+            }
         }
 
         return 0;

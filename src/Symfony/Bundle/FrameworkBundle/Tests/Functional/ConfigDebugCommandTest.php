@@ -69,6 +69,17 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
+    public function testDumpWithBundleRegisteringServicesInBuild(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'framework']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('secret: test', $tester->getDisplay());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
     public function testDumpBundleOption(bool $debug)
     {
         $tester = $this->createCommandTester($debug);

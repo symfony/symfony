@@ -28,6 +28,7 @@ use Symfony\Component\Form\Tests\Fixtures\Author;
 use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Validation;
 
 class FormTest_AuthorWithoutRefSetter
@@ -750,6 +751,36 @@ $ref2
             ->createView();
 
         $this->assertEquals(['%parent_param%' => 'parent_value', '%override_param%' => 'child_value'], $view['child']->vars['help_translation_parameters']);
+    }
+
+    public function testTranslatableLabelDoesNotInheritLabelTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'label_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', $this->getTestedType(), [
+                'label' => new TranslatableMessage('child.label'),
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertSame([], $view['child']->vars['label_translation_parameters']);
+    }
+
+    public function testTranslatableHelpDoesNotInheritHelpTranslationParameters()
+    {
+        $view = $this->factory
+            ->createNamedBuilder('parent', self::TESTED_TYPE, null, [
+                'help_translation_parameters' => ['%param%' => 'value'],
+            ])
+            ->add('child', $this->getTestedType(), [
+                'help' => new TranslatableMessage('child.help'),
+            ])
+            ->getForm()
+            ->createView();
+
+        $this->assertSame([], $view['child']->vars['help_translation_parameters']);
     }
 
     public function testErrorBubblingDoesNotSkipCompoundFieldsWithInheritDataConfigured()

@@ -295,11 +295,11 @@ abstract class AbstractDescriptorTestCase extends TestCase
         return $output;
     }
 
-    private function assertDescription($expectedDescription, $describedObject, array $options = [])
+    protected function assertDescription($expectedDescription, $describedObject, array $options = [])
     {
         $options['is_debug'] = false;
         $options['raw_output'] = true;
-        $options['raw_text'] = true;
+        $options['raw_text'] ??= true;
         $options['method'] ??= null;
         $output = new BufferedOutput(BufferedOutput::VERBOSITY_NORMAL, true);
 
@@ -380,6 +380,27 @@ abstract class AbstractDescriptorTestCase extends TestCase
         $variations = ['priority_tag' => ['tag' => 'tag1']];
         $data = [];
         foreach (ObjectsProvider::getContainerBuildersWithPriorityTags() as $name => $object) {
+            foreach ($variations as $suffix => $options) {
+                $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
+                $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);
+                $data[] = [$object, $description, $options];
+            }
+        }
+
+        return $data;
+    }
+
+    #[DataProvider('getDescribeContainerBuilderWithTaggedItemPriorityTagsTestData')]
+    public function testDescribeContainerBuilderWithTaggedItemPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options)
+    {
+        $this->assertDescription($expectedDescription, $builder, $options);
+    }
+
+    public static function getDescribeContainerBuilderWithTaggedItemPriorityTagsTestData(): array
+    {
+        $variations = ['priority_tag' => ['tag' => 'tag1']];
+        $data = [];
+        foreach (ObjectsProvider::getContainerBuildersWithTaggedItemPriorityTags() as $name => $object) {
             foreach ($variations as $suffix => $options) {
                 $file = \sprintf('%s_%s.%s', trim($name, '.'), $suffix, static::getFormat());
                 $description = file_get_contents(__DIR__.'/../../Fixtures/Descriptor/'.$file);

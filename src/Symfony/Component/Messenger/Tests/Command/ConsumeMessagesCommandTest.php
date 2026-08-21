@@ -22,11 +22,13 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -151,6 +153,47 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
+    public function testRunTwiceInTheSameProcess()
+    {
+        $envelope = new Envelope(new \stdClass());
+
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = $this->createStub(ContainerInterface::class);
+        $receiverLocator->method('has')->willReturn(true);
+        $receiverLocator->method('get')->willReturn($receiver);
+
+        $handledMessages = 0;
+        $bus = $this->createStub(RoutableMessageBus::class);
+        $bus->method('dispatch')->willReturnCallback(static function (Envelope $envelope) use (&$handledMessages) {
+            ++$handledMessages;
+
+            return $envelope;
+        });
+
+        $eventDispatcher = new EventDispatcher();
+        $resetServicesListener = new ResetServicesListener(new ServicesResetter(new \ArrayIterator([]), []));
+        $command = new ConsumeMessagesCommand($bus, $receiverLocator, $eventDispatcher, null, [], $resetServicesListener);
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $tester->execute(['receivers' => ['dummy-receiver'], '--limit' => 1]);
+
+        $this->assertSame(1, $handledMessages);
+        $this->assertSame([], $eventDispatcher->getListeners());
+
+        $tester->execute(['receivers' => ['dummy-receiver'], '--limit' => 2]);
+
+        $this->assertSame(3, $handledMessages);
+    }
+
     #[DataProvider('getInvalidOptions')]
     public function testRunWithInvalidOption(string $option, string $value, string $expectedMessage)
     {
@@ -235,6 +278,29 @@ class ConsumeMessagesCommandTest extends TestCase
 
         $tester->assertCommandIsSuccessful();
         $this->assertSame([8], $receiver->getFetchSizes());
+    }
+
+    public function testRunWithoutReceiverInNonInteractiveMode()
+    {
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            $event->getWorker()->stop();
+        });
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new ServiceLocator([]), $eventDispatcher, null, ['dummy-receiver', 'another-receiver']);
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Please pass at least one receiver.');
+
+        $tester->execute([], ['interactive' => false]);
     }
 
     public function testRunWithTimeLimit()

@@ -162,6 +162,37 @@ class SesApiAsyncAwsTransportTest extends TestCase
         $transport->send($mail);
     }
 
+    public function testSendWithAttachment()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $content = json_decode($options['body'], true);
+            $raw = base64_decode($content['Content']['Raw']['Data']);
+
+            $this->assertStringContainsString('Content-Disposition: attachment; name=foo.txt', $raw);
+            $this->assertStringNotContainsString('X-Metadata-tagName1', $raw);
+            $this->assertStringNotContainsString('X-Metadata-tagName2', $raw);
+            $this->assertSame([['Name' => 'tagName1', 'Value' => 'tag Value1'], ['Name' => 'tagName2', 'Value' => 'tag Value2']], $content['EmailTags']);
+
+            return new MockResponse('{"MessageId": "foobar"}', ['http_code' => 200]);
+        });
+
+        $transport = new SesApiAsyncAwsTransport(new SesClient(Configuration::create(['sharedConfigFile' => false]), new NullProvider(), $client));
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!')
+            ->attach('some attachment', 'foo.txt');
+
+        $mail->getHeaders()->add(new MetadataHeader('tagName1', 'tag Value1'));
+        $mail->getHeaders()->add(new MetadataHeader('tagName2', 'tag Value2'));
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {

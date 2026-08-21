@@ -65,6 +65,11 @@ class MessengerPass implements CompilerPassInterface
         $signedMessageTypes = [];
 
         foreach ($container->findTaggedServiceIds('messenger.message_handler', true) as $serviceId => $tags) {
+            // an option-less tag comes from autoconfiguration; it would defeat the configured ones
+            if ($configuredTags = array_filter($tags)) {
+                $tags = $configuredTags;
+            }
+
             foreach ($tags as $tag) {
                 if (isset($tag['bus']) && !\in_array($tag['bus'], $busIds, true)) {
                     throw new RuntimeException(\sprintf('Invalid handler service "%s": bus "%s" specified on the tag "messenger.message_handler" does not exist (known ones are: "%s").', $serviceId, $tag['bus'], implode('", "', $busIds)));
@@ -157,7 +162,27 @@ class MessengerPass implements CompilerPassInterface
         foreach ($handlersByBusAndMessage as $bus => $handlersByMessage) {
             foreach ($handlersByMessage as $message => $handlersByPriority) {
                 krsort($handlersByPriority);
-                $handlersByBusAndMessage[$bus][$message] = array_merge(...$handlersByPriority);
+                $handlers = array_merge(...$handlersByPriority);
+                $serviceIdsByName = [];
+
+                foreach ($handlers as $key => [$definitionId, $options]) {
+                    $serviceId = $handlerToOriginalServiceIdMapping[$definitionId];
+                    $name = $this->getServiceClass($container, $serviceId).'::'.($options['method'] ?? '__invoke');
+                    $serviceIdsByName[$name][$key] = $serviceId;
+                }
+
+                // several services sharing a name cannot be told apart at runtime, name them after their service id
+                foreach ($serviceIdsByName as $serviceIds) {
+                    if (1 === \count(array_unique($serviceIds))) {
+                        continue;
+                    }
+
+                    foreach ($serviceIds as $key => $serviceId) {
+                        $handlers[$key][1]['alias'] ??= $serviceId;
+                    }
+                }
+
+                $handlersByBusAndMessage[$bus][$message] = $handlers;
             }
         }
 

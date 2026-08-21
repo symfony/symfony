@@ -206,6 +206,50 @@ class CookieJarTest extends TestCase
         $this->assertEquals(['foo' => 'bar2'], $cookieJar->allValues('http://bar.example.com/'));
     }
 
+    public function testCookieGetPrefersTheMostSpecificDomain()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($parent = new Cookie('foo', 'bar1', null, '/', 'example.com'));
+        $cookieJar->set($child = new Cookie('foo', 'bar2', null, '/', 'admin.example.com'));
+
+        $this->assertEquals($child, $cookieJar->get('foo', '/', 'admin.example.com'));
+        $this->assertEquals($parent, $cookieJar->get('foo', '/', 'www.example.com'));
+
+        $cookieJar = new CookieJar();
+        $cookieJar->set($child = new Cookie('foo', 'bar2', null, '/', 'admin.example.com'));
+        $cookieJar->set($parent = new Cookie('foo', 'bar1', null, '/', 'example.com'));
+
+        $this->assertEquals($child, $cookieJar->get('foo', '/', 'admin.example.com'));
+        $this->assertEquals($parent, $cookieJar->get('foo', '/', 'www.example.com'));
+    }
+
+    public function testCookieGetPrefersTheLongestPath()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set($root = new Cookie('foo', 'bar1', null, '/'));
+        $cookieJar->set($admin = new Cookie('foo', 'bar2', null, '/admin'));
+
+        $this->assertEquals($admin, $cookieJar->get('foo', '/admin'));
+        $this->assertEquals($root, $cookieJar->get('foo', '/'));
+    }
+
+    public function testAllValuesPrefersTheMostSpecificCookie()
+    {
+        $cookieJar = new CookieJar();
+        $cookieJar->set(new Cookie('foo', 'bar2', null, '/', 'admin.example.com'));
+        $cookieJar->set(new Cookie('foo', 'bar1', null, '/', 'example.com'));
+
+        $this->assertEquals(['foo' => 'bar2'], $cookieJar->allValues('http://admin.example.com/'));
+        $this->assertEquals(['foo' => 'bar1'], $cookieJar->allValues('http://www.example.com/'));
+
+        $cookieJar = new CookieJar();
+        $cookieJar->set(new Cookie('foo', 'bar2', null, '/admin'));
+        $cookieJar->set(new Cookie('foo', 'bar1', null, '/'));
+
+        $this->assertEquals(['foo' => 'bar2'], $cookieJar->allValues('http://example.com/admin'));
+        $this->assertEquals(['foo' => 'bar1'], $cookieJar->allValues('http://example.com/'));
+    }
+
     public function testCookieGetWithSubdomain()
     {
         $cookieJar = new CookieJar();

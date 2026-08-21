@@ -269,6 +269,21 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertEquals('Left', $view->children[0]->vars['label']->trans(new IdentityTranslator()));
     }
 
+    public function testTranslatableChoiceLabelDoesNotInheritLabelTranslationParameters()
+    {
+        $form = $this->factory->create($this->getTestedType(), null, [
+            'multiple' => false,
+            'expanded' => true,
+            'class' => TranslatableTextAlign::class,
+            'label_translation_parameters' => ['%count%' => 12],
+        ]);
+
+        $view = $form->createView();
+
+        $this->assertSame(['%count%' => 12], $view->vars['label_translation_parameters']);
+        $this->assertSame([], $view->children[0]->vars['label_translation_parameters']);
+    }
+
     public function testChoices()
     {
         $form = $this->factory->create($this->getTestedType(), null, [

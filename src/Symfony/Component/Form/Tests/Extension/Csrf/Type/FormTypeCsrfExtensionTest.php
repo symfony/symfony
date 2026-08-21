@@ -183,6 +183,26 @@ class FormTypeCsrfExtensionTest extends TypeTestCase
         $this->assertEquals('token', $view['csrf']->vars['value']);
     }
 
+    public function testGenerateCsrfTokenWhenAttributesAreReplaced()
+    {
+        $this->tokenManager->expects($this->once())
+            ->method('getToken')
+            ->with('FORM_NAME')
+            ->willReturn(new CsrfToken('TOKEN_ID', 'token'));
+
+        $view = $this->factory
+            ->createNamedBuilder('FORM_NAME', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+                'csrf_field_name' => 'csrf',
+                'csrf_token_manager' => $this->tokenManager,
+                'compound' => true,
+            ])
+            ->setAttributes([])
+            ->getForm()
+            ->createView();
+
+        $this->assertEquals('token', $view['csrf']->vars['value']);
+    }
+
     public static function provideBoolean()
     {
         return [

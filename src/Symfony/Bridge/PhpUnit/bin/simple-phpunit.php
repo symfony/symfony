@@ -120,13 +120,19 @@ $PHPUNIT_REMOVE_RETURN_TYPEHINT = filter_var($getEnvVar('SYMFONY_PHPUNIT_REMOVE_
 
 $COMPOSER_JSON = getenv('COMPOSER') ?: 'composer.json';
 
-$root = __DIR__;
-while (!file_exists($root.'/'.$COMPOSER_JSON) || file_exists($root.'/DeprecationErrorHandler.php')) {
-    if ($root === dirname($root)) {
-        break;
+$findRoot = static function ($dir) use ($COMPOSER_JSON) {
+    while (!file_exists($dir.'/'.$COMPOSER_JSON) || file_exists($dir.'/DeprecationErrorHandler.php')) {
+        if ($dir === dirname($dir)) {
+            return null;
+        }
+        $dir = dirname($dir);
     }
-    $root = dirname($root);
-}
+
+    return $dir;
+};
+
+// __DIR__ has symlinks resolved, so the walk up leaves the project when vendor/ points outside of it
+$root = $findRoot(__DIR__) ?? $findRoot(getcwd()) ?? getcwd();
 
 $oldPwd = getcwd();
 $PHPUNIT_DIR = rtrim($getEnvVar('SYMFONY_PHPUNIT_DIR', $root.'/vendor/bin/.phpunit'), '/'.\DIRECTORY_SEPARATOR);

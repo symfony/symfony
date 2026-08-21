@@ -16,6 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Csrf\EventListener\CsrfValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Util\ServerParams;
@@ -50,10 +51,7 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
             return;
         }
 
-        $csrfTokenId = $options['csrf_token_id']
-            ?: $this->defaultTokenId[$builder->getType()->getInnerType()::class]
-            ?? $builder->getName()
-            ?: $builder->getType()->getInnerType()::class;
+        $csrfTokenId = $this->getCsrfTokenId($builder, $options);
         $builder->setAttribute('csrf_token_id', $csrfTokenId);
 
         $builder
@@ -75,8 +73,9 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         if ($options['csrf_protection'] && !$view->parent && $options['compound']) {
-            $factory = $form->getConfig()->getFormFactory();
-            $tokenId = $form->getConfig()->getAttribute('csrf_token_id');
+            $config = $form->getConfig();
+            $factory = $config->getFormFactory();
+            $tokenId = $config->getAttribute('csrf_token_id') ?? $this->getCsrfTokenId($config, $options);
             $data = (string) $options['csrf_token_manager']->getToken($tokenId);
 
             $csrfForm = $factory->createNamed($options['csrf_field_name'], HiddenType::class, $data, [
@@ -116,5 +115,12 @@ class FormTypeCsrfExtension extends AbstractTypeExtension
     public static function getExtendedTypes(): iterable
     {
         return [FormType::class];
+    }
+
+    private function getCsrfTokenId(FormConfigInterface $config, array $options): string
+    {
+        $type = $config->getType()->getInnerType()::class;
+
+        return $options['csrf_token_id'] ?: $this->defaultTokenId[$type] ?? $config->getName() ?: $type;
     }
 }

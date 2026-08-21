@@ -117,6 +117,32 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
+    public function testTagAddedByAutoconfigurationDoesNotOverrideThePriority()
+    {
+        $container = new ContainerBuilder();
+        $container->registerForAutoconfiguration(\stdClass::class)->addTag('my_custom_tag');
+        $container->register('service1', \stdClass::class)->setAutoconfigured(true)->addTag('my_custom_tag', ['priority' => -70]);
+        $container->register('service2', \stdClass::class)->setAutoconfigured(true);
+
+        (new ResolveInstanceofConditionalsPass())->process($container);
+
+        $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
+
+        $expected = [
+            new Reference('service2'),
+            new Reference('service1'),
+        ];
+        $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
+
+        $expected = [
+            'service2' => new TypedReference('service2', \stdClass::class),
+            'service1' => new TypedReference('service1', \stdClass::class),
+        ];
+        $services = $priorityTaggedServiceTraitImplementation->test(new TaggedIteratorArgument('my_custom_tag', needsIndexes: true), $container);
+        $this->assertSame(array_keys($expected), array_keys($services));
+        $this->assertEquals($expected, $services);
+    }
+
     #[IgnoreDeprecations]
     #[Group('legacy')]
     public function testOnlyTheIndexedTagsAreListed()

@@ -38,6 +38,21 @@ class ContainerLintCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString($expectedOutput, $tester->getDisplay());
     }
 
+    public function testLintContainerChecksServicesOnlyReferencedByTaggedIterators()
+    {
+        $kernel = static::createKernel([
+            'test_case' => 'ContainerLint',
+            'debug' => true,
+        ]);
+        $this->application = new Application($kernel);
+
+        $tester = $this->createCommandTester();
+        $exitCode = $tester->execute([]);
+
+        $this->assertSame(1, $exitCode);
+        $this->assertStringContainsString('Invalid definition for service "tagged_item"', $tester->getDisplay());
+    }
+
     public static function containerLintProvider(): iterable
     {
         yield ['escaped_percent.yml', false, 0, 'The container was linted successfully'];

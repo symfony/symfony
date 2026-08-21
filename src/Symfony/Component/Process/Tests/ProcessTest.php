@@ -1250,6 +1250,23 @@ class ProcessTest extends TestCase
         $this->assertSame('pingpong', $process->getOutput());
     }
 
+    public function testIteratorInputDoesNotWaitForOutput()
+    {
+        $writes = [];
+        $input = static function () use (&$writes) {
+            for ($i = 0; $i < 20; ++$i) {
+                $writes[] = microtime(true);
+                yield 'x';
+            }
+        };
+
+        $process = $this->getProcessForCode('while (!feof(STDIN)) { fread(STDIN, 1024); }', null, null, $input());
+        $process->run();
+
+        $this->assertCount(20, $writes);
+        $this->assertLessThan(Process::TIMEOUT_PRECISION, end($writes) - $writes[0]);
+    }
+
     public function testSimpleInputStream()
     {
         $input = new InputStream();

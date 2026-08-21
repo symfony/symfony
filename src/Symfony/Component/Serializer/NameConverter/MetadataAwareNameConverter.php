@@ -152,15 +152,24 @@ final class MetadataAwareNameConverter implements NameConverterInterface
             $metadataGroups = $metadata->getGroups()
                 ?: ($enableDefaultGroups && !$customGroupsHasBeenDefined ? $defaultGroups : []);
 
-            if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $groups)) {
-                continue;
-            }
+            if (!$groupsHasBeenDefined && !$enableDefaultGroups) {
+                $sameNameMetadata = $classMetadata->getAttributesMetadata()[$serializedName] ?? null;
 
-            // When the flag is off, preserve legacy semantics: any non-empty context
-            // groups (including ['*']) skips ungrouped properties. When the flag is on,
-            // ['*'] keeps them.
-            if (!$metadataGroups && $groupsHasBeenDefined && (!$enableDefaultGroups || !\in_array('*', $groups, true))) {
-                continue;
+                // without groups to tell them apart, the attribute using that name for itself wins
+                if ($metadataGroups && $sameNameMetadata && null === $sameNameMetadata->getSerializedName($groups)) {
+                    continue;
+                }
+            } else {
+                if ($metadataGroups && !array_intersect(array_merge($metadataGroups, ['*']), $groups)) {
+                    continue;
+                }
+
+                // When the flag is off, preserve legacy semantics: any non-empty context
+                // groups (including ['*']) skips ungrouped properties. When the flag is on,
+                // ['*'] keeps them.
+                if (!$metadataGroups && $groupsHasBeenDefined && (!$enableDefaultGroups || !\in_array('*', $groups, true))) {
+                    continue;
+                }
             }
 
             $cache[$serializedName] = $name;

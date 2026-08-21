@@ -179,7 +179,7 @@ Output a table, highest severity first:
 - **Low**: DoS / resource exhaustion / defense-in-depth only.
 - **Not a finding**: excluded by a decision boundary (say which one).
 
-When a finding moves on to `symfony-security-triage`, Critical and High both map to its
+When a finding moves on to `security-triage`, Critical and High both map to its
 `high` label; Medium and Low map to `medium` and `low`.
 
 For each real finding, state whether a **hardening regression test** is required so
@@ -204,7 +204,7 @@ This follows the house conventions:
 - **TDD**: write the failing hardening test first, then the fix.
 - **Component-scoped tests only**: `./phpunit src/Symfony/Component/<Name>` (never the whole suite).
 - Add the regression test at the boundary so the convention gate covers it; for a
-  durable implementation-shape check, see the `symfony-hardening-rule` skill.
+  durable implementation-shape check, see the `hardening-rule` skill.
 - No em-dashes, no `Co-Authored-By`, no Claude/Anthropic credit. Comments sparingly,
   and do not reference issue numbers in code or tests.
 

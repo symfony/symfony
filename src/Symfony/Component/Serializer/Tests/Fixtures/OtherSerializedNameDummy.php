@@ -39,6 +39,8 @@ class OtherSerializedNameDummy
 
     #[Groups(['i', 'a']), SerializedName('puxi', 'i'), SerializedName('puxa', 'a')]
     public $puux;
+    #[Groups(['a']), SerializedName('quux')]
+    public $qux;
 
     public function setBuz($buz)
     {

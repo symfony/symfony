@@ -195,6 +195,42 @@ class TranslatorTest extends TestCase
         $this->assertSame('A', $nodeList->item(0)->textContent);
     }
 
+    public function testDisabledAndEnabledInsideFieldsets()
+    {
+        $translator = new Translator();
+        $translator->registerExtension(new HtmlExtension($translator));
+        $document = new \DOMDocument();
+        $document->loadHTML(<<<'HTML'
+            <html>
+              <body>
+                <fieldset id="outer" disabled="disabled">
+                  <legend><input type="text" id="first-legend-input"></legend>
+                  <legend><input type="text" id="second-legend-input"></legend>
+                  <input type="text" id="direct-input">
+                  <fieldset id="nested"><input type="text" id="nested-input"></fieldset>
+                </fieldset>
+                <fieldset id="standalone"><input type="text" id="standalone-input"></fieldset>
+              </body>
+            </html>
+            HTML
+        );
+
+        $xpath = new \DOMXPath($document);
+
+        $disabled = [];
+        foreach ($xpath->query($translator->cssToXPath(':disabled')) as $node) {
+            $disabled[] = $node->getAttribute('id');
+        }
+
+        $enabled = [];
+        foreach ($xpath->query($translator->cssToXPath(':enabled')) as $node) {
+            $enabled[] = $node->getAttribute('id');
+        }
+
+        $this->assertSame(['outer', 'second-legend-input', 'direct-input', 'nested', 'nested-input'], $disabled);
+        $this->assertSame(['first-legend-input', 'standalone', 'standalone-input'], $enabled);
+    }
+
     public static function getXpathLiteralTestData()
     {
         return [

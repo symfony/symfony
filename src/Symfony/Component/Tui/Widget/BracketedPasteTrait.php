@@ -31,6 +31,7 @@ trait BracketedPasteTrait
     private bool $inPaste = false;
     private bool $pasteOverflowed = false;
     private string $pasteBuffer = '';
+    private string $pasteEndMarkerBuffer = '';
 
     private function isBufferingPaste(): bool
     {
@@ -72,6 +73,12 @@ trait BracketedPasteTrait
             $data = substr($data, $start + 6);
             $this->inPaste = true;
             $this->pasteBuffer = '';
+            $this->pasteEndMarkerBuffer = '';
+        }
+
+        if ('' !== $this->pasteEndMarkerBuffer) {
+            $data = $this->pasteEndMarkerBuffer.$data;
+            $this->pasteEndMarkerBuffer = '';
         }
 
         if (false !== $endIndex = strpos($data, "\x1b[201~")) {
@@ -85,19 +92,34 @@ trait BracketedPasteTrait
             $this->inPaste = false;
             $this->pasteOverflowed = false;
             $this->pasteBuffer = '';
+            $this->pasteEndMarkerBuffer = '';
             $data = $prefix.substr($data, $endIndex + 6);
 
             return $pastedText;
         }
 
-        if ($this->pasteOverflowed) {
-            $data = $prefix;
+        $hold = 0;
+        for ($n = min(5, \strlen($data)); $n > 0; --$n) {
+            if (str_starts_with("\x1b[201~", substr($data, -$n))) {
+                $hold = $n;
+                break;
+            }
+        }
 
+        if (0 < $hold) {
+            $chunk = substr($data, 0, -$hold);
+            $this->pasteEndMarkerBuffer = substr($data, -$hold);
+        } else {
+            $chunk = $data;
+        }
+
+        $data = $prefix;
+
+        if ($this->pasteOverflowed) {
             return null;
         }
 
-        $this->pasteBuffer .= $data;
-        $data = $prefix;
+        $this->pasteBuffer .= $chunk;
 
         // Cap reached without an end marker: discard the content and stop
         // accumulating, as a defense against unbounded buffering from a

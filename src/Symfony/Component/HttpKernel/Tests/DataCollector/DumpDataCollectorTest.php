@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Server\Connection;
@@ -205,5 +206,41 @@ class DumpDataCollectorTest extends TestCase
 
         $this->assertStringContainsString('<script nonce="shared-nonce">', $dumps[0]['data']);
         $this->assertStringContainsString('<style nonce="shared-nonce">', $dumps[0]['data']);
+    }
+
+    public function testDumpAndDieWritesDumpsBeforeTheScriptShutsDown()
+    {
+        $autoload = file_exists(__DIR__.'/../../vendor/autoload.php')
+            ? __DIR__.'/../../vendor/autoload.php'
+            : __DIR__.'/../../../../../../vendor/autoload.php'
+        ;
+
+        $bootCode = <<<'EOPHP'
+            <?php
+            use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
+            use Symfony\Component\VarDumper\Cloner\VarCloner;
+            use Symfony\Component\VarDumper\VarDumper;
+
+            require $argv[1];
+
+            $collector = new DumpDataCollector();
+            $cloner = new VarCloner();
+
+            VarDumper::setHandler(static function ($var) use ($collector, $cloner) {
+                $collector->dump($cloner->cloneVar($var));
+            });
+
+            register_shutdown_function(static function () { echo "shutting down\n"; });
+
+            dd('dumped value');
+            EOPHP;
+
+        $process = new Process([\PHP_BINARY, '--', $autoload]);
+        $process->setInput($bootCode);
+        $process->run();
+
+        $output = preg_replace("/\033\[[^m]*m/", '', $process->getOutput());
+
+        $this->assertStringContainsString("\"dumped value\"\nshutting down\n", $output, $process->getErrorOutput());
     }
 }

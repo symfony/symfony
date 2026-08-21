@@ -111,6 +111,12 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
 
         $this->stopwatch?->stop('dump');
 
+        // dd() exits right after this call, and worker runtimes close the response
+        // before destructors run, so pending dumps are written to the output now.
+        if (!$this->isCollected && $this->isDumpAndDie()) {
+            $this->flush();
+        }
+
         return null;
     }
 
@@ -240,32 +246,40 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
     {
         if (0 === $this->clonesCount-- && !$this->isCollected && $this->dataCount) {
             $this->clonesCount = 0;
-            $this->isCollected = true;
-
-            $h = headers_list();
-            $i = \count($h);
-            array_unshift($h, 'Content-Type: '.\ini_get('default_mimetype'));
-            while (0 !== stripos($h[$i], 'Content-Type:')) {
-                --$i;
-            }
-
-            if ($this->webMode) {
-                $dumper = new HtmlDumper('php://output', $this->charset);
-                $this->applyNonceTo($dumper);
-            } else {
-                $dumper = new CliDumper('php://output', $this->charset);
-            }
-
-            $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
-
-            foreach ($this->data as $i => $dump) {
-                $this->data[$i] = null;
-                $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line'], $dump['label'] ?? '');
-            }
-
-            $this->data = [];
-            $this->dataCount = 0;
+            $this->flush();
         }
+    }
+
+    private function flush(): void
+    {
+        $this->isCollected = true;
+
+        if ($this->webMode) {
+            $dumper = new HtmlDumper('php://output', $this->charset);
+            $this->applyNonceTo($dumper);
+        } else {
+            $dumper = new CliDumper('php://output', $this->charset);
+        }
+        $dumper->setDisplayOptions(['fileLinkFormat' => $this->fileLinkFormat]);
+
+        foreach ($this->data as $i => $dump) {
+            $this->data[$i] = null;
+            $this->doDump($dumper, $dump['data'], $dump['name'], $dump['file'], $dump['line'], $dump['label'] ?? '');
+        }
+
+        $this->data = [];
+        $this->dataCount = 0;
+    }
+
+    private function isDumpAndDie(): bool
+    {
+        foreach (debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 8) as $frame) {
+            if ('dd' === $frame['function'] && !isset($frame['class'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function doDump(DataDumperInterface $dumper, Data $data, string $name, string $file, int $line, string $label): void

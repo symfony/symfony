@@ -614,6 +614,7 @@ class DebugClassLoaderTest extends TestCase
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::never()" might add "never" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::null()" might add "null" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParent::classConstant()" might add "string" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
+            'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeInterface::interfaceClassConstant()" might add "string" as a native return type declaration in the future. Do the same in implementation "Test\Symfony\Component\ErrorHandler\Tests\ReturnType" now to avoid errors or add an explicit @return annotation to suppress this message.',
         ], $deprecations);
     }
 
@@ -631,6 +632,12 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame([
             'Method "Symfony\Component\ErrorHandler\Tests\Fixtures\ReturnTypeParentPhp83::classConstantWithType()" might add "string" as a native return type declaration in the future. Do the same in child class "Test\Symfony\Component\ErrorHandler\Tests\ReturnTypePhp83" now to avoid errors or add an explicit @return annotation to suppress this message.',
         ], $deprecations);
+    }
+
+    public function testClassConstantReturnTypeDoesNotTriggerAutoloading()
+    {
+        $this->assertTrue(class_exists(Fixtures\ReturnTypeClassConstant::class, true));
+        $this->assertFalse(class_exists(Fixtures\ReturnTypeClassConstantHolder::class, false));
     }
 
     public function testOverrideFinalProperty()

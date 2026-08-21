@@ -62,6 +62,31 @@ class FileTypeFilterIteratorTest extends RealIteratorTestCase
             [FileTypeFilterIterator::ONLY_DIRECTORIES, self::toAbsolute($onlyDirectories)],
         ];
     }
+
+    public function testDanglingSymlinkIsNeitherAFileNorADirectory()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('symlinks are not supported on Windows');
+        }
+
+        $tmpDir = realpath(sys_get_temp_dir()).'/symfony_finder_dangling_symlink';
+        mkdir($tmpDir);
+        touch($tmpDir.'/file.txt');
+        mkdir($tmpDir.'/dir');
+        symlink($tmpDir.'/missing', $tmpDir.'/dangling');
+
+        try {
+            $inner = new InnerTypeIterator([$tmpDir.'/file.txt', $tmpDir.'/dir', $tmpDir.'/dangling']);
+
+            $this->assertIterator([$tmpDir.'/file.txt'], new FileTypeFilterIterator($inner, FileTypeFilterIterator::ONLY_FILES));
+            $this->assertIterator([$tmpDir.'/dir'], new FileTypeFilterIterator($inner, FileTypeFilterIterator::ONLY_DIRECTORIES));
+        } finally {
+            unlink($tmpDir.'/dangling');
+            unlink($tmpDir.'/file.txt');
+            rmdir($tmpDir.'/dir');
+            rmdir($tmpDir);
+        }
+    }
 }
 
 class InnerTypeIterator extends \ArrayIterator

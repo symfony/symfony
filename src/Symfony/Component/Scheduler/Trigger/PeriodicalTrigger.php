@@ -70,6 +70,8 @@ class PeriodicalTrigger implements StatefulTriggerInterface
             } else {
                 $this->interval = $i;
             }
+        } catch (InvalidArgumentException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new InvalidArgumentException(\sprintf('Invalid interval "%s": ', $interval instanceof \DateInterval ? 'instance of \DateInterval' : $interval).$e->getMessage(), 0, $e);
         }
@@ -110,7 +112,13 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
         $this->period ??= new \DatePeriod($this->from, $this->interval, $this->until);
         $iterator = $this->period->getIterator();
+        $previous = null;
         while ($run >= $next = $iterator->current()) {
+            if (null !== $previous && $next <= $previous) {
+                throw new InvalidArgumentException(\sprintf('The interval of the "%s" trigger does not move the run date forward. Consider using a cron expression instead.', $this->description));
+            }
+
+            $previous = $next;
             $iterator->next();
             if (!$iterator->valid()) {
                 return null;
@@ -132,6 +140,12 @@ class PeriodicalTrigger implements StatefulTriggerInterface
 
     private function calcInterval(\DateInterval $interval): float
     {
-        return (float) (new \DateTimeImmutable('@0'))->add($interval)->format('U.u');
+        $seconds = (float) (new \DateTimeImmutable('@0'))->add($interval)->format('U.u');
+
+        if (0.0 >= $seconds) {
+            throw new InvalidArgumentException('The "$interval" argument must be greater than zero.');
+        }
+
+        return $seconds;
     }
 }

@@ -73,6 +73,10 @@ class PeriodicalTriggerTest extends TestCase
         yield [-3600, 'The "$interval" argument must be greater than zero.'];
         yield ['0', 'The "$interval" argument must be greater than zero.'];
         yield [0, 'The "$interval" argument must be greater than zero.'];
+        yield ['PT0S', 'The "$interval" argument must be greater than zero.'];
+        yield ['P0D', 'The "$interval" argument must be greater than zero.'];
+        yield ['0 seconds', 'The "$interval" argument must be greater than zero.'];
+        yield [new \DateInterval('PT0S'), 'The "$interval" argument must be greater than zero.'];
     }
 
     #[DataProvider('provideForToString')]
@@ -146,6 +150,25 @@ class PeriodicalTriggerTest extends TestCase
             ],
             20,
         ];
+    }
+
+    #[DataProvider('provideNonMovingIntervals')]
+    public function testThrowsWhenIntervalDoesNotMoveTheRunDateForward(string $interval, string $from, string $run)
+    {
+        $trigger = new PeriodicalTrigger($interval, new \DateTimeImmutable($from));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('The interval of the "every %s" trigger does not move the run date forward. Consider using a cron expression instead.', $interval));
+
+        $trigger->getNextRunDate(new \DateTimeImmutable($run));
+    }
+
+    public static function provideNonMovingIntervals(): iterable
+    {
+        yield 'weekday name matching the current day' => ['Monday', '2024-11-25 15:53:20', '2024-11-25 15:53:20'];
+        yield 'weekday name stalling after one advance' => ['Monday', '2024-11-26 15:53:20', '2024-12-31 00:00:00'];
+        yield 'backward-moving interval' => ['1 day ago', '2024-11-25 15:53:20', '2024-11-25 15:53:20'];
+        yield 'comma-separated weekdays' => ['Monday, Thursday, Saturday', '2024-11-25 15:53:20', '2024-12-31 00:00:00'];
     }
 
     #[DataProvider('providerGetNextRunDateAgain')]

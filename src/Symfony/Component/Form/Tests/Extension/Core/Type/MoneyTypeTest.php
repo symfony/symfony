@@ -71,6 +71,26 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
     }
 
+    public function testMoneyPatternWorksForLocalesWithNonAsciiDigits()
+    {
+        \Locale::setDefault('fa_IR');
+
+        $view = $this->factory->create(static::TESTED_TYPE)
+            ->createView();
+
+        $this->assertSame('€ {{ widget }}', $view->vars['money_pattern']);
+    }
+
+    public function testMoneyPatternIgnoresDirectionalMarks()
+    {
+        \Locale::setDefault('he_IL');
+
+        $view = $this->factory->create(static::TESTED_TYPE)
+            ->createView();
+
+        $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
+    }
+
     public function testSubmitNull($expected = null, $norm = null, $view = null)
     {
         parent::testSubmitNull($expected, $norm, '');

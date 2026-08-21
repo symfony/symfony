@@ -93,8 +93,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $this->magicMethodsFlags = $magicMethodsFlags;
         $this->inflector = $inflector ?? new EnglishInflector();
 
-        $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes));
-        $this->arrayMutatorPrefixesLast = array_reverse($this->arrayMutatorPrefixesFirst);
+        $nonArrayMutatorPrefixes = array_diff($this->mutatorPrefixes, $this->arrayMutatorPrefixes);
+        $this->arrayMutatorPrefixesFirst = array_merge($this->arrayMutatorPrefixes, $nonArrayMutatorPrefixes);
+        $this->arrayMutatorPrefixesLast = array_merge($nonArrayMutatorPrefixes, $this->arrayMutatorPrefixes);
     }
 
     public function getProperties(string $class, array $context = []): ?array

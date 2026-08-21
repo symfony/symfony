@@ -63,6 +63,8 @@ class OidcTokenHandlerFactory implements TokenHandlerFactoryInterface
                 $config['discovery']['enforce_key_usage_verification'],
             ]);
 
+            $tokenHandlerDefinition->addTag('kernel.reset', ['method' => 'reset']);
+
             return;
         }
 

@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
+use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -246,7 +247,7 @@ class SecurityExtensionTest extends TestCase
         ]);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Unrecognized option "some_other" under "security.providers.my_app_provider". Available options are "chain", "custom", "id", "ldap", "memory".');
+        $this->expectExceptionMessage('Unrecognized option "some_other" under "security.providers.my_app_provider". Available options are "chain", "custom", "id", "ldap", "memory", "oidc".');
 
         $container->compile();
     }
@@ -1449,6 +1450,63 @@ class SecurityExtensionTest extends TestCase
         $securityHelperAuthenticatorLocator = $container->getDefinition($container->getDefinition('security.helper')->getArgument(1)['main']);
         $this->assertArrayHasKey(TestAuthenticator::class, $authenticatorMap = $securityHelperAuthenticatorLocator->getArgument(0), 'When programmatically authenticating a user, authenticators’ name must be their original ID.');
         $this->assertSame(TestAuthenticator::class, (string) $authenticatorMap[TestAuthenticator::class]->getValues()[0], 'When programmatically authenticating a user, original authenticators must be used.');
+    }
+
+    public function testOidcLoginAcceptsEnvironmentVariables()
+    {
+        // "provider_uri" carries a validator, so declaring it ->cannotBeEmpty() would make
+        // the Config component reject environment variables on it altogether. The scheme of
+        // the resolved value is checked at runtime by OidcDiscovery instead.
+        $container = $this->getRawContainer();
+        // the pass that validates configuration against env placeholders is an
+        // optimization pass, which getRawContainer() replaces: put it back, otherwise
+        // the env vars are simply skipped and this test guards nothing
+        $container->getCompilerPassConfig()->setOptimizationPasses([
+            new ValidateEnvPlaceholdersPass(),
+            new ResolveChildDefinitionsPass(),
+        ]);
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => '%env(OIDC_PROVIDER_URI)%',
+                        'client_id' => '%env(OIDC_CLIENT_ID)%',
+                        'client_secret' => '%env(OIDC_CLIENT_SECRET)%',
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.main'));
+    }
+
+    public function testOidcLoginUsesTheFirewallUserProvider()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => [
+                'oidc' => ['oidc' => null],
+                'in_memory' => ['memory' => null],
+            ],
+            'firewalls' => [
+                'main' => [
+                    'provider' => 'oidc',
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_secret' => 'my-client-secret',
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
+        $this->assertSame('security.user.provider.concrete.oidc', (string) $authenticator->getArgument(1));
     }
 
     protected function getRawContainer()

@@ -16,6 +16,9 @@ CHANGELOG
  * Configure the decorated handler of `CustomAuthenticationSuccessHandler` and `CustomAuthenticationFailureHandler` when they are called instead of when they are built, so that a single handler can be shared by several authenticators
  * Add argument `$parameters` to `LoginLinkHandlerInterface::createLoginLink()` to add extra query parameters covered by the link signature
  * Expose the verified extra parameters via the `_login_link_parameters` request attribute when consuming a login link
+ * Add `OidcLoginAuthenticator` for the OpenID Connect Authorization Code Flow (interactive login via OIDC provider)
+ * Add `OidcClient` and `OidcDiscovery` protocol classes
+ * Cache the discovery document of the `oidc` access token handler for one hour, where it was fetched again on every refresh of the JWKS
 
 8.1
 ---

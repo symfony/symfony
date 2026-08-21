@@ -44,6 +44,7 @@ use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\MissingUserProvider;
+use Symfony\Component\Security\Core\User\OidcUserProvider;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPasswordValidator;
 use Symfony\Component\Security\Csrf\DelegatingCsrfTokenManager;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
@@ -272,6 +273,9 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('security.user.provider.in_memory', InMemoryUserProvider::class)
+            ->abstract()
+
+        ->set('security.user.provider.oidc', OidcUserProvider::class)
             ->abstract()
 
         ->set('security.user.provider.ldap', LdapUserProvider::class)

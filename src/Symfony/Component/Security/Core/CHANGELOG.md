@@ -6,6 +6,8 @@ CHANGELOG
 
  * Allow using wildcards as placeholders in the keys of the `RoleHierarchy` map
  * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `acceptSignatureHash()` and `verifySignatureHash()`
+ * Add `OidcUser::fromClaims()` to build a user from the claims returned by an OIDC provider
+ * Add `OidcUserProvider`, which builds the OIDC users of the `oidc_login` authenticator from those claims
 
 8.1
 ---

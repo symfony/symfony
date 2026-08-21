@@ -51,6 +51,8 @@ class OidcUserInfoTokenHandlerFactory implements TokenHandlerFactoryInterface
                     "$id.oidc_configuration",
                 ]
             );
+
+            $tokenHandlerDefinition->addTag('kernel.reset', ['method' => 'reset']);
         }
     }
 

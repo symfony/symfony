@@ -1,5 +1,5 @@
 ---
-name: symfony-merge-up
+name: merge-up
 description: >
   Cascade-merge maintained Symfony branches from oldest to newest (e.g.
   6.4 → 7.4 → 8.0 → 8.1). Use when the user says "merge branches",

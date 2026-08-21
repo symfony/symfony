@@ -616,7 +616,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->requestHandler->handleRequest($form, $this->request);
 
         if ($shouldFail) {
-            $error = new FormError($options['post_max_size_message'], null, $errorParams);
+            $error = new FormError(\sprintf('Max %s!', $iniMax), $options['post_max_size_message'], $errorParams);
             $error->setOrigin($form);
 
             $this->assertEquals([$error], iterator_to_array($form->getErrors()));

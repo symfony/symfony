@@ -94,11 +94,18 @@ class DateCaster
         $dates = [];
         foreach (clone $p as $i => $d) {
             if (self::PERIOD_LIMIT === $i) {
+                if (!$end = $p->getEndDate()) {
+                    $dates[] = \sprintf('%s more', $p->recurrences - $i);
+                    break;
+                }
+
                 $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-                $dates[] = \sprintf('%s more', ($end = $p->getEndDate())
-                    ? ceil(($end->format('U.u') - $d->format('U.u')) / ((int) $now->add($p->getDateInterval())->format('U.u') - (int) $now->format('U.u')))
-                    : $p->recurrences - $i
-                );
+                $numberOfSeconds = (float) $now->add($p->getDateInterval())->format('U.u') - (float) $now->format('U.u');
+
+                if (0 < $numberOfSeconds) {
+                    $dates[] = \sprintf('%s more', ceil(($end->format('U.u') - $d->format('U.u')) / $numberOfSeconds));
+                }
+
                 break;
             }
             $dates[] = \sprintf('%s) %s', $i + 1, self::formatDateTime($d));

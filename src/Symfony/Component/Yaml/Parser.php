@@ -200,6 +200,8 @@ class Parser
                         $subTag,
                         $this->parseBlock($this->getRealCurrentLineNb() + 1, $this->getNextEmbedBlock(null, true), $flags)
                     );
+                } elseif (self::preg_match('/^'.self::TAG_PATTERN.' +'.self::BLOCK_SCALAR_HEADER_PATTERN.'$/', $values['value'])) {
+                    $data[] = $this->parseValue($values['value'], $flags, $context);
                 } else {
                     if (
                         isset($values['leadspaces'])

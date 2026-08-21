@@ -34,14 +34,24 @@ class OutputFormatterTest extends TestCase
         $this->assertEquals("foo << \033[32mbar \\ baz\033[39m \\", $formatter->format('foo << <info>bar \\ baz</info> \\'));
         $this->assertEquals('<info>some info</info>', $formatter->format('\\<info>some info\\</info>'));
         $this->assertEquals('\\<info\\>some info\\</info\\>', OutputFormatter::escape('<info>some info</info>'));
-        // every < and > gets escaped if not already escaped, but already escaped ones do not get escaped again
-        // and escaped backslashes remain as such, same with backslashes escaping non-special characters
-        $this->assertEquals('foo \\< bar \\< baz \\\\< foo \\> bar \\> baz \\\\> \\x', OutputFormatter::escape('foo < bar \\< baz \\\\< foo > bar \\> baz \\\\> \\x'));
+        // every < and > gets escaped, backslashes are left as they are
+        $this->assertEquals('foo \\< bar \\\\< baz \\\\\\< foo \\> bar \\\\> baz \\\\\\> \\x', OutputFormatter::escape('foo < bar \\< baz \\\\< foo > bar \\> baz \\\\> \\x'));
 
         $this->assertEquals(
             "\033[33mSymfony\\Component\\Console does work very well!\033[39m",
             $formatter->format('<comment>Symfony\Component\Console does work very well!</comment>')
         );
+    }
+
+    public function testFormatRestoresEscapedText()
+    {
+        $formatter = new OutputFormatter(true);
+
+        $this->assertEquals('foo \\<bar', $formatter->format(OutputFormatter::escape('foo \\<bar')));
+        $this->assertEquals('foo \\>bar', $formatter->format(OutputFormatter::escape('foo \\>bar')));
+        $this->assertEquals('foo \\\\<bar>', $formatter->format(OutputFormatter::escape('foo \\\\<bar>')));
+        $this->assertEquals('foo \\<info>bar\\</info>', $formatter->format(OutputFormatter::escape('foo \\<info>bar\\</info>')));
+        $this->assertEquals('foo \\', $formatter->format(OutputFormatter::escape('foo \\')));
     }
 
     public function testBundledStyles()
@@ -106,7 +116,7 @@ class OutputFormatterTest extends TestCase
         $formatter = new OutputFormatter(true);
 
         $this->assertEquals(
-            "(\033[32mz>=2.0,<<<a2.3\\\033[39m)",
+            "(\033[32mz>=2.0,<\\<<a2.3\\\033[39m)",
             $formatter->format('(<info>'.$formatter->escape('z>=2.0,<\\<<a2.3\\').'</info>)')
         );
 

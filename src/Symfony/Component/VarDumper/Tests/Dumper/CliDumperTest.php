@@ -14,6 +14,8 @@ namespace Symfony\Component\VarDumper\Tests\Dumper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
+use Symfony\Component\Process\Process;
 use Symfony\Component\VarDumper\Caster\ClassDumpStub;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
@@ -570,5 +572,22 @@ class CliDumperTest extends TestCase
                 $_ENV['SYMFONY_IDE'] = $ide;
             }
         }
+    }
+
+    public function testColorsOnTerminalWhenDumpingToPhpOutput()
+    {
+        if (!Process::isPtySupported()) {
+            $this->markTestSkipped('PTY is not supported.');
+        }
+
+        $process = new Process([\PHP_BINARY, __DIR__.'/../Fixtures/dump_colors.php'], null, [
+            'COMPONENT_ROOT' => __DIR__.'/../../',
+            'TERM' => 'xterm-256color',
+            'NO_COLOR' => false,
+        ]);
+        $process->setPty(true);
+        $process->mustRun();
+
+        $this->assertSame('tty=true colors=true', trim($process->getOutput()));
     }
 }

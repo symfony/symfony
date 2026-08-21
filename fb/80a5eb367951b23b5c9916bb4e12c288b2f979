@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-21T06:57:12Z
+
+The dump_data_collector_with_spl_array.phpt failure in the 8.4 high-deps job also happens on the 6.4 branch itself, so it does not come from this change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-21T07:12:59Z
+
+Thanks for the patch. Confirmed both failing jobs are unrelated: the 8.4 high-deps `dump_data_collector_with_spl_array.phpt` fails on the implicit-nullable deprecations from `DumpDataCollector`, and the x86 lowest-php one is `InlineFragmentRendererTest::testESIHeaderIsKeptInSubrequest` in HttpKernel.
+
+I added a test for the sub-second interval, since nothing covered the `(int)` to `(float)` change: with the casts put back to `(int)` the whole suite still passed. Rebased and pushed.

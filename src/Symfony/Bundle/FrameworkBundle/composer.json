@@ -88,7 +88,7 @@
         "symfony/http-client": "<6.3",
         "symfony/form": "<5.4",
         "symfony/lock": "<5.4",
-        "symfony/mailer": "<5.4",
+        "symfony/mailer": "<6.4.44|>=7.0,<7.4.17|>=8.0,<8.1.5",
         "symfony/messenger": "<6.3",
         "symfony/mime": "<6.4.37|>=7.0,<7.4.9",
         "symfony/property-info": "<5.4",

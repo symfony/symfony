@@ -643,6 +643,18 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testDenormalizeSerializedNameOfGroupedAttributeWithoutContextGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new OtherSerializedNameDummy();
+        $obj->qux = 'Aldrin';
+
+        $this->assertEquals($obj, $this->normalizer->denormalize(['quux' => 'Aldrin'], OtherSerializedNameDummy::class));
+    }
+
     // ignored attributes
 
     protected function getNormalizerForIgnoredAttributes(): ObjectNormalizer

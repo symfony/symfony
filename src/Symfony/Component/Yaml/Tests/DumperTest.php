@@ -14,7 +14,6 @@ namespace Symfony\Component\Yaml\Tests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Exception\DumpException;
-use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml;
@@ -604,12 +603,7 @@ class DumperTest extends TestCase
         ];
         $expected = "- !bar |\n    a\n    b";
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
-
-        // @todo Fix the parser, eliminate these exceptions.
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 3 (near "!bar |").');
-
-        $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
+        $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingTaggedMultiLineTrailingNewlinesInMap()
@@ -621,11 +615,7 @@ class DumperTest extends TestCase
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
         // @todo Fix the parser, the result should be identical to $data.
-        $this->assertSameData(
-            [
-                'foo' => new TaggedValue('bar', "a\nb\n"),
-            ],
-            $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
+        $this->assertSameData(['foo' => new TaggedValue('bar', "a\nb\n")], $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingTaggedMultiLineTrailingNewlinesInList()
@@ -636,11 +626,8 @@ class DumperTest extends TestCase
         $expected = "- !bar |\n    a\n    b\n    \n    \n    ";
         $this->assertSame($expected, $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
 
-        // @todo Fix the parser, eliminate these exceptions.
-        $this->expectException(ParseException::class);
-        $this->expectExceptionMessage('Unable to parse at line 6 (near "!bar |").');
-
-        $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
+        // @todo Fix the parser, the result should be identical to $data.
+        $this->assertSameData([new TaggedValue('bar', "a\nb\n")], $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
     public function testDumpingInlinedMultiLineIfRnBreakLineInTaggedValue()

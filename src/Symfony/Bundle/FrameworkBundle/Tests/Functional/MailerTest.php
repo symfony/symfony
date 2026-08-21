@@ -78,19 +78,20 @@ class MailerTest extends AbstractWebTestCase
         $client->request('GET', '/send_email');
 
         $this->assertEmailCount(2);
-        $first = 0;
-        $second = 1;
+        $firstSent = 0;
+        $secondSent = 1;
         if (!class_exists(FullStack::class)) {
             $this->assertQueuedEmailCount(2);
-            $first = 1;
-            $second = 3;
+            $firstSent = 1;
+            $secondSent = 3;
             $this->assertEmailIsQueued($this->getMailerEvent(0));
             $this->assertEmailIsQueued($this->getMailerEvent(2));
         }
-        $this->assertEmailIsNotQueued($this->getMailerEvent($first));
-        $this->assertEmailIsNotQueued($this->getMailerEvent($second));
+        $this->assertEmailIsNotQueued($this->getMailerEvent($firstSent));
+        $this->assertEmailIsNotQueued($this->getMailerEvent($secondSent));
 
-        $email = $this->getMailerMessage($first);
+        // queued and sent emails are reported by two events but by a single message
+        $email = $this->getMailerMessage(0);
         $this->assertEmailHasHeader($email, 'To');
         $this->assertEmailHeaderSame($email, 'To', 'fabien@symfony.com');
         $this->assertEmailHeaderNotSame($email, 'To', 'helene@symfony.com');
@@ -101,7 +102,7 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailAttachmentCount($email, 1);
         $this->assertEmailAddressNotContains($email, 'To', 'thomas@symfony.com');
 
-        $email = $this->getMailerMessage($second);
+        $email = $this->getMailerMessage(1);
         $this->assertEmailSubjectContains($email, 'Foo');
         $this->assertEmailSubjectNotContains($email, 'Bar');
         $this->assertEmailAddressContains($email, 'To', 'fabien@symfony.com');

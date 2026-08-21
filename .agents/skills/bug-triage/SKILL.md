@@ -1,5 +1,5 @@
 ---
-name: symfony-bug-triage
+name: bug-triage
 description: >
   Decide whether open Bug PRs target the correct branch. A bug must be fixed on
   the lowest maintained branch where it exists, then merged up. Use when the

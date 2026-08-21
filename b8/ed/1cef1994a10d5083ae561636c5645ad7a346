@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-20T15:53:42Z
+
+The failing unit test jobs fail the same way on 8.1 itself (Twig Bridge, and FrameworkBundle/SecurityBundle on high-deps). They are not related to this change, which only touches the Console component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-21T14:35:46Z
+
+Thanks for the analysis and the fix, the root cause is exactly right.
+
+What I changed while preparing this for merge:
+
+- squashed the two commits into one. The first one alone breaks `?Application $app` on a command with no application: the resolver stops yielding the extra `null` while `InvokableCommand` still sends the parameter to the resolver, so the next value lands in `$app`. Both halves have to land together.
+- moved the core utility check back to the top of the loop, where your first commit had it. Below the named resolver block it still lets `#[ValueResolver('...')]` on a core utility parameter throw `ResolverNotFoundException`, for a value that `InvokableCommand` would discard anyway.
+- extended the test into two cases, so each half of the fix is covered on its own: `testNullableHelpersInjection` covers all six nullable core utilities with an application set, and fails on 8.1 with `Failed asserting that null is identical to 'test'`; `testNullableApplicationInjectionWithoutApplication` covers `?Application` with no application, and fails with `Argument #1 ($app) must be of type ?Application, string given` when only the resolver half is applied.
+- rebased on the current 8.1.
+
+The CI failures are the Twig 4.x lexer regression that is red on every branch right now, unrelated to this change. Full `Console` suite is green here apart from four `QuestionHelperTest` cases and one `StreamOutputTest` case that fail the same way on 8.1.

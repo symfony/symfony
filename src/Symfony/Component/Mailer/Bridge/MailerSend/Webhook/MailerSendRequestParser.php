@@ -47,10 +47,12 @@ final class MailerSendRequestParser extends AbstractRequestParser
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
         $content = $request->toArray();
+        $isWhVer1 = isset($content['type'], $content['data']['email']['message']['id'], $content['data']['email']['recipient']['email']);
+        $isWhVer2 = isset($content['type'], $content['data']['message_id'], $content['data']['recipient']);
 
         if ('webhook.test' === ($content['type'] ?? null)) {
             $secret = self::TEST_SECRET;
-        } elseif (!isset($content['type'], $content['data']['email']['message']['id'], $content['data']['email']['recipient']['email'])) {
+        } elseif (!$isWhVer1 && !$isWhVer2) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 

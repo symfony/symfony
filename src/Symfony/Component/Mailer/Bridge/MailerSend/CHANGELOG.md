@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for MailerSend webhooks version 2
+
 7.1
 ---
 

@@ -11,7 +11,12 @@
 
 namespace Symfony\Component\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\PercentType;
+use Symfony\Component\Form\Extension\Core\Type\RangeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FormFactory implements FormFactoryInterface
@@ -107,7 +112,14 @@ class FormFactory implements FormFactoryInterface
         $resolvedType = $this->registry->getType($type);
 
         do {
-            if ($resolvedType->getInnerType() instanceof TextType) {
+            $innerType = $resolvedType->getInnerType();
+
+            // both descend from TextType but render their own input types
+            if ($innerType instanceof RangeType || $innerType instanceof ColorType) {
+                return false;
+            }
+
+            if ($innerType instanceof TextType || $innerType instanceof NumberType || $innerType instanceof MoneyType || $innerType instanceof PercentType) {
                 return true;
             }
         } while ($resolvedType = $resolvedType->getParent());

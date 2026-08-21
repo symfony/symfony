@@ -432,8 +432,56 @@ class StdinBufferTest extends TestCase
         $this->assertSame([], $sequences);
         $this->assertSame(['[paste exceeded 16 MiB limit]'], $pastes);
 
+        // The terminal is still sending the paste, so what follows is pasted
+        // content and not typing.
+        $buffer->process("rm -rf /tmp/x\r");
+
+        $this->assertSame([], $sequences, 'Content sent after the abort is dropped, not delivered as keys');
+        $this->assertSame(['[paste exceeded 16 MiB limit]'], $pastes, 'The overflow notice is sent once');
+    }
+
+    public function testInputResumesOnceAnAbortedPasteEnds()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+        $pastes = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        $buffer->process("\x1b[200~");
+        $buffer->process(str_repeat('A', 17 * 1024 * 1024));
+        $buffer->process("tail\x1b");
+        $buffer->process('[201~');
+
+        $this->assertSame([], $sequences, 'The end marker is not delivered as a key');
+        $this->assertSame(['[paste exceeded 16 MiB limit]'], $pastes);
+
         $buffer->process('B');
-        $this->assertSame(['B'], $sequences, 'Buffer should accept new input after abort');
+        $buffer->process("\x1b[200~next\x1b[201~");
+
+        $this->assertSame(['B'], $sequences);
+        $this->assertSame(['[paste exceeded 16 MiB limit]', 'next'], $pastes);
+    }
+
+    public function testFlushKeepsAHeldEndMarkerWhileAPasteIsOpen()
+    {
+        $buffer = new StdinBuffer();
+        $sequences = [];
+        $pastes = [];
+
+        $buffer->onData(static function (string $data) use (&$sequences) { $sequences[] = $data; });
+        $buffer->onPaste(static function (string $data) use (&$pastes) { $pastes[] = $data; });
+
+        // A read can end on the ESC of the end marker. Emitting it as the
+        // Escape key would leave the paste open with no way to close it.
+        $buffer->process("\x1b[200~AA\x1b");
+        $buffer->flush();
+        $buffer->process('[201~x');
+        $buffer->flush();
+
+        $this->assertSame(['AA'], $pastes);
+        $this->assertSame(['x'], $sequences);
     }
 
     public function testUnterminatedPasteAbortsAtCapWhenEveryWriteEndsWithAPartialEndMarker()

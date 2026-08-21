@@ -29,7 +29,9 @@ trait BracketedPasteTrait
     private const string PASTE_OVERFLOW_MESSAGE = '[paste exceeded 16 MiB limit]';
 
     private bool $inPaste = false;
+    private bool $pasteOverflowed = false;
     private string $pasteBuffer = '';
+    private string $pasteEndMarkerBuffer = '';
 
     private function isBufferingPaste(): bool
     {
@@ -55,7 +57,8 @@ trait BracketedPasteTrait
      *                     paste is in progress. If a paste exceeds the
      *                     internal cap, {@see PASTE_OVERFLOW_MESSAGE} is
      *                     returned in lieu of the partial content so the
-     *                     caller can surface a visible notice.
+     *                     caller can surface a visible notice; the rest of
+     *                     that paste is then dropped up to the end marker.
      */
     private function processBracketedPaste(string &$data): ?string
     {
@@ -70,29 +73,64 @@ trait BracketedPasteTrait
             $data = substr($data, $start + 6);
             $this->inPaste = true;
             $this->pasteBuffer = '';
+            $this->pasteEndMarkerBuffer = '';
+        }
+
+        if ('' !== $this->pasteEndMarkerBuffer) {
+            $data = $this->pasteEndMarkerBuffer.$data;
+            $this->pasteEndMarkerBuffer = '';
         }
 
         if (false !== $endIndex = strpos($data, "\x1b[201~")) {
-            $this->pasteBuffer .= substr($data, 0, $endIndex);
-            $pastedText = $this->pasteBuffer;
+            $pastedText = null;
+
+            if (!$this->pasteOverflowed) {
+                $this->pasteBuffer .= substr($data, 0, $endIndex);
+                $pastedText = $this->pasteBuffer;
+            }
+
             $this->inPaste = false;
+            $this->pasteOverflowed = false;
             $this->pasteBuffer = '';
+            $this->pasteEndMarkerBuffer = '';
             $data = $prefix.substr($data, $endIndex + 6);
 
             return $pastedText;
         }
 
-        $this->pasteBuffer .= $data;
+        $hold = 0;
+        for ($n = min(5, \strlen($data)); $n > 0; --$n) {
+            if (str_starts_with("\x1b[201~", substr($data, -$n))) {
+                $hold = $n;
+                break;
+            }
+        }
+
+        if (0 < $hold) {
+            $chunk = substr($data, 0, -$hold);
+            $this->pasteEndMarkerBuffer = substr($data, -$hold);
+        } else {
+            $chunk = $data;
+        }
+
         $data = $prefix;
 
-        // Cap reached without an end marker: discard the partial paste and
-        // exit paste mode. Returns a visible overflow notice in place of
-        // the partial content so the caller can show the user why their
-        // paste did not land. Defense against unbounded buffering from a
-        // missing/spoofed end marker.
+        if ($this->pasteOverflowed) {
+            return null;
+        }
+
+        $this->pasteBuffer .= $chunk;
+
+        // Cap reached without an end marker: discard the content and stop
+        // accumulating, as a defense against unbounded buffering from a
+        // missing/spoofed end marker. Returns a visible overflow notice in
+        // place of the partial content so the caller can show the user why
+        // their paste did not land. The paste stays open, because the terminal
+        // is still sending it and the rest of it must not be handled as key
+        // input.
         if (\strlen($this->pasteBuffer) > self::MAX_PASTE_BYTES) {
             $this->pasteBuffer = '';
-            $this->inPaste = false;
+            $this->pasteOverflowed = true;
 
             return self::PASTE_OVERFLOW_MESSAGE;
         }

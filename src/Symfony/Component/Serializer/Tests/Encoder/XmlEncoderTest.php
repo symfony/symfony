@@ -774,6 +774,20 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
 
+    public function testDecodeItemWithAdditionalAttributes()
+    {
+        $source = '<?xml version="1.0"?>'."\n".
+            '<response><item key="0" foo="bar"/><item key="1" foo="baz">qux</item><item key="2">quux</item></response>'."\n";
+
+        $expected = [
+            0 => ['@key' => 0, '@foo' => 'bar', '#' => ''],
+            1 => ['@key' => 1, '@foo' => 'baz', '#' => 'qux'],
+            2 => 'quux',
+        ];
+
+        $this->assertSame($expected, $this->encoder->decode($source, 'xml'));
+    }
+
     public function testDecodeInvalidXml()
     {
         $this->expectException(UnexpectedValueException::class);

@@ -311,7 +311,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $val = $this->parseXml($subnode, $context);
 
             if ('item' === $subnode->nodeName && isset($val['@key'])) {
-                $value[$val['@key']] = $val['#'] ?? $val;
+                $value[$val['@key']] = 2 === \count($val) && isset($val['#']) ? $val['#'] : $val;
             } else {
                 $value[$subnode->nodeName][] = $val;
             }

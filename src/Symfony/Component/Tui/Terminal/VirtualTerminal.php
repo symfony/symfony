@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Terminal;
 
 use Symfony\Component\Tui\Input\StdinBuffer;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Virtual terminal for testing.
@@ -40,6 +41,7 @@ final class VirtualTerminal implements TerminalInterface
         private int $columns = 80,
         private int $rows = 24,
         private bool $kittyProtocolActive = false,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -48,7 +50,7 @@ final class VirtualTerminal implements TerminalInterface
         $this->onResize = $onResize(...);
 
         // Set up StdinBuffer for input parsing (matches real Terminal behavior)
-        $this->stdinBuffer = new StdinBuffer();
+        $this->stdinBuffer = new StdinBuffer($this->eventDispatcher);
         $this->stdinBuffer->onData($onInput);
 
         // Re-wrap paste content with bracketed paste markers (matches real Terminal behavior)
@@ -60,6 +62,7 @@ final class VirtualTerminal implements TerminalInterface
     public function stop(): void
     {
         $this->onResize = null;
+        $this->stdinBuffer?->clear();
         $this->stdinBuffer = null;
     }
 

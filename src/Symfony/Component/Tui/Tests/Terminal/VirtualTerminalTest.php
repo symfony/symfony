@@ -13,6 +13,9 @@ namespace Symfony\Component\Tui\Tests\Terminal;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Tui\Event\PasteCompletedEvent;
+use Symfony\Component\Tui\Event\PasteStartedEvent;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 
 class VirtualTerminalTest extends TestCase
@@ -51,6 +54,31 @@ class VirtualTerminalTest extends TestCase
         $this->assertSame(["\x1b[200~Hello World\x1b[201~"], $received);
 
         $terminal->stop();
+    }
+
+    public function testStopMidPasteDispatchesPasteCompleted()
+    {
+        $dispatcher = new EventDispatcher();
+        $terminal = new VirtualTerminal(eventDispatcher: $dispatcher);
+        $events = [];
+
+        $dispatcher->addListener(PasteStartedEvent::class, static function () use (&$events) {
+            $events[] = 'started';
+        });
+        $dispatcher->addListener(PasteCompletedEvent::class, static function () use (&$events) {
+            $events[] = 'completed';
+        });
+
+        $terminal->start(
+            static function (string $data) {},
+            static function () {},
+            static function () {},
+        );
+
+        $terminal->simulateInput("\x1b[200~partial");
+        $terminal->stop();
+
+        $this->assertSame(['started', 'completed'], $events);
     }
 
     public function testSimulateInputForwardsPasteMixedWithKeys()

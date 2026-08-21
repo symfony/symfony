@@ -13,8 +13,11 @@ namespace Symfony\Component\Tui\Tests\Widget;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\ChangeEvent;
+use Symfony\Component\Tui\Event\PasteCompletedEvent;
+use Symfony\Component\Tui\Event\PasteStartedEvent;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\Renderer;
 use Symfony\Component\Tui\Style\Style;
@@ -103,6 +106,37 @@ class EditorTest extends TestCase
         $editor->handleInput('X');
 
         $this->assertSame('X', $changedText);
+    }
+
+    public function testPasteLifecycleEventsAreDispatchedWhilePasteIsReceived()
+    {
+        $dispatcher = new EventDispatcher();
+        $terminal = new VirtualTerminal(80, 24, eventDispatcher: $dispatcher);
+        $tui = new Tui(terminal: $terminal, eventDispatcher: $dispatcher);
+        $editor = new EditorWidget();
+        $events = [];
+
+        $tui->add($editor);
+        $tui->setFocus($editor);
+        $tui->addListener(static function (PasteStartedEvent $event) use (&$events) {
+            $events[] = 'started';
+        });
+        $tui->addListener(static function (PasteCompletedEvent $event) use (&$events) {
+            $events[] = 'completed';
+        });
+        $tui->start();
+
+        $terminal->simulateInput("\x1b[200~Hello");
+
+        $this->assertSame(['started'], $events);
+        $this->assertSame('', $editor->getText());
+
+        $terminal->simulateInput(" World\x1b[201~");
+
+        $this->assertSame(['started', 'completed'], $events);
+        $this->assertSame('Hello World', $editor->getText());
+
+        $tui->stop();
     }
 
     public function testFocusable()

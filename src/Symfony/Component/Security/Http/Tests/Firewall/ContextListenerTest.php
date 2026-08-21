@@ -29,11 +29,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Firewall\ContextListener;
@@ -337,6 +339,57 @@ class ContextListenerTest extends TestCase
         $this->assertSame($goodRefreshedUser, $tokenStorage->getToken()->getUser());
     }
 
+    public function testImpersonatorIsRefreshed()
+    {
+        $tokenStorage = new TokenStorage();
+        $userProvider = new RefreshTrackingUserProvider([
+            'admin' => ['password' => 'admin-pass', 'roles' => ['ROLE_ADMIN']],
+            'user' => ['password' => 'user-pass', 'roles' => ['ROLE_USER']],
+        ]);
+
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('admin', 'admin-pass', ['ROLE_ADMIN']), 'context_key', ['ROLE_ADMIN']);
+        $token = new SwitchUserToken(new InMemoryUser('user', 'user-pass', ['ROLE_USER']), 'context_key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize($token));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $listener = new ContextListener($tokenStorage, [$userProvider], 'context_key');
+        $listener(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertSame(['admin', 'user'], $userProvider->refreshedIdentifiers);
+        $this->assertInstanceOf(SwitchUserToken::class, $tokenStorage->getToken());
+        $this->assertSame('user', $tokenStorage->getToken()->getUserIdentifier());
+        $this->assertSame('admin', $tokenStorage->getToken()->getOriginalToken()->getUserIdentifier());
+    }
+
+    public function testTokenIsDeauthenticatedWhenImpersonatorHasChanged()
+    {
+        $tokenStorage = new TokenStorage();
+        $userProvider = new InMemoryUserProvider([
+            'admin' => ['password' => 'admin-pass', 'roles' => ['ROLE_ADMIN'], 'enabled' => false],
+            'user' => ['password' => 'user-pass', 'roles' => ['ROLE_USER']],
+        ]);
+
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('admin', 'admin-pass', ['ROLE_ADMIN']), 'context_key', ['ROLE_ADMIN']);
+        $token = new SwitchUserToken(new InMemoryUser('user', 'user-pass', ['ROLE_USER']), 'context_key', ['ROLE_USER', 'ROLE_PREVIOUS_ADMIN'], $originalToken);
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize($token));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $listener = new ContextListener($tokenStorage, [$userProvider], 'context_key');
+        $listener(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
     public function testTryAllUserProvidersUntilASupportingUserProviderIsFound()
     {
         $refreshedUser = new InMemoryUser('foobar', 'baz');
@@ -585,6 +638,18 @@ class SupportingUserProvider implements UserProviderInterface
     public function supportsClass($class): bool
     {
         return InMemoryUser::class === $class;
+    }
+}
+
+class RefreshTrackingUserProvider extends InMemoryUserProvider
+{
+    public array $refreshedIdentifiers = [];
+
+    public function refreshUser(UserInterface $user): UserInterface
+    {
+        $this->refreshedIdentifiers[] = $user->getUserIdentifier();
+
+        return parent::refreshUser($user);
     }
 }
 

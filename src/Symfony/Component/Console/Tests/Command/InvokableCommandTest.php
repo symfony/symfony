@@ -493,6 +493,62 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput([]), new NullOutput());
     }
 
+    public function testNullableHelpersInjection()
+    {
+        $application = new Application();
+
+        $command = new Command('foo');
+        $command->setCode(static function (
+            ?InputInterface $input,
+            ?OutputInterface $output,
+            ?Cursor $cursor,
+            ?SymfonyStyle $io,
+            ?Application $app,
+            ?Command $cmd,
+            #[Argument] ?string $name = null,
+            #[Option] ?string $format = null,
+        ) use ($command, $application): int {
+            Assert::assertInstanceOf(InputInterface::class, $input);
+            Assert::assertInstanceOf(OutputInterface::class, $output);
+            Assert::assertInstanceOf(Cursor::class, $cursor);
+            Assert::assertInstanceOf(SymfonyStyle::class, $io);
+            Assert::assertSame($application, $app);
+            Assert::assertSame($command, $cmd);
+            Assert::assertSame('test', $name);
+            Assert::assertSame('json', $format);
+
+            return 0;
+        });
+
+        $application->addCommand($command);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['name' => 'test', '--format' => 'json']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testNullableApplicationInjectionWithoutApplication()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            ?Application $app,
+            #[Argument] ?string $name = null,
+            #[Option] ?string $format = null,
+        ): int {
+            Assert::assertNull($app);
+            Assert::assertSame('test', $name);
+            Assert::assertSame('json', $format);
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $tester->execute(['name' => 'test', '--format' => 'json']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
     public function testDefaultArgumentResolversWithoutApplication()
     {
         $command = new Command('foo');

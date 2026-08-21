@@ -1,5 +1,5 @@
 ---
-name: symfony-sync-translations
+name: sync-translations
 description: >
   Synchronize translation catalogs across maintained Symfony branches:
   find messages that newer branches added to the English catalogs but
@@ -40,7 +40,7 @@ keeps the eventual merge-up conflict-free.
 
 ## Step 1 — Get maintained branches and fetch them
 
-Use the same endpoint as the `symfony-merge-up` skill:
+Use the same endpoint as the `merge-up` skill:
 
 ```bash
 curl -s https://symfony.com/releases.json

@@ -28,6 +28,7 @@
         "symfony/mailer": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",
         "symfony/mime": "^7.4|^8.0",
+        "symfony/notifier": "^7.4|^8.0",
         "symfony/var-dumper": "^7.4|^8.0"
     },
     "autoload": {

@@ -30,6 +30,7 @@ class DispatchSchedulerEventListener implements EventSubscriberInterface
     public function __construct(
         private readonly ContainerInterface $scheduleProviderLocator,
         private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ?ContainerInterface $receiverLocator = null,
     ) {
     }
 
@@ -60,6 +61,12 @@ class DispatchSchedulerEventListener implements EventSubscriberInterface
 
         if ($preRunEvent->shouldCancel()) {
             $event->shouldHandle(false);
+
+            $receiverName = $event->getReceiverName();
+
+            if ($this->receiverLocator?->has($receiverName)) {
+                $this->receiverLocator->get($receiverName)->reject($envelope);
+            }
         }
     }
 

@@ -84,6 +84,12 @@ class DoctrineLoaderTest extends TestCase
         $this->assertInstanceOf(Length::class, $publicParentMaxLengthConstraints[0]);
         $this->assertSame(35, $publicParentMaxLengthConstraints[0]->max);
 
+        /** @var PropertyMetadata[] $parentNoAutoMappingMetadata */
+        $parentNoAutoMappingMetadata = $classMetadata->getPropertyMetadata('parentNoAutoMapping');
+        $this->assertCount(1, $parentNoAutoMappingMetadata);
+        $this->assertCount(0, $parentNoAutoMappingMetadata[0]->getConstraints());
+        $this->assertSame(AutoMappingStrategy::DISABLED, $parentNoAutoMappingMetadata[0]->getAutoMappingStrategy());
+
         $embeddedMetadata = $classMetadata->getPropertyMetadata('embedded');
         $this->assertCount(1, $embeddedMetadata);
         $this->assertSame(CascadingStrategy::CASCADE, $embeddedMetadata[0]->getCascadingStrategy());

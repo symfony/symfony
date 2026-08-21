@@ -139,6 +139,16 @@ final class MetadataAwareNameConverterTest extends TestCase
         ];
     }
 
+    public function testDenormalizeSerializedNameOfGroupedAttributeWithoutContextGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+
+        $nameConverter = new MetadataAwareNameConverter($classMetadataFactory);
+
+        $this->assertSame('quux', $nameConverter->normalize('qux', OtherSerializedNameDummy::class));
+        $this->assertSame('qux', $nameConverter->denormalize('quux', OtherSerializedNameDummy::class));
+    }
+
     public function testDenormalizeWithCacheContext()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());

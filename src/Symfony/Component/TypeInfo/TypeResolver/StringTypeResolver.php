@@ -165,7 +165,7 @@ final class StringTypeResolver implements TypeResolverInterface
                     $className = $classType->getClassName();
                 }
 
-                if (!class_exists($className)) {
+                if (!class_exists($className) && !interface_exists($className)) {
                     return Type::mixed();
                 }
 

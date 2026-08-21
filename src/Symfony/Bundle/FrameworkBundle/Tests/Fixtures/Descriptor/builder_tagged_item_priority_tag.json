@@ -1,0 +1,101 @@
+{
+    "definitions": {
+        "definition_tag_priority": {
+            "class": "Full\\Qualified\\Class1",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "arguments": [],
+            "file": null,
+            "tags": [
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "priority": 20
+                    }
+                }
+            ],
+            "usages": []
+        },
+        "definition_method_priority": {
+            "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\TaggedItemWithPriorityMethodClass",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": true,
+            "deprecated": false,
+            "arguments": [],
+            "file": null,
+            "tags": [
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "priority": 10
+                    }
+                },
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "priority": 5
+                    }
+                }
+            ],
+            "usages": []
+        },
+        "definition_no_priority": {
+            "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\TaggedItemWithPriorityClass",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": false,
+            "deprecated": false,
+            "arguments": [],
+            "file": null,
+            "tags": [
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "attr1": "val1"
+                    }
+                }
+            ],
+            "usages": []
+        },
+        "definition_attribute_priority": {
+            "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\TaggedItemWithPriorityClass",
+            "public": true,
+            "synthetic": false,
+            "lazy": false,
+            "shared": true,
+            "abstract": false,
+            "autowire": false,
+            "autoconfigure": true,
+            "deprecated": false,
+            "arguments": [],
+            "file": null,
+            "tags": [
+                {
+                    "name": "tag1",
+                    "parameters": {
+                        "attr1": "val1",
+                        "priority": 30
+                    }
+                }
+            ],
+            "usages": []
+        }
+    },
+    "aliases": [],
+    "services": []
+}

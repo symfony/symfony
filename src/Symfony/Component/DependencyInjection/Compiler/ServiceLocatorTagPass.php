@@ -43,7 +43,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                 $value->setValues($this->findAndSortTaggedServices($taggedIterator, $this->container, $exclude));
             }
 
-            return self::register($this->container, $value->getValues());
+            return self::register($this->container, $this->processValue($value->getValues()));
         }
 
         if ($value instanceof Definition) {
@@ -72,7 +72,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
             foreach ($values as $k => $v) {
                 if ($v instanceof ServiceClosureArgument) {
-                    $services[$k] = $v;
+                    $services[$k] = $this->processValue($v);
                     continue;
                 }
 
@@ -85,7 +85,7 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
                     $i = null;
                 }
 
-                $services[$k] = new ServiceClosureArgument($v);
+                $services[$k] = new ServiceClosureArgument($this->processValue($v));
             }
             if (\count($services) === $i) {
                 ksort($services);

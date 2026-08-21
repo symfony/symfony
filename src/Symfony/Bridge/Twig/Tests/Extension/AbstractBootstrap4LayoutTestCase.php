@@ -14,6 +14,8 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -21,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\RangeType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\Form\FormError;
 
 /**
@@ -1275,6 +1278,66 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     [@min="5"]
     [@max="57"]
     [@class="my&class form-control-range"]
+'
+        );
+    }
+
+    public function testDateTimeWithError()
+    {
+        $form = $this->factory->createNamed('name', DateTimeType::class, null, [
+            'input' => 'string',
+            'with_seconds' => false,
+            'widget' => 'choice',
+        ]);
+        $form->submit(['date' => ['year' => '2018', 'month' => '2', 'day' => '3'], 'time' => ['hour' => '4', 'minute' => '5']]);
+        $form->addError(new FormError('[trans]Error![/trans]'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class is-invalid form-inline"]
+    [count(.//select)=5]
+'
+        );
+    }
+
+    public function testDateWithError()
+    {
+        $form = $this->factory->createNamed('name', DateType::class, null, ['widget' => 'choice']);
+        $form->submit(['year' => '2018', 'month' => '2', 'day' => '3']);
+        $form->addError(new FormError('[trans]Error![/trans]'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class is-invalid form-inline"]
+    [count(.//select)=3]
+'
+        );
+    }
+
+    public function testTimeWithError()
+    {
+        $form = $this->factory->createNamed('name', TimeType::class, null, ['widget' => 'choice']);
+        $form->submit(['hour' => '4', 'minute' => '5']);
+        $form->addError(new FormError('[trans]Error![/trans]'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class is-invalid form-inline"]
+    [count(.//select)=2]
+'
+        );
+    }
+
+    public function testDateIntervalWithError()
+    {
+        $form = $this->factory->createNamed('name', DateIntervalType::class);
+        $form->submit(['years' => '1', 'months' => '2', 'days' => '3']);
+        $form->addError(new FormError('[trans]Error![/trans]'));
+
+        $this->assertWidgetMatchesXpath($form->createView(), ['attr' => ['class' => 'my&class']],
+            '/div
+    [@class="my&class is-invalid form-inline"]
+    [count(.//select)=3]
 '
         );
     }

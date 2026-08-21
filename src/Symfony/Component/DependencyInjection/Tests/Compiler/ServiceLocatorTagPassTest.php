@@ -212,6 +212,25 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(TestDefinition2::class, $locator(1)::class);
     }
 
+    public function testNestedServiceLocatorArgument()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', TestDefinition1::class)->addTag('test_tag');
+
+        $container->register('foo', ServiceLocator::class)
+            ->setArguments([['nested' => new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', null, true))]])
+            ->addTag('container.service_locator')
+        ;
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        $nested = $container->get('foo')->get('nested');
+
+        $this->assertInstanceOf(ServiceLocator::class, $nested);
+        $this->assertSame(TestDefinition1::class, $nested->get('bar')::class);
+    }
+
     public function testIndexedByServiceIdWithDecoration()
     {
         $container = new ContainerBuilder();

@@ -30,14 +30,18 @@ class CookieJar
     /**
      * Gets a cookie by name.
      *
+     * When several cookies match, the one with the longest path is returned,
+     * then the one with the most specific domain.
+     *
      * You should never use an empty domain, but if you do so,
-     * this method returns the first cookie for the given name/path
-     * (this behavior ensures a BC behavior with previous versions of
-     * Symfony).
+     * this method matches cookies of any domain (this behavior ensures
+     * a BC behavior with previous versions of Symfony).
      */
     public function get(string $name, string $path = '/', ?string $domain = null): ?Cookie
     {
         $this->flushExpiredCookies();
+
+        $match = null;
 
         foreach ($this->cookieJar as $cookieDomain => $pathCookies) {
             if ($cookieDomain && $domain) {
@@ -48,16 +52,16 @@ class CookieJar
             }
 
             foreach ($pathCookies as $cookiePath => $namedCookies) {
-                if (!str_starts_with($path, $cookiePath)) {
+                if (!str_starts_with($path, $cookiePath) || !isset($namedCookies[$name])) {
                     continue;
                 }
-                if (isset($namedCookies[$name])) {
-                    return $namedCookies[$name];
+                if (null === $match || self::isMoreSpecific($namedCookies[$name], $match)) {
+                    $match = $namedCookies[$name];
                 }
             }
         }
 
-        return null;
+        return $match;
     }
 
     /**
@@ -184,12 +188,16 @@ class CookieJar
                         continue;
                     }
 
-                    $cookies[$cookie->getName()] = $returnsRawValue ? $cookie->getRawValue() : $cookie->getValue();
+                    $name = $cookie->getName();
+
+                    if (!isset($cookies[$name]) || self::isMoreSpecific($cookie, $cookies[$name])) {
+                        $cookies[$name] = $cookie;
+                    }
                 }
             }
         }
 
-        return $cookies;
+        return array_map(static fn (Cookie $cookie) => $returnsRawValue ? $cookie->getRawValue() : $cookie->getValue(), $cookies);
     }
 
     /**
@@ -214,5 +222,17 @@ class CookieJar
                 }
             }
         }
+    }
+
+    private static function isMoreSpecific(Cookie $cookie, Cookie $other): bool
+    {
+        $pathLength = \strlen($cookie->getPath());
+        $otherPathLength = \strlen($other->getPath());
+
+        if ($pathLength !== $otherPathLength) {
+            return $pathLength > $otherPathLength;
+        }
+
+        return \strlen(ltrim($cookie->getDomain(), '.')) > \strlen(ltrim($other->getDomain(), '.'));
     }
 }

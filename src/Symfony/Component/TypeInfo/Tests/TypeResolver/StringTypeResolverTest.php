@@ -22,6 +22,7 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnumInterface;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithConstants;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithConstantsInterface;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTypeAliases;
@@ -135,6 +136,11 @@ class StringTypeResolverTest extends TestCase
         yield [Type::array(null, Type::union(Type::int(), Type::string())), DummyWithConstants::class.'::DUMMY_ARRAY_*'];
         yield [Type::enum(DummyEnum::class, Type::string()), DummyWithConstants::class.'::DUMMY_ENUM_*'];
         yield [Type::union(Type::enum(DummyEnum::class, Type::string()), Type::array(Type::mixed(), Type::union(Type::int(), Type::string())), Type::string(), Type::int(), Type::float(), Type::bool(), Type::null()), DummyWithConstants::class.'::DUMMY_MIX_*'];
+
+        // const fetch on interface
+        yield [Type::string(), DummyWithConstantsInterface::class.'::DUMMY_STRING_*'];
+        yield [Type::int(), DummyWithConstantsInterface::class.'::DUMMY_INT_*'];
+        yield [Type::array(Type::string(), Type::string()), 'array<'.DummyWithConstantsInterface::class.'::DUMMY_STRING_*, '.DummyWithConstantsInterface::class.'::DUMMY_STRING_*>'];
 
         // identifiers
         yield [Type::bool(), 'bool'];

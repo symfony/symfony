@@ -62,7 +62,9 @@ final class NotifierHandler extends AbstractHandler
 
         $notification->importanceFromLogLevelName($record->level->getName());
 
-        $this->notifier->send($notification, ...$this->notifier->getAdminRecipients());
+        $recipients = method_exists($this->notifier, 'getAdminRecipients') ? $this->notifier->getAdminRecipients() : [];
+
+        $this->notifier->send($notification, ...$recipients);
     }
 
     private function getHighestRecord(array $records): array|LogRecord

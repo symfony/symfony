@@ -16,6 +16,7 @@ use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
@@ -26,7 +27,14 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithInterfaceWithSerializedTypeName;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithSerializedTypeName;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
 
 class SerializerTest extends TestCase
@@ -194,6 +202,26 @@ class SerializerTest extends TestCase
                 'X-Message-Stamp-'.SerializerStamp::class => '[{"context":{"groups":["foo"]}}]',
             ],
         ]);
+    }
+
+    public function testStampsIgnoreTheAttributeSelectionOfTheContext()
+    {
+        if (!class_exists(AttributeLoader::class)) {
+            $this->markTestSkipped('The "AttributeLoader" class from symfony/serializer 6.4 is required.');
+        }
+
+        $symfonySerializer = new SymfonySerializer([new ArrayDenormalizer(), new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()))], [new JsonEncoder()]);
+        $serializer = new Serializer($symfonySerializer, 'json', [
+            AbstractNormalizer::GROUPS => ['dummy'],
+            AbstractNormalizer::ATTRIBUTES => ['message'],
+            AbstractNormalizer::IGNORED_ATTRIBUTES => ['busName'],
+        ]);
+
+        $encoded = $serializer->encode(new Envelope(new DummySymfonySerializerGroupedMessage('Hello'), [new BusNameStamp('the_bus')]));
+
+        $this->assertSame('{"message":"Hello"}', $encoded['body']);
+        $this->assertSame('[{"busName":"the_bus"}]', $encoded['headers']['X-Message-Stamp-'.BusNameStamp::class]);
+        $this->assertEquals([new BusNameStamp('the_bus')], $serializer->decode($encoded)->all(BusNameStamp::class));
     }
 
     public function testDecodingFailsWithBadFormat()
@@ -458,5 +486,16 @@ class DummyMessageWithPrivateConstructorProperty
 {
     public function __construct(private string $secret)
     {
+    }
+}
+
+class DummySymfonySerializerGroupedMessage
+{
+    #[Groups(['dummy'])]
+    public string $message;
+
+    public function __construct(string $message)
+    {
+        $this->message = $message;
     }
 }

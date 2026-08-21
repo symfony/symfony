@@ -133,6 +133,14 @@ class CookieTest extends TestCase
 
         $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
         $this->assertEquals('bar=baz', $cookie->getValue(), '->getValue() returns the urldecoded cookie value');
+
+        $cookie = new Cookie('foo', 'bar+baz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar+baz', $cookie->getValue(), '->getValue() keeps plus signs of the raw cookie value');
+
+        $cookie = new Cookie('foo', 'bar%2Bbaz', null, '/', '', false, true, true); // raw value
+        $this->assertEquals('bar+baz', $cookie->getValue(), '->getValue() decodes percent-encoded plus signs');
+
+        $this->assertEquals('bar+baz', Cookie::fromString('foo=bar+baz')->getValue());
     }
 
     public function testGetRawValue()
@@ -141,6 +149,9 @@ class CookieTest extends TestCase
         $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the urlencoded cookie value');
         $cookie = new Cookie('foo', 'bar%3Dbaz', null, '/', '', false, true, true); // raw value
         $this->assertEquals('bar%3Dbaz', $cookie->getRawValue(), '->getRawValue() returns the non-urldecoded cookie value');
+
+        $cookie = new Cookie('foo', 'bar+baz'); // decoded value
+        $this->assertEquals('bar%2Bbaz', $cookie->getRawValue(), '->getRawValue() encodes plus signs of the cookie value');
     }
 
     public function testGetPath()

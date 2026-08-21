@@ -746,6 +746,18 @@ class ObjectNormalizerTest extends TestCase
         );
     }
 
+    public function testDenormalizeSerializedNameOfGroupedAttributeWithoutContextGroups()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $this->normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+        $this->normalizer->setSerializer($this->serializer);
+
+        $obj = new OtherSerializedNameDummy();
+        $obj->qux = 'Aldrin';
+
+        $this->assertEquals($obj, $this->normalizer->denormalize(['quux' => 'Aldrin'], OtherSerializedNameDummy::class));
+    }
+
     // ignored attributes
 
     protected function getNormalizerForIgnoredAttributes(): ObjectNormalizer
@@ -1168,6 +1180,16 @@ class ObjectNormalizerTest extends TestCase
         $expected->setInner($expectedInner);
 
         $this->assertEquals($expected, $obj);
+    }
+
+    public function testDenormalizeWithPropertyPathIndex()
+    {
+        $classMetadataFactory = new ClassMetadataFactory(new YamlFileLoader(__DIR__.'/../Fixtures/property-path-mapping.yaml'));
+        $normalizer = new ObjectNormalizer($classMetadataFactory, new MetadataAwareNameConverter($classMetadataFactory));
+
+        $obj = $normalizer->denormalize(['first_value' => 'foo'], ObjectWithArrayProperty::class, 'json', ['groups' => 'read']);
+
+        $this->assertSame(['first' => 'foo'], $obj->values);
     }
 
     public function testObjectNormalizerWithAttributeLoaderAndObjectHasStaticProperty()
@@ -1615,6 +1637,39 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame('FOO', $denormalized->foo);
         $this->assertSame('BAR', $denormalized->bar);
     }
+
+    public function testDenormalizeNestedDiscriminatorMapWithoutExtraAttributes()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['type' => 'sub', 'nested_type' => 'sub_sub', 'foo' => 'FOO', 'bar' => 'BAR', 'baz' => 'BAZ'], NestedDiscriminatorBase::class, null, [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]);
+
+        $this->assertInstanceOf(NestedDiscriminatorSubSub::class, $denormalized);
+        $this->assertSame('FOO', $denormalized->foo);
+        $this->assertSame('BAR', $denormalized->bar);
+        $this->assertSame('BAZ', $denormalized->baz);
+    }
+
+    public function testDenormalizeDiscriminatorMapWithUnrestrictedMappedClass()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['type' => 'plain', 'bar' => 'BAR'], DiscriminatorWithIgnoredAttribute::class);
+
+        $this->assertInstanceOf(DiscriminatorWithoutIgnoredAttribute::class, $denormalized);
+        $this->assertSame('BAR', $denormalized->bar);
+    }
+
+    public function testDenormalizeDiscriminatorMapKeepsIgnoredAttributes()
+    {
+        $normalizer = new ObjectNormalizer(new ClassMetadataFactory(new AttributeLoader()));
+
+        $denormalized = $normalizer->denormalize(['type' => 'ignoring', 'foo' => 'FOO', 'hidden' => 'HIDDEN'], DiscriminatorWithIgnoredAttribute::class);
+
+        $this->assertInstanceOf(DiscriminatorWithIgnoredAttribute::class, $denormalized);
+        $this->assertSame('FOO', $denormalized->foo);
+        $this->assertSame('hidden', $denormalized->hidden);
+    }
 }
 
 class ProxyObjectDummy extends ObjectDummy
@@ -1788,6 +1843,11 @@ class ObjectInner
 {
     public $foo;
     public $bar;
+}
+
+class ObjectWithArrayProperty
+{
+    public array $values = [];
 }
 
 class LazyObjectInner extends ObjectInner
@@ -2383,4 +2443,44 @@ class ObjectNormalizerDiscriminatorSub extends ObjectNormalizerDiscriminatorBase
     public const BAR = 'bar';
 
     public string $bar = self::BAR;
+}
+
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'base' => NestedDiscriminatorBase::class,
+    'sub' => NestedDiscriminatorSub::class,
+])]
+class NestedDiscriminatorBase
+{
+    public string $foo = 'foo';
+}
+
+#[DiscriminatorMap(typeProperty: 'nested_type', mapping: [
+    'sub' => NestedDiscriminatorSub::class,
+    'sub_sub' => NestedDiscriminatorSubSub::class,
+])]
+class NestedDiscriminatorSub extends NestedDiscriminatorBase
+{
+    public string $bar = 'bar';
+}
+
+class NestedDiscriminatorSubSub extends NestedDiscriminatorSub
+{
+    public string $baz = 'baz';
+}
+
+#[DiscriminatorMap(typeProperty: 'type', mapping: [
+    'ignoring' => DiscriminatorWithIgnoredAttribute::class,
+    'plain' => DiscriminatorWithoutIgnoredAttribute::class,
+])]
+class DiscriminatorWithIgnoredAttribute
+{
+    public string $foo = 'foo';
+
+    #[Ignore]
+    public string $hidden = 'hidden';
+}
+
+class DiscriminatorWithoutIgnoredAttribute
+{
+    public string $bar = 'bar';
 }

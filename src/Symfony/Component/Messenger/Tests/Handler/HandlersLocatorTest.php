@@ -36,6 +36,18 @@ class HandlersLocatorTest extends TestCase
         $this->assertSame($handler, (new \ReflectionFunction($handlers[0]->getHandler()))->getClosureThis());
     }
 
+    public function testItYieldsHandlersHavingTheSameNameOnlyOnce()
+    {
+        $locator = new HandlersLocator([
+            DummyMessage::class => [
+                $first = new HandlerDescriptor(new HandlersLocatorTestCallable()),
+                new HandlerDescriptor(new HandlersLocatorTestCallable()),
+            ],
+        ]);
+
+        $this->assertSame([$first], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('Body')))));
+    }
+
     public function testItReturnsOnlyHandlersMatchingTransport()
     {
         $firstHandler = new HandlersLocatorTestCallable();

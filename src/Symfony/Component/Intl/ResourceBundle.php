@@ -51,8 +51,9 @@ abstract class ResourceBundle
                 Intl::BUFFER_SIZE
             ));
 
-            $localeAliases = self::$entryReader->readEntry(Intl::getDataDirectory().'/'.Intl::LOCALE_DIR, 'meta', ['Aliases']);
-            self::$entryReader->setLocaleAliases($localeAliases instanceof \Traversable ? iterator_to_array($localeAliases) : $localeAliases);
+            $localeMeta = self::$entryReader->read(Intl::getDataDirectory().'/'.Intl::LOCALE_DIR, 'meta');
+            self::$entryReader->setLocaleAliases($localeMeta['Aliases']);
+            self::$entryReader->setLocaleParents($localeMeta['Parents']);
         }
 
         return self::$entryReader->readEntry(static::getPath(), $locale ?? \Locale::getDefault(), $indices, $fallback);

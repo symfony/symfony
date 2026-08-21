@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Encoder;
 
 use Symfony\Component\Serializer\Exception\BadMethodCallException;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
@@ -313,7 +314,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
             $val = $this->parseXml($subnode, $context);
 
             if ('item' === $subnode->nodeName && isset($val['@key'])) {
-                $value[$val['@key']] = $val['#'] ?? $val;
+                $value[$val['@key']] = 2 === \count($val) && isset($val['#']) ? $val['#'] : $val;
             } else {
                 $value[$subnode->nodeName][] = $val;
             }
@@ -470,7 +471,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
         } elseif ($val instanceof \SimpleXMLElement) {
             $child = $node->ownerDocument->importNode(dom_import_simplexml($val), true);
             $node->appendChild($child);
-        } elseif ($val instanceof \Traversable) {
+        } elseif ($val instanceof \Traversable && (!$this->serializer instanceof NormalizerInterface || !$this->serializer->supportsNormalization($val, $format))) {
             $this->buildXml($node, $val, $format, $context);
         } elseif ($val instanceof \DOMNode) {
             $child = $node->ownerDocument->importNode($val, true);

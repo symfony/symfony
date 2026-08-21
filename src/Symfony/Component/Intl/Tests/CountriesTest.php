@@ -863,6 +863,15 @@ class CountriesTest extends ResourceBundleTestCase
         $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
     }
 
+    public function testGetNameUsesTheParentLocale()
+    {
+        $this->assertSame(Countries::getName('NO', 'no'), Countries::getName('NO', 'nb'));
+        $this->assertNotSame(Countries::getName('NO', 'en'), Countries::getName('NO', 'nb'));
+
+        $this->assertSame(Countries::getName('VC', 'en_001'), Countries::getName('VC', 'en_GB'));
+        $this->assertNotSame(Countries::getName('VC', 'en'), Countries::getName('VC', 'en_GB'));
+    }
+
     public function testGetNameWithInvalidCountryCode()
     {
         $this->expectException(MissingResourceException::class);

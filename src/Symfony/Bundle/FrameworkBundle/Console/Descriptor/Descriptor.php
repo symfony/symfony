@@ -263,7 +263,20 @@ abstract class Descriptor implements DescriptorInterface
     {
         $tags = null !== $tagName ? $definition->getTag($tagName) : $definition->getTags();
 
-        $priority = ($container->getReflectionClass($definition->getClass())?->getAttributes(AsTaggedItem::class)[0] ?? null)?->newInstance()->priority;
+        if (!$r = $container->getReflectionClass($definition->getClass(), false)) {
+            return $tags;
+        }
+
+        $priority = null;
+        if ($r->hasMethod('getDefaultPriority')) {
+            $rm = $r->getMethod('getDefaultPriority');
+            if ($rm->isPublic() && $rm->isStatic() && !$rm->isAbstract() && \is_int($defaultPriority = $rm->invoke(null))) {
+                $priority = $defaultPriority;
+            }
+        } elseif ($definition->isAutoconfigured() && !$definition->hasTag('container.ignore_attributes')) {
+            $priority = ($r->getAttributes(AsTaggedItem::class)[0] ?? null)?->newInstance()->priority;
+        }
+
         if (!$priority) {
             return $tags;
         }

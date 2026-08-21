@@ -126,6 +126,7 @@ class LocaleDataGenerator extends AbstractDataGenerator
     {
         return [
             'Locales' => $this->locales,
+            'Parents' => $this->localeParents,
             'Aliases' => $this->localeAliases,
         ];
     }

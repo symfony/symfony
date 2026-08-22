@@ -1,0 +1,19 @@
+{
+    "type": "activity.soft_bounced",
+    "created_at": "2026-01-01T12:00:00.000000Z",
+    "data": {
+        "id": "62f114f8165fe0d8db0288e5",
+        "domain_id": "dnvo4d93e0ng5r86",
+        "message_id": "67f91abd69f79df391e9d78d",
+        "email_id": "67f91abe2202f3705540234a",
+        "type": "rejected",
+        "subject": "Test subject",
+        "recipient": "test@example.com",
+        "tags": ["test-tag"],
+        "meta": {
+            "bounce_reason": "Unknown reason",
+            "bounce_code": "550",
+            "bounce_type": "soft"
+        }
+    }
+}

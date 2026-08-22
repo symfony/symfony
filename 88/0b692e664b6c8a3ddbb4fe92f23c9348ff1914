@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T21:17:07Z
+
+The cross-version leg of `Unit Tests (8.4, high-deps)` is a real blocker here, not noise.
+
+Adding the `class` key makes `MimeMessageNormalizer` emit a different payload for every mime message. After the main pass, the 6.4 workflow checks out 5.4 and re-runs the patched components with the patched packages as dependencies, so `symfony/serializer` resolves to this branch and 5.4's own frozen fixtures assert the old exact JSON. `EmailTest::testSymfonySerialize`, `MessageTest::testSymfonySerialize` and `TemplatedEmailTest::testSymfonySerialize` fail there. Nothing inside this PR can fix that, because the asserting files live on 5.4.
+
+So the wire-format change needs a decision before this can go in:
+
+1. Keep the payload shape as it is and make the discriminator opt-in through the serialization context, or
+2. Move the change to a branch where the previous minor's fixtures can still be updated.
+
+The rest is green: the low-deps and Serializer high-deps failures were the new test constructing an `Address`, which needs `egulias/email-validator`, absent from those vendors. The fixture builds the message without addresses now. The four `Serializer^` failures in the same job are pre-existing for any 6.4 PR touching Serializer, and the 8.6 job is the known TwigBridge breakage.

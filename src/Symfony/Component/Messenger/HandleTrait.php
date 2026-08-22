@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger;
 
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Symfony\Component\Messenger\Stamp\StampInterface;
@@ -30,16 +31,27 @@ trait HandleTrait
      * This behavior is useful for both synchronous command & query buses,
      * the last one usually returning the handler result.
      *
-     * @param object|Envelope  $message The message or the message pre-wrapped in an envelope
-     * @param StampInterface[] $stamps  Stamps to be set on the Envelope which are used to control middleware behavior
+     * @param object|Envelope  $message                      The message or the message pre-wrapped in an envelope
+     * @param StampInterface[] $stamps                       Stamps to be set on the Envelope which are used to control middleware behavior
+     * @param bool             $unwrapHandlerFailedException Throw the handler's own exception instead of the HandlerFailedException wrapping it
      */
-    private function handle(object $message, array $stamps = []): mixed
+    private function handle(object $message, array $stamps = [], bool $unwrapHandlerFailedException = false): mixed
     {
         if (!isset($this->messageBus)) {
             throw new LogicException(\sprintf('You must provide a "%s" instance in the "%s::$messageBus" property, but that property has not been initialized yet.', MessageBusInterface::class, static::class));
         }
 
-        $envelope = $this->messageBus->dispatch($message, $stamps);
+        try {
+            $envelope = $this->messageBus->dispatch($message, $stamps);
+        } catch (HandlerFailedException $e) {
+            // Not recursive: only the envelope added by this very dispatch is removed, so
+            // nesting several buses does not collapse into a single apparent handler.
+            if (!$unwrapHandlerFailedException || 1 !== \count($wrappedExceptions = $e->getWrappedExceptions())) {
+                throw $e;
+            }
+
+            throw reset($wrappedExceptions);
+        }
         /** @var HandledStamp[] $handledStamps */
         $handledStamps = $envelope->all(HandledStamp::class);
 

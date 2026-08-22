@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBus;
@@ -98,6 +99,86 @@ class HandleTraitTest extends TestCase
 
         $queryBus->query($query);
     }
+
+    public function testHandleUnwrapsSingleHandlerFailureWhenEnabled()
+    {
+        $bus = $this->createMock(MessageBus::class);
+        $queryBus = new TestUnwrappingQueryBus($bus);
+
+        $query = new DummyMessage('Hello');
+        $failure = new \RuntimeException('Handler blew up');
+        $bus->expects($this->once())->method('dispatch')->willThrowException(
+            new HandlerFailedException(new Envelope($query), ['DummyHandler::__invoke' => $failure])
+        );
+
+        try {
+            $queryBus->query($query);
+        } catch (\Throwable $thrown) {
+            // identity, not instanceof: HandlerFailedException extends RuntimeException
+            // and repeats the wrapped message, so a looser assertion passes either way
+            $this->assertSame($failure, $thrown);
+
+            return;
+        }
+
+        $this->fail('The handler failure should have been thrown.');
+    }
+
+    public function testHandleKeepsWrappingByDefault()
+    {
+        $bus = $this->createMock(MessageBus::class);
+        $queryBus = new TestQueryBus($bus);
+
+        $query = new DummyMessage('Hello');
+        $bus->expects($this->once())->method('dispatch')->willThrowException(
+            new HandlerFailedException(new Envelope($query), ['DummyHandler::__invoke' => new \RuntimeException('Handler blew up')])
+        );
+
+        $this->expectException(HandlerFailedException::class);
+
+        $queryBus->query($query);
+    }
+
+    public function testHandleKeepsWrappingSeveralFailuresWhenEnabled()
+    {
+        $bus = $this->createMock(MessageBus::class);
+        $queryBus = new TestUnwrappingQueryBus($bus);
+
+        $query = new DummyMessage('Hello');
+        $bus->expects($this->once())->method('dispatch')->willThrowException(
+            new HandlerFailedException(new Envelope($query), [
+                'FirstDummyHandler::__invoke' => new \RuntimeException('First'),
+                'SecondDummyHandler::__invoke' => new \RuntimeException('Second'),
+            ])
+        );
+
+        $this->expectException(HandlerFailedException::class);
+
+        $queryBus->query($query);
+    }
+
+    public function testHandleUnwrapsNestedHandlerFailureOnlyOneLevel()
+    {
+        $bus = $this->createMock(MessageBus::class);
+        $queryBus = new TestUnwrappingQueryBus($bus);
+
+        $query = new DummyMessage('Hello');
+        $innerFailure = new HandlerFailedException(new Envelope($query), ['InnerHandler::__invoke' => new \RuntimeException('Inner')]);
+        $bus->expects($this->once())->method('dispatch')->willThrowException(
+            new HandlerFailedException(new Envelope($query), ['OuterHandler::__invoke' => $innerFailure])
+        );
+
+        try {
+            $queryBus->query($query);
+        } catch (\Throwable $thrown) {
+            // one level only: a bus dispatched from within a handler keeps its own wrapper
+            $this->assertSame($innerFailure, $thrown);
+
+            return;
+        }
+
+        $this->fail('The nested handler failure should have been thrown.');
+    }
 }
 
 class TestQueryBus
@@ -114,5 +195,20 @@ class TestQueryBus
     public function query($query, array $stamps = []): string
     {
         return $this->handle($query, $stamps);
+    }
+}
+
+class TestUnwrappingQueryBus
+{
+    use HandleTrait;
+
+    public function __construct(MessageBusInterface $messageBus)
+    {
+        $this->messageBus = $messageBus;
+    }
+
+    public function query($query, array $stamps = []): string
+    {
+        return $this->handle($query, $stamps, true);
     }
 }

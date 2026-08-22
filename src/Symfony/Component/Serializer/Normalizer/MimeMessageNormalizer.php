@@ -15,7 +15,6 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
-use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Serializer\Exception\LogicException;
@@ -48,7 +47,7 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         $isCacheable = __CLASS__ === static::class || $this->hasCacheableSupportsMethod();
 
         return [
-            Message::class => $isCacheable,
+            RawMessage::class => $isCacheable,
             Headers::class => $isCacheable,
             HeaderInterface::class => $isCacheable,
             Address::class => $isCacheable,
@@ -83,8 +82,12 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
             unset($ret['seekable'], $ret['cid'], $ret['handle']);
         }
 
-        if ($object instanceof RawMessage && \array_key_exists('message', $ret) && null === $ret['message']) {
-            unset($ret['message']);
+        if ($object instanceof RawMessage) {
+            $ret['class'] = $object::class;
+
+            if (\array_key_exists('message', $ret) && null === $ret['message']) {
+                unset($ret['message']);
+            }
         }
 
         return $ret;
@@ -104,15 +107,15 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         }
 
         if (AbstractPart::class === $type) {
-            $class = $data['class'] ?? null;
-
-            if (!\is_string($class) || !is_a($class, AbstractPart::class, true)) {
-                throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Expected a subclass of "%s", got "%s".', AbstractPart::class, \is_string($class) ? $class : get_debug_type($class)), $data, [AbstractPart::class], $context['deserialization_path'] ?? null);
-            }
-
-            $type = $class;
+            $type = $this->resolveClass($data, AbstractPart::class, $context);
             unset($data['class']);
             $data['headers'] = $this->serializer->denormalize($data['headers'], Headers::class, $format, $context);
+        } elseif (\is_array($data) && is_a($type, RawMessage::class, true)) {
+            if (RawMessage::class === $type && \array_key_exists('class', $data)) {
+                $type = $this->resolveClass($data, RawMessage::class, $context);
+            }
+
+            unset($data['class']);
         }
 
         return $this->normalizer->denormalize($data, $type, $format, $context);
@@ -120,12 +123,12 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
 
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
-        return $data instanceof Message || $data instanceof Headers || $data instanceof HeaderInterface || $data instanceof Address || $data instanceof AbstractPart;
+        return $data instanceof RawMessage || $data instanceof Headers || $data instanceof HeaderInterface || $data instanceof Address || $data instanceof AbstractPart;
     }
 
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
-        return is_a($type, Message::class, true) || Headers::class === $type || AbstractPart::class === $type;
+        return is_a($type, RawMessage::class, true) || Headers::class === $type || AbstractPart::class === $type;
     }
 
     /**
@@ -136,5 +139,16 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
         trigger_deprecation('symfony/serializer', '6.3', 'The "%s()" method is deprecated, implement "%s::getSupportedTypes()" instead.', __METHOD__, get_debug_type($this));
 
         return true;
+    }
+
+    private function resolveClass(mixed $data, string $baseClass, array $context): string
+    {
+        $class = $data['class'] ?? null;
+
+        if (!\is_string($class) || !is_a($class, $baseClass, true)) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Expected a subclass of "%s", got "%s".', $baseClass, \is_string($class) ? $class : get_debug_type($class)), $data, [$baseClass], $context['deserialization_path'] ?? null);
+        }
+
+        return $class;
     }
 }

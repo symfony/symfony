@@ -278,6 +278,37 @@ class TimeTypeTest extends BaseTypeTestCase
         $this->assertEquals('03:04', $form->getViewData());
     }
 
+    public function testSubmitArrayToSingleTextWidgetWhenAllowed()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'allow_array_submission' => true,
+        ]);
+
+        $form->submit(['03:04']);
+
+        $this->assertFalse($form->isSynchronized());
+        $this->assertSame('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+    }
+
+    public function testSubmitArrayToSingleTextWidgetWithReferenceDateWhenAllowed()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'widget' => 'single_text',
+            'reference_date' => new \DateTimeImmutable('2023-06-15', new \DateTimeZone('UTC')),
+            'allow_array_submission' => true,
+        ]);
+
+        $form->submit(['03:04']);
+
+        $this->assertFalse($form->isSynchronized());
+        $this->assertSame('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+    }
+
     public function testSubmitStringSingleTextWithoutMinutes()
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

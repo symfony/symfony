@@ -444,6 +444,8 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             $this->setData($this->config->getData());
         }
 
+        $arrayNotAllowed = false;
+
         // Treat false as NULL to support binding false to checkboxes.
         // Don't convert NULL to a string here in order to determine later
         // whether an empty value has been submitted or whether no value has
@@ -459,8 +461,14 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
             }
         } elseif (\is_array($submittedData) && !$this->config->getCompound() && !$this->config->getOption('multiple', false)) {
-            $submittedData = null;
-            $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
+            if ($this->config->getOption('allow_array_submission', false)) {
+                // The failure is reported after PRE_SUBMIT so that listeners
+                // get a chance to turn the array into data the form accepts.
+                $arrayNotAllowed = true;
+            } else {
+                $submittedData = null;
+                $this->transformationFailure = new TransformationFailedException('Submitted data was expected to be text or number, array given.');
+            }
         }
 
         $dispatcher = $this->config->getEventDispatcher();
@@ -479,6 +487,20 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
                 $event = new PreSubmitEvent($this, $submittedData);
                 $dispatcher->dispatch($event, FormEvents::PRE_SUBMIT);
                 $submittedData = $event->getData();
+            }
+
+            if ($arrayNotAllowed && \is_array($submittedData)) {
+                if (!$this->config->getRequestHandler()->isFileUpload($submittedData)) {
+                    $submittedData = null;
+
+                    throw new TransformationFailedException('Submitted data was expected to be text or number, array given.');
+                }
+
+                if (!$this->config->getOption('allow_file_upload')) {
+                    $submittedData = null;
+
+                    throw new TransformationFailedException('Submitted data was expected to be text or number, file upload given.');
+                }
             }
 
             // Check whether the form is compound.

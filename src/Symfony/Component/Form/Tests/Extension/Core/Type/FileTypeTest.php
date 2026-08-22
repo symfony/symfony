@@ -16,6 +16,8 @@ use Symfony\Component\Form\Extension\Core\CoreExtension;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\NativeRequestHandler;
 use Symfony\Component\Form\RequestHandlerInterface;
 use Symfony\Component\HttpFoundation\File\File;
@@ -170,6 +172,53 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertSame([], $form->getData());
         $this->assertSame([], $form->getNormData());
         $this->assertSame([], $form->getViewData());
+    }
+
+    #[DataProvider('requestHandlerProvider')]
+    public function testSubmitArrayValueWhenNotMultipleButAllowed(RequestHandlerInterface $requestHandler)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, ['allow_array_submission' => true])
+            ->setRequestHandler($requestHandler)
+            ->getForm();
+        $form->submit(['file.txt']);
+
+        $this->assertFalse($form->isSynchronized());
+        $this->assertSame('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+    }
+
+    #[DataProvider('requestHandlerProvider')]
+    public function testArraySetByPreSubmitListenersIsDiscardedWhenNotAllowed(RequestHandlerInterface $requestHandler)
+    {
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE)
+            ->setRequestHandler($requestHandler)
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
+                $event->setData(['file.txt']);
+            }, 1)
+            ->getForm();
+        $form->submit('file.txt');
+
+        $this->assertNull($form->getData());
+    }
+
+    public function testPreSubmitListenersCanTurnArraysIntoFileUploads()
+    {
+        $requestHandler = new NativeRequestHandler();
+        $file = $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg');
+
+        $form = $this->factory
+            ->createBuilder(static::TESTED_TYPE, null, ['allow_array_submission' => true])
+            ->setRequestHandler($requestHandler)
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
+                $event->setData($event->getData()['upload']);
+            })
+            ->getForm();
+
+        $form->submit(['upload' => $file]);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($file, $form->getData());
     }
 
     public static function requestHandlerProvider(): array

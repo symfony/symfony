@@ -937,6 +937,87 @@ class SimpleFormTest extends TestCase
         $this->assertSame(0, $called, 'PRE_SUBMIT event listeners are not called for wrong data');
     }
 
+    public function testArrayDataIsRejectedBeforeListenersByDefault()
+    {
+        $called = 0;
+
+        $form = $this->getBuilder()
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function () use (&$called) {
+                ++$called;
+            })
+            ->getForm();
+
+        $form->submit(['bar' => 'baz']);
+
+        $this->assertSame(0, $called);
+        $this->assertFalse($form->isSynchronized());
+        $this->assertSame('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+    }
+
+    public function testPreSubmitListenersCanTurnArrayDataIntoScalarData()
+    {
+        $form = $this->getBuilder('name', null, ['allow_array_submission' => true])
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
+                $event->setData($event->getData()['bar']);
+            })
+            ->getForm();
+
+        $form->submit(['bar' => 'baz']);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame('baz', $form->getData());
+    }
+
+    public function testArrayDataKeptByPreSubmitListenersIsRejected()
+    {
+        $called = 0;
+
+        $form = $this->getBuilder('name', null, ['allow_array_submission' => true])
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function () use (&$called) {
+                ++$called;
+            })
+            ->getForm();
+
+        $form->submit(['bar' => 'baz']);
+
+        $this->assertSame(1, $called);
+        $this->assertFalse($form->isSynchronized());
+        $this->assertSame('Submitted data was expected to be text or number, array given.', $form->getTransformationFailure()->getMessage());
+        $this->assertNull($form->getData());
+        $this->assertNull($form->getViewData());
+    }
+
+    public function testPreSubmitListenersCanTurnArrayDataIntoFileUploads()
+    {
+        $file = ['name' => 'foo.jpg', 'type' => 'image/jpeg', 'tmp_name' => '/tmp/foo', 'error' => \UPLOAD_ERR_OK, 'size' => 3];
+
+        $form = $this->getBuilder('name', null, ['allow_array_submission' => true, 'allow_file_upload' => true])
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
+                $event->setData($event->getData()['upload']);
+            })
+            ->getForm();
+
+        $form->submit(['upload' => $file]);
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($file, $form->getData());
+    }
+
+    public function testFileUploadSetByPreSubmitListenersIsRejectedWhenNotAllowed()
+    {
+        $form = $this->getBuilder('name', null, ['allow_array_submission' => true, 'allow_file_upload' => false])
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) {
+                $event->setData(['name' => 'foo.jpg', 'type' => 'image/jpeg', 'tmp_name' => '/tmp/foo', 'error' => \UPLOAD_ERR_OK, 'size' => 3]);
+            })
+            ->getForm();
+
+        $form->submit(['bar' => 'baz']);
+
+        $this->assertFalse($form->isSynchronized());
+        $this->assertSame('Submitted data was expected to be text or number, file upload given.', $form->getTransformationFailure()->getMessage());
+        $this->assertNull($form->getData());
+    }
+
     public function testHandleRequestForwardsToRequestHandler()
     {
         $handler = $this->createMock(RequestHandlerInterface::class);

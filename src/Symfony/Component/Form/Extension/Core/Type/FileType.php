@@ -76,7 +76,7 @@ class FileType extends AbstractType
                 $event->setData($data);
             } elseif ($requestHandler->isFileUpload($event->getData()) && method_exists($requestHandler, 'getUploadFileError') && null !== $errorCode = $requestHandler->getUploadFileError($event->getData())) {
                 $form->addError($this->getFileUploadError($errorCode));
-            } elseif (!$requestHandler->isFileUpload($event->getData())) {
+            } elseif (!($options['allow_array_submission'] && \is_array($event->getData())) && !$requestHandler->isFileUpload($event->getData())) {
                 $event->setData(null);
             }
         });

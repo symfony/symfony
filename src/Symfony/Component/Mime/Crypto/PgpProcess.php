@@ -99,7 +99,7 @@ final class PgpProcess
     {
         foreach (array_keys($pgpKeys) as $recipient) {
             if (!\is_string($recipient) || str_starts_with($recipient, '-') || preg_match('/[\x00-\x1F\x7F]/', $recipient)) {
-                throw new InvalidArgumentException(sprintf('The PGP recipient "%s" is not a valid email address.', $recipient));
+                throw new InvalidArgumentException(\sprintf('The PGP recipient "%s" is not a valid email address.', $recipient));
             }
         }
 

@@ -13,12 +13,12 @@ namespace Symfony\Component\Mime\Tests\Crypto;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpProcess;
 use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\Multipart\PgpEncryptedPart;
 use Symfony\Component\Mime\Part\PgpEncryptedInitializationPart;

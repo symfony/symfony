@@ -110,6 +110,9 @@ final class MimeMessageNormalizer implements NormalizerInterface, DenormalizerIn
             $type = $this->resolveClass($data, AbstractPart::class, $context);
             unset($data['class']);
             $data['headers'] = $this->serializer->denormalize($data['headers'], Headers::class, $format, $context);
+        } elseif (RawMessage::class === $type && !\is_array($data)) {
+            // a raw message is a string, an iterable of strings or a resource
+            return new RawMessage($data);
         } elseif (\is_array($data) && is_a($type, RawMessage::class, true)) {
             if (RawMessage::class === $type && \array_key_exists('class', $data)) {
                 $type = $this->resolveClass($data, RawMessage::class, $context);

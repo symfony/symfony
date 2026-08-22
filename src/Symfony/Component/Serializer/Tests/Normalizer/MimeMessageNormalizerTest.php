@@ -121,7 +121,9 @@ class MimeMessageNormalizerTest extends TestCase
     {
         $serializer = $this->createMimeSerializer();
 
-        $this->assertSame(RawMessage::class, $serializer->denormalize('a string', RawMessage::class)::class);
+        $message = $serializer->denormalize('a string', RawMessage::class);
+        $this->assertSame(RawMessage::class, $message::class);
+        $this->assertSame('a string', $message->toString());
         $this->assertInstanceOf(Email::class, $serializer->denormalize('a string', Email::class));
     }
 

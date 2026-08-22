@@ -28,7 +28,7 @@
         "symfony/process": "^7.4|^8.0",
         "symfony/property-access": "^7.4|^8.0",
         "symfony/property-info": "^7.4|^8.0",
-        "symfony/serializer": "^7.4|^8.0"
+        "symfony/serializer": "^7.4.17|^8.1.5"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",

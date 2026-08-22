@@ -265,7 +265,8 @@ class MessageTest extends TestCase
                         ]
                     },
                     "class": "Symfony\\\\Component\\\\Mime\\\\Part\\\\Multipart\\\\MixedPart"
-                }
+                },
+                "class": "Symfony\\\\Component\\\\Mime\\\\Message"
             }
             EOF;
 

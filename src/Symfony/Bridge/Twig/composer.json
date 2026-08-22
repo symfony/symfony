@@ -44,7 +44,7 @@
         "symfony/security-core": "^7.4|^8.0",
         "symfony/security-csrf": "^7.4|^8.0",
         "symfony/security-http": "^7.4|^8.0",
-        "symfony/serializer": "^7.4|^8.0",
+        "symfony/serializer": "^7.4.17|^8.1.5",
         "symfony/stopwatch": "^7.4|^8.0",
         "symfony/translation": "^7.4|^8.0",
         "symfony/validator": "^7.4|^8.0",

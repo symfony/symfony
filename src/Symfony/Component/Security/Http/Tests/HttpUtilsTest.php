@@ -420,6 +420,76 @@ class HttpUtilsTest extends TestCase
         $this->assertFalse($utils->checkRequestPath($request, 'foobar'));
     }
 
+    public function testCheckRequestPathWithRouteAlias()
+    {
+        $request = $this->getRequest('/foo/bar');
+        $request->attributes->set('_route', 'foobar');
+
+        $routes = new RouteCollection();
+        $routes->add('foobar', new Route('/foo/bar'));
+        $routes->add('other', new Route('/other'));
+        $routes->addAlias('App\Controller\FooBarController', 'foobar');
+
+        $utils = new HttpUtils(new UrlGenerator($routes, (new RequestContext())->fromRequest($request)));
+
+        $this->assertTrue($utils->checkRequestPath($request, 'App\Controller\FooBarController'));
+        $this->assertFalse($utils->checkRequestPath($request, 'other'));
+        $this->assertFalse($utils->checkRequestPath($request, 'undefined'));
+    }
+
+    public function testCheckRequestPathWithRouteAliasAndUrlMatcher()
+    {
+        $request = $this->getRequest('/foo/bar');
+
+        $routes = new RouteCollection();
+        $routes->add('foobar', new Route('/foo/bar'));
+        $routes->addAlias('App\Controller\FooBarController', 'foobar');
+
+        $urlMatcher = $this->createStub(RequestMatcherInterface::class);
+        $urlMatcher
+            ->method('matchRequest')
+            ->willReturn(['_route' => 'foobar'])
+        ;
+
+        $utils = new HttpUtils(new UrlGenerator($routes, (new RequestContext())->fromRequest($request)), $urlMatcher);
+
+        $this->assertTrue($utils->checkRequestPath($request, 'App\Controller\FooBarController'));
+    }
+
+    public function testCheckRequestPathWithRouteAliasAndParameters()
+    {
+        $request = $this->getRequest('/foo/bar');
+        $request->attributes->set('_route', 'foobar');
+        $request->attributes->set('_route_params', ['name' => 'bar']);
+
+        $routes = new RouteCollection();
+        $routes->add('foobar', new Route('/foo/{name}'));
+        $routes->addAlias('App\Controller\FooBarController', 'foobar');
+
+        $utils = new HttpUtils(new UrlGenerator($routes, (new RequestContext())->fromRequest($request)));
+
+        $this->assertTrue($utils->checkRequestPath($request, 'App\Controller\FooBarController'));
+    }
+
+    public function testCheckRequestPathWithRouteAliasAndParametersAndUrlMatcher()
+    {
+        $request = $this->getRequest('/foo/bar');
+
+        $routes = new RouteCollection();
+        $routes->add('foobar', new Route('/foo/{name}'));
+        $routes->addAlias('App\Controller\FooBarController', 'foobar');
+
+        $urlMatcher = $this->createStub(RequestMatcherInterface::class);
+        $urlMatcher
+            ->method('matchRequest')
+            ->willReturn(['_route' => 'foobar', '_controller' => 'App\Controller\FooBarController::index', 'name' => 'bar'])
+        ;
+
+        $utils = new HttpUtils(new UrlGenerator($routes, (new RequestContext())->fromRequest($request)), $urlMatcher);
+
+        $this->assertTrue($utils->checkRequestPath($request, 'App\Controller\FooBarController'));
+    }
+
     public function testCheckPathWithoutRouteParam()
     {
         $urlMatcher = $this->createStub(UrlMatcherInterface::class);

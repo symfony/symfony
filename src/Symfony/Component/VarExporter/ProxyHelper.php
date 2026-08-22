@@ -510,6 +510,20 @@ final class ProxyHelper
         if (str_ends_with($default, "...'") && preg_match("/^'(?:[^'\\\\]*+(?:\\\\.)*+)*+'$/", $default)) {
             return VarExporter::export($param->getDefaultValue());
         }
+        if (str_starts_with($default, "'") && str_ends_with($default, "'")) {
+            // Reflection renders string literals without escaping quotes, which makes them
+            // impossible to re-tokenize. Export the value instead, but only when it renders
+            // back identically, which also tells literals apart from concatenations.
+            try {
+                $value = $param->getDefaultValue();
+            } catch (\Throwable) {
+                $value = null;
+            }
+
+            if (\is_string($value) && $default === self::renderString($value)) {
+                return VarExporter::export($value);
+            }
+        }
 
         $regexp = "/(\"(?:[^\"\\\\]*+(?:\\\\.)*+)*+\"|'(?:[^'\\\\]*+(?:\\\\.)*+)*+')/";
         $parts = preg_split($regexp, $default, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY);
@@ -549,5 +563,19 @@ final class ProxyHelper
         }
 
         return '\\'.substr($symbol, $ns + 1);
+    }
+
+    private static function renderString(string $value): string
+    {
+        return "'".preg_replace_callback('/[\x00-\x1F\x7F-\xFF\\\\]/', static fn ($m) => match ($m[0]) {
+            '\\' => '\\\\',
+            "\t" => '\t',
+            "\n" => '\n',
+            "\v" => '\v',
+            "\f" => '\f',
+            "\r" => '\r',
+            "\e" => '\e',
+            default => \sprintf('\x%02X', \ord($m[0])),
+        }, $value)."'";
     }
 }

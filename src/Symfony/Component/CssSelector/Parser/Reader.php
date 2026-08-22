@@ -61,9 +61,17 @@ class Reader
 
     public function findPattern(string $pattern): array|false
     {
-        $source = substr($this->source, $this->position);
+        // Match against the source in place instead of copying the remaining text for
+        // every probe, which is quadratic on token-dense selectors (O(tokens x length)).
+        // "^" combined with an offset only matches at the true subject start, so a leading
+        // anchor is rewritten to "\\G", which matches exactly at the match-start offset -
+        // the same position "^" anchored to when the remaining text was a fresh substring.
+        $delimiter = $pattern[0];
+        if ('^' === ($pattern[1] ?? '')) {
+            $pattern = $delimiter.'\\G'.substr($pattern, 2);
+        }
 
-        if (preg_match($pattern, $source, $matches)) {
+        if (preg_match($pattern, $this->source, $matches, 0, $this->position)) {
             return $matches;
         }
 

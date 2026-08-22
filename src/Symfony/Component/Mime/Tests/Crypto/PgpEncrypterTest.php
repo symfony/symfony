@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Mime\Tests\Crypto;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpProcess;
@@ -46,6 +48,25 @@ class PgpEncrypterTest extends TestCase
 
         $decrypted = $tester->decrypt($output, __DIR__.'/../Fixtures/pgp_test_secret_key.asc', self::KEY_PASSWORD);
         $this->assertSame('Hello there!', $decrypted);
+    }
+
+    public static function provideInvalidRecipients(): iterable
+    {
+        yield 'gpg option injection' => ['--keyserver=hkp://evil.example'];
+        yield 'output redirection' => ['--output'];
+        yield 'line feed' => ["foo\nbar@example.com"];
+        yield 'carriage return' => ["foo\rbar@example.com"];
+    }
+
+    #[DataProvider('provideInvalidRecipients')]
+    public function testPgpProcessRejectsInvalidRecipients(string $recipient)
+    {
+        $process = new PgpProcess();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not a valid email address');
+
+        $process->encrypt('Hello there!', [$recipient => __DIR__.'/../Fixtures/pgp_test_public_key.asc']);
     }
 
     public function testEncrypting()

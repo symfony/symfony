@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Crypto;
 
+use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -96,6 +97,12 @@ final class PgpProcess
      */
     public function encrypt(string $data, array $pgpKeys, array $hiddenRecipients = []): string
     {
+        foreach (array_keys($pgpKeys) as $recipient) {
+            if (!\is_string($recipient) || str_starts_with($recipient, '-') || preg_match('/[\x00-\x1F\x7F]/', $recipient)) {
+                throw new InvalidArgumentException(sprintf('The PGP recipient "%s" is not a valid email address.', $recipient));
+            }
+        }
+
         $temporaryGnupgHome = $this->createTemporaryGnupgHome();
 
         try {

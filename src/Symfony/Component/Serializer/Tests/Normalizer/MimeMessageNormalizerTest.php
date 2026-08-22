@@ -12,8 +12,10 @@
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\AbstractPart;
 use Symfony\Component\Mime\Part\TextPart;
+use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -61,6 +63,68 @@ class MimeMessageNormalizerTest extends TestCase
         $this->expectExceptionMessage('Expected a subclass of "Symfony\Component\Mime\Part\AbstractPart", got "array".');
 
         $serializer->denormalize(['class' => [], 'headers' => []], AbstractPart::class);
+    }
+
+    public function testNormalizeAddsTheMessageClass()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $this->assertSame(Email::class, $serializer->normalize(new Email())['class']);
+        $this->assertSame(RawMessage::class, $serializer->normalize(new RawMessage('Raw content'))['class']);
+    }
+
+    public function testDenormalizeMessageFromRawMessageType()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        // no addresses: egulias/email-validator is not installed on low-deps
+        $email = (new Email())->subject('Text subject')->text('Text content');
+
+        $denormalized = $serializer->denormalize($serializer->normalize($email), RawMessage::class);
+
+        $this->assertInstanceOf(Email::class, $denormalized);
+        $this->assertSame('Text content', $denormalized->getTextBody());
+        $this->assertEquals($email->getHeaders(), $denormalized->getHeaders());
+    }
+
+    public function testDenormalizeRawMessageFromRawMessageType()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $denormalized = $serializer->denormalize($serializer->normalize(new RawMessage('Raw content')), RawMessage::class);
+
+        $this->assertSame(RawMessage::class, $denormalized::class);
+        $this->assertSame('Raw content', $denormalized->toString());
+    }
+
+    public function testDenormalizeRejectsForeignClassInMessage()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Expected a subclass of "Symfony\Component\Mime\RawMessage", got "Symfony\Component\Serializer\Tests\Normalizer\MimeMessageNormalizerTestForeignClass".');
+
+        $serializer->denormalize(['class' => MimeMessageNormalizerTestForeignClass::class, 'marker' => 'foo'], RawMessage::class);
+    }
+
+    public function testDenormalizeRejectsNonArrayDataInPart()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $this->expectException(NotNormalizableValueException::class);
+        $this->expectExceptionMessage('Expected a subclass of "Symfony\Component\Mime\Part\AbstractPart", got "null".');
+
+        $serializer->denormalize('a string', AbstractPart::class);
+    }
+
+    public function testDenormalizeNonArrayDataAsMessage()
+    {
+        $serializer = $this->createMimeSerializer();
+
+        $message = $serializer->denormalize('a string', RawMessage::class);
+        $this->assertSame(RawMessage::class, $message::class);
+        $this->assertSame('a string', $message->toString());
+        $this->assertInstanceOf(Email::class, $serializer->denormalize('a string', Email::class));
     }
 
     private function createMimeSerializer(): Serializer

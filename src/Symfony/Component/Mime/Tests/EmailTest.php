@@ -687,7 +687,8 @@ class EmailTest extends TestCase
                         }
                     ]
                 },
-                "body": null
+                "body": null,
+                "class": "Symfony\\\Component\\\Mime\\\Email"
             }
             EOF;
 

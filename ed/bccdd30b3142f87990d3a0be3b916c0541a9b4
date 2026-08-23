@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:51:07Z
+
+I pushed one extra commit on top of yours. In trans-unit 62 ("This value is neither a valid ISBN-10 nor a valid ISBN-13.") the first word used a Latin `a` instead of a Cyrillic `а`. It is the only accidental script mix in the file; the Latin `URL` in unit 113 is a real acronym. `validators.sr_Latn.xlf` is not affected.
+
+This PR already edits that catalog, so I folded the fix in here instead of opening a separate one. If you would rather have it on its own, tell me and I will drop the commit.

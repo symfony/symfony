@@ -419,7 +419,8 @@ class Connection
 
         if (self::isFifoQueue($this->configuration['queue_name'])) {
             $parameters['MessageGroupId'] = $messageGroupId ?? __METHOD__;
-            $parameters['MessageDeduplicationId'] = $messageDeduplicationId ?? sha1(json_encode(['body' => $body, 'headers' => $headers]));
+            // a unique id by default: deduplicating on the content is up to the queue (ContentBasedDeduplication) or to an explicit id
+            $parameters['MessageDeduplicationId'] = $messageDeduplicationId ?? bin2hex(random_bytes(16));
             unset($parameters['DelaySeconds']);
         } elseif (null !== $messageGroupId) {
             $parameters['MessageGroupId'] = $messageGroupId;

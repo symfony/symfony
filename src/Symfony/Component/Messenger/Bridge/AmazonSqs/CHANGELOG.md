@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Stop deduplicating the messages sent to a FIFO queue on their content: the default `MessageDeduplicationId` is now unique per send
  * Allow auto-setup to create the queue when the DSN names the account the client already authenticates as
  * Add `AmazonSqsFairQueueStamp` to set a `MessageGroupId` on standard queues, enabling SQS fair queues
 

@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-22T11:24:08Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 8.2 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-08-22T11:24:08Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "6.4" but it seems your PR description refers to branch "8.2 for features / 6.4, 7.4, 8.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:36:30Z
+
+Thank you for the per-unit account of what you reviewed, that is exactly the level of detail that makes this easy to check.
+
+One thing: that whole block sits inside `<!-- ... -->` in the description, so nothing of it renders on GitHub. Could you move it out of the HTML comment markers, including the sentence saying you are a native Urdu speaker?
+
+Removing `state="needs-review-translation"` is only accepted when a native speaker did the review, so that statement is the evidence supporting this change. You did state it on #65568, but it is worth having in the pull request itself.
+
+Nothing else needed from your side.
+
+---------------------------------------------------------------------------
+
+by UmairRathore at 2026-08-23T07:48:15Z
+
+Thanks, Nicolas. I’ve moved the review details outside the HTML comment markers so they’re now visible in the PR description, including the native Urdu speaker note.

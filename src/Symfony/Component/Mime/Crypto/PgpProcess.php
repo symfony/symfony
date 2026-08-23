@@ -167,6 +167,7 @@ final class PgpProcess
         }
 
         $command[] = '--import';
+        $command[] = '--';
         $command[] = $this->convertToMsysPath($filePath);
 
         $this->execute($command, null, $gnupgHome);

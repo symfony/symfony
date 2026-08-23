@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:38:21Z
+
+Thank you for this, the quadratic behaviour is real and worth fixing on 6.4.
+
+One thing I had to change: as submitted, the patch was 17 to 19% slower than base on ordinary selectors. It rebuilt the pattern string on every call, and that allocation costs more than the `substr()` it removes. In pure PCRE over 300k probes with identical hit counts: `substr` plus `^` 55.6 ms, offset plus `\G` 43.5 ms, per-call `\G` rewrite 135.7 ms. I memoized the rewrite in a static array, which restores parity on ordinary selectors and also improves the pathological case (512 KB goes from 1412.9 ms to 1083.9 ms). I also shortened the code comment and rewrote the commit message to match the diff.
+
+Note for whoever merges 6.4 up: on 7.4 and above `Reader` uses a promoted constructor and has no `private string $source;` line, so the property hunk conflicts. Put `private static array $anchoredPatterns = [];` above `private int $length;`. The `findPattern()` hunk applies cleanly. I ran that shape on 8.1 and it is green.
+
+Unrelated but nearby: #65596 is complementary, not overlapping. There is no file overlap, and `Parser::parse()` tokenizes eagerly before parsing, so its nesting cap never reaches the tokenizer. On 8.1, `(new Parser())->parse(str_repeat(':is(', 128000))` takes 13889 ms on base, 11835 ms with #65596 alone, and 1116 ms with both. Neither PR needs to wait for the other.

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:37:57Z
+
+Two things changed here that you may want to react to.
+
+**Retargeted to 7.4.** `:is()` and `:where()` were added by #48803 and released in 7.1, so 7.4 is the oldest maintained branch that has them. On 6.4 the `is` identifier falls into the generic function branch, which does not recurse, so there is nothing to cap there.
+
+**Dropped the new `SyntaxErrorException::nestedMatching()`.** That class is public API with no `@internal`, and adding a public method to it on a maintained branch is outside the BC promise. The exception is now built in `Parser`, which is `@internal`: same type, same message, no new public surface.
+
+I also reworded the description. Probing showed the failure mode is not a stack overflow, and the cap does not remove the segfault, since flat shapes such as `a a a ...` reach it too. The details are in the description.
+
+---
+
+Merge-up resolution for 8.1, which already has `:has()`:
+
+- in `Parser.php`, rename `HAS_NESTING_LIMIT` to `NESTING_LIMIT` and `hasNestingDepth` to `nestingDepth`, and let `parseRelativeSelector()` use that shared counter (it keeps throwing `SyntaxErrorException::nestedHas()`);
+- in `ParserTest.php`, update the two `\ReflectionProperty(Parser::class, 'hasNestingDepth')` lookups in `testHasNestingDepthLimit` and `testHasNestingWithinLimitIsAccepted`;
+- add `yield 'has nested in is' => [15, 'div:is(:has(a))', 'Got too deeply nested :has().'];` to `getNestedMatchingData()` and `yield 'nested is in has' => [str_repeat(':has(:is(', 100).'a'.str_repeat('))', 100)];` to `getDeeplyNestedSelectorData()`.

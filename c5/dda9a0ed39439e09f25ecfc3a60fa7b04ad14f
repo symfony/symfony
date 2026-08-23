@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T08:43:01Z
+
+@GromNaN I reworked this to drop the cache and remove the `mongodb-1.12.0` pin instead. Two facts pushed me there.
+
+First, mongodb could never be cached from this workflow. You already noted the 55s that remain on a cache hit; the reason is that `setup-php` extracts its php-ubuntu tarball *after* the cache is restored, and that tarball ships its own `mongodb.so` (2.3.3). It overwrites the restored file, the pinned version then mismatches, and the driver is rebuilt. No cache key can win against that.
+
+Second, once the pin is gone, the only extension the cache still saves is couchbase: about 44s on 6.4 and 31s on 7.4, and 0s on 8.1 and 8.2, where couchbase fails to build on PHP 8.4 anyway. Against that it writes 21.5MB per branch, per job, per PR ref, per UTC day, in a repo that uses no Actions cache at all today, and it freezes relay's version. Removing the pin needs no cache and no warm run: extension setup goes from 115s to 50s on 6.4, from 89s to 36s on 7.4 and from 59s to 26s on 8.1, which beats the warm figure on every branch.
+
+Credit for looking at this step, it was worth the look. What made the pin obsolete is your own #52336: it removed the `mongodb/mongodb` requirement that the pin existed to match, and nothing has needed it since.
+
+One thing I could not verify locally: whether 6.4 stays green on ext-mongodb 2.3.3. The Integration job on this PR is what answers that. If it goes red, it is a real 6.4 bug the pin has been masking, not a problem with this change.
+
+You wrote both the pin and the v2 compatibility fix in #58668, so please sanity-check the reasoning.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-23T08:53:58Z
+
+The MongoDB integration in Symfony is compatible with latest ext-mongodb versions (including 2.4.0 released this week). I'm fine with removing the version pin.
+
+Thank you very much for the deeper investigation you performed; very instructive.

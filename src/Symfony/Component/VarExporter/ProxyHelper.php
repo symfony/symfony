@@ -510,7 +510,9 @@ final class ProxyHelper
         if (str_ends_with($default, "...'") && preg_match("/^'(?:[^'\\\\]*+(?:\\\\.)*+)*+'$/", $default)) {
             return VarExporter::export($param->getDefaultValue());
         }
-        if (str_starts_with($default, "'") && str_ends_with($default, "'")) {
+        if ((str_starts_with($default, "'") && str_ends_with($default, "'"))
+            || (str_starts_with($default, '[') && str_ends_with($default, ']'))
+        ) {
             // Reflection renders string literals without escaping quotes, which makes them
             // impossible to re-tokenize. Export the value instead, but only when it renders
             // back identically, which also tells literals apart from concatenations.
@@ -520,8 +522,8 @@ final class ProxyHelper
                 $value = null;
             }
 
-            if (\is_string($value) && $default === self::renderString($value)) {
-                return VarExporter::export($value);
+            if ((\is_string($value) || \is_array($value)) && $default === self::renderValue($value)) {
+                return self::exportValue($value);
             }
         }
 
@@ -546,7 +548,7 @@ final class ProxyHelper
 
         return implode('', array_map(static fn ($part) => match ($part[0]) {
             '"' => $part, // for internal classes only
-            "'" => false !== strpbrk($part, "\\\0\r\n") ? '"'.substr(str_replace(['$', "\0", "\r", "\n"], ['\$', '\0', '\r', '\n'], $part), 1, -1).'"' : $part,
+            "'" => false !== strpbrk($part, "\\\0\r\n") ? '"'.self::escapeDoubleQuoted(substr($part, 1, -1)).'"' : $part,
             default => preg_replace_callback($regexp, $callback, $part),
         }, $parts));
     }
@@ -577,5 +579,80 @@ final class ProxyHelper
             "\e" => '\e',
             default => \sprintf('\x%02X', \ord($m[0])),
         }, $value)."'";
+    }
+
+    /**
+     * Reproduces how reflection renders a resolved default value, or null when it cannot.
+     */
+    private static function renderValue(mixed $value): ?string
+    {
+        if (\is_string($value)) {
+            return self::renderString($value);
+        }
+        if (\is_int($value)) {
+            return (string) $value;
+        }
+        if (\is_float($value)) {
+            $repr = (string) $value;
+
+            return is_finite($value) && !str_contains($repr, '.') && !str_contains($repr, 'E') ? $repr.'.0' : $repr;
+        }
+        if (\is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (null === $value) {
+            return 'NULL';
+        }
+        if (!\is_array($value)) {
+            return null;
+        }
+
+        $isList = array_is_list($value);
+        $rendered = [];
+
+        foreach ($value as $k => $v) {
+            if (null === $part = self::renderValue($v)) {
+                return null;
+            }
+
+            $rendered[] = $isList ? $part : self::renderValue($k).' => '.$part;
+        }
+
+        return '['.implode(', ', $rendered).']';
+    }
+
+    /**
+     * Turns the inside of a single-quoted rendering into the inside of a double-quoted one.
+     *
+     * Reflection renders resolved values with \n-style escapes and unevaluated expressions with
+     * \'-style ones. Both encodings write a backslash as \\, so the two can be decoded at once.
+     */
+    private static function escapeDoubleQuoted(string $part): string
+    {
+        return preg_replace_callback('/\\\\[\\\\\']|["$\0\r\n]/', static fn ($m) => match ($m[0]) {
+            "\\'" => "'",
+            '"' => '\"',
+            '$' => '\$',
+            "\0" => '\0',
+            "\r" => '\r',
+            "\n" => '\n',
+            default => $m[0],
+        }, $part);
+    }
+
+    private static function exportValue(mixed $value): string
+    {
+        if (!\is_array($value)) {
+            return VarExporter::export($value);
+        }
+
+        $isList = array_is_list($value);
+        $exported = [];
+
+        foreach ($value as $k => $v) {
+            $exported[] = ($isList ? '' : VarExporter::export($k).' => ').self::exportValue($v);
+        }
+
+        return '['.implode(', ', $exported).']';
     }
 }

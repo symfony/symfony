@@ -1,0 +1,99 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-22T20:20:21Z
+
+Thank you for taking this on, and for the clear problem statement in #65439.
+
+I reviewed the branch and pushed a rework. The main thing I found is that the version 2 recipient key was not the one MailerSend actually sends.
+
+**The recipient address is `data.email`, not `data.recipient`.** MailerSend's documented version 2 payload, shown identically on [the API reference](https://developers.mailersend.com/api/v1/webhooks) and [the setup guide](https://developers.mailersend.com/guides/setting-up-webhooks), is:
+
+```json
+{"type":"activity.sent","created_at":"2025-08-05T21:23:54.000000Z",
+ "data":{"id":"...","domain_id":"...","message_id":"...","email_id":"...",
+         "type":"sent","subject":"Test email","email":"test@mailersend.com",
+         "tags":["test","test2"],"meta":[]}}
+```
+
+There is no `recipient` key. I fed that payload, correctly signed, through the branch as submitted, and the parser still answered `406 Payload is malformed`, which is the symptom the pull request is meant to remove. The fixtures did not catch it because they were written to match the code rather than captured from a real delivery.
+
+Other changes I made:
+
+- `ip` and `url` were dropped for `activity.opened_unique` and `activity.clicked_unique`, since the version 2 `match` only listed the non-unique types. Version 1 keeps that data for both, so this was a regression between the two paths. The `"meta": []` in those two fixtures hid it.
+- Removed the `$whVer` property. The converter is registered as a shared service, so per-call state on it is worth avoiding, and it is not needed here: the two layouts use disjoint keys, so a `??` fallback in each accessor covers both. That also removed the duplicated version 1 and version 2 bodies, about 45 lines.
+- Dropped the CHANGELOG entry. 7.4 is already released, so the entry landed in a shipped section, and a bug fix does not need one.
+- Fixed the style issues that Fabbot reported, and removed a `$computedSignature` in the version 2 signed test that was computed and never used.
+
+One point I could not settle, and where you can help: MailerSend documents `meta` only for `activity.sent` (`[]`) and `activity.survey_submitted`. The keys for bounces, opens, clicks and unsubscribes (`bounce_reason`, `ip`, `url`, `unsubscribe_reason`) are still inferred. The code reads them defensively, so a wrong guess costs the optional metadata rather than the event itself, but if you have a real version 2 delivery for a bounce, an open, a click or an unsubscribe, pasting the redacted payloads here would let us confirm the last part.
+
+The branch is rebased on the current 7.4 and the bridge suite is green.
+
+---------------------------------------------------------------------------
+
+by ovgray at 2026-08-22T22:16:03Z
+
+@nicolas-grekas
+
+Thanks for the quick response. Reading your message, however, I got stuck on your comment about the "recipient" key.
+
+I have a MailSend account set up to send version 1 webhooks. I added a version 2 webhook with separate temporary url , used the MailerSend site to cause"test webhooks" to be sent to that url, and captured the POST request contents at that url. That's how I got the structures of each of the *.json files in my Tests\Webhook\v2\Fixtures directory. In every case the email address is in the "recipient" key.
+
+Apart from changing the contents of the "created_at" and "tags" keys in those json files so that my tests would work like the original version 1 tests as far as possible, I did not add or remove keys and did not change the content of any other keys from what MailerSend actually send.
+
+I would think that a bug in the documentation is more likely than a bug in the functionality that sends test webhooks. If you look at [https://www.mailersend.com/whats-new/webhooks-v2](https://www.mailersend.com/whats-new/webhooks-v2) the example given there has the email address as the value of a "recipient" key.
+
+Given  given that the site documentation and test webhooks are inconsistent, I suppose it may be that what is sent in "real" webhooks is inconsistent with what is sent in test webhooks. With a bit of effort I may be able to check that possibility by getting some "real" webhook content for some webhook types.
+
+In the meantime, I suggest that we need to verify the actual content of version 2 webhooks is before going any further.
+
+I will see if I can get a response from MailerSend support to a question about the inconsistency between the docs and the test webhooks. I am not hopeful. I started this task by asking support how I could get full documentation of all the v2 webhook structures. I just got ai generated responses pointing to the existing site docs and, eventually, acknowledging that not all webhook types are documented on the site.
+
+And I will see if I can capture some "real" webhook content.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T06:40:38Z
+
+Arf
+Can you maybe reach out to them to clarify? They should eg know their doc is outdated if that's the case.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:15:07Z
+
+You are right and I was wrong. Your fixtures were captured, mine came from the API reference, and captured payloads win.
+
+I checked the page you linked. Its Webhooks 2.0 example is:
+
+```json
+{"type":"activity.sent","created_at":"2025-08-05T21:23:54.000000Z",
+ "data":{"id":"6892766a5b66e2daf3dc9155","account_id":1,"domain_id":1,
+         "message_id":"6892766ae78995a317577aa1","email_id":"6892766a8d52ba62543d5e71",
+         "type":"sent","subject":"Qui consequatur hic sit quas.",
+         "recipient":"fisher.harley@example.net","tags":["test","test2"],"meta":null}}
+```
+
+So MailerSend publishes two examples of the same event, with the same `created_at` down to the microsecond, that disagree on three points: `recipient` against `email`, `account_id` present against absent, and `meta: null` against `meta: []`. Two documented shapes and your captures make it two to one for `recipient`, so my change would have broken the payloads you actually receive. Sorry for the detour, and thank you for pushing back with the evidence instead of taking my word for it.
+
+I have pushed a fix. Rather than pick a side, the branch now accepts both:
+
+```php
+return $payload['data']['email']['recipient']['email'] ?? $payload['data']['recipient'] ?? $payload['data']['email'];
+```
+
+The three keys cannot collide. In version 1 `data.email` is an object, in version 2 it is a string, and `??` uses isset semantics, so a string offset lookup with a non-numeric key returns false and falls through instead of erroring. The parser guard now accepts either key as well, and I split it into named `$isV1` and `$isV2` locals so it stays readable.
+
+Your fixtures are restored to `recipient` as you captured them, and I added `sent_email_key.json` covering the API reference shape, including `account_id` and `meta: null`, so both layouts are locked in by tests. I verified all four shapes end to end through the parser with a valid signature:
+
+```
+OK   whats-new v2 (recipient)   id=6892766ae78995a317577aa1 recipient=fisher.harley@example.net
+OK   api-reference v2 (email)   id=6892766ae78995a317577aa1 recipient=test@mailersend.com
+OK   v1 (nested email object)   id=5fc0d003f718c90162341852 recipient=v1@mailersend.com
+OK   v2 click with meta         id=mid recipient=click@example.net meta={"ip":"10.0.0.1","url":"..."}
+```
+
+The bridge suite is green at 49 tests.
+
+This also lowers the stakes on your open question. Since both key names are accepted, a real capture that disagrees with one of the documented examples can no longer break the recipient. Real payloads for a bounce, an open, a click and an unsubscribe are still worth having, since the `meta` keys are the last inferred part, but they are no longer blocking.
+
+Do ask MailerSend to fix whichever page is wrong. Worth mentioning that the API reference and the release note contradict each other on the same example, since that is the part they can act on.

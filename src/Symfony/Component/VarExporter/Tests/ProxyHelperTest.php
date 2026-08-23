@@ -166,6 +166,24 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperInterface1::class), new \ReflectionClass(TestForProxyHelperInterface2::class)]));
     }
 
+    public function testGenerateLazyProxyWithStringParameterDefaults()
+    {
+        $code = ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperStringDefaults::class)]);
+
+        $this->assertStringContainsString('public function singleQuote($a = \'it\\\'s a "quote" \\\\ back\')', $code);
+        $this->assertStringContainsString('public function doubleQuote($a = \'a"b\\\\c\')', $code);
+        $this->assertStringContainsString('public function concat($a = \'pre-\' . \\'.TestForProxyHelperStringDefaults::class.'::SUFFIX . \'-post\')', $code);
+
+        eval('class TestForProxyHelperStringDefaultsImpl'.$code);
+
+        foreach ((new \ReflectionClass(TestForProxyHelperStringDefaults::class))->getMethods() as $method) {
+            $expected = $method->getParameters()[0]->getDefaultValue();
+            $actual = (new \ReflectionParameter([\TestForProxyHelperStringDefaultsImpl::class, $method->name], 'a'))->getDefaultValue();
+
+            $this->assertSame($expected, $actual, $method->name);
+        }
+    }
+
     /**
      * @dataProvider classWithUnserializeMagicMethodProvider
      */
@@ -327,6 +345,23 @@ interface TestForProxyHelperInterface2
     public function foo2(?Bar $b, ...$d): self;
 
     public static function foo3(): string;
+}
+
+interface TestForProxyHelperStringDefaults
+{
+    public const SUFFIX = 'suffix';
+
+    public function singleQuote($a = 'it\'s a "quote" \ back');
+
+    public function doubleQuote($a = 'a"b\\c');
+
+    public function newLine($a = "line1\nline2");
+
+    public function nullByte($a = "nul\0byte");
+
+    public function emoji($a = "emoji \u{1F600} end");
+
+    public function concat($a = 'pre-'.self::SUFFIX.'-post');
 }
 
 class TestSignatureFQ extends \stdClass

@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by iliaal at 2026-08-22T18:15:23Z
+
+The Unit Tests (8.4) failure is unrelated to this change: `Symfony\Bridge\Doctrine\Tests\Middleware\Debug\MiddlewareTest::testTransaction` with data set "rollback" asserts `executionMS > 0` for the final ROLLBACK, which completed in 0.0 ms (timer resolution). Re-ran the failed job. This PR only touches `src/Symfony/Component/Filesystem/*`.
+
+---------------------------------------------------------------------------
+
+by iliaal at 2026-08-22T18:23:33Z
+
+Follow-up: after the re-trigger, Unit Tests (8.4, high-deps) fails on another unrelated timing flake — `Symfony\Component\Clock\Tests\MockClockTest::testNow` asserts `now() > $realTime` but both timestamps landed on the same microsecond (`2026-08-22 18:18:49.008769`). Combined with the Doctrine-bridge `executionMS > 0` flake in the previous run, that's two different bridge components failing on strict "> 0" time assertions across two runs, while every Filesystem test passes in all jobs. The Filesystem diff itself is green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:37:07Z
+
+Thanks for the report and for the patch. I reworked the mechanism: instead of creating the file and then chmod'ing it, the umask is forced around the `fopen()` call. Create-then-chmod only narrows the window, it does not close it. A second process polling the directory with plain `scandir()` still saw 1565 of 9520 files at `0644` before the chmod landed; with the umask forced, 4088 of 4088 were `0600` on first sight.
+
+The chmod also broke a call that used to work: `self::box('chmod', ...)` goes through `assertFunctionExists()`, so with `-d disable_functions=chmod` a suffixed `tempnam()` went from returning a filename to throwing an `IOException`. And custom stream wrappers usually do not implement `stream_metadata`, so on those the chmod was a no-op and the file stayed at `0644`.
+
+`umask()` is already an unguarded dependency of this class (`copy()` and `dumpFile()` both call it), and forcing it around a creation is what `Console\Input\File\InputFile` does for the same reason.
+
+I also added an assertion on the umask value after the call, so a leaked umask fails the test.

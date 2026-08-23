@@ -26,17 +26,57 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
 {
+    /**
+     * Each namespace maps to the package providing it, limited to packages having a recipe in symfony/recipes
+     * or belonging to a family of packages that do, like symfony/ux-*. A "_default" requires a namespace that
+     * no Symfony command uses and that a single package owns; otherwise the package only gets the
+     * sub-namespaces of the commands it provides.
+     */
     private const PACKAGES = [
+        'api' => [
+            '_default' => ['ApiPlatformBundle', 'api-platform/symfony'],
+        ],
+        'bazinga' => [
+            'js-translation' => ['BazingaJsTranslationBundle', 'willdurand/js-translation-bundle'],
+        ],
+        'debug' => [
+            'live-component' => ['LiveComponentBundle', 'symfony/ux-live-component'],
+            'twig-component' => ['TwigComponentBundle', 'symfony/ux-twig-component'],
+        ],
         'doctrine' => [
             'fixtures' => ['DoctrineFixturesBundle', 'doctrine/doctrine-fixtures-bundle --dev'],
+            'migrations' => ['DoctrineMigrationsBundle', 'doctrine/doctrine-migrations-bundle'],
             'mongodb' => ['DoctrineMongoDBBundle', 'doctrine/mongodb-odm-bundle'],
             '_default' => ['Doctrine ORM', 'symfony/orm-pack'],
         ],
+        'hautelook' => [
+            'fixtures' => ['HautelookAliceBundle', 'hautelook/alice-bundle --dev'],
+        ],
+        'league' => [
+            'oauth2-server' => ['LeagueOAuth2ServerBundle', 'league/oauth2-server-bundle'],
+        ],
+        'lexik' => [
+            'jwt' => ['LexikJWTAuthenticationBundle', 'lexik/jwt-authentication-bundle'],
+        ],
         'make' => [
+            'admin' => ['EasyAdminBundle', 'easycorp/easyadmin-bundle'],
             '_default' => ['MakerBundle', 'symfony/maker-bundle --dev'],
+        ],
+        'sass' => [
+            '_default' => ['SassBundle', 'symfonycasts/sass-bundle'],
         ],
         'server' => [
             '_default' => ['Debug Bundle', 'symfony/debug-bundle --dev'],
+        ],
+        'tailwind' => [
+            '_default' => ['TailwindBundle', 'symfonycasts/tailwind-bundle'],
+        ],
+        'ux' => [
+            'icons' => ['UXIconsBundle', 'symfony/ux-icons'],
+            'install' => ['UXToolkitBundle', 'symfony/ux-toolkit'],
+            'native' => ['UXNativeBundle', 'symfony/ux-native'],
+            'toolkit' => ['UXToolkitBundle', 'symfony/ux-toolkit'],
+            'translator' => ['UxTranslatorBundle', 'symfony/ux-translator'],
         ],
     ];
 
@@ -52,12 +92,10 @@ final class SuggestMissingPackageSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (isset(self::PACKAGES[$namespace][$command])) {
+        if ($exact = isset(self::PACKAGES[$namespace][$command])) {
             $suggestion = self::PACKAGES[$namespace][$command];
-            $exact = true;
-        } else {
-            $suggestion = self::PACKAGES[$namespace]['_default'];
-            $exact = false;
+        } elseif (!$suggestion = self::PACKAGES[$namespace]['_default'] ?? null) {
+            return;
         }
 
         $error = $event->getError();

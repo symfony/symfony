@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -226,6 +227,65 @@ class ApplicationTest extends TestCase
     {
         $result = $this->createEventForSuggestingPackages('server', ['server:run']);
         $this->assertDoesNotMatchRegularExpression('/You may be looking for a command provided by/', $result);
+    }
+
+    #[DataProvider('provideCommandsSuggestingAPackage')]
+    public function testSuggestingPackageForCommand(string $command, string $bundle, string $package)
+    {
+        $result = $this->createEventForSuggestingPackages($command);
+
+        $this->assertStringContainsString(\sprintf('provided by the "%s" which is currently not installed. Try running "composer require %s".', $bundle, $package), $result);
+    }
+
+    public static function provideCommandsSuggestingAPackage(): iterable
+    {
+        yield 'api:openapi:export' => ['api:openapi:export', 'ApiPlatformBundle', 'api-platform/symfony'];
+        yield 'bazinga:js-translation:dump' => ['bazinga:js-translation:dump', 'BazingaJsTranslationBundle', 'willdurand/js-translation-bundle'];
+        yield 'debug:live-component' => ['debug:live-component', 'LiveComponentBundle', 'symfony/ux-live-component'];
+        yield 'debug:twig-component' => ['debug:twig-component', 'TwigComponentBundle', 'symfony/ux-twig-component'];
+        yield 'doctrine:fixtures:load' => ['doctrine:fixtures:load', 'DoctrineFixturesBundle', 'doctrine/doctrine-fixtures-bundle --dev'];
+        yield 'doctrine:migrations:migrate' => ['doctrine:migrations:migrate', 'DoctrineMigrationsBundle', 'doctrine/doctrine-migrations-bundle'];
+        yield 'doctrine:mongodb:schema:create' => ['doctrine:mongodb:schema:create', 'DoctrineMongoDBBundle', 'doctrine/mongodb-odm-bundle'];
+        yield 'doctrine:schema:update' => ['doctrine:schema:update', 'Doctrine ORM', 'symfony/orm-pack'];
+        yield 'hautelook:fixtures:load' => ['hautelook:fixtures:load', 'HautelookAliceBundle', 'hautelook/alice-bundle --dev'];
+        yield 'league:oauth2-server:create-client' => ['league:oauth2-server:create-client', 'LeagueOAuth2ServerBundle', 'league/oauth2-server-bundle'];
+        yield 'lexik:jwt:generate-keypair' => ['lexik:jwt:generate-keypair', 'LexikJWTAuthenticationBundle', 'lexik/jwt-authentication-bundle'];
+        yield 'make:admin:dashboard' => ['make:admin:dashboard', 'EasyAdminBundle', 'easycorp/easyadmin-bundle'];
+        yield 'make:controller' => ['make:controller', 'MakerBundle', 'symfony/maker-bundle --dev'];
+        yield 'sass:build' => ['sass:build', 'SassBundle', 'symfonycasts/sass-bundle'];
+        yield 'server:dump' => ['server:dump', 'Debug Bundle', 'symfony/debug-bundle --dev'];
+        yield 'tailwind:build' => ['tailwind:build', 'TailwindBundle', 'symfonycasts/tailwind-bundle'];
+        yield 'ux:icons:import' => ['ux:icons:import', 'UXIconsBundle', 'symfony/ux-icons'];
+        yield 'ux:install' => ['ux:install', 'UXToolkitBundle', 'symfony/ux-toolkit'];
+        yield 'ux:native:build-configs' => ['ux:native:build-configs', 'UXNativeBundle', 'symfony/ux-native'];
+        yield 'ux:toolkit:create-kit' => ['ux:toolkit:create-kit', 'UXToolkitBundle', 'symfony/ux-toolkit'];
+        yield 'ux:translator:warm-cache' => ['ux:translator:warm-cache', 'UxTranslatorBundle', 'symfony/ux-translator'];
+    }
+
+    public function testNotSuggestingPackageForUnknownNamespace()
+    {
+        $result = $this->createEventForSuggestingPackages('unknown:command');
+        $this->assertStringNotContainsString('You may be looking for a command provided by', $result);
+    }
+
+    public function testNotSuggestingPackageWithoutDefaultAndPartialMatch()
+    {
+        $result = $this->createEventForSuggestingPackages('ux:unknown');
+        $this->assertStringNotContainsString('You may be looking for a command provided by', $result);
+    }
+
+    public function testNotSuggestingPackageForACommandOfACoreNamespace()
+    {
+        $result = $this->createEventForSuggestingPackages('debug:route');
+        $this->assertStringNotContainsString('You may be looking for a command provided by', $result);
+    }
+
+    public function testSuggestingPackagesWithExactMatchAndAlternatives()
+    {
+        // a partially installed namespace: DoctrineBundle is there, the fixtures bundle is not
+        $result = $this->createEventForSuggestingPackages('doctrine:fixtures:load', ['doctrine', 'doctrine:database', 'doctrine:schema']);
+
+        $this->assertStringContainsString('provided by the "DoctrineFixturesBundle"', $result);
     }
 
     private function createEventForSuggestingPackages(string $command, array $alternatives = []): string

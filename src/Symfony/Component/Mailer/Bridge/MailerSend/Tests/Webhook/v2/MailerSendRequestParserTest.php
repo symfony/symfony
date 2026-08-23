@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Mailer\Bridge\MailerSend\Tests\Webhook;
+namespace Symfony\Component\Mailer\Bridge\MailerSend\Tests\Webhook\v2;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;

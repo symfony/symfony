@@ -57,47 +57,44 @@ final class MailerSendPayloadConverter implements PayloadConverterInterface
 
     private function getMessageId(array $payload): string
     {
-        return $payload['data']['email']['message']['id'];
+        return $payload['data']['message_id'] ?? $payload['data']['email']['message']['id'];
     }
 
     private function getRecipientEmail(array $payload): string
     {
-        return $payload['data']['email']['recipient']['email'];
+        return $payload['data']['email']['recipient']['email'] ?? $payload['data']['recipient'] ?? $payload['data']['email'];
     }
 
     private function getReason(array $payload): string
     {
-        if (isset($payload['data']['morph']['readable_reason'])) {
-            return $payload['data']['morph']['readable_reason'];
-        }
-
-        if (isset($payload['data']['morph']['reason'])) {
-            return $payload['data']['morph']['reason'];
-        }
-
-        return '';
+        return $payload['data']['morph']['readable_reason']
+            ?? $payload['data']['morph']['reason']
+            ?? $payload['data']['meta']['bounce_reason']
+            ?? '';
     }
 
     private function getTags(array $payload): array
     {
-        return $payload['data']['email']['tags'] ?? [];
+        return $payload['data']['email']['tags'] ?? $payload['data']['tags'] ?? [];
     }
 
     private function getMetadata(array $payload): array
     {
-        $morphObject = $payload['data']['morph']['object'] ?? null;
+        if (!$meta = $payload['data']['morph'] ?? $payload['data']['meta'] ?? []) {
+            return [];
+        }
 
-        return match ($morphObject) {
-            'open' => [
-                'ip' => $payload['data']['morph']['ip'] ?? null,
+        return match ($payload['type']) {
+            'activity.opened', 'activity.opened_unique' => [
+                'ip' => $meta['ip'] ?? null,
             ],
-            'click' => [
-                'ip' => $payload['data']['morph']['ip'] ?? null,
-                'url' => $payload['data']['morph']['url'] ?? null,
+            'activity.clicked', 'activity.clicked_unique' => [
+                'ip' => $meta['ip'] ?? null,
+                'url' => $meta['url'] ?? null,
             ],
-            'recipient_unsubscribe' => [
-                'reason' => $payload['data']['morph']['reason'] ?? null,
-                'readable_reason' => $payload['data']['morph']['readable_reason'] ?? null,
+            'activity.unsubscribed' => [
+                'reason' => $meta['reason'] ?? $meta['unsubscribe_reason'] ?? null,
+                'readable_reason' => $meta['readable_reason'] ?? null,
             ],
             default => [],
         };

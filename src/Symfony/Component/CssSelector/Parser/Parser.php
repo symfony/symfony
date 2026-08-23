@@ -29,9 +29,11 @@ use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
 class Parser implements ParserInterface
 {
     private const HAS_NESTING_LIMIT = 16;
+    private const NESTING_LIMIT = 16;
 
     private Tokenizer $tokenizer;
     private int $hasNestingDepth = 0;
+    private int $nestingDepth = 0;
 
     public function __construct(?Tokenizer $tokenizer = null)
     {
@@ -304,7 +306,7 @@ class Parser implements ParserInterface
 
                     $result = new Node\NegationNode($result, $argument);
                 } elseif ('is' === strtolower($identifier)) {
-                    $selectors = $this->parseSelectorList($stream, true);
+                    $selectors = $this->parseNestedSelectorList($stream, 'is');
 
                     $next = $stream->getNext();
                     if (!$next->isDelimiter([')'])) {
@@ -313,7 +315,7 @@ class Parser implements ParserInterface
 
                     $result = new Node\MatchingNode($result, $selectors);
                 } elseif ('where' === strtolower($identifier)) {
-                    $selectors = $this->parseSelectorList($stream, true);
+                    $selectors = $this->parseNestedSelectorList($stream, 'where');
 
                     $next = $stream->getNext();
                     if (!$next->isDelimiter([')'])) {
@@ -360,6 +362,26 @@ class Parser implements ParserInterface
         }
 
         return [$result, $pseudoElement];
+    }
+
+    /**
+     * @return Node\SelectorNode[]
+     *
+     * @throws SyntaxErrorException
+     */
+    private function parseNestedSelectorList(TokenStream $stream, string $identifier): array
+    {
+        if ($this->nestingDepth >= self::NESTING_LIMIT) {
+            throw new SyntaxErrorException(\sprintf('Got too deeply nested :%s().', $identifier));
+        }
+
+        ++$this->nestingDepth;
+
+        try {
+            return $this->parseSelectorList($stream, true);
+        } finally {
+            --$this->nestingDepth;
+        }
     }
 
     private function parseElementNode(TokenStream $stream): Node\ElementNode

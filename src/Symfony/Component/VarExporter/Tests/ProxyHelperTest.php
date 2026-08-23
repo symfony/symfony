@@ -33,7 +33,11 @@ class ProxyHelperTest extends TestCase
 
         foreach ($methods as $method) {
             $expected = substr($source[$method->getStartLine() - 1], $method->isAbstract() ? 13 : 4, -(1 + $method->isAbstract()));
-            $expected = str_replace(['.', ' .  .  . ', '\'$a\', \'$a\n\', "\$a\n"'], [' . ', '...', '\'$a\', "\$a\\\n", "\$a\n"'], $expected);
+            $expected = str_replace(
+                ['.', ' .  .  . ', '$b = [\'$a\', \'$a\n\', "\$a\n"]', '\'$a\', \'$a\n\', "\$a\n"'],
+                [' . ', '...', '$b = [\'$a\', \'$a\\\\n\', \'$a\'."\n"]', '\'$a\', "\$a\\\n", "\$a\n"'],
+                $expected
+            );
             $expected = str_replace('Bar', '\\'.Bar::class, $expected);
             $expected = str_replace('self', '\\'.TestForProxyHelper::class, $expected);
             $expected = str_replace('= [namespace\M_PI, new M_PI()]', '= [\M_PI, new \Symfony\Component\VarExporter\Tests\M_PI()]', $expected);
@@ -129,7 +133,7 @@ class ProxyHelperTest extends TestCase
                     };
                 }
 
-                public function foo9($a = \Symfony\Component\VarExporter\Tests\TestForProxyHelper::BOB, $b = ['$a', "\$a\\n", "\$a\n"], $c = ['$a', "\$a\\n", "\$a\n", new \stdClass()])
+                public function foo9($a = \Symfony\Component\VarExporter\Tests\TestForProxyHelper::BOB, $b = ['$a', '$a\\n', '$a'."\n"], $c = ['$a', "\$a\\n", "\$a\n", new \stdClass()])
                 {
                     ${0} = $this->lazyObjectState->realInstance;
                     ${1} = ${0}->foo9(...\func_get_args());
@@ -209,6 +213,69 @@ class ProxyHelperTest extends TestCase
             EOPHP;
 
         $this->assertSame($expected, ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperInterface1::class), new \ReflectionClass(TestForProxyHelperInterface2::class)]));
+    }
+
+    public function testGenerateLazyProxyWithStringParameterDefaults()
+    {
+        $code = ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperStringDefaults::class)]);
+
+        $this->assertStringContainsString('public function singleQuote($a = \'it\\\'s a "quote" \\\\ back\')', $code);
+        $this->assertStringContainsString('public function doubleQuote($a = \'a"b\\\\c\')', $code);
+        $this->assertStringContainsString('public function concat($a = \'pre-\' . \\'.TestForProxyHelperStringDefaults::class.'::SUFFIX . \'-post\')', $code);
+
+        eval('class TestForProxyHelperStringDefaultsImpl'.$code);
+
+        foreach ((new \ReflectionClass(TestForProxyHelperStringDefaults::class))->getMethods() as $method) {
+            $expected = $method->getParameters()[0]->getDefaultValue();
+            $actual = (new \ReflectionParameter([\TestForProxyHelperStringDefaultsImpl::class, $method->name], 'a'))->getDefaultValue();
+
+            $this->assertSame($expected, $actual, $method->name);
+        }
+    }
+
+    public function testGenerateLazyProxyWithArrayParameterDefaults()
+    {
+        $code = ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperArrayDefaults::class)]);
+
+        $this->assertStringContainsString('public function quotes($a = [\'it\\\'s\', \'a "quote"\', \'a \\\\ back\'])', $code);
+        $this->assertStringContainsString('public function keys($a = [\'q\\\'\' => \'v\', \'d"\' => \'w\'])', $code);
+        $this->assertStringContainsString('public function constants($a = [\\'.TestForProxyHelperArrayDefaults::class.'::SUFFIX, \\DIRECTORY_SEPARATOR])', $code);
+        $this->assertStringContainsString('public function quotesAndConstants($a = ["it\'s a \\"quote\\" \\\\ back", \\'.TestForProxyHelperArrayDefaults::class.'::SUFFIX])', $code);
+
+        eval('class TestForProxyHelperArrayDefaultsImpl'.$code);
+
+        foreach ((new \ReflectionClass(TestForProxyHelperArrayDefaults::class))->getMethods() as $method) {
+            $expected = $method->getParameters()[0]->getDefaultValue();
+            $actual = (new \ReflectionParameter([\TestForProxyHelperArrayDefaultsImpl::class, $method->name], 'a'))->getDefaultValue();
+
+            $this->assertSame($expected, $actual, $method->name);
+        }
+    }
+
+    public function testGenerateLazyProxyWithNewInParameterDefaults()
+    {
+        $code = ProxyHelper::generateLazyProxy(null, [new \ReflectionClass(TestForProxyHelperNewDefaults::class)]);
+        $new = 'new \\'.TestForProxyHelperNewInitializer::class;
+
+        $this->assertStringContainsString('public function quote($a = '.$new.'("it\'s"))', $code);
+        $this->assertStringContainsString('public function bothQuotes($a = '.$new.'("quote\\" and \'single\'"))', $code);
+        $this->assertStringContainsString('public function backslashQuote($a = '.$new.'("\\\\\'"))', $code);
+        $this->assertStringContainsString('public function nested($a = '.$new.'('.$new.'("it\'s")))', $code);
+        $this->assertStringContainsString('public function arrayArgument($a = '.$new.'([\'k\' => "it\'s"]))', $code);
+        $this->assertStringContainsString('public function namedArgument($a = '.$new.'(v: "it\'s"))', $code);
+        $this->assertStringContainsString('public function inArray($a = ['.$new.'("it\'s")])', $code);
+        $this->assertStringContainsString('public function classConstant($a = '.$new.'("a\'b", \\'.TestForProxyHelperNewDefaults::class.'::SUFFIX))', $code);
+        $this->assertStringContainsString('public function globalConstant($a = '.$new.'("a\'b", \\DIRECTORY_SEPARATOR))', $code);
+
+        // this also checks that the generated code parses
+        eval('class TestForProxyHelperNewDefaultsImpl'.$code);
+
+        foreach ((new \ReflectionClass(TestForProxyHelperNewDefaults::class))->getMethods() as $method) {
+            $expected = $method->getParameters()[0]->getDefaultValue();
+            $actual = (new \ReflectionParameter([\TestForProxyHelperNewDefaultsImpl::class, $method->name], 'a'))->getDefaultValue();
+
+            $this->assertEquals($expected, $actual, $method->name);
+        }
     }
 
     #[DataProvider('classWithUnserializeMagicMethodProvider')]
@@ -354,6 +421,74 @@ interface TestForProxyHelperInterface2
     public function foo2(?Bar $b, ...$d): self;
 
     public static function foo3(): string;
+}
+
+interface TestForProxyHelperStringDefaults
+{
+    public const SUFFIX = 'suffix';
+
+    public function singleQuote($a = 'it\'s a "quote" \ back');
+
+    public function doubleQuote($a = 'a"b\\c');
+
+    public function newLine($a = "line1\nline2");
+
+    public function nullByte($a = "nul\0byte");
+
+    public function emoji($a = "emoji \u{1F600} end");
+
+    public function concat($a = 'pre-'.self::SUFFIX.'-post');
+}
+
+interface TestForProxyHelperArrayDefaults
+{
+    public const SUFFIX = 'suffix';
+
+    public function quotes($a = ['it\'s', 'a "quote"', 'a \\ back']);
+
+    public function keys($a = ['q\'' => 'v', 'd"' => 'w']);
+
+    public function nested($a = [['it\'s'], ['x' => ['a "quote"']]]);
+
+    public function control($a = ["nul\0byte", "line1\nline2", "emoji \u{1F600} end"]);
+
+    public function mixed($a = [5 => 'a', 'k' => 'b', 'c', true, null, 1.5, -0.0]);
+
+    public function emptyArray($a = []);
+
+    public function constants($a = [self::SUFFIX, \DIRECTORY_SEPARATOR]);
+
+    public function quotesAndConstants($a = ['it\'s a "quote" \\ back', self::SUFFIX]);
+}
+
+class TestForProxyHelperNewInitializer
+{
+    public function __construct(public mixed $v = null, public mixed $w = null)
+    {
+    }
+}
+
+interface TestForProxyHelperNewDefaults
+{
+    public const SUFFIX = 'suffix';
+
+    public function quote($a = new TestForProxyHelperNewInitializer('it\'s'));
+
+    public function bothQuotes($a = new TestForProxyHelperNewInitializer('quote" and \'single\''));
+
+    public function backslashQuote($a = new TestForProxyHelperNewInitializer('\\\''));
+
+    public function nested($a = new TestForProxyHelperNewInitializer(new TestForProxyHelperNewInitializer('it\'s')));
+
+    public function arrayArgument($a = new TestForProxyHelperNewInitializer(['k' => 'it\'s']));
+
+    public function namedArgument($a = new TestForProxyHelperNewInitializer(v: 'it\'s'));
+
+    public function inArray($a = [new TestForProxyHelperNewInitializer('it\'s')]);
+
+    public function classConstant($a = new TestForProxyHelperNewInitializer('a\'b', self::SUFFIX));
+
+    public function globalConstant($a = new TestForProxyHelperNewInitializer('a\'b', \DIRECTORY_SEPARATOR));
 }
 
 class TestSignatureFQ extends \stdClass

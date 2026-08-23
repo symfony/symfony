@@ -236,7 +236,7 @@
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Овa вредност није ни валидан ISBN-10 ни валидан ISBN-13.</target>
+                <target>Ова вредност није ни валидан ISBN-10 ни валидан ISBN-13.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
@@ -412,7 +412,7 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target>Ова вредност садржи карактере који нису дозвољени од стране важећег нивоа рестрикције.</target>
+                <target>Ова вредност садржи карактере који нису дозвољени од стране тренутног нивоа рестрикције.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
@@ -556,7 +556,7 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target>Ова вредност није важећи XML.</target>
+                <target>Ова вредност није исправан XML.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
@@ -568,15 +568,15 @@
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target>Ова вредност није важећи cron израз.</target>
+                <target>Ова вредност није исправан cron израз.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">Референцирани ентитет не постоји.</target>
+                <target>Референцирани ентитет не постоји.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Ова вредност није валидан ULID.</target>
+                <target>Ова вредност није исправан ULID.</target>
             </trans-unit>
         </body>
     </file>

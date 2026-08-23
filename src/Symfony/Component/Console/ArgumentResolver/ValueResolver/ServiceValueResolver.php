@@ -32,7 +32,9 @@ final class ServiceValueResolver implements ValueResolverInterface
 
     public function resolve(string $argumentName, InputInterface $input, ReflectionMember $member): iterable
     {
-        $command = $input->getFirstArgument();
+        // the "command" argument is normalized to the resolved command name by Command::run(),
+        // while getFirstArgument() may return an abbreviation or an alias of it
+        $command = ($input->hasArgument('command') ? $input->getArgument('command') : null) ?? $input->getFirstArgument();
 
         if ($command && $this->container->has($command)) {
             $locator = $this->container->get($command);

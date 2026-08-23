@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpProcess;
 use Symfony\Component\Mime\Crypto\PgpSigner;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\RuntimeException;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\Multipart\PgpEncryptedPart;
 use Symfony\Component\Mime\Part\PgpEncryptedInitializationPart;
@@ -46,6 +47,18 @@ class PgpEncrypterTest extends TestCase
 
         $decrypted = $tester->decrypt($output, __DIR__.'/../Fixtures/pgp_test_secret_key.asc', self::KEY_PASSWORD);
         $this->assertSame('Hello there!', $decrypted);
+    }
+
+    public function testKeyPathIsNeverParsedAsAGpgOption()
+    {
+        $process = new PgpProcess();
+
+        try {
+            $process->encrypt('Hello there!', [self::KEY_EMAIL_ADDRESS => '--version']);
+            $this->fail('Importing the key should have failed.');
+        } catch (RuntimeException $e) {
+            $this->assertStringContainsString('--import', $e->getMessage());
+        }
     }
 
     public function testEncrypting()

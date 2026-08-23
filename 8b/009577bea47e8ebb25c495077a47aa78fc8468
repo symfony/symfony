@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:39:46Z
+
+Thanks for the patch @iliaal. Two things changed while preparing it for merge.
+
+I retargeted the PR to 6.4. `exportDefault()` is byte-identical on 6.4, 7.4, 8.1 and 8.2, and the same defaults produce a parse error on all four, so 6.4 is the oldest affected maintained branch.
+
+I also reworked the guard. `str_starts_with($default, "'") && str_ends_with($default, "'")` matches constant concatenations too, and folded them into literals: `'a' . \DIRECTORY_SEPARATOR . 'b'` came out as `'a/b'`. Proxies are dumped to the cache, so that would bake an env-dependent constant in at build time. The value path now applies only when the value renders back to exactly the string reflection produced, which separates a literal from a concatenation, and anything else falls back to the existing behaviour.
+
+Note that array defaults containing quotes or backslashes are still broken. Same root cause, pre-existing, out of scope here.

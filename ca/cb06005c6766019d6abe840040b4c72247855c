@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:38:52Z
+
+Thanks for the patch. Two things changed during review, both worth a look.
+
+The reproduction in the original description does not reproduce. `Path::makeRelative('/.htaccess', '/')` returns `'.htaccess'` on every state, including 6.4 as it is today: `/.htaccess` is absolute, so `$root` is `/` and the guard on the buggy branch is `'' === $root`, which is false. Two of the three data rows you added therefore also passed before the fix. The real trigger needs a relative first argument, so I switched the description and the commit message to `makeRelative('.env', '/')`, which does return `'env'` today.
+
+The `while` loop as submitted only matched `./` and `../` with a trailing slash, so a canonical path that is exactly `..` survived it: `makeRelative('..', '/')` returned `''` before and `'..'` after, which contradicts the root collapse the existing `['../style.css', '/', 'style.css']` row asserts. 10 rows of a generated grid regressed that way. I added a collapse of a leftover bare `..` to `''` after the loop, plus data rows for `..`, `../..` and the `phar:///` and `C:\` forms.
+
+The Windows rows could not be executed here, so CI is what confirms them.

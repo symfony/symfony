@@ -73,6 +73,30 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertSame('streamed content', $client->getInternalResponse()->getContent());
     }
 
+    public function testStreamedResponseThatFlushesIsCaptured()
+    {
+        $kernel = new class implements HttpKernelInterface {
+            public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
+            {
+                return new StreamedResponse(static function () {
+                    foreach (['strea', 'med ', 'content'] as $chunk) {
+                        echo $chunk;
+                        @ob_flush();
+                        flush();
+                    }
+                });
+            }
+        };
+
+        $client = new HttpKernelBrowser($kernel);
+
+        $this->expectOutputString('');
+
+        $client->request('GET', '/');
+
+        $this->assertSame('streamed content', $client->getInternalResponse()->getContent());
+    }
+
     public function testGetScript()
     {
         $client = new TestClient(new TestHttpKernel());

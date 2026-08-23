@@ -619,6 +619,19 @@ class PathTest extends TestCase
         // second argument shorter than first
         yield ['/webmozart/symfony', '/css', '../webmozart/symfony'];
 
+        // base path is the root: leading dots of dotfile names must survive
+        yield ['/.htaccess', '/', '.htaccess'];
+        yield ['/./.htaccess', '/', '.htaccess'];
+        yield ['./.env', '/', '.env'];
+        yield ['.env', '/', '.env'];
+        yield ['../.hidden/.file', '/', '.hidden/.file'];
+        yield ['...', '/', '...'];
+        yield ['..foo', '/', '..foo'];
+        yield ['.env', 'phar:///', '.env'];
+        yield ['..', '/', ''];
+        yield ['../..', '/', ''];
+        yield ['..', 'phar:///', ''];
+
         yield ['phar:///webmozart/symfony/css/style.css', 'phar:///webmozart/symfony', 'css/style.css'];
         yield ['phar:///webmozart/css/style.css', 'phar:///webmozart/symfony', '../css/style.css'];
         yield ['phar:///css/style.css', 'phar:///webmozart/symfony', '../../css/style.css'];
@@ -674,6 +687,11 @@ class PathTest extends TestCase
             yield ['..\\style.css', 'phar://C:\\', 'style.css'];
             yield ['.\\style.css', 'phar://C:\\', 'style.css'];
             yield ['..\\..\\style.css', 'phar://C:\\', 'style.css'];
+
+            yield ['.env', 'C:\\', '.env'];
+            yield ['.\\.env', 'C:\\', '.env'];
+            yield ['..\\.env', 'C:/', '.env'];
+            yield ['..', 'C:\\', ''];
 
             yield ['css\\..\\style.css', 'C:\\', 'style.css'];
             yield ['css\\.\\style.css', 'C:\\', 'css/style.css'];

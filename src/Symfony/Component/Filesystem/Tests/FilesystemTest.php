@@ -1493,6 +1493,24 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertFileExists($filename);
     }
 
+    public function testTempnamWithSuffixIsPrivate()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot run on Windows.');
+        }
+
+        $oldUmask = umask(0o022);
+        try {
+            $filename = $this->filesystem->tempnam($this->workspace, 'foo', '.txt');
+
+            $this->assertFileExists($filename);
+            $this->assertSame(0o600, fileperms($filename) & 0o777);
+            $this->assertSame(0o022, umask());
+        } finally {
+            umask($oldUmask);
+        }
+    }
+
     public function testTempnamTrimsTrailingWhitespaceFromTruncatedPrefix()
     {
         // PHP's tempnam() truncates the prefix to 63 characters; if that leaves a

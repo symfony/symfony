@@ -64,12 +64,19 @@ class HttpKernelBrowser extends AbstractBrowser
         $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
 
         // the content must be sent before the kernel is terminated, as when serving a real request
-        ob_start();
+        $content = '';
+        ob_start(static function ($chunk) use (&$content) {
+            $content .= $chunk;
+
+            return '';
+        });
+
         try {
             $response->sendContent();
         } finally {
+            ob_end_clean();
             $this->sentResponse = $response;
-            $this->sentContent = ob_get_clean();
+            $this->sentContent = $content;
         }
 
         if ($this->kernel instanceof TerminableInterface) {

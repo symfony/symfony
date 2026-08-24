@@ -73,6 +73,34 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/login');
     }
 
+    /**
+     * @dataProvider provideClearOnChangeConfigs
+     */
+    public function testUserChangeInvalidatesRememberMeCookie(string $rootConfig)
+    {
+        $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => $rootConfig]);
+
+        $client->request('POST', '/login', [
+            '_username' => 'johannes',
+            '_password' => 'test',
+        ]);
+
+        $this->assertSame(302, $client->getResponse()->getStatusCode());
+        $cookieJar = $client->getCookieJar();
+        $this->assertNotNull($cookieJar->get('REMEMBERME'));
+
+        // clear the session, only the remember-me cookie is left to authenticate
+        $cookieJar->expire('MOCKSESSID');
+
+        UserChangingUserProvider::$changePassword = true;
+
+        $client->request('GET', '/profile');
+        $this->assertRedirect($client->getResponse(), '/login');
+
+        // the failed login clears the cookie, which is what deletes the token
+        $this->assertNull($cookieJar->get('REMEMBERME'));
+    }
+
     public function testSessionLessRememberMeLogout()
     {
         $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'stateless_config.yml']);
@@ -97,5 +125,12 @@ class RememberMeTest extends AbstractWebTestCase
     {
         yield [['root_config' => 'config_session.yml']];
         yield [['root_config' => 'config_persistent.yml']];
+    }
+
+    public static function provideClearOnChangeConfigs(): iterable
+    {
+        yield ['clear_on_change_config.yml'];
+        yield ['clear_on_change_persistent_config.yml'];
+        yield ['clear_on_change_explicit_persistent_config.yml'];
     }
 }

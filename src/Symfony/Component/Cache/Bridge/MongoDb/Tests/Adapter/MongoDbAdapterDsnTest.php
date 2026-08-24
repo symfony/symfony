@@ -105,6 +105,8 @@ class MongoDbAdapterDsnTest extends TestCase
         $this->assertInstanceOf(Collection::class, $collection);
         $this->assertSame('mydb', $collection->getDatabaseName());
         $this->assertSame('cache', $collection->getCollectionName());
+        $this->assertSame(['root' => 'bson'], $collection->__debugInfo()['typeMap']);
+        $this->assertNull($collection->__debugInfo()['codec']);
     }
 
     public function testInvalidScheme()

@@ -32,7 +32,7 @@
 
     <extensions>
         <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
-            <parameter name="clock-mock-namespaces" value="Symfony\Component\Cache\Test" />
+            <parameter name="clock-mock-namespaces" value="Cache\IntegrationTests,Symfony\Component\Cache,Symfony\Component\Cache\Test,Symfony\Component\Cache\Traits" />
         </bootstrap>
     </extensions>
 </phpunit>

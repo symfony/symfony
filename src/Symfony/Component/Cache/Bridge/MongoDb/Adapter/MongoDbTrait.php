@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Bridge\MongoDb\Internal;
+namespace Symfony\Component\Cache\Bridge\MongoDb\Adapter;
 
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Regex;
@@ -56,6 +56,9 @@ trait MongoDbTrait
 
         $options += self::DSN_OPTIONS + ['driverOptions' => []];
 
+        // Set before the parent constructor so that it can check the namespace length.
+        $this->maxIdLength = 1024;
+
         // The positional namespace wins; fall back to the DSN "namespace" query parameter.
         parent::__construct($namespace ?: $options['namespace'], $defaultLifetime);
 
@@ -88,7 +91,6 @@ trait MongoDbTrait
 
         $this->marshaller = $marshaller;
         $this->clock = $clock;
-        $this->maxIdLength = 1024;
     }
 
     /**
@@ -110,11 +112,10 @@ trait MongoDbTrait
         // raw BSON type map is forced, since the adapter reads and writes plain
         // documents itself.
         $uriOptions = array_diff_key($options, self::DSN_OPTIONS + ['driverOptions' => null, 'lazy' => null]);
-        $uriOptions['typeMap'] = ['root' => 'bson'];
 
         $client = new Client($uri, $uriOptions, $driverOptions);
 
-        return $client->getCollection($options['database_name'], $options['collection_name']);
+        return $client->getCollection($options['database_name'], $options['collection_name'], ['typeMap' => ['root' => 'bson'], 'codec' => null]);
     }
 
     /**

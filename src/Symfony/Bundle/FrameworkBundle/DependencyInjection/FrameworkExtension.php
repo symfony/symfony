@@ -2817,6 +2817,9 @@ class FrameworkExtension extends Extension
                 if (!isset($pool['provider']) && !\is_int($provider)) {
                     $pool['provider'] = $provider;
                 }
+                if (!isset($pool['provider']) && \in_array($adapter, ['cache.adapter.mongodb', 'cache.adapter.mongodb_tag_aware'], true) && !$container->hasAlias('cache.default_mongodb_provider')) {
+                    throw new InvalidArgumentException(\sprintf('The "%s" cache pool uses the "%s" adapter, which requires a "provider" DSN, or a "framework.cache.default_mongodb_provider" one, for example "mongodb://localhost:27017/db_name?collection_name=cache".', $name, $adapter));
+                }
                 $definition = new ChildDefinition($adapter);
             } else {
                 $definition = new Definition(ChainAdapter::class, [$pool['adapters'], 0]);

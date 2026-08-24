@@ -16,7 +16,6 @@ use MongoDB\Collection;
 use MongoDB\Database;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
-use Symfony\Component\Cache\Bridge\MongoDb\Internal\MongoDbTrait;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
 use Symfony\Component\Cache\PruneableInterface;

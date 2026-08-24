@@ -12,16 +12,19 @@
 namespace Symfony\Component\Cache\Bridge\MongoDb\Tests\Adapter;
 
 use MongoDB\BSON\Regex;
+use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Database;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Clock\ClockInterface;
 use Symfony\Bridge\PhpUnit\Attribute\TimeSensitive;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Bridge\MongoDb\Adapter\MongoDbAdapter;
 use Symfony\Component\Cache\Bridge\MongoDb\Adapter\MongoDbTagAwareAdapter;
-use Symfony\Component\Cache\Bridge\MongoDb\Internal\MongoDbTrait;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Test\AdapterTestCase;
 use Symfony\Component\Clock\MockClock;
@@ -30,12 +33,14 @@ require_once __DIR__.'/../Stubs/mongodb.php';
 
 #[RequiresPhpExtension('mongodb')]
 #[Group('integration')]
-#[TimeSensitive(MongoDbTrait::class)]
+#[TimeSensitive]
 #[TimeSensitive(AbstractAdapter::class)]
 class MongoDbAdapterTest extends AdapterTestCase
 {
     protected const DATABASE = 'symfony_cache_test';
     protected const COLLECTION = 'cache';
+
+    protected const OPTIONS = ['database_name' => self::DATABASE, 'collection_name' => self::COLLECTION];
 
     protected static Client $client;
 
@@ -65,16 +70,13 @@ class MongoDbAdapterTest extends AdapterTestCase
     public static function tearDownAfterClass(): void
     {
         if (isset(self::$client)) {
-            self::$client->getDatabase(self::DATABASE)->drop();
+            self::$client->getCollection(self::DATABASE, self::COLLECTION)->drop();
         }
     }
 
     public function createCachePool(int $defaultLifetime = 0, ?string $testMethod = null): CacheItemPoolInterface
     {
-        return new MongoDbAdapter(self::$client, str_replace('\\', '.', static::class), $defaultLifetime, [
-            'database_name' => self::DATABASE,
-            'collection_name' => self::COLLECTION,
-        ]);
+        return $this->createAdapter(self::$client, str_replace('\\', '.', static::class), $defaultLifetime, self::OPTIONS);
     }
 
     protected function isPruned(MongoDbAdapter|MongoDbTagAwareAdapter $cache, string $name): bool
@@ -85,9 +87,29 @@ class MongoDbAdapterTest extends AdapterTestCase
         return 0 === $collection->countDocuments(['_id' => new Regex(':'.preg_quote($name, '').'$')]);
     }
 
+    /**
+     * Overridden by the tag aware test case so that the inherited tests build the right adapter.
+     */
+    protected function createAdapter(Collection|Client|Database|string $mongo, string $namespace = '', int $defaultLifetime = 0, array $options = [], ?ClockInterface $clock = null): MongoDbAdapter|MongoDbTagAwareAdapter
+    {
+        return new MongoDbAdapter($mongo, $namespace, $defaultLifetime, $options, null, $clock);
+    }
+
+    /**
+     * Adds the database and the collection to the server URI, which may already
+     * carry a path and query parameters such as "replicaSet".
+     */
+    protected static function dsn(): string
+    {
+        $uri = getenv('MONGODB_URI') ?: 'mongodb://localhost:27017';
+        [$hosts, $query] = explode('?', $uri, 2) + [1 => ''];
+
+        return rtrim($hosts, '/').'/'.self::DATABASE.'?'.($query ? $query.'&' : '').'collection_name='.self::COLLECTION;
+    }
+
     public function testCreateConnectionFromDsnAcceptsDatabaseAndCollection()
     {
-        $adapter = new MongoDbAdapter(\sprintf('%s/%s?collection_name=%s', getenv('MONGODB_URI') ?: 'mongodb://localhost:27017', self::DATABASE, self::COLLECTION));
+        $adapter = $this->createAdapter(self::dsn());
 
         $item = $adapter->getItem('foo');
         $item->set('bar');
@@ -98,10 +120,7 @@ class MongoDbAdapterTest extends AdapterTestCase
     public function testExpiryUsesInjectedClock()
     {
         $clock = new MockClock();
-        $adapter = new MongoDbAdapter(self::$client, str_replace('\\', '.', static::class), 0, [
-            'database_name' => self::DATABASE,
-            'collection_name' => self::COLLECTION,
-        ], null, $clock);
+        $adapter = $this->createAdapter(self::$client, str_replace('\\', '.', static::class), 0, self::OPTIONS, $clock);
 
         $item = $adapter->getItem('foo');
         $item->set('bar')->expiresAfter(10);
@@ -115,18 +134,98 @@ class MongoDbAdapterTest extends AdapterTestCase
         $this->assertFalse($adapter->getItem('foo')->isHit());
     }
 
+    public function testClearOnlyRemovesTheNamespacePrefix()
+    {
+        $cache = $this->createCachePool();
+        $namespace = str_replace('\\', '.', static::class);
+
+        $item = $cache->getItem('foo');
+        $cache->save($item->set('bar'));
+
+        // an id holding the namespace anywhere but at the start, as another pool would write
+        $collection = self::$client->getCollection(self::DATABASE, self::COLLECTION);
+        $collection->insertOne(['_id' => 'other.'.$namespace.':foo', 'data' => 'kept']);
+
+        $this->assertTrue($cache->clear());
+        $this->assertFalse($cache->getItem('foo')->isHit());
+        $this->assertSame(1, $collection->countDocuments(['_id' => 'other.'.$namespace.':foo']));
+    }
+
+    public function testExpirationIsStoredAsADate()
+    {
+        $cache = $this->createCachePool();
+
+        $item = $cache->getItem('foo');
+        $cache->save($item->set('bar')->expiresAfter(300));
+
+        $document = self::findOne();
+
+        $this->assertInstanceOf(UTCDateTime::class, $document['expires_at']);
+        $this->assertEqualsWithDelta(time() + 300, $document['expires_at']->toDateTime()->getTimestamp(), 5);
+    }
+
+    public function testItemWithoutLifetimeIsStoredWithoutExpiration()
+    {
+        $cache = $this->createCachePool();
+
+        $item = $cache->getItem('foo');
+        $cache->save($item->set('bar'));
+
+        // no "expires_at" at all, so the partial TTL index does not index the item
+        $this->assertArrayNotHasKey('expires_at', self::findOne());
+    }
+
+    public function testCollectionReadsRawBson()
+    {
+        $cache = $this->createCachePool();
+        $collection = (new \ReflectionProperty($cache, 'collection'))->getValue($cache);
+
+        $this->assertSame(['root' => 'bson'], $collection->__debugInfo()['typeMap']);
+        $this->assertNull($collection->__debugInfo()['codec']);
+    }
+
+    public function testNamespaceLongerThanTheMaxIdLengthIsRejected()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Namespace must be');
+
+        $this->createAdapter(self::$client, str_repeat('a', 1500), 0, self::OPTIONS);
+    }
+
     public function testSetupCreatesTtlIndex()
     {
         $adapter = $this->createCachePool();
         $this->assertInstanceOf(PruneableInterface::class, $adapter);
         $adapter->setup();
 
-        $names = [];
+        $indexes = self::listIndexes();
+
+        $this->assertArrayHasKey('expires_at_1', $indexes);
+        $this->assertSame(0, $indexes['expires_at_1']['expireAfterSeconds']);
+        $this->assertSame('{"expires_at":{"$exists":true}}', json_encode($indexes['expires_at_1']['partialFilterExpression']));
+    }
+
+    /**
+     * The single stored document, as a plain array.
+     */
+    protected static function findOne(): array
+    {
+        return self::$client->getCollection(self::DATABASE, self::COLLECTION)->findOne(
+            [],
+            ['typeMap' => ['root' => 'array', 'document' => 'array']]
+        );
+    }
+
+    /**
+     * @return array<string, \MongoDB\Model\IndexInfo>
+     */
+    protected static function listIndexes(): array
+    {
+        $indexes = [];
         foreach (self::$client->getCollection(self::DATABASE, self::COLLECTION)->listIndexes() as $index) {
-            $names[$index->getName()] = $index['expireAfterSeconds'] ?? null;
+            $indexes[$index->getName()] = $index;
         }
 
-        $this->assertArrayHasKey('expires_at_1', $names);
-        $this->assertSame(0, $names['expires_at_1']);
+        return $indexes;
     }
 }

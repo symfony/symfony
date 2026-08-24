@@ -38,6 +38,7 @@ use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Bridge\MongoDb\Adapter\MongoDbAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -51,6 +52,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgument
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -2349,6 +2351,18 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $connection = $container->getDefinition($providerId);
         $this->assertSame([AbstractAdapter::class, 'createConnection'], $connection->getFactory());
         $this->assertSame($dsn, $connection->getArgument(0));
+    }
+
+    public function testCacheMongodbWithoutProviderIsRejected()
+    {
+        if (!class_exists(MongoDbAdapter::class)) {
+            $this->markTestSkipped('The "symfony/mongodb-cache" package is required.');
+        }
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "my_mongodb_pool" cache pool uses the "cache.adapter.mongodb" adapter, which requires a "provider" DSN, or a "framework.cache.default_mongodb_provider" one, for example "mongodb://localhost:27017/db_name?collection_name=cache".');
+
+        $this->createContainerFromFile('cache_mongodb_without_provider');
     }
 
     public function testCacheMongodbPoolDeducesTheAdapterFromTheDsn()

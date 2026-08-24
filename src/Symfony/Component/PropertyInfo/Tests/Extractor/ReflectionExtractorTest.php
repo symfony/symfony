@@ -21,6 +21,8 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderParentDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderValue;
@@ -607,6 +609,41 @@ class ReflectionExtractorTest extends TestCase
 
         $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
         $this->assertSame('hasPayments', $readAccessor->getName());
+    }
+
+    public function testGetReadAccessorDoesNotPreferTheStaticNamedConstructor()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithStaticConstructorAndAccessor::class, 'zero', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('isZero', $readAccessor->getName());
+    }
+
+    public function testGetReadAccessorTriesTheStaticMethodNamedAfterThePropertyLast()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithStaticConstructorAndAccessor::class, 'one', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('one', $readAccessor->getName());
+        $this->assertTrue($readAccessor->isStatic());
+    }
+
+    public function testGetReadAccessorKeepsAConfiguredStaticAccessorWhenGetterSetterExtractionIsDisabled()
+    {
+        $extractor = new ReflectionExtractor(null, ['']);
+        $readAccessor = $extractor->getReadInfo(DummyWithNonAsciiStaticAccessor::class, 'émail');
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('émail', $readAccessor->getName());
+        $this->assertTrue($readAccessor->isStatic());
+    }
+
+    public function testGetReadAccessorPrefersThePropertyOverTheStaticMethodNamedAfterIt()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithStaticConstructorAndAccessor::class, 'positive', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readAccessor->getType());
+        $this->assertSame('positive', $readAccessor->getName());
     }
 
     /**

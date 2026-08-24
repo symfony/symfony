@@ -47,6 +47,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 {
     private const DEFAULT_KEEPALIVE_INTERVAL = 5;
 
+    private bool $shouldStop = false;
     private ?Worker $worker = null;
 
     public function __construct(
@@ -407,9 +408,16 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             return false;
         }
 
+        if ($this->shouldStop && \SIGINT === $signal) {
+            $this->logger?->info('Received signal {signal} again, forcing exit.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+            return 0 === $previousExitCode ? 128 + $signal : $previousExitCode;
+        }
+
         $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
 
         $this->worker->stop();
+        $this->shouldStop = true;
 
         return false;
     }

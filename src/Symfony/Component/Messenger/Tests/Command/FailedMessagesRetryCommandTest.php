@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -19,6 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -30,6 +33,7 @@ use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Worker;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
@@ -577,6 +581,82 @@ class FailedMessagesRetryCommandTest extends TestCase
         $tester->execute(['--failed-after' => 'not a date']);
     }
 
+    #[RequiresPhpExtension('pcntl')]
+    public function testHandleSignalWithoutRunningWorker()
+    {
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator([]),
+            $this->createStub(MessageBusInterface::class),
+            new EventDispatcher(),
+        );
+
+        $this->assertFalse($command->handleSignal(\SIGTERM));
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testFirstSignalStopsRetryingTheRemainingMessages()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (FailedMessagesRetryCommand $command) use (&$exitCodes) {
+            $exitCodes[] = $command->handleSignal(\SIGTERM);
+        });
+
+        $tester->execute(['id' => ['failed-id', 'other-id'], '--force' => true]);
+
+        $this->assertSame([false], $exitCodes);
+        $this->assertStringNotContainsString('[OK] All done!', $tester->getDisplay());
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testSecondSignalForcesTheQuit()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (FailedMessagesRetryCommand $command) use (&$exitCodes) {
+            $exitCodes[] = $command->handleSignal(\SIGTERM);
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+            $exitCodes[] = $command->handleSignal(\SIGINT, 3);
+            $exitCodes[] = $command->handleSignal(\SIGINT, false);
+        });
+
+        $tester->execute(['id' => ['failed-id'], '--force' => true]);
+
+        $this->assertSame([false, 128 + \SIGINT, 3, false], $exitCodes);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testOnlySigintReceivedWhileStoppingForcesTheQuit()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (FailedMessagesRetryCommand $command) use (&$exitCodes) {
+            $exitCodes[] = $command->handleSignal(\SIGALRM);
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+            $exitCodes[] = $command->handleSignal(\SIGTERM);
+            $exitCodes[] = $command->handleSignal(\SIGQUIT);
+            $exitCodes[] = $command->handleSignal(\SIGALRM);
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+        });
+
+        $tester->execute(['id' => ['failed-id'], '--force' => true]);
+
+        $this->assertSame([false, false, false, false, false, 128 + \SIGINT], $exitCodes);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testSignalStaysGracefulWhenTheWorkerWasStoppedWithoutASignal()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (FailedMessagesRetryCommand $command, Worker $worker) use (&$exitCodes) {
+            $worker->stop();
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+        });
+
+        $tester->execute(['id' => ['failed-id'], '--force' => true]);
+
+        $this->assertSame([false], $exitCodes);
+        $this->assertStringNotContainsString('[OK] All done!', $tester->getDisplay());
+    }
+
     private function createFailedEnvelope(int $id, string $failedAt): Envelope
     {
         return new Envelope(new \stdClass(), [
@@ -619,5 +699,42 @@ class FailedMessagesRetryCommandTest extends TestCase
         );
 
         return new CommandTester($command);
+    }
+
+    private function createSignalableCommandTester(callable $onMessage): CommandTester
+    {
+        $command = null;
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->willReturn(new Envelope(new \stdClass(), [
+            new SentToFailureTransportStamp('async'),
+            new TransportMessageIdStamp('failed-id'),
+        ]));
+
+        $worker = null;
+
+        $bus = self::createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnCallback(static function (Envelope $envelope) use (&$command, &$worker, $onMessage) {
+            $onMessage($command, $worker);
+
+            return $envelope;
+        });
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(WorkerStartedEvent::class, static function (WorkerStartedEvent $event) use (&$worker) {
+            $worker = $event->getWorker();
+        });
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            $bus,
+            $eventDispatcher,
+        );
+
+        $application = new Application();
+        $application->addCommand($command);
+
+        return new CommandTester($application->get('messenger:failed:retry'));
     }
 }

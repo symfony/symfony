@@ -201,6 +201,12 @@ class FailedMessagesRetryCommand extends AbstractFailedMessagesCommand implement
             return false;
         }
 
+        if ($this->shouldStop && \SIGINT === $signal) {
+            $this->logger?->info('Received signal {signal} again, forcing exit.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
+
+            return 0 === $previousExitCode ? 128 + $signal : $previousExitCode;
+        }
+
         $this->logger?->info('Received signal {signal}.', ['signal' => $signal, 'transport_names' => $this->worker->getMetadata()->getTransportNames()]);
 
         $this->worker->stop();

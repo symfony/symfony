@@ -47,6 +47,7 @@ trait RedisTrait
         'lazy' => null,
         'redis_cluster' => false,
         'redis_sentinel' => null,
+        'sentinel_auth' => true, // whether "auth" is also sent to the Sentinel server, not just the final Redis/Relay connection
         'dbindex' => 0,
         'failover' => 'none',
         'ssl' => null, // see https://php.net/context.ssl
@@ -241,7 +242,7 @@ trait RedisTrait
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
-                    $passAuth = null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
+                    $passAuth = null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL')) && $params['sentinel_auth'];
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {

@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-24T07:08:24Z
+
+Thank you for the quick and accurate fix, the root cause analysis was spot on.
+
+While reviewing, I found one case where skipping the static bare accessor changes behavior that predates #65501: a class exposing only a static `foo()` and no other candidate had its `foo` property read through that method since 5.1, and skipping it would turn such reads into a `NoSuchPropertyException` (or resolve to a same-named public property instead of the method). The Serializer is not exposed to that case since `ObjectNormalizer` filters static methods when extracting attributes, but direct PropertyAccess users are.
+
+I reworked the patch to demote instead of skip: a static method named after the property is now tried after all the prefixed accessors, which restores the exact pre-6.4.44 order in every case I probed, including yours. I kept your test and added one covering the last-resort resolution, updated the commit message and the description accordingly, and amended into your commit to preserve authorship.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-24T07:17:40Z
+
+One more refinement after a second look: the previous revision kept the static bare accessor at its historical position, before `__get()` and the property itself. That meant a class exposing both a public `$foo` and a static `foo()` had its property read through the static method, returning a value unrelated to the object's state. That ordering was as questionable as the bug being fixed here, so the static candidate is now tried after every instance-based one, just before giving up. A class exposing only a static `foo()` still resolves to it, so no read that used to work starts throwing.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-24T07:34:36Z
+
+A review remark made me tighten the deferral's scope: it now applies only when the candidate was added by `enable_getter_setter_extraction`, never to a method found through the configured accessor prefixes. The distinction is observable with a custom prefix list containing an empty string and a method whose name `lcfirst()` cannot change, such as a non-ASCII one: with extraction disabled, such an explicitly configured static accessor was deferred behind `__get()` and the property. A test with that shape now pins the behavior.

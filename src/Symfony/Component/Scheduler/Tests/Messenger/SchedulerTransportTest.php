@@ -64,6 +64,34 @@ class SchedulerTransportTest extends TestCase
         $this->assertSame('id', $stamp->messageContext->id);
     }
 
+    public function testMessageIsNotWrappedWhenUseMessengerRoutingIsDisabled()
+    {
+        $generator = $this->createStub(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(function (): \Generator {
+            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new \stdClass();
+        });
+        $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: false))->get());
+
+        $this->assertInstanceOf(\stdClass::class, $envelopes[0]->getMessage());
+    }
+
+    public function testMessageIsWrappedInRedispatchMessageWhenUseMessengerRoutingIsEnabled()
+    {
+        $generator = $this->createStub(MessageGeneratorInterface::class);
+        $generator->method('getMessages')->willReturnCallback(function (): \Generator {
+            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new \stdClass();
+        });
+        $envelopes = iterator_to_array((new SchedulerTransport($generator, useMessengerRouting: true))->get());
+
+        $this->assertInstanceOf(RedispatchMessage::class, $envelopes[0]->getMessage());
+        $this->assertSame([], $envelopes[0]->getMessage()->transportNames);
+        // the ScheduledStamp must live on the inner envelope so it survives the redispatch
+        $this->assertSame(
+            $envelopes[0]->getMessage()->envelope->last(ScheduledStamp::class),
+            $envelopes[0]->last(ScheduledStamp::class)
+        );
+    }
+
     public function testAckIgnored()
     {
         $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));

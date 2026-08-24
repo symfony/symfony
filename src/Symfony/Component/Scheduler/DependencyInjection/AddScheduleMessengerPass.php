@@ -36,7 +36,7 @@ class AddScheduleMessengerPass implements CompilerPassInterface
             $container->removeDefinition('scheduler.event_listener');
         }
 
-        $useMessengerRouting = $container->hasParameter('scheduler.use_messenger_routing') && $container->getParameter('scheduler.use_messenger_routing');
+        $useMessengerRouting = $container->hasParameter('.scheduler.use_messenger_routing') && $container->getParameter('.scheduler.use_messenger_routing');
 
         $receivers = [];
         foreach ($container->findTaggedServiceIds('messenger.receiver') as $serviceId => $tags) {

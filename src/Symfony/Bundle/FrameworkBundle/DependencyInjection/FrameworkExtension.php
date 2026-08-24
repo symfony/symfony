@@ -2447,7 +2447,20 @@ class FrameworkExtension extends Extension
             trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
         }
 
-        $container->setParameter('scheduler.use_messenger_routing', $config['use_messenger_routing'] ?? false);
+        $useMessengerRouting = $config['use_messenger_routing'] ?? false;
+
+        if (\is_string($useMessengerRouting)) {
+            $usedEnvs = [];
+            $container->resolveEnvPlaceholders($useMessengerRouting, null, $usedEnvs);
+
+            if ($usedEnvs) {
+                throw new InvalidArgumentException(\sprintf('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%%env(%s)%%"). Set a static boolean instead.', implode('", "', array_keys($usedEnvs))));
+            }
+        }
+
+        // the leading dot marks it as internal: it is consumed at build time only
+        // and dropped from the compiled container by RemoveBuildParametersPass
+        $container->setParameter('.scheduler.use_messenger_routing', $useMessengerRouting);
     }
 
     private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $validationEnabled, bool $lockEnabled): void

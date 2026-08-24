@@ -57,7 +57,7 @@ class AddScheduleMessengerPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         if (null !== $useMessengerRouting) {
-            $container->setParameter('scheduler.use_messenger_routing', $useMessengerRouting);
+            $container->setParameter('.scheduler.use_messenger_routing', $useMessengerRouting);
         }
 
         $definition = new Definition(\stdClass::class);

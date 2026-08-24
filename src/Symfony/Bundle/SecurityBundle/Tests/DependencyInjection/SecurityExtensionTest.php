@@ -692,6 +692,126 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('very', $handler->getArgument(2));
     }
 
+    public function testRememberMeSignaturePropertiesDefaultToPassword()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['secret' => 'very'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $hasher = $container->getDefinition('security.authenticator.remember_me_signature_hasher.default');
+        $this->assertSame(['password'], $hasher->getArgument(1));
+    }
+
+    public function testRememberMeSignaturePropertiesAreImplicitByDefaultWithATokenProvider()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_token_provider', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['token_provider' => 'custom_token_provider'],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
+        $this->assertNull($handler->getArgument(6));
+    }
+
+    public function testRememberMeSignaturePropertiesAreBoundToTokensWhenConfigured()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_token_provider', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => [
+                        'token_provider' => 'custom_token_provider',
+                        'signature_properties' => ['email', 'password'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $handler = $container->getDefinition('security.authenticator.remember_me_handler.default');
+        $this->assertSame(['email', 'password'], $handler->getArgument(6));
+    }
+
+    public function testRememberMeSignaturePropertiesCannotBeUsedWithACustomHandler()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => [
+                        'service' => 'custom_remember_me',
+                        'signature_properties' => ['password'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You cannot use both "service" and "signature_properties" in "security.firewalls.default.remember_me" because the custom handler signs the cookies itself and the option would have no effect.');
+        $container->compile();
+    }
+
+    public function testCustomRememberMeHandlerWithATokenProviderReportsTheTokenProviderConflict()
+    {
+        $container = $this->getRawContainer();
+
+        $container->register('custom_remember_me', \stdClass::class);
+        $container->register('custom_token_provider', \stdClass::class);
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => [
+                        'service' => 'custom_remember_me',
+                        'token_provider' => 'custom_token_provider',
+                        'signature_properties' => ['password'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('You cannot use both "service" and "token_provider" in "security.firewalls.default.remember_me".');
+        $container->compile();
+    }
+
+    public function testRememberMeSignaturePropertiesCannotBeEmpty()
+    {
+        $container = $this->getRawContainer();
+
+        $container->loadFromExtension('security', [
+            'firewalls' => [
+                'default' => [
+                    'remember_me' => ['signature_properties' => []],
+                ],
+            ],
+        ]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The path "security.firewalls.default.remember_me.signature_properties" should have at least 1 element(s) defined.');
+        $container->compile();
+    }
+
     public static function sessionConfigurationProvider(): array
     {
         return [

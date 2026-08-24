@@ -71,6 +71,11 @@ final class GuzzleHttpHandler
 
     private readonly bool $autoUpgradeHttpVersion;
 
+    /**
+     * Whether a stream() iterator is currently being consumed.
+     */
+    private bool $streaming = false;
+
     public function __construct(?HttpClientInterface $client = null, bool $autoUpgradeHttpVersion = true)
     {
         $this->client = $client ?? HttpClient::create();
@@ -100,7 +105,11 @@ final class GuzzleHttpHandler
         }
 
         $promise = new Promise(
-            function () use ($symfonyResponse): void {
+            function () use ($request, $symfonyResponse): void {
+                if ($this->streaming) {
+                    throw new RequestException('Cannot wait for a response from inside a callback of the same handler; the callback must return before the transfer can progress.', $request);
+                }
+
                 $this->streamPending(null, $symfonyResponse);
             },
             function () use ($symfonyResponse): void {
@@ -144,6 +153,10 @@ final class GuzzleHttpHandler
      */
     public function execute(): void
     {
+        if ($this->streaming) {
+            throw new \LogicException('Cannot run the event loop from inside a callback of the same handler; the callback must return before transfers can progress.');
+        }
+
         while ($this->pending->count()) {
             $this->streamPending(null, false);
         }
@@ -160,13 +173,35 @@ final class GuzzleHttpHandler
             return;
         }
 
-        $queue = PromiseUtils::queue();
+        if ($this->streaming) {
+            // A callback is asking for more I/O while a stream() iterator is suspended. Starting a
+            // second one over the same responses would consume them out of band, behind the back of
+            // the suspended one. The loop that is already running drives them to completion anyway.
+            return;
+        }
 
         $responses = [];
         foreach ($this->pending as $r) {
             $responses[] = $r;
         }
 
+        $this->streaming = true;
+
+        try {
+            $this->streamResponses($responses, $timeout, $breakAfter);
+        } finally {
+            $this->streaming = false;
+
+            // Run .then() callbacks now that no iterator is alive; they may add entries to $this->pending
+            PromiseUtils::queue()->run();
+        }
+    }
+
+    /**
+     * @param SymfonyResponseInterface[] $responses
+     */
+    private function streamResponses(array $responses, ?float $timeout, bool|SymfonyResponseInterface $breakAfter): void
+    {
         foreach ($this->client->stream($responses, $timeout) as $response => $chunk) {
             try {
                 if ($chunk->isTimeout()) {
@@ -232,9 +267,6 @@ final class GuzzleHttpHandler
                 if (\in_array($breakAfter, [true, $response], true)) {
                     break;
                 }
-            } finally {
-                // Run .then() callbacks; they may add new entries to $this->pending.
-                $queue->run();
             }
         }
     }
@@ -255,7 +287,7 @@ final class GuzzleHttpHandler
         }
 
         $this->fireOnStats($options, $guzzleRequest, $psrResponse, null, $response);
-        $promise->resolve($psrResponse);
+        $this->settle($promise, $psrResponse);
     }
 
     private function rejectResponse(SymfonyResponseInterface $response, TransportExceptionInterface $e): void
@@ -276,11 +308,30 @@ final class GuzzleHttpHandler
             }
 
             $this->fireOnStats($options, $guzzleRequest, $psrResponse, $e, $response);
-            $promise->reject($this->createRequestException($e->getMessage(), $guzzleRequest, $psrResponse, $e));
+            $reason = $this->createRequestException($e->getMessage(), $guzzleRequest, $psrResponse, $e);
         } else {
             // No headers received: connection-level failure.
             $this->fireOnStats($options, $guzzleRequest, null, $e, $response);
-            $promise->reject(new ConnectException($e->getMessage(), $guzzleRequest, $e));
+            $reason = new ConnectException($e->getMessage(), $guzzleRequest, $e);
+        }
+
+        $this->settle($promise, $reason);
+    }
+
+    /**
+     * Guzzle settles the promise itself when a wait callback cannot run, and an on_stats callback
+     * can do so while the transfer is still tracked here. Settling it again would throw.
+     */
+    private function settle(Promise $promise, ResponseInterface|\Throwable $outcome): void
+    {
+        if (PromiseInterface::PENDING !== $promise->getState()) {
+            return;
+        }
+
+        if ($outcome instanceof \Throwable) {
+            $promise->reject($outcome);
+        } else {
+            $promise->resolve($outcome);
         }
     }
 

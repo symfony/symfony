@@ -207,6 +207,7 @@ trait RedisTrait
             $params['lazy'] = filter_var($params['lazy'], \FILTER_VALIDATE_BOOLEAN);
         }
         $params['redis_cluster'] = filter_var($params['redis_cluster'], \FILTER_VALIDATE_BOOLEAN);
+        $params['sentinel_auth'] = filter_var($params['sentinel_auth'], \FILTER_VALIDATE_BOOLEAN);
 
         if ($params['redis_cluster'] && isset($params['redis_sentinel'])) {
             throw new InvalidArgumentException('Cannot use both "redis_cluster" and "redis_sentinel" at the same time.');
@@ -242,7 +243,11 @@ trait RedisTrait
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
-                    $passAuth = null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL')) && $params['sentinel_auth'];
+                    // Only pass auth to the Sentinel connection when the caller opted in via
+                    // "sentinel_auth", there is actually a password configured, and the
+                    // installed phpredis version supports passing it this way.
+                    $phpredisSupportsAuthOption = !$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL');
+                    $passAuth = $params['sentinel_auth'] && null !== $params['auth'] && $phpredisSupportsAuthOption;
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {

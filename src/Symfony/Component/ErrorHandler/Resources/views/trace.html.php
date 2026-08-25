@@ -16,10 +16,10 @@
                 <?= implode(\DIRECTORY_SEPARATOR, array_slice($filePathParts, 0, -1)).\DIRECTORY_SEPARATOR; ?><strong><?= end($filePathParts); ?></strong>
             </a>
             (line <?= $lineNumber; ?>)
-            <span class="icon icon-copy hidden" data-clipboard-text="<?php echo implode(\DIRECTORY_SEPARATOR, $filePathParts).':'.$lineNumber; ?>">
+            <button type="button" class="icon icon-copy hidden" aria-label="Copy file path" data-clipboard-text="<?php echo implode(\DIRECTORY_SEPARATOR, $filePathParts).':'.$lineNumber; ?>">
                 <span class="icon-copy-default"><?php echo $this->include('assets/images/icon-copy.svg'); ?></span>
                 <span class="icon-copy-success"><?php echo $this->include('assets/images/icon-copy-check.svg'); ?></span>
-            </span>
+            </button>
         </span>
     <?php } ?>
 </div>

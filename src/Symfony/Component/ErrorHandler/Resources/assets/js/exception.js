@@ -29,11 +29,31 @@
         };
     }
 
+    var announcer = document.querySelector('[data-announcer]');
+
+    function announce(message) {
+        if (!announcer) {
+            return;
+        }
+        /* clearing first, then filling in a moment later, makes screen readers announce repeated copies */
+        announcer.textContent = '';
+        clearTimeout(announcer.sfAnnounceTimer);
+        announcer.sfAnnounceTimer = setTimeout(function() {
+            announcer.textContent = message;
+            announcer.sfAnnounceTimer = setTimeout(function() { announcer.textContent = ''; }, 5000);
+        }, 50);
+    }
+
     if (navigator.clipboard) {
         document.querySelectorAll('[data-clipboard-text]:not([data-processed=true])').forEach(function(element) {
             removeClass(element, 'hidden');
-            element.addEventListener('click', function() {
-                navigator.clipboard.writeText(element.getAttribute('data-clipboard-text'));
+            element.addEventListener('click', function(e) {
+                /* Prevents from disallowing clicks on "copy to clipboard" elements inside toggles */
+                e.stopPropagation();
+
+                navigator.clipboard.writeText(element.getAttribute('data-clipboard-text')).then(function() {
+                    announce('File path copied to clipboard');
+                });
                 /* briefly swap the copy glyph for a checkmark as feedback */
                 addClass(element, 'is-copied');
                 clearTimeout(element.sfCopiedTimer);
@@ -170,6 +190,7 @@
             btn.removeAttribute('hidden');
             btn.addEventListener('click', function() {
                 navigator.clipboard.writeText(buildTextContent(btn)).then(function() {
+                    announce('Copied to clipboard');
                     var label = btn.querySelector('.copy-label');
                     if (!label) { return; }
                     var previous = label.textContent;
@@ -200,7 +221,7 @@
             addEventListener(toggles[i], 'click', function(e) {
                 var toggle = e.currentTarget;
 
-                if (e.target.closest('a, span[data-clipboard-text], .sf-toggle') !== toggle) {
+                if (e.target.closest('a, .sf-toggle') !== toggle) {
                     return;
                 }
 
@@ -257,7 +278,9 @@
             var card = btn.closest('.trace-raw-card');
             var pre = card ? card.querySelector('pre') : null;
             addEventListener(btn, 'click', function() {
-                navigator.clipboard.writeText(pre ? pre.textContent.replace(/[ \t]+\n/g, '\n').trim() : '');
+                navigator.clipboard.writeText(pre ? pre.textContent.replace(/[ \t]+\n/g, '\n').trim() : '').then(function() {
+                    announce('Stack trace copied to clipboard');
+                });
                 addClass(btn, 'is-copied');
                 clearTimeout(btn.sfCopiedTimer);
                 btn.sfCopiedTimer = setTimeout(function() { removeClass(btn, 'is-copied'); }, 1500);
@@ -387,7 +410,16 @@
         });
 
         addEventListener(document, 'click', closeFilter);
-        addEventListener(document, 'keydown', function(e) { if ('Escape' === e.key) { closeFilter(); } });
+        addEventListener(document, 'keydown', function(e) {
+            if ('Escape' !== e.key || !openFilter) {
+                return;
+            }
+            /* hiding the menu drops the focus it holds, so hand it back to the trigger */
+            var trigger = openFilter.trigger;
+            var restoreFocus = openFilter.menu.contains(document.activeElement);
+            closeFilter();
+            if (restoreFocus) { trigger.focus(); }
+        });
     })();
 })();
 /*]]>*/

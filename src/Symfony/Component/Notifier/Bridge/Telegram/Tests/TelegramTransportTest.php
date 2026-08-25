@@ -252,7 +252,7 @@ final class TelegramTransportTest extends TransportTestCase
 
         $expectedBody = [
             'chat_id' => 'testChannel',
-            'text' => 'I contain special characters _ * [ ] ( ) \~ ` \> \# \+ \- \= \| \{ \} \. \! \ to send\.',
+            'text' => 'I contain special characters _ * [ ] ( ) ~ ` \> \# \+ \- \= \| \{ \} \. \! \ to send\.',
             'parse_mode' => 'MarkdownV2',
         ];
 
@@ -265,6 +265,32 @@ final class TelegramTransportTest extends TransportTestCase
         $transport = self::createTransport($client, 'testChannel');
 
         $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! \\ to send.'));
+    }
+
+    public function testSendWithMarkdownEscapesReservedCharactersButNotMarkup()
+    {
+        $cases = [
+            'plain text' => ['Hello world. Cost: 10 EUR!', 'Hello world\. Cost: 10 EUR\!'],
+            'digits and unreserved punctuation' => ['v1.2.3 at 10:30, a/b; x<y', 'v1\.2\.3 at 10:30, a/b; x<y'],
+            'already escaped' => ['Version 1\.2 and \\\\.', 'Version 1\.2 and \\\\\.'],
+            'paired markup' => ['*bold* _italic_ __underline__ `code` ~strike~ ||spoiler|| [link](https://symfony.com/)', '*bold* _italic_ __underline__ `code` ~strike~ ||spoiler|| [link](https://symfony\.com/)'],
+            'block quotation' => [">Quote\n>More\n**>Expandable\n>Last line||", ">Quote\n>More\n**>Expandable\n>Last line||"],
+            'reserved characters outside markup' => ['a > b, a | b, a ! b, **> c', 'a \> b, a \| b, a \! b, **\> c'],
+            'custom emoji' => ['![👍](tg://emoji?id=5368324170671202286)', '![👍](tg://emoji?id\=5368324170671202286)'],
+        ];
+
+        foreach ($cases as $case => [$subject, $expectedText]) {
+            $sentText = null;
+            $client = new MockHttpClient(static function (string $method, string $url, array $options = []) use (&$sentText): ResponseInterface {
+                $sentText = json_decode($options['body'], true)['text'];
+
+                return new JsonMockResponse(['ok' => true, 'result' => ['message_id' => 1]]);
+            });
+
+            self::createTransport($client, 'testChannel')->send(new ChatMessage($subject));
+
+            $this->assertSame($expectedText, $sentText, $case);
+        }
     }
 
     /**

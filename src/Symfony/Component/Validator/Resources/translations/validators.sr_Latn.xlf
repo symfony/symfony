@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>Jedna ili više vrednosti je nevalidna.</target>
+                <target>Jedna ili više vrednosti je neispravna.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
@@ -44,15 +44,15 @@
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>Vrednost nije validan datum.</target>
+                <target>Vrednost nije ispravan datum.</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>Vrednost nije validan datum-vreme.</target>
+                <target>Vrednost nije ispravan datum-vreme.</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Vrednost nije validna adresa elektronske pošte.</target>
+                <target>Vrednost nije ispravna adresa elektronske pošte.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -68,7 +68,7 @@
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>MIME tip datoteke nije validan ({{ type }}). Dozvoljeni MIME tipovi su {{ types }}.</target>
+                <target>MIME tip datoteke nije ispravan ({{ type }}). Dozvoljeni MIME tipovi su {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -100,15 +100,15 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Vrednost nije validna.</target>
+                <target>Vrednost nije ispravna.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>Vrednost nije validno vreme.</target>
+                <target>Vrednost nije ispravno vreme.</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>Vrednost nije validan URL.</target>
+                <target>Vrednost nije ispravan URL.</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
@@ -128,27 +128,27 @@
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>Vrednost treba da bude validan broj.</target>
+                <target>Vrednost treba da bude ispravan broj.</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Ova datoteka nije validna slika.</target>
+                <target>Ova datoteka nije ispravna slika.</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target>Ova vrednost nije validna IP adresa.</target>
+                <target>Ova vrednost nije ispravna IP adresa.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Vrednost nije validan jezik.</target>
+                <target>Vrednost nije ispravan jezik.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
-                <target>Vrednost nije validna međunarodna oznaka jezika.</target>
+                <target>Vrednost nije ispravna međunarodna oznaka jezika.</target>
             </trans-unit>
             <trans-unit id="40">
                 <source>This value is not a valid country.</source>
-                <target>Vrednost nije validna država.</target>
+                <target>Vrednost nije ispravna država.</target>
             </trans-unit>
             <trans-unit id="41">
                 <source>This value is already used.</source>
@@ -172,7 +172,7 @@
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Visina slike je preniska ({{ height }} piksela). Najmanja dozvoljena visina je {{ min_height }} piksela.</target>
+                <target>Visina slike je premala ({{ height }} piksela). Najmanja dozvoljena visina je {{ min_height }} piksela.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -216,35 +216,35 @@
             </trans-unit>
             <trans-unit id="57">
                 <source>Invalid card number.</source>
-                <target>Nevalidan broj kartice.</target>
+                <target>Neispravan broj kartice.</target>
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Nevalidan broj kartice ili tip kartice nije podržan.</target>
+                <target>Neispravan broj kartice ili tip kartice nije podržan.</target>
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target>Ova vrednost nije validan Međunarodni broj bankovnog računa (IBAN).</target>
+                <target>Ova vrednost nije ispravan međunarodni broj bankovnog računa (IBAN).</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
-                <target>Ova vrednost nije validan ISBN-10.</target>
+                <target>Ova vrednost nije ispravan ISBN-10.</target>
             </trans-unit>
             <trans-unit id="61">
                 <source>This value is not a valid ISBN-13.</source>
-                <target>Ova vrednost nije validan ISBN-13.</target>
+                <target>Ova vrednost nije ispravan ISBN-13.</target>
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Ova vrednost nije ni validan ISBN-10 ni validan ISBN-13.</target>
+                <target>Ova vrednost nije ni ispravan ISBN-10 ni ispravan ISBN-13.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
-                <target>Ova vrednost nije validan ISSN.</target>
+                <target>Ova vrednost nije ispravan ISSN.</target>
             </trans-unit>
             <trans-unit id="64">
                 <source>This value is not a valid currency.</source>
-                <target>Ova vrednost nije validna valuta.</target>
+                <target>Ova vrednost nije ispravna valuta.</target>
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target>Ova vrednost nije validan Kod za identifikaciju biznisa (BIC).</target>
+                <target>Ova vrednost nije ispravan Kod za identifikaciju biznisa (BIC).</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target>Ova vrednost nije validan UUID.</target>
+                <target>Ova vrednost nije ispravan UUID.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -332,7 +332,7 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>Ova vrednost treba da bude validan JSON.</target>
+                <target>Ova vrednost treba da bude ispravan JSON.</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
@@ -356,7 +356,7 @@
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
-                <target>Ova vrednost nije validna vremenska zona.</target>
+                <target>Ova vrednost nije ispravna vremenska zona.</target>
             </trans-unit>
             <trans-unit id="93">
                 <source>This password has been leaked in a data breach, it must not be used. Please use another password.</source>
@@ -384,19 +384,19 @@
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
-                <target>Ova vrednost nije validna međunarodna identifikaciona oznaka hartija od vrednosti (ISIN).</target>
+                <target>Ova vrednost nije ispravna međunarodna identifikaciona oznaka hartija od vrednosti (ISIN).</target>
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>Ova vrednost treba da bude validan izraz.</target>
+                <target>Ova vrednost treba da bude ispravan izraz.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
-                <target>Ova vrednost nije validna CSS boja.</target>
+                <target>Ova vrednost nije ispravna CSS boja.</target>
             </trans-unit>
             <trans-unit id="102">
                 <source>This value is not a valid CIDR notation.</source>
-                <target>Ova vrednost nije validna CIDR notacija.</target>
+                <target>Ova vrednost nije ispravna CIDR notacija.</target>
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
@@ -412,7 +412,7 @@
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target>Ova vrednost sadrži karaktere koji nisu dozvoljeni od strane važećeg nivoa restrikcije.</target>
+                <target>Ova vrednost sadrži karaktere koji nisu dozvoljeni od strane trenutnog nivoa restrikcije.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
@@ -428,19 +428,19 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>Ekstenzija fajla nije validna ({{ extension }}). Dozvoljene ekstenzije su {{ extensions }}.</target>
+                <target>Ekstenzija fajla nije ispravna ({{ extension }}). Dozvoljene ekstenzije su {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>Detektovano kodiranje znakova nije validno ({{ detected }}). Dozvoljena kodiranja su {{ encodings }}.</target>
+                <target>Detektovano kodiranje znakova nije ispravno ({{ detected }}). Dozvoljena kodiranja su {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target>Ova vrednost nije validna MAC adresa.</target>
+                <target>Ova vrednost nije ispravna MAC adresa.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target>Ovom URL nedostaje domen najvišeg nivoa.</target>
+                <target>Ovom URL-u nedostaje domen najvišeg nivoa.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
@@ -452,11 +452,11 @@
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target>Ova vrednost ne predstavlja validnu nedelju u ISO 8601 formatu.</target>
+                <target>Ova vrednost ne predstavlja ispravnu nedelju u ISO 8601 formatu.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target>Ova vrednost nije validna nedelja</target>
+                <target>Ova vrednost nije ispravna nedelja.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
@@ -472,7 +472,7 @@
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target>Fajl nije u ispravnom video formatu.</target>
+                <target>Ova datoteka nije u ispravnom video formatu.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
@@ -484,7 +484,7 @@
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>Širina videa je previše mala ({{ width }}px). Očekivana minimalna širina je {{ min_width }}px.</target>
+                <target>Širina videa je premala ({{ width }}px). Očekivana minimalna širina je {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
@@ -496,11 +496,11 @@
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>Video ima premalo piksela ({{ pixels }}). Očekivana minimalna količina je {{ min_pixels }}.</target>
+                <target>Video ima premalo piksela ({{ pixels }}). Očekivani minimum je {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>Video ima previše piksela ({{ pixels }}). Očekivana maksimalna količina je {{ max_pixels }}.</target>
+                <target>Video ima previše piksela ({{ pixels }}). Očekivani maksimum je {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
@@ -508,19 +508,19 @@
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>Odnos širine i visine videa je previše mali ({{ ratio }}). Očekivani minimalni odnos je {{ min_ratio }}.</target>
+                <target>Odnos širine i visine videa je premali ({{ ratio }}). Očekivani minimalni odnos je {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target>Video je kvadratnog oblika ({{ width }}x{{ height }}px). Video zapisi kvadratnog oblika nisu dozvoljeni.</target>
+                <target>Video je kvadratnog oblika ({{ width }}x{{ height }}px). Kvadratni video zapisi nisu dozvoljeni.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target>Video je u vodoravnoj orijentaciji ({{ width }}x{{ height }} px). Video zapisi u vodoravnoj orijentaciji nisu dozvoljeni.</target>
+                <target>Video je u vodoravnoj orijentaciji ({{ width }}x{{ height }}px). Vodoravno orijentisani video zapisi nisu dozvoljeni.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target>Video je u vertikalnoj orijentaciji ({{ width }}x{{ height }}px). Video zapisi u vertikalnoj orijentaciji nisu dozvoljeni.</target>
+                <target>Video je u portret orijentaciji ({{ width }}x{{ height }}px). Portretno orijentisani video zapisi nisu dozvoljeni.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
@@ -540,15 +540,15 @@
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target>Slika je oštećena.</target>
+                <target>Datoteka slike je oštećena.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target>Slika ima premalo piksela ({{ pixels }}). Očekivani minimalni broj je {{ min_pixels }}.</target>
+                <target>Slika ima premalo piksela ({{ pixels }}). Očekivani minimum je {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target>Slika ima previše piksela ({{ pixels }}). Očekivani maksimalni broj je {{ max_pixels }}.</target>
+                <target>Slika ima previše piksela ({{ pixels }}). Očekivani maksimum je {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
@@ -556,7 +556,7 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target>Ova vrednost nije važeći XML.</target>
+                <target>Ova vrednost nije ispravan XML.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
@@ -568,15 +568,15 @@
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target>Ova vrednost nije važeći cron izraz.</target>
+                <target>Ova vrednost nije ispravan cron izraz.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">Referencirani entitet ne postoji.</target>
+                <target>Referencirani entitet ne postoji.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Ova vrednost nije validan ULID.</target>
+                <target>Ova vrednost nije ispravan ULID.</target>
             </trans-unit>
         </body>
     </file>

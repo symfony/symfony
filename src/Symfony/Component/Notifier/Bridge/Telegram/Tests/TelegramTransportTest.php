@@ -487,6 +487,53 @@ final class TelegramTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('I contain special characters _ * [ ] ( ) ~ ` > # + - = | { } . ! \\ to send.'));
     }
 
+    public function testSendWithMarkdownV2EscapingDisabledSendsTextAsIs()
+    {
+        $text = "*Bold*\n>Quote\n||Spoiler||\n~Strike~\nVersion 1\\.2\\.3\\!";
+        $expectedBody = [
+            'chat_id' => 'testChannel',
+            'text' => $text,
+            'parse_mode' => 'MarkdownV2',
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
+            $this->assertEqualsCanonicalizing($expectedBody, json_decode($options['body'], true));
+
+            return new JsonMockResponse(['ok' => true, 'result' => ['message_id' => 1]]);
+        });
+
+        $transport = self::createTransport($client, 'testChannel');
+        $options = (new TelegramOptions())
+            ->parseMode(TelegramOptions::PARSE_MODE_MARKDOWN_V2)
+            ->disableMarkdownV2Escaping();
+
+        $sentMessage = $transport->send(new ChatMessage($text, $options));
+
+        $this->assertSame('1', $sentMessage->getMessageId());
+    }
+
+    public function testSendWithMarkdownV2EscapingExplicitlyEnabledEscapesText()
+    {
+        $expectedBody = [
+            'chat_id' => 'testChannel',
+            'text' => '\>Quote \|\|Spoiler\|\| \~Strike\~',
+            'parse_mode' => 'MarkdownV2',
+        ];
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($expectedBody): ResponseInterface {
+            $this->assertEqualsCanonicalizing($expectedBody, json_decode($options['body'], true));
+
+            return new JsonMockResponse(['ok' => true, 'result' => ['message_id' => 1]]);
+        });
+
+        $transport = self::createTransport($client, 'testChannel');
+        $options = (new TelegramOptions())->disableMarkdownV2Escaping(false);
+
+        $sentMessage = $transport->send(new ChatMessage('>Quote ||Spoiler|| ~Strike~', $options));
+
+        $this->assertSame('1', $sentMessage->getMessageId());
+    }
+
     /**
      * @return array<array<string, array{messageOptions: TelegramOptions, endpoint: string, expectedBody: array<mixed>, responseContent: array<mixed>}>>
      */

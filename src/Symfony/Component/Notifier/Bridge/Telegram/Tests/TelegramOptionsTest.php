@@ -124,6 +124,18 @@ final class TelegramOptionsTest extends TestCase
         $this->assertSame('123456', $options->getRecipientId());
     }
 
+    public function testDisableMarkdownV2Escaping()
+    {
+        $options = new TelegramOptions();
+
+        $this->assertSame($options, $options->disableMarkdownV2Escaping());
+        $this->assertSame(['disable_markdown_v2_escaping' => true], $options->toArray());
+
+        $options->disableMarkdownV2Escaping(false);
+
+        $this->assertSame(['disable_markdown_v2_escaping' => false], $options->toArray());
+    }
+
     public function testParseModeConstants()
     {
         $this->assertSame('HTML', TelegramOptions::PARSE_MODE_HTML);

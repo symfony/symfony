@@ -91,6 +91,38 @@ $telegramOptions = (new TelegramOptions())
 The keyboard above shows "Yes" and "No" side by side on the first row, and the
 link alone on the second one.
 
+Escaping MarkdownV2 Text
+------------------------
+
+The `TelegramOptions::disableMarkdownV2Escaping()` method was introduced in Symfony 8.2.
+
+When the parse mode is not set or is `MarkdownV2`, the transport escapes the
+special characters that do not come in pairs, such as `.`, `!` and `-`, before
+sending the message. This lets plain text through, while paired markup such as
+`*bold*`, `_italic_` and `` `code` `` is kept as written. The escaped characters
+include `>`, `|` and `~`, which prevents using block quotations, spoilers and
+strikethrough.
+
+Call `disableMarkdownV2Escaping()` to send the message text exactly as written.
+The text must then be valid MarkdownV2, so any special character that is not
+part of the markup must be escaped by hand.
+
+```php
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
+use Symfony\Component\Notifier\Message\ChatMessage;
+
+$chatMessage = new ChatMessage(">Quoted text\n||Spoiler||\n~Strikethrough~\nVersion 1\\.2");
+
+$telegramOptions = (new TelegramOptions())
+    ->chatId('@symfonynotifierdev')
+    ->parseMode(TelegramOptions::PARSE_MODE_MARKDOWN_V2)
+    ->disableMarkdownV2Escaping();
+
+$chatMessage->options($telegramOptions);
+
+$chatter->send($chatMessage);
+```
+
 Adding files to a Message
 -------------------------
 

@@ -96,8 +96,9 @@ final class TelegramTransport extends AbstractTransport
         $options['chat_id'] ??= $message->getRecipientId() ?: $this->chatChannel;
         $text = $message->getSubject();
 
-        if (!isset($options['parse_mode']) || TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode']) {
-            $options['parse_mode'] = TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+        $options['parse_mode'] ??= TelegramOptions::PARSE_MODE_MARKDOWN_V2;
+
+        if (TelegramOptions::PARSE_MODE_MARKDOWN_V2 === $options['parse_mode'] && empty($options['disable_markdown_v2_escaping'])) {
             /*
              * Just replace the obvious chars according to Telegram documentation.
              * Do not try to find pairs or replace chars, that occur in pairs like
@@ -113,6 +114,7 @@ final class TelegramTransport extends AbstractTransport
              */
             $text = preg_replace('/([.!#>+-=|{}~])/', '\\\\$1', $text);
         }
+        unset($options['disable_markdown_v2_escaping']);
 
         if (isset($options['upload'])) {
             foreach ($options['upload'] as $option => $path) {

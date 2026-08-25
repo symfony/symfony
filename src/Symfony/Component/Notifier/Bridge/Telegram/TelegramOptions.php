@@ -68,6 +68,13 @@ final class TelegramOptions implements MessageOptionsInterface
         return $this;
     }
 
+    public function disableMarkdownV2Escaping(bool $bool = true): static
+    {
+        $this->options['disable_markdown_v2_escaping'] = $bool;
+
+        return $this;
+    }
+
     /**
      * @return $this
      */

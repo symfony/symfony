@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add `TelegramOptions::disableMarkdownV2Escaping()` to send MarkdownV2 text as is
  * Add support for editing media messages via the `editMessageMedia` and `editMessageCaption` API methods
 
 8.1

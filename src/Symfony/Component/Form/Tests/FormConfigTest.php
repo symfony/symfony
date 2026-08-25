@@ -22,7 +22,7 @@ use Symfony\Component\Form\NativeRequestHandler;
  */
 class FormConfigTest extends TestCase
 {
-    public static function getHtml4Ids()
+    public static function getNames()
     {
         return [
             ['z0'],
@@ -37,7 +37,9 @@ class FormConfigTest extends TestCase
             ["a\t", 'Symfony\Component\Form\Exception\InvalidArgumentException'],
             ["a\n", 'Symfony\Component\Form\Exception\InvalidArgumentException'],
             ['a-'],
+            ['-a'],
             ['a_'],
+            [':a'],
             ['a:'],
             // Periods are allowed by the HTML4 spec, but disallowed by us
             // because they break the generated property paths
@@ -63,8 +65,8 @@ class FormConfigTest extends TestCase
         ];
     }
 
-    #[DataProvider('getHtml4Ids')]
-    public function testNameAcceptsOnlyNamesValidAsIdsInHtml4($name, $expectedException = null)
+    #[DataProvider('getNames')]
+    public function testNameValidation($name, $expectedException = null)
     {
         if (null !== $expectedException) {
             $this->expectException($expectedException);

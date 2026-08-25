@@ -41,7 +41,7 @@ class ButtonBuilderTest extends TestCase
     public function testNameContainingIllegalCharacters()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The name "button[]" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").');
+        $this->expectExceptionMessage('The name "button[]" contains illegal characters. Names should only contain letters, digits, underscores ("_"), hyphens ("-") and colons (":").');
 
         $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder('button[]'));
     }

@@ -28,6 +28,7 @@ class LocaleAwareListener implements EventSubscriberInterface
     private iterable $localeAwareServices;
     private RequestStack $requestStack;
     private array $storedLocales = [];
+    private array $initializedServices = [];
 
     /**
      * @param iterable<mixed, LocaleAwareInterface> $localeAwareServices
@@ -44,7 +45,10 @@ class LocaleAwareListener implements EventSubscriberInterface
             $locales = [];
 
             foreach ($this->localeAwareServices as $key => $service) {
-                $locales[$key] = $service->getLocale();
+                // a service the listener never set can hold no locale to restore
+                if (isset($this->initializedServices[$key])) {
+                    $locales[$key] = $service->getLocale();
+                }
             }
 
             $this->storedLocales[spl_object_id($event->getRequest())] = $locales;
@@ -86,6 +90,8 @@ class LocaleAwareListener implements EventSubscriberInterface
             } catch (\InvalidArgumentException) {
                 $service->setLocale($defaultLocale);
             }
+
+            $this->initializedServices[$key] = true;
         }
     }
 }

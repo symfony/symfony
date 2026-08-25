@@ -95,7 +95,9 @@ class Argument
 
         $self->interactiveAttribute = Ask::tryFrom($member, $self->name) ?? AskChoice::tryFrom($member, $self->name);
 
-        if ($self->interactiveAttribute && $isOptional) {
+        // A variadic argument is optional at the CLI but, like an array argument, collects
+        // values until an empty answer, so it stays compatible with an interactive attribute.
+        if ($self->interactiveAttribute && $isOptional && !$reflection->isVariadic()) {
             throw new LogicException(\sprintf('The %s "$%s" argument of "%s" cannot be both interactive and optional.', $reflection->getMemberName(), $self->name, $reflection->getSourceName()));
         }
 

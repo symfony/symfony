@@ -24,6 +24,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFilesArrayTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFilesDtoTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFilesVariadicTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFileTestCommand;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -255,5 +258,109 @@ class InputFileValueResolverTest extends TestCase
         $tester->assertCommandIsSuccessful();
         $this->assertStringContainsString('Filename: InputFileValueResolverTest.php', $tester->getDisplay());
         $this->assertStringContainsString('Valid: yes', $tester->getDisplay());
+    }
+
+    public function testResolvesVariadicInputFilesFromPaths()
+    {
+        $a = $this->tempDir.'/a.txt';
+        $b = $this->tempDir.'/b.txt';
+        file_put_contents($a, 'a');
+        file_put_contents($b, 'b');
+
+        $resolver = new InputFileValueResolver();
+        $input = new ArrayInput(['files' => [$a, $b]], new InputDefinition([
+            new InputArgument('files', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(#[Argument] InputFile ...$files)
+            {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        $results = [...$resolver->resolve('files', $input, $member)];
+
+        $this->assertCount(2, $results);
+        $this->assertContainsOnlyInstancesOf(InputFile::class, $results);
+        $this->assertSame([$a, $b], [$results[0]->getPathname(), $results[1]->getPathname()]);
+    }
+
+    public function testResolvesArrayOfInputFilesNarrowedByPhpDoc()
+    {
+        $a = $this->tempDir.'/a.txt';
+        $b = $this->tempDir.'/b.txt';
+        file_put_contents($a, 'a');
+        file_put_contents($b, 'b');
+
+        $resolver = new InputFileValueResolver();
+        $input = new ArrayInput(['files' => [$a, $b]], new InputDefinition([
+            new InputArgument('files', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            /**
+             * @param InputFile[] $files
+             */
+            public function __invoke(#[Argument] array $files)
+            {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        // A non-variadic array argument receives the whole list as a single value.
+        $results = [...$resolver->resolve('files', $input, $member)];
+
+        $this->assertCount(1, $results);
+        $this->assertContainsOnlyInstancesOf(InputFile::class, $results[0]);
+        $this->assertSame([$a, $b], [$results[0][0]->getPathname(), $results[0][1]->getPathname()]);
+    }
+
+    public function testDoesNotResolveAPlainArray()
+    {
+        $resolver = new InputFileValueResolver();
+        $input = new ArrayInput(['tags' => ['a', 'b']], new InputDefinition([
+            new InputArgument('tags', InputArgument::IS_ARRAY),
+        ]));
+
+        $command = new class {
+            public function __invoke(#[Argument] array $tags)
+            {
+            }
+        };
+        $member = new ReflectionMember((new \ReflectionMethod($command, '__invoke'))->getParameters()[0]);
+
+        $this->assertSame([], [...$resolver->resolve('tags', $input, $member)]);
+    }
+
+    public function testResolvesVariadicInputFilesInNonInteractiveMode()
+    {
+        $tester = new CommandTester(new InvokableWithInputFilesVariadicTestCommand());
+        $tester->execute(['files' => [__FILE__, __DIR__.'/../../Fixtures/InvokableWithInputFilesArrayTestCommand.php']], ['interactive' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('Count: 2', $tester->getDisplay());
+        $this->assertStringContainsString('Filename: InputFileValueResolverTest.php', $tester->getDisplay());
+        $this->assertStringContainsString('Filename: InvokableWithInputFilesArrayTestCommand.php', $tester->getDisplay());
+    }
+
+    public function testResolvesArrayOfInputFilesInNonInteractiveMode()
+    {
+        $tester = new CommandTester(new InvokableWithInputFilesArrayTestCommand());
+        $tester->execute(['files' => [__FILE__, __FILE__]], ['interactive' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('Count: 2', $tester->getDisplay());
+        $this->assertStringContainsString('Filename: InputFileValueResolverTest.php', $tester->getDisplay());
+    }
+
+    public function testResolvesDtoInputFilesInNonInteractiveMode()
+    {
+        $tester = new CommandTester(new InvokableWithInputFilesDtoTestCommand());
+        $tester->execute(['files' => [__FILE__, __FILE__]], ['interactive' => false]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('Count: 2', $tester->getDisplay());
+        $this->assertStringContainsString('Filename: InputFileValueResolverTest.php', $tester->getDisplay());
     }
 }

@@ -302,6 +302,15 @@ class SymfonyStyle extends OutputStyle
     }
 
     /**
+     * @return InputFile[] The files provided by the user, e.g. by dragging and dropping several
+     *                     files at once or by pasting space-separated paths
+     */
+    public function askFiles(string $question): array
+    {
+        return $this->askQuestion(new FileQuestion($question, multiple: true));
+    }
+
+    /**
      * @param string|null $format
      */
     public function progressStart(int $max = 0 /* , ?string $format = null */): void

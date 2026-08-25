@@ -16,6 +16,7 @@ use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Exception\InputValidationFailedException;
+use Symfony\Component\Console\Input\File\InputFileType;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -32,6 +33,7 @@ final class MapInputValueResolver implements ValueResolverInterface
         private readonly ValueResolverInterface $backedEnumResolver,
         private readonly ValueResolverInterface $dateTimeResolver,
         private readonly ?ValidatorInterface $validator = null,
+        private readonly ?ValueResolverInterface $inputFileResolver = null,
     ) {
     }
 
@@ -102,6 +104,12 @@ final class MapInputValueResolver implements ValueResolverInterface
 
     private function resolveArgumentSpec(Argument $argument, \ReflectionProperty $property, InputInterface $input): mixed
     {
+        $member = new ReflectionMember($property);
+
+        if ($this->inputFileResolver && (InputFileType::isInputFile($member) || InputFileType::isInputFileCollection($member))) {
+            return iterator_to_array($this->inputFileResolver->resolve($property->name, $input, $member))[0] ?? null;
+        }
+
         if (is_subclass_of($argument->typeName, \BackedEnum::class)) {
             return iterator_to_array($this->backedEnumResolver->resolve($property->name, $input, new ReflectionMember($property)))[0] ?? null;
         }
@@ -115,6 +123,12 @@ final class MapInputValueResolver implements ValueResolverInterface
 
     private function resolveOptionSpec(Option $option, \ReflectionProperty $property, InputInterface $input): mixed
     {
+        $member = new ReflectionMember($property);
+
+        if ($this->inputFileResolver && (InputFileType::isInputFile($member) || InputFileType::isInputFileCollection($member))) {
+            return iterator_to_array($this->inputFileResolver->resolve($property->name, $input, $member))[0] ?? null;
+        }
+
         if (is_subclass_of($option->typeName, \BackedEnum::class)) {
             return iterator_to_array($this->backedEnumResolver->resolve($property->name, $input, new ReflectionMember($property)))[0] ?? null;
         }

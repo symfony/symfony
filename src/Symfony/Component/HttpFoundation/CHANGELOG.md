@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add five not-globally-reachable ranges to `IpUtils::PRIVATE_SUBNETS`: `192.0.0.0/24`, `192.88.99.0/24`, `224.0.0.0/4`, `100::/64` and `ff00::/8`
  * Add `Response::cacheControl()` to set the targeted cache directives defined by RFC 9213, e.g. `CDN-Cache-Control`
  * Deprecate not passing an expiry to `UriSigner::sign()`
  * Add the `$defaultExpiration` argument to `UriSigner::__construct()`

@@ -79,3 +79,6 @@
         </div>
     <?php } ?>
 </div>
+
+<?php // the profiler scopes this fragment's stylesheet to itself, so the live region has to sit inside the fragment ?>
+<p class="sr-only" role="status" data-announcer></p>

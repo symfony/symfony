@@ -13,7 +13,12 @@ namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class HtmlErrorRendererTest extends TestCase
 {
@@ -122,6 +127,53 @@ class HtmlErrorRendererTest extends TestCase
             $rendered,
             '->render() returns the HTML content with "binary string" replacement'
         );
+    }
+
+    public function testTheCopyStatusRegionIsPartOfTheRenderedBody()
+    {
+        // the profiler embeds this fragment and scopes the stylesheet to it, so the region
+        // cannot be appended to the document from JavaScript
+        $body = (new HtmlErrorRenderer(true))->getBody(FlattenException::createFromThrowable(new \RuntimeException('Foo')));
+
+        $this->assertStringContainsString('<p class="sr-only" role="status" data-announcer></p>', $body);
+    }
+
+    public function testExpandableLogRowsNameThemselvesFromTheirParts()
+    {
+        $rendered = (new HtmlErrorRenderer(true, null, null, null, '', $this->createDebugLogger()))->render(new \RuntimeException('Foo'))->getAsString();
+
+        $this->assertStringContainsString('aria-labelledby="log-0-time log-0-level log-0-channel log-0-message"', $rendered);
+        $this->assertStringContainsString('<span class="log-time" id="log-0-time">', $rendered);
+        $this->assertStringContainsString('<span class="log-message break-long-words" id="log-0-message">', $rendered);
+
+        // a row without context is not expandable, so it has no summary to name
+        $this->assertStringNotContainsString('id="log-1-', $rendered);
+    }
+
+    private function createDebugLogger(): LoggerInterface&DebugLoggerInterface
+    {
+        return new class extends AbstractLogger implements DebugLoggerInterface {
+            public function log($level, $message, array $context = []): void
+            {
+            }
+
+            public function getLogs(?Request $request = null): array
+            {
+                return [
+                    ['timestamp' => 0, 'timestamp_rfc3339' => '1970-01-01T00:00:00.000+00:00', 'message' => 'With context', 'priority' => 200, 'priorityName' => 'INFO', 'channel' => 'request', 'context' => ['foo' => 'bar']],
+                    ['timestamp' => 0, 'timestamp_rfc3339' => '1970-01-01T00:00:00.000+00:00', 'message' => 'Without context', 'priority' => 200, 'priorityName' => 'INFO', 'channel' => 'request', 'context' => []],
+                ];
+            }
+
+            public function countErrors(?Request $request = null): int
+            {
+                return 0;
+            }
+
+            public function clear(): void
+            {
+            }
+        };
     }
 
     private function getRuntimeException(string $unusedArgument): \RuntimeException

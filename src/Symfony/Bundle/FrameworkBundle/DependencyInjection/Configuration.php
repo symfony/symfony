@@ -1086,7 +1086,7 @@ class Configuration implements ConfigurationInterface
                             ->info('The public path where the assets will be written to (and served from when "server" is true).')
                             ->defaultValue('/assets/')
                         ->end()
-                        ->scalarNode('compile_cache_dir')
+                        ->scalarNode('metadata_dir')
                             ->info('The directory where "asset-map:compile" writes manifest.json, importmap.json and entrypoint.*.json. These files are read by PHP only, never fetched by the browser. Defaults to the public assets directory; will default to "%kernel.build_dir%/asset_mapper" in 9.0.')
                             ->defaultNull()
                         ->end()

@@ -6,7 +6,7 @@ framework:
     validation: true
     serializer: true
     asset_mapper:
-        compile_cache_dir: '%kernel.build_dir%/asset_mapper'
+        metadata_dir: '%kernel.build_dir%/asset_mapper'
 
 twig:
     strict_variables: '%kernel.debug%'

@@ -3523,7 +3523,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'asset_mapper' => [
                     'server' => $server,
                     'public_prefix' => '/assets_path/',
-                    'compile_cache_dir' => '%kernel.build_dir%/asset_mapper',
+                    'metadata_dir' => '%kernel.build_dir%/asset_mapper',
                     'paths' => ['assets/'],
                 ],
             ]);
@@ -3561,9 +3561,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('my-polyfill', $container->getDefinition('asset_mapper.importmap.renderer')->getArgument(3));
     }
 
-    public function testAssetMapperCompileCacheDirIsConfigurable()
+    public function testAssetMapperMetadataDirIsConfigurable()
     {
-        $container = $this->createContainerFromFile('asset_mapper_compile_cache_dir');
+        $container = $this->createContainerFromFile('asset_mapper_metadata_dir');
 
         $this->assertSame(
             $container->getParameter('kernel.build_dir').'/asset_mapper',
@@ -3572,11 +3572,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public function testAssetMapperCompileCacheDirFallsBackToThePublicAssetsDirectory()
+    public function testAssetMapperMetadataDirFallsBackToThePublicAssetsDirectory()
     {
-        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.asset_mapper.compile_cache_dir" configuration option is deprecated. Set it explicitly: it currently defaults to the public assets directory, and will default to "%kernel.build_dir%/asset_mapper" in 9.0.');
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.asset_mapper.metadata_dir" configuration option is deprecated. Set it explicitly: it currently defaults to the public assets directory, and will default to "%kernel.build_dir%/asset_mapper" in 9.0.');
 
-        $container = $this->createContainerFromFile('asset_mapper_default_compile_cache_dir');
+        $container = $this->createContainerFromFile('asset_mapper_default_metadata_dir');
 
         $this->assertStringEndsWith(
             '/assets',

@@ -199,6 +199,23 @@ class Configuration implements ConfigurationInterface
         $this->addRemoteEventSection($rootNode, $enableIfStandalone);
         $this->addJsonStreamerSection($rootNode, $enableIfStandalone);
 
+        $rootNode
+            ->validate()
+                ->always(static function (array $config): array {
+                    foreach ($config['messenger']['transports'] ?? [] as $name => $transport) {
+                        if (null === $pool = $transport['claim_check']['cache_pool'] ?? null) {
+                            continue;
+                        }
+                        if (isset($config['cache']['pools'][$pool]) && !isset($config['cache']['pools'][$pool]['default_lifetime'])) {
+                            throw new InvalidConfigurationException(\sprintf('The cache pool "%s" used by Messenger transport "%s" for claim checks must define a "default_lifetime".', $pool, $name));
+                        }
+                    }
+
+                    return $config;
+                })
+            ->end()
+        ;
+
         return $treeBuilder;
     }
 
@@ -1925,6 +1942,12 @@ class Configuration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('dsn')->end()
                                     ->scalarNode('serializer')->defaultNull()->info('Service id of a custom serializer to use.')->end()
+                                    ->arrayNode('claim_check')
+                                        ->children()
+                                            ->scalarNode('cache_pool')->isRequired()->cannotBeEmpty()->info('Service id of the dedicated cache pool used to store claims. Pools declared under "framework.cache.pools" must define a "default_lifetime".')->end()
+                                            ->integerNode('max_size')->isRequired()->min(1)->info('Maximum encoded message size in bytes before using a claim check.')->end()
+                                        ->end()
+                                    ->end()
                                     ->arrayNode('options', 'option')
                                         ->useAttributeAsKey('key')
                                         ->normalizeKeys(false)

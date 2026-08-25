@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `framework.webhook.no_private_network` and `framework.webhook.http_client` options
+ * Add the `claim_check` option to Messenger transports
  * Add the `framework.asset_mapper.importmap_entries` option to limit the rendered import map to the entries reachable from the rendered entrypoints
  * Add the `http_cache.cache_status` option to emit the RFC 9211 `Cache-Status` header
  * Add the `framework.mailer.tracking` option to set default open/click tracking for every outgoing message

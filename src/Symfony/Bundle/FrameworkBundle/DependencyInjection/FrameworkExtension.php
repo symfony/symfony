@@ -132,6 +132,7 @@ use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
+use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface as MessengerTransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
@@ -2608,18 +2609,32 @@ class FrameworkExtension extends Extension
         $serializerIds = [];
         foreach ($config['transports'] as $name => $transport) {
             $serializerId = $transport['serializer'] ?? 'messenger.default_serializer';
+            $transportSerializerId = $serializerId;
             $tags = [
                 'alias' => $name,
                 'is_failure_transport' => \in_array($name, $failureTransports, true),
                 'priority' => $transport['priority'],
             ];
-            $serializerReferencesByTransport[$name] = new Reference($serializerId);
+            if ($transport['claim_check'] ?? null) {
+                if (!class_exists(ClaimCheckSerializer::class)) {
+                    throw new LogicException('Claim checks require symfony/messenger 8.2 or higher.');
+                }
+
+                $container->setDefinition($transportSerializerId = '.messenger.transport.'.$name.'.claim_check_serializer', (new Definition(ClaimCheckSerializer::class))
+                    ->setArguments([
+                        new Reference($serializerId),
+                        new Reference($transport['claim_check']['cache_pool']),
+                        $transport['claim_check']['max_size'],
+                    ]));
+            }
+
+            $serializerReferencesByTransport[$name] = new Reference($transportSerializerId);
             if (str_starts_with($transport['dsn'], 'sync://')) {
                 $tags['is_consumable'] = false;
             }
             $transportDefinition = (new Definition(TransportInterface::class))
                 ->setFactory([new Reference('messenger.transport_factory'), 'createTransport'])
-                ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($serializerId)])
+                ->setArguments([$transport['dsn'], $transport['options'] + ['transport_name' => $name], new Reference($transportSerializerId)])
                 ->addTag('messenger.receiver', $tags)
             ;
             $container->setDefinition($transportId = 'messenger.transport.'.$name, $transportDefinition);

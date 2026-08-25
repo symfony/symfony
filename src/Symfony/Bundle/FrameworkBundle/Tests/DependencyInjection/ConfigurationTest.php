@@ -685,6 +685,56 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
+    public function testMessengerClaimCheckConfiguration()
+    {
+        $processor = new Processor();
+        $config = $processor->processConfiguration(new Configuration(true), [[
+            'messenger' => [
+                'transports' => [
+                    'async' => [
+                        'dsn' => 'in-memory:///',
+                        'claim_check' => [
+                            'cache_pool' => 'app.claim_check_pool',
+                            'max_size' => 200000,
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+
+        $this->assertSame([
+            'cache_pool' => 'app.claim_check_pool',
+            'max_size' => 200000,
+        ], $config['messenger']['transports']['async']['claim_check']);
+    }
+
+    public function testMessengerClaimCheckCachePoolRequiresDefaultLifetime()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The cache pool "app.claim_check_pool" used by Messenger transport "async" for claim checks must define a "default_lifetime".');
+
+        (new Processor())->processConfiguration(new Configuration(true), [[
+            'cache' => [
+                'pools' => [
+                    'app.claim_check_pool' => [
+                        'adapter' => 'cache.adapter.pdo',
+                    ],
+                ],
+            ],
+            'messenger' => [
+                'transports' => [
+                    'async' => [
+                        'dsn' => 'in-memory:///',
+                        'claim_check' => [
+                            'cache_pool' => 'app.claim_check_pool',
+                            'max_size' => 200000,
+                        ],
+                    ],
+                ],
+            ],
+        ]]);
+    }
+
     public function testBusMiddlewareDontMerge()
     {
         $processor = new Processor();

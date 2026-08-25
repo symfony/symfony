@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:38:29Z
+
+Thanks for splitting this into the two scripts and for keeping them character for character in sync. I checked: transliterating the Cyrillic targets in #65594 gives exactly the Latin targets here, so the two are the same change.
+
+Dropping "važeći" is clear to me, your explanation makes sense.
+
+One question, and it is not blocking. After the patch the catalog uses "validan" or "validna" 35 times, and "ispravan" 6 times, 3 of which this pull request adds. Unit 148 now reads "Ova vrednost nije ispravan ULID." while unit 83, the parallel UUID message, keeps "Ova vrednost nije validan UUID.". Since the issue asks to follow the existing style, is "ispravan" the better register for these messages, or should they use "validan" like their siblings? You are the native speaker here, so I will follow your answer. If "ispravan" is what you want, say so and this is ready as it is.
+
+Same question applies to #65594, no need to answer twice.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-23T07:54:26Z
+
+Feel free to update both languages in this one PR if you think my previous comment means changing some entries.
+
+---------------------------------------------------------------------------
+
+by kaznovac at 2026-08-24T19:07:49Z
+
+> One question, and it is not blocking. After the patch the catalog uses "validan" or "validna" 35 times, and "ispravan" 6 times, 3 of which this pull request adds. Unit 148 now reads "Ova vrednost nije ispravan ULID." while unit 83, the parallel UUID message, keeps "Ova vrednost nije validan UUID.". Since the issue asks to follow the existing style, is "ispravan" the better register for these messages, or should they use "validan" like their siblings? You are the native speaker here, so I will follow your answer. If "ispravan" is what you want, say so and this is ready as it is.
+
+I agree, but it has to be done...
+
+I took liberty to fix few typos and few grammar/gender errors
+Also now latin and cyrillic messages are in sync
+
+and sorry I have not intended to ask the whole the team to do a review :|
+(I had wrong rebase branch target...)

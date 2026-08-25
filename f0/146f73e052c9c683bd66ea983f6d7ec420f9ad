@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-24T13:40:36Z
+
+The Fabbot and x86 minimal-exts lowest-php failures are HTTP 504 timeouts while downloading dependencies from GitHub, not related to this change.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-25T12:45:22Z
+
+Thank you for the report and the patch @lazerg. I pushed a rework, plus a rebase.
+
+Two changes.
+
+The listener now tracks which services it has set, and reads back only those, instead of catching the error that reading an uninitialized one raises. It fixes the same case without matching on the wording of a PHP error message, and it keeps a genuine failure inside `getLocale()` visible: with a service whose `getLocale()` dereferences a null delegate, or returns `null` from a `string` return type, or throws on purpose, the try/catch version silently skipped it, while this one lets it through once the listener has set that service. It also covers a service that guards with an explicit `throw`, which the try/catch could not.
+
+I also retitled it. `LocaleAwareListener` started reading `getLocale()` in 6.4.44, so this is a regression in a patch release rather than a BC break.
+
+Ready on my side once CI is green.

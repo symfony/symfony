@@ -39,6 +39,7 @@ class ImportMapTestAppKernel extends Kernel
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['assets'],
+                    'compile_cache_dir' => '%kernel.project_dir%/public/assets',
                 ],
                 'test' => true,
             ]);

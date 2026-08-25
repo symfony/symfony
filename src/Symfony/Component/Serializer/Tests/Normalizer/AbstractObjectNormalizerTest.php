@@ -1512,6 +1512,28 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame([1, 'nope'], $dummy->ints);
     }
 
+    #[DataProvider('denormalizeBasicTypePropertiesConversionDataProvider')]
+    public function testDenormalizeKeepsUnconvertibleScalarCollectionElementsWhenTypeEnforcementIsDisabled(string $format, array $context)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize(['ints' => ['1', 'nope', '']], ScalarCollectionsDummy::class, $format, $context + [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
+
+        $this->assertSame([1, 'nope', ''], $dummy->ints);
+    }
+
+    #[DataProvider('denormalizeBasicTypePropertiesConversionDataProvider')]
+    public function testDenormalizeKeepsUnconvertibleBasicTypePropertiesWhenTypeEnforcementIsDisabled(string $format, array $context)
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $object = $normalizer->denormalize(['boolTrue1' => 'maybe', 'int1' => 'nope', 'float1' => 'nope'], ObjectWithBasicProperties::class, $format, $context + [AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true]);
+
+        $this->assertSame('maybe', $object->boolTrue1);
+        $this->assertSame('nope', $object->int1);
+        $this->assertSame('nope', $object->float1);
+    }
+
     public function testDenormalizeCollectionOfUnionTypesPropertyWithPhpDocExtractor()
     {
         $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();

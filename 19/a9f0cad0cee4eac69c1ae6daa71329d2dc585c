@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-25T13:15:13Z
+
+Thank you for the report and the fix.
+
+I moved the initialization from `FrameworkBundle`'s `Application` to `ConsoleProfilerListener::profile()`, next to the two lines that already record the exit code and the interrupting signal on the `TraceableCommand`. Where you had it, the input is not bound to the command definition yet, so `arguments` and `options` could only be set to empty arrays and the profile of a stopped command showed empty tables. The terminate event carries the bound input, so they now hold what was really passed:
+
+```
+before: arguments=[]        options=[]  application inputs=[]
+after:  arguments=["name"]  options=[]  application inputs=["command","--help",…,"--profile"]
+```
+
+Your `CliRequest` change is kept as it was. It earns its place beyond the deprecation: with `max[total]=0` in `phpunit.xml.dist`, the new test fails on the base branch on that self deprecation alone, and PHPStan reports the same `@final` override today.
+
+I added a test for the listener that throws, since that path reaches the collector through `ConsoleEvents::ERROR`, and removed the new test app's `routing.yml`, which the kernel does not need.

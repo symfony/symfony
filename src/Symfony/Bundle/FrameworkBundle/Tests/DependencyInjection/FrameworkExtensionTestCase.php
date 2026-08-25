@@ -3523,6 +3523,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'asset_mapper' => [
                     'server' => $server,
                     'public_prefix' => '/assets_path/',
+                    'compile_cache_dir' => '%kernel.build_dir%/asset_mapper',
                     'paths' => ['assets/'],
                 ],
             ]);
@@ -3558,6 +3559,29 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('reachable', $definition->getArgument(4));
         // the polyfill name is configured on the renderer only, and handed over at render time
         $this->assertSame('my-polyfill', $container->getDefinition('asset_mapper.importmap.renderer')->getArgument(3));
+    }
+
+    public function testAssetMapperCompileCacheDirIsConfigurable()
+    {
+        $container = $this->createContainerFromFile('asset_mapper_compile_cache_dir');
+
+        $this->assertSame(
+            $container->getParameter('kernel.build_dir').'/asset_mapper',
+            $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0),
+        );
+    }
+
+    #[IgnoreDeprecations]
+    public function testAssetMapperCompileCacheDirFallsBackToThePublicAssetsDirectory()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.asset_mapper.compile_cache_dir" configuration option is deprecated. Set it explicitly: it currently defaults to the public assets directory, and will default to "%kernel.build_dir%/asset_mapper" in 9.0.');
+
+        $container = $this->createContainerFromFile('asset_mapper_default_compile_cache_dir');
+
+        $this->assertStringEndsWith(
+            '/assets',
+            $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')->getArgument(0),
+        );
     }
 
     public function testDefaultLock()

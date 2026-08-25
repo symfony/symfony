@@ -62,6 +62,20 @@ FrameworkBundle
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
  * BrowserKit assertions are no longer verbose by default. Failed response assertions no longer include the response body unless `setBrowserKitAssertionsAsVerbose(true)` is called or `verbose: true` is passed to the assertion.
  * Deprecate the `framework.fragments.hinclude_default_template` config option and the `fragment.renderer.hinclude.global_template` parameter; use the `esi` or `inline` fragment renderer, or [Symfony UX Turbo](https://ux.symfony.com/turbo), instead
+ * Deprecate not setting the `framework.asset_mapper.compile_cache_dir` config option. It currently
+   defaults to the public assets directory, which publishes `manifest.json`, `importmap.json` and
+   `entrypoint.*.json` over HTTP although they are read by PHP only. It will default to
+   `%kernel.build_dir%/asset_mapper` in 9.0. Set it explicitly to silence the deprecation:
+
+   ```yaml
+   framework:
+       asset_mapper:
+           # keep the current location
+           compile_cache_dir: '%kernel.project_dir%/public/assets'
+
+           # or adopt the 9.0 default now; make sure the build directory is deployed
+           compile_cache_dir: '%kernel.build_dir%/asset_mapper'
+   ```
 
 HttpClient
 ----------

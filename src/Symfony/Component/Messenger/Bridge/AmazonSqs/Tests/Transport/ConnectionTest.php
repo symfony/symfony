@@ -20,6 +20,7 @@ use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
 use AsyncAws\Sqs\Result\QueueExistsWaiter;
 use AsyncAws\Sqs\Result\ReceiveMessageResult;
+use AsyncAws\Sqs\Result\SendMessageResult;
 use AsyncAws\Sqs\SqsClient;
 use AsyncAws\Sqs\ValueObject\Message;
 use Composer\InstalledVersions;
@@ -654,6 +655,31 @@ class ConnectionTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('can\'t be created when another account is provided');
         $connection->setup();
+    }
+
+    public function testSendOnFifoQueueUsesAUniqueDeduplicationIdByDefault()
+    {
+        $sent = [];
+        $client = $this->createMock(SqsClient::class);
+        $client->method('getQueueUrl')->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue.fifo']));
+        $client->expects($this->exactly(3))->method('sendMessage')->willReturnCallback(static function (array $parameters) use (&$sent) {
+            $sent[] = $parameters;
+
+            return ResultMockFactory::create(SendMessageResult::class);
+        });
+
+        $connection = new Connection(['queue_name' => 'queue.fifo', 'auto_setup' => false], $client);
+
+        // the same message dispatched twice must not be deduplicated by the queue
+        $connection->send('body', ['type' => 'foo']);
+        $connection->send('body', ['type' => 'foo']);
+        $connection->send('body', ['type' => 'foo'], messageDeduplicationId: 'explicit-id');
+
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $sent[0]['MessageDeduplicationId']);
+        $this->assertMatchesRegularExpression('/^[0-9a-f]{32}$/', $sent[1]['MessageDeduplicationId']);
+        $this->assertNotSame($sent[0]['MessageDeduplicationId'], $sent[1]['MessageDeduplicationId']);
+        $this->assertSame('explicit-id', $sent[2]['MessageDeduplicationId']);
+        $this->assertSame([Connection::class.'::send', Connection::class.'::send', Connection::class.'::send'], array_column($sent, 'MessageGroupId'));
     }
 
     public function testQueueAttributesAndTags()

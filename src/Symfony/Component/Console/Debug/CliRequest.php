@@ -49,14 +49,12 @@ final class CliRequest extends Request
     public function getResponse(): Response
     {
         return new class($this->command->exitCode) extends Response {
-            public function __construct(private readonly int $exitCode)
+            public function __construct(int $exitCode)
             {
                 parent::__construct();
-            }
 
-            public function getStatusCode(): int
-            {
-                return $this->exitCode;
+                // getStatusCode() is final and setStatusCode() rejects an exit code
+                $this->statusCode = $exitCode;
             }
         };
     }

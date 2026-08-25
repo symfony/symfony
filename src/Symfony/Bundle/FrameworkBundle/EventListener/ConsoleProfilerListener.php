@@ -122,8 +122,17 @@ final class ConsoleProfilerListener implements EventSubscriberInterface
             }
         }
 
-        $request->command->exitCode = $event->getExitCode();
-        $request->command->interruptedBySignal = $event->getInterruptingSignal();
+        $command = $request->command;
+        $command->exitCode = $event->getExitCode();
+        $command->interruptedBySignal = $event->getInterruptingSignal();
+
+        if (!isset($command->input)) {
+            // the command was stopped before it could run and record what it was given
+            $command->input = $input = $event->getInput();
+            $command->output = $event->getOutput();
+            $command->arguments = $input->getArguments();
+            $command->options = $input->getOptions();
+        }
 
         $profile = $this->profiler->collect($request, $request->getResponse(), $error);
         $this->profiles[$request] = $profile;

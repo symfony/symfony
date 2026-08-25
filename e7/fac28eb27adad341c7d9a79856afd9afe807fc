@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-25T12:46:46Z
+
+Thank you, the analysis is correct and the reproducer made it straightforward to verify. I amended your commit with three changes and pushed.
+
+**The guard alone reintroduced one of the three failures it removes.** A guarded nested wait is a no-op, so Guzzle rejects that promise itself. The response stays in `$pending`, and when the outer loop finishes it, `resolveResponse()` resolves the now rejected promise. With `on_headers` waiting on a sibling, then `execute()`:
+
+```
+base 8.1: a => one / execute() returned / b => two
+this PR:  a => one / execute() THROW LogicException: Cannot change a rejected promise to fulfilled
+```
+
+Added a private `settle()` that skips a promise which is no longer pending. That also fixes a case broken on 8.1 without this patch: an inline callback waiting on its own promise raises the same `LogicException`, where Guzzle's own `CurlMultiHandler` simply leaves the promise rejected.
+
+**The refusal now names its cause.** `Invoking the wait callback did not resolve the promise` explains nothing, and `RejectionException` extends `\RuntimeException` instead of implementing `GuzzleException`, so callers filtering on that interface never see it. It now throws `RequestException` with the wording `CurlMultiHandler` uses.
+
+**`execute()` now throws instead of returning early.** `while (!$this->streaming && ...)` made it return while transfers were still outstanding, which its own docblock says it never does. Guzzle throws `LogicException` there.
+
+Three tests cover those, each failing both on 8.1 and on the previous state of this pull request.
+
+I ran 20 probes on 8.1, on your version and on this one: concurrent mixed requests, a transport error mid-flight, cancel while siblings run, cancel from a `.then()`, a chunked body into a `sink`, a response never waited on, `Utils::settle()`, `execute()`, `tick()`, both of those from `on_headers`, and `on_stats` waiting on a sibling and on itself. Only the four cases above differ between the three states. Your reproducer goes from 14 leaked exceptions to 0, and the full HttpClient suite is green.
+
+I also rewrote the description, since that is what people read once this is merged rather than the thread.

@@ -194,12 +194,18 @@ trait RedisTrait
 
         if (!isset($params['redis_sentinel'])) {
             $params['auth'] ??= $auth;
-        }
-
-        if (\is_array($params['auth']) && (!array_is_list($params['auth']) || 2 !== \count($params['auth']))) {
-            throw new InvalidArgumentException('Invalid Redis DSN: the "auth" parameter must be a string, or a list of exactly two elements for ACL, "[username, password]".');
+            $sentinelAuth = null;
         } elseif (!class_exists(\Predis\Client::class) && !class_exists(\RedisSentinel::class) && !class_exists(Sentinel::class)) {
             throw new CacheException('Redis Sentinel support requires one of: "predis/predis", "ext-redis >= 5.2", "ext-relay".');
+        } else {
+            $sentinelAuth = $params['auth'] ?? null;
+            $params['auth'] = $auth ?? $params['auth'];
+        }
+
+        foreach ([$params['auth'], $sentinelAuth] as $v) {
+            if (\is_array($v) && (!array_is_list($v) || 2 !== \count($v))) {
+                throw new InvalidArgumentException('Invalid Redis DSN: the "auth" parameter must be a string, or a list of exactly two elements for ACL, "[username, password]".');
+            }
         }
 
         if (isset($params['lazy'])) {
@@ -234,14 +240,14 @@ trait RedisTrait
         if ($isRedisExt || $isRelayExt) {
             $connect = $params['persistent'] || $params['persistent_id'] ? 'pconnect' : 'connect';
 
-            $initializer = static function () use ($class, $isRedisExt, $connect, $params, $hosts, $tls) {
+            $initializer = static function () use ($class, $isRedisExt, $connect, $params, $sentinelAuth, $hosts, $tls) {
                 $sentinelClass = $isRedisExt ? \RedisSentinel::class : Sentinel::class;
                 $redis = new $class();
                 $hostIndex = 0;
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
-                    $passAuth = null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
+                    $passAuth = null !== $sentinelAuth && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {
@@ -264,7 +270,7 @@ trait RedisTrait
                             ];
 
                             if ($passAuth) {
-                                $options['auth'] = $params['auth'];
+                                $options['auth'] = $sentinelAuth;
                             }
 
                             if (null !== $params['ssl'] && version_compare(phpversion('redis'), '6.2.0', '>=')) {
@@ -273,7 +279,7 @@ trait RedisTrait
 
                             $sentinel = new \RedisSentinel($options);
                         } else {
-                            $extra = $passAuth ? [$params['auth']] : [];
+                            $extra = $passAuth ? [$sentinelAuth] : [];
 
                             $sentinel = @new $sentinelClass($host, $port, $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...$extra);
                         }
@@ -403,6 +409,24 @@ trait RedisTrait
                 $params['parameters']['password'] = $params['auth'][1];
             } elseif (null !== $params['auth']) {
                 $params['parameters']['password'] = $params['auth'];
+            }
+
+            if (isset($params['redis_sentinel']) && null !== $sentinelAuth) {
+                if (\is_array($sentinelAuth)) {
+                    $sentinelUsername = $sentinelAuth[0];
+                    $sentinelPassword = $sentinelAuth[1];
+                } else {
+                    $sentinelUsername = null;
+                    $sentinelPassword = $sentinelAuth;
+                }
+
+                foreach ($hosts as $i => $host) {
+                    $hosts[$i]['password'] ??= $sentinelPassword;
+
+                    if (null !== $sentinelUsername) {
+                        $hosts[$i]['username'] ??= $sentinelUsername;
+                    }
+                }
             }
 
             if (isset($params['ssl'])) {

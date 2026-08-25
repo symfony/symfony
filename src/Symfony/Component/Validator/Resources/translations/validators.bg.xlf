@@ -568,15 +568,15 @@
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Тази стойност не е валиден cron израз.</target>
+                <target>Тази стойност не е валиден cron израз.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">Обектът, към който се препраща, не съществува.</target>
+                <target>Обектът, към който се препраща, не съществува.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Стойността не е валиден ULID.</target>
+                <target>Стойността не е валиден ULID.</target>
             </trans-unit>
         </body>
     </file>

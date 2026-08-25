@@ -385,8 +385,16 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
             array_splice($accessorMethods, false === $getterPosition ? \count($accessorMethods) : $getterPosition + 1, 0, [$getsetter]);
         }
 
+        $staticGetsetter = null;
+
         foreach ($accessorMethods as $methodName) {
             if ($reflClass->hasMethod($methodName) && ($m = $reflClass->getMethod($methodName))->getModifiers() & $this->methodReflectionFlags && !$m->getNumberOfRequiredParameters() && !\in_array((string) $m->getReturnType(), ['void', 'never'], true)) {
+                if ($allowGetterSetter && $methodName === $getsetter && $m->isStatic()) {
+                    // a static method named after the property, e.g. a named constructor, must not win over any instance-based candidate; try it last
+                    $staticGetsetter = $m;
+                    continue;
+                }
+
                 return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $methodName, $this->getReadVisibilityForMethod($m), $m->isStatic(), false);
             }
         }
@@ -401,6 +409,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
 
         if ($allowMagicCall && $reflClass->hasMethod('__call') && ($reflClass->getMethod('__call')->getModifiers() & $this->methodReflectionFlags)) {
             return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, 'get'.$camelProp, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
+        }
+
+        if ($staticGetsetter) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisibilityForMethod($staticGetsetter), true, false);
         }
 
         return null;
@@ -510,12 +522,19 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
         $getsetter = lcfirst($camelized);
         $getsetterNonCamelized = lcfirst($nonCamelized);
 
+        $staticGetsetter = null;
+
         if ($allowGetterSetter) {
             [$accessible, $methodAccessibleErrors] = $this->isMethodAccessible($reflClass, $getsetter, 1);
             if ($accessible) {
                 $method = $reflClass->getMethod($getsetter);
 
-                return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetter, $this->getWriteVisibilityForMethod($method), $method->isStatic());
+                if (!$method->isStatic()) {
+                    return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetter, $this->getWriteVisibilityForMethod($method), false);
+                }
+
+                // a static method named after the property, e.g. a named constructor, must not win over any instance-based candidate; try it last
+                $staticGetsetter = [$getsetter, $method];
             }
 
             $errors[] = $methodAccessibleErrors;
@@ -525,7 +544,11 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
                 if ($accessible) {
                     $method = $reflClass->getMethod($getsetterNonCamelized);
 
-                    return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetterNonCamelized, $this->getWriteVisibilityForMethod($method), $method->isStatic());
+                    if (!$method->isStatic()) {
+                        return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $getsetterNonCamelized, $this->getWriteVisibilityForMethod($method), false);
+                    }
+
+                    $staticGetsetter ??= [$getsetterNonCamelized, $method];
                 }
                 $errors[] = $methodAccessibleErrors;
             }
@@ -567,6 +590,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyNam
                 $reflClass->getName(),
                 implode('()", "', [$adderAccessName, $removerAccessName])
             )];
+        }
+
+        if ($staticGetsetter) {
+            [$methodName, $method] = $staticGetsetter;
+
+            return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $methodName, $this->getWriteVisibilityForMethod($method), true);
         }
 
         $noneProperty = new PropertyWriteInfo();

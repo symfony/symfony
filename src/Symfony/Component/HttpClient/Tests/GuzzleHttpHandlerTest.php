@@ -14,13 +14,19 @@ namespace Symfony\Component\HttpClient\Tests;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectionException;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpClient\DecoratorTrait;
 use Symfony\Component\HttpClient\GuzzleHttpHandler;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\ResponseStream;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface as SymfonyResponseInterface;
+use Symfony\Contracts\HttpClient\ResponseStreamInterface;
 
 class GuzzleHttpHandlerTest extends TestCase
 {
@@ -913,6 +919,111 @@ class GuzzleHttpHandlerTest extends TestCase
 
         $this->assertSame(999, $response->getStatusCode());
         $this->assertSame('proprietary', (string) $response->getBody());
+    }
+
+    /**
+     * A .then() callback may wait on another promise, which drives the handler again. Two stream()
+     * iterators alive at once would consume the same responses out of band, so the handler must
+     * never start a second one, while still letting such a callback make progress.
+     */
+    public function testWaitingFromACallbackDoesNotConsumeASecondStream()
+    {
+        $client = new class(new MockHttpClient([new MockResponse('one'), new MockResponse('two')])) implements HttpClientInterface {
+            use DecoratorTrait;
+
+            public int $live = 0;
+            public int $maxLive = 0;
+
+            public function stream(SymfonyResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
+            {
+                $stream = $this->client->stream($responses, $timeout);
+
+                return new ResponseStream((function () use ($stream): \Generator {
+                    $this->maxLive = max($this->maxLive, ++$this->live);
+
+                    try {
+                        yield from $stream;
+                    } finally {
+                        --$this->live;
+                    }
+                })());
+            }
+        };
+
+        $handler = new GuzzleHttpHandler($client);
+
+        $p1 = $handler(new Request('GET', 'https://example.com/one'), []);
+        $p2 = $handler(new Request('GET', 'https://example.com/two'), []);
+
+        $p1->then(static function () use ($p2) { $p2->wait(); });
+
+        $this->assertSame('one', (string) $p1->wait()->getBody());
+        $this->assertSame('two', (string) $p2->wait()->getBody());
+        $this->assertSame(1, $client->maxLive);
+    }
+
+    /**
+     * on_headers and on_stats run inline from the loop, as Guzzle's contract requires, so a promise
+     * waited on from there cannot make progress. The handler must say so and stay usable: the
+     * response whose promise got rejected is still tracked, and settling it again would throw.
+     */
+    public function testWaitingFromAnInlineCallbackFailsWithoutStrandingTheHandler()
+    {
+        $handler = new GuzzleHttpHandler(new MockHttpClient([new MockResponse('one'), new MockResponse('two')]));
+
+        $p2 = null;
+        $error = null;
+        $p1 = $handler(new Request('GET', 'https://example.com/one'), ['on_headers' => static function () use (&$p2, &$error) {
+            try {
+                $p2->wait();
+            } catch (\Throwable $e) {
+                $error = $e;
+            }
+        }]);
+        $p2 = $handler(new Request('GET', 'https://example.com/two'), []);
+
+        $this->assertSame('one', (string) $p1->wait()->getBody());
+        $this->assertInstanceOf(RequestException::class, $error);
+        $this->assertSame('Cannot wait for a response from inside a callback of the same handler; the callback must return before the transfer can progress.', $error->getMessage());
+
+        $handler->execute();
+
+        $this->assertSame(PromiseInterface::REJECTED, $p2->getState());
+    }
+
+    public function testRunningTheEventLoopFromAnInlineCallbackIsRejected()
+    {
+        $handler = new GuzzleHttpHandler(new MockHttpClient([new MockResponse('one')]));
+
+        $error = null;
+        $promise = $handler(new Request('GET', 'https://example.com/one'), ['on_headers' => static function () use ($handler, &$error) {
+            try {
+                $handler->execute();
+            } catch (\Throwable $e) {
+                $error = $e;
+            }
+        }]);
+
+        $this->assertSame('one', (string) $promise->wait()->getBody());
+        $this->assertInstanceOf(\LogicException::class, $error);
+        $this->assertSame('Cannot run the event loop from inside a callback of the same handler; the callback must return before transfers can progress.', $error->getMessage());
+    }
+
+    public function testAPromiseGuzzleRejectedFromAnInlineCallbackIsNotResolvedAfterwards()
+    {
+        $handler = new GuzzleHttpHandler(new MockHttpClient([new MockResponse('one')]));
+
+        $promise = null;
+        $promise = $handler(new Request('GET', 'https://example.com/one'), ['on_stats' => static function () use (&$promise) {
+            // The wait callback has been consumed already, so Guzzle rejects the promise here
+            try {
+                $promise->wait();
+            } catch (RejectionException) {
+            }
+        }]);
+
+        $this->expectException(RejectionException::class);
+        $promise->wait();
     }
 
     /**

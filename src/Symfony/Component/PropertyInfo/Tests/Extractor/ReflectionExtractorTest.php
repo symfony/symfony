@@ -27,6 +27,9 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProperty;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticMutator;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\FalseAccessorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\HookedProperties;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
@@ -535,6 +538,41 @@ class ReflectionExtractorTest extends TestCase
         $this->assertSame('hasPayments', $readAccessor->getName());
     }
 
+    public function testGetReadAccessorDoesNotPreferTheStaticNamedConstructor()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithStaticConstructorAndAccessor::class, 'zero', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('isZero', $readAccessor->getName());
+    }
+
+    public function testGetReadAccessorTriesTheStaticMethodNamedAfterThePropertyLast()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithStaticConstructorAndAccessor::class, 'one', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('one', $readAccessor->getName());
+        $this->assertTrue($readAccessor->isStatic());
+    }
+
+    public function testGetReadAccessorKeepsAConfiguredStaticAccessorWhenGetterSetterExtractionIsDisabled()
+    {
+        $extractor = new ReflectionExtractor(null, ['']);
+        $readAccessor = $extractor->getReadInfo(DummyWithNonAsciiStaticAccessor::class, 'émail');
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('émail', $readAccessor->getName());
+        $this->assertTrue($readAccessor->isStatic());
+    }
+
+    public function testGetReadAccessorPrefersThePropertyOverTheStaticMethodNamedAfterIt()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithStaticConstructorAndAccessor::class, 'positive', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readAccessor->getType());
+        $this->assertSame('positive', $readAccessor->getName());
+    }
+
     #[TestWith(['name', 'retrieveName'])]
     #[TestWith(['priority', 'currentPriority'])]
     #[TestWith(['tags', 'allTags'])]
@@ -630,6 +668,31 @@ class ReflectionExtractorTest extends TestCase
         self::assertNotNull($writeMutator);
         self::assertSame(PropertyWriteInfo::TYPE_NONE, $writeMutator->getType());
         self::assertSame([\sprintf('The property "baz" in class "%s" can be defined with the methods "addBaz()", "removeBaz()" but the new value must be an array or an instance of \Traversable', Php71Dummy::class)], $writeMutator->getErrors());
+    }
+
+    public function testGetWriteMutatorPrefersTheSetterOverTheStaticMethodNamedAfterTheProperty()
+    {
+        $writeMutator = $this->extractor->getWriteInfo(DummyWithStaticMutator::class, 'quantity', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_METHOD, $writeMutator->getType());
+        $this->assertSame('setQuantity', $writeMutator->getName());
+    }
+
+    public function testGetWriteMutatorPrefersThePropertyOverTheStaticMethodNamedAfterIt()
+    {
+        $writeMutator = $this->extractor->getWriteInfo(DummyWithStaticMutator::class, 'value', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_PROPERTY, $writeMutator->getType());
+        $this->assertSame('value', $writeMutator->getName());
+    }
+
+    public function testGetWriteMutatorTriesTheStaticMethodNamedAfterThePropertyLast()
+    {
+        $writeMutator = $this->extractor->getWriteInfo(DummyWithStaticMutator::class, 'amount', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyWriteInfo::TYPE_METHOD, $writeMutator->getType());
+        $this->assertSame('amount', $writeMutator->getName());
+        $this->assertTrue($writeMutator->isStatic());
     }
 
     #[TestWith([Bar::class, 'name', PropertyWriteInfo::TYPE_METHOD, 'renameTo', null, null])]

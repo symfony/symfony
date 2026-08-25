@@ -247,6 +247,14 @@ class Command implements SignalableCommandInterface
             }
         }
 
+        // The command name argument is often omitted when a command is executed directly with its run() method,
+        // and it may hold an abbreviation or an alias when the command was resolved from one (e.g. Application::find()).
+        // Normalize it to the command's actual name so it can be relied on afterwards, since it's required by the
+        // application, and so argument resolution during interact() below can already rely on it.
+        if ($input->hasArgument('command') && null !== $name = $this->getName()) {
+            $input->setArgument('command', $name);
+        }
+
         $this->initialize($input, $output);
 
         if (null !== $this->processTitle) {
@@ -271,13 +279,6 @@ class Command implements SignalableCommandInterface
             if ($this->code?->isInteractive()) {
                 $this->code->interact($input, $output);
             }
-        }
-
-        // The command name argument is often omitted when a command is executed directly with its run() method.
-        // It would fail the validation if we didn't make sure the command argument is present,
-        // since it's required by the application.
-        if ($input->hasArgument('command') && null === $input->getArgument('command')) {
-            $input->setArgument('command', $this->getName());
         }
 
         $input->validate();

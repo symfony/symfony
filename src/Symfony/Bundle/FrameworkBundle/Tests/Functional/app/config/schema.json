@@ -4733,153 +4733,6 @@
                 },
                 "additionalProperties": false
             },
-            "mercure": {
-                "$ref": "#/$defs/types/object_null",
-                "properties": {
-                    "hubs": {
-                        "$ref": "#/$defs/types/object_null",
-                        "additionalProperties": {
-                            "$ref": "#/$defs/types/object_null",
-                            "properties": {
-                                "url": {
-                                    "$ref": "#/$defs/types/scalar",
-                                    "description": "URL of the hub's publish endpoint",
-                                    "examples": [
-                                        "https://demo.mercure.rocks/.well-known/mercure"
-                                    ]
-                                },
-                                "public_url": {
-                                    "$ref": "#/$defs/types/scalar",
-                                    "default": null,
-                                    "description": "URL of the hub's public endpoint",
-                                    "examples": [
-                                        "https://demo.mercure.rocks/.well-known/mercure"
-                                    ]
-                                },
-                                "jwt": {
-                                    "anyOf": [
-                                        {
-                                            "$ref": "#/$defs/types/object_null",
-                                            "properties": {
-                                                "value": {
-                                                    "$ref": "#/$defs/types/scalar",
-                                                    "description": "JSON Web Token to use to publish to this hub."
-                                                },
-                                                "provider": {
-                                                    "$ref": "#/$defs/types/scalar",
-                                                    "description": "The ID of a service to call to provide the JSON Web Token."
-                                                },
-                                                "factory": {
-                                                    "$ref": "#/$defs/types/scalar",
-                                                    "description": "The ID of a service to call to create the JSON Web Token."
-                                                },
-                                                "publish": {
-                                                    "$ref": "#/$defs/types/array_null",
-                                                    "items": {
-                                                        "$ref": "#/$defs/types/scalar"
-                                                    },
-                                                    "description": "A list of topics to allow publishing to when using the given factory to generate the JWT."
-                                                },
-                                                "subscribe": {
-                                                    "$ref": "#/$defs/types/array_null",
-                                                    "items": {
-                                                        "$ref": "#/$defs/types/scalar"
-                                                    },
-                                                    "description": "A list of topics to allow subscribing to when using the given factory to generate the JWT."
-                                                },
-                                                "secret": {
-                                                    "$ref": "#/$defs/types/scalar",
-                                                    "description": "The JWT Secret to use.",
-                                                    "examples": [
-                                                        "!ChangeMe!"
-                                                    ]
-                                                },
-                                                "passphrase": {
-                                                    "$ref": "#/$defs/types/scalar",
-                                                    "default": "",
-                                                    "description": "The JWT secret passphrase."
-                                                },
-                                                "algorithm": {
-                                                    "$ref": "#/$defs/types/scalar",
-                                                    "default": "hmac.sha256",
-                                                    "description": "The algorithm to use to sign the JWT"
-                                                }
-                                            },
-                                            "additionalProperties": false
-                                        },
-                                        {
-                                            "type": [
-                                                "string"
-                                            ]
-                                        }
-                                    ],
-                                    "description": "JSON Web Token configuration."
-                                },
-                                "jwt_provider": {
-                                    "$ref": "#/$defs/types/scalar",
-                                    "description": "Deprecated since symfony/mercure-bundle 0.3: The child node \"jwt_provider\" at path \"mercure.hubs..jwt_provider\" is deprecated, use \"jwt.provider\" instead.\n\nThe ID of a service to call to generate the JSON Web Token.",
-                                    "deprecated": true
-                                },
-                                "bus": {
-                                    "$ref": "#/$defs/types/scalar",
-                                    "description": "Name of the Messenger bus where the handler for this hub must be registered. Default to the default bus if Messenger is enabled."
-                                }
-                            },
-                            "additionalProperties": false
-                        }
-                    },
-                    "default_hub": {
-                        "$ref": "#/$defs/types/scalar"
-                    },
-                    "default_cookie_lifetime": {
-                        "$ref": "#/$defs/types/integer",
-                        "default": null,
-                        "description": "Default lifetime of the cookie containing the JWT, in seconds. Defaults to the value of \"framework.session.cookie_lifetime\"."
-                    },
-                    "enable_profiler": {
-                        "$ref": "#/$defs/types/boolean",
-                        "description": "Deprecated since symfony/mercure-bundle 0.3: The child node \"enable_profiler\" at path \"mercure.enable_profiler\" is deprecated.\n\nEnable Symfony Web Profiler integration.",
-                        "deprecated": true
-                    }
-                },
-                "additionalProperties": false
-            },
-            "test": {
-                "$ref": "#/$defs/types/object_null",
-                "properties": {
-                    "custom": {
-                        "$ref": "#/$defs/types/scalar"
-                    },
-                    "array": {
-                        "$ref": "#/$defs/types/object_null",
-                        "properties": {
-                            "child1": {
-                                "$ref": "#/$defs/types/scalar"
-                            },
-                            "child2": {
-                                "$ref": "#/$defs/types/scalar"
-                            }
-                        },
-                        "additionalProperties": false
-                    },
-                    "options": {
-                        "$ref": "#/$defs/types/object_null",
-                        "additionalProperties": {
-                            "$ref": "#/$defs/types/object_null",
-                            "properties": {
-                                "key": {
-                                    "$ref": "#/$defs/types/scalar"
-                                },
-                                "data": {
-                                    "$ref": "#/$defs/types/scalar"
-                                }
-                            },
-                            "additionalProperties": false
-                        }
-                    }
-                },
-                "additionalProperties": false
-            },
             "test_dump": {
                 "$ref": "#/$defs/types/object_null",
                 "properties": {
@@ -4900,12 +4753,6 @@
         "framework": {
             "$ref": "#/$defs/nodes/framework"
         },
-        "mercure": {
-            "$ref": "#/$defs/nodes/mercure"
-        },
-        "test": {
-            "$ref": "#/$defs/nodes/test"
-        },
         "test_dump": {
             "$ref": "#/$defs/nodes/test_dump"
         }
@@ -4919,12 +4766,6 @@
                 },
                 "framework": {
                     "$ref": "#/$defs/nodes/framework"
-                },
-                "mercure": {
-                    "$ref": "#/$defs/nodes/mercure"
-                },
-                "test": {
-                    "$ref": "#/$defs/nodes/test"
                 },
                 "test_dump": {
                     "$ref": "#/$defs/nodes/test_dump"

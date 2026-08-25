@@ -150,6 +150,68 @@ class LocaleAwareListenerTest extends TestCase
         $this->assertSame('fr', $service->getLocale());
     }
 
+    public function testSubRequestDoesNotFailOnAServiceWithAnUninitializedLocale()
+    {
+        $this->localeAwareService->expects($this->never())->method('setLocale');
+
+        $service = new class implements LocaleAwareInterface {
+            private string $locale;
+
+            public function setLocale(string $locale): void
+            {
+                $this->locale = $locale;
+            }
+
+            public function getLocale(): string
+            {
+                return $this->locale;
+            }
+        };
+        $listener = new LocaleAwareListener(new \ArrayIterator([$service]), $this->requestStack);
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $this->requestStack->push($mainRequest = $this->createRequest('fr'));
+        $this->requestStack->push($subRequest = $this->createRequest('de'));
+        $listener->onKernelRequest(new RequestEvent($kernel, $subRequest, HttpKernelInterface::SUB_REQUEST));
+
+        $this->assertSame('de', $service->getLocale());
+
+        $listener->onKernelFinishRequest(new FinishRequestEvent($kernel, $subRequest, HttpKernelInterface::SUB_REQUEST));
+        $this->requestStack->pop();
+
+        $this->assertSame('fr', $service->getLocale());
+    }
+
+    public function testSubRequestDoesNotHideAnUnrelatedErrorThrownByGetLocale()
+    {
+        $this->localeAwareService->expects($this->never())->method('setLocale');
+
+        $service = new class implements LocaleAwareInterface {
+            private ?LocaleAwareInterface $inner = null;
+
+            public function setLocale(string $locale): void
+            {
+            }
+
+            public function getLocale(): string
+            {
+                return $this->inner->getLocale();
+            }
+        };
+        $listener = new LocaleAwareListener(new \ArrayIterator([$service]), $this->requestStack);
+        $kernel = $this->createStub(HttpKernelInterface::class);
+
+        $this->requestStack->push($mainRequest = $this->createRequest('fr'));
+        $listener->onKernelRequest(new RequestEvent($kernel, $mainRequest, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->requestStack->push($subRequest = $this->createRequest('de'));
+
+        $this->expectException(\Error::class);
+        $this->expectExceptionMessage('Call to a member function getLocale() on null');
+
+        $listener->onKernelRequest(new RequestEvent($kernel, $subRequest, HttpKernelInterface::SUB_REQUEST));
+    }
+
     private function createRequest(string $locale): Request
     {
         $request = new Request();

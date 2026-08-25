@@ -269,6 +269,13 @@ class RedisTraitTest extends TestCase
 
     public static function providePredisSentinelAuthResolution(): \Generator
     {
+        yield 'master userinfo, no sentinel auth' => [
+            'redis://master-user:master-pass@localhost?redis_sentinel=mymaster',
+            [],
+            ['master-user', 'master-pass'],
+            null,
+        ];
+
         yield 'sentinel query auth, master userinfo' => [
             'redis://master-user:master-pass@localhost?redis_sentinel=mymaster&auth[]=sentinel-user&auth[]=sentinel-pass',
             [],
@@ -288,6 +295,13 @@ class RedisTraitTest extends TestCase
             ['auth' => ['opt-user', 'opt-pass']],
             'master-pass',
             ['query-user', 'query-pass'],
+        ];
+
+        yield 'auth shared by master and sentinel when no userinfo' => [
+            'redis://localhost?redis_sentinel=mymaster&auth=shared-pass',
+            [],
+            'shared-pass',
+            'shared-pass',
         ];
     }
 

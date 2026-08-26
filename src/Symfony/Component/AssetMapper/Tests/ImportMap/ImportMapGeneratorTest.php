@@ -62,6 +62,104 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals(['entry1', 'entry2'], $manager->getEntrypointNames());
     }
 
+    public function testGetImportMapDataLimitedToTheReachableEntries()
+    {
+        $manager = $this->createImportMapGenerator(entries: ImportMapGenerator::ENTRIES_REACHABLE);
+        $this->mockImportMap([
+            self::createLocalEntry('login', path: 'login.js', isEntrypoint: true),
+            self::createLocalEntry('admin', path: 'admin.js', isEntrypoint: true),
+            self::createLocalEntry('lazy_controller', path: 'lazy_controller.js'),
+            self::createLocalEntry('lazy_dependency', path: 'lazy_dependency.js'),
+            self::createLocalEntry('admin_dependency', path: 'admin_dependency.js'),
+            self::createLocalEntry('never_imported', path: 'never_imported.js'),
+            self::createRemoteEntry('es-module-shims', version: '1.8.2', path: '/path/to/es-module-shims.js'),
+        ]);
+        $this->configReader->method('convertPathToFilesystemPath')->willReturnArgument(0);
+
+        $lazyController = new MappedAsset(
+            'lazy_controller.js',
+            '/path/to/lazy_controller.js',
+            publicPath: '/assets/lazy_controller-d1g35t.js',
+            javaScriptImports: [
+                new JavaScriptImport('lazy_dependency', assetLogicalPath: 'lazy_dependency.js', assetSourcePath: '/path/to/lazy_dependency.js', isLazy: false),
+            ],
+        );
+        $this->mockAssetMapper([
+            new MappedAsset(
+                'login.js',
+                '/path/to/login.js',
+                publicPath: '/assets/login-d1g35t.js',
+                javaScriptImports: [
+                    // the lazy import must stay resolvable through the import map, its own dependencies included
+                    new JavaScriptImport('lazy_controller', assetLogicalPath: $lazyController->logicalPath, assetSourcePath: $lazyController->sourcePath, isLazy: true),
+                ],
+            ),
+            new MappedAsset(
+                'admin.js',
+                '/path/to/admin.js',
+                publicPath: '/assets/admin-d1g35t.js',
+                javaScriptImports: [
+                    new JavaScriptImport('admin_dependency', assetLogicalPath: 'admin_dependency.js', assetSourcePath: '/path/to/admin_dependency.js', isLazy: false),
+                ],
+            ),
+            $lazyController,
+            new MappedAsset('lazy_dependency.js', '/path/to/lazy_dependency.js', publicPath: '/assets/lazy_dependency-d1g35t.js'),
+            new MappedAsset('admin_dependency.js', '/path/to/admin_dependency.js', publicPath: '/assets/admin_dependency-d1g35t.js'),
+            new MappedAsset('never_imported.js', '/path/to/never_imported.js', publicPath: '/assets/never_imported-d1g35t.js'),
+            new MappedAsset('es-module-shims.js', '/path/to/es-module-shims.js', publicPath: '/assets/es-module-shims-d1g35t.js'),
+        ]);
+
+        $actualImportMapData = $manager->getImportMapData(['login'], 'es-module-shims');
+
+        $this->assertEquals([
+            // the entrypoint and its eager imports are preloaded
+            'login' => ['path' => '/assets/login-d1g35t.js', 'type' => 'js', 'preload' => true],
+            // the lazy import and its own dependencies stay in the map, unpreloaded
+            'lazy_controller' => ['path' => '/assets/lazy_controller-d1g35t.js', 'type' => 'js'],
+            'lazy_dependency' => ['path' => '/assets/lazy_dependency-d1g35t.js', 'type' => 'js'],
+            // the polyfill is always kept
+            'es-module-shims' => ['path' => '/assets/es-module-shims-d1g35t.js', 'type' => 'js'],
+            // the other entrypoint, its dependencies and the entries imported by nothing are left out
+        ], $actualImportMapData);
+    }
+
+    public function testGetImportMapDataLimitedToTheReachableEntriesUsesTheCompiledMetadata()
+    {
+        $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
+        $this->compiledConfigReader->expects($this->any())
+            ->method('configExists')
+            ->willReturnCallback(static fn (string $file) => 'entrypoint.reachable.app.json' === $file);
+        $this->compiledConfigReader->expects($this->once())
+            ->method('loadConfig')
+            ->with('entrypoint.reachable.app.json')
+            ->willReturn(['dependency']);
+
+        $manager = $this->createImportMapGenerator(entries: ImportMapGenerator::ENTRIES_REACHABLE);
+        $this->mockImportMap([
+            self::createLocalEntry('app', path: 'app.js', isEntrypoint: true),
+            self::createLocalEntry('dependency', path: 'dependency.js'),
+            self::createLocalEntry('never_imported', path: 'never_imported.js'),
+        ]);
+        $this->mockAssetMapper([
+            new MappedAsset('app.js', '/path/to/app.js', publicPath: '/assets/app-d1g35t.js'),
+            new MappedAsset('dependency.js', '/path/to/dependency.js', publicPath: '/assets/dependency-d1g35t.js'),
+            new MappedAsset('never_imported.js', '/path/to/never_imported.js', publicPath: '/assets/never_imported-d1g35t.js'),
+        ]);
+
+        $this->assertEquals([
+            'app' => ['path' => '/assets/app-d1g35t.js', 'type' => 'js', 'preload' => true],
+            'dependency' => ['path' => '/assets/dependency-d1g35t.js', 'type' => 'js'],
+        ], $manager->getImportMapData(['app']));
+    }
+
+    public function testInvalidEntries()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Unsupported import map entries "everything".');
+
+        $this->createImportMapGenerator(entries: 'everything');
+    }
+
     public function testGetImportMapData()
     {
         $manager = $this->createImportMapGenerator();
@@ -886,6 +984,42 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($entrypointData, $manager->findEagerEntrypointImports('foo'));
     }
 
+    public function testFindReachableEntrypointImports()
+    {
+        $manager = $this->createImportMapGenerator();
+
+        $deep = new MappedAsset('deep.js', '/path/to/deep.js', publicPathWithoutDigest: '/assets/deep.js');
+        $lazy = new MappedAsset(
+            'lazy.js',
+            '/path/to/lazy.js',
+            publicPathWithoutDigest: '/assets/lazy.js',
+            javaScriptImports: [new JavaScriptImport('/assets/deep.js', assetLogicalPath: $deep->logicalPath, assetSourcePath: $deep->sourcePath, isLazy: false)],
+        );
+        $eager = new MappedAsset(
+            'eager.js',
+            '/path/to/eager.js',
+            publicPathWithoutDigest: '/assets/eager.js',
+            javaScriptImports: [new JavaScriptImport('/assets/deep.js', assetLogicalPath: $deep->logicalPath, assetSourcePath: $deep->sourcePath, isLazy: true)],
+        );
+        $entrypoint = new MappedAsset(
+            'app.js',
+            '/path/to/app.js',
+            publicPath: '/assets/app.js',
+            javaScriptImports: [
+                new JavaScriptImport('/assets/eager.js', assetLogicalPath: $eager->logicalPath, assetSourcePath: $eager->sourcePath, isLazy: false),
+                new JavaScriptImport('/assets/lazy.js', assetLogicalPath: $lazy->logicalPath, assetSourcePath: $lazy->sourcePath, isLazy: true),
+            ],
+        );
+
+        $this->mockAssetMapper([$entrypoint, $eager, $lazy, $deep]);
+        $this->mockImportMap([
+            ImportMapEntry::createLocal('the_entrypoint_name', ImportMapType::JS, $entrypoint->logicalPath, true),
+        ]);
+
+        $this->assertSame(['/assets/eager.js'], $manager->findEagerEntrypointImports('the_entrypoint_name'));
+        $this->assertSame(['/assets/eager.js', '/assets/lazy.js', '/assets/deep.js'], $manager->findReachableEntrypointImports('the_entrypoint_name'));
+    }
+
     public function testGetRawImportMapDataResolvesEachEntryOnce()
     {
         $manager = $this->createImportMapGenerator();
@@ -907,7 +1041,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertSame(['app.js' => 1, 'admin.js' => 1], $resolvedAssets);
     }
 
-    private function createImportMapGenerator(array $integrityHashAlgorithms = []): ImportMapGenerator
+    private function createImportMapGenerator(array $integrityHashAlgorithms = [], string $entries = ImportMapGenerator::ENTRIES_ALL): ImportMapGenerator
     {
         $this->compiledConfigReader ??= $this->createStub(CompiledAssetMapperConfigReader::class);
         $this->assetMapper = $this->createStub(AssetMapperInterface::class);
@@ -927,6 +1061,7 @@ class ImportMapGeneratorTest extends TestCase
             $this->compiledConfigReader,
             $this->configReader,
             $integrityHashAlgorithms,
+            $entries,
         );
     }
 

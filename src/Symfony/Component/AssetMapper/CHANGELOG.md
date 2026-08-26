@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add an `$entries` argument to `ImportMapGenerator` to restrict the import map to the entries reachable from the rendered entrypoints
  * Defined stable alphabetical order of importmap entries
  * Add support for adding integrity metadata to importmaps
  * Add a `--no-esm` option to `importmap:require` and an `esm` option to importmap entries

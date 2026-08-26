@@ -3538,6 +3538,28 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame(604800, $container->getDefinition('asset_mapper.importmap.update_checker')->getArgument(3));
     }
 
+    public function testAssetMapperImportmapEntries()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'http_method_override' => false,
+                'handle_all_throwables' => true,
+                'php_errors' => ['log' => true],
+                'assets' => null,
+                'asset_mapper' => [
+                    'paths' => ['assets/'],
+                    'importmap_entries' => 'reachable',
+                    'importmap_polyfill' => 'my-polyfill',
+                ],
+            ]);
+        });
+
+        $definition = $container->getDefinition('asset_mapper.importmap.generator');
+        $this->assertSame('reachable', $definition->getArgument(4));
+        // the polyfill name is configured on the renderer only, and handed over at render time
+        $this->assertSame('my-polyfill', $container->getDefinition('asset_mapper.importmap.renderer')->getArgument(3));
+    }
+
     public function testDefaultLock()
     {
         $container = $this->createContainerFromFile('lock');

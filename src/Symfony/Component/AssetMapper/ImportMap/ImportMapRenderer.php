@@ -48,7 +48,7 @@ class ImportMapRenderer
     {
         $entryPoint = (array) $entryPoint;
 
-        $importMapData = $this->importMapGenerator->getImportMapData($entryPoint);
+        $importMapData = $this->importMapGenerator->getImportMapData($entryPoint, $this->polyfillImportName ?: null);
         $importMap = [];
         $integrity = [];
         $modulePreloads = [];

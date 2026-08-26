@@ -108,6 +108,26 @@ class AssetMapperCompileCommandTest extends TestCase
             '/assets/subdir/file5.js',
             '/assets/file4.js',
         ], $entrypointData);
+
+        $this->assertFileDoesNotExist($targetBuildDir.'/entrypoint.reachable.file6.json');
+    }
+
+    public function testReachableEntrypointMetadataIsCompiledWhenTheImportMapIsLimitedToIt()
+    {
+        $this->kernel = new AssetMapperTestAppKernel('reachable_entries', true);
+        $application = new Application($this->kernel);
+
+        $targetBuildDir = $this->kernel->getProjectDir().'/public/assets';
+        $this->filesystem->remove($targetBuildDir);
+
+        $tester = new CommandTester($application->find('asset-map:compile'));
+        $this->assertSame(0, $tester->execute([]));
+
+        $this->assertFileExists($targetBuildDir.'/entrypoint.reachable.file6.json');
+        $this->assertSame([
+            '/assets/subdir/file5.js',
+            '/assets/file4.js',
+        ], json_decode($this->filesystem->readFile($targetBuildDir.'/entrypoint.reachable.file6.json'), true));
     }
 
     public function testEventIsDispatched()

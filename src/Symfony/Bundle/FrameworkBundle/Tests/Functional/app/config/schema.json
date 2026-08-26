@@ -1393,6 +1393,21 @@
                                         "default": "es-module-shims",
                                         "description": "The importmap name that will be used to load the polyfill. Set to false to disable."
                                     },
+                                    "importmap_entries": {
+                                        "anyOf": [
+                                            {
+                                                "enum": [
+                                                    "all",
+                                                    "reachable"
+                                                ]
+                                            },
+                                            {
+                                                "$ref": "#/$defs/types/param"
+                                            }
+                                        ],
+                                        "default": "all",
+                                        "description": "Which entries end up in the rendered importmap: \"all\" of them, or only the ones \"reachable\" from the rendered entrypoints (their eager and lazy import chains) plus the polyfill."
+                                    },
                                     "importmap_script_attributes": {
                                         "$ref": "#/$defs/types/object_null",
                                         "additionalProperties": {
@@ -1532,6 +1547,7 @@
                             "extensions": [],
                             "importmap_path": "%kernel.project_dir%/importmap.php",
                             "importmap_polyfill": "es-module-shims",
+                            "importmap_entries": "all",
                             "importmap_script_attributes": [],
                             "importmap_integrity_algorithms": [],
                             "vendor_dir": "%kernel.project_dir%/assets/vendor",

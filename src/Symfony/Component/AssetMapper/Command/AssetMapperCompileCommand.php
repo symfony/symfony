@@ -68,10 +68,19 @@ final class AssetMapperCompileCommand extends Command
         $this->compiledConfigReader->removeConfig(AssetMapper::MANIFEST_FILE_NAME);
         $this->compiledConfigReader->removeConfig(ImportMapGenerator::IMPORT_MAP_CACHE_FILENAME);
         $entrypointFiles = [];
+        $reachableEntrypointFiles = [];
+        $limitedToReachableEntries = $this->importMapGenerator->isLimitedToReachableEntries();
         foreach ($this->importMapGenerator->getEntrypointNames() as $entrypointName) {
             $path = \sprintf(ImportMapGenerator::ENTRYPOINT_CACHE_FILENAME_PATTERN, $entrypointName);
             $this->compiledConfigReader->removeConfig($path);
             $entrypointFiles[$entrypointName] = $path;
+
+            // always removed, so that turning the option off does not leave a stale file behind
+            $reachablePath = \sprintf(ImportMapGenerator::ENTRYPOINT_REACHABLE_CACHE_FILENAME_PATTERN, $entrypointName);
+            $this->compiledConfigReader->removeConfig($reachablePath);
+            if ($limitedToReachableEntries) {
+                $reachableEntrypointFiles[$entrypointName] = $reachablePath;
+            }
         }
 
         $manifest = $this->createManifestAndWriteFiles($io);
@@ -83,6 +92,9 @@ final class AssetMapperCompileCommand extends Command
 
         foreach ($entrypointFiles as $entrypointName => $path) {
             $this->compiledConfigReader->saveConfig($path, $this->importMapGenerator->findEagerEntrypointImports($entrypointName));
+            if (isset($reachableEntrypointFiles[$entrypointName])) {
+                $this->compiledConfigReader->saveConfig($reachableEntrypointFiles[$entrypointName], $this->importMapGenerator->findReachableEntrypointImports($entrypointName));
+            }
         }
         $styledEntrypointNames = array_map(static fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
         $io->comment(\sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));

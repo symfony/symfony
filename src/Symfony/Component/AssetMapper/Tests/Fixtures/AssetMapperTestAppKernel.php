@@ -34,14 +34,20 @@ class AssetMapperTestAppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(static function (ContainerBuilder $container) {
+        $loader->load(function (ContainerBuilder $container) {
+            $assetMapper = [
+                'paths' => ['dir1', 'dir2', 'non_ascii', 'assets'],
+                'public_prefix' => 'assets',
+            ];
+
+            if ('reachable_entries' === $this->getEnvironment()) {
+                $assetMapper['importmap_entries'] = 'reachable';
+            }
+
             $container->loadFromExtension('framework', [
                 'http_client' => true,
                 'assets' => null,
-                'asset_mapper' => [
-                    'paths' => ['dir1', 'dir2', 'non_ascii', 'assets'],
-                    'public_prefix' => 'assets',
-                ],
+                'asset_mapper' => $assetMapper,
                 'test' => true,
             ]);
 

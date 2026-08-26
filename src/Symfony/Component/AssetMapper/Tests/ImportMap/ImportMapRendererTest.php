@@ -177,6 +177,17 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString("import 'bar';", $html);
     }
 
+    public function testThePolyfillNameIsHandedOverToTheGenerator()
+    {
+        $importMapGenerator = $this->createMock(ImportMapGenerator::class);
+        $importMapGenerator->expects($this->once())
+            ->method('getImportMapData')
+            ->with(['app'], 'es-module-shims')
+            ->willReturn([]);
+
+        (new ImportMapRenderer($importMapGenerator, polyfillImportName: 'es-module-shims'))->render(['app']);
+    }
+
     public function testIntegrityIsRenderedForCssAndPolyfill()
     {
         $importMapGenerator = $this->createMock(ImportMapGenerator::class);

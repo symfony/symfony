@@ -1530,6 +1530,7 @@ class FrameworkExtension extends Extension
         $container
             ->getDefinition('asset_mapper.importmap.generator')
             ->replaceArgument(3, $config['importmap_integrity_algorithms'])
+            ->setArgument(4, $config['importmap_entries'])
         ;
 
         $container

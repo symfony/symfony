@@ -13,6 +13,8 @@ namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthRecursiveDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\MaxDepthRecursiveDummyProxy;
 
 /**
  * Covers AbstractObjectNormalizer::ENABLE_MAX_DEPTH and AbstractObjectNormalizer::MAX_DEPTH_HANDLER.
@@ -58,6 +60,31 @@ trait MaxDepthTestTrait
         ];
 
         $this->assertEquals($expected, $result);
+    }
+
+    public function testMaxDepthWithSubclassInheritingMetadata()
+    {
+        $normalizer = $this->getNormalizerForMaxDepth();
+
+        $level1 = new MaxDepthRecursiveDummy();
+        $level1->name = 'level1';
+
+        $level2 = new MaxDepthRecursiveDummyProxy();
+        $level2->name = 'level2';
+        $level1->linked = $level2;
+
+        $level3 = new MaxDepthRecursiveDummy();
+        $level3->name = 'level3';
+        $level2->linked = $level3;
+
+        $result = $normalizer->normalize($level1, null, ['enable_max_depth' => true]);
+
+        $this->assertEquals([
+            'name' => 'level1',
+            'linked' => [
+                'name' => 'level2',
+            ],
+        ], $result);
     }
 
     public function testMaxDepthHandler()

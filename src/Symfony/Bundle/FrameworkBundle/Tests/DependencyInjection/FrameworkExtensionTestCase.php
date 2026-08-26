@@ -3549,6 +3549,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
                 'assets' => null,
                 'asset_mapper' => [
                     'paths' => ['assets/'],
+                    'metadata_dir' => '%kernel.build_dir%/asset_mapper',
                     'importmap_entries' => 'reachable',
                     'importmap_polyfill' => 'my-polyfill',
                 ],

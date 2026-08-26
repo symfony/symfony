@@ -114,6 +114,10 @@ class AssetMapperCompileCommandTest extends TestCase
 
     public function testReachableEntrypointMetadataIsCompiledWhenTheImportMapIsLimitedToIt()
     {
+        if (AssetMapperTestAppKernel::VERSION_ID < 80200) {
+            $this->markTestSkipped('This test requires symfony/framework-bundle 8.2 or higher.');
+        }
+
         $this->kernel = new AssetMapperTestAppKernel('reachable_entries', true);
         $application = new Application($this->kernel);
 

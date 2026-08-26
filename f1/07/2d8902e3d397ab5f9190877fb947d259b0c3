@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-25T12:26:08Z
+
+Renamed the option to `framework.asset_mapper.importmap_entries`: `scopes` is a top-level key of the import maps spec with an unrelated meaning (per-referrer mapping overrides), while this filters `imports`. The constructor argument and the constants follow.
+
+Two other changes pushed on top:
+
+- the polyfill name is no longer a constructor argument of `ImportMapGenerator`. The renderer hands it to `getImportMapData()`, so it stays configured in one place. With it on both services, overriding only one silently fell back to the jspm CDN.
+- `entrypoint.reachable.<name>.json` is written only when the option is on, so projects that never enable it do not pay for an extra graph walk and file. The removal stays unconditional, so turning the option off leaves no stale file behind. Switching mode now needs a recompile; until then the generator walks the asset graph, as it already does for the eager closure in dev.
+
+Description updated to match. This still needs a symfony-docs PR, covering the dynamic-specifier limit and the fact that `importmap.json` and `manifest.json` keep listing every entry, so this hides entries from the page, not from the server.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2026-08-25T13:00:44Z
+
+> the polyfill name is no longer a constructor argument of ImportMapGenerator. The renderer hands it to getImportMapData(), so it stays configured in one place. With it on both services, overriding only one silently fell back to the jspm CDN.
+
+🙏
+
+> entrypoint.reachable.<name>.json is written only when the option is on, so projects that never enable it do not pay for an extra graph walk and file. The removal stays unconditional, so turning the option off leaves no stale file behind.
+
+Thank you for that!
+
+> This still needs a symfony-docs PR, covering the dynamic-specifier limit and the fact that importmap.json and manifest.json keep listing every entry, so this hides entries from the page, not from the server.
+
+Wait one hour and I'll offer a way out this :)
+
+---------------------------------------------------------------------------
+
+by smnandre at 2026-08-25T13:30:19Z
+
+> so this hides entries from the page, not from the server
+
+At least it will hide entries from the rest of the world :)
+
+--> https://github.com/symfony/symfony/pull/65642
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-08-25T19:10:59Z
+
+Docs PR: symfony/symfony-docs#22841 (covers the dynamic-specifier limit and the page-vs-server distinction).

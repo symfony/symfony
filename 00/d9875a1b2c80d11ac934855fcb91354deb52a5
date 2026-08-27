@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-27T12:05:51Z
+
+Thank you for the report and the fix. The diagnosis is right; I checked the mechanism in php-src: NTS builds on Linux arm `setitimer(ITIMER_PROF)`, which counts CPU time, while ZTS builds with zend-max-execution-timers (the FrankenPHP builds) use `timer_create(CLOCK_BOOTTIME)`, and Windows and Apple Silicon use wall-clock timers too. So the 30 second wait is fatal exactly on those builds.
+
+I reworked the fix and pushed it to your branch, retargeted to 6.4 since the loop is the same there:
+- `min(30, 0.8 * limit)` counts from the start of the wait, not from the start of the request. With a 2 second limit of which 1.5 seconds were already spent, the loop still waited 1.69 seconds and the request would have died. The deadline is now capped on the remaining budget, `$_SERVER['REQUEST_TIME_FLOAT'] + max_execution_time - 1s`, and a limit that is already past is ignored (on a wall-time build the request would be dead already, so it means the timer counts CPU time or was restarted by `set_time_limit()`).
+- The comment named the wrong mechanism (`usleep()` does not "count as CPU time"; the clock behind the timer differs per build). It now names the builds and the margin.
+- A regression test holds the slot from a child process under a 2 second limit and checks the callback runs within the budget: 30.04 seconds on the current code, 1.05 and 0.11 seconds with the fix.
+
+Trade-off worth knowing: on CPU-time builds (php-fpm), a request that is near the end of its wall budget now evicts the slot before the 30 second cap instead of waiting for the winner. That is the pre-existing eviction behavior, applied earlier.

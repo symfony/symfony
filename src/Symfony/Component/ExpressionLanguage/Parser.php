@@ -26,12 +26,15 @@ class Parser
     public const OPERATOR_LEFT = 1;
     public const OPERATOR_RIGHT = 2;
 
+    private const MAX_NESTING_LEVEL = 256;
+
     private $stream;
     private $unaryOperators;
     private $binaryOperators;
     private $functions;
     private $names;
     private $lint;
+    private $nestingLevel = 0;
 
     public function __construct(array $functions)
     {
@@ -118,10 +121,16 @@ class Parser
     {
         $this->stream = $stream;
         $this->names = $names;
+        $this->nestingLevel = 0;
 
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
             throw new SyntaxError(sprintf('Unexpected token "%s" of value "%s".', $stream->current->type, $stream->current->value), $stream->current->cursor, $stream->getExpression());
+        }
+
+        // a node tree is at most one level deeper than its number of tokens
+        if (self::MAX_NESTING_LEVEL <= \strlen($stream->getExpression())) {
+            $this->checkDepth($node);
         }
 
         $this->stream = null;
@@ -132,23 +141,33 @@ class Parser
 
     public function parseExpression(int $precedence = 0)
     {
-        $expr = $this->getPrimary();
-        $token = $this->stream->current;
-        while ($token->test(Token::OPERATOR_TYPE) && isset($this->binaryOperators[$token->value]) && $this->binaryOperators[$token->value]['precedence'] >= $precedence) {
-            $op = $this->binaryOperators[$token->value];
-            $this->stream->next();
+        $nestingLevel = $this->nestingLevel;
+        $this->enterNestingLevel();
 
-            $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
-            $expr = new Node\BinaryNode($token->value, $expr, $expr1);
-
+        try {
+            $expr = $this->getPrimary();
             $token = $this->stream->current;
-        }
+            while ($token->test(Token::OPERATOR_TYPE) && isset($this->binaryOperators[$token->value]) && $this->binaryOperators[$token->value]['precedence'] >= $precedence) {
+                $this->enterNestingLevel();
+                $op = $this->binaryOperators[$token->value];
+                $this->stream->next();
 
-        if (0 === $precedence) {
-            return $this->parseConditionalExpression($expr);
-        }
+                $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
+                $expr = new Node\BinaryNode($token->value, $expr, $expr1);
 
-        return $expr;
+                $token = $this->stream->current;
+            }
+
+            if (0 === $precedence) {
+                $this->nestingLevel = $nestingLevel + 1;
+
+                return $this->parseConditionalExpression($expr);
+            }
+
+            return $expr;
+        } finally {
+            $this->nestingLevel = $nestingLevel;
+        }
     }
 
     protected function getPrimary()
@@ -177,6 +196,7 @@ class Parser
     protected function parseConditionalExpression(Node\Node $expr)
     {
         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '?')) {
+            $this->enterNestingLevel();
             $this->stream->next();
             if (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ':')) {
                 $expr2 = $this->parseExpression();
@@ -336,6 +356,7 @@ class Parser
         $token = $this->stream->current;
         while (Token::PUNCTUATION_TYPE == $token->type) {
             if ('.' === $token->value) {
+                $this->enterNestingLevel();
                 $this->stream->next();
                 $token = $this->stream->current;
                 $this->stream->next();
@@ -373,6 +394,7 @@ class Parser
 
                 $node = new Node\GetAttrNode($node, $arg, $arguments, $type);
             } elseif ('[' === $token->value) {
+                $this->enterNestingLevel();
                 $this->stream->next();
                 $arg = $this->parseExpression();
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ']');
@@ -405,5 +427,44 @@ class Parser
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
 
         return new Node\Node($args);
+    }
+
+    /**
+     * Accounts for one more node on the branch being built.
+     *
+     * The nesting level bounds the recursion of the parser.
+     *
+     * @throws SyntaxError
+     */
+    private function enterNestingLevel(): void
+    {
+        if (self::MAX_NESTING_LEVEL < ++$this->nestingLevel) {
+            throw new SyntaxError(sprintf('Expression is nested too deeply, the maximum nesting level is %d', self::MAX_NESTING_LEVEL), $this->stream->current->cursor, $this->stream->getExpression());
+        }
+    }
+
+    /**
+     * Bounds the depth of the resulting node tree.
+     *
+     * Beyond a few thousand levels, serializing or destroying such a tree overflows the native stack.
+     * The nesting level is not enough: it misses the levels that a chain of binary operators or of property accesses adds above its first operand, as in "((a + b + c) + d + e)".
+     *
+     * @throws SyntaxError
+     */
+    private function checkDepth(Node\Node $node): void
+    {
+        $nodes = [[$node, 1]];
+
+        while ($nodes) {
+            [$node, $depth] = array_pop($nodes);
+
+            if (self::MAX_NESTING_LEVEL < $depth) {
+                throw new SyntaxError(sprintf('Expression is nested too deeply, the maximum nesting level is %d', self::MAX_NESTING_LEVEL), $this->stream->current->cursor, $this->stream->getExpression());
+            }
+
+            foreach ($node->nodes as $child) {
+                $nodes[] = [$child, $depth + 1];
+            }
+        }
     }
 }

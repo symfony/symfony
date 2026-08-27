@@ -65,4 +65,5 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
             ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
             ->assertRaised();
     }
+
 }

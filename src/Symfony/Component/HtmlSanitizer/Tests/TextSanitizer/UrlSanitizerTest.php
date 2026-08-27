@@ -337,6 +337,61 @@ class UrlSanitizerTest extends TestCase
             'allowRelative' => false,
             'expected' => null,
         ];
+
+        // view-source URLs wrap another URL, which must pass the same checks
+        yield [
+            'input' => 'view-source:https://trusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'view-source:https://trusted.com/index.html',
+        ];
+
+        yield [
+            'input' => 'view-source:https://untrusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'view-source:https://untrusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'view-source:http://trusted.com/index.html',
+            'allowedSchemes' => ['http', 'https', 'view-source'],
+            'allowedHosts' => null,
+            'forceHttps' => true,
+            'allowRelative' => false,
+            'expected' => 'view-source:https://trusted.com/index.html',
+        ];
+
+        yield [
+            'input' => 'view-source:javascript:alert(1)',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'view-source:view-source:https://trusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
     }
 
     /**

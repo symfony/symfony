@@ -73,6 +73,18 @@ final class UrlSanitizer
             return null;
         }
 
+        // A view-source URL wraps another URL, which has to pass the same checks;
+        // browsers reject a view-source URL wrapped in another one
+        if ('view-source' === $url['scheme']) {
+            $nested = substr($input, \strlen('view-source:'));
+
+            if (0 === strncasecmp($nested, 'view-source:', 12) || null === $nested = self::sanitize($nested, $allowedSchemes, $forceHttps, $allowedHosts, $allowRelative)) {
+                return null;
+            }
+
+            return 'view-source:'.$nested;
+        }
+
         // If the scheme used is not supposed to have a host, do not check the host
         if (!self::isHostlessScheme($url['scheme'])) {
             // No host and relative not allowed
@@ -187,7 +199,7 @@ final class UrlSanitizer
 
     private static function isHostlessScheme(?string $scheme): bool
     {
-        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'sms', 'view-source'], true);
+        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'sms'], true);
     }
 
     private static function isAllowedHost(?string $host, array $allowedHosts): bool

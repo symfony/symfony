@@ -26,12 +26,15 @@ class Parser
     public const OPERATOR_LEFT = 1;
     public const OPERATOR_RIGHT = 2;
 
+    private const MAX_NESTING_LEVEL = 256;
+
     private $stream;
     private $unaryOperators;
     private $binaryOperators;
     private $functions;
     private $names;
     private $lint;
+    private $nestingLevel = 0;
 
     public function __construct(array $functions)
     {
@@ -118,6 +121,7 @@ class Parser
     {
         $this->stream = $stream;
         $this->names = $names;
+        $this->nestingLevel = 0;
 
         $node = $this->parseExpression();
         if (!$stream->isEOF()) {
@@ -132,23 +136,31 @@ class Parser
 
     public function parseExpression(int $precedence = 0)
     {
-        $expr = $this->getPrimary();
-        $token = $this->stream->current;
-        while ($token->test(Token::OPERATOR_TYPE) && isset($this->binaryOperators[$token->value]) && $this->binaryOperators[$token->value]['precedence'] >= $precedence) {
-            $op = $this->binaryOperators[$token->value];
-            $this->stream->next();
+        $nestingLevel = $this->nestingLevel;
+        $this->enterNestingLevel();
 
-            $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
-            $expr = new Node\BinaryNode($token->value, $expr, $expr1);
-
+        try {
+            $expr = $this->getPrimary();
             $token = $this->stream->current;
-        }
+            while ($token->test(Token::OPERATOR_TYPE) && isset($this->binaryOperators[$token->value]) && $this->binaryOperators[$token->value]['precedence'] >= $precedence) {
+                $this->enterNestingLevel();
+                $op = $this->binaryOperators[$token->value];
+                $this->stream->next();
 
-        if (0 === $precedence) {
-            return $this->parseConditionalExpression($expr);
-        }
+                $expr1 = $this->parseExpression(self::OPERATOR_LEFT === $op['associativity'] ? $op['precedence'] + 1 : $op['precedence']);
+                $expr = new Node\BinaryNode($token->value, $expr, $expr1);
 
-        return $expr;
+                $token = $this->stream->current;
+            }
+
+            if (0 === $precedence) {
+                return $this->parseConditionalExpression($expr);
+            }
+
+            return $expr;
+        } finally {
+            $this->nestingLevel = $nestingLevel;
+        }
     }
 
     protected function getPrimary()
@@ -177,6 +189,7 @@ class Parser
     protected function parseConditionalExpression(Node\Node $expr)
     {
         while ($this->stream->current->test(Token::PUNCTUATION_TYPE, '?')) {
+            $this->enterNestingLevel();
             $this->stream->next();
             if (!$this->stream->current->test(Token::PUNCTUATION_TYPE, ':')) {
                 $expr2 = $this->parseExpression();
@@ -336,6 +349,7 @@ class Parser
         $token = $this->stream->current;
         while (Token::PUNCTUATION_TYPE == $token->type) {
             if ('.' === $token->value) {
+                $this->enterNestingLevel();
                 $this->stream->next();
                 $token = $this->stream->current;
                 $this->stream->next();
@@ -373,6 +387,7 @@ class Parser
 
                 $node = new Node\GetAttrNode($node, $arg, $arguments, $type);
             } elseif ('[' === $token->value) {
+                $this->enterNestingLevel();
                 $this->stream->next();
                 $arg = $this->parseExpression();
                 $this->stream->expect(Token::PUNCTUATION_TYPE, ']');
@@ -405,5 +420,20 @@ class Parser
         $this->stream->expect(Token::PUNCTUATION_TYPE, ')', 'A list of arguments must be closed by a parenthesis');
 
         return new Node\Node($args);
+    }
+
+    /**
+     * Accounts for one more node on the branch being built.
+     *
+     * The nesting level bounds the depth of the resulting node tree. Beyond a few
+     * thousand levels, destroying such a tree overflows the native stack.
+     *
+     * @throws SyntaxError
+     */
+    private function enterNestingLevel(): void
+    {
+        if (self::MAX_NESTING_LEVEL < ++$this->nestingLevel) {
+            throw new SyntaxError(sprintf('Expression is nested too deeply, the maximum nesting level is %d', self::MAX_NESTING_LEVEL), $this->stream->current->cursor, $this->stream->getExpression());
+        }
     }
 }

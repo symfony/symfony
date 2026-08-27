@@ -65,4 +65,20 @@ class ExpressionLanguageSyntaxValidatorTest extends ConstraintValidatorTestCase
             ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
             ->assertRaised();
     }
+
+    public function testDeeplyNestedExpressionIsNotValid()
+    {
+        $expression = str_repeat('!', 300).'1';
+
+        $this->validator->validate($expression, new ExpressionLanguageSyntax([
+            'message' => 'myMessage',
+            'allowedVariables' => [],
+        ]));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ syntax_error }}', sprintf('"Expression is nested too deeply, the maximum nesting level is 256 around position 257 for expression `%s`."', $expression))
+            ->setInvalidValue($expression)
+            ->setCode(ExpressionLanguageSyntax::EXPRESSION_LANGUAGE_SYNTAX_ERROR)
+            ->assertRaised();
+    }
 }

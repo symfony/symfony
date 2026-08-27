@@ -127,6 +127,17 @@ final class LockRegistry
                 $logger?->info('Item "{key}" is locked, waiting for it to be released', ['key' => $item->getKey()]);
 
                 $deadline = microtime(true) + 30.0;
+
+                // max_execution_time counts wall time on Windows, on Apple Silicon and on ZTS builds with zend-max-execution-timers
+                // (e.g. FrankenPHP): stop waiting 1s before that limit, to leave time for evicting the slot and computing the value.
+                // A limit that is already past means the timer counts CPU time or was restarted by set_time_limit(): ignore it then.
+                if (0 < $limit = (int) \ini_get('max_execution_time')) {
+                    $end = ($_SERVER['REQUEST_TIME_FLOAT'] ?? microtime(true)) + $limit;
+
+                    if (microtime(true) < $end) {
+                        $deadline = min($deadline, $end - 1.0);
+                    }
+                }
                 $acquired = false;
                 do {
                     if ($acquired = flock($lock, \LOCK_SH | \LOCK_NB)) {

@@ -62,6 +62,41 @@ class ConsoleFormatterTest extends TestCase
         ];
     }
 
+    public function testItEscapesTheRecordFields()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        $record = self::createRecord([
+            'message' => "SELECT * FROM t WHERE a < 1 AND b > 2\033[2J\u{9b}2J",
+            'channel' => '<fg=red>app</>',
+        ]);
+
+        $output = $formatter->format($record);
+
+        $this->assertStringNotContainsString("\033", $output);
+        $this->assertStringNotContainsString("\u{9b}", $output);
+        $this->assertStringContainsString('[\<fg=red\>app\</\>]', $output);
+        $this->assertStringContainsString('SELECT * FROM t WHERE a \< 1 AND b \> 2', $output);
+    }
+
+    public function testItEscapesTheDumpedContext()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        $record = self::createRecord(['context' => ['user' => '<fg=red>alice</>']]);
+
+        $this->assertStringContainsString('"user" =\> "\<fg=red\>alice\</\>"', $formatter->format($record));
+    }
+
+    public function testItKeepsTheMarkupAroundReplacedPlaceholders()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        $record = self::createRecord(['message' => 'Hello {user}', 'context' => ['user' => '<fg=red>alice</>']]);
+
+        $this->assertStringContainsString('Hello <comment>\<fg=red\>alice\</\></>', $formatter->format($record));
+    }
+
     public function testPlaceholderInMessageWithDataContext()
     {
         $context = (new VarCloner())->cloneVar(['user' => 'alice']);
@@ -78,5 +113,18 @@ class ConsoleFormatterTest extends TestCase
         ]);
 
         self::assertStringContainsString('Hello <comment>alice</>', $output);
+    }
+
+    private static function createRecord(array $record): array
+    {
+        return $record + [
+            'message' => 'test',
+            'context' => [],
+            'level' => Logger::WARNING,
+            'level_name' => Logger::getLevelName(Logger::WARNING),
+            'channel' => 'test',
+            'datetime' => new \DateTime(),
+            'extra' => [],
+        ];
     }
 }

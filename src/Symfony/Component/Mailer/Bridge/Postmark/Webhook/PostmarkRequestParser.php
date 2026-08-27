@@ -45,6 +45,10 @@ final class PostmarkRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
+        if ($secret && !hash_equals('Basic '.base64_encode($secret), $request->headers->get('Authorization', ''))) {
+            throw new RejectWebhookException(403, 'Invalid credentials.');
+        }
+
         $payload = $request->toArray();
         if (
             !isset($payload['RecordType'])

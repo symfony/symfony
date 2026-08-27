@@ -67,6 +67,11 @@ use Symfony\Component\Tui\Widget\AbstractWidget;
  * ### Font
  *     font-{name}           FIGlet font (big, small, slant, standard, mini, or path)
  *
+ *     The standard Tailwind font-weight (font-thin … font-black) and
+ *     font-family (font-sans, font-serif, font-mono) utilities are reserved
+ *     and never treated as a FIGlet font name, even if a font of that name
+ *     is registered.
+ *
  * ### Layout
  *     flex-row              Horizontal direction
  *     flex-col              Vertical direction

@@ -405,7 +405,9 @@ class TailwindStylesheetTest extends TestCase
      */
     public static function fontUtilityKeywordProvider(): iterable
     {
-        foreach (['thin', 'extralight', 'light', 'normal', 'medium', 'semibold', 'bold', 'extrabold', 'black', 'sans', 'serif', 'mono'] as $keyword) {
+        $keywords = (new \ReflectionClass(TailwindStylesheet::class))->getConstant('FONT_UTILITY_KEYWORDS');
+
+        foreach ($keywords as $keyword) {
             yield $keyword => ["font-{$keyword}"];
         }
     }

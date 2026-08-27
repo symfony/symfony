@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-27T11:22:09Z
+
+Thank you for the fix. I reviewed it and pushed the merge-ready version to your branch:
+- the two commits are squashed into one;
+- the data provider lists the classes explicitly instead of reading the private constant, and each case also checks that a `.font-X` stylesheet rule still applies to the widget;
+- `FigletTest` gained a render-level case (`font-bold` renders plain text);
+- the docblock is shorter.
+
+Two notes for the record:
+- Any other `font-*` class that is not a registered font still throws at render time (`font-display`, `font-[Inter]`, a typo), because the stylesheet cannot see the `FontRegistry`. That is the pre-existing behavior for unknown FIGlet names. A follow-up could resolve the name at render time and fall back to plain text, and mapping `font-bold`/`font-light` to the existing `bold`/`dim` utilities could be a feature for 8.2.
+- Merge-up note: on 8.2, `Renderer::render()` was replaced by `renderFrame()->toArray()`, so the new `FigletTest` case needs that one-line change there.

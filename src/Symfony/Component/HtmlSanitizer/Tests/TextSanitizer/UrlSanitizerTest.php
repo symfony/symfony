@@ -903,6 +903,19 @@ class UrlSanitizerTest extends TestCase
             'http://example.com/?q=col1%09col2' => null,
             'http://example.com/#line1%0Aline2' => null,
             'http://example.com/?q=a%C2%A0b' => null,
+
+            // A stray byte next to a denied character must not disable the check
+            'http://example.com/?q=%E2%80%AD%80' => null,
+            'http://example.com/#%E2%80%AE%80' => null,
+            'http://example.com/%E2%81%A6%80/x' => null,
+            'http://%E2%80%AE%80@example.com/' => null,
+            'http://example.com/?q=%C2%A0%80' => null,
+            'mailto:x@example.com?subject=%E2%80%AE%80' => null,
+            "http://example.com/foo\u{202E}bar\x80" => null,
+
+            // Percent-encoded bytes that are not UTF-8 are accepted when no character is denied
+            'http://example.com/%80' => ['scheme' => 'http', 'host' => 'example.com'],
+            'http://example.com/?name=Fran%E7ois' => ['scheme' => 'http', 'host' => 'example.com'],
         ];
 
         foreach ($urls as $url => $expected) {

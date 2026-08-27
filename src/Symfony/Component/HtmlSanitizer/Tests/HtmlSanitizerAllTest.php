@@ -349,6 +349,10 @@ class HtmlSanitizerAllTest extends TestCase
                 '<a href="mailto:infobot&#64;example.com?body&#61;send%20current-issue%0D%0Asend%20index" title="Link title">Lorem ipsum</a>',
             ],
             [
+                '<a href="https://trusted.com/?q=%E2%80%AD%80" title="Link title">Lorem ipsum</a>',
+                '<a title="Link title">Lorem ipsum</a>',
+            ],
+            [
                 '<blockquote>Lorem ipsum</blockquote>',
                 '<blockquote>Lorem ipsum</blockquote>',
             ],

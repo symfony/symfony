@@ -400,6 +400,26 @@ class TailwindStylesheetTest extends TestCase
         $this->assertSame('mini', $stylesheet->resolve($widget)->getFont());
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function fontUtilityKeywordProvider(): iterable
+    {
+        foreach (['thin', 'extralight', 'light', 'normal', 'medium', 'semibold', 'bold', 'extrabold', 'black', 'sans', 'serif', 'mono'] as $keyword) {
+            yield $keyword => ["font-{$keyword}"];
+        }
+    }
+
+    #[DataProvider('fontUtilityKeywordProvider')]
+    public function testStandardFontUtilityIsNotTreatedAsFigletFont(string $utilityClass)
+    {
+        $stylesheet = new TailwindStylesheet();
+        $widget = new TextWidget('Hello');
+        $widget->addStyleClass($utilityClass);
+
+        $this->assertNull($stylesheet->resolve($widget)->getFont());
+    }
+
     // --- Align ---
 
     /**

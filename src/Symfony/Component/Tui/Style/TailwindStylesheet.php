@@ -165,6 +165,19 @@ class TailwindStylesheet extends StyleSheet
         950 => 90,
     ];
 
+    /**
+     * Standard Tailwind `font-{weight|family}` utilities.
+     *
+     * These share the `font-` prefix with Tui's FIGlet font directive
+     * (`font-{name}`), so they must be excluded from that match: a widget
+     * styled with a plain `font-bold`/`font-sans` should not be treated as
+     * requesting a (nonexistent) FIGlet font named "bold" or "sans".
+     */
+    private const FONT_UTILITY_KEYWORDS = [
+        'thin', 'extralight', 'light', 'normal', 'medium', 'semibold', 'bold', 'extrabold', 'black',
+        'sans', 'serif', 'mono',
+    ];
+
     protected function getCssClasses(AbstractWidget $widget): array
     {
         return $this->partitionClasses($widget)['css'];
@@ -334,7 +347,7 @@ class TailwindStylesheet extends StyleSheet
         }
 
         // === FONT ===
-        if (preg_match('/^font-(.+)$/', $class, $m)) {
+        if (preg_match('/^font-(.+)$/', $class, $m) && !\in_array($m[1], self::FONT_UTILITY_KEYWORDS, true)) {
             return ['font' => $m[1]];
         }
 

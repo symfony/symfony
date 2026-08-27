@@ -11,15 +11,53 @@
 
 namespace Symfony\Component\Mailer\Bridge\AhaSend\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\AhaSend\RemoteEvent\AhaSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\AhaSend\Webhook\AhaSendRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
+#[Group('time-sensitive')]
 class AhaSendRequestParserTest extends AbstractRequestParserTestCase
 {
     private const SECRET = 'nxLe:L:fZLb7J_Wb3uFeWX/&z4Ed#9&DxPL%Ud&:jhpAW1gLaR%AEFwfKnwp60cC';
+
+    public static function getStaleClockOffsets(): iterable
+    {
+        yield 'too old' => [301];
+        yield 'too far in the future' => [-301];
+    }
+
+    #[DataProvider('getStaleClockOffsets')]
+    public function testRejectSignedRequestWithStaleTimestamp(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
+
+        $this->createRequestParser()->parse($request, self::SECRET);
+    }
+
+    public static function getToleratedClockOffsets(): iterable
+    {
+        yield 'at the past edge' => [300];
+        yield 'at the future edge' => [-300];
+    }
+
+    #[DataProvider('getToleratedClockOffsets')]
+    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
+
+        $this->assertNotNull($this->createRequestParser()->parse($request, self::SECRET));
+    }
 
     protected function createRequestParser(): RequestParserInterface
     {
@@ -43,6 +81,8 @@ class AhaSendRequestParserTest extends AbstractRequestParserTestCase
             }
         }
         $payload = json_encode($payloadArray, \JSON_UNESCAPED_SLASHES);
+
+        ClockMock::withClockMock((int) $server['HTTP_webhook-timestamp']);
 
         return Request::create('/', 'POST', [], [], [], $server, $payload);
     }

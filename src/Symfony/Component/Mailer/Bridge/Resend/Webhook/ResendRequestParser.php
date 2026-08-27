@@ -27,6 +27,8 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class ResendRequestParser extends AbstractRequestParser
 {
+    private const TIMESTAMP_TOLERANCE = 300;
+
     public function __construct(
         private readonly ResendPayloadConverter $converter,
     ) {
@@ -81,6 +83,10 @@ final class ResendRequestParser extends AbstractRequestParser
         $messageId = $headers->get('svix-id');
         $messageTimestamp = (int) $headers->get('svix-timestamp');
         $messageSignature = $headers->get('svix-signature');
+
+        if (abs(time() - $messageTimestamp) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
+        }
 
         $signature = $this->sign($secret, $messageId, $messageTimestamp, $payload);
         $expectedSignature = explode(',', $signature, 2)[1];

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-27T12:11:43Z
+
+Thank you for the fix. The scope is the right one (query and fragment of hostless schemes only), but the submitted patch did not change the outcome for the CRLF cases, which is why the two new test cases failed on CI: the new constant is a single-quoted PHP string, so PCRE receives `\v` and reads it as its vertical-whitespace class, which matches CR and LF as well. Only the tab case changed.
+
+I reworked it and pushed to your branch, retargeted to 6.4 where the check was introduced:
+- one pattern kept, with the exception expressed in the loop (`str_replace(["\r", "\n", "\t"], '', $decoded)` for the query and fragment of hostless schemes), and a comment stating the rule and the RFC;
+- `\v` in `DENIED_CHARS_PATTERN` replaced by `\x0B`, with no behavior change, so the next copy of the pattern does not hit the same trap;
+- the provider now also asserts what must stay rejected: encoded CR/LF in the user, host or path of hostless URLs, `https://...?x=1%0A2`, BiDi marks and NBSP everywhere, raw CR/LF/TAB; plus one end-to-end case in `HtmlSanitizerAllTest` with the RFC example;
+- the commit message uses the component prefix instead of the conventional-commit prefix.

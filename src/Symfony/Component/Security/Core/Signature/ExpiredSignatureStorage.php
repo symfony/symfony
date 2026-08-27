@@ -37,7 +37,10 @@ final class ExpiredSignatureStorage
         return $this->cache->getItem($key)->get();
     }
 
-    public function incrementUsages(string $hash): void
+    /**
+     * @return int The number of usages once this one is accounted for
+     */
+    public function incrementUsages(string $hash): int
     {
         $item = $this->cache->getItem(rawurlencode($hash));
 
@@ -45,7 +48,10 @@ final class ExpiredSignatureStorage
             $item->expiresAfter($this->lifetime);
         }
 
-        $item->set($this->countUsages($hash) + 1);
+        $usages = ($item->get() ?? 0) + 1;
+        $item->set($usages);
         $this->cache->save($item);
+
+        return $usages;
     }
 }

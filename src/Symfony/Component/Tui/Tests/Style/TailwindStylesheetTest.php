@@ -400,6 +400,40 @@ class TailwindStylesheetTest extends TestCase
         $this->assertSame('mini', $stylesheet->resolve($widget)->getFont());
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function tailwindFontUtilityProvider(): iterable
+    {
+        yield 'thin' => ['font-thin'];
+        yield 'extralight' => ['font-extralight'];
+        yield 'light' => ['font-light'];
+        yield 'normal' => ['font-normal'];
+        yield 'medium' => ['font-medium'];
+        yield 'semibold' => ['font-semibold'];
+        yield 'bold' => ['font-bold'];
+        yield 'extrabold' => ['font-extrabold'];
+        yield 'black' => ['font-black'];
+        yield 'sans' => ['font-sans'];
+        yield 'serif' => ['font-serif'];
+        yield 'mono' => ['font-mono'];
+    }
+
+    #[DataProvider('tailwindFontUtilityProvider')]
+    public function testTailwindFontUtilityIsACssClassNotAFigletFont(string $class)
+    {
+        $stylesheet = new TailwindStylesheet();
+        $stylesheet->addRule('.'.$class, new Style()->withItalic());
+
+        $widget = new TextWidget('Hello');
+        $widget->addStyleClass($class);
+
+        $resolved = $stylesheet->resolve($widget);
+
+        $this->assertNull($resolved->getFont());
+        $this->assertTrue($resolved->getItalic());
+    }
+
     // --- Align ---
 
     /**

@@ -29,7 +29,7 @@
         "symfony/process": "^5.4|^6.4",
         "symfony/property-access": "^4.4|^5.1|^6.0",
         "symfony/property-info": "^4.4|^5.1|^6.0",
-        "symfony/serializer": "^5.4.35|~6.3.12|^6.4.3"
+        "symfony/serializer": "^5.4.35|~6.3.12|^6.4.3,<6.4.44"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",

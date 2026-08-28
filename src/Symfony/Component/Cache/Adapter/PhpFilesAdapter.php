@@ -109,19 +109,23 @@ class PhpFilesAdapter extends AbstractAdapter implements PruneableInterface
         $getExpiry = false;
 
         foreach ($ids as $id) {
-            if (null === $value = $this->values[$id] ?? null) {
-                $missingIds[] = $id;
-            } elseif ('N;' === $value) {
-                $values[$id] = null;
-            } elseif (!\is_object($value)) {
-                $values[$id] = $value;
-            } elseif ($value instanceof CachedValueInterface) {
-                $values[$id] = $value->getValue();
-            } elseif (!$value instanceof LazyValue) {
-                $values[$id] = $value;
-            } elseif (false === $values[$id] = include $value->file) {
-                unset($values[$id], $this->values[$id]);
-                $missingIds[] = $id;
+            try {
+                if (null === $value = $this->values[$id] ?? null) {
+                    $missingIds[] = $id;
+                } elseif ('N;' === $value) {
+                    $values[$id] = null;
+                } elseif (!\is_object($value)) {
+                    $values[$id] = $value;
+                } elseif ($value instanceof CachedValueInterface) {
+                    $values[$id] = $value->getValue();
+                } elseif (!$value instanceof LazyValue) {
+                    $values[$id] = $value;
+                } elseif (false === $values[$id] = include $value->file) {
+                    unset($values[$id], $this->values[$id]);
+                    $missingIds[] = $id;
+                }
+            } catch (\Throwable) {
+                unset($values[$id], $this->values[$id], self::$valuesCache[$this->files[$id] ?? '']);
             }
             if (!$this->appendOnly) {
                 unset($this->values[$id]);

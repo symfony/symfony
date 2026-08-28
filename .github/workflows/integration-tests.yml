@@ -19,7 +19,7 @@ jobs:
 
   tests:
     name: Integration
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       matrix:
@@ -150,7 +150,7 @@ jobs:
         run: |
           echo "::group::apt-get update"
           sudo wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | sudo apt-key add -
-          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
+          echo "deb https://packages.couchbase.com/clients/c/repos/deb/ubuntu2404 noble noble/main" | sudo tee /etc/apt/sources.list.d/couchbase.list
           sudo apt-get update
           echo "::endgroup::"
 

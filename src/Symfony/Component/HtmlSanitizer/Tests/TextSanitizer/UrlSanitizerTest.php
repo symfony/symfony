@@ -878,6 +878,28 @@ class UrlSanitizerTest extends TestCase
             'http://example.com/foo%C2%A0bar' => null,
             'http://example.com/%E2%80%A8bar' => null,
             'http://example.com/%E3%80%80bar' => null,
+
+            // Percent-encoded line breaks and tabs are legitimate in the query and
+            // fragment of hostless schemes (RFC 6068 requires %0D%0A in a mailto body)
+            'mailto:infobot@example.com?body=send%20current-issue%0D%0Asend%20index' => ['scheme' => 'mailto', 'host' => null],
+            'mailto:x@example.com?body=line1%0d%0aline2' => ['scheme' => 'mailto', 'host' => null],
+            'mailto:x@example.com?body=col1%09col2' => ['scheme' => 'mailto', 'host' => null],
+            'mailto:x@example.com#line1%0D%0Aline2' => ['scheme' => 'mailto', 'host' => null],
+            'sms:+15105550101?body=line1%0D%0Aline2' => ['scheme' => 'sms', 'host' => null],
+            'mailto:x%0D%0Ay@example.com' => null,
+            'mailto:x@example.com?subject=%E2%80%AE' => null,
+            'mailto:x@example.com#%E2%81%A6' => null,
+            'mailto:x@example.com?subject=a%C2%A0b' => null,
+            'mailto:x@example.com?subject=a%E2%80%A8b' => null,
+            'mailto:x@example.com?subject=a%0Bb' => null,
+            'mailto:x@example.com?subject=a%0Cb' => null,
+            'mailto:x@example.com?body=line1%0D%0Aline2%E2%80%AE' => null,
+            "mailto:x@example.com?body=line1\nline2" => null,
+            "mailto:x@example.com?body=col1\tcol2" => null,
+            'http://example.com/?q=line1%0D%0Aline2' => null,
+            'http://example.com/?q=col1%09col2' => null,
+            'http://example.com/#line1%0Aline2' => null,
+            'http://example.com/?q=a%C2%A0b' => null,
         ];
 
         foreach ($urls as $url => $expected) {

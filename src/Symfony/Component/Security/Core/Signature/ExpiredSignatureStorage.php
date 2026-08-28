@@ -43,13 +43,11 @@ final class ExpiredSignatureStorage
     public function incrementUsages(string $hash): int
     {
         $item = $this->cache->getItem(rawurlencode($hash));
-
-        if (!$item->isHit()) {
-            $item->expiresAfter($this->lifetime);
-        }
-
         $usages = ($item->get() ?? 0) + 1;
+
+        // a fetched item does not carry its expiration, it has to be set on every save
         $item->set($usages);
+        $item->expiresAfter($this->lifetime);
         $this->cache->save($item);
 
         return $usages;

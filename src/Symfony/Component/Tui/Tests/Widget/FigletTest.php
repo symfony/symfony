@@ -177,6 +177,21 @@ class FigletTest extends TestCase
         $this->assertCount(4, $lines);
     }
 
+    public function testTailwindFontUtilityDoesNotSelectAFigletFont()
+    {
+        $renderer = new Renderer(new TailwindStylesheet());
+
+        $root = new ContainerWidget();
+        $widget = new TextWidget('Hello');
+        $widget->addStyleClass('font-bold');
+        $root->add($widget);
+
+        $lines = $renderer->render($root, 80, 24);
+
+        $this->assertCount(1, $lines);
+        $this->assertStringContainsString('Hello', AnsiUtils::stripAnsiCodes($lines[0]));
+    }
+
     public function testInstanceStyleFontOverridesStylesheet()
     {
         $stylesheet = new StyleSheet([

@@ -48,7 +48,7 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 {
     /**
      * @param iterable<mixed, AuthenticatorInterface> $authenticators
-     * @param ExposeSecurityLevel                     $exposeSecurityErrors Passing a bool is deprecated since Symfony 8.1
+     * @param ExposeSecurityLevel                     $exposeSecurityErrors Passing the removed "bool $eraseCredentials" as 6th argument (pre-8.1 signature) is deprecated since Symfony 8.1
      * @param string[]                                $requiredBadges
      */
     public function __construct(

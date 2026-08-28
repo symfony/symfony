@@ -24,7 +24,7 @@ final class UrlSanitizer
      * formatting marks plus Unicode whitespace and the zero-width no-break
      * space. ASCII space is tolerated and percent-encoded by parse().
      */
-    private const DENIED_CHARS_PATTERN = '/[\t\n\v\f\r\x{0085}\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}\x{202A}-\x{202E}\x{2066}-\x{2069}]/u';
+    private const DENIED_CHARS_PATTERN = '/[\t\n\x0B\f\r\x{0085}\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}\x{202A}-\x{202E}\x{2066}-\x{2069}]/u';
 
     /**
      * Sanitizes a given URL string.
@@ -149,8 +149,22 @@ final class UrlSanitizer
 
             // Reject denied characters reachable via percent-encoding in any
             // component; otherwise the upfront check is bypassed by encoding.
+            // Percent-encoded line breaks and tabs are legitimate in the query
+            // and fragment of hostless schemes: RFC 6068 requires %0D%0A for
+            // line breaks in the body of a mailto URL.
+            $isHostless = self::isHostlessScheme($parsedUrl['scheme']);
             foreach (['user', 'pass', 'host', 'path', 'query', 'fragment'] as $part) {
-                if (isset($parsedUrl[$part]) && preg_match(self::DENIED_CHARS_PATTERN, rawurldecode($parsedUrl[$part]))) {
+                if (!isset($parsedUrl[$part])) {
+                    continue;
+                }
+
+                $decoded = rawurldecode($parsedUrl[$part]);
+
+                if ($isHostless && ('query' === $part || 'fragment' === $part)) {
+                    $decoded = str_replace(["\r", "\n", "\t"], '', $decoded);
+                }
+
+                if (preg_match(self::DENIED_CHARS_PATTERN, $decoded)) {
                     return null;
                 }
             }

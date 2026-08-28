@@ -32,7 +32,7 @@
         "symfony/var-exporter": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
-        "cache/integration-tests": "dev-master",
+        "cache/integration-tests": "^0.18",
         "doctrine/cache": "^1.6|^2.0",
         "doctrine/dbal": "^2.13.1|^3|^4",
         "predis/predis": "^1.1|^2.0",

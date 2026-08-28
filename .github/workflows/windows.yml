@@ -63,7 +63,6 @@ jobs:
           "extension=php_mbstring.dll" >> php.ini-min
           Copy php.ini-min php.ini-max
           "zend_extension=php_opcache.dll" >> php.ini-max
-          "opcache.enable_cli=1" >> php.ini-max
           "extension=php_openssl.dll" >> php.ini-max
           "extension=php_apcu.dll" >> php.ini-max
           "extension=php_redis.dll" >> php.ini-max

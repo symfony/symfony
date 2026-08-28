@@ -556,27 +556,27 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Deze waarde is geen geldige XML.</target>
+                <target>Deze waarde is geen geldige XML.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Deze waarde voldoet niet aan het verwachte XSD-schema.</target>
+                <target>Deze waarde voldoet niet aan het verwachte XSD-schema.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Deze XML-payload is te groot ({{ size }} bytes): deze overschrijdt de limiet van {{ limit }} bytes.</target>
+                <target>Deze XML-payload is te groot ({{ size }} bytes): deze overschrijdt de limiet van {{ limit }} bytes.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Deze waarde is geen geldige cron-expressie.</target>
+                <target>Deze waarde is geen geldige cron-expressie.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">De gerefereerde entiteit bestaat niet.</target>
+                <target>De gerefereerde entiteit bestaat niet.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Deze waarde is geen geldige ULID.</target>
+                <target>Deze waarde is geen geldige ULID.</target>
             </trans-unit>
         </body>
     </file>

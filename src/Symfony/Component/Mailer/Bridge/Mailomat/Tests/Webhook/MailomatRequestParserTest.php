@@ -80,6 +80,27 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
         ], str_replace("\n", "\r\n", $payload));
     }
 
+    public function testRejectsForgedSignature()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $request->headers->set('X-MOM-Webhook-Signature', 'sha256='.hash_hmac('sha256', '1d958822-0934-4c6a-abc8-5defec4baa64.delivered.1718004211', 'another-secret'));
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is wrong.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public function testRejectsMissingSignature()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $request->headers->remove('X-MOM-Webhook-Signature');
+
+        $this->expectException(RejectWebhookException::class);
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
     #[DataProvider('provideNonSha256Algorithms')]
     public function testRejectsNonSha256Algorithm(string $algo)
     {

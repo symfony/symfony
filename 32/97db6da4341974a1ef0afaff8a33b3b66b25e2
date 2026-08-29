@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-29T11:11:38Z
+
+Changes made while reviewing:
+
+- The discovery request now sets `max_redirects` to 0, in both handlers, with a test for each. The check on the advertised endpoints used the final URL of the discovery request, so a provider whose https well-known URL redirected to http skipped it; and a plain hop anywhere in a redirect chain lets a third party on the path pick the host that serves the rest. The specification does not allow a redirect there anyway (the `issuer` must be identical to the URL the document was directly retrieved from). The description explains the trade-off for providers that redirect.
+- The test that modelled a redirected discovery request is replaced by the no-redirect tests, since that scenario cannot happen anymore.
+- The two new `OidcTokenHandlerTest` tests are placed before `testDiscoveryThrowsWhenJwksUriIsMissing()` instead of before `testDiscoveryIgnoresNonSignatureKeys()`: 8.1 and 8.2 replaced the latter with the key-usage tests and appended more at the end of the class, which made the merge-up conflict; trial merges into 8.1 and 8.2 are clean now.
+
+Checks: Security/Http 668 tests and SecurityBundle 418 tests green on the current 7.4 tip; php-cs-fixer clean on the changed files.

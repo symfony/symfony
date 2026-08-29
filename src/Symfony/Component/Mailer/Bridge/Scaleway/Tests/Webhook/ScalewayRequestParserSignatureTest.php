@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -34,6 +35,26 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Signature is invalid.');
         $parser->parse($this->createRequest($envelope), '');
+    }
+
+    #[DataProvider('provideNonStringSignedFields')]
+    public function testRejectsNonStringSignedField(string $type, string $field)
+    {
+        $envelope = $this->createSignedEnvelope(type: $type);
+        $envelope[$field] = ['not a string'];
+        $parser = $this->createParser($this->createCertClient());
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Payload is malformed.');
+        $parser->parse($this->createRequest($envelope), '');
+    }
+
+    public static function provideNonStringSignedFields(): iterable
+    {
+        yield ['Notification', 'Message'];
+        yield ['Notification', 'Subject'];
+        yield ['SubscriptionConfirmation', 'SubscribeURL'];
+        yield ['SubscriptionConfirmation', 'Token'];
     }
 
     public function testRejectsCertificateNotIssuedByTrustedCA()

@@ -90,6 +90,23 @@ class MailgunRequestParserTest extends AbstractRequestParserTestCase
         $this->createRequestParser()->parse($this->createRequest($payload), $this->getSecret());
     }
 
+    /**
+     * @dataProvider provideNonStringSignatureFields
+     */
+    public function testNonStringSignatureFieldsAreRejected(string $payload)
+    {
+        $this->expectException(RejectWebhookException::class);
+        $this->createRequestParser()->parse($this->createRequest($payload), $this->getSecret());
+    }
+
+    public static function provideNonStringSignatureFields(): iterable
+    {
+        yield 'int signature' => ['{"signature":{"timestamp":"1","token":"token","signature":123},"event-data":{"event":"delivered"}}'];
+        yield 'array signature' => ['{"signature":{"timestamp":"1","token":"token","signature":["wrong"]},"event-data":{"event":"delivered"}}'];
+        yield 'array timestamp' => ['{"signature":{"timestamp":["1"],"token":"token","signature":"wrong"},"event-data":{"event":"delivered"}}'];
+        yield 'array token' => ['{"signature":{"timestamp":"1","token":["token"],"signature":"wrong"},"event-data":{"event":"delivered"}}'];
+    }
+
     public function testMalformedPayloadIsRejected()
     {
         $this->expectException(RejectWebhookException::class);

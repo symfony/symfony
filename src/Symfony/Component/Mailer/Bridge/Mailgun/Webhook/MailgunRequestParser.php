@@ -48,9 +48,9 @@ final class MailgunRequestParser extends AbstractRequestParser
 
         $content = $request->toArray();
         if (
-            !isset($content['signature']['timestamp'])
-            || !isset($content['signature']['token'])
-            || !isset($content['signature']['signature'])
+            !\is_string($content['signature']['timestamp'] ?? null)
+            || !\is_string($content['signature']['token'] ?? null)
+            || !\is_string($content['signature']['signature'] ?? null)
             || !isset($content['event-data']['event'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');

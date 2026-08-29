@@ -38,13 +38,13 @@ final class MailchimpRequestParser extends AbstractRequestParser
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null
     {
         $content = $request->request->all();
-        if (!isset($content['mandrill_events'])) {
+        if (!\is_string($content['mandrill_events'] ?? null)) {
             throw new RejectWebhookException(400, 'Payload malformed.');
         }
 
         // Mailchimp sends an empty array to verify the webhook URL is reachable.
         if ([] === $events = json_decode($content['mandrill_events'], true)) {
-            $this->validateSignature($content, $secret, $request->getUri(), $request->headers->get('X-Mandrill-Signature'));
+            $this->validateSignature($content, $secret, $this->getWebhookUrl($request), $request->headers->get('X-Mandrill-Signature'));
 
             return null;
         }
@@ -53,13 +53,26 @@ final class MailchimpRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(400, 'Payload malformed.');
         }
 
-        $this->validateSignature($content, $secret, $request->getUri(), $request->headers->get('X-Mandrill-Signature'));
+        $this->validateSignature($content, $secret, $this->getWebhookUrl($request), $request->headers->get('X-Mandrill-Signature'));
 
         try {
             return array_map($this->converter->convert(...), $events);
         } catch (ParseException $e) {
             throw new RejectWebhookException(406, $e->getMessage(), $e);
         }
+    }
+
+    /**
+     * Mandrill signs the webhook URL as configured, so the query string must be used as sent, not normalized.
+     */
+    private function getWebhookUrl(Request $request): string
+    {
+        $url = $request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo();
+        if ('' !== ($queryString = $request->server->get('QUERY_STRING', '')) && null !== $queryString) {
+            $url .= '?'.$queryString;
+        }
+
+        return $url;
     }
 
     /**

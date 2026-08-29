@@ -13,6 +13,7 @@ namespace Symfony\Component\Security\Http\Tests\LoginLink;
 
 use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
@@ -216,6 +217,27 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
+    public function testConsumeLoginLinkExceedsMaxUsageWhenConsumedConcurrently()
+    {
+        $expires = time() + 500;
+        $signature = $this->createSignatureHash('weaverryan', $expires);
+        $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=%s&expires=%d', $signature, $expires));
+
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+
+        $linker = null;
+        // consume the same link a second time while the first consumption reads the usage counter
+        $this->expiredLinkCache = new TestLoginLinkConcurrentCache(new ArrayAdapter(), static function () use (&$linker, $request) {
+            $linker->consumeLoginLink($request);
+        });
+        $this->expiredLinkStorage = new ExpiredSignatureStorage($this->expiredLinkCache, 360);
+        $linker = $this->createLinker(['max_uses' => 1]);
+
+        $this->expectException(ExpiredLoginLinkException::class);
+        $linker->consumeLoginLink($request);
+    }
+
     public function testConsumeLoginLinkWithMissingHash()
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
@@ -310,6 +332,71 @@ class LoginLinkHandlerTest extends TestCase
         ], $options);
 
         return new LoginLinkHandler($this->router ?? $this->createStub(UrlGeneratorInterface::class), $this->userProvider, new SignatureHasher($this->propertyAccessor, $extraProperties, 's3cret', $this->expiredLinkStorage, $options['max_uses'] ?? null), $options);
+    }
+}
+
+/**
+ * Runs a concurrent request the first time an item is read from the pool.
+ */
+class TestLoginLinkConcurrentCache implements CacheItemPoolInterface
+{
+    private $pool;
+    private $concurrentRequest;
+
+    public function __construct(CacheItemPoolInterface $pool, callable $concurrentRequest)
+    {
+        $this->pool = $pool;
+        $this->concurrentRequest = \Closure::fromCallable($concurrentRequest);
+    }
+
+    public function getItem($key): CacheItemInterface
+    {
+        if ($concurrentRequest = $this->concurrentRequest) {
+            $this->concurrentRequest = null;
+            $concurrentRequest();
+        }
+
+        return $this->pool->getItem($key);
+    }
+
+    public function getItems(array $keys = []): iterable
+    {
+        return $this->pool->getItems($keys);
+    }
+
+    public function hasItem($key): bool
+    {
+        return $this->pool->hasItem($key);
+    }
+
+    public function clear(): bool
+    {
+        return $this->pool->clear();
+    }
+
+    public function deleteItem($key): bool
+    {
+        return $this->pool->deleteItem($key);
+    }
+
+    public function deleteItems(array $keys): bool
+    {
+        return $this->pool->deleteItems($keys);
+    }
+
+    public function save(CacheItemInterface $item): bool
+    {
+        return $this->pool->save($item);
+    }
+
+    public function saveDeferred(CacheItemInterface $item): bool
+    {
+        return $this->pool->saveDeferred($item);
+    }
+
+    public function commit(): bool
+    {
+        return $this->pool->commit();
     }
 }
 

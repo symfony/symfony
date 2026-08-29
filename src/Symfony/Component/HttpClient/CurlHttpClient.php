@@ -327,7 +327,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority, $noProxy), CurlClientState::$curlVersion['version_number'], $url, $ntlmOriginKey);
+        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $scheme, $authority, $noProxy), CurlClientState::$curlVersion['version_number'], $url, $ntlmOriginKey);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -406,10 +406,11 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      *
      * Work around CVE-2018-1000007: Authorization and Cookie headers should not follow redirects - fixed in Curl 7.64
      */
-    private static function createRedirectResolver(array $options, string $authority, string $noProxy): \Closure
+    private static function createRedirectResolver(array $options, string $scheme, string $authority, string $noProxy): \Closure
     {
         $redirectHeaders = [];
         if (0 < $options['max_redirects']) {
+            $redirectHeaders['scheme'] = $scheme;
             $redirectHeaders['authority'] = $authority;
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static fn ($h) => 0 !== stripos($h, 'Host:'));
 
@@ -434,7 +435,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
 
             if ($redirectHeaders && isset($location['authority'])) {
-                $requestHeaders = $location['authority'] === $redirectHeaders['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+                // Authorization and Cookie headers MUST NOT follow except for the initial scheme and authority
+                $requestHeaders = $url['scheme'] === $redirectHeaders['scheme'] && $location['authority'] === $redirectHeaders['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 curl_setopt($ch, \CURLOPT_HTTPHEADER, $requestHeaders);
             } elseif ($noContent && $redirectHeaders) {
                 curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders['with_auth']);

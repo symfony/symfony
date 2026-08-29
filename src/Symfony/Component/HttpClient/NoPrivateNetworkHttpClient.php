@@ -73,6 +73,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions, true);
 
         $redirectHeaders = parse_url($url['authority']);
+        $redirectHeaders['scheme'] = $url['scheme'];
         $host = $redirectHeaders['host'];
         $url = implode('', $url);
         $dnsCache = $this->dnsCache;
@@ -140,9 +141,9 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                 }
             }
 
-            // Authorization and Cookie headers MUST NOT follow except for the initial host name
+            // Authorization and Cookie headers MUST NOT follow except for the initial scheme, host and port
             $port = parse_url($url, \PHP_URL_PORT);
-            $options['headers'] = $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            $options['headers'] = parse_url($url, \PHP_URL_SCHEME).':' === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
 
             static $redirectCount = 0;
             $context->setInfo('redirect_count', ++$redirectCount);

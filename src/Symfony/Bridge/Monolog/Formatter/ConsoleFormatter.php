@@ -108,13 +108,13 @@ class ConsoleFormatter implements FormatterInterface
         $record = $this->replacePlaceHolder($record);
 
         if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['context'])) {
-            $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['context']);
+            $context = ($this->options['multiline'] ? "\n" : ' ').OutputFormatter::escape($this->dumpData($record['context']));
         } else {
             $context = '';
         }
 
         if (!$this->options['ignore_empty_context_and_extra'] || !empty($record['extra'])) {
-            $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($record['extra']);
+            $extra = ($this->options['multiline'] ? "\n" : ' ').OutputFormatter::escape($this->dumpData($record['extra']));
         } else {
             $extra = '';
         }
@@ -122,12 +122,12 @@ class ConsoleFormatter implements FormatterInterface
         $formatted = strtr($this->options['format'], [
             '%datetime%' => $record['datetime'] instanceof \DateTimeInterface
                 ? $record['datetime']->format($this->options['date_format'])
-                : $record['datetime'],
+                : self::escape($record['datetime']),
             '%start_tag%' => \sprintf('<%s>', self::LEVEL_COLOR_MAP[$record['level']]),
-            '%level_name%' => \sprintf($this->options['level_name_format'], $record['level_name']),
+            '%level_name%' => \sprintf($this->options['level_name_format'], self::escape($record['level_name'])),
             '%end_tag%' => '</>',
-            '%channel%' => $record['channel'],
-            '%message%' => $this->replacePlaceHolder($record)['message'],
+            '%channel%' => self::escape($record['channel']),
+            '%message%' => $record['message'],
             '%context%' => $context,
             '%extra%' => $extra,
         ]);
@@ -164,7 +164,7 @@ class ConsoleFormatter implements FormatterInterface
 
     private function replacePlaceHolder(array $record): array
     {
-        $message = $record['message'];
+        $message = $record['message'] = self::escape($record['message']);
 
         if (!str_contains($message, '{')) {
             return $record;
@@ -208,5 +208,10 @@ class ConsoleFormatter implements FormatterInterface
         ftruncate($this->outputBuffer, 0);
 
         return rtrim($dump);
+    }
+
+    private static function escape(string $value): string
+    {
+        return OutputFormatter::escape(preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', '', $value));
     }
 }

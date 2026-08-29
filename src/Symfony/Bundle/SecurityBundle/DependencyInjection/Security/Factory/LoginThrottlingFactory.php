@@ -15,9 +15,11 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\CacheStorage;
@@ -51,7 +53,7 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
                 ->scalarNode('limiter')->info(\sprintf('A service id implementing "%s".', RequestRateLimiterInterface::class))->end()
                 ->integerNode('max_attempts')->defaultValue(5)->end()
                 ->scalarNode('interval')->defaultValue('1 minute')->end()
-                ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter (or null to disable locking)')->defaultNull()->end()
+                ->scalarNode('lock_factory')->info('The service ID of the lock factory used by the login rate limiter ("auto" to use the default one when the Lock component is configured, or null to disable locking)')->defaultValue('auto')->end()
             ->end();
     }
 
@@ -66,12 +68,19 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
                 'policy' => 'fixed_window',
                 'limit' => $config['max_attempts'],
                 'interval' => $config['interval'],
-                'lock_factory' => $config['lock_factory'],
+                'lock_factory' => 'auto' === $config['lock_factory'] ? null : $config['lock_factory'],
             ];
             $this->registerRateLimiter($container, $localId = '_login_local_'.$firewallName, $limiterOptions);
 
             $limiterOptions['limit'] = 5 * $config['max_attempts'];
             $this->registerRateLimiter($container, $globalId = '_login_global_'.$firewallName, $limiterOptions);
+
+            if ('auto' === $config['lock_factory'] && class_exists(LockFactory::class)) {
+                // resolved when the container is compiled, so that the order in which extensions are loaded does not matter
+                $lockFactory = new Reference('lock.factory', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+                $container->getDefinition('limiter.'.$localId)->replaceArgument(2, $lockFactory);
+                $container->getDefinition('limiter.'.$globalId)->replaceArgument(2, $lockFactory);
+            }
 
             $container->register($config['limiter'] = 'security.login_throttling.'.$firewallName.'.limiter', DefaultLoginRateLimiter::class)
                 ->addArgument(new Reference('limiter.'.$globalId))

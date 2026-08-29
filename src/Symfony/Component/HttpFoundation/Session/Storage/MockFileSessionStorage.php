@@ -76,6 +76,20 @@ class MockFileSessionStorage extends MockArraySessionStorage
     /**
      * @return void
      */
+    public function setId(string $id)
+    {
+        // the id is turned into a file name, so keep it to the charset PHP allows for session ids
+        // and to the 255 bytes a file name can hold once the ".mocksess" suffix is added
+        if ('' !== $id && !preg_match('/^[a-zA-Z0-9,-]{1,246}$/D', $id)) {
+            $id = '';
+        }
+
+        parent::setId($id);
+    }
+
+    /**
+     * @return void
+     */
     public function save()
     {
         if (!$this->started) {

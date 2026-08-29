@@ -25,6 +25,13 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class BinaryFileResponse extends Response
 {
+    // Values accepted for the "X-Sendfile-Type" header, mapped to the response header to send
+    private const SENDFILE_TYPES = [
+        'x-sendfile' => 'X-Sendfile',
+        'x-accel-redirect' => 'X-Accel-Redirect',
+        'x-lighttpd-send-file' => 'X-LIGHTTPD-send-file',
+    ];
+
     protected static $trustXSendfileTypeHeader = false;
 
     /**
@@ -207,15 +214,17 @@ class BinaryFileResponse extends Response
             $this->headers->set('Accept-Ranges', $request->isMethodSafe() ? 'bytes' : 'none');
         }
 
-        if (self::$trustXSendfileTypeHeader && $request->headers->has('X-Sendfile-Type')) {
+        $sendfileType = self::$trustXSendfileTypeHeader ? $request->headers->get('X-Sendfile-Type') : null;
+        $type = self::SENDFILE_TYPES[strtolower($sendfileType ?? '')] ?? null;
+
+        if (null !== $type) {
             // Use X-Sendfile, do not send any content.
-            $type = $request->headers->get('X-Sendfile-Type');
             $path = $this->file->getRealPath();
             // Fall back to scheme://path for stream wrapped locations.
             if (false === $path) {
                 $path = $this->file->getPathname();
             }
-            if ('x-accel-redirect' === strtolower($type)) {
+            if ('X-Accel-Redirect' === $type) {
                 // Do X-Accel-Mapping substitutions.
                 // @link https://github.com/rack/rack/blob/main/lib/rack/sendfile.rb
                 // @link https://mattbrictson.com/blog/accelerated-rails-downloads

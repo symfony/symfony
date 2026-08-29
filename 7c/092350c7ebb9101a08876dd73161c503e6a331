@@ -1,0 +1,33 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-21T16:46:15Z
+
+Thanks for implementing this @Amoifr, and for deriving the header from the traces instead of touching the cache flow. I reviewed it against RFC 9211 and reworked a few points, pushed on top of your commit.
+
+Behaviour changes:
+
+- non-safe and non-cacheable methods now report `fwd=method` instead of `fwd=bypass`. The RFC asks for the most specific reason known to the cache, and `method` is the one that fits a POST. `bypass` stays for `Expect` and for a store lookup failure.
+- `ttl` is computed from `getMaxAge()` and `getAge()` rather than `Response::getTtl()`, which clamps at 0. A stale entry served through stale-while-revalidate now reports a negative `ttl`, which is how the RFC signals staleness.
+- `fwd-status` was lost on HEAD requests, because `fetch()` and `validate()` forward them as GET and the status was recorded under the GET trace key. It is now read under that key.
+- the cache identifier is quoted when it is not a valid structured-field token, so a value with a space no longer produces an unparsable header.
+- no member is added to the 503 that the cache builds on its own when the backend stays locked. The RFC asks caches not to report responses they generate themselves.
+
+Smaller points:
+
+- `fwd-status` and `stored` moved inside the `fwd` branch, since the RFC says both are only meaningful there.
+- the `invalidate` and `invalidate-failed` checks were dropped, since `invalidate()` calls `pass()` first and the `pass` branch already matches.
+- `addCacheStatus()` moved to the end of the class, after the other private methods. It had landed between `getLog()` and its docblock.
+
+Each of these has a test. I kept `cache_status` rather than `cache_name`: the option turns the header on, and naming it after the value would hide that.
+
+On your question about the default, `null` is the right choice. Turning it on would change the responses of every existing application, and RFC 9211 section 6 is explicit that this header helps an attacker probe the cache. I wrote that reasoning into the description.
+
+The red job on 8.6 is unrelated. It fails on the same two components on the 8.2 base tip.
+
+A symfony-docs pull request is still needed once this lands. The points it should carry are listed at the end of the description.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-08-22T07:10:17Z
+
+Thanks a lot for the review and the rework @nicolas-grekas, the RFC reading is much tighter now (`fwd=method`, the negative `ttl` for stale entries, the HEAD trace key, the quoted identifier and the self-generated 503 all make sense). I went through your changes and learned a few things along the way, much appreciated!

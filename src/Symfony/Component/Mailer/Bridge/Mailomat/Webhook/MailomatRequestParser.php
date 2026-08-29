@@ -31,6 +31,7 @@ final class MailomatRequestParser extends AbstractRequestParser
     private const HEADER_ID = 'X-MOM-Webhook-Id';
     private const HEADER_TIMESTAMP = 'X-MOM-Webhook-Timestamp';
     private const HEADER_SIGNATURE = 'X-MOM-Webhook-Signature';
+    private const TIMESTAMP_TOLERANCE = 300;
 
     public function __construct(
         private readonly MailomatPayloadConverter $converter,
@@ -67,6 +68,10 @@ final class MailomatRequestParser extends AbstractRequestParser
             || !isset($content['recipient'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
+        }
+
+        if (abs(time() - (int) $request->headers->get(self::HEADER_TIMESTAMP)) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 
         $this->validateSignature($request->headers, $secret);

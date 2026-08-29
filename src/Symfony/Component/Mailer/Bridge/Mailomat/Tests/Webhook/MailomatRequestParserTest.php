@@ -12,6 +12,8 @@
 namespace Symfony\Component\Mailer\Bridge\Mailomat\Tests\Webhook;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Mailomat\RemoteEvent\MailomatPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailomat\Webhook\MailomatRequestParser;
@@ -19,8 +21,42 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
+#[Group('time-sensitive')]
 class MailomatRequestParserTest extends AbstractRequestParserTestCase
 {
+    public static function getStaleClockOffsets(): iterable
+    {
+        yield 'too old' => [301];
+        yield 'too far in the future' => [-301];
+    }
+
+    #[DataProvider('getStaleClockOffsets')]
+    public function testRejectSignedRequestWithStaleTimestamp(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        ClockMock::withClockMock((int) $request->headers->get('X-MOM-Webhook-Timestamp') + $offset);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public static function getToleratedClockOffsets(): iterable
+    {
+        yield 'at the past edge' => [300];
+        yield 'at the future edge' => [-300];
+    }
+
+    #[DataProvider('getToleratedClockOffsets')]
+    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        ClockMock::withClockMock((int) $request->headers->get('X-MOM-Webhook-Timestamp') + $offset);
+
+        $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
     protected function createRequestParser(): RequestParserInterface
     {
         return new MailomatRequestParser(new MailomatPayloadConverter());
@@ -33,6 +69,8 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
 
     protected function createRequest(string $payload): Request
     {
+        ClockMock::withClockMock(1718004211);
+
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'HTTP_X-MOM-Webhook-Event' => 'delivered',
@@ -49,6 +87,7 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
         $data = '1d958822-0934-4c6a-abc8-5defec4baa64.delivered.1718004211';
         $payload = file_get_contents(__DIR__.'/Fixtures/delivered.json');
 
+        ClockMock::withClockMock(1718004211);
         $request = Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'HTTP_X-MOM-Webhook-Event' => 'delivered',
@@ -58,6 +97,8 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
         ], str_replace("\n", "\r\n", $payload));
 
         $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is wrong.');
+
         $this->createRequestParser()->parse($request, $secret);
     }
 

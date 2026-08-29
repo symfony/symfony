@@ -40,6 +40,11 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     private ?Request $backendRequest = null;
 
     /**
+     * @var array<string, int> The status code received from the backend, by trace key
+     */
+    private array $forwardedStatuses = [];
+
+    /**
      * Constructor.
      *
      * The available options are:
@@ -52,6 +57,11 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *                            requests (including ESI subrequests). (default: 'full' if in debug; 'none' otherwise)
      *
      *   * trace_header           Header name to use for traces. (default: X-Symfony-Cache)
+     *
+     *   * cache_status           Enables the RFC 9211 "Cache-Status" response header and names this cache in it,
+     *                            e.g. "Symfony" reports "Cache-Status: Symfony; hit; ttl=60". The member is
+     *                            appended to any "Cache-Status" header received from the backend.
+     *                            No header is added when null. (default: null)
      *
      *   * default_ttl            The number of seconds that a cache entry should be considered
      *                            fresh when no explicit freshness information is provided in
@@ -104,6 +114,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             'stale_if_error' => 60,
             'trace_level' => 'none',
             'trace_header' => 'X-Symfony-Cache',
+            'cache_status' => null,
         ], $options);
 
         if (!isset($options['trace_level'])) {
@@ -188,6 +199,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // FIXME: catch exceptions and implement a 500 error page here? -> in Varnish, there is a built-in error page mechanism
         if (HttpKernelInterface::MAIN_REQUEST === $type) {
             $this->traces = [];
+            $this->forwardedStatuses = [];
             $this->forwardedRequest = null;
             $this->backendRequest = null;
             // Keep a clone of the original request for surrogates so they can access it.
@@ -233,6 +245,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         if (HttpKernelInterface::MAIN_REQUEST === $type) {
             $this->addTraces($response);
+            $this->addCacheStatus($request, $response);
         }
 
         if (null !== $this->surrogate) {
@@ -475,6 +488,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // always a "master" request (as the real master request can be in cache)
         $response = SubRequestHandler::handle($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $catch);
         $this->forwardedRequest = $request;
+        $this->forwardedStatuses[$this->getTraceKey($request)] = $response->getStatusCode();
 
         /*
          * Support stale-if-error given on Responses or as a config option.
@@ -750,5 +764,70 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         }
 
         return $wait < 100;
+    }
+
+    /**
+     * Reports how the main request was handled in the RFC 9211 "Cache-Status" response header.
+     *
+     * @see https://www.rfc-editor.org/rfc/rfc9211.html
+     */
+    private function addCacheStatus(Request $request, Response $response): void
+    {
+        if (null === $cache = $this->options['cache_status']) {
+            return;
+        }
+
+        $key = $this->getTraceKey($request);
+        $traces = $this->traces[$key] ?? [];
+        $has = static fn (string $event): bool => \in_array($event, $traces, true);
+
+        // the cache builds this response on its own when the backend stays locked, the RFC asks not to report those
+        if ($has('waiting') && 503 === $response->getStatusCode()) {
+            return;
+        }
+
+        if ($has('fresh') || $has('stale-while-revalidate')) {
+            $params = ['hit'];
+
+            if (null !== $maxAge = $response->getMaxAge()) {
+                $params[] = 'ttl='.($maxAge - $response->getAge());
+            }
+        } else {
+            if ($has('pass')) {
+                $params = [$request->isMethodCacheable() ? 'fwd=bypass' : 'fwd=method'];
+            } elseif ($has('reload')) {
+                $params = ['fwd=request'];
+            } elseif ($has('valid') || $has('invalid') || $has('stale-if-error')) {
+                $params = ['fwd=stale'];
+            } elseif ($has('miss')) {
+                $params = ['fwd=miss'];
+            } else {
+                return;
+            }
+
+            $forwardedKey = $key;
+
+            if ('HEAD' === $request->getMethod()) {
+                // fetch() and validate() send HEAD requests to the backend as GET
+                $forwardedRequest = clone $request;
+                $forwardedRequest->setMethod('GET');
+                $forwardedKey = $this->getTraceKey($forwardedRequest);
+            }
+
+            if (isset($this->forwardedStatuses[$forwardedKey]) && $this->forwardedStatuses[$forwardedKey] !== $response->getStatusCode()) {
+                $params[] = 'fwd-status='.$this->forwardedStatuses[$forwardedKey];
+            }
+
+            if ($has('store')) {
+                $params[] = 'stored';
+            }
+        }
+
+        if (!preg_match('{^[a-zA-Z*][-a-zA-Z0-9:/!#$%&\'*+.^_`|~]*+$}', $cache)) {
+            $cache = '"'.addcslashes($cache, '"\\').'"';
+        }
+
+        // the RFC asks each cache to append its own member, keeping the ones added closer to the origin
+        $response->headers->set('Cache-Status', $cache.'; '.implode('; ', $params), false);
     }
 }

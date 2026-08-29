@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\AssetMapper\Event\PreAssetsCompileEvent;
 use Symfony\Component\AssetMapper\Tests\Fixtures\AssetMapperTestAppKernel;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -115,6 +116,13 @@ class AssetMapperCompileCommandTest extends TestCase
     public function testReachableEntrypointMetadataIsCompiledWhenTheImportMapIsLimitedToIt()
     {
         $this->kernel = new AssetMapperTestAppKernel('reachable_entries', true);
+
+        try {
+            $this->kernel->boot();
+        } catch (InvalidConfigurationException) {
+            $this->markTestSkipped('The installed FrameworkBundle has no "importmap_entries" option.');
+        }
+
         $application = new Application($this->kernel);
 
         $targetBuildDir = $this->kernel->getProjectDir().'/public/assets';

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-08-28T09:51:59Z
+
+The two failing jobs don't come from this change. The high-deps one is the 5.4 re-run of the Serializer suite, which fails on the same four tests in #65647, and the 8.6 one is in VarDumper.

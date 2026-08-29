@@ -42,7 +42,7 @@ class CliDumper extends AbstractDumper
         'index' => '38;5;38',
     ];
 
-    protected static $controlCharsRx = '/[\x00-\x1F\x7F]+/';
+    protected static $controlCharsRx = '/(?:[\x00-\x1F\x7F]|\xC2[\x80-\x9F])+/';
     protected static $controlCharsMap = [
         "\t" => '\t',
         "\n" => '\n',

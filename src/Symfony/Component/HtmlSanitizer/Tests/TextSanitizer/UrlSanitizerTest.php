@@ -337,6 +337,61 @@ class UrlSanitizerTest extends TestCase
             'allowRelative' => false,
             'expected' => null,
         ];
+
+        // view-source URLs wrap another URL, which must pass the same checks
+        yield [
+            'input' => 'view-source:https://trusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'view-source:https://trusted.com/index.html',
+        ];
+
+        yield [
+            'input' => 'view-source:https://untrusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'view-source:https://untrusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'view-source:http://trusted.com/index.html',
+            'allowedSchemes' => ['http', 'https', 'view-source'],
+            'allowedHosts' => null,
+            'forceHttps' => true,
+            'allowRelative' => false,
+            'expected' => 'view-source:https://trusted.com/index.html',
+        ];
+
+        yield [
+            'input' => 'view-source:javascript:alert(1)',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => 'view-source:view-source:https://trusted.com/index.html',
+            'allowedSchemes' => ['https', 'view-source'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
     }
 
     /**
@@ -903,6 +958,19 @@ class UrlSanitizerTest extends TestCase
             'http://example.com/?q=col1%09col2' => null,
             'http://example.com/#line1%0Aline2' => null,
             'http://example.com/?q=a%C2%A0b' => null,
+
+            // A stray byte next to a denied character must not disable the check
+            'http://example.com/?q=%E2%80%AD%80' => null,
+            'http://example.com/#%E2%80%AE%80' => null,
+            'http://example.com/%E2%81%A6%80/x' => null,
+            'http://%E2%80%AE%80@example.com/' => null,
+            'http://example.com/?q=%C2%A0%80' => null,
+            'mailto:x@example.com?subject=%E2%80%AE%80' => null,
+            "http://example.com/foo\u{202E}bar\x80" => null,
+
+            // Percent-encoded bytes that are not UTF-8 are accepted when no character is denied
+            'http://example.com/%80' => ['scheme' => 'http', 'host' => 'example.com'],
+            'http://example.com/?name=Fran%E7ois' => ['scheme' => 'http', 'host' => 'example.com'],
         ];
 
         foreach ($urls as $url => $expected) {

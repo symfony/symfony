@@ -38,7 +38,7 @@ final class MailchimpRequestParser extends AbstractRequestParser
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null
     {
         $content = $request->request->all();
-        if (!isset($content['mandrill_events'])) {
+        if (!\is_string($content['mandrill_events'] ?? null)) {
             throw new RejectWebhookException(400, 'Payload malformed.');
         }
 

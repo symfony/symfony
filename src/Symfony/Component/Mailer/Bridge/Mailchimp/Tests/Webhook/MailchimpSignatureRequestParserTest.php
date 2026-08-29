@@ -59,9 +59,17 @@ class MailchimpSignatureRequestParserTest extends TestCase
         $this->parse($this->createRequest(['mandrill_events' => ['[]']]));
     }
 
+    public function testUrlIsSignedAsSentAndNotNormalized()
+    {
+        $request = Request::create('/hook?foo=1&bar=2', 'POST', ['mandrill_events' => $this->events()], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
+        $request->headers->set('X-Mandrill-Signature', base64_encode(hash_hmac('sha1', 'http://localhost/hook?foo=1&bar=2mandrill_events'.$this->events(), self::SECRET, true)));
+
+        $this->assertCount(1, $this->parse($request));
+    }
+
     private function events(): string
     {
-        return '[{"event":"send","msg":{"_id":"1","email":"foo@example.com","ts":1365109999}}]';
+        return json_encode(json_decode(file_get_contents(__DIR__.'/Fixtures/send.json'), true)['mandrill_events'], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
     }
 
     private function createRequest(array $params): Request

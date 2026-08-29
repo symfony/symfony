@@ -50,6 +50,7 @@
         "cloudflare-mailer": "src/Symfony/Component/Mailer/Bridge/Cloudflare",
         "google-mailer": "src/Symfony/Component/Mailer/Bridge/Google",
         "infobip-mailer": "src/Symfony/Component/Mailer/Bridge/Infobip",
+        "mail-kite-mailer": "src/Symfony/Component/Mailer/Bridge/MailKite",
         "mail-pace-mailer": "src/Symfony/Component/Mailer/Bridge/MailPace",
         "mailchimp-mailer": "src/Symfony/Component/Mailer/Bridge/Mailchimp",
         "mailer-send-mailer": "src/Symfony/Component/Mailer/Bridge/MailerSend",

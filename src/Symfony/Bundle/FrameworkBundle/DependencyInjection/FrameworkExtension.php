@@ -3198,6 +3198,7 @@ class FrameworkExtension extends Extension
             MailerBridge\MailerSend\Transport\MailerSendTransportFactory::class => ['symfony/mailer-send-mailer', 'mailer.transport_factory.mailersend'],
             MailerBridge\Mailgun\Transport\MailgunTransportFactory::class => ['symfony/mailgun-mailer', 'mailer.transport_factory.mailgun'],
             MailerBridge\Mailjet\Transport\MailjetTransportFactory::class => ['symfony/mailjet-mailer', 'mailer.transport_factory.mailjet'],
+            MailerBridge\MailKite\Transport\MailKiteTransportFactory::class => ['symfony/mail-kite-mailer', 'mailer.transport_factory.mailkite'],
             MailerBridge\Mailomat\Transport\MailomatTransportFactory::class => ['symfony/mailomat-mailer', 'mailer.transport_factory.mailomat'],
             MailerBridge\MailPace\Transport\MailPaceTransportFactory::class => ['symfony/mail-pace-mailer', 'mailer.transport_factory.mailpace'],
             MailerBridge\Mailchimp\Transport\MandrillTransportFactory::class => ['symfony/mailchimp-mailer', 'mailer.transport_factory.mailchimp'],

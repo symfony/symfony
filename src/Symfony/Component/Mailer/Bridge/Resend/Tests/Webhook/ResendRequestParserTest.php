@@ -78,4 +78,34 @@ class ResendRequestParserTest extends AbstractRequestParserTestCase
             'HTTP_svix-signature' => 'v1,4wjuRp64yC/2itgCQwl2xPePVwSPTdPbXLIY6IxGLTA=',
         ], str_replace("\n", "\r\n", $payload));
     }
+
+    #[DataProvider('provideInvalidSignatureHeaders')]
+    public function testRejectsInvalidSignatureHeader(string $signature)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/sent.json'));
+        $request->headers->set('svix-signature', $signature);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('No signatures found matching the expected signature.');
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public static function provideInvalidSignatureHeaders(): iterable
+    {
+        yield 'forged' => ['v1,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='];
+        yield 'empty' => [''];
+        yield 'no version' => ['4wjuRp64yC/2itgCQwl2xPePVwSPTdPbXLIY6IxGLTA='];
+        yield 'version only' => ['v1'];
+        yield 'unknown version' => ['v2,4wjuRp64yC/2itgCQwl2xPePVwSPTdPbXLIY6IxGLTA='];
+    }
+
+    public function testRejectsMissingSignatureHeader()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/sent.json'));
+        $request->headers->remove('svix-signature');
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Request does not match.');
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
 }

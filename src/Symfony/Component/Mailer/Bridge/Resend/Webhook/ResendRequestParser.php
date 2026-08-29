@@ -94,14 +94,11 @@ final class ResendRequestParser extends AbstractRequestParser
         $signatureFound = false;
 
         foreach ($passedSignatures as $versionedSignature) {
-            $signatureParts = explode(',', $versionedSignature, 2);
-            $version = $signatureParts[0];
+            [$version, $passedSignature] = explode(',', $versionedSignature, 2) + [1 => ''];
 
             if ('v1' !== $version) {
                 continue;
             }
-
-            $passedSignature = $signatureParts[1];
 
             if (hash_equals($expectedSignature, $passedSignature)) {
                 $signatureFound = true;

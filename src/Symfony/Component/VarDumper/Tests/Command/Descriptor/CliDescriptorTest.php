@@ -12,6 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Command\Descriptor;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -96,6 +97,10 @@ class CliDescriptorTest extends TestCase
 
     public function testItEscapesTheFileLink()
     {
+        if ('\<\>' !== OutputFormatter::escape('<>')) {
+            $this->markTestSkipped('The installed symfony/console does not escape adjacent brackets.');
+        }
+
         $output = new BufferedOutput();
         $output->setDecorated(true);
         $descriptor = new CliDescriptor(new CliDumper(function ($s) {

@@ -37,6 +37,26 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $parser->parse($this->createRequest($envelope), '');
     }
 
+    #[DataProvider('provideNonStringSignedFields')]
+    public function testRejectsNonStringSignedField(string $type, string $field)
+    {
+        $envelope = $this->createSignedEnvelope(type: $type);
+        $envelope[$field] = ['not a string'];
+        $parser = $this->createParser($this->createCertClient());
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Payload is malformed.');
+        $parser->parse($this->createRequest($envelope), '');
+    }
+
+    public static function provideNonStringSignedFields(): iterable
+    {
+        yield ['Notification', 'Message'];
+        yield ['Notification', 'Subject'];
+        yield ['SubscriptionConfirmation', 'SubscribeURL'];
+        yield ['SubscriptionConfirmation', 'Token'];
+    }
+
     public function testRejectsCertificateNotIssuedByTrustedCA()
     {
         // the signature itself is valid, but the certificate is not issued by the bundled CA

@@ -123,9 +123,15 @@ final class ScalewayRequestParser extends AbstractRequestParser
 
         $signedString = '';
         foreach ($signedKeys as $key) {
-            if (isset($payload[$key])) {
-                $signedString .= $key."\n".$payload[$key]."\n";
+            if (!isset($payload[$key])) {
+                continue;
             }
+
+            if (!\is_string($payload[$key])) {
+                throw new RejectWebhookException(406, 'Payload is malformed.');
+            }
+
+            $signedString .= $key."\n".$payload[$key]."\n";
         }
 
         $certUrl = $payload['SigningCertURL'];

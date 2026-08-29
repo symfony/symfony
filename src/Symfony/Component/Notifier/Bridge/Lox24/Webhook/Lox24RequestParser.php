@@ -43,7 +43,7 @@ final class Lox24RequestParser extends AbstractRequestParser
             }
         }
 
-        $payload = $request->request->all() ?? [];
+        $payload = $request->getPayload()->all();
         $name = $payload['name'] ?? null;
         $data = $payload['data'] ?? null;
         $id = $payload['id'] ?? null;

@@ -375,8 +375,30 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame($payload, $event->getPayload());
     }
 
+    public function testFormEncodedRequestIsRejected()
+    {
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Request does not match.');
+
+        $request = Request::create('/test', 'POST', [
+            'id' => 'webhook-id',
+            'name' => 'sms.delivery',
+            'data' => ['id' => '123', 'status_code' => 100],
+        ]);
+        $this->parser->parse($request, '');
+    }
+
+    public function testNonObjectJsonBodyIsRejected()
+    {
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('The payload must be a JSON object.');
+
+        $request = Request::create('/test', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '"not an object"');
+        $this->parser->parse($request, '');
+    }
+
     private function getRequest(array $data, array $server = []): Request
     {
-        return Request::create('/test', 'POST', $data, [], [], $server);
+        return Request::create('/test', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'] + $server, json_encode($data));
     }
 }

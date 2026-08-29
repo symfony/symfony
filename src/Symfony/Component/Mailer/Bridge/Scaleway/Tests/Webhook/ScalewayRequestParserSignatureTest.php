@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -47,14 +48,37 @@ class ScalewayRequestParserSignatureTest extends TestCase
         $parser->parse($this->createRequest($envelope), '');
     }
 
-    public function testRejectsNonHttpsSigningCertUrl()
+    #[DataProvider('provideForeignSigningCertUrls')]
+    public function testRejectsSigningCertUrlOnForeignHostWithoutFetchingIt(string $certUrl)
     {
-        $envelope = $this->createSignedEnvelope(certUrl: 'http://messaging.s3.fr-par.scw.cloud/certs/cert-11111111.pem');
-        $parser = $this->createParser($this->createCertClient());
+        $envelope = $this->createSignedEnvelope(certUrl: $certUrl);
+        $parser = $this->createParser(new MockHttpClient(static fn () => throw new \LogicException('The certificate must not be fetched.')));
 
         $this->expectException(RejectWebhookException::class);
-        $this->expectExceptionMessage('The signing certificate URL must use HTTPS.');
+        $this->expectExceptionMessage('The signing certificate URL must point to Scaleway over HTTPS.');
         $parser->parse($this->createRequest($envelope), '');
+    }
+
+    public static function provideForeignSigningCertUrls(): iterable
+    {
+        yield 'plain http' => ['http://messaging.s3.fr-par.scw.cloud/certs/cert-11111111.pem'];
+        yield 'other domain' => ['https://example.com/cert.pem'];
+        yield 'other bucket on Scaleway object storage' => ['https://attacker.s3.fr-par.scw.cloud/cert.pem'];
+        yield 'lookalike domain' => ['https://messaging.s3.fr-par.scw.cloud.example.com/cert.pem'];
+        yield 'userinfo trick' => ['https://messaging.s3.fr-par.scw.cloud@example.com/cert.pem'];
+        yield 'private address' => ['https://169.254.169.254/latest/meta-data/'];
+        yield 'explicit port' => ['https://messaging.s3.fr-par.scw.cloud:8443/cert.pem'];
+        yield 'backslash after host' => ['https://messaging.s3.fr-par.scw.cloud\\@example.com/cert.pem'];
+        yield 'host without path' => ['https://messaging.s3.fr-par.scw.cloud'];
+        yield 'leading whitespace' => [' https://messaging.s3.fr-par.scw.cloud/cert.pem'];
+    }
+
+    public function testAcceptsSigningCertUrlOnEveryScalewayRegion()
+    {
+        $envelope = $this->createSignedEnvelope(certUrl: 'https://messaging.s3.nl-ams.scw.cloud/nl-ams/sns/sns_certificate_123.crt');
+        $parser = $this->createParser($this->createCertClient());
+
+        $this->assertInstanceOf(MailerDeliveryEvent::class, $parser->parse($this->createRequest($envelope), ''));
     }
 
     public function testRejectsUnsupportedSignatureVersion()

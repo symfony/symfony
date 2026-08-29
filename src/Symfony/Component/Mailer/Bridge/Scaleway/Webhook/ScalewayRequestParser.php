@@ -37,6 +37,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class ScalewayRequestParser extends AbstractRequestParser
 {
+    private const SIGNING_CERT_URL = '{^https://messaging\.s3\.[a-z]{2}-[a-z]{3}\.scw\.cloud/}i';
+
     private const SIGNED_KEYS = [
         'Notification' => ['Message', 'MessageId', 'Subject', 'Timestamp', 'TopicArn', 'Type'],
         'SubscriptionConfirmation' => ['Message', 'MessageId', 'SubscribeURL', 'Timestamp', 'Token', 'TopicArn', 'Type'],
@@ -127,8 +129,8 @@ final class ScalewayRequestParser extends AbstractRequestParser
         }
 
         $certUrl = $payload['SigningCertURL'];
-        if ('https' !== strtolower((string) parse_url($certUrl, \PHP_URL_SCHEME))) {
-            throw new RejectWebhookException(406, 'The signing certificate URL must use HTTPS.');
+        if (!preg_match(self::SIGNING_CERT_URL, $certUrl)) {
+            throw new RejectWebhookException(406, 'The signing certificate URL must point to Scaleway over HTTPS.');
         }
 
         $cacheKey = 'scaleway_sns_cert.'.hash('xxh128', $certUrl);

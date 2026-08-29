@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-29T19:34:31Z
+
+The second commit is dropped, and the pull request is reduced to the backport of #65025.
+
+Gating `supportsDenormalization()` on an already loaded class regresses 5.4: `Serializer::getDenormalizer()` calls `class_exists()` on the type before consulting the normalizers only since 6.4. On 5.4 there is no such call, and the answer of `supportsDenormalization()` is cached per type, so in a process that has not loaded `Email` yet the Mime normalizer says no, `ObjectNormalizer` takes over for the rest of the Serializer's life, and a normalized email deserialized in a fresh process comes back with `text` and `html` set to null. On 6.4 and up the check would be dead code, since the type is autoloaded before any normalizer sees it. The check also closes nothing when the normalizer is used through the Serializer: `AbstractObjectNormalizer::supportsDenormalization()` calls `class_exists()` on the same type right after.

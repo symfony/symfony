@@ -29,6 +29,13 @@ class CliDumperTest extends TestCase
 {
     use VarDumperTestTrait;
 
+    public function testC1ControlCharsAreEscaped()
+    {
+        $this->assertDumpEquals('"a\xC2\x9Bb"', "a\u{9B}b");
+        $this->assertDumpEquals('"\e\xC2\x9B\xC2\x80"', "\e\u{9B}\u{80}");
+        $this->assertDumpEquals("\"\u{A0}\u{E9}\"", "\u{A0}\u{E9}");
+    }
+
     public function testGet()
     {
         require __DIR__.'/../Fixtures/dumb-var.php';

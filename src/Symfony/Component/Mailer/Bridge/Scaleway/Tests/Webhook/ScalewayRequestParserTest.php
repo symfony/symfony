@@ -11,16 +11,54 @@
 
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Scaleway\RemoteEvent\ScalewayPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Scaleway\Webhook\ScalewayRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
+#[Group('time-sensitive')]
 class ScalewayRequestParserTest extends AbstractRequestParserTestCase
 {
+    public static function getStaleClockOffsets(): iterable
+    {
+        yield 'too old' => [28801];
+        yield 'too far in the future' => [-28801];
+    }
+
+    #[DataProvider('getStaleClockOffsets')]
+    public function testRejectSignedRequestWithStaleTimestamp(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/email_delivered.json'));
+        ClockMock::withClockMock(1768473001 + $offset);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public static function getToleratedClockOffsets(): iterable
+    {
+        yield 'at the past edge' => [28800];
+        yield 'at the future edge' => [-28800];
+    }
+
+    #[DataProvider('getToleratedClockOffsets')]
+    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/email_delivered.json'));
+        ClockMock::withClockMock(1768473001 + $offset);
+
+        $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
     protected function createRequestParser(): RequestParserInterface
     {
         return new ScalewayRequestParser(
@@ -33,6 +71,8 @@ class ScalewayRequestParserTest extends AbstractRequestParserTestCase
 
     protected function createRequest(string $payload): Request
     {
+        ClockMock::withClockMock(1768473001);
+
         $envelope = [
             'Type' => 'Notification',
             'MessageId' => '9ae5c56c-6c9c-42e5-b0b1-0fe0f8bbdbf7',

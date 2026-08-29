@@ -38,6 +38,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 final class ScalewayRequestParser extends AbstractRequestParser
 {
     private const SIGNING_CERT_URL = '{^https://messaging\.s3\.[a-z]{2}-[a-z]{3}\.scw\.cloud/}i';
+    private const TIMESTAMP_FORMAT = 'Y-m-d\TH:i:s.v\Z';
+    // retried deliveries keep the timestamp of the original publication
+    private const TIMESTAMP_TOLERANCE = 8 * 3600;
 
     private const SIGNED_KEYS = [
         'Notification' => ['Message', 'MessageId', 'Subject', 'Timestamp', 'TopicArn', 'Type'],
@@ -74,6 +77,14 @@ final class ScalewayRequestParser extends AbstractRequestParser
             if (!\is_string($payload[$key] ?? null)) {
                 throw new RejectWebhookException(406, 'Payload is malformed.');
             }
+        }
+
+        if (!$timestamp = \DateTimeImmutable::createFromFormat(self::TIMESTAMP_FORMAT, $payload['Timestamp'], new \DateTimeZone('UTC'))) {
+            throw new RejectWebhookException(406, 'Payload is malformed.');
+        }
+
+        if (abs(time() - $timestamp->getTimestamp()) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 
         $this->verifySignature($payload);

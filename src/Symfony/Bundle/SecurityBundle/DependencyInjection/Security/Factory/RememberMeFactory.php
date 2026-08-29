@@ -37,9 +37,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         'lifetime' => 31536000,
         'path' => '/',
         'domain' => null,
-        'secure' => false,
+        'secure' => 'auto',
         'httponly' => true,
-        'samesite' => null,
+        'samesite' => Cookie::SAMESITE_LAX,
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',
     ];
@@ -162,7 +162,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
         foreach ($this->options as $name => $value) {
             if ('secure' === $name) {
-                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue('auto' === $value ? null : $value);
+                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue($value);
             } elseif ('samesite' === $name) {
                 $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultValue($value);
             } elseif (\is_bool($value)) {
@@ -219,21 +219,15 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
     public function prepend(ContainerBuilder $container): void
     {
-        $rememberMeSecureDefault = false;
-        $rememberMeSameSiteDefault = null;
-
         if (!isset($container->getExtensions()['framework'])) {
             return;
         }
 
         foreach ($container->getExtensionConfig('framework') as $config) {
             if (isset($config['session']) && \is_array($config['session'])) {
-                $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
-                $rememberMeSameSiteDefault = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
+                $this->options['secure'] = $config['session']['cookie_secure'] ?? $this->options['secure'];
+                $this->options['samesite'] = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $this->options['samesite'];
             }
         }
-
-        $this->options['secure'] = $rememberMeSecureDefault;
-        $this->options['samesite'] = $rememberMeSameSiteDefault;
     }
 }

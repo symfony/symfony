@@ -160,16 +160,13 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $jwkSetResponses = [];
 
             foreach ($clients as $client) {
-                $configResponses[] = [$client, $client->request('GET', '.well-known/openid-configuration')];
+                $configResponses[] = [$client, $client->request('GET', '.well-known/openid-configuration', ['max_redirects' => 0])];
             }
 
             foreach ($configResponses as [$client, $response]) {
                 $config = $response->toArray();
 
-                $jwksUri = $config['jwks_uri'] ?? null;
-                if (!\is_string($jwksUri) || '' === $jwksUri) {
-                    throw new \RuntimeException('The "jwks_uri" is missing from the OIDC discovery document.');
-                }
+                $jwksUri = self::checkDiscoveredEndpoint($config['jwks_uri'] ?? null, 'jwks_uri', $response->getInfo('url'));
 
                 $jwkSetResponses[] = $client->request('GET', $jwksUri);
             }

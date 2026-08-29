@@ -79,7 +79,11 @@ final class TwilioRequestParser extends AbstractRequestParser
         }
 
         ksort($payload);
-        $data = $request->getUri();
+        // the query string must be signed as sent, getUri() would normalize it
+        $data = $request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo();
+        if ('' !== $qs = (string) $request->server->get('QUERY_STRING')) {
+            $data .= '?'.$qs;
+        }
         foreach ($payload as $key => $value) {
             $data .= $key.$value;
         }

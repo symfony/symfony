@@ -26,6 +26,62 @@ class UrlSanitizerTest extends TestCase
 
     public static function provideSanitize(): iterable
     {
+        // Schemes are case-insensitive
+        yield [
+            'input' => 'HTTPS://trusted.com/link',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://trusted.com/link',
+        ];
+
+        yield [
+            'input' => 'HTTP://trusted.com/link',
+            'allowedSchemes' => ['http', 'https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => true,
+            'allowRelative' => false,
+            'expected' => 'https://trusted.com/link',
+        ];
+
+        yield [
+            'input' => 'MAILTO:john@trusted.com?body=line1%0D%0Aline2',
+            'allowedSchemes' => ['mailto'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'mailto:john@trusted.com?body=line1%0D%0Aline2',
+        ];
+
+        // Hosts are case-insensitive
+        yield [
+            'input' => 'https://Trusted.COM/link',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://Trusted.COM/link',
+        ];
+
+        yield [
+            'input' => 'https://trusted.com/link',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['Trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => 'https://trusted.com/link',
+        ];
+
+        yield [
+            'input' => 'https://Untrusted.COM/link',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => ['trusted.com'],
+            'forceHttps' => false,
+            'allowRelative' => false,
+            'expected' => null,
+        ];
+
         // Simple accepted cases
         yield [
             'input' => '',
@@ -419,6 +475,7 @@ class UrlSanitizerTest extends TestCase
 
             // Simple tests
             'https://trusted.com/link.php' => ['scheme' => 'https', 'host' => 'trusted.com'],
+            'HTTPS://trusted.com/link.php' => ['scheme' => 'https', 'host' => 'trusted.com'],
             'https://trusted.com/link.php?query=1#foo' => ['scheme' => 'https', 'host' => 'trusted.com'],
             'https://subdomain.trusted.com/link' => ['scheme' => 'https', 'host' => 'subdomain.trusted.com'],
             '//trusted.com/link.php' => ['scheme' => null, 'host' => 'trusted.com'],

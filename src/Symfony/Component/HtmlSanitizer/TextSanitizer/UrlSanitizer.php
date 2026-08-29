@@ -164,6 +164,9 @@ final class UrlSanitizer
             }
 
             $parsedUrl = UriString::parse($url);
+            if (isset($parsedUrl['scheme'])) {
+                $parsedUrl['scheme'] = strtolower($parsedUrl['scheme']);
+            }
 
             if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {
                 return null;
@@ -208,10 +211,10 @@ final class UrlSanitizer
             return \in_array(null, $allowedHosts, true);
         }
 
-        $parts = array_reverse(explode('.', $host));
+        $parts = array_reverse(explode('.', strtolower($host)));
 
         foreach ($allowedHosts as $allowedHost) {
-            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', $allowedHost)))) {
+            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', strtolower($allowedHost))))) {
                 return true;
             }
         }

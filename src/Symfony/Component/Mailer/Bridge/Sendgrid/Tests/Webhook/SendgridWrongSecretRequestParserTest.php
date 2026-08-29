@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Webhook;
 
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
@@ -22,6 +23,8 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
  * @author WoutervanderLoop.nl <info@woutervanderloop.nl>
  *
  * @requires extension openssl
+ *
+ * @group time-sensitive
  */
 class SendgridWrongSecretRequestParserTest extends AbstractRequestParserTestCase
 {
@@ -38,6 +41,8 @@ class SendgridWrongSecretRequestParserTest extends AbstractRequestParserTestCase
      */
     protected function createRequest(string $payload): Request
     {
+        ClockMock::withClockMock(1600112502);
+
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'HTTP_X-Twilio-Email-Event-Webhook-Signature' => 'MEUCIGHQVtGj+Y3LkG9fLcxf3qfI10QysgDWmMOVmxG0u6ZUAiEAyBiXDWzM+uOe5W0JuG+luQAbPIqHh89M15TluLtEZtM=',

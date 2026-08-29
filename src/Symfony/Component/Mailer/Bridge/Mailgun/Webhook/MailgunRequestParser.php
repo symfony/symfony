@@ -25,6 +25,8 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class MailgunRequestParser extends AbstractRequestParser
 {
+    private const TIMESTAMP_TOLERANCE = 300;
+
     public function __construct(
         private readonly MailgunPayloadConverter $converter,
     ) {
@@ -52,6 +54,10 @@ final class MailgunRequestParser extends AbstractRequestParser
             || !isset($content['event-data']['event'])
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
+        }
+
+        if (abs(time() - (int) $content['signature']['timestamp']) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
 
         $this->validateSignature($content['signature'], $secret);

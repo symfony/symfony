@@ -11,14 +11,55 @@
 
 namespace Symfony\Component\Notifier\Bridge\Vonage\Tests\Webhook;
 
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Bridge\Vonage\Webhook\VonageRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
+/**
+ * @group time-sensitive
+ */
 class VonageRequestParserTest extends AbstractRequestParserTestCase
 {
+    public static function getStaleClockOffsets(): iterable
+    {
+        yield 'too old' => [301];
+        yield 'too far in the future' => [-301];
+    }
+
+    /**
+     * @dataProvider getStaleClockOffsets
+     */
+    public function testRejectSignedRequestWithStaleTimestamp(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        ClockMock::withClockMock(self::getIssuedAt($request) + $offset);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public static function getToleratedClockOffsets(): iterable
+    {
+        yield 'at the past edge' => [300];
+        yield 'at the future edge' => [-300];
+    }
+
+    /**
+     * @dataProvider getToleratedClockOffsets
+     */
+    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        ClockMock::withClockMock(self::getIssuedAt($request) + $offset);
+
+        $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
     public function testMissingAuthorizationTokenThrows()
     {
         $request = $this->createRequest('{}');
@@ -55,6 +96,7 @@ class VonageRequestParserTest extends AbstractRequestParserTestCase
 
         $request = parent::createRequest($payload);
         $request->headers->set('Authorization', 'Bearer '.$jwt);
+        ClockMock::withClockMock(self::getIssuedAt($request));
 
         return $request;
     }
@@ -62,5 +104,12 @@ class VonageRequestParserTest extends AbstractRequestParserTestCase
     protected function getSecret(): string
     {
         return 'secret-key';
+    }
+
+    private static function getIssuedAt(Request $request): int
+    {
+        $claims = explode('.', substr($request->headers->get('Authorization'), \strlen('Bearer ')))[1];
+
+        return json_decode(base64_decode(strtr($claims, '-_', '+/')), true)['iat'];
     }
 }

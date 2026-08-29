@@ -16,45 +16,33 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 /**
- * @author WoutervanderLoop.nl <info@woutervanderloop.nl>
- *
- * @requires extension openssl
- *
  * @group time-sensitive
  */
-class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
+class SendgridStaleTimestampRequestParserTest extends AbstractRequestParserTestCase
 {
-    public static function getToleratedClockOffsets(): iterable
-    {
-        yield 'at the past edge' => [300];
-        yield 'at the future edge' => [-300];
-    }
-
-    /**
-     * @dataProvider getToleratedClockOffsets
-     */
-    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    public function testRejectSignedRequestFromTheFuture()
     {
         $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/webhook.json'));
-        ClockMock::withClockMock((int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp') + $offset);
+        ClockMock::withClockMock((int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp') - 301);
 
-        $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+        $this->createRequestParser()->parse($request, $this->getSecret());
     }
 
     protected function createRequestParser(): RequestParserInterface
     {
-        return new SendgridRequestParser(new SendgridPayloadConverter(), true);
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
+
+        return new SendgridRequestParser(new SendgridPayloadConverter());
     }
 
-    /**
-     * @see https://github.com/sendgrid/sendgrid-php/blob/9335dca98bc64456a72db73469d1dd67db72f6ea/test/unit/EventWebhookTest.php#L20
-     */
     protected function createRequest(string $payload): Request
     {
-        ClockMock::withClockMock(1600112502);
+        ClockMock::withClockMock(1600112502 + 301);
 
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',

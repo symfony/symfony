@@ -91,6 +91,19 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->assertEquals('unmarshalled_data', $result);
     }
 
+    public function testReadReturnsEmptyStringWhenUnmarshallingFails()
+    {
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+
+        $this->handler->expects($this->once())->method('read')->with('session_id')
+            ->willReturn('data');
+        $this->marshaller->expects($this->once())->method('unmarshall')->with('data')
+            ->willThrowException(new \DomainException('Failed to decrypt value.'))
+        ;
+
+        $this->assertSame('', $marshallingSessionHandler->read('session_id'));
+    }
+
     public function testWrite()
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);

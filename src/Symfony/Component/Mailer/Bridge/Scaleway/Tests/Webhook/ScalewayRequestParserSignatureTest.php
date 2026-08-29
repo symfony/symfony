@@ -12,7 +12,9 @@
 namespace Symfony\Component\Mailer\Bridge\Scaleway\Tests\Webhook;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -24,8 +26,28 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
+#[Group('time-sensitive')]
 class ScalewayRequestParserSignatureTest extends TestCase
 {
+    public static function getMalformedTimestamps(): iterable
+    {
+        yield 'no milliseconds' => ['2026-01-15T10:30:01Z'];
+        yield 'no timezone' => ['2026-01-15T10:30:01.000'];
+        yield 'unix time' => ['1768473001'];
+        yield 'relative' => ['now'];
+    }
+
+    #[DataProvider('getMalformedTimestamps')]
+    public function testRejectsMalformedTimestamp(string $timestamp)
+    {
+        $envelope = $this->createSignedEnvelope(timestamp: $timestamp);
+        $parser = $this->createParser($this->createCertClient());
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Payload is malformed.');
+        $parser->parse($this->createRequest($envelope), '');
+    }
+
     public function testRejectsTamperedPayload()
     {
         $envelope = $this->createSignedEnvelope();
@@ -195,14 +217,14 @@ class ScalewayRequestParserSignatureTest extends TestCase
         return new MockHttpClient(static fn () => new MockResponse(file_get_contents(__DIR__.'/Fixtures/signing.crt')));
     }
 
-    private function createSignedEnvelope(string $type = 'Notification', string $key = __DIR__.'/Fixtures/signing.key', string $certUrl = 'https://messaging.s3.fr-par.scw.cloud/certs/cert-11111111.pem', string $signatureVersion = '2'): array
+    private function createSignedEnvelope(string $type = 'Notification', string $key = __DIR__.'/Fixtures/signing.key', string $certUrl = 'https://messaging.s3.fr-par.scw.cloud/certs/cert-11111111.pem', string $signatureVersion = '2', string $timestamp = '2026-01-15T10:30:01.000Z'): array
     {
         $envelope = [
             'Type' => $type,
             'MessageId' => '9ae5c56c-6c9c-42e5-b0b1-0fe0f8bbdbf7',
             'TopicArn' => 'arn:scw:sns:fr-par:project-8c8bfa06:mailer-events',
             'Message' => json_encode(['type' => 'email_delivered', 'id' => 'af5c1aac-cf1b-4d4d-9e46-e6d0cd40b81c', 'email_id' => 'd4fbec9d-eed9-44d5-af47-c1126467a5ca', 'created_at' => '2026-01-15T10:30:00Z', 'email_to' => 'recipient@example.com']),
-            'Timestamp' => '2026-01-15T10:30:01.000Z',
+            'Timestamp' => $timestamp,
             'SignatureVersion' => $signatureVersion,
             'SigningCertURL' => $certUrl,
         ];
@@ -229,6 +251,8 @@ class ScalewayRequestParserSignatureTest extends TestCase
 
     private function createRequest(array $envelope): Request
     {
+        ClockMock::withClockMock(1768473001);
+
         return Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'text/plain; charset=UTF-8'], json_encode($envelope));
     }
 }

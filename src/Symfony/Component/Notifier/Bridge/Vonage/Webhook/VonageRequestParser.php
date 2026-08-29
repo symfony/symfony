@@ -23,6 +23,8 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class VonageRequestParser extends AbstractRequestParser
 {
+    private const TIMESTAMP_TOLERANCE = 300;
+
     protected function getRequestMatcher(): RequestMatcherInterface
     {
         return new ChainRequestMatcher([
@@ -86,6 +88,11 @@ final class VonageRequestParser extends AbstractRequestParser
         $expected = $this->base64EncodeUrl(hash_hmac('sha256', $header.'.'.$payload, $secret, true));
         if (!hash_equals($expected, $signature)) {
             throw new RejectWebhookException(406, 'Signature is wrong.');
+        }
+
+        $claims = json_decode(base64_decode(strtr($payload, '-_', '+/')), true);
+        if (abs(time() - (int) ($claims['iat'] ?? 0)) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
     }
 

@@ -216,6 +216,60 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
+    public function testConsumeLoginLinkWithMissingUser()
+    {
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Missing "user" parameter.');
+        $request = Request::create('/login/verify?hash=thehash&expires='.(time() + 500));
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithArrayUser()
+    {
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "user" parameter.');
+        $request = Request::create('/login/verify?user[]=weaverryan&hash=thehash&expires='.(time() + 500));
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithArrayExpiration()
+    {
+        $this->expectException(InvalidLoginLinkException::class);
+        $this->expectExceptionMessage('Invalid "expires" parameter.');
+        $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires[]=1000000000');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithInvalidExpiration()
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires=%E2%80%AA1000000000%E2%80%AC');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
+    public function testConsumeLoginLinkWithInvalidHash()
+    {
+        $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
+        $this->userProvider->createUser($user);
+
+        $this->expectException(InvalidLoginLinkException::class);
+        $request = Request::create('/login/verify?user=weaverryan&hash[]=an&hash[]=array&expires=1000000000');
+
+        $linker = $this->createLinker();
+        $linker->consumeLoginLink($request);
+    }
+
     private function createSignatureHash(string $username, int $expires, array $extraFields = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash']): string
     {
         $hasher = new SignatureHasher($this->propertyAccessor, array_keys($extraFields), 's3cret');

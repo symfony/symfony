@@ -83,12 +83,25 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
     public function consumeLoginLink(Request $request): UserInterface
     {
         $userIdentifier = $request->get('user');
+        if (null === $userIdentifier || '' === $userIdentifier) {
+            throw new InvalidLoginLinkException('Missing "user" parameter.');
+        }
+        if (!\is_string($userIdentifier)) {
+            throw new InvalidLoginLinkException('Invalid "user" parameter.');
+        }
 
         if (!$hash = $request->get('hash')) {
             throw new InvalidLoginLinkException('Missing "hash" parameter.');
         }
+        if (!\is_string($hash)) {
+            throw new InvalidLoginLinkException('Invalid "hash" parameter.');
+        }
+
         if (!$expires = $request->get('expires')) {
             throw new InvalidLoginLinkException('Missing "expires" parameter.');
+        }
+        if (!\is_string($expires) || !preg_match('/^\d+$/', $expires)) {
+            throw new InvalidLoginLinkException('Invalid "expires" parameter.');
         }
 
         try {

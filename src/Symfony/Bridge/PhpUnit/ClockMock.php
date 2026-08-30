@@ -98,10 +98,14 @@ class ClockMock
      */
     public static function hrtime($asNumber = false)
     {
+        if (null === self::$now) {
+            return \hrtime($asNumber);
+        }
+
         $ns = (self::$now - (int) self::$now) * 1000000000;
 
         if ($asNumber) {
-            $number = \sprintf('%d%d', (int) self::$now, $ns);
+            $number = \sprintf('%d%09d', (int) self::$now, $ns);
 
             return \PHP_INT_SIZE === 8 ? (int) $number : (float) $number;
         }

@@ -106,6 +106,36 @@ class MockFileSessionStorageTest extends TestCase
         $storage1->save();
     }
 
+    public function testSetIdIgnoresAnIdThatIsNotUsableAsAFileName()
+    {
+        $this->storage->setId('../'.basename($this->sessionDir).'/planted');
+
+        $this->assertSame('', $this->storage->getId());
+    }
+
+    public function testSetIdIgnoresAnIdThatIsTooLongForAFileName()
+    {
+        $this->storage->setId($id = str_repeat('a', 246));
+        $this->assertSame($id, $this->storage->getId());
+
+        $this->storage->setId(str_repeat('a', 247));
+        $this->assertSame('', $this->storage->getId());
+    }
+
+    public function testAnIdThatIsNotUsableAsAFileNameStartsANewSession()
+    {
+        $planted = $this->sessionDir.'/planted.mocksess';
+        file_put_contents($planted, serialize(['_sf2_attributes' => ['foo' => 'bar']]));
+
+        $this->storage->setId('../'.basename($this->sessionDir).'/planted');
+        $this->storage->start();
+        $this->storage->getBag('attributes')->set('new', '108');
+        $this->storage->save();
+
+        $this->assertNull($this->storage->getBag('attributes')->get('foo'));
+        $this->assertSame(['_sf2_attributes' => ['foo' => 'bar']], unserialize(file_get_contents($planted)));
+    }
+
     private function getStorage(): MockFileSessionStorage
     {
         $storage = new MockFileSessionStorage($this->sessionDir);

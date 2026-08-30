@@ -3370,6 +3370,34 @@ class ParserTest extends TestCase
         $this->parser->parse($yaml);
     }
 
+    public function testParseRejectsUnterminatedInlineSequencesThatExceedTheNestingDepth()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Maximum nesting depth of 128 exceeded');
+
+        $this->parser->parse(str_repeat('[', Parser::DEFAULT_MAX_NESTING_LEVEL + 1));
+    }
+
+    public function testParseRejectsUnterminatedInlineMappingsThatExceedTheNestingDepth()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Maximum nesting depth of 128 exceeded');
+
+        $this->parser->parse(str_repeat('{', Parser::DEFAULT_MAX_NESTING_LEVEL + 1));
+    }
+
+    public function testParseAcceptsInlineSequencesAtTheNestingDepth()
+    {
+        $expected = [];
+        for ($i = 1; $i < Parser::DEFAULT_MAX_NESTING_LEVEL; ++$i) {
+            $expected = [$expected];
+        }
+
+        $yaml = str_repeat('[', Parser::DEFAULT_MAX_NESTING_LEVEL).str_repeat(']', Parser::DEFAULT_MAX_NESTING_LEVEL);
+
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
     public function testParseRejectsDocumentsThatExceedTheConfiguredCollectionAliasLimit()
     {
         $parser = new Parser(Parser::DEFAULT_MAX_NESTING_LEVEL, 5);

@@ -144,7 +144,6 @@ class SplCaster
     public static function castFileObject(\SplFileObject $c, array $a, Stub $stub, bool $isNested): array
     {
         static $map = [
-            'csvControl' => 'getCsvControl',
             'flags' => 'getFlags',
             'maxLineLen' => 'getMaxLineLen',
             'fstat' => 'fstat',
@@ -153,6 +152,16 @@ class SplCaster
         ];
 
         $prefix = Caster::PREFIX_VIRTUAL;
+
+        if (\PHP_VERSION_ID < 90000) {
+            set_error_handler(static fn () => true, \E_DEPRECATED);
+            try {
+                $a[$prefix.'csvControl'] = $c->getCsvControl();
+            } catch (\Exception) {
+            } finally {
+                restore_error_handler();
+            }
+        }
 
         foreach ($map as $key => $accessor) {
             try {

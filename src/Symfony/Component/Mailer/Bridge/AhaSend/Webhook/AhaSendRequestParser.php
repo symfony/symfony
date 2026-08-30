@@ -24,6 +24,8 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class AhaSendRequestParser extends AbstractRequestParser
 {
+    private const TIMESTAMP_TOLERANCE = 300;
+
     public function __construct(
         private readonly AhaSendPayloadConverter $converter,
     ) {
@@ -48,6 +50,9 @@ final class AhaSendRequestParser extends AbstractRequestParser
         }
         if (!is_numeric($timestamp) || \is_float($timestamp + 0) || (int) $timestamp != $timestamp || (int) $timestamp <= 0) {
             throw new RejectWebhookException(406, 'Invalid timestamp.');
+        }
+        if (abs(time() - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
         $expectedSignature = $this->sign($eventID, $timestamp, $request->getContent(), $secret);
         if (!hash_equals($expectedSignature, $signature)) {

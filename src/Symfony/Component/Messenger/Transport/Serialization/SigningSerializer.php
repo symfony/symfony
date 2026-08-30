@@ -20,6 +20,14 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
  */
 final class SigningSerializer implements SerializerInterface
 {
+    private const STAMP_HEADER_PREFIX = 'X-Message-Stamp-';
+
+    // Tells apart a signature that covers the headers from an older one that covers the body alone.
+    // HMACs are written in lowercase hexadecimal, so no older signature can ever start with this marker.
+    // The marker also derives the key of the newer scheme, so that a signature stripped of it cannot
+    // be replayed as a body-only signature over its own payload.
+    private const SIGNATURE_MARKER = 'v2:';
+
     /**
      * @param list<class-string> $signedMessageTypes
      */
@@ -37,7 +45,7 @@ final class SigningSerializer implements SerializerInterface
         $type = $envelope->getMessage()::class;
 
         if ($this->shouldSign($type)) {
-            $encoded['headers']['Body-Sign'] = hash_hmac($this->algorithm, $encoded['body'] ?? '', $this->signingKey);
+            $encoded['headers']['Body-Sign'] = self::SIGNATURE_MARKER.hash_hmac($this->algorithm, self::getSignedPayload($encoded), $this->getSigningKey(false));
             $encoded['headers']['Sign-Algo'] = $this->algorithm;
         }
 
@@ -53,14 +61,22 @@ final class SigningSerializer implements SerializerInterface
 
         $headers = $encodedEnvelope['headers'] ?? [];
         $sign = $headers['Body-Sign'] ?? null;
+        $sign = \is_string($sign) ? $sign : null;
 
         try {
-            if ($sign && hash_equals(hash_hmac($this->algorithm, $encodedEnvelope['body'] ?? '', $this->signingKey), $sign)) {
-                // A valid signature authenticates the message whatever its type: decode it without peeking.
-                // The algorithm is implied by the HMAC itself, so the "Sign-Algo" header isn't consulted here.
-                unset($encodedEnvelope['headers']['Body-Sign'], $encodedEnvelope['headers']['Sign-Algo']);
+            if ($sign) {
+                // signatures written before the headers were covered carry no marker and authenticate the body alone
+                $bodyOnly = !str_starts_with($sign, self::SIGNATURE_MARKER);
+                $payload = $bodyOnly ? ($encodedEnvelope['body'] ?? '') : self::getSignedPayload($encodedEnvelope);
+                $expected = ($bodyOnly ? '' : self::SIGNATURE_MARKER).hash_hmac($this->algorithm, $payload, $this->getSigningKey($bodyOnly));
 
-                return $this->inner->decode($encodedEnvelope);
+                if (hash_equals($expected, $sign)) {
+                    // A valid signature authenticates the message whatever its type: decode it without peeking.
+                    // The algorithm is implied by the HMAC itself, so the "Sign-Algo" header isn't consulted here.
+                    unset($encodedEnvelope['headers']['Body-Sign'], $encodedEnvelope['headers']['Sign-Algo']);
+
+                    return $this->inner->decode($encodedEnvelope);
+                }
             }
 
             $envelope = null;
@@ -99,5 +115,32 @@ final class SigningSerializer implements SerializerInterface
         }
 
         return false;
+    }
+
+    private function getSigningKey(bool $bodyOnly): string
+    {
+        return $bodyOnly ? $this->signingKey : hash_hmac($this->algorithm, self::SIGNATURE_MARKER, $this->signingKey);
+    }
+
+    /**
+     * Returns the payload the signature covers: the body, plus the headers that
+     * decide how the body is turned into an envelope. Transports add headers of
+     * their own, so signing every header would break as soon as one of them does.
+     */
+    private static function getSignedPayload(array $encodedEnvelope): string
+    {
+        $headers = [];
+
+        foreach ($encodedEnvelope['headers'] ?? [] as $name => $value) {
+            if ('type' === $name || str_starts_with($name, self::STAMP_HEADER_PREFIX)) {
+                $headers[$name] = $value;
+            }
+        }
+
+        // transports are free to reorder headers, so the order must not matter
+        ksort($headers, \SORT_STRING);
+
+        // serialize() gives an unambiguous encoding of the pair; it is never read back
+        return serialize([$encodedEnvelope['body'] ?? '', $headers]);
     }
 }

@@ -49,6 +49,80 @@ class HtmlDescriptorTest extends TestCase
         $this->assertDoesNotMatchRegularExpression('#<style>(.*?)</style><script>(.*?)</script>(.*)#', $output->fetch(), 'styles & scripts are output only once');
     }
 
+    public function testItEscapesContextStrings()
+    {
+        $output = new BufferedOutput();
+        $dumper = $this->createStub(HtmlDumper::class);
+        $dumper->method('dump')->willReturn('[DUMPED]');
+        $descriptor = new HtmlDescriptor($dumper);
+
+        $descriptor->describe($output, new Data([[123]]), ['timestamp' => 1544804268.3668], 1);
+        $output->fetch();
+
+        $descriptor->describe($output, new Data([[123]]), [
+            'timestamp' => 1544804268.3668,
+            'request' => [
+                'identifier' => 'id"><script>alert(1)</script>',
+                'controller' => new Data([['FooController.php']]),
+                'method' => 'GET<script>alert(2)</script>',
+                'uri' => 'http://localhost/"><script>alert(3)</script>',
+            ],
+            'source' => [
+                'name' => 'Foo<script>alert(4)</script>.php',
+                'line' => 30,
+                'project_dir' => '/app"><script>alert(5)</script>',
+                'file_link' => 'phpstorm://open"><script>alert(6)</script>',
+            ],
+        ], 1);
+
+        $dump = $output->fetch();
+
+        $this->assertStringNotContainsString('<script>', $dump);
+        $this->assertStringContainsString('data-dedup-id="id&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"', $dump);
+        $this->assertStringContainsString('<code>GET&lt;script&gt;alert(2)&lt;/script&gt;</code>', $dump);
+        $this->assertStringContainsString('<a href="http://localhost/&quot;&gt;&lt;script&gt;alert(3)&lt;/script&gt;">http://localhost/&quot;&gt;&lt;script&gt;alert(3)&lt;/script&gt;</a>', $dump);
+        $this->assertStringContainsString('<a href="phpstorm://open&quot;&gt;&lt;script&gt;alert(6)&lt;/script&gt;">Foo&lt;script&gt;alert(4)&lt;/script&gt;.php on line 30</a>', $dump);
+        $this->assertStringContainsString('<li><span class="badge">project dir</span>/app&quot;&gt;&lt;script&gt;alert(5)&lt;/script&gt;</li>', $dump);
+    }
+
+    public function testItKeepsContextStringsThatAreNotValidUtf8()
+    {
+        $output = new BufferedOutput();
+        $dumper = $this->createStub(HtmlDumper::class);
+        $dumper->method('dump')->willReturn('[DUMPED]');
+        $descriptor = new HtmlDescriptor($dumper);
+
+        $descriptor->describe($output, new Data([[123]]), [
+            'timestamp' => 1544804268.3668,
+            'cli' => [
+                'identifier' => 'd8bece1c',
+                'command_line' => "bin/phpunit \xB1",
+            ],
+        ], 1);
+
+        $this->assertStringContainsString('<code>$ </code>bin/phpunit ', $output->fetch());
+    }
+
+    public function testItKeepsTheDumpedControllerAsMarkup()
+    {
+        $output = new BufferedOutput();
+        $dumper = $this->createStub(HtmlDumper::class);
+        $dumper->method('dump')->willReturn('<span class=sf-dump-str>App\\Controller\\FooController</span>');
+        $descriptor = new HtmlDescriptor($dumper);
+
+        $descriptor->describe($output, new Data([[123]]), [
+            'timestamp' => 1544804268.3668,
+            'request' => [
+                'identifier' => 'd8bece1c',
+                'controller' => new Data([['FooController.php']]),
+                'method' => 'GET',
+                'uri' => 'http://localhost/foo',
+            ],
+        ], 1);
+
+        $this->assertStringContainsString('<span class=\'dumped-tag\'><span class=sf-dump-str>App\\Controller\\FooController</span></span>', $output->fetch());
+    }
+
     #[DataProvider('provideContext')]
     public function testDescribe(array $context, string $expectedOutput)
     {
@@ -121,7 +195,7 @@ class HtmlDescriptorTest extends TestCase
                     </header>
                     <section class="body">
                         <p class="text-small">
-                            <a href="phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&line=30">CliDescriptorTest.php on line 30</a>
+                            <a href="phpstorm://open?file=/Users/ogi/symfony/src/Symfony/Component/VarDumper/Tests/Command/Descriptor/CliDescriptorTest.php&amp;line=30">CliDescriptorTest.php on line 30</a>
                         </p>
                         [DUMPED]
                     </section>

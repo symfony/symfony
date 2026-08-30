@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
+use Symfony\Component\VarExporter\Exception\LogicException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
 use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\VarExporter\Tests\Fixtures\BackedProperty;
@@ -67,6 +68,14 @@ class VarExporterTest extends TestCase
         } finally {
             $this->assertSame('var_dump', ini_set('unserialize_callback_func', $unserializeCallback));
         }
+    }
+
+    public function testLoadingLegacyExportedCodeThrows()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Code exported by symfony/var-exporter < 8.1 cannot be loaded anymore and must be regenerated.');
+
+        include __DIR__.'/Fixtures/legacy-exported-code.php';
     }
 
     #[DataProvider('provideFailingSerialization')]

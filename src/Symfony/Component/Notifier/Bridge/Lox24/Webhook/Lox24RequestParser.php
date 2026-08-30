@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Notifier\Bridge\Lox24\Webhook;
 
+use Symfony\Component\HttpFoundation\ChainRequestMatcher;
+use Symfony\Component\HttpFoundation\Exception\JsonException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
@@ -28,7 +31,10 @@ final class Lox24RequestParser extends AbstractRequestParser
 {
     protected function getRequestMatcher(): RequestMatcherInterface
     {
-        return new MethodRequestMatcher('POST');
+        return new ChainRequestMatcher([
+            new MethodRequestMatcher('POST'),
+            new IsJsonRequestMatcher(),
+        ]);
     }
 
     /**
@@ -43,7 +49,12 @@ final class Lox24RequestParser extends AbstractRequestParser
             }
         }
 
-        $payload = $request->request->all() ?? [];
+        try {
+            $payload = $request->toArray();
+        } catch (JsonException) {
+            throw new RejectWebhookException(406, 'The payload must be a JSON object.');
+        }
+
         $name = $payload['name'] ?? null;
         $data = $payload['data'] ?? null;
         $id = $payload['id'] ?? null;

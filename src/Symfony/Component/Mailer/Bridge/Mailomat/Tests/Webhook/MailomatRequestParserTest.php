@@ -80,11 +80,33 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
         ], $body);
     }
 
+    public function testRejectsForgedSignature()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $request->headers->set('X-MOM-Webhook-Signature', 'sha256='.hash_hmac('sha256', '1d958822-0934-4c6a-abc8-5defec4baa64.delivered.1718004211', 'another-secret'));
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is wrong.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public function testRejectsMissingSignature()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $request->headers->remove('X-MOM-Webhook-Signature');
+
+        $this->expectException(RejectWebhookException::class);
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
     #[DataProvider('provideNonSha256Algorithms')]
     public function testRejectsNonSha256Algorithm(string $algo)
     {
         $secret = $this->getSecret();
-        $data = '1d958822-0934-4c6a-abc8-5defec4baa64.delivered.1718004211';
+        $timestamp = (string) time();
+        $data = '1d958822-0934-4c6a-abc8-5defec4baa64.delivered.'.$timestamp;
         $payload = file_get_contents(__DIR__.'/Fixtures/delivered.json');
 
         $request = Request::create('/', 'POST', [], [], [], [
@@ -92,10 +114,12 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
             'HTTP_X-MOM-Webhook-Event' => 'delivered',
             'HTTP_X-MOM-Webhook-ID' => '1d958822-0934-4c6a-abc8-5defec4baa64',
             'HTTP_X-MOM-Webhook-Signature' => $algo.'='.hash_hmac($algo, $data, $secret),
-            'HTTP_X-MOM-Webhook-Timestamp' => '1718004211',
+            'HTTP_X-MOM-Webhook-Timestamp' => $timestamp,
         ], str_replace("\n", "\r\n", $payload));
 
         $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is wrong.');
+
         $this->createRequestParser()->parse($request, $secret);
     }
 

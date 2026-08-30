@@ -54,6 +54,37 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
+    public function testDenormalizeSplitsObjectToPopulatePerItem()
+    {
+        $first = new ArrayDummy('one', 'two');
+        $nested = [new ArrayDummy('three', 'four')];
+        $contexts = [];
+
+        $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
+        $nestedDenormalizer->expects($this->exactly(4))
+            ->method('denormalize')
+            ->willReturnCallback(static function ($data, $type, $format, $context) use (&$contexts) {
+                $contexts[] = $context;
+
+                return $data;
+            })
+        ;
+
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+        $denormalizer->denormalize(
+            ['a' => [], 'b' => [], 'c' => [], 'd' => []],
+            __NAMESPACE__.'\ArrayDummy[]',
+            null,
+            ['object_to_populate' => ['a' => $first, 'b' => $nested, 'c' => 'scalar']]
+        );
+
+        $this->assertSame($first, $contexts[0]['object_to_populate']);
+        $this->assertSame($nested, $contexts[1]['object_to_populate']);
+        $this->assertArrayNotHasKey('object_to_populate', $contexts[2]);
+        $this->assertArrayNotHasKey('object_to_populate', $contexts[3]);
+    }
+
     public function testSupportsValidArray()
     {
         $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);

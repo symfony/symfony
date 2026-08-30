@@ -458,4 +458,33 @@ class ParserTest extends TestCase
             ],
         ];
     }
+
+    #[DataProvider('getDeeplyNestedExpressions')]
+    public function testDeeplyNestedExpressionIsRejected(string $expression)
+    {
+        $this->expectException(SyntaxError::class);
+        $this->expectExceptionMessage('Expression is nested too deeply, the maximum nesting level is 256');
+
+        (new Parser([]))->lint((new Lexer())->tokenize($expression), [], Parser::IGNORE_UNKNOWN_VARIABLES);
+    }
+
+    public static function getDeeplyNestedExpressions(): iterable
+    {
+        yield 'unary operators' => [str_repeat('!', 300).'1'];
+        yield 'signs' => [str_repeat('-', 300).'1'];
+        yield 'parentheses' => [str_repeat('(', 300).'1'.str_repeat(')', 300)];
+        yield 'arrays' => [str_repeat('[', 300).'1'.str_repeat(']', 300)];
+        yield 'hashes' => [str_repeat('{a:', 300).'1'.str_repeat('}', 300)];
+        yield 'binary operators' => [str_repeat('1+', 300).'1'];
+        yield 'properties' => ['a'.str_repeat('.b', 300)];
+        yield 'array accesses' => ['a'.str_repeat('[0]', 300)];
+        yield 'ternaries' => [str_repeat('1?', 300).'1'.str_repeat(':1', 300)];
+    }
+
+    public function testDeepButReasonableExpressionIsAccepted()
+    {
+        (new Parser([]))->lint((new Lexer())->tokenize(str_repeat('(', 100).'a'.str_repeat(' + 1)', 100)), ['a']);
+
+        $this->expectNotToPerformAssertions();
+    }
 }

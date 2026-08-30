@@ -14,6 +14,7 @@ namespace Symfony\Bridge\Monolog\Tests\Formatter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class ConsoleFormatterTest extends TestCase
@@ -24,6 +25,38 @@ class ConsoleFormatterTest extends TestCase
         $formatter = new ConsoleFormatter();
 
         self::assertSame("12:34:56 <fg=cyan>WARNING  </> <comment>[test]</> test\n", $formatter->format($record));
+    }
+
+    public function testItEscapesTheRecordFields()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        $record = RecordFactory::create(message: "SELECT * FROM t WHERE a < 1 AND b > 2\033[2J\u{9b}2J", channel: '<fg=red>app</>');
+
+        $output = $formatter->format($record);
+
+        $this->assertStringNotContainsString("\033", $output);
+        $this->assertStringNotContainsString("\u{9b}", $output);
+        $this->assertStringContainsString('['.OutputFormatter::escape('<fg=red>app</>').']', $output);
+        $this->assertStringContainsString(OutputFormatter::escape('SELECT * FROM t WHERE a < 1 AND b > 2'), $output);
+    }
+
+    public function testItEscapesTheDumpedContext()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        $record = RecordFactory::create(context: ['user' => '<fg=red>alice</>']);
+
+        $this->assertStringContainsString(OutputFormatter::escape('"user" => "<fg=red>alice</>"'), $formatter->format($record));
+    }
+
+    public function testItKeepsTheMarkupAroundReplacedPlaceholders()
+    {
+        $formatter = new ConsoleFormatter(['colors' => false]);
+
+        $record = RecordFactory::create(message: 'Hello {user}', context: ['user' => '<fg=red>alice</>']);
+
+        $this->assertStringContainsString('Hello <comment>'.OutputFormatter::escape('<fg=red>alice</>').'</>', $formatter->format($record));
     }
 
     public function testPlaceholderInMessageWithDataContext()

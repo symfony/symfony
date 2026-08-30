@@ -37,9 +37,9 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
         'lifetime' => 31536000,
         'path' => '/',
         'domain' => null,
-        'secure' => false,
+        'secure' => 'auto',
         'httponly' => true,
-        'samesite' => null,
+        'samesite' => Cookie::SAMESITE_LAX,
         'always_remember_me' => false,
         'remember_me_parameter' => '_remember_me',
     ];
@@ -61,6 +61,10 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             throw new InvalidConfigurationException(\sprintf('You cannot use both "service" and "token_provider" in "security.firewalls.%s.remember_me".', $firewallName));
         }
 
+        if (isset($config['service']) && $config['signature_properties']) {
+            throw new InvalidConfigurationException(\sprintf('You cannot use both "service" and "signature_properties" in "security.firewalls.%s.remember_me" because the custom handler signs the cookies itself and the option would have no effect.', $firewallName));
+        }
+
         if (isset($config['service'])) {
             $container->register($rememberMeHandlerId, DecoratedRememberMeHandler::class)
                 ->addArgument(new Reference($config['service']))
@@ -73,11 +77,12 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
                 ->replaceArgument(1, new Reference($userProviderId))
                 ->replaceArgument(3, $config)
                 ->replaceArgument(5, $tokenVerifier)
+                ->replaceArgument(6, $config['signature_properties'] ?: null)
                 ->addTag('security.remember_me_handler', ['firewall' => $firewallName]);
         } else {
             $signatureHasherId = 'security.authenticator.remember_me_signature_hasher.'.$firewallName;
             $container->setDefinition($signatureHasherId, new ChildDefinition('security.authenticator.remember_me_signature_hasher'))
-                ->replaceArgument(1, $config['signature_properties'])
+                ->replaceArgument(1, $config['signature_properties'] ?: ['password'])
                 ->replaceArgument(2, $config['secret'])
             ;
 
@@ -140,9 +145,8 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
             ->arrayNode('signature_properties', 'signature_property')
                 ->prototype('scalar')->end()
                 ->requiresAtLeastOneElement()
-                ->info('An array of properties on your User that are used to sign the remember-me cookie. If any of these change, all existing cookies will become invalid.')
+                ->info('An array of properties on your User. All existing cookies become invalid when one of them changes. Defaults to ["password"], which a "token_provider" skips when the user class does not expose it. A property listed here explicitly must exist on the user class. Cannot be combined with a custom "service".')
                 ->example(['email', 'password'])
-                ->defaultValue(['password'])
             ->end()
             ->arrayNode('token_provider')
                 ->acceptAndWrap(['string'], 'service')
@@ -162,7 +166,7 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
         foreach ($this->options as $name => $value) {
             if ('secure' === $name) {
-                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue('auto' === $value ? null : $value);
+                $builder->enumNode($name)->values([true, false, 'auto'])->defaultValue($value);
             } elseif ('samesite' === $name) {
                 $builder->enumNode($name)->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])->defaultValue($value);
             } elseif (\is_bool($value)) {
@@ -219,21 +223,15 @@ class RememberMeFactory implements AuthenticatorFactoryInterface, PrependExtensi
 
     public function prepend(ContainerBuilder $container): void
     {
-        $rememberMeSecureDefault = false;
-        $rememberMeSameSiteDefault = null;
-
         if (!isset($container->getExtensions()['framework'])) {
             return;
         }
 
         foreach ($container->getExtensionConfig('framework') as $config) {
             if (isset($config['session']) && \is_array($config['session'])) {
-                $rememberMeSecureDefault = $config['session']['cookie_secure'] ?? $rememberMeSecureDefault;
-                $rememberMeSameSiteDefault = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $rememberMeSameSiteDefault;
+                $this->options['secure'] = $config['session']['cookie_secure'] ?? $this->options['secure'];
+                $this->options['samesite'] = \array_key_exists('cookie_samesite', $config['session']) ? $config['session']['cookie_samesite'] : $this->options['samesite'];
             }
         }
-
-        $this->options['secure'] = $rememberMeSecureDefault;
-        $this->options['samesite'] = $rememberMeSameSiteDefault;
     }
 }

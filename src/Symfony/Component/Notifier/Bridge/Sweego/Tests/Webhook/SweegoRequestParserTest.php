@@ -11,15 +11,53 @@
 
 namespace Symfony\Component\Notifier\Bridge\Sweego\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Bridge\Sweego\Webhook\SweegoRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
+#[Group('time-sensitive')]
 class SweegoRequestParserTest extends AbstractRequestParserTestCase
 {
     private const WEBHOOK_ID = 'a5ccc627-6e43-4012-bb29-f1bfe3a3d13e';
     private const WEBHOOK_TIMESTAMP = '1725290740';
+
+    public static function getStaleClockOffsets(): iterable
+    {
+        yield 'too old' => [301];
+        yield 'too far in the future' => [-301];
+    }
+
+    #[DataProvider('getStaleClockOffsets')]
+    public function testRejectSignedRequestWithStaleTimestamp(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/sent.json'));
+        ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public static function getToleratedClockOffsets(): iterable
+    {
+        yield 'at the past edge' => [300];
+        yield 'at the future edge' => [-300];
+    }
+
+    #[DataProvider('getToleratedClockOffsets')]
+    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/sent.json'));
+        ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
+
+        $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
 
     protected function createRequestParser(): RequestParserInterface
     {
@@ -28,6 +66,8 @@ class SweegoRequestParserTest extends AbstractRequestParserTestCase
 
     protected function createRequest(string $payload): Request
     {
+        ClockMock::withClockMock((int) self::WEBHOOK_TIMESTAMP);
+
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'HTTP_webhook-id' => self::WEBHOOK_ID,

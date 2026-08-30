@@ -15,7 +15,9 @@ use AsyncAws\DynamoDb\DynamoDbClient;
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
+use Symfony\Component\Lock\Key;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DynamoDbStoreTest extends TestCase
@@ -157,5 +159,45 @@ class DynamoDbStoreTest extends TestCase
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');
 
         new DynamoDbStore('dynamodb://default?foo=foo', ['bar' => 'bar']);
+    }
+
+    public function testDeleteIsScopedToTheOwnerToken()
+    {
+        $requests = [];
+        $httpClient = new MockHttpClient(static function (string $method, string $url, array $options) use (&$requests) {
+            $requests[] = json_decode($options['body'], true);
+
+            return new MockResponse('{}', ['response_headers' => ['content-type' => 'application/x-amz-json-1.0']]);
+        });
+
+        $store = new DynamoDbStore($this->createClient($httpClient), ['table_name' => 'table']);
+
+        $key = new Key(__METHOD__);
+        $store->save($key);
+        $store->delete($key);
+
+        $this->assertCount(2, $requests);
+        $this->assertSame('#token = :token', $requests[1]['ConditionExpression']);
+        $this->assertSame(['#token' => 'key_token'], $requests[1]['ExpressionAttributeNames']);
+        $this->assertSame($requests[0]['Item']['key_token']['S'], $requests[1]['ExpressionAttributeValues'][':token']['S']);
+    }
+
+    public function testDeleteOfALockHeldBySomeoneElseIsIgnored()
+    {
+        $httpClient = new MockHttpClient(new MockResponse(json_encode([
+            '__type' => 'com.amazonaws.dynamodb.v20120810#ConditionalCheckFailedException',
+            'message' => 'The conditional request failed',
+        ]), ['http_code' => 400, 'response_headers' => ['content-type' => 'application/x-amz-json-1.0']]));
+
+        $store = new DynamoDbStore($this->createClient($httpClient), ['table_name' => 'table']);
+
+        $store->delete(new Key(__METHOD__));
+
+        $this->addToAssertionCount(1);
+    }
+
+    private function createClient(HttpClientInterface $httpClient): DynamoDbClient
+    {
+        return new DynamoDbClient(['region' => 'us-east-1', 'accessKeyId' => 'key', 'accessKeySecret' => 'secret'], null, $httpClient);
     }
 }

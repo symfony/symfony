@@ -128,7 +128,7 @@
             </trans-unit>
             <trans-unit id="127">
                 <source>Please select a valid range.</source>
-                <target>لطفاً یک محدوده‌ معتبر انتخاب کنید.</target>
+                <target>لطفاً یک بازه‌ معتبر انتخاب کنید.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>Please enter a valid week.</source>
@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="129">
                 <source>Please enter a valid UUID.</source>
-                <target state="needs-review-translation">لطفاً یک UUID معتبر وارد کنید.</target>
+                <target>لطفاً یک UUID معتبر وارد کنید.</target>
             </trans-unit>
         </body>
     </file>

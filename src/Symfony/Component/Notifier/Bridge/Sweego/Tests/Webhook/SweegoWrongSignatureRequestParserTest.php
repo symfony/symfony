@@ -32,7 +32,7 @@ class SweegoWrongSignatureRequestParserTest extends AbstractRequestParserTestCas
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'HTTP_webhook-id' => 'a5ccc627-6e43-4012-bb29-f1bfe3a3d13e',
-            'HTTP_webhook-timestamp' => '1725290740',
+            'HTTP_webhook-timestamp' => (string) time(),
             'HTTP_webhook-signature' => 'wrong_signature',
         ], $payload);
     }

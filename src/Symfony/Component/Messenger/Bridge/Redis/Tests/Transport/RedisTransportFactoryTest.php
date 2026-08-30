@@ -80,7 +80,7 @@ class RedisTransportFactoryTest extends TestCase
     private function skipIfRedisUnavailable()
     {
         try {
-            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2]);
         } catch (\Exception $e) {
             self::markTestSkipped($e->getMessage());
         }

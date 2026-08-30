@@ -308,7 +308,8 @@ class RedisStore implements SharedLockStoreInterface
 
     private function getUniqueToken(Key $key): string
     {
-        if (!$key->hasState(__CLASS__)) {
+        // "__write__" is the reserved member that marks a write lock, so it can never be a token
+        if (!$key->hasState(__CLASS__) || '__write__' === $key->getState(__CLASS__)) {
             $token = base64_encode(random_bytes(32));
             $key->setState(__CLASS__, $token);
         }

@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\LoginThrottlingFactory;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\Alias;
@@ -63,23 +62,9 @@ class LoginThrottlingFactoryTest extends TestCase
     {
         $this->skipIfLockIsNotInstalled();
 
-        if (!(new \ReflectionClass(FrameworkExtension::class))->hasProperty('lockConfigEnabled')) {
-            $this->markTestSkipped('This test requires symfony/framework-bundle 5.x.');
-        }
-
         $container = $this->createContainer(true);
         $container->register('app.lock_factory', LockFactory::class);
-
-        // FrameworkExtension::registerRateLimiter() accepts an explicit lock factory only when the lock configuration is enabled
-        $setLockConfigEnabled = \Closure::bind(static function (bool $enabled) { self::$lockConfigEnabled = $enabled; }, null, FrameworkExtension::class);
-        $setLockConfigEnabled(true);
-
-        try {
-            $this->createAuthenticator($container, ['lock_factory' => 'app.lock_factory']);
-        } finally {
-            $setLockConfigEnabled(false);
-        }
-
+        $this->createAuthenticator($container, ['lock_factory' => 'app.lock_factory']);
         $this->resolveDefinitions($container);
 
         $this->assertSame('app.lock_factory', (string) $container->getDefinition('limiter._login_local_main')->getArgument(2));

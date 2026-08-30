@@ -1481,6 +1481,27 @@ class AbstractObjectNormalizerTest extends TestCase
         }
     }
 
+    public function testDenormalizeEnforcesNestedScalarCollectionElementType()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        try {
+            $normalizer->denormalize(['intsByName' => ['a' => [1, 'nope']]], ScalarCollectionsDummy::class);
+            $this->fail(\sprintf('A "%s" should have been thrown.', NotNormalizableValueException::class));
+        } catch (NotNormalizableValueException $e) {
+            $this->assertSame('intsByName[a][1]', $e->getPath());
+        }
+    }
+
+    public function testDenormalizeConvertsNestedScalarCollectionElements()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors();
+
+        $dummy = $normalizer->denormalize(['intsByName' => ['a' => ['1', '2']]], ScalarCollectionsDummy::class, null, [AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION => true]);
+
+        $this->assertSame(['a' => [1, 2]], $dummy->intsByName);
+    }
+
     public function testDenormalizeCollectsScalarCollectionElementErrors()
     {
         $serializer = new Serializer([new AbstractObjectNormalizerWithMetadataAndPropertyTypeExtractors()]);
@@ -2434,6 +2455,9 @@ class ScalarCollectionsDummy
 
     /** @var int[]|string[] */
     public array $intsOrStrings = [];
+
+    /** @var array<string, list<int>> */
+    public array $intsByName = [];
 }
 
 class UnionCollectionDocBlockDummy

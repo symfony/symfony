@@ -625,7 +625,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                         }
 
                         return $result;
-                    } elseif (\is_array($data) && $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
+                    } elseif (\is_array($data) && self::hasScalarElements($collectionValueBaseType, $collectionValueType)) {
                         // elements of a scalar collection are converted and enforced with the very same rules as any other value
                         $result = [];
                         $childContext = null;
@@ -640,6 +640,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                                 TypeIdentifier::BOOL => \is_bool($value),
                                 TypeIdentifier::FLOAT => \is_float($value),
                                 TypeIdentifier::INT => \is_int($value),
+                                // a nested collection is an array already, its own elements still have to be checked
+                                TypeIdentifier::ARRAY => false,
                                 default => \is_string($value),
                             }) {
                                 $result[$key] = $value;
@@ -862,6 +864,22 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $parameterData = $this->applyCallbacks($parameterData, $class->getName(), $parameterName, $format, $context);
 
         return $this->applyFilterBool($parameter, $parameterData, $context);
+    }
+
+    /**
+     * Tells whether the elements of a collection are scalars, or nested collections of scalars.
+     */
+    private static function hasScalarElements(Type $collectionValueBaseType, Type $collectionValueType): bool
+    {
+        if ($collectionValueBaseType instanceof BuiltinType && TypeIdentifier::ARRAY === $collectionValueBaseType->getTypeIdentifier()) {
+            while ($collectionValueType instanceof NullableType || $collectionValueType instanceof CollectionType) {
+                $collectionValueType = $collectionValueType instanceof NullableType ? $collectionValueType->getWrappedType() : $collectionValueType->getCollectionValueType();
+            }
+
+            $collectionValueBaseType = $collectionValueType;
+        }
+
+        return $collectionValueBaseType instanceof BuiltinType && \in_array($collectionValueBaseType->getTypeIdentifier(), [TypeIdentifier::BOOL, TypeIdentifier::FLOAT, TypeIdentifier::INT, TypeIdentifier::STRING], true);
     }
 
     private function getType(string $currentClass, string $attribute): ?Type

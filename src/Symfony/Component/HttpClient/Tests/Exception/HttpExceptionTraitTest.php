@@ -13,7 +13,11 @@ namespace Symfony\Component\HttpClient\Tests\Exception;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\HttpExceptionTrait;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
@@ -56,6 +60,65 @@ class HttpExceptionTraitTest extends TestCase
         $e = new TestException($response);
         $this->assertSame(400, $e->getCode());
         $this->assertSame($expectedMessage, $e->getMessage());
+    }
+
+    public function testParseErrorOnAStreamedResponse()
+    {
+        $e = $this->requestError('{"title": "An error occurred", "detail": "Some details"}');
+
+        $this->assertSame("An error occurred\n\nSome details", $e->getMessage());
+    }
+
+    public function testParseErrorKeepsTheHeadOfTheBodyOnly()
+    {
+        $e = $this->requestError($this->longErrorBody());
+
+        $this->assertSame('HTTP/1.1 400 Bad Request returned for "http://example.com/".', $e->getMessage());
+    }
+
+    public function testBufferedResponseStaysReadable()
+    {
+        $e = $this->requestError($this->longErrorBody());
+
+        $this->assertSame($this->longErrorBody(), $e->getResponse()->getContent(false));
+    }
+
+    public function testUnbufferedResponseStaysUnreadable()
+    {
+        $e = $this->requestError($this->longErrorBody(), ['buffer' => false]);
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Cannot get the content of the response twice: buffering is disabled.');
+
+        $e->getResponse()->getContent(false);
+    }
+
+    public function testNonJsonResponseIsNotRead()
+    {
+        $e = $this->requestError($this->longErrorBody(), ['buffer' => false], 'text/plain');
+
+        $this->assertSame($this->longErrorBody(), $e->getResponse()->getContent(false));
+    }
+
+    private function longErrorBody(): string
+    {
+        return json_encode(['title' => 'An error occurred', 'detail' => str_repeat('x', 64 * 1024)]);
+    }
+
+    private function requestError(string $body, array $options = [], string $contentType = 'application/problem+json'): ClientException
+    {
+        $client = new MockHttpClient(new MockResponse(str_split($body, 16384), [
+            'http_code' => 400,
+            'response_headers' => ['HTTP/1.1 400 Bad Request', 'Content-Type: '.$contentType],
+        ]));
+
+        try {
+            $client->request('GET', 'http://example.com/', $options)->getHeaders();
+        } catch (ClientException $e) {
+            return $e;
+        }
+
+        $this->fail(ClientException::class.' expected');
     }
 }
 

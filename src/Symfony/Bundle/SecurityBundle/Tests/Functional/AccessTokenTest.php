@@ -473,7 +473,7 @@ class AccessTokenTest extends AbstractWebTestCase
     {
         return (new JwsCompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
             new ES256(),
-        ])))->create()
+        ])))
             ->withPayload(json_encode($claims))
             // tip: use https://mkjwk.org/ to generate a JWK
             ->addSignature(new JWK([
@@ -501,7 +501,7 @@ class AccessTokenTest extends AbstractWebTestCase
         return (new JweCompactSerializer())->serialize(
             (new JWEBuilder(new AlgorithmManager([
                 new ECDHES(), new A128GCM(),
-            ]), null))->create()
+            ]), null))
                 ->withPayload($input)
                 ->withSharedProtectedHeader(['alg' => 'ECDH-ES', 'enc' => 'A128GCM', ...$header])
                 // tip: use https://mkjwk.org/ to generate a JWK

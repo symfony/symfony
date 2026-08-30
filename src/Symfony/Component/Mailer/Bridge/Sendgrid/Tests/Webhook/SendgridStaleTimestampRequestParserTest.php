@@ -12,7 +12,6 @@
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Webhook;
 
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
@@ -21,31 +20,32 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
-/**
- * @author WoutervanderLoop.nl <info@woutervanderloop.nl>
- */
-#[RequiresPhpExtension('openssl')]
 #[Group('time-sensitive')]
-class SendgridWrongSignatureRequestParserTest extends AbstractRequestParserTestCase
+class SendgridStaleTimestampRequestParserTest extends AbstractRequestParserTestCase
 {
+    public function testRejectSignedRequestFromTheFuture()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/webhook.json'));
+        ClockMock::withClockMock((int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp') - 301);
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
     protected function createRequestParser(): RequestParserInterface
     {
         $this->expectException(RejectWebhookException::class);
-        $this->expectExceptionMessage('Signature is wrong.');
+        $this->expectExceptionMessage('Timestamp is outside the allowed time window.');
 
         return new SendgridRequestParser(new SendgridPayloadConverter());
     }
 
-    /**
-     * @see https://github.com/sendgrid/sendgrid-php/blob/9335dca98bc64456a72db73469d1dd67db72f6ea/test/unit/EventWebhookTest.php#L20
-     */
     protected function createRequest(string $payload): Request
     {
-        ClockMock::withClockMock(1600112502);
+        ClockMock::withClockMock(1600112502 + 301);
 
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
-            'HTTP_X-Twilio-Email-Event-Webhook-Signature' => 'incorrect',
+            'HTTP_X-Twilio-Email-Event-Webhook-Signature' => 'MEUCIGHQVtGj+Y3LkG9fLcxf3qfI10QysgDWmMOVmxG0u6ZUAiEAyBiXDWzM+uOe5W0JuG+luQAbPIqHh89M15TluLtEZtM=',
             'HTTP_X-Twilio-Email-Event-Webhook-Timestamp' => '1600112502',
         ], str_replace("\n", "\r\n", $payload));
     }

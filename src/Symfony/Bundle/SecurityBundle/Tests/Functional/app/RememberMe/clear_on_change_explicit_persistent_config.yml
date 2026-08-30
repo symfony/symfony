@@ -1,0 +1,8 @@
+imports:
+    - { resource: ./clear_on_change_persistent_config.yml }
+
+security:
+    firewalls:
+        default:
+            remember_me:
+                signature_properties: [password]

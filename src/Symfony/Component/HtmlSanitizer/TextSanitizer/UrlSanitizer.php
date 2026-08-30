@@ -23,8 +23,18 @@ final class UrlSanitizer
      * Characters with no legitimate place in a URL: explicit-direction BiDi
      * formatting marks plus Unicode whitespace and the zero-width no-break
      * space. ASCII space is tolerated and percent-encoded by parse().
+     *
+     * The characters are matched as UTF-8 byte sequences: with the "u" modifier,
+     * preg_match() returns false on malformed UTF-8, which percent-decoding can
+     * produce, and the check would then be skipped.
      */
-    private const DENIED_CHARS_PATTERN = '/[\t\n\x0B\f\r\x{0085}\x{00A0}\x{1680}\x{2000}-\x{200A}\x{2028}\x{2029}\x{202F}\x{205F}\x{3000}\x{FEFF}\x{202A}-\x{202E}\x{2066}-\x{2069}]/u';
+    private const DENIED_CHARS_PATTERN = '/[\t\n\x0B\f\r]'
+        .'|\xC2[\x85\xA0]'                // U+0085, U+00A0
+        .'|\xE1\x9A\x80'                  // U+1680
+        .'|\xE2\x80[\x80-\x8A\xA8-\xAF]'  // U+2000-U+200A, U+2028-U+202F
+        .'|\xE2\x81[\x9F\xA6-\xA9]'       // U+205F, U+2066-U+2069
+        .'|\xE3\x80\x80'                  // U+3000
+        .'|\xEF\xBB\xBF/';                // U+FEFF
 
     /**
      * Sanitizes a given URL string.
@@ -61,6 +71,18 @@ final class UrlSanitizer
         // Forbidden scheme
         if ($url['scheme'] && null !== $allowedSchemes && !\in_array($url['scheme'], $allowedSchemes, true)) {
             return null;
+        }
+
+        // A view-source URL wraps another URL, which has to pass the same checks;
+        // browsers reject a view-source URL wrapped in another one
+        if ('view-source' === $url['scheme']) {
+            $nested = substr($input, \strlen('view-source:'));
+
+            if (0 === strncasecmp($nested, 'view-source:', 12) || null === $nested = self::sanitize($nested, $allowedSchemes, $forceHttps, $allowedHosts, $allowRelative)) {
+                return null;
+            }
+
+            return 'view-source:'.$nested;
         }
 
         // If the scheme used is not supposed to have a host, do not check the host
@@ -142,6 +164,9 @@ final class UrlSanitizer
             }
 
             $parsedUrl = UriString::parse($url);
+            if (isset($parsedUrl['scheme'])) {
+                $parsedUrl['scheme'] = strtolower($parsedUrl['scheme']);
+            }
 
             if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {
                 return null;
@@ -177,7 +202,7 @@ final class UrlSanitizer
 
     private static function isHostlessScheme(?string $scheme): bool
     {
-        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'sms', 'view-source'], true);
+        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'sms'], true);
     }
 
     private static function isAllowedHost(?string $host, array $allowedHosts): bool
@@ -186,10 +211,10 @@ final class UrlSanitizer
             return \in_array(null, $allowedHosts, true);
         }
 
-        $parts = array_reverse(explode('.', $host));
+        $parts = array_reverse(explode('.', strtolower($host)));
 
         foreach ($allowedHosts as $allowedHost) {
-            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', $allowedHost)))) {
+            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', strtolower($allowedHost))))) {
                 return true;
             }
         }

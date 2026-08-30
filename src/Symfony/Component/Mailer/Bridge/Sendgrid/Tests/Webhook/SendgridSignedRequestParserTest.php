@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
@@ -22,6 +25,7 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
  * @author WoutervanderLoop.nl <info@woutervanderloop.nl>
  */
 #[RequiresPhpExtension('openssl')]
+#[Group('time-sensitive')]
 class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
 {
     private const PRIVATE_KEY = <<<'KEY'
@@ -43,6 +47,21 @@ class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
         KEY;
     private const SECRET = 'MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgHH/ZmiTGDi6/1IIx4vOKedN24Zuxj9G0ioNpCbNssQlukWijQizUaOZ98JgEA11jGY1gFwCKYVSH5e1ZWN+m4hdxNQoNn8QaODzyo2ocGbobzrIuMJpmroyl6WmNa0jW8DMoW1Mpsxo/Vw9FrkAL+eSYgR8ZFWeXbcD8yRfVm/lAgMBAAE=';
 
+    public static function getToleratedClockOffsets(): iterable
+    {
+        yield 'at the past edge' => [300];
+        yield 'at the future edge' => [-300];
+    }
+
+    #[DataProvider('getToleratedClockOffsets')]
+    public function testAcceptSignedRequestWithinTolerance(int $offset)
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/webhook.json'));
+        ClockMock::withClockMock((int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp') + $offset);
+
+        $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
     protected function createRequestParser(): RequestParserInterface
     {
         return new SendgridRequestParser(new SendgridPayloadConverter(), true);
@@ -53,6 +72,7 @@ class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
      */
     protected function createRequest(string $payload): Request
     {
+        ClockMock::withClockMock(1600112502);
         $payload = str_replace("\n", "\r\n", $payload);
 
         openssl_sign('1600112502'.$payload, $signature, self::PRIVATE_KEY, \OPENSSL_ALGO_SHA256);

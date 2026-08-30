@@ -1263,6 +1263,18 @@ class Parser
 
     private function lexInlineStructure(int &$cursor, string $closingTag, bool $consumeUntilEol = true): string
     {
+        $state = $this->getState();
+        $state->enterNestingLevel($this->getRealCurrentLineNb() + 1, $this->currentLine, $this->filename);
+
+        try {
+            return $this->doLexInlineStructure($cursor, $closingTag, $consumeUntilEol);
+        } finally {
+            $state->leaveNestingLevel();
+        }
+    }
+
+    private function doLexInlineStructure(int &$cursor, string $closingTag, bool $consumeUntilEol = true): string
+    {
         $value = $this->currentLine[$cursor];
         ++$cursor;
 

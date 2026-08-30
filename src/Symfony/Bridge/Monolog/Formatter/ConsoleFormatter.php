@@ -102,14 +102,14 @@ final class ConsoleFormatter implements FormatterInterface
 
         if (!$this->options['ignore_empty_context_and_extra'] || $record->context) {
             $context = $record->context;
-            $context = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($context);
+            $context = ($this->options['multiline'] ? "\n" : ' ').OutputFormatter::escape($this->dumpData($context));
         } else {
             $context = '';
         }
 
         if (!$this->options['ignore_empty_context_and_extra'] || $record->extra) {
             $extra = $record->extra;
-            $extra = ($this->options['multiline'] ? "\n" : ' ').$this->dumpData($extra);
+            $extra = ($this->options['multiline'] ? "\n" : ' ').OutputFormatter::escape($this->dumpData($extra));
         } else {
             $extra = '';
         }
@@ -119,8 +119,8 @@ final class ConsoleFormatter implements FormatterInterface
             '%start_tag%' => \sprintf('<%s>', self::LEVEL_COLOR_MAP[$record->level->value]),
             '%level_name%' => \sprintf($this->options['level_name_format'], $record->level->getName()),
             '%end_tag%' => '</>',
-            '%channel%' => $record->channel,
-            '%message%' => $this->replacePlaceHolder($record)->message,
+            '%channel%' => self::escape($record->channel),
+            '%message%' => $record->message,
             '%context%' => $context,
             '%extra%' => $extra,
         ]);
@@ -155,7 +155,7 @@ final class ConsoleFormatter implements FormatterInterface
 
     private function replacePlaceHolder(LogRecord $record): LogRecord
     {
-        $message = $record->message;
+        $record = $record->with(message: $message = self::escape($record->message));
 
         if (!str_contains($message, '{')) {
             return $record;
@@ -199,5 +199,10 @@ final class ConsoleFormatter implements FormatterInterface
         ftruncate($this->outputBuffer, 0);
 
         return rtrim($dump);
+    }
+
+    private static function escape(string $value): string
+    {
+        return OutputFormatter::escape(preg_replace('/[\x00-\x08\x0B-\x1F\x7F]|\xC2[\x80-\x9F]/', '', $value));
     }
 }

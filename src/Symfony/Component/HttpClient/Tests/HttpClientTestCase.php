@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
@@ -45,6 +46,26 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         }
 
         parent::testTimeoutOnDestruct();
+    }
+
+    #[RequiresPhpExtension('openssl')]
+    public function testRedirectToADifferentSchemeDropsCredentials()
+    {
+        TestRedirectServer::start();
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $response = $client->request('GET', 'https://127.0.0.1:8059/', [
+            'auth_basic' => 'foo:bar',
+            'headers' => ['Cookie' => 'a=b', 'X-Custom' => 'kept'],
+            'verify_peer' => false,
+            'verify_host' => false,
+        ]);
+        $headers = $response->toArray();
+
+        $this->assertSame('http://127.0.0.1:8059/', $response->getInfo('url'));
+        $this->assertSame('kept', $headers['x-custom']);
+        $this->assertArrayNotHasKey('authorization', $headers);
+        $this->assertArrayNotHasKey('cookie', $headers);
     }
 
     public function testAcceptHeader()

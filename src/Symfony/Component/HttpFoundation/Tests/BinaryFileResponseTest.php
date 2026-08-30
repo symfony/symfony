@@ -287,6 +287,56 @@ class BinaryFileResponseTest extends ResponseTestCase
         ];
     }
 
+    #[DataProvider('provideSupportedXSendfileTypes')]
+    public function testSupportedXSendfileTypes(string $type, string $header)
+    {
+        $request = Request::create('/');
+        $request->headers->set('X-Sendfile-Type', $type);
+
+        BinaryFileResponse::trustXSendfileTypeHeader();
+        $response = new BinaryFileResponse(__DIR__.'/../README.md', 200, ['Content-Type' => 'application/octet-stream']);
+        $response->prepare($request);
+
+        $this->expectOutputString('');
+        $response->sendContent();
+
+        $this->assertArrayHasKey($header, $response->headers->allPreserveCase());
+        $this->assertStringContainsString('README.md', $response->headers->get($header));
+    }
+
+    public static function provideSupportedXSendfileTypes()
+    {
+        return [
+            ['X-Sendfile', 'X-Sendfile'],
+            ['x-sendfile', 'X-Sendfile'],
+            ['X-LIGHTTPD-send-file', 'X-LIGHTTPD-send-file'],
+        ];
+    }
+
+    #[DataProvider('provideUnsupportedXSendfileTypes')]
+    public function testUnsupportedXSendfileTypeIsIgnored(string $type)
+    {
+        $request = Request::create('/');
+        $request->headers->set('X-Sendfile-Type', $type);
+
+        BinaryFileResponse::trustXSendfileTypeHeader();
+        $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
+        $response->prepare($request);
+
+        $this->assertFalse($response->headers->has($type));
+
+        $this->expectOutputString(file_get_contents(__DIR__.'/File/Fixtures/test.gif'));
+        $response->sendContent();
+    }
+
+    public static function provideUnsupportedXSendfileTypes()
+    {
+        return [
+            ['X-Leak-Path'],
+            ['Location'],
+        ];
+    }
+
     #[DataProvider('getSampleXAccelMappings')]
     public function testXAccelMapping($realpath, $mapping, $virtual)
     {

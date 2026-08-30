@@ -1733,6 +1733,55 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertEquals(12, $this->response->headers->get('Content-Length'));
     }
 
+    public function testBackendCannotSetBodyFileHeader()
+    {
+        $file = sys_get_temp_dir().'/http_cache_local_file.txt';
+        file_put_contents($file, 'contents of a local file');
+
+        try {
+            $this->setNextResponse(200, ['X-Body-File' => $file], 'backend body');
+            $this->request('GET', '/');
+
+            $this->assertSame('backend body', $this->response->getContent());
+            $this->assertFalse($this->response->headers->has('X-Body-File'));
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    public function testBackendCannotSetBodyEvalHeader()
+    {
+        $boundary = str_repeat('b', HttpCache::BODY_EVAL_BOUNDARY_LENGTH);
+        $body = $boundary.'start'.$boundary."/embedded\n\n\nend".$boundary;
+
+        $this->setNextResponses([
+            [
+                'status' => 200,
+                'body' => $body,
+                'headers' => ['X-Body-Eval' => 'ESI'],
+            ],
+            [
+                'status' => 200,
+                'body' => 'embedded content',
+                'headers' => [],
+            ],
+        ]);
+
+        $this->request('GET', '/', [], [], true);
+
+        $this->assertSame($body, $this->response->getContent());
+        $this->assertFalse($this->response->headers->has('X-Body-Eval'));
+    }
+
+    public function testBackendCannotSetContentDigestHeader()
+    {
+        $this->setNextResponse(200, ['X-Content-Digest' => 'from-the-backend'], 'backend body');
+        $this->request('GET', '/');
+
+        $this->assertSame('backend body', $this->response->getContent());
+        $this->assertFalse($this->response->headers->has('X-Content-Digest'));
+    }
+
     public function testClientIpIsAlwaysLocalhostForForwardedRequests()
     {
         $this->setNextResponse();

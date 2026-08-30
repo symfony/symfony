@@ -48,7 +48,7 @@ class RedisCasterTest extends TestCase
             self::markTestSkipped(\sprintf('"%s" class required', $class));
         }
 
-        $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];
+        $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2];
         $redis = new $class();
         try {
             $redis->connect(...$redisHost);
@@ -64,7 +64,7 @@ class RedisCasterTest extends TestCase
               auth: null
               mode: ATOMIC
               dbNum: 0
-              timeout: 0.0
+              timeout: 2.0
               lastError: null
               persistentId: %a
               options: {

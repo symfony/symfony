@@ -82,6 +82,22 @@ class ClockMockTest extends TestCase
         $this->assertSame(1234567890125000000, hrtime(true));
     }
 
+    public function testHrTimeAsNumberWithLeadingZerosInTheNanoseconds()
+    {
+        ClockMock::withClockMock(1234567890.0625);
+
+        $this->assertSame([1234567890, 62500000], hrtime());
+        $this->assertSame(1234567890062500000, hrtime(true));
+    }
+
+    public function testHrTimeWithoutClockMock()
+    {
+        ClockMock::withClockMock(false);
+
+        $this->assertGreaterThan(0, hrtime()[0]);
+        $this->assertGreaterThan(0, hrtime(true));
+    }
+
     public function testStrToTime()
     {
         $this->assertSame(1234567890, strtotime('now'));

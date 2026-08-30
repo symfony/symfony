@@ -23,7 +23,7 @@ class RedisTraitTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         try {
-            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2]);
         } catch (\Exception $e) {
             self::markTestSkipped(getenv('REDIS_HOST').': '.$e->getMessage());
         }

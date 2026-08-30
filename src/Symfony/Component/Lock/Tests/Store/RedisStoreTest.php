@@ -29,7 +29,7 @@ class RedisStoreTest extends AbstractRedisStoreTestCase
     public static function setUpBeforeClass(): void
     {
         try {
-            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2]);
         } catch (\Exception $e) {
             throw new SkippedTestSuiteError($e->getMessage());
         }
@@ -41,7 +41,7 @@ class RedisStoreTest extends AbstractRedisStoreTestCase
     protected function getRedisConnection(): object
     {
         $redis = new \Redis();
-        $redis->connect(...explode(':', getenv('REDIS_HOST')));
+        $redis->connect(...explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2]);
 
         return $redis;
     }

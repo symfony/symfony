@@ -36,7 +36,7 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
             throw new SkippedTestSuiteError('Extension redis required.');
         }
         try {
-            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2]);
         } catch (\Exception $e) {
             throw new SkippedTestSuiteError(getenv('REDIS_HOST').': '.$e->getMessage());
         }

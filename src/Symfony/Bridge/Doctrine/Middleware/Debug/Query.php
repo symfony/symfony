@@ -25,7 +25,7 @@ class Query
     /** @var array<ParameterType|int> */
     private array $types = [];
 
-    private ?float $start = null;
+    private ?int $start = null;
     private ?float $duration = null;
 
     public function __construct(
@@ -35,13 +35,13 @@ class Query
 
     public function start(): void
     {
-        $this->start = microtime(true);
+        $this->start = hrtime(true);
     }
 
     public function stop(): void
     {
         if (null !== $this->start) {
-            $this->duration = microtime(true) - $this->start;
+            $this->duration = (hrtime(true) - $this->start) / 1e9;
         }
     }
 

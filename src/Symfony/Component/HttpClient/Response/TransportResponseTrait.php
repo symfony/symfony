@@ -41,6 +41,8 @@ trait TransportResponseTrait
     private $id;
     private $timeout = 0;
     private $inflate;
+    private $inflateIn = 0;
+    private $inflateOut = 0;
     private $finalInfo;
     private $logger;
 
@@ -199,9 +201,22 @@ trait TransportResponseTrait
                         $elapsedTimeout = 0;
 
                         if (\is_string($chunk = array_shift($multi->handlesActivity[$j]))) {
-                            if (null !== $response->inflate && false === $chunk = @inflate_add($response->inflate, $chunk)) {
-                                $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Error while processing content unencoding for "%s".', $response->getInfo('url')))];
-                                continue;
+                            if (null !== $response->inflate) {
+                                $response->inflateIn += \strlen($chunk);
+
+                                if (false === $chunk = @inflate_add($response->inflate, $chunk)) {
+                                    $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Error while processing content unencoding for "%s".', $response->getInfo('url')))];
+                                    continue;
+                                }
+
+                                $response->inflateOut += \strlen($chunk);
+
+                                // Reject decompression bombs. The ratio is meaningless on small bodies,
+                                // so it applies only past the 2 MB that php://temp keeps in memory.
+                                if (2097152 < $response->inflateOut && 100 * $response->inflateIn < $response->inflateOut) {
+                                    $multi->handlesActivity[$j] = [null, new TransportException(sprintf('Content of "%s" inflated to more than 100 times its compressed size.', $response->getInfo('url')))];
+                                    continue;
+                                }
                             }
 
                             if ('' !== $chunk && null !== $response->content && \strlen($chunk) !== fwrite($response->content, $chunk)) {

@@ -244,6 +244,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         $context = stream_context_create($context, ['notification' => $notification]);
 
         $resolver = static function ($multi) use ($context, $options, $url, &$info, $onProgress) {
+            $authority = $url['authority'];
             [$host, $port] = self::parseHostPort($url, $info);
 
             if (!isset($options['normalized_headers']['host'])) {
@@ -257,7 +258,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 $url['authority'] = substr_replace($url['authority'], $ip, -\strlen($host) - \strlen($port), \strlen($host));
             }
 
-            return [self::createRedirectResolver($options, $url['scheme'], $host, $proxy, $info, $onProgress), implode('', $url)];
+            return [self::createRedirectResolver($options, $url['scheme'], $authority, $proxy, $info, $onProgress), implode('', $url)];
         };
 
         return new NativeResponse($this->multi, $context, implode('', $url), $options, $info, $resolver, $onProgress, $this->logger);
@@ -360,11 +361,11 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
     /**
      * Handles redirects - the native logic is too buggy to be used.
      */
-    private static function createRedirectResolver(array $options, string $scheme, string $host, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
+    private static function createRedirectResolver(array $options, string $scheme, string $authority, ?array $proxy, array &$info, ?\Closure $onProgress): \Closure
     {
         $redirectHeaders = [];
         if (0 < $maxRedirects = $options['max_redirects']) {
-            $redirectHeaders = ['scheme' => $scheme, 'host' => $host];
+            $redirectHeaders = ['scheme' => $scheme, 'authority' => $authority];
             $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = array_filter($options['headers'], static function ($h) {
                 return 0 !== stripos($h, 'Host:');
             });
@@ -428,8 +429,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             [$host, $port] = self::parseHostPort($url, $info);
 
             if ($locationHasHost) {
-                // Authorization and Cookie headers MUST NOT follow except for the initial scheme and host name
-                $requestHeaders = $url['scheme'] === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+                // Authorization and Cookie headers MUST NOT follow except for the initial scheme and authority
+                $requestHeaders = $url['scheme'] === $redirectHeaders['scheme'] && $redirectHeaders['authority'] === $url['authority'] ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
                 $requestHeaders[] = 'Host: '.$host.$port;
                 $dnsResolve = !self::configureHeadersAndProxy($context, $host, $requestHeaders, $proxy, 'https:' === $url['scheme']);
             } else {

@@ -637,10 +637,6 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $client = $this->getHttpClient(__FUNCTION__);
 
             $response = $client->request('GET', $url, [
-                'query' => [
-                    'status' => 302,
-                    'headers' => ['Location: http://localhost:8057/'],
-                ],
                 'headers' => [
                     'Host' => 'foo.example.com',
                     'Authorization' => 'Basic Zm9vOmJhcg==',
@@ -663,11 +659,10 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
     public static function getRedirectWithHostHeaderTests()
     {
-        // the native client keeps the credentials when only the port changes
         return [
-            'same host and port' => ['url' => 'http://localhost:8057/custom', 'redirectWithAuth' => true, 'expectedHost' => 'localhost:8057'],
-            'other port' => ['url' => 'http://localhost:8067/custom', 'redirectWithAuth' => true, 'expectedHost' => 'localhost:8057'],
-            'other host' => ['url' => 'http://127.0.0.1:8057/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
+            'same host and port' => ['url' => 'http://localhost:8057/301/proxy', 'redirectWithAuth' => true, 'expectedHost' => 'localhost:8057'],
+            'other port' => ['url' => 'http://localhost:8067/301/proxy', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
+            'other host' => ['url' => 'http://127.0.0.1:8057/301/proxy', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
         ];
     }
 }

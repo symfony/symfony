@@ -28,9 +28,9 @@ class AmpHttpClientTest extends HttpClientTestCase
     {
         // unlike curl and the native client, amphp keeps the user-provided Host header when the authority doesn't change
         return [
-            'same host and port' => ['url' => 'http://localhost:8057/custom', 'redirectWithAuth' => true, 'expectedHost' => 'foo.example.com'],
-            'other port' => ['url' => 'http://localhost:8067/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
-            'other host' => ['url' => 'http://127.0.0.1:8057/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
+            'same host and port' => ['url' => 'http://localhost:8057/301/proxy', 'redirectWithAuth' => true, 'expectedHost' => 'foo.example.com'],
+            'other port' => ['url' => 'http://localhost:8067/301/proxy', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
+            'other host' => ['url' => 'http://127.0.0.1:8057/301/proxy', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
         ];
     }
 

@@ -171,8 +171,9 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                 }
             }
 
-            // Authorization and Cookie headers MUST NOT follow except for the initial scheme and host name
-            $options['headers'] = parse_url($url, \PHP_URL_SCHEME).':' === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
+            // Authorization and Cookie headers MUST NOT follow except for the initial scheme, host and port
+            $port = parse_url($url, \PHP_URL_PORT);
+            $options['headers'] = parse_url($url, \PHP_URL_SCHEME).':' === $redirectHeaders['scheme'] && $redirectHeaders['host'] === $host && ($redirectHeaders['port'] ?? null) === $port ? $redirectHeaders['with_auth'] : $redirectHeaders['no_auth'];
 
             static $redirectCount = 0;
             $context->setInfo('redirect_count', ++$redirectCount);

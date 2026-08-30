@@ -119,16 +119,6 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
-    public static function getRedirectWithHostHeaderTests()
-    {
-        // curl itself drops the credentials when the port changes
-        return [
-            'same host and port' => ['url' => 'http://localhost:8057/custom', 'redirectWithAuth' => true, 'expectedHost' => 'localhost:8057'],
-            'other port' => ['url' => 'http://localhost:8067/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
-            'other host' => ['url' => 'http://127.0.0.1:8057/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
-        ];
-    }
-
     public function testHttpsProxyIsRejectedWhenCurlLacksSupport()
     {
         $client = $this->getHttpClient(__FUNCTION__);

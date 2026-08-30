@@ -174,12 +174,23 @@ class DynamoDbStore implements PersistingStoreInterface
 
     public function delete(Key $key): void
     {
-        $this->client->deleteItem(new DeleteItemInput([
-            'TableName' => $this->tableName,
-            'Key' => [
-                $this->idAttr => new AttributeValue(['S' => $this->getHashedKey($key)]),
-            ],
-        ]));
+        try {
+            $this->client->deleteItem(new DeleteItemInput([
+                'TableName' => $this->tableName,
+                'Key' => [
+                    $this->idAttr => new AttributeValue(['S' => $this->getHashedKey($key)]),
+                ],
+                'ConditionExpression' => '#token = :token',
+                'ExpressionAttributeNames' => [
+                    '#token' => $this->tokenAttr,
+                ],
+                'ExpressionAttributeValues' => [
+                    ':token' => new AttributeValue(['S' => $this->getUniqueToken($key)]),
+                ],
+            ]));
+        } catch (ConditionalCheckFailedException) {
+            // the lock is held by someone else, or it doesn't exist anymore
+        }
     }
 
     public function exists(Key $key): bool

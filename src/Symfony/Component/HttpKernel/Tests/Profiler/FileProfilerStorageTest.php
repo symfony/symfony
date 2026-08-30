@@ -140,6 +140,71 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(1, $this->storage->find('', '', 1000, ''), '->find() does not return the same profile twice');
     }
 
+    public function testStoreTokenWithDash()
+    {
+        $profile = new Profile('a-token');
+        $profile->setUrl('http://example.com/');
+        $profile->setIp('127.0.0.1');
+        $profile->setStatusCode(200);
+        $profile->setMethod('GET');
+
+        $this->assertTrue($this->storage->write($profile));
+        $this->assertSame('http://example.com/', $this->storage->read('a-token')->getUrl());
+    }
+
+    public function testReadDoesNotLeaveTheStorageFolder()
+    {
+        $outside = \dirname($this->tmpDir).'/sf_profiler_outside';
+        file_put_contents($outside, serialize([
+            'token' => 'outside',
+            'parent' => null,
+            'children' => [],
+            'data' => [],
+            'ip' => '127.0.0.1',
+            'method' => 'GET',
+            'url' => 'http://example.com/',
+            'time' => time(),
+            'status_code' => 200,
+            'virtual_type' => 'request',
+        ]));
+
+        // the sharding folders must exist for the ".." segments to resolve
+        mkdir($this->tmpDir.'/de/si', 0o777, true);
+
+        try {
+            $this->assertNull($this->storage->read('../../../sf_profiler_outside'));
+        } finally {
+            unlink($outside);
+        }
+    }
+
+    #[DataProvider('provideInvalidTokens')]
+    public function testReadInvalidToken(string $token)
+    {
+        $this->assertNull($this->storage->read($token));
+    }
+
+    #[DataProvider('provideInvalidTokens')]
+    public function testWriteInvalidToken(string $token)
+    {
+        $profile = new Profile($token);
+        $profile->setIp('127.0.0.1');
+        $profile->setMethod('GET');
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->storage->write($profile);
+    }
+
+    public static function provideInvalidTokens()
+    {
+        yield 'slash' => ['../../../evil'];
+        yield 'backslash' => ['..\\..\\..\\evil'];
+        yield 'dot' => ['evil.token'];
+        yield 'null byte' => ["evil\0token"];
+        yield 'trailing new line' => ["eviltoken\n"];
+    }
+
     public function testRetrieveByIp()
     {
         $profile = new Profile('token');

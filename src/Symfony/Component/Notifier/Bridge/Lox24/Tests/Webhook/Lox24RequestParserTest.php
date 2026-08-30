@@ -347,8 +347,58 @@ class Lox24RequestParserTest extends TestCase
         $this->assertInstanceOf(SmsEvent::class, $event);
     }
 
+    public function testJsonPayload()
+    {
+        $payload = [
+            'id' => 'a3cd6e19-8af2-498d-ad07-c7840f1b4ac8',
+            'data' => [
+                'id' => 'd6c12ac4-cc7d-11ec-b6da-525400bbb7dc',
+                'key_id' => 8207,
+                'dlr_code' => 1,
+                'status_code' => 100,
+                'callback_data' => 'some data',
+            ],
+            'name' => 'sms.delivery',
+            'created_at' => 1653378603,
+            'api_version' => '2022-05-25',
+            'attempt_number' => 1,
+            'attempts_total' => 4,
+            'notification_task_id' => '3378de83-de66-4de8-9d29-2b10d41bb641',
+        ];
+
+        $request = Request::create('/test', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json', 'HTTP_X-LOX24-Token' => 'shared-secret'], json_encode($payload));
+        $event = $this->parser->parse($request, 'shared-secret');
+
+        $this->assertInstanceOf(SmsEvent::class, $event);
+        $this->assertSame('d6c12ac4-cc7d-11ec-b6da-525400bbb7dc', $event->getId());
+        $this->assertSame(SmsEvent::DELIVERED, $event->getName());
+        $this->assertSame($payload, $event->getPayload());
+    }
+
+    public function testFormEncodedRequestIsRejected()
+    {
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Request does not match.');
+
+        $request = Request::create('/test', 'POST', [
+            'id' => 'webhook-id',
+            'name' => 'sms.delivery',
+            'data' => ['id' => '123', 'status_code' => 100],
+        ]);
+        $this->parser->parse($request, '');
+    }
+
+    public function testNonObjectJsonBodyIsRejected()
+    {
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('The payload must be a JSON object.');
+
+        $request = Request::create('/test', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '"not an object"');
+        $this->parser->parse($request, '');
+    }
+
     private function getRequest(array $data, array $server = []): Request
     {
-        return Request::create('/test', 'POST', $data, [], [], $server);
+        return Request::create('/test', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'] + $server, json_encode($data));
     }
 }

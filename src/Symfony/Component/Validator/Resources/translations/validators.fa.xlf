@@ -556,27 +556,27 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">این مقدار یک XML معتبر نیست.</target>
+                <target>این مقدار یک XML معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">این مقدار با طرح‌وارهٔ XSD مورد انتظار مطابقت ندارد.</target>
+                <target>این مقدار با طرحواره (اسکیما) XSD مورد انتظار مطابقت ندارد.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">این محتوای XML بیش از حد بزرگ است ({{ size }} بایت): از محدودیت {{ limit }} بایت فراتر می‌رود.</target>
+                <target>این محتوای XML بیش از حد بزرگ است ({{ size }} بایت): از محدودیت {{ limit }} بایت فراتر می‌رود.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">این مقدار یک عبارت cron معتبر نیست.</target>
+                <target>این مقدار یک عبارت cron معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">موجودیت ارجاع‌شده وجود ندارد.</target>
+                <target>موجودیت ارجاع داده شده وجود ندارد.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">این مقدار یک ULID معتبر نیست.</target>
+                <target>این مقدار یک ULID معتبر نیست.</target>
             </trans-unit>
         </body>
     </file>

@@ -126,14 +126,7 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
             return true;
         }
 
-        // Generate an alternative series id here by changing the suffix == to _
-        // this is needed to be able to store an older token value in the database
-        // which has a PRIMARY(series), and it works as long as series ids are
-        // generated using base64_encode(random_bytes(64)) which always outputs
-        // a == suffix, but if it should not work for some reason we abort
-        // for safety
-        $tmpSeries = preg_replace('{=+$}', '_', $token->getSeries());
-        if ($tmpSeries === $token->getSeries()) {
+        if (null === $tmpSeries = self::getPreviousTokenSeries($token->getSeries())) {
             return false;
         }
 
@@ -162,9 +155,7 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
         // Persist a copy of the previous token for authentication
         // in verifyToken should the old token still be sent by the browser
         // in a request concurrent to the one that did this token update
-        $tmpSeries = preg_replace('{=+$}', '_', $token->getSeries());
-        // if we cannot generate a unique series it is not worth trying further
-        if ($tmpSeries === $token->getSeries()) {
+        if (null === $tmpSeries = self::getPreviousTokenSeries($token->getSeries())) {
             return;
         }
 
@@ -242,5 +233,21 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
         $table->addColumn('username', Types::STRING, ['length' => 200]);
 
         $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('series'))], true));
+    }
+
+    /**
+     * Returns the series under which a copy of the previous token is stored, or null when none can be derived.
+     *
+     * Series are base64 encoded without padding and shorter than the column, so a "_" suffix keeps the copy
+     * apart from any series the remember-me handler generates. Series created before Symfony 5.3 ended with
+     * "==" and filled the column: their padding is replaced instead.
+     */
+    private static function getPreviousTokenSeries(string $series): ?string
+    {
+        if (str_ends_with($series, '=')) {
+            return preg_replace('{=+$}', '_', $series);
+        }
+
+        return \strlen($series) < 88 ? $series.'_' : null;
     }
 }

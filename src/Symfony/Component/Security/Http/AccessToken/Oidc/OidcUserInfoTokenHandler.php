@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\AccessToken\Oidc;
 
+use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
@@ -45,15 +46,35 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
     {
+        $userInfoEndpoint = '';
+
         if (null !== $this->discoveryCache) {
             try {
                 // Call OIDC discovery to retrieve userinfo endpoint
                 // OIDC configuration is stored in cache
-                $oidcConfiguration = json_decode($this->discoveryCache->get($this->oidcConfigurationCacheKey, function (): string {
-                    $response = $this->client->request('GET', '.well-known/openid-configuration');
+                $discover = function (CacheItemInterface $item, bool &$save): array {
+                    $response = $this->client->request('GET', '.well-known/openid-configuration', ['max_redirects' => 0]);
+                    $config = $response->toArray();
+                    $discoveryUrl = $response->getInfo('url');
 
-                    return $response->getContent();
-                }), true, 512, \JSON_THROW_ON_ERROR);
+                    self::checkDiscoveredEndpoint($config['userinfo_endpoint'] ?? null, 'userinfo_endpoint', $discoveryUrl);
+
+                    // A cached configuration does not tell which URL served it, so store only what has been checked against that URL
+                    $save = null !== $discoveryUrl && '' !== $discoveryUrl;
+
+                    return $config;
+                };
+
+                $oidcConfiguration = $this->discoveryCache->get($this->oidcConfigurationCacheKey, $discover);
+
+                if (!\is_array($oidcConfiguration)) {
+                    // Raw JSON was cached before the discovered endpoints were checked, refresh it to get it checked
+                    $this->discoveryCache->delete($this->oidcConfigurationCacheKey);
+                    $oidcConfiguration = $this->discoveryCache->get($this->oidcConfigurationCacheKey, $discover);
+                }
+
+                // The endpoint was checked against the discovery URL before the configuration was stored
+                $userInfoEndpoint = self::checkDiscoveredEndpoint($oidcConfiguration['userinfo_endpoint'] ?? null, 'userinfo_endpoint', null);
             } catch (\Throwable $e) {
                 $this->logger?->error('An error occurred while requesting OIDC configuration.', [
                     'error' => $e->getMessage(),
@@ -67,7 +88,7 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
         try {
             // Call the OIDC server to retrieve the user info
             // If the token is invalid or expired, the OIDC server will return an error
-            $claims = $this->client->request('GET', $this->discoveryCache ? $oidcConfiguration['userinfo_endpoint'] : '', [
+            $claims = $this->client->request('GET', $userInfoEndpoint, [
                 'auth_bearer' => $accessToken,
             ])->toArray();
 

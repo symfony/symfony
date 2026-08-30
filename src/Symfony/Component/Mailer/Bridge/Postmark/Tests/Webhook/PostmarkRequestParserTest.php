@@ -25,11 +25,17 @@ class PostmarkRequestParserTest extends AbstractRequestParserTestCase
         return new PostmarkRequestParser(new PostmarkPayloadConverter());
     }
 
+    protected function getSecret(): string
+    {
+        return 'symfony:top-secret';
+    }
+
     protected function createRequest(string $payload): Request
     {
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'REMOTE_ADDR' => '3.134.147.250',
+            'HTTP_Authorization' => 'Basic '.base64_encode('symfony:top-secret'),
         ], $payload);
     }
 
@@ -61,5 +67,34 @@ class PostmarkRequestParserTest extends AbstractRequestParserTestCase
         ], $payload);
 
         $this->assertNotNull($parser->parse($request, ''));
+    }
+
+    public function testRejectMissingCredentials()
+    {
+        $parser = new PostmarkRequestParser(new PostmarkPayloadConverter());
+        $payload = file_get_contents(__DIR__.'/Fixtures/delivery.json');
+        $request = Request::create('/', 'POST', [], [], [], [
+            'Content-Type' => 'application/json',
+            'REMOTE_ADDR' => '3.134.147.250',
+        ], $payload);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+        $parser->parse($request, 'symfony:top-secret');
+    }
+
+    public function testRejectWrongSecret()
+    {
+        $parser = new PostmarkRequestParser(new PostmarkPayloadConverter());
+        $payload = file_get_contents(__DIR__.'/Fixtures/delivery.json');
+        $request = Request::create('/', 'POST', [], [], [], [
+            'Content-Type' => 'application/json',
+            'REMOTE_ADDR' => '3.134.147.250',
+            'HTTP_Authorization' => 'Basic '.base64_encode('symfony:wrong-secret'),
+        ], $payload);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+        $parser->parse($request, 'symfony:top-secret');
     }
 }

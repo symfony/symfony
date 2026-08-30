@@ -85,12 +85,8 @@ class SignatureHasher
             throw new InvalidSignatureException('Invalid or expired signature.');
         }
 
-        if ($this->expiredSignaturesStorage && $this->maxUses) {
-            if ($this->expiredSignaturesStorage->countUsages($hash) >= $this->maxUses) {
-                throw new ExpiredSignatureException(\sprintf('Signature can only be used "%d" times.', $this->maxUses));
-            }
-
-            $this->expiredSignaturesStorage->incrementUsages($hash);
+        if ($this->expiredSignaturesStorage && $this->maxUses && $this->expiredSignaturesStorage->incrementUsages($hash) > $this->maxUses) {
+            throw new ExpiredSignatureException(\sprintf('Signature can only be used "%d" times.', $this->maxUses));
         }
     }
 

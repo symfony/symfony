@@ -25,6 +25,8 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 final class SweegoRequestParser extends AbstractRequestParser
 {
+    private const TIMESTAMP_TOLERANCE = 300;
+
     public function __construct(
         private readonly SweegoPayloadConverter $converter,
     ) {
@@ -73,10 +75,16 @@ final class SweegoRequestParser extends AbstractRequestParser
 
     private function validateSignature(Request $request, string $secret): void
     {
+        $timestamp = $request->headers->get('webhook-timestamp');
+
+        if (abs(time() - (int) $timestamp) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(403, 'Timestamp is outside the allowed time window.');
+        }
+
         $contentToSign = \sprintf(
             '%s.%s.%s',
             $request->headers->get('webhook-id'),
-            $request->headers->get('webhook-timestamp'),
+            $timestamp,
             $request->getContent(),
         );
 

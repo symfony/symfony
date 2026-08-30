@@ -23,6 +23,18 @@ use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
  */
 class HtmlDumperTest extends TestCase
 {
+    public function testC1ControlCharsAreEscaped()
+    {
+        $dumper = new HtmlDumper('php://output');
+        $dumper->setDumpHeader('<foo></foo>');
+        $dumper->setDumpBoundaries('<bar>', '</bar>');
+        $cloner = new VarCloner();
+
+        $out = $dumper->dump($cloner->cloneVar("a\u{9B}b"), true);
+
+        $this->assertStringContainsString('a<span class=sf-dump-default>\u{9B}</span>b', $out);
+    }
+
     public function testGet()
     {
         if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {

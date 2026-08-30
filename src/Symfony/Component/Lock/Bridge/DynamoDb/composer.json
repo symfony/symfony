@@ -21,6 +21,9 @@
         "async-aws/dynamo-db": "^3.0",
         "symfony/lock": "^7.4|^8.0"
     },
+    "require-dev": {
+        "symfony/http-client": "^6.4|^7.0|^8.0"
+    },
     "conflict": {
         "symfony/polyfill-uuid": "<1.15"
     },

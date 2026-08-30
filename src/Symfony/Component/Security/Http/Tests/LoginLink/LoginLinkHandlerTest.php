@@ -312,6 +312,9 @@ class LoginLinkHandlerTest extends TestCase
     }
 }
 
+/**
+ * Runs a concurrent request the first time an item is read from the pool.
+ */
 class TestLoginLinkHandlerUser implements UserInterface
 {
     public string $username;

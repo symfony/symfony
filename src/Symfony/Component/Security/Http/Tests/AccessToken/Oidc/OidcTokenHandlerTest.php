@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
@@ -445,6 +446,85 @@ class OidcTokenHandlerTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('No OIDC discovery client configured.');
         $handler->computeDiscoveryKeys($item);
+    }
+
+    public function testDiscoveryDoesNotFollowRedirects()
+    {
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) {
+            $this->assertSame(0, $options['max_redirects']);
+
+            return new MockResponse('', ['http_code' => 301, 'response_headers' => ['location' => 'https://other.example.com/.well-known/openid-configuration']]);
+        });
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_redirected_discovery');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())->method('expiresAfter');
+
+        try {
+            $handler->computeDiscoveryKeys($item);
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException) {
+        }
+
+        $this->assertSame(1, $httpClient->getRequestsCount());
+    }
+
+    public function testDiscoveryRejectsJwksUriDowngradedToHttp()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'http://169.254.169.254/latest/meta-data/']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ]);
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_insecure_jwks_uri');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())->method('expiresAfter');
+
+        try {
+            $handler->computeDiscoveryKeys($item);
+            $this->fail('A BadCredentialsException should have been thrown.');
+        } catch (BadCredentialsException) {
+        }
+
+        $this->assertSame(1, $httpClient->getRequestsCount());
+    }
+
+    public function testDiscoveryFollowsJwksUriOfAnIssuerServedOverHttp()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'http://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]),
+        ], 'http://www.example.com');
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['http://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_http_issuer');
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())->method('expiresAfter');
+
+        $this->assertCount(1, $handler->computeDiscoveryKeys($item));
     }
 
     public function testDiscoveryThrowsWhenJwksUriIsMissing()

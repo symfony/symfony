@@ -53,6 +53,33 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         self::assertInstanceOf(Animal::class, $zoo->getAnimals()[0]);
     }
 
+    public function testPropertyPhpDocWithDeepObjectToPopulate()
+    {
+        $json = <<<EOF
+            {
+                "animals": [
+                    {"name": "Bug"}
+                ]
+            }
+            EOF;
+        $serializer = new Serializer([
+            new ObjectNormalizer(null, null, null, new PhpDocExtractor()),
+            new ArrayDenormalizer(),
+        ], ['json' => new JsonEncoder()]);
+
+        $zoo = new Zoo();
+        $zoo->setAnimals([$animal = new Animal()]);
+
+        $serializer->deserialize($json, Zoo::class, 'json', [
+            'object_to_populate' => $zoo,
+            'deep_object_to_populate' => true,
+        ]);
+
+        self::assertCount(1, $zoo->getAnimals());
+        self::assertSame($animal, $zoo->getAnimals()[0]);
+        self::assertSame('Bug', $animal->getName());
+    }
+
     public function testPropertyPhpDocWithKeyTypes()
     {
         $json = <<<EOF

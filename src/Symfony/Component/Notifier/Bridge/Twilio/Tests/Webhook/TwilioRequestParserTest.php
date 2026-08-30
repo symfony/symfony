@@ -59,6 +59,27 @@ class TwilioRequestParserTest extends AbstractRequestParserTestCase
         $this->assertSame('SM1234', $event->getId());
     }
 
+    public function testQueryStringIsSignedAsSent()
+    {
+        $secret = 's3cret-token';
+        $params = [
+            'MessageSid' => 'SM1234',
+            'MessageStatus' => 'delivered',
+            'To' => '+15555550100',
+        ];
+        $url = 'https://example.com/webhook?foo=1&bar=2';
+        $signature = $this->computeTwilioSignature($url, $params, $secret);
+
+        $request = Request::create($url, 'POST', $params, [], [], [
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            'HTTP_X-Twilio-Signature' => $signature,
+        ]);
+
+        $event = (new TwilioRequestParser())->parse($request, $secret);
+        $this->assertNotNull($event);
+        $this->assertSame('SM1234', $event->getId());
+    }
+
     public function testMissingSignatureHeaderIsRejected()
     {
         $request = Request::create('https://example.com/webhook', 'POST', [

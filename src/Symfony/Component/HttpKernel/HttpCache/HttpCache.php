@@ -476,6 +476,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $response = SubRequestHandler::handle($this->kernel, $request, HttpKernelInterface::MAIN_REQUEST, $catch);
         $this->forwardedRequest = $request;
 
+        // These headers drive how the body is restored before sending the response.
+        // Only the store and the surrogate may set them, never the backend.
+        $response->headers->remove('X-Body-File');
+        $response->headers->remove('X-Body-Eval');
+        $response->headers->remove('X-Content-Digest');
+
         /*
          * Support stale-if-error given on Responses or as a config option.
          * RFC 7234 summarizes in Section 4.2.4 (but also mentions with the individual

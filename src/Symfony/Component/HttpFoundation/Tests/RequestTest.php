@@ -2262,6 +2262,23 @@ class RequestTest extends TestCase
         $this->assertSame([], (new \ReflectionProperty(Request::class, 'trustedHosts'))->getValue());
     }
 
+    public function testTrustedHostsAreNotMatchedLoosely()
+    {
+        Request::setTrustedHosts(['^123$']);
+
+        $request = Request::create('/');
+        $request->headers->set('host', '123');
+        $this->assertSame('123', $request->getHost());
+
+        $request = Request::create('/');
+        $request->headers->set('host', '0123');
+
+        $this->expectException(SuspiciousOperationException::class);
+        $this->expectExceptionMessage('Untrusted Host "0123".');
+
+        $request->getHost();
+    }
+
     public function testFactory()
     {
         Request::setFactory(static fn (array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) => new NewRequest());

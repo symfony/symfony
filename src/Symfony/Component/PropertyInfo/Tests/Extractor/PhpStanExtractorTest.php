@@ -18,6 +18,7 @@ use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Clazz;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithoutDocBlock;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithPropertyDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummyWithVarTagsDocBlock;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DockBlockFallback;
@@ -325,7 +326,7 @@ class PhpStanExtractorTest extends TestCase
         yield ['date', Type::int()];
         yield ['timezone', Type::object(\DateTimeZone::class)];
         yield ['dateObject', Type::object(\DateTimeInterface::class)];
-        yield ['dateTime', Type::int()];
+        yield ['dateTime', null];
         yield ['ddd', null];
     }
 
@@ -346,6 +347,21 @@ class PhpStanExtractorTest extends TestCase
         yield ['dateTime', null];
         yield ['mixed', null];
         yield ['timezone', null];
+    }
+
+    #[DataProvider('constructorTypesWithPropertyDocBlockProvider')]
+    public function testExtractConstructorTypesIgnoresTheDocBlockOfAPlainProperty(string $property)
+    {
+        $this->assertNull($this->extractor->getTypeFromConstructor(ConstructorDummyWithPropertyDocBlock::class, $property));
+    }
+
+    /**
+     * @return iterable<array{0: string}>
+     */
+    public static function constructorTypesWithPropertyDocBlockProvider(): iterable
+    {
+        yield ['date'];
+        yield ['objectsArray'];
     }
 
     #[DataProvider('constructorTypesOfParentClassProvider')]

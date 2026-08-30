@@ -140,7 +140,8 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     {
         $declaringClass = $class;
         if (!$tagDocNode = $this->getDocBlockFromConstructor($declaringClass, $property)) {
-            return $this->getType($class, $property);
+            // the doc block of a promoted property describes the constructor argument, the one of a plain property does not
+            return $this->isPromotedProperty($class, $property) ? $this->getType($class, $property) : null;
         }
 
         $typeContext = $this->typeContextFactory->createFromClassName($class, $declaringClass);
@@ -480,5 +481,14 @@ final class PhpStanExtractor implements PropertyDescriptionExtractorInterface, P
     private function canAccessMemberBasedOnItsVisibility(\ReflectionProperty|\ReflectionMethod $member): bool
     {
         return $this->allowPrivateAccess || $member->isPublic();
+    }
+
+    private function isPromotedProperty(string $class, string $property): bool
+    {
+        try {
+            return (new \ReflectionProperty($class, $property))->isPromoted();
+        } catch (\ReflectionException) {
+            return false;
+        }
     }
 }

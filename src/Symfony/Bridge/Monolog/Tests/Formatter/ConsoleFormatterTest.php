@@ -66,10 +66,7 @@ class ConsoleFormatterTest extends TestCase
     {
         $formatter = new ConsoleFormatter(['colors' => false]);
 
-        $record = self::createRecord([
-            'message' => "SELECT * FROM t WHERE a < 1 AND b > 2\033[2J\u{9b}2J",
-            'channel' => '<fg=red>app</>',
-        ]);
+        $record = RecordFactory::create(message: "SELECT * FROM t WHERE a < 1 AND b > 2\033[2J\u{9b}2J", channel: '<fg=red>app</>');
 
         $output = $formatter->format($record);
 
@@ -83,7 +80,7 @@ class ConsoleFormatterTest extends TestCase
     {
         $formatter = new ConsoleFormatter(['colors' => false]);
 
-        $record = self::createRecord(['context' => ['user' => '<fg=red>alice</>']]);
+        $record = RecordFactory::create(context: ['user' => '<fg=red>alice</>']);
 
         $this->assertStringContainsString(OutputFormatter::escape('"user" => "<fg=red>alice</>"'), $formatter->format($record));
     }
@@ -92,7 +89,7 @@ class ConsoleFormatterTest extends TestCase
     {
         $formatter = new ConsoleFormatter(['colors' => false]);
 
-        $record = self::createRecord(['message' => 'Hello {user}', 'context' => ['user' => '<fg=red>alice</>']]);
+        $record = RecordFactory::create(message: 'Hello {user}', context: ['user' => '<fg=red>alice</>']);
 
         $this->assertStringContainsString('Hello <comment>'.OutputFormatter::escape('<fg=red>alice</>').'</>', $formatter->format($record));
     }
@@ -122,18 +119,5 @@ class ConsoleFormatterTest extends TestCase
 
             self::assertStringContainsString('Hello <comment>alice</>', $output);
         }
-    }
-
-    private static function createRecord(array $record): array
-    {
-        return $record + [
-            'message' => 'test',
-            'context' => [],
-            'level' => Logger::WARNING,
-            'level_name' => Logger::getLevelName(Logger::WARNING),
-            'channel' => 'test',
-            'datetime' => new \DateTime(),
-            'extra' => [],
-        ];
     }
 }

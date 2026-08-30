@@ -7804,6 +7804,13 @@ diff --git a/src/Symfony/Component/HttpFoundation/Session/Storage/MockFileSessio
 @@ -77,5 +77,5 @@ class MockFileSessionStorage extends MockArraySessionStorage
       * @return void
       */
+-    public function setId(string $id)
++    public function setId(string $id): void
+     {
+         // the id is turned into a file name, so keep it to the charset PHP allows for session ids
+@@ -91,5 +91,5 @@ class MockFileSessionStorage extends MockArraySessionStorage
+      * @return void
+      */
 -    public function save()
 +    public function save(): void
      {

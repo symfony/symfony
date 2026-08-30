@@ -215,6 +215,7 @@ class JsonDescriptor extends Descriptor
             'pathRegex' => $route->compile()->getRegex(),
             'host' => '' !== $route->getHost() ? $route->getHost() : 'ANY',
             'hostRegex' => '' !== $route->getHost() ? $route->compile()->getHostRegex() : '',
+            'port' => '' !== $route->getPort() ? $route->getPort() : 'ANY',
             'scheme' => $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY',
             'method' => $route->getMethods() ? implode('|', $route->getMethods()) : 'ANY',
             'class' => $route::class,

@@ -44,6 +44,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodsAndSchemes
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MissingRouteNameController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MultipleDeprecatedAliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\NothingButNameController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PortController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\PrefixedActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\RequirementsWithoutPlaceholderNameController;
@@ -339,6 +340,15 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame('/path', $routes->get('action')->getPath());
         $this->assertSame('/path4', $routes->get('action4')->getPath());
         $this->assertSame('/path5', $routes->get('action5')->getPath());
+    }
+
+    public function testPort()
+    {
+        $routes = $this->loader->load(PortController::class);
+
+        $this->assertSame('8000', $routes->get('inherited_port')->getPort());
+        $this->assertSame('8001', $routes->get('overridden_port')->getPort());
+        $this->assertSame('8002', $routes->get('string_port')->getPort());
     }
 
     public function testMethodsAndSchemes()

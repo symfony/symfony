@@ -166,6 +166,7 @@ abstract class AttributeClassLoader implements LoaderInterface
         $methods = array_unique(array_merge($globals['methods'], $attr->methods));
 
         $host = $attr->host ?? $globals['host'];
+        $port = $attr->port ?? $globals['port'];
         $condition = $attr->condition ?? $globals['condition'];
         $priority = $attr->priority ?? $globals['priority'];
 
@@ -215,6 +216,7 @@ abstract class AttributeClassLoader implements LoaderInterface
 
         foreach ($paths as $locale => $path) {
             $route = $this->createRoute($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
+            $route->setPort($port);
             $this->configureRoute($route, $class, $method, $attr);
             if (0 !== $locale) {
                 $route->setDefault('_locale', $locale);
@@ -318,6 +320,10 @@ abstract class AttributeClassLoader implements LoaderInterface
                 $globals['host'] = $attr->host;
             }
 
+            if (null !== $attr->port) {
+                $globals['port'] = $attr->port;
+            }
+
             if (null !== $attr->condition) {
                 $globals['condition'] = $attr->condition;
             }
@@ -346,6 +352,7 @@ abstract class AttributeClassLoader implements LoaderInterface
             'schemes' => [],
             'methods' => [],
             'host' => '',
+            'port' => '',
             'condition' => '',
             'name' => '',
             'priority' => 0,

@@ -20,9 +20,9 @@ return [
     ],
     [ // $dynamicRoutes
         55 => [
-            [['_route' => 'r1'], ['foo', 'foo'], null, null, false, true, null],
-            [['_route' => 'r2'], ['foo', 'foo'], null, null, false, true, null],
-            [null, null, null, null, false, false, 0],
+            [['_route' => 'r1'], ['foo', 'foo'], null, null, false, true, null, null],
+            [['_route' => 'r2'], ['foo', 'foo'], null, null, false, true, null, null],
+            [null, null, null, null, false, false, 0, null],
         ],
     ],
     null, // $checkCondition

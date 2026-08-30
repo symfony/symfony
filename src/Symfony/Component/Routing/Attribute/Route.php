@@ -48,6 +48,7 @@ class Route
      * @param string|null                                       $firewall     The firewall name to use for matching this route
      * @param string|string[]|null                              $env          The env(s) in which the route is defined (i.e. "dev", "test", "prod", ["dev", "test"])
      * @param string|DeprecatedAlias|(string|DeprecatedAlias)[] $alias        The list of aliases for this route
+     * @param string|int|null                                   $port         The port for which this route should be active (i.e. 8000)
      */
     public function __construct(
         public string|array|null $path = null,
@@ -67,6 +68,7 @@ class Route
         ?string $firewall = null,
         string|array|null $env = null,
         string|DeprecatedAlias|array $alias = [],
+        public string|int|null $port = null,
     ) {
         $this->path = $path;
         $this->methods = (array) $methods;

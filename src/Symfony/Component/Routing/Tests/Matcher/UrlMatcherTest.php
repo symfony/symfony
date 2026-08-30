@@ -1100,6 +1100,106 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));
     }
 
+    public function testPortMatching()
+    {
+        $coll = new RouteCollection();
+        $coll->add('api', new Route('/users', port: 8001));
+        $coll->add('admin', new Route('/users', port: 8002));
+        $coll->add('front', new Route('/users'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8001));
+        $this->assertEquals(['_route' => 'api'], $matcher->match('/users'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+        $this->assertEquals(['_route' => 'admin'], $matcher->match('/users'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext());
+        $this->assertEquals(['_route' => 'front'], $matcher->match('/users'));
+    }
+
+    public function testPortMatchingWithDynamicPath()
+    {
+        $coll = new RouteCollection();
+        $coll->add('api', new Route('/users/{id}', port: 8001));
+        $coll->add('admin', new Route('/users/{id}', port: 8002));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+        $this->assertEquals(['_route' => 'admin', 'id' => '42'], $matcher->match('/users/42'));
+    }
+
+    public function testPortDoesNotMatch()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', port: 8001));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
+    public function testPortMatchesTheSchemePort()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', port: 8443));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'https', 8443, 8443));
+        $this->assertEquals(['_route' => 'foo'], $matcher->match('/foo'));
+
+        // the HTTP port is not looked at when the scheme is HTTPS
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'https', 8443, 443));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
+    public function testPortMismatchDoesNotAllowTheMethod()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', methods: ['POST'], port: 8001));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
+    public function testPortMismatchDoesNotAllowTheMethodOnDynamicRoutes()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/{id}', methods: ['POST'], port: 8001));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo/1');
+    }
+
+    public function testTrailingSlashIsNotFixedWhenThePortDoesNotMatch()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/', port: 8001));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
+    public function testPortAndHostAreBothChecked()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', host: 'example.com', port: 8001));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'example.com', 'http', 8001));
+        $this->assertEquals(['_route' => 'foo'], $matcher->match('/foo'));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'example.org', 'http', 8001));
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         return new UrlMatcher($routes, $context ?? new RequestContext());

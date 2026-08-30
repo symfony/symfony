@@ -28,5 +28,6 @@ return function (RoutingConfigurator $routes) {
     $routes->add('ouf', '/ouf')
         ->schemes(['https'])
         ->methods(['GET'])
+        ->port(8000)
         ->defaults(['id' => 0]);
 };

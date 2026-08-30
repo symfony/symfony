@@ -29,7 +29,7 @@ trait ContentLoaderTrait
      * Config keys accepted at the route or import level by {@see validate()}.
      */
     private const AVAILABLE_KEYS = [
-        'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
+        'resource', 'type', 'prefix', 'path', 'host', 'port', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless', 'firewall',
     ];
 
     /**
@@ -118,6 +118,9 @@ trait ContentLoaderTrait
         if (isset($config['host'])) {
             $this->addHost($routes, $config['host']);
         }
+        if (isset($config['port'])) {
+            $routes->setPort($config['port']);
+        }
 
         $collection->addCollection($routes);
     }
@@ -133,6 +136,7 @@ trait ContentLoaderTrait
         $requirements = $config['requirements'] ?? [];
         $options = $config['options'] ?? [];
         $host = $config['host'] ?? null;
+        $port = $config['port'] ?? null;
         $condition = $config['condition'] ?? null;
         $schemes = $config['schemes'] ?? null;
         $methods = $config['methods'] ?? null;
@@ -173,6 +177,9 @@ trait ContentLoaderTrait
 
             if (null !== $host) {
                 $this->addHost($subCollection, $host);
+            }
+            if (null !== $port) {
+                $subCollection->setPort($port);
             }
             if (null !== $condition) {
                 $subCollection->setCondition($condition);

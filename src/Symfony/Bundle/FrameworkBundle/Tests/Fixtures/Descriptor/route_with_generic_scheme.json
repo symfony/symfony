@@ -4,6 +4,7 @@
         "pathRegex": "#PATH_REGEX#",
         "host": "symfony.com",
         "hostRegex": "#HOST_REGEX#",
+        "port": "ANY",
         "scheme": "ANY",
         "method": "ANY",
         "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\RouteStub",

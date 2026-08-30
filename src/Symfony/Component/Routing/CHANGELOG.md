@@ -4,6 +4,9 @@ CHANGELOG
 8.2
 ---
 
+ * Add a `port` option to route definitions to restrict a route to a given port, taken into account when matching and generating URLs
+ * Add `Route::setPort()`/`Route::getPort()`, `RouteCollection::setPort()` and the `port()` method of the routing configurators
+ * Add `RequestContext::getPort()` to get the port of the current scheme
  * Add a `firewall` option to route definitions, exposed as the `_firewall` route default
  * Allow defining default query parameters with the `_query` route default
  * Add `RequestContext::runWith()` to generate and match URLs for another host, scheme or base URL without leaking the change

@@ -30,6 +30,7 @@ return new class {
         $routes->add('ouf', '/ouf')
             ->schemes(['https'])
             ->methods(['GET'])
+            ->port(8000)
             ->defaults(['id' => 0]);
     }
 };

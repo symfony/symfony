@@ -453,6 +453,13 @@ class CompiledUrlMatcherDumperTest extends TestCase
             ])
         ;
 
+        /* test case 15 */
+        $portCollection = new RouteCollection();
+        $portCollection->add('api', (new Route('/users'))->setPort(8001));
+        $portCollection->add('admin', (new Route('/users'))->setPort(8002));
+        $portCollection->add('front', new Route('/users'));
+        $portCollection->add('api_dynamic', (new Route('/users/{id}'))->setPort(8001));
+
         return [
             [new RouteCollection(), 'compiled_url_matcher0.php'],
             [$collection, 'compiled_url_matcher1.php'],
@@ -469,6 +476,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             [$suffixCollection, 'compiled_url_matcher12.php'],
             [$hostCollection, 'compiled_url_matcher13.php'],
             [$fixedLocaleCollection, 'compiled_url_matcher14.php'],
+            [$portCollection, 'compiled_url_matcher15.php'],
         ];
     }
 

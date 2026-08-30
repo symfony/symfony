@@ -8,8 +8,8 @@
 return [
     false, // $matchHost
     [ // $staticRoutes
-        '/fr/accueil' => [[['_route' => 'home', '_locale' => 'fr'], null, null, null, false, false, null]],
-        '/en/home' => [[['_route' => 'home', '_locale' => 'en'], null, null, null, false, false, null]],
+        '/fr/accueil' => [[['_route' => 'home', '_locale' => 'fr'], null, null, null, false, false, null, null]],
+        '/en/home' => [[['_route' => 'home', '_locale' => 'en'], null, null, null, false, false, null, null]],
     ],
     [ // $regexpList
     ],

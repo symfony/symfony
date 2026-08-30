@@ -66,6 +66,7 @@ class TextDescriptor extends Descriptor
         $tableRows = [];
         $shouldShowScheme = false;
         $shouldShowHost = false;
+        $shouldShowPort = false;
         foreach ($routes->all() as $name => $route) {
             $controller = $route->getDefault('_controller');
 
@@ -75,11 +76,15 @@ class TextDescriptor extends Descriptor
             $host = '' !== $route->getHost() ? $route->getHost() : 'ANY';
             $shouldShowHost = $shouldShowHost || 'ANY' !== $host;
 
+            $port = '' !== $route->getPort() ? $route->getPort() : 'ANY';
+            $shouldShowPort = $shouldShowPort || 'ANY' !== $port;
+
             $row = [
                 'Name' => $name,
                 'Methods' => $this->formatMethods($route->getMethods()),
                 'Scheme' => $scheme,
                 'Host' => $host,
+                'Port' => $port,
                 'Path' => $route->getPath(),
             ];
 
@@ -107,6 +112,12 @@ class TextDescriptor extends Descriptor
             $tableHeaders[] = 'Host';
         } else {
             array_walk($tableRows, static function (&$row) { unset($row['Host']); });
+        }
+
+        if ($shouldShowPort) {
+            $tableHeaders[] = 'Port';
+        } else {
+            array_walk($tableRows, static function (&$row) { unset($row['Port']); });
         }
 
         $tableHeaders[] = 'Path';
@@ -145,6 +156,7 @@ class TextDescriptor extends Descriptor
             ['Path Regex', $route->compile()->getRegex()],
             ['Host', '' !== $route->getHost() ? $route->getHost() : 'ANY'],
             ['Host Regex', '' !== $route->getHost() ? $route->compile()->getHostRegex() : ''],
+            ['Port', '' !== $route->getPort() ? $route->getPort() : 'ANY'],
             ['Scheme', $route->getSchemes() ? implode('|', $route->getSchemes()) : 'ANY'],
             ['Method', $this->formatMethods($route->getMethods())],
             ['Requirements', $route->getRequirements() ? $this->formatRouterConfig($route->getRequirements()) : 'NO CUSTOM'],

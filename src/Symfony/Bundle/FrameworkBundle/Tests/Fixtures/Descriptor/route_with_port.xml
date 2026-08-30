@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+  <route name="some_route_with_port" class="Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub">
+    <path regex="#PATH_REGEX#">/some-route</path>
+    <port>8000</port>
+    <defaults>
+      <default key="_controller">Controller</default>
+    </defaults>
+    <options>
+      <option key="compiler_class">Symfony\Component\Routing\RouteCompiler</option>
+    </options>
+  </route>
+</routes>

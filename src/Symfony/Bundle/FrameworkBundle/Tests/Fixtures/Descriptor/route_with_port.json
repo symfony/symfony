@@ -1,11 +1,12 @@
 {
-    "some_route": {
+    "some_route_with_port": {
         "path": "\/some-route",
         "pathRegex": "#PATH_REGEX#",
         "host": "ANY",
         "hostRegex": "",
         "port": "ANY",
-        "scheme": "https",
+        "port": "8000",
+        "scheme": "ANY",
         "method": "ANY",
         "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\RouteStub",
         "defaults": {

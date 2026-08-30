@@ -5,6 +5,7 @@ some_route_with_host
 - Path Regex: #PATH_REGEX#
 - Host: symfony.com
 - Host Regex: #HOST_REGEX#
+- Port: ANY
 - Scheme: ANY
 - Method: ANY
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub

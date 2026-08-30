@@ -255,6 +255,16 @@ class RouteCollection implements \IteratorAggregate, \Countable
     }
 
     /**
+     * Sets the port on all routes.
+     */
+    public function setPort(string|int|null $port): void
+    {
+        foreach ($this->routes as $route) {
+            $route->setPort($port);
+        }
+    }
+
+    /**
      * Sets a condition on all routes.
      *
      * Existing conditions will be overridden.

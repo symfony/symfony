@@ -3,6 +3,7 @@
     "pathRegex": "#PATH_REGEX#",
     "host": "localhost",
     "hostRegex": "#HOST_REGEX#",
+    "port": "ANY",
     "scheme": "http|https",
     "method": "PUT|POST",
     "class": "Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\RouteStub",

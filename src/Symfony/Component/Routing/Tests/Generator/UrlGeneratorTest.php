@@ -59,6 +59,70 @@ class UrlGeneratorTest extends TestCase
         $this->assertEquals('https://localhost:8080/app.php/testing', $url);
     }
 
+    public function testUrlWithRoutePortDiffersFromTheContext()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', port: 8080));
+        $url = $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('//localhost:8080/app.php/testing', $url);
+    }
+
+    public function testUrlWithRoutePortMatchingTheContext()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', port: 8080));
+        $url = $this->getGenerator($routes, ['httpPort' => 8080])->generate('test', [], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('/app.php/testing', $url);
+    }
+
+    public function testAbsoluteUrlWithRoutePort()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', port: 8080));
+        $url = $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->assertEquals('http://localhost:8080/app.php/testing', $url);
+    }
+
+    public function testUrlWithDefaultRoutePortWhileTheContextUsesAnotherOne()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', port: 80));
+        $url = $this->getGenerator($routes, ['httpPort' => 8080])->generate('test', [], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('//localhost/app.php/testing', $url);
+    }
+
+    public function testAbsoluteSecureUrlWithRoutePort()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', schemes: ['https'], port: 8443));
+        $url = $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_PATH);
+
+        $this->assertEquals('https://localhost:8443/app.php/testing', $url);
+    }
+
+    public function testRelativePathIsPromotedWhenTheRoutePortDiffers()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', port: 8080));
+        $url = $this->getGenerator($routes, ['pathInfo' => '/app.php/current/page'])->generate('test', [], UrlGeneratorInterface::RELATIVE_PATH);
+
+        $this->assertEquals('//localhost:8080/app.php/testing', $url);
+    }
+
+    public function testRelativePathIsKeptWhenTheRoutePortMatches()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', port: 8080));
+        $url = $this->getGenerator($routes, ['httpPort' => 8080, 'pathInfo' => '/app.php/current/page'])->generate('test', [], UrlGeneratorInterface::RELATIVE_PATH);
+
+        $this->assertEquals('../../testing', $url);
+    }
+
+    public function testUrlWithRoutePortAndHost()
+    {
+        $routes = $this->getRoutes('test', new Route('/testing', host: 'api.example.com', port: 8080));
+        $url = $this->getGenerator($routes)->generate('test', [], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $this->assertEquals('http://api.example.com:8080/app.php/testing', $url);
+    }
+
     public function testRelativeUrlWithoutParameters()
     {
         $routes = $this->getRoutes('test', new Route('/testing'));

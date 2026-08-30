@@ -5,6 +5,7 @@ route_2
 - Path Regex: #PATH_REGEX#
 - Host: localhost
 - Host Regex: #HOST_REGEX#
+- Port: ANY
 - Scheme: http|https
 - Method: PUT|POST
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub

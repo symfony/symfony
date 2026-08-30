@@ -91,6 +91,18 @@ trait RouteTrait
     }
 
     /**
+     * Sets the port this route is restricted to.
+     *
+     * @return $this
+     */
+    final public function port(string|int|null $port): static
+    {
+        $this->route->setPort($port);
+
+        return $this;
+    }
+
+    /**
      * Sets the schemes (e.g. 'https') this route is restricted to.
      * So an empty array means that any scheme is allowed.
      *

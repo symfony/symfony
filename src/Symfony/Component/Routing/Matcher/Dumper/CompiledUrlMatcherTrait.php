@@ -87,7 +87,8 @@ trait CompiledUrlMatcherTrait
         }
         $supportsRedirections = 'GET' === $canonicalMethod && $this instanceof RedirectableUrlMatcherInterface;
 
-        foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition]) {
+        foreach ($this->staticRoutes[$trimmedPathinfo] ?? [] as $r) {
+            [$ret, $requiredHost, $requiredMethods, $requiredSchemes, $hasTrailingSlash, , $condition] = $r;
             if ($requiredHost) {
                 if ('{' !== $requiredHost[0] ? $requiredHost !== $host : !preg_match($requiredHost, $host, $hostMatches)) {
                     continue;
@@ -110,6 +111,10 @@ trait CompiledUrlMatcherTrait
             }
 
             $hasRequiredScheme = !$requiredSchemes || isset($requiredSchemes[$context->getScheme()]);
+            if ($hasRequiredScheme && null !== ($requiredPort = $r[7] ?? null) && $requiredPort !== $context->getPort()) {
+                continue;
+            }
+
             if ($hasRequiredScheme && $requiredMethods && !isset($requiredMethods[$canonicalMethod]) && !isset($requiredMethods[$requestMethod])) {
                 $allow += $requiredMethods;
                 continue;
@@ -127,7 +132,9 @@ trait CompiledUrlMatcherTrait
 
         foreach ($this->regexpList as $offset => $regex) {
             while (preg_match($regex, $matchedPathinfo, $matches)) {
-                foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as [$ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition]) {
+                foreach ($this->dynamicRoutes[$m = (int) $matches['MARK']] as $r) {
+                    [$ret, $vars, $requiredMethods, $requiredSchemes, $hasTrailingSlash, $hasTrailingVar, $condition] = $r;
+
                     if (0 === $condition) { // marks the last route in the regexp
                         continue 3;
                     }
@@ -161,6 +168,10 @@ trait CompiledUrlMatcherTrait
 
                     if ($requiredSchemes && !isset($requiredSchemes[$context->getScheme()])) {
                         $allowSchemes += $requiredSchemes;
+                        continue;
+                    }
+
+                    if (null !== ($requiredPort = $r[7] ?? null) && $requiredPort !== $context->getPort()) {
                         continue;
                     }
 

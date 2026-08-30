@@ -184,6 +184,32 @@ class RouteTest extends TestCase
         $this->assertEquals('{locale}.example.net', $route->getHost(), '->setHost() sets the host pattern');
     }
 
+    public function testPort()
+    {
+        $route = new Route('/');
+        $this->assertSame('', $route->getPort(), 'port is initialized with an empty string');
+        $route->setPort(8000);
+        $this->assertSame('8000', $route->getPort(), '->setPort() accepts an integer');
+        $route->setPort('8001');
+        $this->assertSame('8001', $route->getPort(), '->setPort() accepts a string');
+        $route->setPort(null);
+        $this->assertSame('', $route->getPort(), '->setPort() accepts null to remove the restriction');
+        $route->setPort(' 8002 ');
+        $this->assertSame('8002', $route->getPort(), '->setPort() trims the value');
+
+        $route = new Route('/', port: 8003);
+        $this->assertSame('8003', $route->getPort(), 'the constructor accepts a port');
+    }
+
+    public function testSetPortInvalidatesTheCompiledRoute()
+    {
+        $route = new Route('/');
+        $compiled = $route->compile();
+        $route->setPort(8000);
+
+        $this->assertNotSame($compiled, $route->compile(), '->setPort() clears the compiled route');
+    }
+
     public function testScheme()
     {
         $route = new Route('/');
@@ -243,6 +269,7 @@ class RouteTest extends TestCase
         $data = [
             'path' => '/',
             'host' => '',
+            'port' => '',
             'defaults' => [],
             'requirements' => [],
             'options' => [],
@@ -271,6 +298,7 @@ class RouteTest extends TestCase
     {
         yield ['path'];
         yield ['host'];
+        yield ['port'];
         yield ['condition'];
     }
 
@@ -314,6 +342,25 @@ class RouteTest extends TestCase
 
         yield [new Route('/', host: '{bar<.*>?}'), '/', '{bar}', ['bar' => null], ['bar' => '.*']];
         yield [new Route('/', host: '{bar<>>?<>}'), '/', '{bar}', ['bar' => '<>'], ['bar' => '>']];
+    }
+
+    public function testSerializeKeepsThePort()
+    {
+        $route = new Route('/prefix', port: 8000);
+
+        $this->assertSame('8000', unserialize(serialize($route))->getPort());
+    }
+
+    public function testUnserializeWithoutPort()
+    {
+        $route = new Route('/prefix');
+        $data = $route->__serialize();
+        unset($data['port']);
+
+        $unserialized = new Route('/');
+        $unserialized->__unserialize($data);
+
+        $this->assertSame('', $unserialized->getPort());
     }
 
     /**

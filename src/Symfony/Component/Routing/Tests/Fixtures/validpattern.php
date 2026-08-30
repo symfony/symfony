@@ -12,7 +12,8 @@ $collection->add('blog_show', new Route(
     '{locale}.example.com',
     ['https'],
     ['GET', 'POST', 'put', 'OpTiOnS'],
-    'context.getMethod() == "GET"'
+    'context.getMethod() == "GET"',
+    8000
 ));
 
 return $collection;

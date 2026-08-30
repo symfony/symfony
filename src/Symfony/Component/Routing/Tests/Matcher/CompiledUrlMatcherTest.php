@@ -40,6 +40,23 @@ class CompiledUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals('static_host_route', $result['_route'], 'CompiledUrlMatcher should match case-insensitive host');
     }
 
+    public function testCompiledRoutesDumpedByAnOlderVersionStillMatch()
+    {
+        // routes dumped before the port was added carry 7 elements instead of 8
+        $compiledRoutes = [
+            false,
+            ['/foo' => [[['_route' => 'foo'], null, null, null, false, false, null]]],
+            [0 => '{^(?|/bar/([^/]++)(*:20))/?$}sD'],
+            [20 => [[['_route' => 'bar'], ['id'], null, null, false, true, null], [null, null, null, null, false, false, 0]]],
+            null,
+        ];
+
+        $matcher = new CompiledUrlMatcher($compiledRoutes, new RequestContext());
+
+        $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
+        $this->assertSame(['_route' => 'bar', 'id' => '1'], $matcher->match('/bar/1'));
+    }
+
     protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
     {
         $dumper = new CompiledUrlMatcherDumper($routes);

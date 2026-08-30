@@ -3,6 +3,7 @@ blog_show:
     defaults:     { _controller: "MyBundle:Blog:show", _stateless: true }
     firewall:     api
     host:         "{locale}.example.com"
+    port:         8000
     requirements: { 'locale': '\w+' }
     methods:      ['GET','POST','put','OpTiOnS']
     schemes:      ['https']

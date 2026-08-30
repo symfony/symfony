@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Display the port of port-restricted routes in `debug:router` and add a `--port` option to `router:match`
  * Add the `framework.asset_mapper.importmap_entries` option to limit the rendered import map to the entries reachable from the rendered entrypoints
  * Add the `http_cache.cache_status` option to emit the RFC 9211 `Cache-Status` header
  * Add the `framework.mailer.tracking` option to set default open/click tracking for every outgoing message

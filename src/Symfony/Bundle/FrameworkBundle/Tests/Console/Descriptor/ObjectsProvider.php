@@ -57,11 +57,25 @@ class ObjectsProvider
             [],
         ));
 
+        $routesWithPort = new RouteCollection();
+        $routesWithPort->add('some_route_with_port', new RouteStub(
+            '/some-route',
+            ['_controller' => 'Controller'],
+            [],
+            [],
+            null,
+            [],
+            [],
+            null,
+            8000,
+        ));
+
         return [
             'empty_route_collection' => new RouteCollection(),
             'route_collection_1' => $collection1,
             'route_with_generic_host' => $routesWithGenericHost,
             'route_with_generic_scheme' => $routesWithGenericScheme,
+            'route_with_port' => $routesWithPort,
         ];
     }
 

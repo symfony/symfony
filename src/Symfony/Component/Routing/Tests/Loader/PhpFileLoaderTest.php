@@ -53,6 +53,7 @@ class PhpFileLoaderTest extends TestCase
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
             $this->assertTrue($route->getDefault('_stateless'));
             $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('8000', $route->getPort());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
             $this->assertEquals(['https'], $route->getSchemes());
@@ -72,6 +73,7 @@ class PhpFileLoaderTest extends TestCase
             $this->assertSame('/prefix/blog/{slug}', $route->getPath());
             $this->assertSame('MyBlogBundle:Blog:show', $route->getDefault('_controller'));
             $this->assertSame('{locale}.example.com', $route->getHost());
+            $this->assertSame('8000', $route->getPort());
             $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
             $this->assertEquals(['GET', 'POST', 'PUT', 'OPTIONS'], $route->getMethods());
             $this->assertEquals(['https'], $route->getSchemes());
@@ -231,6 +233,7 @@ class PhpFileLoaderTest extends TestCase
         $expectedCollection->add('ouf', (new Route('/ouf'))
             ->setSchemes(['https'])
             ->setMethods(['GET'])
+            ->setPort(8000)
             ->setDefaults(['id' => 0])
         );
 
@@ -245,6 +248,24 @@ class PhpFileLoaderTest extends TestCase
 
         $this->assertEquals($expectedCollectionClosure, $routeCollectionClosure);
         $this->assertEquals($expectedCollectionObject, $routeCollectionObject);
+    }
+
+    public function testRoutingConfiguratorPort()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routes = $loader->load('php_dsl_port.php');
+
+        // set on the collection, inherited by every route added to it
+        $this->assertSame('8001', $routes->get('api_users')->getPort());
+        $this->assertSame('8001', $routes->get('api_posts')->getPort());
+
+        // set on the import, applied to every imported route
+        $this->assertSame('8002', $routes->get('c_root')->getPort());
+        $this->assertSame('8002', $routes->get('c_bar')->getPort());
+
+        // routes outside both keep no port restriction
+        $this->assertSame('', $routes->get('front')->getPort());
     }
 
     public function testRoutingConfiguratorCanImportGlobPatterns()

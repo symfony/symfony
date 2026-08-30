@@ -113,6 +113,7 @@ final class Router extends BaseRouter implements WarmableInterface, ServiceSubsc
      * - the route requirements,
      * - the route path,
      * - the route host,
+     * - the route port,
      * - the route schemes,
      * - the route methods.
      */
@@ -129,6 +130,7 @@ final class Router extends BaseRouter implements WarmableInterface, ServiceSubsc
 
             $route->setPath($this->resolve($route->getPath()));
             $route->setHost($this->resolve($route->getHost()));
+            $route->setPort($this->resolve($route->getPort()));
 
             $schemes = [];
             foreach ($route->getSchemes() as $scheme) {

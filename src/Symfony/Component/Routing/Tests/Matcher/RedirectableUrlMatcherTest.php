@@ -68,6 +68,44 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
+    public function testSchemeRedirectWithPortRestrictedRoute()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', schemes: ['https'], port: 8443));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8080, 8443), true);
+        $matcher
+            ->expects($this->once())
+            ->method('redirect')
+            ->with('/foo', 'foo', 'https')
+            ->willReturn(['_route' => 'foo'])
+        ;
+        $matcher->match('/foo');
+    }
+
+    public function testMissingTrailingSlashIsRedirectedOnTheMatchingPort()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo/', port: 8001));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8001), true);
+        $matcher->expects($this->once())->method('redirect')->willReturn([]);
+        $matcher->match('/foo');
+    }
+
+    public function testNoSchemeRedirectWhenThePortIsNotReachableOnThatScheme()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', schemes: ['https'], port: 9999));
+
+        // the route's port is neither the HTTP nor the HTTPS port of the context
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 80, 443), true);
+        $matcher->expects($this->never())->method('redirect');
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('/foo');
+    }
+
     public function testNoSchemaRedirectIfOneOfMultipleSchemesMatches()
     {
         $coll = new RouteCollection();

@@ -361,6 +361,24 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
+    public function testPortPlaceholders()
+    {
+        $routes = new RouteCollection();
+
+        $route = new Route('foo');
+        $route->setPort('%parameter.port%');
+
+        $routes->add('foo', $route);
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = $this->getParameterBag(['parameter.port' => 8000]);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+        $route = $router->getRouteCollection()->get('foo');
+
+        $this->assertSame('8000', $route->getPort());
+    }
+
     public function testHostPlaceholders()
     {
         $routes = new RouteCollection();

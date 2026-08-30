@@ -140,6 +140,11 @@ class TraceableUrlMatcher extends UrlMatcher
                 continue;
             }
 
+            if (null !== ($requiredPort = $compiledRoute->getPort()) && $requiredPort !== $this->context->getPort()) {
+                $this->addTrace(\sprintf('Port "%s" does not match the required port ("%s")', $this->context->getPort(), $requiredPort), self::ROUTE_ALMOST_MATCHES, $name, $route);
+                continue;
+            }
+
             if ($requiredMethods && !\in_array($method, $requiredMethods, true)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 $this->addTrace(\sprintf('Method "%s" does not match any of the required methods (%s)', $this->context->getMethod(), implode(', ', $requiredMethods)), self::ROUTE_ALMOST_MATCHES, $name, $route);

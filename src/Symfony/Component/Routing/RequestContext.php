@@ -30,6 +30,7 @@ class RequestContext
     private string $scheme;
     private int $httpPort;
     private int $httpsPort;
+    private ?int $port = null;
     private string $queryString;
     private array $parameters = [];
 
@@ -84,6 +85,8 @@ class RequestContext
         $this->setScheme($request->getScheme());
         $this->setHttpPort($request->isSecure() || null === $request->getPort() ? $this->httpPort : $request->getPort());
         $this->setHttpsPort($request->isSecure() && null !== $request->getPort() ? $request->getPort() : $this->httpsPort);
+        $port = $request->getPort();
+        $this->setPort(null === $port ? null : (int) $port);
         $this->setQueryString($request->server->get('QUERY_STRING', ''));
 
         return $this;
@@ -234,6 +237,33 @@ class RequestContext
     }
 
     /**
+     * Gets the port the current request was made on.
+     *
+     * It falls back to the HTTPS port when the scheme is "https" and to the HTTP
+     * port otherwise, for contexts that are not built from a request.
+     */
+    public function getPort(): int
+    {
+        return $this->port ?? ($this->isSecure() ? $this->httpsPort : $this->httpPort);
+    }
+
+    /**
+     * Sets the port the current request was made on.
+     *
+     * Unlike the HTTP and HTTPS ports, which are the ports used to generate URLs
+     * for each scheme, this is the port that routes are matched against. Pass null
+     * to fall back to the port of the current scheme.
+     *
+     * @return $this
+     */
+    public function setPort(?int $port): static
+    {
+        $this->port = $port;
+
+        return $this;
+    }
+
+    /**
      * Gets the query string without the "?".
      */
     public function getQueryString(): string
@@ -322,7 +352,7 @@ class RequestContext
      *
      * @return T
      */
-    public function runWith(callable $callback, ?string $baseUrl = null, ?string $method = null, ?string $host = null, ?string $scheme = null, ?int $httpPort = null, ?int $httpsPort = null, ?string $pathInfo = null, ?string $queryString = null, ?array $parameters = null): mixed
+    public function runWith(callable $callback, ?string $baseUrl = null, ?string $method = null, ?string $host = null, ?string $scheme = null, ?int $httpPort = null, ?int $httpsPort = null, ?string $pathInfo = null, ?string $queryString = null, ?array $parameters = null, ?int $port = null): mixed
     {
         $original = clone $this;
 
@@ -332,6 +362,7 @@ class RequestContext
         null === $scheme || $this->setScheme($scheme);
         null === $httpPort || $this->setHttpPort($httpPort);
         null === $httpsPort || $this->setHttpsPort($httpsPort);
+        null === $port || $this->setPort($port);
         null === $pathInfo || $this->setPathInfo($pathInfo);
         null === $queryString || $this->setQueryString($queryString);
         null === $parameters || $this->setParameters($parameters);
@@ -346,6 +377,7 @@ class RequestContext
             $this->scheme = $original->scheme;
             $this->httpPort = $original->httpPort;
             $this->httpsPort = $original->httpsPort;
+            $this->port = $original->port;
             $this->queryString = $original->queryString;
             $this->parameters = $original->parameters;
         }

@@ -251,6 +251,25 @@ class RouteCollectionTest extends TestCase
         $this->assertEquals('{locale}.example.com', $routeb->getHost());
     }
 
+    public function testSetPort()
+    {
+        $collection = new RouteCollection();
+        $routea = new Route('/a');
+        $routeb = new Route('/b', port: 8000);
+        $collection->add('a', $routea);
+        $collection->add('b', $routeb);
+
+        $collection->setPort(8080);
+
+        $this->assertSame('8080', $routea->getPort());
+        $this->assertSame('8080', $routeb->getPort());
+
+        $collection->setPort(null);
+
+        $this->assertSame('', $routea->getPort());
+        $this->assertSame('', $routeb->getPort());
+    }
+
     public function testSetCondition()
     {
         $collection = new RouteCollection();

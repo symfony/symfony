@@ -27,6 +27,7 @@ class CompiledRoute
      * @param array       $hostTokens    Host tokens
      * @param array       $hostVariables An array of host variables
      * @param array       $variables     An array of variables (variables defined in the path and in the host patterns)
+     * @param int|null    $port          The port this route is restricted to
      */
     public function __construct(
         private string $staticPrefix,
@@ -37,6 +38,7 @@ class CompiledRoute
         private array $hostTokens = [],
         private array $hostVariables = [],
         private array $variables = [],
+        private ?int $port = null,
     ) {
     }
 
@@ -51,6 +53,7 @@ class CompiledRoute
             'host_regex' => $this->hostRegex,
             'host_tokens' => $this->hostTokens,
             'host_vars' => $this->hostVariables,
+            'port' => $this->port,
         ];
     }
 
@@ -71,6 +74,7 @@ class CompiledRoute
         $this->hostRegex = $data['host_regex'];
         $this->hostTokens = $data['host_tokens'];
         $this->hostVariables = $data['host_vars'];
+        $this->port = $data['port'] ?? null;
     }
 
     /**
@@ -95,6 +99,14 @@ class CompiledRoute
     public function getHostRegex(): ?string
     {
         return $this->hostRegex;
+    }
+
+    /**
+     * Returns the port this route is restricted to, or null when any port is allowed.
+     */
+    public function getPort(): ?int
+    {
+        return $this->port;
     }
 
     /**

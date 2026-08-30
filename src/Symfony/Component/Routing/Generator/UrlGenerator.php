@@ -133,7 +133,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             }
         }
 
-        return $this->doGenerate($variables, $defaults, $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostTokens(), $route->getSchemes());
+        return $this->doGenerate($variables, $defaults, $route->getRequirements(), $compiledRoute->getTokens(), $parameters, $name, $referenceType, $compiledRoute->getHostTokens(), $route->getSchemes(), $compiledRoute->getPort());
     }
 
     /**
@@ -141,7 +141,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
      * @throws InvalidParameterException           When a parameter value for a placeholder is not correct because
      *                                             it does not match the requirement
      */
-    protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = []): string
+    protected function doGenerate(array $variables, array $defaults, array $requirements, array $tokens, array $parameters, string $name, int $referenceType, array $hostTokens, array $requiredSchemes = [], ?int $requiredPort = null): string
     {
         $defaultQuery = $defaults['_query'] ?? [];
 
@@ -261,13 +261,18 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
             }
         }
 
+        if (null !== $requiredPort && $requiredPort !== ('https' === $scheme ? $this->context->getHttpsPort() : $this->context->getHttpPort()) && self::ABSOLUTE_URL !== $referenceType) {
+            // the port differs from the one of the current request, so the URL cannot be a path only
+            $referenceType = self::NETWORK_PATH;
+        }
+
         if (self::ABSOLUTE_URL === $referenceType || self::NETWORK_PATH === $referenceType) {
             if ('' !== $host || ('' !== $scheme && 'http' !== $scheme && 'https' !== $scheme)) {
                 $port = '';
-                if ('http' === $scheme && 80 !== $this->context->getHttpPort()) {
-                    $port = ':'.$this->context->getHttpPort();
-                } elseif ('https' === $scheme && 443 !== $this->context->getHttpsPort()) {
-                    $port = ':'.$this->context->getHttpsPort();
+                if ('http' === $scheme && 80 !== ($requiredPort ?? $this->context->getHttpPort())) {
+                    $port = ':'.($requiredPort ?? $this->context->getHttpPort());
+                } elseif ('https' === $scheme && 443 !== ($requiredPort ?? $this->context->getHttpsPort())) {
+                    $port = ':'.($requiredPort ?? $this->context->getHttpsPort());
                 }
 
                 $schemeAuthority = self::NETWORK_PATH === $referenceType || '' === $scheme ? '//' : "$scheme://";

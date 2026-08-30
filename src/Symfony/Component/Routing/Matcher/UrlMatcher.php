@@ -174,6 +174,10 @@ class UrlMatcher implements UrlMatcherInterface, RequestMatcherInterface
                 continue;
             }
 
+            if (null !== ($requiredPort = $compiledRoute->getPort()) && $requiredPort !== $this->context->getPort()) {
+                continue;
+            }
+
             if ($requiredMethods && !\in_array($method, $requiredMethods, true)) {
                 $this->allow = array_merge($this->allow, $requiredMethods);
                 continue;

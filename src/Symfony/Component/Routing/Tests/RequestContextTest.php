@@ -148,6 +148,31 @@ class RequestContextTest extends TestCase
         $this->assertSame(567, $requestContext->getHttpsPort());
     }
 
+    public function testGetPort()
+    {
+        $requestContext = new RequestContext('', 'GET', 'localhost', 'http', 8080, 8443);
+        $this->assertSame(8080, $requestContext->getPort());
+
+        $requestContext->setScheme('https');
+        $this->assertSame(8443, $requestContext->getPort());
+    }
+
+    public function testGetPortFromRequest()
+    {
+        $requestContext = new RequestContext();
+        $requestContext->fromRequest(Request::create('http://localhost:8002/'));
+
+        $this->assertSame(8002, $requestContext->getPort());
+
+        // the port of the request wins over the port of the scheme, and survives a scheme change
+        $requestContext->setScheme('https');
+        $this->assertSame(8002, $requestContext->getPort());
+
+        // passing null falls back to the port of the current scheme
+        $requestContext->setPort(null);
+        $this->assertSame(443, $requestContext->getPort());
+    }
+
     public function testGetParameters()
     {
         $requestContext = new RequestContext();

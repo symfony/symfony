@@ -59,6 +59,18 @@ class TraceableUrlMatcherTest extends UrlMatcherTest
         $this->assertSame([0, 0, 0, 0, 0, 1], $this->getLevels($traces));
     }
 
+    public function testRoutePortAlmostMatches()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', port: 8001));
+
+        $matcher = new TraceableUrlMatcher($coll, new RequestContext('', 'GET', 'localhost', 'http', 8002));
+        $traces = $matcher->getTraces('/foo');
+
+        $this->assertSame([TraceableUrlMatcher::ROUTE_ALMOST_MATCHES], $this->getLevels($traces));
+        $this->assertSame('Port "8002" does not match the required port ("8001")', $traces[0]['log']);
+    }
+
     public function testMatchRouteOnMultipleHosts()
     {
         $routes = new RouteCollection();

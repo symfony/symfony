@@ -2,6 +2,7 @@
 - Path Regex: #PATH_REGEX#
 - Host: localhost
 - Host Regex: #HOST_REGEX#
+- Port: ANY
 - Scheme: http|https
 - Method: GET|HEAD
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Command\RouterDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\RouterMatchCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -43,6 +44,34 @@ class RouterMatchCommandTest extends TestCase
         $this->assertStringContainsString('None of the routes match the path "/test"', $tester->getDisplay());
     }
 
+    public function testWithMatchPathAndPort()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['path_info' => '/bar', '--port' => '8001'], ['decorated' => false]);
+
+        $this->assertEquals(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('Route Name   | bar', $tester->getDisplay());
+    }
+
+    public function testWithNotMatchingPort()
+    {
+        $tester = $this->createCommandTester();
+        $ret = $tester->execute(['path_info' => '/bar', '--port' => '8002'], ['decorated' => false]);
+
+        $this->assertEquals(1, $ret, 'Returns 1 in case of failure');
+        $this->assertStringContainsString('None of the routes match the path "/bar"', $tester->getDisplay());
+    }
+
+    public function testWithInvalidPort()
+    {
+        $tester = $this->createCommandTester();
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "--port" option expects an integer between 1 and 65535, "foo" given.');
+
+        $tester->execute(['path_info' => '/bar', '--port' => 'foo'], ['decorated' => false]);
+    }
+
     private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());
@@ -56,6 +85,7 @@ class RouterMatchCommandTest extends TestCase
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
+        $routeCollection->add('bar', new Route('bar', port: 8001));
         $requestContext = new RequestContext();
         $router = $this->createStub(RouterInterface::class);
         $router

@@ -136,7 +136,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         foreach ($staticRoutes as $path => $routes) {
             $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
+                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
             $code .= "    ],\n";
         }
@@ -148,7 +148,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
         foreach ($dynamicRoutes as $path => $routes) {
             $code .= \sprintf("    %s => [\n", self::export($path));
             foreach ($routes as $route) {
-                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
+                $code .= vsprintf("        [%s, %s, %s, %s, %s, %s, %s, %s],\n", array_map([__CLASS__, 'export'], $route));
             }
             $code .= "    ],\n";
         }
@@ -361,7 +361,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             $regexpList[$startingMark] = $state->regex;
         }
 
-        $state->routes[$state->mark][] = [null, null, null, null, false, false, 0];
+        $state->routes[$state->mark][] = [null, null, null, null, false, false, 0, null];
         unset($state->getVars);
 
         return [$regexpList, $state->routes, $code];
@@ -442,6 +442,7 @@ class CompiledUrlMatcherDumper extends MatcherDumper
             $hasTrailingSlash,
             $hasTrailingVar,
             $condition,
+            $route->compile()->getPort(),
         ];
     }
 

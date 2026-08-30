@@ -414,6 +414,44 @@ class RouteCompilerTest extends TestCase
         yield ['{^/(?P<foo>(*F))$}sD', '(*F)'];
         yield ['{^/(?P<foo>(?:(?:foo)))$}sD', '((foo))'];
     }
+
+    #[DataProvider('provideInvalidPorts')]
+    public function testInvalidPort(string|int $port)
+    {
+        $route = new Route('/', port: $port);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(\sprintf('Route port "%s" is not a valid port number, it must be an integer between 1 and 65535.', trim((string) $port)));
+
+        $route->compile();
+    }
+
+    public static function provideInvalidPorts(): iterable
+    {
+        yield 'not a number' => ['http'];
+        yield 'negative' => [-1];
+        yield 'zero' => [0];
+        yield 'too large' => [65536];
+        yield 'not an integer' => ['80.5'];
+        yield 'leading zero' => ['0080'];
+    }
+
+    #[DataProvider('provideValidPorts')]
+    public function testValidPort(string|int $port)
+    {
+        $route = new Route('/', port: $port);
+        $route->compile();
+
+        $this->assertSame((string) $port, $route->getPort());
+    }
+
+    public static function provideValidPorts(): iterable
+    {
+        yield [1];
+        yield [80];
+        yield ['8000'];
+        yield [65535];
+    }
 }
 
 class Utf8RouteCompiler extends RouteCompiler

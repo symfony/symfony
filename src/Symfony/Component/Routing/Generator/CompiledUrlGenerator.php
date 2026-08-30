@@ -52,7 +52,7 @@ class CompiledUrlGenerator extends UrlGenerator
             throw new RouteNotFoundException(\sprintf('Unable to generate a URL for the named route "%s" as such route does not exist.', $name));
         }
 
-        [$variables, $defaults, $requirements, $tokens, $hostTokens, $requiredSchemes, $deprecations] = $this->compiledRoutes[$name] + [6 => []];
+        [$variables, $defaults, $requirements, $tokens, $hostTokens, $requiredSchemes, $deprecations, $requiredPort] = $this->compiledRoutes[$name] + [6 => [], 7 => null];
 
         foreach ($deprecations as $deprecation) {
             trigger_deprecation($deprecation['package'], $deprecation['version'], $deprecation['message']);
@@ -66,6 +66,6 @@ class CompiledUrlGenerator extends UrlGenerator
             }
         }
 
-        return $this->doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes);
+        return $this->doGenerate($variables, $defaults, $requirements, $tokens, $parameters, $name, $referenceType, $hostTokens, $requiredSchemes, $requiredPort);
     }
 }

@@ -1,12 +1,12 @@
-some_route
-----------
+some_route_with_port
+--------------------
 
 - Path: /some-route
 - Path Regex: #PATH_REGEX#
 - Host: ANY
 - Host Regex: 
-- Port: ANY
-- Scheme: https
+- Port: 8000
+- Scheme: ANY
 - Method: ANY
 - Class: Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub
 - Defaults: 

@@ -180,6 +180,11 @@ class XmlDescriptor extends Descriptor
             $hostXML->appendChild(new \DOMText($route->getHost()));
         }
 
+        if ('' !== $route->getPort()) {
+            $routeXML->appendChild($portXML = $dom->createElement('port'));
+            $portXML->appendChild(new \DOMText($route->getPort()));
+        }
+
         foreach ($route->getSchemes() as $scheme) {
             $routeXML->appendChild($schemeXML = $dom->createElement('scheme'));
             $schemeXML->appendChild(new \DOMText($scheme));

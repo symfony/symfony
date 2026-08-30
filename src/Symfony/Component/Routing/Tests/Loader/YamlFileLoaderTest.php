@@ -93,6 +93,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertInstanceOf(Route::class, $route);
         $this->assertSame('/blog/{slug}', $route->getPath());
         $this->assertSame('{locale}.example.com', $route->getHost());
+        $this->assertSame('8000', $route->getPort());
         $this->assertSame('MyBundle:Blog:show', $route->getDefault('_controller'));
         $this->assertSame('\w+', $route->getRequirement('locale'));
         $this->assertSame('RouteCompiler', $route->getOption('compiler_class'));
@@ -118,6 +119,7 @@ class YamlFileLoaderTest extends TestCase
             $this->assertSame('\d+', $route->getRequirement('foo'));
             $this->assertSame('bar', $route->getOption('foo'));
             $this->assertSame('', $route->getHost());
+            $this->assertSame('8080', $route->getPort());
             $this->assertSame('context.getMethod() == "POST"', $route->getCondition());
         }
     }

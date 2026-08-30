@@ -21,6 +21,7 @@ class Route
 {
     private string $path = '/';
     private string $host = '';
+    private string $port = '';
     private array $schemes = [];
     private array $methods = [];
     private array $defaults = [];
@@ -45,8 +46,9 @@ class Route
      * @param string|string[]           $schemes      A required URI scheme or an array of restricted schemes
      * @param string|string[]           $methods      A required HTTP method or an array of restricted methods
      * @param string|null               $condition    A condition that should evaluate to true for the route to match
+     * @param string|int|null           $port         The port this route is restricted to
      */
-    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [], ?string $host = '', string|array $schemes = [], string|array $methods = [], ?string $condition = '')
+    public function __construct(string $path, array $defaults = [], array $requirements = [], array $options = [], ?string $host = '', string|array $schemes = [], string|array $methods = [], ?string $condition = '', string|int|null $port = null)
     {
         $this->setPath($path);
         $this->addDefaults($defaults);
@@ -56,6 +58,7 @@ class Route
         $this->setSchemes($schemes);
         $this->setMethods($methods);
         $this->setCondition($condition);
+        $this->setPort($port);
     }
 
     public function __serialize(): array
@@ -63,6 +66,7 @@ class Route
         return [
             'path' => $this->path,
             'host' => $this->host,
+            'port' => $this->port,
             'defaults' => $this->defaults,
             'requirements' => $this->requirements,
             'options' => $this->options,
@@ -77,6 +81,7 @@ class Route
     {
         if (($data['path'] ?? null) instanceof \Stringable
             || ($data['host'] ?? null) instanceof \Stringable
+            || ($data['port'] ?? null) instanceof \Stringable
             || ($data['condition'] ?? null) instanceof \Stringable
         ) {
             throw new \BadMethodCallException('Cannot unserialize '.self::class);
@@ -84,6 +89,7 @@ class Route
 
         $this->path = $data['path'];
         $this->host = $data['host'];
+        $this->port = $data['port'] ?? '';
         $this->defaults = $data['defaults'];
         $this->requirements = $data['requirements'];
         $this->options = $data['options'];
@@ -129,6 +135,31 @@ class Route
     public function setHost(?string $pattern): static
     {
         $this->host = $this->extractInlineDefaultsAndRequirements((string) $pattern);
+        $this->compiled = null;
+
+        return $this;
+    }
+
+    /**
+     * Returns the port this route is restricted to.
+     *
+     * An empty string means that any port is allowed.
+     */
+    public function getPort(): string
+    {
+        return $this->port;
+    }
+
+    /**
+     * Sets the port this route is restricted to.
+     *
+     * Passing null or an empty string means that any port is allowed.
+     *
+     * @return $this
+     */
+    public function setPort(string|int|null $port): static
+    {
+        $this->port = trim((string) $port);
         $this->compiled = null;
 
         return $this;

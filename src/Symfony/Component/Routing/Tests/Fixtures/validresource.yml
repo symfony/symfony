@@ -5,4 +5,5 @@ _blog:
     requirements: { 'foo': '\d+' }
     options:      { 'foo': 'bar' }
     host:         ""
+    port:         8080
     condition:    'context.getMethod() == "POST"'

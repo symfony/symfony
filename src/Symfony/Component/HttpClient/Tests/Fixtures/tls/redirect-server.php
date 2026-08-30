@@ -16,7 +16,11 @@ $port = (int) ($argv[1] ?? 8059);
 $context = stream_context_create(['ssl' => ['local_cert' => __DIR__.'/server.crt', 'local_pk' => __DIR__.'/server.key']]);
 $server = stream_socket_server('tcp://127.0.0.1:'.$port, $errno, $errstr, \STREAM_SERVER_BIND | \STREAM_SERVER_LISTEN, $context);
 
-while ($conn = @stream_socket_accept($server, 30)) {
+while (true) {
+    if (!$conn = @stream_socket_accept($server, 30)) {
+        continue;
+    }
+
     $tls = "\x16" === stream_socket_recvfrom($conn, 1, \STREAM_PEEK);
 
     if ($tls && !@stream_socket_enable_crypto($conn, true, \STREAM_CRYPTO_METHOD_TLS_SERVER)) {

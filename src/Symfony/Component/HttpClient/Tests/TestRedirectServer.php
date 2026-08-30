@@ -23,7 +23,7 @@ class TestRedirectServer
 
     public static function start(): void
     {
-        if (self::$process) {
+        if (self::$process && self::$process->isRunning()) {
             return;
         }
 

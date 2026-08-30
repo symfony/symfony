@@ -16,6 +16,7 @@ use Monolog\LogRecord;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Formatter\ConsoleFormatter;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class ConsoleFormatterTest extends TestCase
@@ -74,8 +75,8 @@ class ConsoleFormatterTest extends TestCase
 
         $this->assertStringNotContainsString("\033", $output);
         $this->assertStringNotContainsString("\u{9b}", $output);
-        $this->assertStringContainsString('[\<fg=red\>app\</\>]', $output);
-        $this->assertStringContainsString('SELECT * FROM t WHERE a \< 1 AND b \> 2', $output);
+        $this->assertStringContainsString('['.OutputFormatter::escape('<fg=red>app</>').']', $output);
+        $this->assertStringContainsString(OutputFormatter::escape('SELECT * FROM t WHERE a < 1 AND b > 2'), $output);
     }
 
     public function testItEscapesTheDumpedContext()
@@ -84,7 +85,7 @@ class ConsoleFormatterTest extends TestCase
 
         $record = self::createRecord(['context' => ['user' => '<fg=red>alice</>']]);
 
-        $this->assertStringContainsString('"user" =\> "\<fg=red\>alice\</\>"', $formatter->format($record));
+        $this->assertStringContainsString(OutputFormatter::escape('"user" => "<fg=red>alice</>"'), $formatter->format($record));
     }
 
     public function testItKeepsTheMarkupAroundReplacedPlaceholders()
@@ -93,7 +94,7 @@ class ConsoleFormatterTest extends TestCase
 
         $record = self::createRecord(['message' => 'Hello {user}', 'context' => ['user' => '<fg=red>alice</>']]);
 
-        $this->assertStringContainsString('Hello <comment>\<fg=red\>alice\</\></>', $formatter->format($record));
+        $this->assertStringContainsString('Hello <comment>'.OutputFormatter::escape('<fg=red>alice</>').'</>', $formatter->format($record));
     }
 
     public function testPlaceholderInMessageWithDataContext()

@@ -186,7 +186,7 @@ class FigletTest extends TestCase
         $widget->addStyleClass('font-bold');
         $root->add($widget);
 
-        $lines = $renderer->render($root, 80, 24);
+        $lines = $renderer->renderFrame($root, 80, 24)->toArray();
 
         $this->assertCount(1, $lines);
         $this->assertStringContainsString('Hello', AnsiUtils::stripAnsiCodes($lines[0]));

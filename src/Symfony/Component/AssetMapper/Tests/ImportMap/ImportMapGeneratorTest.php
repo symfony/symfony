@@ -126,7 +126,7 @@ class ImportMapGeneratorTest extends TestCase
     public function testGetImportMapDataLimitedToTheReachableEntriesUsesTheCompiledMetadata()
     {
         $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
-        $this->compiledConfigReader->expects($this->any())
+        $this->compiledConfigReader
             ->method('configExists')
             ->willReturnCallback(static fn (string $file) => 'entrypoint.reachable.app.json' === $file);
         $this->compiledConfigReader->expects($this->once())

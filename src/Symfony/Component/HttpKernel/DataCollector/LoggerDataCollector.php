@@ -207,7 +207,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
 
         $bootTime = filemtime($file);
         $logs = [];
-        foreach (unserialize($logContent) as $log) {
+        foreach (unserialize($logContent, ['allowed_classes' => false]) as $log) {
             $log['context'] = ['exception' => new SilencedErrorContext($log['type'], $log['file'], $log['line'], $log['trace'], $log['count'])];
             $log['timestamp'] = $bootTime;
             $log['timestamp_rfc3339'] = (new \DateTimeImmutable())->setTimestamp($bootTime)->format(\DateTimeInterface::RFC3339_EXTENDED);

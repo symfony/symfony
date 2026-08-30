@@ -73,7 +73,6 @@ class AnonymousToken extends AbstractToken
     public function __unserialize(array $data): void
     {
         [$this->secret, $parentData] = $data;
-        $parentData = \is_array($parentData) ? $parentData : unserialize($parentData);
         parent::__unserialize($parentData);
     }
 }

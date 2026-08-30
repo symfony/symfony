@@ -48,6 +48,18 @@ class RememberMeTokenTest extends TestCase
         );
     }
 
+    public function testUnserializeRejectsLegacyStringParentData()
+    {
+        $token = new RememberMeToken($this->getUser(), 'fookey', 'foo');
+        $data = $token->__serialize();
+        $data[2] = serialize($data[2]);
+
+        $token = new RememberMeToken($this->getUser(), 'fookey', 'foo');
+
+        $this->expectException(\TypeError::class);
+        $token->__unserialize($data);
+    }
+
     protected function getUser($roles = ['ROLE_FOO'])
     {
         $user = $this->createMock(UserInterface::class);

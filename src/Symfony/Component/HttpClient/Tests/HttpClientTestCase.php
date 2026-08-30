@@ -24,6 +24,7 @@ use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\HttpClientTestCase as BaseHttpClientTestCase;
+use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 /*
 Tests for HTTP2 Push need a recent version of both PHP and curl. This docker command should run them:
@@ -623,5 +624,50 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $response = $client->request('GET', 'http://localhost:8057/302?location=http:localhost');
 
         $this->assertSame(302, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider getRedirectWithHostHeaderTests
+     */
+    public function testRedirectWithHostHeader(string $url, bool $redirectWithAuth, string $expectedHost)
+    {
+        $p = TestHttpServer::start(8067);
+
+        try {
+            $client = $this->getHttpClient(__FUNCTION__);
+
+            $response = $client->request('GET', $url, [
+                'query' => [
+                    'status' => 302,
+                    'headers' => ['Location: http://localhost:8057/'],
+                ],
+                'headers' => [
+                    'Host' => 'foo.example.com',
+                    'Authorization' => 'Basic Zm9vOmJhcg==',
+                ],
+            ]);
+            $body = $response->toArray();
+        } finally {
+            $p->stop();
+        }
+
+        $this->assertSame('http://localhost:8057/', $response->getInfo('url'));
+        $this->assertSame($expectedHost, $body['HTTP_HOST']);
+
+        if ($redirectWithAuth) {
+            $this->assertSame('Basic Zm9vOmJhcg==', $body['HTTP_AUTHORIZATION']);
+        } else {
+            $this->assertArrayNotHasKey('HTTP_AUTHORIZATION', $body);
+        }
+    }
+
+    public static function getRedirectWithHostHeaderTests()
+    {
+        // the native client keeps the credentials when only the port changes
+        return [
+            'same host and port' => ['url' => 'http://localhost:8057/custom', 'redirectWithAuth' => true, 'expectedHost' => 'localhost:8057'],
+            'other port' => ['url' => 'http://localhost:8067/custom', 'redirectWithAuth' => true, 'expectedHost' => 'localhost:8057'],
+            'other host' => ['url' => 'http://127.0.0.1:8057/custom', 'redirectWithAuth' => false, 'expectedHost' => 'localhost:8057'],
+        ];
     }
 }

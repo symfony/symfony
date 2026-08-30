@@ -16,6 +16,7 @@ use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Implements common logic for response classes.
@@ -162,16 +163,47 @@ trait CommonResponseTrait
     {
         $code = $this->getInfo('http_code');
 
+        if (300 > $code) {
+            return;
+        }
+
+        $getErrorBody = $this->getErrorBody(...);
+
         if (500 <= $code) {
-            throw new ServerException($this);
+            throw new ServerException($this, $getErrorBody);
         }
 
         if (400 <= $code) {
-            throw new ClientException($this);
+            throw new ClientException($this, $getErrorBody);
         }
 
-        if (300 <= $code) {
-            throw new RedirectionException($this);
+        throw new RedirectionException($this, $getErrorBody);
+    }
+
+    /**
+     * Returns the head of the body, where API error formats put the fields an error message is made of.
+     *
+     * The body can be arbitrarily large, and it is decompressed on the way in, so keeping it whole in
+     * memory is not an option. The rest of it is still streamed, so that the response is left in the
+     * state it would be in if this had not run. Read errors are ignored because this only makes the
+     * message nicer: they are reported again when the body itself is read.
+     */
+    private function getErrorBody(): string
+    {
+        $body = '';
+
+        try {
+            foreach (self::stream([$this]) as $chunk) {
+                if (!$chunk->isLast() && 32768 > \strlen($body)) {
+                    $body .= substr($chunk->getContent(), 0, 32768 - \strlen($body));
+                }
+
+                // Free the current chunk before the next one is inflated
+                $chunk = null;
+            }
+        } catch (TransportExceptionInterface) {
         }
+
+        return $body;
     }
 }

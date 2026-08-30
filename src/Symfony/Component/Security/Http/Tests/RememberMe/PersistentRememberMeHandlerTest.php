@@ -485,7 +485,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         [$series, $tokenValue] = $this->readCookieValue();
 
         $token = $this->tokenProvider->loadTokenBySeries($series);
-        $this->tokenProvider->createNewToken(new PersistentToken($token->getClass(false), $token->getUserIdentifier(), $series, $token->getTokenValue(), new \DateTimeImmutable('-10 min'), false));
+        $this->tokenProvider->createNewToken(self::createPersistentToken($token->getUserIdentifier(), $series, $token->getTokenValue(), new \DateTimeImmutable('-10 min')));
 
         $rememberMeDetails = new RememberMeDetails(InMemoryUser::class, 'wouter', 360, $series.':'.$tokenValue, false);
         $handler->consumeRememberMeCookie($rememberMeDetails);

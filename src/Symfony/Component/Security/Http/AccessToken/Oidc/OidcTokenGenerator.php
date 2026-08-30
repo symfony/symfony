@@ -60,7 +60,6 @@ class OidcTokenGenerator
         }
 
         $jws = $jwsBuilder
-            ->create()
             ->withPayload(json_encode($payload, flags: \JSON_THROW_ON_ERROR))
             ->addSignature($jwk, ['alg' => $algorithm->name()])
             ->build();

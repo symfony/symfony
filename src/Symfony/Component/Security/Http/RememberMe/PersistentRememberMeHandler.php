@@ -131,7 +131,12 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
             return;
         }
 
-        $rememberMeDetails = RememberMeDetails::fromRawCookie($cookie);
+        try {
+            $rememberMeDetails = RememberMeDetails::fromRawCookie($cookie);
+        } catch (AuthenticationException $e) {
+            // malformed cookie should not fail the response and can be simply ignored
+            return;
+        }
         [$series] = explode(':', $rememberMeDetails->getValue());
         $this->tokenProvider->deleteTokenBySeries($series);
     }

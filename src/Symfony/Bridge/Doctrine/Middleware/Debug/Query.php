@@ -27,7 +27,7 @@ class Query
     /** @var array<ParameterType|int> */
     private array $types = [];
 
-    private ?int $start = null;
+    private int|float|null $start = null;
     private ?float $duration = null;
 
     private ?bool $ranOnPrimary = null;

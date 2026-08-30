@@ -32,7 +32,7 @@ final class TokenBucketLimiter implements LimiterInterface
     public function __construct(string $id, int $maxBurst, Rate $rate, StorageInterface $storage, ?LockInterface $lock = null)
     {
         $this->id = $id;
-        $this->maxBurst = $maxBurst;
+        $this->maxBurst = min($maxBurst, TokenBucket::MAX_BURST_SIZE);
         $this->rate = $rate;
         $this->storage = $storage;
         $this->lock = $lock ?? new NoLock();

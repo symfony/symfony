@@ -34,4 +34,26 @@ class RateTest extends TestCase
         yield [Rate::perMonth(10)];
         yield [Rate::perYear(10)];
     }
+
+    /**
+     * @dataProvider provideOverflowingRate
+     */
+    public function testCalculateTimeForTokensIsCappedOnOverflow(Rate $rate, int $tokens)
+    {
+        self::assertSame(2147483647, $rate->calculateTimeForTokens($tokens));
+    }
+
+    public static function provideOverflowingRate(): iterable
+    {
+        yield 'product far above the int range' => [Rate::perHour(1), \PHP_INT_MAX];
+        yield 'product rounding to exactly the int range bound' => [new Rate(new \DateInterval('PT10S'), 10), \PHP_INT_MAX];
+        // the token count stays within the int range on 32-bit platforms, only the product exceeds the cap
+        yield 'product just above the cap' => [new Rate(new \DateInterval('PT2S'), 1), 1073741824];
+    }
+
+    public function testCalculateTimeForTokensBelowTheCapIsNotChanged()
+    {
+        self::assertSame(2147483647, Rate::perSecond(1)->calculateTimeForTokens(2147483647));
+        self::assertSame(3600, Rate::perHour(1)->calculateTimeForTokens(1));
+    }
 }

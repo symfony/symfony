@@ -1153,7 +1153,7 @@ abstract class HttpClientTestCase extends TestCase
     {
         $client = $this->getHttpClient(__FUNCTION__);
         if (!method_exists($client, 'withOptions')) {
-            $this->markTestSkipped(sprintf('Not implementing "%s::withOptions()" is deprecated.', get_debug_type($client)));
+            $this->markTestSkipped(sprintf('Not implementing "%s::withOptions()" is deprecated.', \get_class($client)));
         }
 
         $client2 = $client->withOptions(['base_uri' => 'http://localhost:8057/']);

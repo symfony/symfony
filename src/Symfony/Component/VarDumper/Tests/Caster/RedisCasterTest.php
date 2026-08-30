@@ -40,7 +40,7 @@ EODUMP;
 
     public function testConnected()
     {
-        $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379, 2 => 2];
+        $redisHost = explode(':', getenv('REDIS_HOST')) + [1 => 6379];
         $redis = new \Redis();
         try {
             $redis->connect(...$redisHost);
@@ -56,7 +56,7 @@ Redis {%A
   auth: null
   mode: ATOMIC
   dbNum: 0
-  timeout: 2.0
+  timeout: 0.0
   lastError: null
   persistentId: null
   options: {

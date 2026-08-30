@@ -1541,6 +1541,61 @@ class ProcessTest extends TestCase
         $this->assertSame($env, $p->getEnv());
     }
 
+    public function testEnvNonScalarValuesAreIgnored()
+    {
+        $_ENV['BAD_ARRAY_ENV'] = ['foo', 'bar'];
+        $_ENV['BAD_OBJECT_ENV'] = new \stdClass();
+
+        try {
+            $process = $this->getProcessForCode('echo "OK";');
+            $process->mustRun();
+
+            $this->assertSame('OK', $process->getOutput());
+        } finally {
+            unset($_ENV['BAD_ARRAY_ENV'], $_ENV['BAD_OBJECT_ENV']);
+        }
+    }
+
+    public function testEnvVarNamesCastToString()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv([123 => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
+    public function testEnvVarNamesWithEqualsSigns()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(['VAR=NAME' => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
+    public function testEnvVarNamesWithNullBytes()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(["VAR\0NAME" => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
+    public function testEnvVarNamesEmpty()
+    {
+        $process = $this->getProcess('echo hello');
+        $process->setEnv(['' => 'value']);
+
+        $process->run();
+
+        $this->assertSame('hello'.\PHP_EOL, $process->getOutput());
+    }
+
     public function testWaitStoppedDeadProcess()
     {
         $process = $this->getProcess(self::$phpBin.' '.__DIR__.'/ErrorProcessInitiator.php -e '.self::$phpBin);

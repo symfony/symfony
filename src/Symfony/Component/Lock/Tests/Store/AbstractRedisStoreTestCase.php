@@ -53,6 +53,53 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
         $this->expectException(LockConflictedException::class);
         $newStore->save($key2);
     }
+
+    public function testWriteMemberIsNotOwnedByTheKeyThatNamesIt()
+    {
+        $store = $this->getStore();
+
+        $resource = uniqid(__METHOD__, true);
+        $key1 = new Key($resource);
+        $store->save($key1);
+
+        $key2 = new Key($resource);
+        $key2->setState(RedisStore::class, '__write__');
+
+        $this->assertFalse($store->exists($key2));
+    }
+
+    public function testWriteMemberDoesNotGrantASecondWriteLock()
+    {
+        $store = $this->getStore();
+
+        $resource = uniqid(__METHOD__, true);
+        $key1 = new Key($resource);
+        $store->save($key1);
+
+        $key2 = new Key($resource);
+        $key2->setState(RedisStore::class, '__write__');
+
+        $this->expectException(LockConflictedException::class);
+        $store->save($key2);
+    }
+
+    public function testWriteMemberCannotBeDeletedByAnotherKey()
+    {
+        $store = $this->getStore();
+
+        $resource = uniqid(__METHOD__, true);
+        $key1 = new Key($resource);
+        $store->save($key1);
+
+        $key2 = new Key($resource);
+        $key2->setState(RedisStore::class, '__write__');
+        $store->delete($key2);
+
+        $this->assertTrue($store->exists($key1));
+
+        $this->expectException(LockConflictedException::class);
+        $store->saveRead(new Key($resource));
+    }
 }
 
 class Symfony51Store

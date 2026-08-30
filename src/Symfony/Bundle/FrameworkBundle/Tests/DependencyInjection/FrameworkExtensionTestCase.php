@@ -66,6 +66,8 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -3483,6 +3485,123 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->loadFromExtension('framework', [
                 'http_client' => ['enabled' => true],
                 'webhook' => ['enabled' => true, 'signature_format' => 'standard'],
+            ]);
+        });
+    }
+
+    public function testWebhookUsesTheDefaultHttpClient()
+    {
+        if (!class_exists(WebhookController::class)) {
+            $this->markTestSkipped('Webhook not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => ['enabled' => true],
+            ]);
+        });
+
+        $this->assertFalse($container->hasDefinition('webhook.http_client'));
+        $this->assertEquals(new Reference('http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
+    }
+
+    public function testWebhookUsesTheConfiguredHttpClient()
+    {
+        if (!class_exists(WebhookController::class)) {
+            $this->markTestSkipped('Webhook not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('my_http_client', MockHttpClient::class);
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => ['enabled' => true, 'http_client' => 'my_http_client'],
+            ]);
+        });
+
+        $this->assertFalse($container->hasDefinition('webhook.http_client'));
+        $this->assertEquals(new Reference('my_http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
+    }
+
+    public function testWebhookNoPrivateNetwork()
+    {
+        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+            $this->markTestSkipped('The installed symfony/http-client has no NoPrivateNetworkHttpClient.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => ['enabled' => true, 'no_private_network' => true],
+            ]);
+        });
+
+        $definition = $container->getDefinition('webhook.http_client');
+        $this->assertSame(NoPrivateNetworkHttpClient::class, $definition->getClass());
+        $this->assertEquals([new Reference('http_client'), null, []], $definition->getArguments());
+        $this->assertSame([['method' => 'reset']], $definition->getTag('kernel.reset'));
+
+        $this->assertEquals(new Reference('webhook.http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
+    }
+
+    public function testWebhookNoPrivateNetworkWrapsTheConfiguredHttpClient()
+    {
+        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+            $this->markTestSkipped('The installed symfony/http-client has no NoPrivateNetworkHttpClient.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('my_http_client', MockHttpClient::class);
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => [
+                    'enabled' => true,
+                    'http_client' => 'my_http_client',
+                    'no_private_network' => [
+                        'subnets' => '10.0.0.0/8',
+                        'allow_list' => ['10.1.2.3', '10.2.0.0/16'],
+                    ],
+                ],
+            ]);
+        });
+
+        $definition = $container->getDefinition('webhook.http_client');
+        $this->assertEquals([new Reference('my_http_client'), ['10.0.0.0/8'], ['10.1.2.3', '10.2.0.0/16']], $definition->getArguments());
+
+        $this->assertEquals(new Reference('webhook.http_client'), $container->getDefinition('webhook.transport')->getArgument(0));
+        $this->assertFalse($container->hasDefinition('my_http_client.no_private_network'));
+    }
+
+    public function testWebhookNoPrivateNetworkLeavesTheGlobalHttpClientAlone()
+    {
+        if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+            $this->markTestSkipped('The installed symfony/http-client has no NoPrivateNetworkHttpClient.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'http_client' => ['enabled' => true],
+                'webhook' => ['enabled' => true, 'no_private_network' => true],
+            ]);
+        });
+
+        $this->assertNull($container->getDefinition('webhook.http_client')->getDecoratedService());
+        $this->assertSame(HttpClientInterface::class, $container->getDefinition('http_client')->getClass());
+    }
+
+    public function testWebhookNoPrivateNetworkNeedsHttpClient()
+    {
+        if (class_exists(NoPrivateNetworkHttpClient::class)) {
+            $this->markTestSkipped('The installed symfony/http-client provides NoPrivateNetworkHttpClient.');
+        }
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Configuring "framework.webhook.no_private_network" requires the HttpClient component. Try running "composer require symfony/http-client".');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'webhook' => ['enabled' => true, 'no_private_network' => true],
             ]);
         });
     }

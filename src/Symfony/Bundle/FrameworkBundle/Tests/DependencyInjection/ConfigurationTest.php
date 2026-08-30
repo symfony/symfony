@@ -1393,6 +1393,12 @@ class ConfigurationTest extends TestCase
                 'enabled' => !class_exists(FullStack::class) && class_exists(WebhookController::class),
                 'routing' => [],
                 'message_bus' => 'messenger.default_bus',
+                'http_client' => 'http_client',
+                'no_private_network' => [
+                    'enabled' => false,
+                    'subnets' => null,
+                    'allow_list' => [],
+                ],
                 'event_header_name' => 'Webhook-Event',
                 'id_header_name' => 'Webhook-Id',
                 'timestamp_header_name' => 'Webhook-Timestamp',

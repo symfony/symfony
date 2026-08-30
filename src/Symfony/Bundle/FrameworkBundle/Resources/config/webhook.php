@@ -25,7 +25,7 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('webhook.transport', Transport::class)
             ->args([
-                service('http_client'),
+                abstract_arg('http client'),
                 service('webhook.headers_configurator'),
                 service('webhook.body_configurator.json'),
                 service('webhook.signer'),

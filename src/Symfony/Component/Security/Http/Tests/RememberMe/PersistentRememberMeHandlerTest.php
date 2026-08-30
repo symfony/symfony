@@ -333,7 +333,7 @@ class PersistentRememberMeHandlerTest extends TestCase
     public function testConsumeRememberMeCookieBindsThePasswordByDefaultToAnUnboundToken()
     {
         $handler = $this->createHandler(null, $this->createChangingUserProvider());
-        $this->tokenProvider->createNewToken(new PersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')));
+        $this->tokenProvider->createNewToken(self::createPersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')));
 
         $handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'series1:tokenvalue'));
 
@@ -361,7 +361,7 @@ class PersistentRememberMeHandlerTest extends TestCase
     public function testConsumeRememberMeCookieWithAnExplicitPropertyTheUserDoesNotExpose()
     {
         $handler = $this->createHandler(['ipAddress'], $this->createChangingUserProvider());
-        $this->tokenProvider->createNewToken(new PersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable()));
+        $this->tokenProvider->createNewToken(self::createPersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable()));
 
         $this->expectException(NoSuchPropertyException::class);
         $handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'series1:tokenvalue'));
@@ -450,7 +450,7 @@ class PersistentRememberMeHandlerTest extends TestCase
     public function testConsumeRememberMeCookieBindsSignaturePropertiesToUnboundToken()
     {
         $handler = $this->createSignedHandler();
-        $this->tokenProvider->createNewToken(new PersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')));
+        $this->tokenProvider->createNewToken(self::createPersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')));
 
         $handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'series1:tokenvalue'));
 
@@ -469,7 +469,7 @@ class PersistentRememberMeHandlerTest extends TestCase
     public function testConsumeRememberMeCookieRejectsUnboundTokenValueAfterRotation()
     {
         $handler = $this->createSignedHandler();
-        $this->tokenProvider->createNewToken(new PersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')));
+        $this->tokenProvider->createNewToken(self::createPersistentToken('wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min')));
 
         $handler->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'series1:tokenvalue'));
 
@@ -528,5 +528,14 @@ class PersistentRememberMeHandlerTest extends TestCase
         $cookie = $this->request->attributes->get(ResponseListener::COOKIE_ATTR_NAME);
 
         return explode(':', explode(':', $cookie->getValue(), 4)[3], 2);
+    }
+
+    private static function createPersistentToken(string $userIdentifier, string $series, string $tokenValue, \DateTimeImmutable $lastUsed): PersistentToken
+    {
+        if (method_exists(PersistentToken::class, 'getClass')) {
+            return new PersistentToken(InMemoryUser::class, $userIdentifier, $series, $tokenValue, $lastUsed, false);
+        }
+
+        return new PersistentToken($userIdentifier, $series, $tokenValue, $lastUsed);
     }
 }

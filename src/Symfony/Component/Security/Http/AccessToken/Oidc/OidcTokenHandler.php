@@ -215,7 +215,12 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         $jws = $serializerManager->unserialize($accessToken);
 
         // Verify the signature
-        if (!$jwsVerifier->verifyWithKeySet($jws, $jwkset, 0)) {
+        if (method_exists($jwsVerifier, 'verify')) { // web-token/jwt-library >= 4.3
+            $verified = $jwsVerifier->verify($jws, $jwkset, 0)->isVerified();
+        } else {
+            $verified = $jwsVerifier->verifyWithKeySet($jws, $jwkset, 0);
+        }
+        if (!$verified) {
             throw new InvalidSignatureException();
         }
 
@@ -270,7 +275,13 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         try {
             $jwe = $serializerManager->unserialize($accessToken);
             $jweHeaderChecker->check($jwe, 0);
-            $result = $jweDecrypter->decryptUsingKeySet($jwe, $this->decryptionKeyset, 0);
+            if (method_exists($jweDecrypter, 'decrypt')) { // web-token/jwt-library >= 4.3
+                $result = $jweDecrypter->decrypt($jwe, $this->decryptionKeyset, 0);
+                $jwe = $result->getJwe();
+                $result = $result->isDecrypted();
+            } else {
+                $result = $jweDecrypter->decryptUsingKeySet($jwe, $this->decryptionKeyset, 0);
+            }
             if (!$result) {
                 throw new \RuntimeException('The JWE could not be decrypted.');
             }

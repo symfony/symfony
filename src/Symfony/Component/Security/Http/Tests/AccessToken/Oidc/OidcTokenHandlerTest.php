@@ -195,7 +195,7 @@ class OidcTokenHandlerTest extends TestCase
     {
         return (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
             new ES256(),
-        ])))->create()
+        ])))
             ->withPayload($payload)
             ->addSignature(self::getJWK(), ['alg' => 'ES256'])
             ->build()
@@ -340,7 +340,7 @@ class OidcTokenHandlerTest extends TestCase
     {
         return (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
             new ES256(),
-        ])))->create()
+        ])))
             ->withPayload($payload)
             ->addSignature($jwk, ['alg' => 'ES256'])
             ->build()

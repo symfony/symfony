@@ -51,6 +51,30 @@ class AddressTest extends TestCase
         $this->assertSame('"em@il"@example.test', $a->getAddress());
     }
 
+    public function testConstructorWithAtSignInDomainLiteral()
+    {
+        $a = new Address('user@[em@il]');
+        $this->assertSame('user@[em@il]', $a->getAddress());
+    }
+
+    public function testConstructorWithUnquotedAtSignInLocalPartAndDomainLiteral()
+    {
+        $this->expectException(RfcComplianceException::class);
+        new Address('em@il@[example]');
+    }
+
+    public function testConstructorWithQuotedAtSignInLocalPartAndDomainLiteral()
+    {
+        $a = new Address('"em@il"@[em@il]');
+        $this->assertSame('"em@il"@[em@il]', $a->getAddress());
+    }
+
+    public function testConstructorWithACommentAfterADomainLiteral()
+    {
+        $a = new Address('user@[em@il] (comment)');
+        $this->assertSame('user@[em@il] (comment)', $a->getAddress());
+    }
+
     /**
      * @dataProvider provideAddressesWithControlCharacters
      */

@@ -159,7 +159,9 @@ final class Address
             return false;
         }
 
-        if (substr_count($address, '@') < 2) {
+        // an address that already complies with the addr-spec needs no further check: the extra
+        // "@" then belongs to the domain, e.g. inside a domain-literal (RFC 5322, 3.4.1)
+        if (substr_count($address, '@') < 2 || self::$validator->isValid($address, new RFCValidation())) {
             return true;
         }
 

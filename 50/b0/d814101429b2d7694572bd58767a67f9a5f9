@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-31T16:43:42Z
+
+Thank you for the patience. I rebased and reworked the patch, here is what changed and why.
+
+The submitted version forced `'headers' => []`, and `Serializer::decode()` rejects empty headers before it looks at anything else, so the new path could never work with Symfony's own serializer. Worse, when the producer did send a `headers` field it was dropped. Checked end to end against a real Redis with the stock serializer:
+
+| `XADD` fields | 8.2 | PR as submitted | after rework |
+| --- | --- | --- | --- |
+| `message '{"body":…,"headers":{"type":…}}'` | consumed | consumed | consumed |
+| `body '<json>'` | silently dropped | decode failed | decode failed |
+| `body '<json>' headers '{"type":…}'` | silently dropped | decode failed | **consumed** |
+
+The third row is the one that makes the feature worth having, so `headers` is now read from the stream field and JSON-decoded, falling back to `[]` when it is absent or not a JSON object.
+
+Also:
+
+* Added the tests for the `headers` field on `get()` and `find()`, one for a `headers` field that is not JSON, and an integration test that consumes a raw `XADD` through the real `Serializer`. All seven new tests fail against the unpatched receiver.
+* Dropped the `BODY_FIELD` / `HEADERS_FIELD` / `MESSAGE_FIELD` constants. They accounted for most of the diff, and `Connection` writes the same three literals on the producer side, so the class was ending up half and half.
+* Reworded the changelog entry to name the accepted fields.
+
+One thing to know for the first row: `XADD messages '*' message '{"body":"…","headers":{"type":"App\\Message\\Mail"}}'` already worked before this pull request, with no custom serializer. It is undocumented, which is why nobody finds it. The description now lists what the documentation pull request has to cover.
+
+The `is_array()` guard you added is a real bug fix on its own: `json_decode()` returns a scalar for a `message` field holding `12345`, the `null ===` guard lets it through and `array_key_exists()` raises an uncaught `TypeError` that kills the worker. That one goes back to 6.4, so I sent it separately in #65779.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-31T16:58:33Z
+
+Follow-up push: both `json_decode()` calls now use `JSON_THROW_ON_ERROR | JSON_BIGINT_AS_STRING`.
+
+`JSON_THROW_ON_ERROR` does not replace the array check. `json_decode('12345')` and `json_decode('"a string"')` return a scalar with no error, so that guard stays. What the flag adds is telling a syntax error apart from a payload that decoded to nothing, and that turned out to matter: `ReceiverInterface::get()` asks a transport to return a `MessageDecodingFailedException` envelope for what it cannot decode, and this receiver was skipping instead. The entry then sat in the consumer group's pending list for good with nothing logged, which is the symptom reported in #65047.
+
+End to end against a real Redis, stock serializer, `pending` read with `XPENDING` after the worker had its turn:
+
+| `XADD` fields | 8.2 | after |
+| --- | --- | --- |
+| `body '<json>' headers '<json>'` | dropped, pending=1 | consumed |
+| `body '<json>'`, no headers | dropped, pending=1 | reported, pending=0 |
+| `message '<malformed>'` | dropped, pending=1 | reported, pending=0 |
+| `body '<json>' headers '<malformed>'` | dropped, pending=1 | reported, pending=0 |
+| `payload '<json>'` | dropped, pending=1 | dropped, pending=1 |
+
+The last row stays as it is on purpose: an entry with neither `message` nor `body` cannot be told apart from one written for a consumer that is not Messenger, so the stream stays shareable. `all()` and `find()` also keep skipping what they cannot read, otherwise one bad entry would break `messenger:failed:show`.
+
+`JSON_BIGINT_AS_STRING` covers the two places the receiver decodes on its own account: the `headers` field, and the pass-through payload handed to a custom serializer. `{"id":9223372036854775808}` reached that serializer as `9.2233720368548E+18` before and reaches it as `'9223372036854775808'` now. It does not reach inside `body`, where the decoding belongs to the serializer.
+
+Three tests were added for this, and two of the earlier ones were tightened after they turned out to pass against the unpatched receiver for the wrong reason: `with()` compares loosely, so a float matched the expected string, and the malformed `headers` case was passing on the "should have at least a body and some headers" error rather than on the syntax error. Ten of the tests on the branch now fail against the unpatched receiver.

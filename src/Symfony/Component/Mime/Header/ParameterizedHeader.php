@@ -117,7 +117,7 @@ final class ParameterizedHeader extends UnstructuredHeader
         if (!preg_match('/^'.self::TOKEN_REGEX.'$/D', $value)) {
             // TODO: text, or something else??
             // ... and it's not ascii
-            if (!preg_match('/^[\x00-\x08\x0B\x0C\x0E-\x7F]*$/D', $value)) {
+            if (!preg_match('/^[\x20-\x7E]*$/D', $value)) {
                 $encoded = true;
                 // Allow space for the indices, charset and language
                 $maxValueLength = $this->getMaxLineLength() - \strlen($name.'*N*="";') - 1;

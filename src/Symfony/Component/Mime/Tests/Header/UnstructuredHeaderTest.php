@@ -113,7 +113,7 @@ class UnstructuredHeaderTest extends TestCase
     public function testEncodedWordsAreUsedToEncodedNonPrintableAscii()
     {
         // SPACE and TAB permitted
-        $nonPrintableBytes = array_merge(range(0x00, 0x08), range(0x10, 0x19), [0x7F]);
+        $nonPrintableBytes = array_merge(range(0x00, 0x08), range(0x0A, 0x1F), [0x7F]);
         foreach ($nonPrintableBytes as $byte) {
             $char = pack('C', $byte);
             $encodedChar = sprintf('=%02X', $byte);

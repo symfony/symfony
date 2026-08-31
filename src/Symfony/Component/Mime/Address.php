@@ -50,7 +50,7 @@ final class Address
         }
 
         $this->address = trim($address);
-        $this->name = trim(str_replace(["\n", "\r"], '', $name));
+        $this->name = trim(preg_replace('/[\x00-\x08\x0A-\x1F\x7F]/', '', $name));
 
         if (preg_match('/[\x00-\x1F\x7F]/', $this->address)) {
             throw new InvalidArgumentException('Email address contains control characters.');

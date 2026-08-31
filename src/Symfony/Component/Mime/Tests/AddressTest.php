@@ -42,7 +42,7 @@ class AddressTest extends TestCase
     public function testConstructorWithUnquotedAtSignInLocalPart()
     {
         $this->expectException(RfcComplianceException::class);
-        $this->expectExceptionMessage('Email "em@il@example.test" does not comply with addr-spec of RFC 2822.');
+        $this->expectExceptionMessage('Email "em@il@example.test" does not comply with addr-spec of RFC 5322.');
         new Address('em@il@example.test');
     }
 

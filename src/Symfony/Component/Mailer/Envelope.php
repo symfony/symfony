@@ -52,7 +52,7 @@ class Envelope
     }
 
     /**
-     * @return Address Returns a "mailbox" as specified by RFC 2822
+     * @return Address Returns a "mailbox" as specified by RFC 5322
      *                 Must be converted to an "addr-spec" when used as a "MAIL FROM" value in SMTP (use getAddress())
      */
     public function getSender(): Address

@@ -97,7 +97,7 @@ final class MailboxListHeader extends AbstractHeader
     }
 
     /**
-     * Gets the full mailbox list of this Header as an array of valid RFC 2822 strings.
+     * Gets the full mailbox list of this Header as an array of valid RFC 5322 strings.
      *
      * @return string[]
      *
@@ -127,7 +127,7 @@ final class MailboxListHeader extends AbstractHeader
      *
      * All "specials" must be encoded as the full header value will not be quoted
      *
-     * @see RFC 2822 3.2.1
+     * @see RFC 5322 3.2.3
      */
     protected function tokenNeedsEncoding(string $token): bool
     {

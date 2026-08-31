@@ -30,7 +30,7 @@ class UnstructuredHeaderTest extends TestCase
 
     public function testBasicStructureIsKeyValuePair()
     {
-        /* -- RFC 2822, 2.2
+        /* -- RFC 5322, 2.2
         Header fields are lines composed of a field name, followed by a colon
         (":"), followed by a field body, and terminated by CRLF.
         */
@@ -40,7 +40,7 @@ class UnstructuredHeaderTest extends TestCase
 
     public function testLongHeadersAreFoldedAtWordBoundary()
     {
-        /* -- RFC 2822, 2.2.3
+        /* -- RFC 5322, 2.2.3
         Each header field is logically a single line of characters comprising
         the field name, the colon, and the field body.  For convenience
         however, and to deal with the 998/78 character limitations per line,
@@ -67,7 +67,7 @@ class UnstructuredHeaderTest extends TestCase
 
     public function testPrintableAsciiOnlyAppearsInHeaders()
     {
-        /* -- RFC 2822, 2.2.
+        /* -- RFC 5322, 2.2.
         A field name MUST be composed of printable US-ASCII characters (i.e.,
         characters that have values between 33 and 126, inclusive), except
         colon.  A field body may be composed of any US-ASCII characters,

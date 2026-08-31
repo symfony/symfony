@@ -54,7 +54,7 @@ interface HeaderInterface
     /**
      * Gets the header's body, prepared for folding into a final header value.
      *
-     * This is not necessarily RFC 2822 compliant since folding white space is
+     * This is not necessarily RFC 5322 compliant since folding white space is
      * not added at this stage (see {@link toString()} for that).
      */
     public function getBodyAsString(): string;

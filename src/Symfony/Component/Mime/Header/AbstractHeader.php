@@ -80,7 +80,7 @@ abstract class AbstractHeader implements HeaderInterface
     }
 
     /**
-     * Produces a compliant, formatted RFC 2822 'phrase' based on the string given.
+     * Produces a compliant, formatted RFC 5322 'phrase' based on the string given.
      *
      * @param string $string  as displayed
      * @param bool   $shorten the first line to make remove for header name
@@ -127,7 +127,7 @@ abstract class AbstractHeader implements HeaderInterface
         $value = '';
         $tokens = $this->getEncodableWordTokens($input);
         foreach ($tokens as $token) {
-            // See RFC 2822, Sect 2.2 (really 2.2 ??)
+            // See RFC 5322, Sect 2.2 (really 2.2 ??)
             if ($this->tokenNeedsEncoding($token)) {
                 // Don't encode starting WSP
                 $firstChar = substr($token, 0, 1);
@@ -262,7 +262,7 @@ abstract class AbstractHeader implements HeaderInterface
 
     /**
      * Takes an array of tokens which appear in the header and turns them into
-     * an RFC 2822 compliant string, adding FWSP where needed.
+     * an RFC 5322 compliant string, adding FWSP where needed.
      *
      * @param string[] $tokens
      */
@@ -289,7 +289,7 @@ abstract class AbstractHeader implements HeaderInterface
             }
         }
 
-        // Implode with FWS (RFC 2822, 2.2.3)
+        // Implode with FWS (RFC 5322, 2.2.3)
         return implode("\r\n", $headerLines);
     }
 }

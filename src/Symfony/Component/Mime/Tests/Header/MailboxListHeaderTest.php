@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Header\MailboxListHeader;
 
 class MailboxListHeaderTest extends TestCase
 {
-    // RFC 2822, 3.6.2 for all tests
+    // RFC 5322, 3.6.2 for all tests
 
     public function testMailboxIsSetForAddress()
     {

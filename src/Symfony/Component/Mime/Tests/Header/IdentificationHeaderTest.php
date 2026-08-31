@@ -18,7 +18,7 @@ class IdentificationHeaderTest extends TestCase
 {
     public function testValueMatchesMsgIdSpec()
     {
-        /* -- RFC 2822, 3.6.4.
+        /* -- RFC 5322, 3.6.4.
          message-id      =       "Message-ID:" msg-id CRLF
 
          in-reply-to     =       "In-Reply-To:" 1*msg-id CRLF
@@ -55,7 +55,7 @@ class IdentificationHeaderTest extends TestCase
 
     public function testSettingMultipleIdsProducesAListValue()
     {
-        /* -- RFC 2822, 3.6.4.
+        /* -- RFC 5322, 3.6.4.
         The "References:" and "In-Reply-To:" field each contain one or more
         unique message identifiers, optionally separated by CFWS.
 
@@ -72,7 +72,7 @@ class IdentificationHeaderTest extends TestCase
 
     public function testIdLeftCanBeQuoted()
     {
-        /* -- RFC 2822, 3.6.4.
+        /* -- RFC 5322, 3.6.4.
          id-left         =       dot-atom-text / no-fold-quote / obs-id-left
          */
 
@@ -83,7 +83,7 @@ class IdentificationHeaderTest extends TestCase
 
     public function testIdLeftCanContainAnglesAsQuotedPairs()
     {
-        /* -- RFC 2822, 3.6.4.
+        /* -- RFC 5322, 3.6.4.
          no-fold-quote   =       DQUOTE *(qtext / quoted-pair) DQUOTE
          */
 
@@ -102,13 +102,13 @@ class IdentificationHeaderTest extends TestCase
     public function testInvalidIdLeftThrowsException()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
+        $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 5322.');
         new IdentificationHeader('References', 'a b c@d');
     }
 
     public function testIdRightCanBeDotAtom()
     {
-        /* -- RFC 2822, 3.6.4.
+        /* -- RFC 5322, 3.6.4.
          id-right        =       dot-atom-text / no-fold-literal / obs-id-right
          */
 
@@ -119,7 +119,7 @@ class IdentificationHeaderTest extends TestCase
 
     public function testIdRightCanBeLiteral()
     {
-        /* -- RFC 2822, 3.6.4.
+        /* -- RFC 5322, 3.6.4.
          no-fold-literal =       "[" *(dtext / quoted-pair) "]"
         */
 
@@ -138,15 +138,15 @@ class IdentificationHeaderTest extends TestCase
     public function testInvalidIdRightThrowsException()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
+        $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 5322.');
         new IdentificationHeader('References', 'a@b c d');
     }
 
     public function testMissingAtSignThrowsException()
     {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 2822.');
-        /* -- RFC 2822, 3.6.4.
+        $this->expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 5322.');
+        /* -- RFC 5322, 3.6.4.
          msg-id          =       [CFWS] "<" id-left "@" id-right ">" [CFWS]
          */
         new IdentificationHeader('References', 'abc');

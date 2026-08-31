@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Header\DateHeader;
 class DateHeaderTest extends TestCase
 {
     /* --
-    The following tests refer to RFC 2822, section 3.6.1 and 3.3.
+    The following tests refer to RFC 5322, section 3.6.1 and 3.3.
     */
 
     public function testGetDateTime()

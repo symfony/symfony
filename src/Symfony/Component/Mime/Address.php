@@ -20,6 +20,12 @@ use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
+ * An addr-spec as defined by RFC 5322 (3.4.1), updated by RFC 6532 for the non-ASCII characters.
+ *
+ * The transport restrictions of RFC 5321 are deliberately not enforced here: the local part is
+ * not limited to 64 octets (4.5.3.1) and it is not restricted to a Dot-string or a Quoted-string
+ * (4.1.2). Deciding what an SMTP session accepts is up to the envelope and the transport.
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 final class Address
@@ -55,7 +61,7 @@ final class Address
         }
 
         if (!self::isValidAddrSpec($this->address)) {
-            throw new RfcComplianceException(\sprintf('Email "%s" does not comply with addr-spec of RFC 2822.', $address));
+            throw new RfcComplianceException(\sprintf('Email "%s" does not comply with addr-spec of RFC 5322.', $address));
         }
     }
 

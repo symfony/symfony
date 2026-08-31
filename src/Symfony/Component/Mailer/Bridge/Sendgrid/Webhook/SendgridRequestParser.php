@@ -43,7 +43,7 @@ final class SendgridRequestParser extends AbstractRequestParser
         ]);
     }
 
-    protected function doParse(Request $request, string $secret): ?AbstractMailerEvent
+    protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
         $content = $request->toArray();
         if (

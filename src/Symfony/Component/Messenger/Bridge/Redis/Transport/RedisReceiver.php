@@ -58,7 +58,7 @@ class RedisReceiver implements ReceiverInterface, MessageCountAwareInterface
 
         $redisEnvelope = json_decode($message['data']['message'] ?? '', true);
 
-        if (null === $redisEnvelope) {
+        if (!\is_array($redisEnvelope)) {
             return [];
         }
 

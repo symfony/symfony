@@ -424,6 +424,20 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertEquals('Hi2', $message->getMessage());
     }
 
+    public function testItConsumesEntriesAddedWithARawXadd()
+    {
+        $this->redis->xAdd('messages', '*', [
+            'body' => '{"message": "Hi"}',
+            'headers' => json_encode(['type' => DummyMessage::class]),
+        ]);
+
+        $receiver = new RedisReceiver($this->connection, new Serializer());
+        $envelopes = $receiver->get();
+
+        $this->assertCount(1, $envelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+    }
+
     public function testItCountMessages()
     {
         $this->assertSame(0, $this->connection->getMessageCount());

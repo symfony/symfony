@@ -67,16 +67,16 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
                 continue;
             }
 
-            if (null === $redisEnvelope = json_decode($message['data']['message'] ?? '', true)) {
-                continue;
-            }
-
             $stamps = [
                 new RedisReceivedStamp($message['id']),
                 new TransportMessageIdStamp($message['id']),
             ];
 
             try {
+                if (null === $redisEnvelope = $this->decodeRedisEnvelope($message['data'])) {
+                    continue;
+                }
+
                 if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                     $envelope = $this->serializer->decode($redisEnvelope = [
                         'body' => $redisEnvelope['body'],
@@ -85,6 +85,10 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
                 } else {
                     $envelope = $this->serializer->decode($redisEnvelope);
                 }
+            } catch (\JsonException $e) {
+                $envelopes[] = MessageDecodingFailedException::wrap($message['data'], 'Could not decode the Redis stream entry: '.$e->getMessage(), $e->getCode(), $e)->with(...$stamps);
+
+                continue;
             } catch (MessageDecodingFailedException $e) {
                 $envelopes[] = MessageDecodingFailedException::wrap($redisEnvelope, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
 
@@ -126,7 +130,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
         $messages = $this->connection->findAll($limit);
 
         foreach ($messages as $message) {
-            if (null !== $envelope = $this->createEnvelopeFromData($message['id'], $message['data']['message'] ?? null)) {
+            if (null !== $envelope = $this->createEnvelopeFromData($message['id'], $message['data'] ?? null)) {
                 yield $envelope;
             }
         }
@@ -138,20 +142,20 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
             return null;
         }
 
-        return $this->createEnvelopeFromData($message['id'], $message['data']['message'] ?? null);
+        return $this->createEnvelopeFromData($message['id'], $message['data'] ?? null);
     }
 
-    private function createEnvelopeFromData(string $id, ?string $json): ?Envelope
+    private function createEnvelopeFromData(string $id, ?array $data): ?Envelope
     {
-        if (null === $json) {
-            return null;
-        }
-
-        if (null === $redisEnvelope = json_decode($json, true)) {
+        if (null === $data) {
             return null;
         }
 
         try {
+            if (null === $redisEnvelope = $this->decodeRedisEnvelope($data)) {
+                return null;
+            }
+
             if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
                 $envelope = $this->serializer->decode([
                     'body' => $redisEnvelope['body'],
@@ -160,7 +164,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
             } else {
                 $envelope = $this->serializer->decode($redisEnvelope);
             }
-        } catch (MessageDecodingFailedException) {
+        } catch (\JsonException|MessageDecodingFailedException) {
             return null;
         }
 
@@ -170,6 +174,26 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
                 new RedisReceivedStamp($id),
                 new TransportMessageIdStamp($id)
             );
+    }
+
+    private function decodeRedisEnvelope(array $data): ?array
+    {
+        if (isset($data['message'])) {
+            $redisEnvelope = json_decode($data['message'], true, flags: \JSON_THROW_ON_ERROR | \JSON_BIGINT_AS_STRING);
+
+            return \is_array($redisEnvelope) ? $redisEnvelope : null;
+        }
+
+        if (!isset($data['body'])) {
+            return null;
+        }
+
+        $headers = isset($data['headers']) ? json_decode($data['headers'], true, flags: \JSON_THROW_ON_ERROR | \JSON_BIGINT_AS_STRING) : [];
+
+        return [
+            'body' => $data['body'],
+            'headers' => \is_array($headers) ? $headers : [],
+        ];
     }
 
     private function findRedisReceivedStampId(Envelope $envelope): string

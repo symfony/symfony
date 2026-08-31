@@ -152,7 +152,7 @@ abstract class AbstractHeader implements HeaderInterface
 
     protected function tokenNeedsEncoding(string $token): bool
     {
-        return (bool) preg_match('~[\x00-\x08\x10-\x19\x7F-\xFF\r\n]~', $token);
+        return preg_match('~[\x00-\x08\x0A-\x1F\x7F-\xFF]~', $token);
     }
 
     /**

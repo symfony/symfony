@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Twilio\Tests\Webhook;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Notifier\Bridge\Twilio\Webhook\TwilioRequestParser;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
@@ -24,18 +25,39 @@ class TwilioRequestParserTest extends AbstractRequestParserTestCase
         return new TwilioRequestParser();
     }
 
+    /**
+     * The signature is the one Twilio computes for the "delivered.txt" fixture.
+     *
+     * @see https://www.twilio.com/docs/usage/webhooks/webhooks-security
+     */
     protected function createRequest(string $payload): Request
     {
         parse_str(trim($payload), $parameters);
 
         return Request::create('/', 'POST', $parameters, [], [], [
             'Content-Type' => 'application/x-www-form-urlencoded',
+            'HTTP_X-Twilio-Signature' => 'xllaS9aFah5h0erZk5LjbK8XC3M=',
         ]);
+    }
+
+    protected function getSecret(): string
+    {
+        return 's3cret-token';
     }
 
     protected static function getFixtureExtension(): string
     {
         return 'txt';
+    }
+
+    public function testEmptySecretIsRejected()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.txt'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        $this->createRequestParser()->parse($request, '');
     }
 
     public function testValidSignatureIsAccepted()

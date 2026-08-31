@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for consuming stream entries written with a raw `XADD`, using `body` and `headers` fields
+ * Report stream entries that cannot be decoded through the failure transport instead of dropping them silently
+
 8.1
 ---
 

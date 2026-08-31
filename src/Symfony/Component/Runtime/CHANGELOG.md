@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Reject requests PHP cannot parse with a 400 response in `FrankenPhpWorkerRunner` instead of letting them kill the worker
+
 8.1
 ---
 

@@ -29,6 +29,7 @@ class FrankenPhpWorkerRunnerTest extends TestCase
     protected function tearDown(): void
     {
         unset($_SERVER['FRANKENPHP_RESET_KERNEL'], $_SERVER['APP_RUNTIME_MODE']);
+        error_clear_last();
     }
 
     public function testRun()
@@ -124,5 +125,88 @@ class FrankenPhpWorkerRunnerTest extends TestCase
 
         $runner = new FrankenPhpWorkerRunner($application, -1);
         $this->assertSame(0, $runner->run());
+    }
+
+    public function testRunRejectsUnparsableRequests()
+    {
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->never())->method('handle');
+        $application->expects($this->never())->method('terminate');
+
+        $this->recordError('frankenphp_handle_request(): Request body exceeds post_max_size');
+
+        $this->expectOutputString('Bad Request');
+
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+        $this->assertSame(0, $runner->run());
+        $this->assertNull(error_get_last());
+    }
+
+    public function testRunWithResponseRejectsUnparsableRequests()
+    {
+        $response = $this->createMock(Response::class);
+        $response->expects($this->never())->method('send');
+
+        $this->recordError('frankenphp_handle_request(): Input variables exceeded 1000');
+
+        $this->expectOutputString('Bad Request');
+
+        $runner = new FrankenPhpWorkerRunner($response, 500);
+        $this->assertSame(0, $runner->run());
+    }
+
+    public function testRunKeepsUnrelatedLastErrors()
+    {
+        $application = $this->createMock(TestAppInterface::class);
+        $application
+            ->expects($this->once())
+            ->method('handle')
+            ->willReturnCallback(function (): Response {
+                $this->assertSame('Some unrelated warning', error_get_last()['message'] ?? null);
+
+                return new Response();
+            });
+        $application->expects($this->once())->method('terminate');
+
+        $this->recordError('Some unrelated warning');
+
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+        $this->assertSame(0, $runner->run());
+    }
+
+    public function testRunIgnoresParsingNotices()
+    {
+        $application = $this->createMock(TestAppInterface::class);
+        $application->expects($this->once())->method('handle')->willReturn(new Response());
+
+        $this->recordError('frankenphp_handle_request(): some notice', \E_USER_NOTICE);
+
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+        $this->assertSame(0, $runner->run());
+    }
+
+    public function testRunRestoresErrorReporting()
+    {
+        $errorReporting = error_reporting();
+        $application = $this->createMock(TestAppInterface::class);
+        $application
+            ->expects($this->once())
+            ->method('handle')
+            ->willReturnCallback(function () use ($errorReporting): Response {
+                $this->assertSame($errorReporting, error_reporting());
+
+                return new Response();
+            });
+
+        $runner = new FrankenPhpWorkerRunner($application, 500);
+        $this->assertSame(0, $runner->run());
+        $this->assertSame($errorReporting, error_reporting());
+    }
+
+    private function recordError(string $message, int $level = \E_USER_WARNING): void
+    {
+        $errorReporting = error_reporting(0);
+        trigger_error($message, $level);
+        error_reporting($errorReporting);
     }
 }

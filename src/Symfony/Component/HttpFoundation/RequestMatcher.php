@@ -173,7 +173,7 @@ class RequestMatcher implements RequestMatcherInterface
             }
         }
 
-        if (null !== $this->path && !preg_match('{'.$this->path.'}', rawurldecode($request->getPathInfo()))) {
+        if (null !== $this->path && !preg_match('{'.$this->path.'}s', rawurldecode($request->getPathInfo()))) {
             return false;
         }
 

@@ -194,7 +194,7 @@
         "yaml": "src/Symfony/Component/Yaml",
         "contracts": {
             "prefixes": [{ "from": "src/Symfony/Contracts", "to": "" }],
-            "target_branch": "main"
+            "target_branch": "3.7"
         }
     },
     "defaults": {

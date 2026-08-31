@@ -148,6 +148,33 @@ class RequestMatcherTest extends TestCase
         $this->assertTrue($matcher->matches($request));
     }
 
+    public function testPathWithEncodedControlCharacters()
+    {
+        $matcher = new RequestMatcher();
+        $request = Request::create('/admin/fo%0Ao');
+
+        $matcher->matchPath('^.*$');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchPath('^/.*$');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchPath('^/admin/.*$');
+        $this->assertTrue($matcher->matches($request));
+
+        $matcher->matchPath('^/blog/.*$');
+        $this->assertFalse($matcher->matches($request));
+    }
+
+    public function testPathStillMatchesBeforeATrailingNewLine()
+    {
+        $matcher = new RequestMatcher();
+
+        $matcher->matchPath('^/admin$');
+        $this->assertTrue($matcher->matches(Request::create('/admin')));
+        $this->assertTrue($matcher->matches(Request::create('/admin%0A')));
+    }
+
     public function testAttributes()
     {
         $matcher = new RequestMatcher();

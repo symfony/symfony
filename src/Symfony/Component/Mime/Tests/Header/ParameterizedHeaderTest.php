@@ -230,6 +230,24 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('X-Foo: bar; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
     }
 
+    public function testParamsAreEncodedIfTheyHoldAControlCharacter()
+    {
+        $value = 'fo'.pack('C', 0x00).'bar';
+        $header = new ParameterizedHeader('X-Foo', 'bar');
+        $header->setCharset('iso-8859-1');
+        $header->setParameters(['says' => $value]);
+        $this->assertEquals('X-Foo: bar; says*='.$header->getCharset()."''fo%00bar", $header->toString());
+    }
+
+    public function testParamsAreEncodedIfTheyHoldAControlCharacterWithLegacyEncodingEnabled()
+    {
+        $value = 'fo'.pack('C', 0x00).'bar';
+        $header = new ParameterizedHeader('Content-Type', 'bar');
+        $header->setCharset('iso-8859-1');
+        $header->setParameters(['says' => $value]);
+        $this->assertEquals('Content-Type: bar; says="=?'.$header->getCharset().'?Q?fo=00bar?="', $header->toString());
+    }
+
     public function testParamsAreEncodedWithLegacyEncodingEnabled()
     {
         $value = 'fo'.pack('C', 0x8F).'bar';

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\HeaderRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
@@ -41,6 +42,10 @@ final class SweegoRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?SmsEvent
     {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         $payload = $request->toArray();
 
         if (!isset($payload['event_type']) || !isset($payload['swg_uid']) || !isset($payload['phone_number'])) {

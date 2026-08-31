@@ -17,6 +17,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\AhaSend\RemoteEvent\AhaSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\AhaSend\Webhook\AhaSendRequestParser;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
@@ -57,6 +58,18 @@ class AhaSendRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock((int) $request->headers->get('webhook-timestamp') + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, self::SECRET));
+    }
+
+    public function testRequestSignedWithAnEmptySecretIsRejected()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $signedPayload = $request->headers->get('webhook-id').'.'.$request->headers->get('webhook-timestamp').'.'.$request->getContent();
+        $request->headers->set('webhook-signature', 'v1,'.base64_encode(hash_hmac('sha256', $signedPayload, '', true)));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        $this->createRequestParser()->parse($request, '');
     }
 
     protected function createRequestParser(): RequestParserInterface

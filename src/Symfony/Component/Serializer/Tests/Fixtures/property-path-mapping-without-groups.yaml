@@ -1,0 +1,4 @@
+Symfony\Component\Serializer\Tests\Normalizer\ObjectOuter:
+    attributes:
+        inner.foo:
+            serialized_name: inner_foo

@@ -14,6 +14,7 @@ namespace Symfony\Component\Notifier\Bridge\Twilio\Webhook;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
@@ -27,6 +28,10 @@ final class TwilioRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?SmsEvent
     {
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         // Statuses: https://www.twilio.com/docs/sms/api/message-resource#message-status-values
         // Payload examples: https://www.twilio.com/docs/sms/outbound-message-logging
         $payload = $request->request->all();
@@ -38,9 +43,7 @@ final class TwilioRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
-        if ('' !== $secret) {
-            $this->verifySignature($request, $payload, $secret);
-        }
+        $this->verifySignature($request, $payload, $secret);
 
         $name = match ($payload['MessageStatus']) {
             'delivered' => SmsEvent::DELIVERED,

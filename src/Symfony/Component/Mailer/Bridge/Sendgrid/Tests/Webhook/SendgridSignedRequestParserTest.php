@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Webhook\SendgridRequestParser;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 /**
@@ -60,6 +61,29 @@ class SendgridSignedRequestParserTest extends AbstractRequestParserTestCase
         ClockMock::withClockMock((int) $request->headers->get('X-Twilio-Email-Event-Webhook-Timestamp') + $offset);
 
         $this->assertNotNull($this->createRequestParser()->parse($request, $this->getSecret()));
+    }
+
+    public function testRejectUnsignedRequestBeforeParsingThePayload()
+    {
+        $request = $this->createRequest('{"not":"an event"}');
+        $request->headers->remove('X-Twilio-Email-Event-Webhook-Signature');
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is required.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
+
+    public function testRejectForgedSignatureBeforeParsingThePayload()
+    {
+        $request = $this->createRequest('{"not":"an event"}');
+        $signatureOfAnotherPayload = $this->createRequest('{"another":"payload"}')->headers->get('X-Twilio-Email-Event-Webhook-Signature');
+        $request->headers->set('X-Twilio-Email-Event-Webhook-Signature', $signatureOfAnotherPayload);
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is wrong.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
     }
 
     protected function createRequestParser(): RequestParserInterface

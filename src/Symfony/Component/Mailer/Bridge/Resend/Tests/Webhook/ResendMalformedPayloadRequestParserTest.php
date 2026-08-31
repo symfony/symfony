@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Bridge\Resend\Tests\Webhook;
 
+use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Resend\RemoteEvent\ResendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Resend\Webhook\ResendRequestParser;
@@ -18,6 +20,7 @@ use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
+#[Group('time-sensitive')]
 class ResendMalformedPayloadRequestParserTest extends AbstractRequestParserTestCase
 {
     protected function createRequestParser(): RequestParserInterface
@@ -40,11 +43,13 @@ class ResendMalformedPayloadRequestParserTest extends AbstractRequestParserTestC
 
     protected function createRequest(string $payload): Request
     {
+        ClockMock::withClockMock(1712569389);
+
         return Request::create('/', 'POST', [], [], [], [
             'Content-Type' => 'application/json',
             'HTTP_svix-id' => '172c41ce-ba6d-4281-8a7a-541faa725748',
             'HTTP_svix-timestamp' => '1712569389',
-            'HTTP_svix-signature' => 'v1,4wjuRp64yC/2itgCQwl2xPePVwSPTdPbXLIY6IxGLTA=',
+            'HTTP_svix-signature' => 'v1,3LK1qunqNcqstAUfpz7z6mR8MmnaY879b8972Avqv3E=',
         ], $payload);
     }
 }

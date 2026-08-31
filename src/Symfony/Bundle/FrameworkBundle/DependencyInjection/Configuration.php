@@ -2552,6 +2552,7 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                                 ->scalarNode('secret')
                                     ->defaultValue('')
+                                    ->info('The secret used to verify incoming request signatures. It must be set in production: with an empty value, requests from any sender are accepted.')
                                 ->end()
                             ->end()
                         ->end()

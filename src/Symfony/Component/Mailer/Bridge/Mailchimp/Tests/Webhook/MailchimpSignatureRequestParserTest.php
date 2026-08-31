@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Mailchimp\RemoteEvent\MailchimpPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Webhook\MailchimpRequestParser;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 class MailchimpSignatureRequestParserTest extends TestCase
@@ -49,6 +50,28 @@ class MailchimpSignatureRequestParserTest extends TestCase
         $this->expectExceptionMessage('Signature is wrong.');
 
         $this->parse($request);
+    }
+
+    public function testEventsSignedWithAnEmptySecretAreRejected()
+    {
+        $request = $this->createRequest(['mandrill_events' => $this->events()]);
+        $request->headers->set('X-Mandrill-Signature', base64_encode(hash_hmac('sha1', 'http://localhost/mandrill_events'.$this->events(), '', true)));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        (new MailchimpRequestParser(new MailchimpPayloadConverter()))->parse($request, '');
+    }
+
+    public function testEmptyCheckIsRejectedWhenNoSecretIsConfigured()
+    {
+        $request = $this->createRequest(['mandrill_events' => '[]']);
+        $request->headers->set('X-Mandrill-Signature', base64_encode(hash_hmac('sha1', 'http://localhost/mandrill_events[]', 'test-webhook', true)));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        (new MailchimpRequestParser(new MailchimpPayloadConverter()))->parse($request, '');
     }
 
     public function testNonStringEventsParameterIsRejected()

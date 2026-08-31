@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-31T16:27:54Z
+
+Thank you Florent. I widened the fix while reviewing it, and rebased on 5.4 after #65777 landed.
+
+The display name is one of three places where a control character reached the wire. The two others are the same defect through a different door, and both are one line:
+
+- `AbstractHeader::tokenNeedsEncoding()` tested for `[\x00-\x08\x10-\x19\x7F-\xFF\r\n]`, so `Subject: a\x0Bb` came out as it went in. The `\x10-\x19` leg has been there since the component was imported from Swift Mailer, and the neighbouring test `testEncodedWordsAreUsedToEncodedNonPrintableAscii` had its byte list copied from it, comment `// SPACE and TAB permitted` included. Both now cover everything but HTAB.
+- `ParameterizedHeader::createParameter()` counted a control character as plain ascii, so an attachment filename put a raw NUL into `Content-Type` and `Content-Disposition`. It is encoded now, `filename*=utf-8''f%00n.txt`.
+
+The `multipart/form-data` branch is deliberately untouched: the WHATWG living standard escapes only the double quote, CR and LF there, and says the user agent must not perform any other escapes.
+
+Checks that were run, on the rebased head:
+
+- `./phpunit src/Symfony/Component/Mime` 378 tests green, `src/Symfony/Component/Mailer` 376 green, `src/Symfony/Component/HttpClient` 845 green, `src/Symfony/Component/Notifier` 1206 green, `src/Symfony/Bridge/Twig` 1705 green. Not one existing expectation or fixture had to change, which is what decided that the two extra fixes belong here rather than in a follow-up.
+- With `AbstractHeader.php` and `ParameterizedHeader.php` put back to their base state and the tests kept, `testEncodedWordsAreUsedToEncodedNonPrintableAscii` fails on `\x0B` with `'X-A: =?iso-8859-1?Q?=0B?='` against a raw `X-A: `, and both new parameter tests fail with `says="fo<NUL>bar"`.
+- Sweeping `\x00` to `\x1F` plus `\x7F` through a display name, a `Subject` and an attachment filename: on 5.4 they reach the wire raw, with this branch only HTAB survives, in the two places where it is folding white space.
+- The one red job, `x86 / minimal-exts / lowest-php`, times out in PropertyInfo on Windows. The same workflow failed twice on the 5.4 branch itself on 2026-08-30, so it is not this pull request.
+
+The `(bool)` cast on the return is gone with it: the component has no `declare(strict_types=1)` and the same bare `return preg_match()` already sits in `XmlEncoder::needsCdataWrapping()` and `FileProfilerStorage::isValidToken()`. Psalm reports it, `InvalidReturnType` and `InvalidReturnStatement` on `AbstractHeader.php`, since the workflow rebuilds its baseline from the base branch and that file carries neither today. Not a reason to keep the cast.
+
+One thing kept as you wrote it: the `@dataProvider` on `testConstructorStripsControlCharactersFromName`. 7.4 and up run PHPUnit 13, which reads no doc-comment metadata, so it turns into `ArgumentCountError` there; it will become `#[DataProvider]` in the merge-up.

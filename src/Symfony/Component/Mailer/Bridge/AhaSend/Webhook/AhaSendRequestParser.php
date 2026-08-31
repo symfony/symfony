@@ -69,7 +69,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
         }
     }
 
-    private function sign(string $eventID, string $timestamp, string $payload, $secret): string
+    private function sign(string $eventID, string $timestamp, string $payload, #[\SensitiveParameter] string $secret): string
     {
         $signaturePayload = "{$eventID}.{$timestamp}.{$payload}";
         $hash = hash_hmac('sha256', $signaturePayload, $secret);

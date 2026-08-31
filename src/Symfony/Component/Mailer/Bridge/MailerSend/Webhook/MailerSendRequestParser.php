@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
@@ -58,20 +59,22 @@ final class MailerSendRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
-        if ($secret) {
-            if (!$request->headers->get('Signature')) {
-                throw new RejectWebhookException(406, 'Signature is required.');
-            }
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
 
-            $this->validateSignature(
-                $request->headers->get('Signature'),
-                $request->getContent(),
-                $secret,
-            );
+        if (!$request->headers->get('Signature')) {
+            throw new RejectWebhookException(406, 'Signature is required.');
+        }
 
-            if (self::TEST_SECRET === $secret) {
-                throw new RejectWebhookException(202);
-            }
+        $this->validateSignature(
+            $request->headers->get('Signature'),
+            $request->getContent(),
+            $secret,
+        );
+
+        if (self::TEST_SECRET === $secret) {
+            throw new RejectWebhookException(202);
         }
 
         try {

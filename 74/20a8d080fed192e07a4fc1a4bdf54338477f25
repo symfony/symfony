@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-08-31T14:10:16Z
+
+> * the reject message tells the caller whether the payload shape was right, so the expected fields can be probed without ever holding a signature.
+
+this is not a big leak though:
+- the expected shape of a sendgrid webhook payload is public knowledge documented by Sendgrid
+- the parser code is public anyway

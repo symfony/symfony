@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-31T15:41:45Z
+
+Thank you Florent. I reworked the fix while reviewing it.
+
+An `@` inside a domain-literal is one shape of a wider family. The split on the last `@` also falls inside a comment, and inside any comment or folding white space that follows a domain-literal. Neutralising a trailing domain-literal fixes the reported address, but it leaves `user@[em@il] (comment)` and `user@(em@il)example.com` rejected, and it cannot reach them, since the pattern has to be anchored on `$` to stay unambiguous.
+
+Accepting an address that already complies with the addr-spec removes the need to look for the separator at all, so the regex is gone:
+
+```php
+if (substr_count($address, '@') < 2 || self::$validator->isValid($address, new RFCValidation())) {
+    return true;
+}
+```
+
+Measured on a corpus of 396 addresses, counting the ones 5.4 accepted before #65744 and rejects today, with `egulias/email-validator` 4.0.4: 116 with the branch as it stands, 89 with the regex, 36 with what is pushed now. Those 36 are exactly the unquoted `@` in the local part that #65744 targets. Same picture on 2.1.10, 3.1.0 and 4.0.0.
+
+`testConstructorWithADomainLiteralThatIsNotTheWholeDomain` is dropped. `user@[email]x` has a single `@`, takes the early return and is accepted, so the rule the name states is not the one that was enforced; `user@[em@il]x` was rejected only because the split landed inside the literal. A test for a comment after a domain-literal replaces it.
+
+Checks that were run: `./phpunit src/Symfony/Component/Mime` 367 tests green, `src/Symfony/Component/Mailer` 376 green, `src/Symfony/Bridge/Twig/Tests/Mime` 18 green, `src/Symfony/Component/Notifier` 1206 green. With `Address.php` put back to its base state and the tests kept, the three tests that prove the fix fail with `RfcComplianceException`; `testConstructorWithUnquotedAtSignInLocalPartAndDomainLiteral` passes on the base state as well, so it guards existing behaviour rather than proving the fix.
+
+One thing the fix does not address, and neither did the previous state: `egulias/email-validator` accepts `user@[a@b]@c` and `a@[b]@[c]` with `RFCValidation` itself, so those still get through. That predates #65744 and belongs upstream.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-31T15:47:06Z
+
+Modifications agreed. I updated the PR description to include your tested use cases

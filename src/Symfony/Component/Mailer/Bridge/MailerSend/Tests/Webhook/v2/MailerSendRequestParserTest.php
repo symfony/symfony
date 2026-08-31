@@ -14,16 +14,14 @@ namespace Symfony\Component\Mailer\Bridge\MailerSend\Tests\Webhook\v2;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\MailerSend\RemoteEvent\MailerSendPayloadConverter;
 use Symfony\Component\Mailer\Bridge\MailerSend\Webhook\MailerSendRequestParser;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 class MailerSendRequestParserTest extends AbstractRequestParserTestCase
 {
-    protected function createRequestParser(): RequestParserInterface
-    {
-        return new MailerSendRequestParser(new MailerSendPayloadConverter());
-    }
+    private const SECRET = 'GvLY88Uyj70jQm3fUwYyWmAaiz98wWim';
 
     public function testWebhookTest()
     {
@@ -45,5 +43,58 @@ class MailerSendRequestParserTest extends AbstractRequestParserTestCase
         } catch (RejectWebhookException $e) {
             $this->assertSame(202, $e->getStatusCode());
         }
+    }
+
+    public function testWebhookTestIsAcceptedWithoutConfiguredSecret()
+    {
+        $payload = json_encode([
+            'type' => 'webhook.test',
+            'message' => 'This is a ping test message',
+            'created_at' => '2026-04-08T12:19:27.608339Z',
+        ]);
+
+        $request = Request::create('/', 'POST', [], [], [], [
+            'Content-Type' => 'application/json',
+            'HTTP_Signature' => '7fb29be5b1cdb588ee67fa43a0a9d1b394cbb9603a0ac0b87924649d715194c2',
+        ], $payload);
+
+        try {
+            $this->createRequestParser()->parse($request, '');
+            $this->fail('A RejectWebhookException with a 202 status code should have been thrown.');
+        } catch (RejectWebhookException $e) {
+            $this->assertSame(202, $e->getStatusCode());
+        }
+    }
+
+    public function testRequestSignedWithAnEmptySecretIsRejected()
+    {
+        $payload = file_get_contents(__DIR__.'/Fixtures/sent.json');
+        $request = Request::create('/', 'POST', [], [], [], [
+            'Content-Type' => 'application/json',
+            'HTTP_Signature' => '4da13a6cb012056c0f858fd06f8f02bd3568cc2c0e754bc01617dc0c28c0f380',
+        ], $payload);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        $this->createRequestParser()->parse($request, '');
+    }
+
+    protected function createRequestParser(): RequestParserInterface
+    {
+        return new MailerSendRequestParser(new MailerSendPayloadConverter());
+    }
+
+    protected function getSecret(): string
+    {
+        return self::SECRET;
+    }
+
+    protected function createRequest(string $payload): Request
+    {
+        return Request::create('/', 'POST', [], [], [], [
+            'Content-Type' => 'application/json',
+            'HTTP_Signature' => hash_hmac('sha256', $payload, self::SECRET),
+        ], $payload);
     }
 }

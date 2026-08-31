@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Mailtrap\Tests\Webhook;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Mailtrap\RemoteEvent\MailtrapPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Mailtrap\Webhook\MailtrapRequestParser;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
@@ -63,5 +64,20 @@ class MailtrapRequestParserTest extends AbstractRequestParserTestCase
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('Signature is wrong.');
         $parser->parse($request, 'top-secret');
+    }
+
+    public function testRequestSignedWithAnEmptySecretIsRejected()
+    {
+        $parser = new MailtrapRequestParser(new MailtrapPayloadConverter());
+        $payload = file_get_contents(__DIR__.'/Fixtures/delivery.json');
+        $request = Request::create('/', 'POST', [], [], [], [
+            'Content-Type' => 'application/json',
+            'HTTP_Mailtrap-Signature' => 'beb0cf17a6314aa51243ae6cfd66809bff36fa6764311d16bdd3d8c68601567c',
+        ], $payload);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        $parser->parse($request, '');
     }
 }

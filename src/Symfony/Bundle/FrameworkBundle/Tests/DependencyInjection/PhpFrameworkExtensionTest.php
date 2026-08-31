@@ -27,6 +27,7 @@ use Symfony\Component\RateLimiter\CompoundRateLimiterFactory;
 use Symfony\Component\RateLimiter\RateLimiterBuilder;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Webhook\Client\AbstractRequestParser;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
@@ -489,6 +490,11 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
     public function testMailerWebhookProdExcludesLocalhost()
     {
+        if (!class_exists(AbstractRequestParser::class)) {
+            // the bridges below extend it, loading them without it is fatal
+            $this->markTestSkipped('The Webhook component is not installed.');
+        }
+
         if (!\defined(BrevoRequestParser::class.'::PROVIDER_IPS') || !\defined(PostmarkRequestParser::class.'::PROVIDER_IPS')) {
             $this->markTestSkipped('PROVIDER_IPS not available on the installed bridges.');
         }
@@ -511,6 +517,11 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
     public function testMailerWebhookDebugAddsLocalhost()
     {
+        if (!class_exists(AbstractRequestParser::class)) {
+            // the bridges below extend it, loading them without it is fatal
+            $this->markTestSkipped('The Webhook component is not installed.');
+        }
+
         if (!\defined(BrevoRequestParser::class.'::PROVIDER_IPS') || !\defined(PostmarkRequestParser::class.'::PROVIDER_IPS')) {
             $this->markTestSkipped('PROVIDER_IPS not available on the installed bridges.');
         }

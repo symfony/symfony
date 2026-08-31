@@ -46,13 +46,13 @@ final class SweegoRequestParser extends AbstractRequestParser
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
 
+        $this->validateSignature($request, $secret);
+
         $payload = $request->toArray();
 
         if (!isset($payload['event_type']) || !isset($payload['swg_uid']) || !isset($payload['phone_number'])) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
-
-        $this->validateSignature($request, $secret);
 
         $name = match ($payload['event_type']) {
             'sms_sent' => SmsEvent::DELIVERED,

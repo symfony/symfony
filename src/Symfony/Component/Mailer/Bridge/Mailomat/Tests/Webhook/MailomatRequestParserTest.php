@@ -129,4 +129,15 @@ class MailomatRequestParserTest extends AbstractRequestParserTestCase
         yield 'sha1' => ['sha1'];
         yield 'sha512' => ['sha512'];
     }
+
+    public function testRejectForgedSignatureBeforeParsingThePayload()
+    {
+        $request = $this->createRequest('1');
+        $request->headers->set('X-MOM-Webhook-Signature', 'sha256='.hash_hmac('sha256', 'forged', 'another-secret'));
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Signature is wrong.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
 }

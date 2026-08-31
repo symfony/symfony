@@ -91,4 +91,15 @@ class SweegoRequestParserTest extends AbstractRequestParserTestCase
     {
         return self::SECRET;
     }
+
+    public function testRejectForgedSignatureBeforeParsingThePayload()
+    {
+        $request = $this->createRequest('1');
+        $request->headers->set('webhook-signature', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=');
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Invalid signature.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
 }

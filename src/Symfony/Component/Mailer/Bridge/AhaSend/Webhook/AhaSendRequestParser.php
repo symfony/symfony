@@ -46,7 +46,6 @@ final class AhaSendRequestParser extends AbstractRequestParser
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
 
-        $payload = $request->toArray();
         $eventID = $request->headers->get('webhook-id');
         $signature = $request->headers->get('webhook-signature');
         $timestamp = $request->headers->get('webhook-timestamp');
@@ -63,6 +62,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
         if (!hash_equals($expectedSignature, $signature)) {
             throw new RejectWebhookException(406, 'Invalid signature');
         }
+        $payload = $request->toArray();
         if (!isset($payload['type']) || !isset($payload['timestamp']) || !(isset($payload['data']))) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }

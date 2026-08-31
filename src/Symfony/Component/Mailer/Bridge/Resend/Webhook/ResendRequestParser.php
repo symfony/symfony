@@ -53,6 +53,8 @@ final class ResendRequestParser extends AbstractRequestParser
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
 
+        $this->validateSignature($request->getContent(), $request->headers, $secret);
+
         $content = $request->toArray();
 
         if (
@@ -67,8 +69,6 @@ final class ResendRequestParser extends AbstractRequestParser
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
-
-        $this->validateSignature($request->getContent(), $request->headers, $secret);
 
         try {
             return $this->converter->convert($content);

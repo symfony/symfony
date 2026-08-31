@@ -16,6 +16,7 @@ use Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent\SweegoPayloadConverter;
 use Symfony\Component\Mailer\Bridge\Sweego\Webhook\SweegoRequestParser;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Client\RequestParserInterface;
+use Symfony\Component\Webhook\Exception\RejectWebhookException;
 use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 class SweegoRequestParserTest extends AbstractRequestParserTestCase
@@ -60,5 +61,16 @@ class SweegoRequestParserTest extends AbstractRequestParserTestCase
             'HTTP_webhook-timestamp' => $timestamp,
             'HTTP_webhook-signature' => base64_encode(hash_hmac('sha256', $contentToSign, base64_decode(self::SECRET), true)),
         ], $payload);
+    }
+
+    public function testRejectForgedSignatureBeforeParsingThePayload()
+    {
+        $request = $this->createRequest('1');
+        $request->headers->set('webhook-signature', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=');
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Invalid signature.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
     }
 }

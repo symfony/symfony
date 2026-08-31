@@ -104,4 +104,15 @@ class AhaSendRequestParserTest extends AbstractRequestParserTestCase
     {
         return self::SECRET;
     }
+
+    public function testRejectForgedSignatureBeforeParsingThePayload()
+    {
+        $request = $this->createRequest(file_get_contents(__DIR__.'/Fixtures/delivered.json'));
+        $request = Request::create('/', 'POST', [], [], [], $request->server->all(), '1');
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('Invalid signature');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
 }

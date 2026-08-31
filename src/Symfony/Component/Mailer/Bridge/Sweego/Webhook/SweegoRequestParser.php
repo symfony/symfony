@@ -48,6 +48,15 @@ final class SweegoRequestParser extends AbstractRequestParser
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
 
+        if (!$request->headers->get('webhook-id')
+            || !$request->headers->get('webhook-timestamp')
+            || !$request->headers->get('webhook-signature')
+        ) {
+            throw new RejectWebhookException(406, 'Signature is required.');
+        }
+
+        $this->validateSignature($request, $secret);
+
         $content = $request->toArray();
 
         if (
@@ -59,15 +68,6 @@ final class SweegoRequestParser extends AbstractRequestParser
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
-
-        if (!$request->headers->get('webhook-id')
-            && !$request->headers->get('webhook-timestamp')
-            && !$request->headers->get('webhook-signature')
-        ) {
-            throw new RejectWebhookException(406, 'Signature is required.');
-        }
-
-        $this->validateSignature($request, $secret);
 
         try {
             return $this->converter->convert($content);

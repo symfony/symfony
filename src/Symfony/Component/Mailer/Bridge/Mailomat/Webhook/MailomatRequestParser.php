@@ -58,6 +58,12 @@ final class MailomatRequestParser extends AbstractRequestParser
             throw new InvalidArgumentException('A non-empty secret is required.');
         }
 
+        if (abs(time() - (int) $request->headers->get(self::HEADER_TIMESTAMP)) > self::TIMESTAMP_TOLERANCE) {
+            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
+        }
+
+        $this->validateSignature($request->headers, $secret);
+
         $content = $request->toArray();
 
         if (
@@ -69,12 +75,6 @@ final class MailomatRequestParser extends AbstractRequestParser
         ) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
-
-        if (abs(time() - (int) $request->headers->get(self::HEADER_TIMESTAMP)) > self::TIMESTAMP_TOLERANCE) {
-            throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
-        }
-
-        $this->validateSignature($request->headers, $secret);
 
         try {
             return $this->converter->convert($content);

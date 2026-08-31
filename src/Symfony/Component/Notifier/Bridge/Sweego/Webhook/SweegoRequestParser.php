@@ -60,7 +60,7 @@ final class SweegoRequestParser extends AbstractRequestParser
         return $event;
     }
 
-    private function validateSignature(Request $request, string $secret): void
+    private function validateSignature(Request $request, #[\SensitiveParameter] string $secret): void
     {
         $timestamp = $request->headers->get('webhook-timestamp');
 

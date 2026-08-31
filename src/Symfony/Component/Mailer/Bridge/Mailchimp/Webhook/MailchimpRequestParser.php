@@ -78,7 +78,7 @@ final class MailchimpRequestParser extends AbstractRequestParser
     /**
      * @see https://mailchimp.com/developer/transactional/guides/track-respond-activity-webhooks/#authenticating-webhook-requests
      */
-    private function validateSignature(array $content, string $secret, string $webhookUrl, ?string $mandrillHeaderSignature): void
+    private function validateSignature(array $content, #[\SensitiveParameter] string $secret, string $webhookUrl, ?string $mandrillHeaderSignature): void
     {
         if (null === $mandrillHeaderSignature || !isset($content['mandrill_events'])) {
             throw new RejectWebhookException(400, 'Signature is wrong.');

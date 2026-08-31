@@ -77,7 +77,7 @@ final class ResendRequestParser extends AbstractRequestParser
         }
     }
 
-    private function validateSignature(string $payload, HeaderBag $headers, string $secret): void
+    private function validateSignature(string $payload, HeaderBag $headers, #[\SensitiveParameter] string $secret): void
     {
         $secret = $this->decodeSecret($secret);
         $messageId = $headers->get('svix-id');
@@ -112,7 +112,7 @@ final class ResendRequestParser extends AbstractRequestParser
         }
     }
 
-    private function sign(string $secret, string $messageId, int $timestamp, string $payload): string
+    private function sign(#[\SensitiveParameter] string $secret, string $messageId, int $timestamp, string $payload): string
     {
         $toSign = \sprintf('%s.%s.%s', $messageId, $timestamp, $payload);
         $hash = hash_hmac('sha256', $toSign, $secret);
@@ -121,7 +121,7 @@ final class ResendRequestParser extends AbstractRequestParser
         return 'v1,'.$signature;
     }
 
-    private function decodeSecret(string $secret): string
+    private function decodeSecret(#[\SensitiveParameter] string $secret): string
     {
         $prefix = 'whsec_';
         if (str_starts_with($secret, $prefix)) {

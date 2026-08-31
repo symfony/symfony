@@ -83,6 +83,7 @@ use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ScopingHttpClient;
@@ -3652,6 +3653,26 @@ class FrameworkExtension extends Extension
             ->replaceArgument(4, $config['timestamp_header_name'])
             ->replaceArgument(5, $signatureFormat)
             ->replaceArgument(6, $config['timestamp_tolerance']);
+
+        $clientId = $config['http_client'];
+
+        if ($this->readConfigEnabled('webhook.no_private_network', $container, $config['no_private_network'])) {
+            if (!class_exists(NoPrivateNetworkHttpClient::class)) {
+                throw new LogicException('Configuring "framework.webhook.no_private_network" requires the HttpClient component. Try running "composer require symfony/http-client".');
+            }
+
+            $container->register('webhook.http_client', NoPrivateNetworkHttpClient::class)
+                ->setArguments([
+                    new Reference($clientId),
+                    $config['no_private_network']['subnets'],
+                    $config['no_private_network']['allow_list'],
+                ])
+                ->addTag('kernel.reset', ['method' => 'reset']);
+
+            $clientId = 'webhook.http_client';
+        }
+
+        $container->getDefinition('webhook.transport')->replaceArgument(0, new Reference($clientId));
     }
 
     private function registerRemoteEventConfiguration(PhpFileLoader $loader): void

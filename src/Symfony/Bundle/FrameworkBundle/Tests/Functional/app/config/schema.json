@@ -4603,6 +4603,69 @@
                                         "default": "messenger.default_bus",
                                         "description": "The message bus to use."
                                     },
+                                    "http_client": {
+                                        "$ref": "#/$defs/types/scalar",
+                                        "default": "http_client",
+                                        "description": "The HTTP client to use to send webhooks."
+                                    },
+                                    "no_private_network": {
+                                        "anyOf": [
+                                            {
+                                                "$ref": "#/$defs/types/object_null",
+                                                "properties": {
+                                                    "enabled": {
+                                                        "$ref": "#/$defs/types/boolean",
+                                                        "default": false
+                                                    },
+                                                    "subnets": {
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/array",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": [
+                                                                    "string"
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "default": null,
+                                                        "description": "Subnets in CIDR notation to consider private. Defaults to the standard private subnets."
+                                                    },
+                                                    "allow_list": {
+                                                        "anyOf": [
+                                                            {
+                                                                "$ref": "#/$defs/types/array_null",
+                                                                "items": {
+                                                                    "$ref": "#/$defs/types/scalar"
+                                                                }
+                                                            },
+                                                            {
+                                                                "type": [
+                                                                    "string"
+                                                                ]
+                                                            }
+                                                        ],
+                                                        "description": "IPs or subnets in CIDR notation to send to even when they match the private subnets."
+                                                    }
+                                                },
+                                                "additionalProperties": false
+                                            },
+                                            {
+                                                "type": [
+                                                    "boolean"
+                                                ]
+                                            }
+                                        ],
+                                        "default": {
+                                            "enabled": false,
+                                            "subnets": null,
+                                            "allow_list": []
+                                        },
+                                        "description": "Refuse to send webhooks to URLs that resolve to a private network."
+                                    },
                                     "event_header_name": {
                                         "$ref": "#/$defs/types/scalar",
                                         "default": "Webhook-Event"
@@ -4676,6 +4739,12 @@
                         "default": {
                             "enabled": false,
                             "message_bus": "messenger.default_bus",
+                            "http_client": "http_client",
+                            "no_private_network": {
+                                "enabled": false,
+                                "subnets": null,
+                                "allow_list": []
+                            },
                             "event_header_name": "Webhook-Event",
                             "id_header_name": "Webhook-Id",
                             "timestamp_header_name": "Webhook-Timestamp",

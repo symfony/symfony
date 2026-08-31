@@ -95,6 +95,33 @@ class AddressTest extends TestCase
         yield 'control char in domain' => ["foo@example\x01.com"];
     }
 
+    /**
+     * @dataProvider provideNamesWithControlCharacters
+     */
+    public function testConstructorStripsControlCharactersFromName(string $name)
+    {
+        $a = new Address('fabien@symfony.com', $name);
+        $this->assertSame('ab', $a->getName());
+        $this->assertSame('"ab" <fabien@symfony.com>', $a->toString());
+    }
+
+    public function testConstructorKeepsTheOnlyControlCharacterLegalInAPhrase()
+    {
+        $a = new Address('fabien@symfony.com', "Jean\tDupont");
+        $this->assertSame("Jean\tDupont", $a->getName());
+    }
+
+    public static function provideNamesWithControlCharacters(): iterable
+    {
+        yield 'NUL byte' => ["a\x00b"];
+        yield 'SOH (0x01)' => ["a\x01b"];
+        yield 'LF' => ["a\nb"];
+        yield 'CR' => ["a\rb"];
+        yield 'VT (0x0B)' => ["a\x0Bb"];
+        yield 'US (0x1F)' => ["a\x1Fb"];
+        yield 'DEL (0x7F)' => ["a\x7Fb"];
+    }
+
     public function testCreate()
     {
         $this->assertSame($a = new Address('fabien@symfony.com'), Address::create($a));

@@ -12,8 +12,10 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -34,22 +36,7 @@ class LoginThrottlingListenerTest extends TestCase
     protected function setUp(): void
     {
         $this->requestStack = new RequestStack();
-
-        $localLimiter = new RateLimiterFactory([
-            'id' => 'login',
-            'policy' => 'fixed_window',
-            'limit' => 3,
-            'interval' => '1 minute',
-        ], new InMemoryStorage());
-        $globalLimiter = new RateLimiterFactory([
-            'id' => 'login',
-            'policy' => 'fixed_window',
-            'limit' => 6,
-            'interval' => '1 minute',
-        ], new InMemoryStorage());
-        $limiter = new DefaultLoginRateLimiter($globalLimiter, $localLimiter, '$3cre7');
-
-        $this->listener = new LoginThrottlingListener($this->requestStack, $limiter);
+        $this->listener = new LoginThrottlingListener($this->requestStack, $this->createLimiter());
     }
 
     public function testPreventsLoginWhenOverLocalThreshold()
@@ -100,6 +87,58 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
+    public function testDispatchesRateLimitExceededEventWhenThrottled()
+    {
+        if (!class_exists(RateLimitExceededEvent::class)) {
+            $this->markTestSkipped('The installed "symfony/rate-limiter" does not provide RateLimitExceededEvent.');
+        }
+
+        $passport = $this->createPassport('wouter');
+
+        $this->requestStack->push($this->createRequest());
+
+        $dispatcher = new EventDispatcher();
+
+        $dispatchedEvent = null;
+        $dispatcher->addListener(RateLimitExceededEvent::class, static function (RateLimitExceededEvent $event) use (&$dispatchedEvent) {
+            $dispatchedEvent = $event;
+        });
+
+        $listener = new LoginThrottlingListener($this->requestStack, $this->createLimiter(), $dispatcher);
+
+        for ($i = 0; $i < 3; ++$i) {
+            $listener->checkPassport($this->createCheckPassportEvent($passport));
+            $listener->onFailedLogin($this->createLoginFailedEvent($passport));
+        }
+
+        try {
+            $listener->checkPassport($this->createCheckPassportEvent($passport));
+            $this->fail('Expected TooManyLoginAttemptsAuthenticationException');
+        } catch (TooManyLoginAttemptsAuthenticationException) {
+        }
+
+        $this->assertInstanceOf(RateLimitExceededEvent::class, $dispatchedEvent);
+        $this->assertNull($dispatchedEvent->getLimiterName());
+        $this->assertSame('wouter-192.168.1.0', $dispatchedEvent->getKey());
+    }
+
+    public function testAcceptedDoesNotDispatchRateLimitExceededEvent()
+    {
+        $this->requestStack->push($this->createRequest());
+
+        $dispatched = [];
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(RateLimitExceededEvent::class, static function ($event) use (&$dispatched) {
+            $dispatched[] = $event;
+        });
+
+        $listener = new LoginThrottlingListener($this->requestStack, $this->createLimiter(), $dispatcher);
+
+        $listener->checkPassport($this->createCheckPassportEvent($this->createPassport('wouter')));
+
+        $this->assertSame([], $dispatched);
+    }
+
     private function createPassport($username)
     {
         return new SelfValidatingPassport(new UserBadge($username));
@@ -121,5 +160,23 @@ class LoginThrottlingListenerTest extends TestCase
         $request->server->set('REMOTE_ADDR', $ip);
 
         return $request;
+    }
+
+    private function createLimiter(): DefaultLoginRateLimiter
+    {
+        $localLimiter = new RateLimiterFactory([
+            'id' => 'login',
+            'policy' => 'fixed_window',
+            'limit' => 3,
+            'interval' => '1 minute',
+        ], new InMemoryStorage());
+        $globalLimiter = new RateLimiterFactory([
+            'id' => 'login',
+            'policy' => 'fixed_window',
+            'limit' => 6,
+            'interval' => '1 minute',
+        ], new InMemoryStorage());
+
+        return new DefaultLoginRateLimiter($globalLimiter, $localLimiter, '$3cre7');
     }
 }

@@ -18,7 +18,9 @@ while (!@file_exists($parent.'/vendor/autoload.php')) {
 
 require $parent.'/vendor/autoload.php';
 
-error_reporting(-1);
+// deprecations are not part of what these fixtures assert, and dependencies
+// resolved to old versions emit some of them on recent PHP versions
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED);
 ini_set('html_errors', 0);
 ini_set('display_errors', 1);
 

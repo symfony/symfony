@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Bridge\Azure\RemoteEvent\AzurePayloadConverter;
 use Symfony\Component\Mailer\Bridge\Azure\Webhook\AzureRequestParser;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 class AzureSecretRequestParserTest extends TestCase
@@ -25,6 +26,14 @@ class AzureSecretRequestParserTest extends TestCase
         $this->expectExceptionMessage('Invalid secret.');
 
         $this->parse(Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '[]'), 'the-secret');
+    }
+
+    public function testAnEmptySecretIsRejected()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('A non-empty secret is required.');
+
+        $this->parse(Request::create('/', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json'], '[]'), '');
     }
 
     public function testRequestWithAWrongSecretIsRejected()

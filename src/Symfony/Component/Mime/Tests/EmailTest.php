@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Group;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
@@ -179,6 +180,27 @@ class EmailTest extends TestCase
         $e->replyTo('lucas@symfony.com');
         $e->replyTo($caramel);
         $this->assertSame([$caramel], $e->getReplyTo());
+    }
+
+    public function testToWithAnEmptyGroup()
+    {
+        $e = (new Email())->from('fabien@symfony.com')->bcc('helene@symfony.com')->text('content');
+        $e->getHeaders()->addMailboxListHeader('To', [$group = new Group('undisclosed-recipients')]);
+
+        $this->assertSame([], $e->getTo());
+        $this->assertSame([$group], $e->getHeaders()->get('To')->getAddressList());
+        $this->assertSame('To: undisclosed-recipients:;', $e->getHeaders()->get('To')->toString());
+
+        $e->ensureValidity();
+    }
+
+    public function testGetToFlattensTheGroups()
+    {
+        $e = (new Email())->from('fabien@symfony.com');
+        $e->getHeaders()->addMailboxListHeader('To', [new Group('Board', [$chair = new Address('chair@symfony.com')]), $observer = new Address('observer@symfony.com')]);
+
+        $this->assertSame([$chair, $observer], $e->getTo());
+        $this->assertSame('To: Board: chair@symfony.com;, observer@symfony.com', $e->getHeaders()->get('To')->toString());
     }
 
     public function testTo()

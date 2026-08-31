@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Group;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 
 class MailboxListHeaderTest extends TestCase
@@ -137,5 +138,62 @@ class MailboxListHeaderTest extends TestCase
     {
         $header = new MailboxListHeader('To', [new Address('chris@example.org', "Chris\x00Corbyn")]);
         $this->assertEquals('To: ChrisCorbyn <chris@example.org>', $header->toString());
+    }
+
+    public function testToStringWithAGroup()
+    {
+        $header = new MailboxListHeader('To', [new Group('Friends', [new Address('chris@example.org'), new Address('mark@example.org', 'Mark Corbyn')])]);
+        $this->assertEquals('To: Friends: chris@example.org, Mark Corbyn <mark@example.org>;', $header->toString());
+    }
+
+    public function testToStringWithAnEmptyGroup()
+    {
+        $header = new MailboxListHeader('To', [new Group('undisclosed-recipients')]);
+        $this->assertEquals('To: undisclosed-recipients:;', $header->toString());
+    }
+
+    public function testToStringWithAGroupAndAMailbox()
+    {
+        $header = new MailboxListHeader('To', [new Address('chris@example.org'), new Group('Friends', [new Address('mark@example.org')])]);
+        $this->assertEquals('To: chris@example.org, Friends: mark@example.org;', $header->toString());
+    }
+
+    public function testGroupNameIsEncodedIfNonAscii()
+    {
+        $header = new MailboxListHeader('To', [new Group('Câlins', [new Address('chris@example.org')])]);
+        $this->assertEquals('To: =?utf-8?Q?C=C3=A2lins?=: chris@example.org;', $header->toString());
+    }
+
+    public function testGroupNameIsQuotedIfItHasSpecials()
+    {
+        $header = new MailboxListHeader('To', [new Group('a:b;c', [new Address('chris@example.org')])]);
+        $this->assertEquals('To: "a:b;c": chris@example.org;', $header->toString());
+    }
+
+    public function testGetAddressesFlattensGroups()
+    {
+        $chris = new Address('chris@example.org');
+        $mark = new Address('mark@example.org');
+        $header = new MailboxListHeader('To', [$chris, $friends = new Group('Friends', [$mark]), $undisclosed = new Group('undisclosed-recipients')]);
+
+        $this->assertSame([$chris, $mark], $header->getAddresses());
+        $this->assertSame([$chris, $mark], $header->getBody());
+        $this->assertSame([$chris, $friends, $undisclosed], $header->getAddressList());
+    }
+
+    public function testCreateAddressList()
+    {
+        $list = MailboxListHeader::createAddressList(['chris@example.org', $mark = new Address('mark@example.org'), $friends = new Group('Friends')]);
+
+        $this->assertEquals([new Address('chris@example.org'), $mark, $friends], $list);
+    }
+
+    public function testAddAddressAcceptsAGroup()
+    {
+        $header = new MailboxListHeader('To', []);
+        $header->addAddress($chris = new Address('chris@example.org'));
+        $header->addAddress($group = new Group('Friends', [new Address('mark@example.org')]));
+
+        $this->assertSame([$chris, $group], $header->getAddressList());
     }
 }

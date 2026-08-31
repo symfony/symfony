@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Group;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -125,6 +126,47 @@ class MessageTest extends TestCase
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com', 'lucas@symfony.com']);
         $message->getHeaders()->addMailboxHeader('Sender', 'thomas@symfony.com');
         $this->assertEquals('thomas@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
+    }
+
+    public function testGetPreparedHeadersCountsTheMailboxesOfAGroupInFrom()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new Group('Friends', ['fabien@symfony.com'])]);
+        $this->assertNull($message->getPreparedHeaders()->get('Sender'));
+
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new Group('Friends', ['fabien@symfony.com', 'lucas@symfony.com'])]);
+        $this->assertEquals('fabien@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
+    }
+
+    public function testGetPreparedHeadersWithAnEmptyGroupInFromAndASender()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new Group('Automated System')]);
+        $message->getHeaders()->addMailboxHeader('Sender', 'robot@symfony.com');
+        $headers = $message->getPreparedHeaders();
+
+        $this->assertSame('From: Automated System:;', $headers->get('From')->toString());
+        $this->assertSame('Sender: robot@symfony.com', $headers->get('Sender')->toString());
+        $this->assertStringEndsWith('@symfony.com>', $headers->get('Message-ID')->toString());
+    }
+
+    public function testGenerateMessageIdWithAGroupInFrom()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new Group('Friends', ['fabien@symfony.com'])]);
+        $this->assertStringEndsWith('@symfony.com', $message->generateMessageId());
+    }
+
+    public function testGenerateMessageIdThrowsWhenFromOnlyHasAnEmptyGroup()
+    {
+        $message = new Message();
+        $message->getHeaders()->addMailboxListHeader('From', [new Group('undisclosed-recipients')]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('A "From" header must have at least one email address.');
+
+        $message->generateMessageId();
     }
 
     public function testGenerateMessageIdThrowsWhenHasFromButNoAddresses()

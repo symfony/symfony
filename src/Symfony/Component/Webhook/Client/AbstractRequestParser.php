@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Webhook\Client;
 
+use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,11 @@ abstract class AbstractRequestParser implements RequestParserInterface
     {
         $this->validate($request);
 
-        return $this->doParse($request, $secret);
+        try {
+            return $this->doParse($request, $secret);
+        } catch (RequestExceptionInterface $e) {
+            throw new RejectWebhookException(406, 'Request body is malformed.', $e);
+        }
     }
 
     public function createSuccessfulResponse(?Request $request = null): Response

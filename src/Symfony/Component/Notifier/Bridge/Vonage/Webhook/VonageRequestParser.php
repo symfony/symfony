@@ -43,7 +43,11 @@ final class VonageRequestParser extends AbstractRequestParser
         if (!$request->headers->has('Authorization')) {
             throw new RejectWebhookException(406, 'Missing "Authorization" header.');
         }
-        $this->validateSignature(substr($request->headers->get('Authorization'), \strlen('Bearer ')), $secret);
+        $claims = $this->validateSignature(substr($request->headers->get('Authorization'), \strlen('Bearer ')), $secret);
+
+        if (!\is_string($claims['payload_hash'] ?? null) || !hash_equals(hash('sha256', $request->getContent()), $claims['payload_hash'])) {
+            throw new RejectWebhookException(406, 'Payload hash is wrong.');
+        }
 
         // Statuses: https://developer.vonage.com/en/api/messages-olympus#message-status
         $payload = $request->toArray();
@@ -77,7 +81,7 @@ final class VonageRequestParser extends AbstractRequestParser
         return $event;
     }
 
-    private function validateSignature(string $jwt, #[\SensitiveParameter] string $secret): void
+    private function validateSignature(string $jwt, #[\SensitiveParameter] string $secret): array
     {
         $tokenParts = explode('.', $jwt);
         if (3 !== \count($tokenParts)) {
@@ -91,9 +95,15 @@ final class VonageRequestParser extends AbstractRequestParser
         }
 
         $claims = json_decode(base64_decode(strtr($payload, '-_', '+/')), true);
+        if (!\is_array($claims)) {
+            throw new RejectWebhookException(406, 'Signature is wrong.');
+        }
+
         if (abs(time() - (int) ($claims['iat'] ?? 0)) > self::TIMESTAMP_TOLERANCE) {
             throw new RejectWebhookException(406, 'Timestamp is outside the allowed time window.');
         }
+
+        return $claims;
     }
 
     private function base64EncodeUrl(string $string): string

@@ -132,4 +132,10 @@ class MailboxListHeaderTest extends TestCase
         $header = new MailboxListHeader('From', [new Address('chris@example.org', 'Chris Corbyn'), new Address('mark@example.org', 'Mark Corbyn')]);
         $this->assertEquals('From: Chris Corbyn <chris@example.org>, Mark Corbyn <mark@example.org>', $header->toString());
     }
+
+    public function testToStringNeverEmitsControlCharactersFromTheName()
+    {
+        $header = new MailboxListHeader('To', [new Address('chris@example.org', "Chris\x00Corbyn")]);
+        $this->assertEquals('To: ChrisCorbyn <chris@example.org>', $header->toString());
+    }
 }

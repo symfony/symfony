@@ -154,6 +154,30 @@ class RedisReceiverTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
+    public function testItIgnoresAMessageFieldThatDoesNotDecodeToAnArray()
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([['id' => '1', 'data' => ['message' => '12345']]]);
+
+        $receiver = new RedisReceiver($connection, new PhpSerializer());
+
+        $this->assertSame([], $receiver->get());
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([['id' => '2', 'data' => ['message' => '"a string"']]]);
+
+        $receiver = new RedisReceiver($connection, new PhpSerializer());
+
+        $this->assertSame([], $receiver->get());
+
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([['id' => '3', 'data' => ['message' => 'false']]]);
+
+        $receiver = new RedisReceiver($connection, new PhpSerializer());
+
+        $this->assertSame([], $receiver->get());
+    }
+
     public static function redisEnvelopeProvider(): \Generator
     {
         yield [

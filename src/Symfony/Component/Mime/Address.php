@@ -54,7 +54,7 @@ final class Address
         self::$validator ??= new EmailValidator();
 
         $this->address = trim($address);
-        $this->name = trim(str_replace(["\n", "\r"], '', $name));
+        $this->name = trim(preg_replace('/[\x00-\x08\x0A-\x1F\x7F]/', '', $name));
 
         if (preg_match('/[\x00-\x1F\x7F]/', $this->address)) {
             throw new InvalidArgumentException('Email address contains control characters.');
@@ -156,7 +156,9 @@ final class Address
             return false;
         }
 
-        if (substr_count($address, '@') < 2) {
+        // an address that already complies with the addr-spec needs no further check: the extra
+        // "@" then belongs to the domain, e.g. inside a domain-literal (RFC 5322, 3.4.1)
+        if (substr_count($address, '@') < 2 || self::$validator->isValid($address, new RFCValidation())) {
             return true;
         }
 

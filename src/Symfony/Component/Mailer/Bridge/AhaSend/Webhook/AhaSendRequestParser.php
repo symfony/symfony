@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\AhaSend\RemoteEvent\AhaSendPayloadConverter;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
@@ -41,7 +42,10 @@ final class AhaSendRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): ?AbstractMailerEvent
     {
-        $payload = $request->toArray();
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
+
         $eventID = $request->headers->get('webhook-id');
         $signature = $request->headers->get('webhook-signature');
         $timestamp = $request->headers->get('webhook-timestamp');
@@ -58,6 +62,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
         if (!hash_equals($expectedSignature, $signature)) {
             throw new RejectWebhookException(406, 'Invalid signature');
         }
+        $payload = $request->toArray();
         if (!isset($payload['type']) || !isset($payload['timestamp']) || !(isset($payload['data']))) {
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
@@ -69,7 +74,7 @@ final class AhaSendRequestParser extends AbstractRequestParser
         }
     }
 
-    private function sign(string $eventID, string $timestamp, string $payload, $secret): string
+    private function sign(string $eventID, string $timestamp, string $payload, #[\SensitiveParameter] string $secret): string
     {
         $signaturePayload = "{$eventID}.{$timestamp}.{$payload}";
         $hash = hash_hmac('sha256', $signaturePayload, $secret);

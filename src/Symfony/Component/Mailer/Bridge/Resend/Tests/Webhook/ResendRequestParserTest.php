@@ -108,4 +108,15 @@ class ResendRequestParserTest extends AbstractRequestParserTestCase
         $this->expectExceptionMessage('Request does not match.');
         $this->createRequestParser()->parse($request, $this->getSecret());
     }
+
+    public function testRejectForgedSignatureBeforeParsingThePayload()
+    {
+        $request = $this->createRequest('1');
+        $request->headers->set('svix-signature', 'v1,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=');
+
+        $this->expectException(RejectWebhookException::class);
+        $this->expectExceptionMessage('No signatures found matching the expected signature.');
+
+        $this->createRequestParser()->parse($request, $this->getSecret());
+    }
 }

@@ -50,4 +50,13 @@ class PathRequestMatcherTest extends TestCase
         $request = Request::create('/admin/fo%20o');
         $this->assertTrue($matcher->matches($request));
     }
+
+    public function testWithEncodedControlCharacters()
+    {
+        $request = Request::create('/admin/fo%0Ao');
+
+        $this->assertTrue((new PathRequestMatcher('^.*$'))->matches($request));
+        $this->assertTrue((new PathRequestMatcher('^/.*$'))->matches($request));
+        $this->assertTrue((new PathRequestMatcher('^/admin/.*$'))->matches($request));
+    }
 }

@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
 use Symfony\Component\Mailer\Bridge\Mailtrap\RemoteEvent\MailtrapPayloadConverter;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
 use Symfony\Component\RemoteEvent\RemoteEvent;
 use Symfony\Component\Webhook\Client\AbstractRequestParser;
@@ -42,14 +43,16 @@ final class MailtrapRequestParser extends AbstractRequestParser
 
     protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null
     {
-        if ($secret) {
-            if (!$signature = $request->headers->get('Mailtrap-Signature')) {
-                throw new RejectWebhookException(406, 'Signature is required.');
-            }
+        if (!$secret) {
+            throw new InvalidArgumentException('A non-empty secret is required.');
+        }
 
-            if (!hash_equals(hash_hmac('sha256', $request->getContent(), $secret), $signature)) {
-                throw new RejectWebhookException(406, 'Signature is wrong.');
-            }
+        if (!$signature = $request->headers->get('Mailtrap-Signature')) {
+            throw new RejectWebhookException(406, 'Signature is required.');
+        }
+
+        if (!hash_equals(hash_hmac('sha256', $request->getContent(), $secret), $signature)) {
+            throw new RejectWebhookException(406, 'Signature is wrong.');
         }
 
         $payload = $request->toArray();

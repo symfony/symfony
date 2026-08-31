@@ -36,4 +36,9 @@ class SweegoWrongSignatureRequestParserTest extends AbstractRequestParserTestCas
             'HTTP_webhook-signature' => 'wrong_signature',
         ], $payload);
     }
+
+    protected function getSecret(): string
+    {
+        return 'GvLY88Uyj70jQm3fUwYyWmAaiz98wWim';
+    }
 }

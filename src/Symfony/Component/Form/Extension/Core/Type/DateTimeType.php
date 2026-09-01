@@ -49,6 +49,27 @@ class DateTimeType extends AbstractType
         \IntlDateFormatter::SHORT,
     ];
 
+    private const UTC_EQUIVALENT_TIMEZONES = [
+        '+00:00',
+        'Etc/GMT',
+        'Etc/GMT+0',
+        'Etc/GMT-0',
+        'Etc/GMT0',
+        'Etc/Greenwich',
+        'Etc/UCT',
+        'Etc/UTC',
+        'Etc/Universal',
+        'Etc/Zulu',
+        'GMT',
+        'GMT0',
+        'Greenwich',
+        'UCT',
+        'UTC',
+        'Universal',
+        'Z',
+        'Zulu',
+    ];
+
     /**
      * @return void
      */
@@ -205,9 +226,11 @@ class DateTimeType extends AbstractType
                     return;
                 }
 
-                if ($date->getTimezone()->getName() !== $options['model_timezone']) {
-                    trigger_deprecation('symfony/form', '6.4', \sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is deprecated.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
-                    // throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', $date::class, $date->getTimezone()->getName(), $options['model_timezone']));
+                $timezone = $date->getTimezone()->getName();
+
+                if ($timezone !== $options['model_timezone'] && !(\in_array($timezone, self::UTC_EQUIVALENT_TIMEZONES, true) && \in_array($options['model_timezone'], self::UTC_EQUIVALENT_TIMEZONES, true))) {
+                    trigger_deprecation('symfony/form', '6.4', \sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is deprecated.', $date::class, $timezone, $options['model_timezone']));
+                    // throw new LogicException(sprintf('Using a "%s" instance with a timezone ("%s") not matching the configured model timezone "%s" is not supported.', $date::class, $timezone, $options['model_timezone']));
                 }
             });
         }

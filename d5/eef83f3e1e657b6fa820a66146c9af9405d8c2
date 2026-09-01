@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-01T06:47:50Z
+
+Thank you @ousamabenyounes for working on this. The fix is correct, I verified it (the two new tests fail with the reported exception when the source change is reverted). I reworked the PR while reviewing:
+
+- `DateType` and `TimeType` have the same check with the same behavior. I verified that a `DateTime` in `+00:00` with `model_timezone: UTC` also throws there. The fix now covers the three types, with the same tests for each.
+- Retargeted to 6.4: the name-only comparison was introduced there by #46426 as a deprecation, so 6.4 users get a wrong deprecation for UTC-equivalent timezones. The fix belongs to the oldest affected maintained branch and will be merged up to the branches that throw.
+- Merged the two constant lists into one and removed the `getOffset()` check and the `new \DateTimeZone()` call: every name in the list has a fixed zero offset by definition, so the offset check cannot fail, and building a `DateTimeZone` from the option string could replace the explicit exception with a "bad timezone" one when `model_timezone` is invalid. The check is now a pure name comparison.
+- Replaced `GB`, `Eire` and `Atlantic/Faeroe` in the tests with `Europe/London` and `Africa/Abidjan`: those three are tzdata backward links that do not exist on every PHP build; `new \DateTimeZone('GB')` throws "Unknown or bad timezone" on builds using the bundled timezone db, and the tests errored on my machine while passing on CI. `Africa/Abidjan` also covers a regional zone at offset zero all year round.
+
+For the merge up to 7.4: the guard keeps the new condition but throws, and the two "regional timezone" tests become `expectException` tests instead of `@group legacy` + `expectDeprecation`. I validated that resolution against 7.4 with a green Form suite.

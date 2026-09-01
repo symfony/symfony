@@ -1719,6 +1719,12 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNotEmpty($nonExistingDirectories, 'FrameworkBundle should pass non existing directories to Translator');
 
         $this->assertSame('Fixtures/translations', $options['cache_vary']['scanned_directories'][3]);
+
+        $this->assertSame(
+            [__DIR__.'/Fixtures/translations', __DIR__.'/translations'],
+            $container->getParameterBag()->resolveValue($container->getDefinition('console.command.translation_xliff_update_sources')->getArgument(3)),
+            '->registerTranslatorConfiguration() passes only app-owned paths to the XLIFF source updater'
+        );
     }
 
     public function testTranslatorProvidersMergedEnabledLocales()

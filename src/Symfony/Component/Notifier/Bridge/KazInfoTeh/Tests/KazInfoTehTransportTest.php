@@ -20,6 +20,7 @@ use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Component\Notifier\Transport\TransportInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 /**
  * @author Egor Taranov <dev@taranovegor.com>
@@ -46,6 +47,19 @@ final class KazInfoTehTransportTest extends TransportTestCase
         yield [new SmsMessage('420000000000', 'KazInfoTeh!')];
 
         yield [new DummyMessage()];
+    }
+
+    public function testSendUsesHttpsEndpoint()
+    {
+        $client = new MockHttpClient(static function (string $method, string $url): ResponseInterface {
+            self::assertSame('POST', $method);
+            self::assertStringStartsWith('https://kazinfoteh.org:9507/api?', $url);
+
+            return new MockResponse('<?xml version="1.0" encoding="utf-8" ?><acceptreport><statuscode>0</statuscode></acceptreport>');
+        });
+        $transport = new KazInfoTehTransport('username', 'password', 'sender', $client);
+
+        $transport->send(new SmsMessage('77000000000', 'Hello!'));
     }
 
     public function createClient(int $statusCode, string $content): HttpClientInterface

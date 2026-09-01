@@ -60,7 +60,7 @@ class KazInfoTehTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('http://%s/api', $this->getEndpoint());
+        $endpoint = \sprintf('https://%s/api', $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'query' => [
                 'action' => 'sendmessage',

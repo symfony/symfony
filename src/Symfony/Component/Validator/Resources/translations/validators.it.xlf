@@ -572,11 +572,11 @@
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">L'entità referenziata non esiste.</target>
+                <target>L'entità referenziata non esiste.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Questo valore non è un ULID valido.</target>
+                <target>Questo valore non è un ULID valido.</target>
             </trans-unit>
         </body>
     </file>

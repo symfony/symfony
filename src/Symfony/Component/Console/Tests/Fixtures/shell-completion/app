@@ -1,0 +1,87 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+foreach ([__DIR__.'/../../../vendor/autoload.php', __DIR__.'/../../../../../../../vendor/autoload.php'] as $autoload) {
+    if (file_exists($autoload)) {
+        require $autoload;
+
+        break;
+    }
+}
+
+if (!class_exists(Application::class)) {
+    fwrite(\STDERR, "Cannot find the Composer autoloader, run \"composer install\" in the Console component.\n");
+    exit(1);
+}
+
+$hello = (new Command('demo:hello'))
+    ->setDescription('Greets somebody')
+    ->addArgument('name', InputArgument::OPTIONAL, 'Who to greet', null, [
+        'alice',
+        'bob',
+        'bob smith',
+        'ns:member',
+        'App\Entity\User',
+    ])
+    ->addOption('format', 'f', InputOption::VALUE_REQUIRED, 'Output format', null, ['json', 'xml', 'yaml'])
+    ->addOption('env', 'e', InputOption::VALUE_REQUIRED, 'The environment', null, ['dev', 'prod', 'test'])
+    ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not write anything')
+;
+$hello->setCode(function (InputInterface $input, OutputInterface $output) {
+    $output->writeln(sprintf('Hello %s', $input->getArgument('name') ?? 'world'));
+
+    return Command::SUCCESS;
+});
+
+// values containing characters that have a meaning for the shells
+$special = (new Command('demo:special'))
+    ->setDescription('Suggests values needing an escaping')
+    ->addArgument('value', InputArgument::OPTIONAL, 'A value', null, [
+        'x/y',
+        'x$y',
+        'x y',
+        'x"y',
+        "x'y",
+        'x`y',
+        'x*y',
+        'x&y',
+        'x\\y',
+        'x(y)',
+        'x!y',
+        'x#y',
+        'x=y',
+    ])
+    ->addOption('value', null, InputOption::VALUE_REQUIRED, 'A value', null, [
+        'y/z',
+        'y$z',
+        'y z',
+        'y"z',
+        "y'z",
+    ])
+;
+$special->setCode(fn () => Command::SUCCESS);
+
+$other = (new Command('demo:other'))->setDescription('Another command');
+$other->setCode(fn () => Command::SUCCESS);
+
+$app = new Application('app', '1.0.0');
+$app->add($hello);
+$app->add($special);
+$app->add($other);
+$app->run();

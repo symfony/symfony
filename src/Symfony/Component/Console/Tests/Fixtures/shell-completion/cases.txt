@@ -1,0 +1,78 @@
+# Test cases for the shell completion scripts.
+#
+# Format: <shells>|<command line, cursor is at the end>|<expected suggestions, separated by ";">
+#
+# <shells> is either "all" or a comma separated list of shells (bash, zsh, fish).
+# Suggestions are compared as sorted logical values: descriptions are stripped and
+# shell escaping is undone by the drivers.
+#
+# In bash, ":" is part of COMP_WORDBREAKS, so the completion script trims what is
+# before the last colon of the word being completed (__ltrim_colon_completions).
+# Readline puts it back, which is why the expectations differ for bash.
+
+# command names
+zsh,fish|app demo:|demo:hello;demo:other;demo:special
+bash|app demo:|hello;other;special
+zsh,fish|app demo:h|demo:hello
+bash|app demo:h|hello
+
+# global option names
+all|app --|--ansi;--help;--no-ansi;--no-interaction;--quiet;--verbose;--version
+
+# the application called through a path instead of a name (%app% is replaced by
+# the absolute path of the fixture)
+zsh,fish|%app% demo:|demo:hello;demo:other;demo:special
+bash|%app% demo:|hello;other;special
+
+# option names
+all|app demo:hello --d|--dry-run
+all|app demo:hello --f|--format
+
+# option values
+all|app demo:hello --format |json;xml;yaml
+all|app demo:hello --format x|xml
+all|app demo:hello -f |json;xml;yaml
+# the "--option=value" form: bash and fish complete the whole word, so the
+# suggestions keep the option, while zsh only completes the value (_describe -P)
+bash,fish|app demo:hello --format=j|--format=json
+zsh|app demo:hello --format=j|json
+bash,fish|app demo:hello --env=|--env=dev;--env=prod;--env=test
+zsh|app demo:hello --env=|dev;prod;test
+# the option is only prepended while the cursor is inside the "--option=value" token
+all|app demo:hello --format=json alic|alice
+
+# argument values
+all|app demo:hello |App\Entity\User;alice;bob;bob smith;ns:member
+bash,zsh|app demo:hello a|alice
+# fish matches anywhere in the value, "a" also matches "App\Entity\User"
+fish|app demo:hello a|App\Entity\User;alice
+
+# values containing a space
+all|app demo:hello b|bob;bob smith
+
+# values containing a colon
+all|app demo:hello ns|ns:member
+zsh,fish|app demo:hello ns:|ns:member
+bash|app demo:hello ns:|member
+
+# values containing a backslash (FQCN)
+all|app demo:hello App|App\Entity\User
+
+# quoted values
+all|app demo:hello 'b|bob;bob smith
+all|app demo:hello "b|bob;bob smith
+
+# option after an argument, and flag without value followed by an argument
+all|app demo:hello alice --format |json;xml;yaml
+bash,zsh|app demo:hello --dry-run a|alice
+fish|app demo:hello --dry-run a|App\Entity\User;alice
+
+# values containing characters that are special for the shells. ";" cannot be
+# used here, it is the separator of the expectations.
+all|app demo:special x|x/y;x$y;x y;x"y;x'y;x`y;x*y;x&y;x\y;x(y);x!y;x#y;x=y
+all|app demo:special |x/y;x$y;x y;x"y;x'y;x`y;x*y;x&y;x\y;x(y);x!y;x#y;x=y
+all|app demo:special --value |y/z;y$z;y z;y"z;y'z
+bash,fish|app demo:special --value=y|--value=y/z;--value=y$z;--value=y z;--value=y"z;--value=y'z
+zsh|app demo:special --value=y|y/z;y$z;y z;y"z;y'z
+all|app demo:special 'x|x/y;x$y;x y;x"y;x'y;x`y;x*y;x&y;x\y;x(y);x!y;x#y;x=y
+all|app demo:special "x|x/y;x$y;x y;x"y;x'y;x`y;x*y;x&y;x\y;x(y);x!y;x#y;x=y

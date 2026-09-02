@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T12:16:19Z
+
+I amended the last commit: the bash-completion lookup lists in `drivers/bash.sh` and `try.sh` had diverged. The driver only knew the Homebrew 1.x location (`etc/bash_completion`) while `try.sh` only knew the bash-completion@2 shim (`etc/profile.d/bash_completion.sh`), so each setup worked with one script and failed with the other. Both now probe the same list, covering the two Homebrew layouts.

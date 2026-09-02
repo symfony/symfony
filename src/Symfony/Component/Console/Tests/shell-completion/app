@@ -84,7 +84,7 @@ $other = (new Command('demo:other'))->setDescription('Another command');
 $other->setCode(fn () => Command::SUCCESS);
 
 $app = new Application('app', '1.0.0');
-$app->add($hello);
-$app->add($special);
-$app->add($other);
+$app->addCommand($hello);
+$app->addCommand($special);
+$app->addCommand($other);
 $app->run();

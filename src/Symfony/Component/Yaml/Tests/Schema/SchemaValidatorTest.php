@@ -86,6 +86,113 @@ class SchemaValidatorTest extends TestCase
         $this->assertSame(2, $errors[0]['line']);
     }
 
+    public function testErrorLineSkipsSameKeyNestedDeeper()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'second' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'other' => ['type' => 'object', 'properties' => ['target' => ['type' => 'integer']]],
+                        'target' => ['type' => 'integer'],
+                    ],
+                ],
+            ],
+        ]));
+
+        $content = "second:\n    other:\n        target: 1\n    target: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame(4, $errors[0]['line']);
+    }
+
+    public function testErrorLineDoesNotLeaveTheParentBlock()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'first' => ['type' => 'object', 'properties' => ['target' => ['type' => 'string']]],
+                'second' => ['type' => 'object', 'properties' => ['target' => ['type' => 'string']]],
+            ],
+        ]));
+
+        // The invalid value sits in a flow mapping; the same key exists later in another block.
+        $content = "first: { target: 1 }\nsecond:\n    target: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame(1, $errors[0]['line']);
+    }
+
+    public function testErrorLineFollowsSequenceIndices()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'items' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'object', 'properties' => ['name' => ['type' => 'integer']]],
+                ],
+            ],
+        ]));
+
+        $content = "items:\n    - name: 1\n    - name: not-an-integer\n    - name: 3";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame(3, $errors[0]['line']);
+    }
+
+    public function testErrorLineWithSequenceItemsAtTheKeyIndentation()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'list' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'object', 'properties' => ['name' => ['type' => 'integer']]],
+                ],
+            ],
+        ]));
+
+        $content = "list:\n- name: 1\n- name: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame(3, $errors[0]['line']);
+    }
+
+    public function testErrorLineWithSequenceItemOnItsOwnLine()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'list' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'object', 'properties' => ['name' => ['type' => 'integer']]],
+                ],
+            ],
+        ]));
+
+        $content = "list:\n    -\n        name: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertCount(1, $errors);
+        $this->assertSame(3, $errors[0]['line']);
+    }
+
     public function testInvalidUtf8ThrowsRuntimeException()
     {
         // Encoding such a value to JSON fails, and the data must not be silently validated as null.

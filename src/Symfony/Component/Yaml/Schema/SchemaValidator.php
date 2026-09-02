@@ -120,34 +120,140 @@ final class SchemaValidator implements SchemaValidatorInterface
     /**
      * Best-effort resolution of the YAML line for a JSON Schema error path.
      *
-     * The path is a JSON Pointer (for example "/when@prod/framework") or a dotted
-     * property path. The line of the deepest matching key is returned, or 0 when
-     * it cannot be located.
+     * The path is a JSON Pointer (for example "/when@prod/framework" or "/paths/0/name").
+     * Keys are matched at the indentation level of the block they belong to, and numeric
+     * segments follow block sequence items, so a key nested in another block is never
+     * mistaken for the target. The line of the deepest located segment is returned, or 0
+     * when none is located. A value in flow notation resolves to the line where it starts.
      */
     private static function locateLine(string $content, string $path): int
     {
-        $path = str_replace(['~1', '~0'], ['/', '~'], $path);
-        $segments = preg_split('#[/.]#', trim($path, '/.'), -1, \PREG_SPLIT_NO_EMPTY) ?: [];
+        $segments = [];
+        foreach (explode('/', $path) as $segment) {
+            if ('' !== $segment) {
+                $segments[] = str_replace(['~1', '~0'], ['/', '~'], $segment);
+            }
+        }
 
         $lines = explode("\n", $content);
         $line = 0;
-        $offset = 0;
+        $start = 0;
+        $end = \count($lines);
+        $compactItem = false;
 
         foreach ($segments as $segment) {
-            // Array indices in the path do not map to a key in the document.
-            if (ctype_digit($segment)) {
-                continue;
-            }
+            $found = false;
 
-            for ($i = $offset; $i < \count($lines); ++$i) {
-                if (preg_match('/^\s*'.preg_quote($segment, '/').'\s*:/', $lines[$i])) {
+            // A digit can be a sequence index or a mapping key: peek at the block to know.
+            if (ctype_digit($segment) && self::startsWithSequenceItem($lines, $start, $end)) {
+                $remaining = (int) $segment;
+                $itemIndent = null;
+
+                for ($i = $start; $i < $end; ++$i) {
+                    $text = rtrim(ltrim($lines[$i], ' '));
+                    if ('' === $text || '#' === $text[0]) {
+                        continue;
+                    }
+                    $indent = \strlen(rtrim($lines[$i])) - \strlen($text);
+                    $isItem = '-' === $text || str_starts_with($text, '- ');
+
+                    if (null === $itemIndent) {
+                        $itemIndent = $indent;
+                    } elseif ($indent > $itemIndent) {
+                        continue;
+                    } elseif ($indent < $itemIndent || !$isItem) {
+                        break;
+                    }
+
+                    if ($remaining-- > 0) {
+                        continue;
+                    }
+
                     $line = $i + 1;
-                    $offset = $i + 1;
+                    $start = $i;
+                    $end = self::findBlockEnd($lines, $i + 1, $end, $itemIndent, true);
+                    $compactItem = true;
+                    $found = true;
                     break;
                 }
+            } else {
+                $childIndent = null;
+                $pattern = '/^(["\']?)'.preg_quote($segment, '/').'\1\s*:(.*)$/';
+
+                for ($i = $start; $i < $end; ++$i) {
+                    $text = rtrim(ltrim($lines[$i], ' '));
+                    if ($compactItem && $i === $start && ('-' === $text || str_starts_with($text, '- '))) {
+                        // The first key of a sequence item can sit on the "-" line itself.
+                        $text = ltrim(substr($text, 1), ' ');
+                    }
+                    if ('' === $text || '#' === $text[0]) {
+                        continue;
+                    }
+                    $indent = \strlen(rtrim($lines[$i])) - \strlen($text);
+                    $childIndent ??= $indent;
+
+                    if ($indent !== $childIndent || !preg_match($pattern, $text, $matches)) {
+                        continue;
+                    }
+
+                    $line = $i + 1;
+                    $rest = trim($matches[2]);
+                    if ('' !== $rest && '#' !== $rest[0]) {
+                        // The value is inline, a scalar or a flow collection: deeper
+                        // segments cannot be resolved to a more precise line.
+                        return $line;
+                    }
+
+                    $start = $i + 1;
+                    $end = self::findBlockEnd($lines, $i + 1, $end, $childIndent, false);
+                    $compactItem = false;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                break;
             }
         }
 
         return $line;
+    }
+
+    /**
+     * Tells whether the first content line of the range is a block sequence item.
+     */
+    private static function startsWithSequenceItem(array $lines, int $start, int $end): bool
+    {
+        for ($i = $start; $i < $end; ++$i) {
+            $text = rtrim(ltrim($lines[$i], ' '));
+            if ('' !== $text && '#' !== $text[0]) {
+                return '-' === $text || str_starts_with($text, '- ');
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns the exclusive end of the block made of the lines more indented than $indent.
+     *
+     * Sequence items indented exactly at $indent are part of the block when $stopAtItems
+     * is false, which matches the value of a mapping key whose items are not indented.
+     */
+    private static function findBlockEnd(array $lines, int $start, int $end, int $indent, bool $stopAtItems): int
+    {
+        for ($i = $start; $i < $end; ++$i) {
+            $text = rtrim(ltrim($lines[$i], ' '));
+            if ('' === $text || '#' === $text[0]) {
+                continue;
+            }
+            $lineIndent = \strlen(rtrim($lines[$i])) - \strlen($text);
+            if ($lineIndent < $indent || ($lineIndent === $indent && ($stopAtItems || ('-' !== $text && !str_starts_with($text, '- '))))) {
+                return $i;
+            }
+        }
+
+        return $end;
     }
 }

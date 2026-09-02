@@ -32,14 +32,16 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureE
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The token handler decodes and validates the token, and retrieves the user identifier from it.
  */
-final class OidcTokenHandler implements AccessTokenHandlerInterface
+final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterface
 {
     use OidcTrait;
     private ?JWKSet $decryptionKeyset = null;
@@ -54,6 +56,11 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
      * @var HttpClientInterface[]
      */
     private array $discoveryClients = [];
+
+    /**
+     * @var OidcDiscovery[]
+     */
+    private array $discoveries = [];
 
     public function __construct(
         private AlgorithmManager $signatureAlgorithm,
@@ -89,6 +96,15 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
         $this->discoveryClients = \is_array($client) ? $client : [$client];
         $this->oidcConfigurationCacheKey = $oidcConfigurationCacheKey;
         $this->enforceKeyUsageVerification = $enforceKeyUsageVerification;
+
+        // the discovery documents get their own cache entries: $oidcConfigurationCacheKey
+        // keeps holding the JWKS, whose lifetime is driven by the JWKS response headers
+        $discoveries = [];
+        foreach ($this->discoveryClients as $i => $discoveryClient) {
+            // the keys are kept aligned with $discoveryClients, which computeDiscoveryKeys() indexes back into
+            $discoveries[$i] = new OidcDiscovery($discoveryClient, $cache, cacheKey: $oidcConfigurationCacheKey.'.document.'.$i, checkedEndpoints: ['jwks_uri']);
+        }
+        $this->discoveries = $discoveries;
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
@@ -144,27 +160,27 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
      */
     public function computeDiscoveryKeys(ItemInterface $item): array
     {
-        $clients = $this->discoveryClients;
-        if (!$clients) {
+        if (!$this->discoveries) {
             throw new \LogicException('No OIDC discovery client configured.');
         }
         $logger = $this->logger;
         try {
             $discoveredKeys = [];
             $minTtl = null;
-            $configResponses = [];
             $jwkSetResponses = [];
 
-            foreach ($clients as $client) {
-                $configResponses[] = [$client, $client->request('GET', '.well-known/openid-configuration', ['max_redirects' => 0])];
+            // the ".well-known" requests are sent first, so that they travel concurrently:
+            // the responses are lazy, and only consumed by getConfiguration() below
+            foreach ($this->discoveries as $discovery) {
+                $discovery->prefetch();
             }
 
-            foreach ($configResponses as [$client, $response]) {
-                $config = $response->toArray();
+            foreach ($this->discoveries as $i => $discovery) {
+                // the scheme was checked against the URL that served the document before
+                // the configuration was cached, so only the announcement is enforced here
+                $jwksUri = self::checkDiscoveredEndpoint($discovery->getConfiguration()['jwks_uri'] ?? null, 'jwks_uri', null);
 
-                $jwksUri = self::checkDiscoveredEndpoint($config['jwks_uri'] ?? null, 'jwks_uri', $response->getInfo('url'));
-
-                $jwkSetResponses[] = $client->request('GET', $jwksUri);
+                $jwkSetResponses[] = $this->discoveryClients[$i]->request('GET', $jwksUri);
             }
 
             foreach ($jwkSetResponses as $response) {
@@ -329,6 +345,13 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface
             $this->logger?->debug('The token decryption failed. Skipping as not mandatory.');
 
             return $accessToken;
+        }
+    }
+
+    public function reset(): void
+    {
+        foreach ($this->discoveries as $discovery) {
+            $discovery->reset();
         }
     }
 }

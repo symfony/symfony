@@ -24,6 +24,74 @@ class OidcUserTest extends TestCase
         new OidcUser();
     }
 
+    public function testFromClaims()
+    {
+        $user = OidcUser::fromClaims([
+            'sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f',
+            'preferred_username' => 'john.doe',
+            'email' => 'john.doe@example.com',
+            'email_verified' => 'true',
+            'updated_at' => 1669628917,
+            'custom_id' => 12345,
+            'nickname' => '',
+        ]);
+
+        $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $user->getUserIdentifier());
+        $this->assertSame('john.doe', $user->getPreferredUsername());
+        $this->assertSame('john.doe@example.com', $user->getEmail());
+        $this->assertTrue($user->getEmailVerified());
+        $this->assertEquals((new \DateTimeImmutable())->setTimestamp(1669628917), $user->getUpdatedAt());
+        $this->assertNull($user->getNickname());
+        $this->assertSame(['customId' => 12345], $user->getAdditionalClaims());
+        $this->assertSame(['ROLE_USER'], $user->getRoles());
+    }
+
+    public function testFromClaimsGrantsTheRolesItIsGiven()
+    {
+        // this is how a user provider maps the claims of its choice onto roles
+        $user = OidcUser::fromClaims(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f', 'roles' => ['ROLE_ADMIN']]);
+
+        $this->assertSame(['ROLE_ADMIN'], $user->getRoles());
+    }
+
+    public function testFromClaimsIgnoresMistypedClaims()
+    {
+        $user = OidcUser::fromClaims([
+            'sub' => 'valid-sub-123',
+            'name' => ['formatted' => 'John Doe'],
+            'updated_at' => '2024-01-01T00:00:00Z',
+            'address' => 'not-a-struct',
+            'email_verified' => ['yes'],
+            'roles' => 'ROLE_ADMIN',
+        ]);
+
+        $this->assertSame('valid-sub-123', $user->getSub());
+        $this->assertNull($user->getName());
+        $this->assertNull($user->getUpdatedAt());
+        $this->assertNull($user->getAddress());
+        $this->assertNull($user->getEmailVerified());
+        $this->assertSame(['ROLE_USER'], $user->getRoles());
+    }
+
+    public function testFromClaimsAcceptsNumericStringUpdatedAt()
+    {
+        $user = OidcUser::fromClaims([
+            'sub' => 'valid-sub-123',
+            'updated_at' => '1700000000',
+            'custom' => ['a' => 1],
+        ]);
+
+        $this->assertSame(1700000000, $user->getUpdatedAt()?->getTimestamp());
+        $this->assertSame(['custom' => ['a' => 1]], $user->getAdditionalClaims());
+    }
+
+    public function testFromClaimsKeepsTheCalledClass()
+    {
+        $user = TestOidcUser::fromClaims(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f']);
+
+        $this->assertInstanceOf(TestOidcUser::class, $user);
+    }
+
     public function testCreateFullUserWithAdditionalClaimsUsingPositionalParameters()
     {
         $this->assertEquals(new OidcUser(
@@ -171,4 +239,8 @@ class OidcUserTest extends TestCase
             12345
         ));
     }
+}
+
+class TestOidcUser extends OidcUser
+{
 }

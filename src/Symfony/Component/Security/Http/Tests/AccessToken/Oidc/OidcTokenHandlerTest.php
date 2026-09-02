@@ -336,6 +336,45 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertTrue($cache->hasItem('oidc_config'));
     }
 
+    public function testDiscoveryDocumentsOfEveryClientAreRequestedBeforeTheirJwks()
+    {
+        // the responses are lazy, so requesting every ".well-known" document before consuming
+        // any of them is what lets those round trips happen concurrently
+        $requestedUrls = [];
+        $httpClients = [];
+        foreach ([1, 2] as $provider) {
+            $httpClients[] = new MockHttpClient(static function ($method, $url) use (&$requestedUrls, $provider): JsonMockResponse {
+                $requestedUrls[] = $url;
+
+                if (str_contains($url, 'openid-configuration')) {
+                    return new JsonMockResponse(['jwks_uri' => \sprintf('https://provider%d.example.com/jwks.json', $provider)]);
+                }
+
+                return new JsonMockResponse(['keys' => [array_merge((1 === $provider ? self::getJWK() : self::getSecondJWK())->all(), ['use' => 'sig'])]]);
+            }, \sprintf('https://provider%d.example.com/', $provider));
+        }
+
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com']);
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClients, 'oidc_config');
+
+        $time = time();
+        $handler->getUserBadgeFrom(self::buildJWSWithKey(json_encode([
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-from-provider1',
+        ]), self::getJWK()));
+
+        $this->assertSame([
+            'https://provider1.example.com/.well-known/openid-configuration',
+            'https://provider2.example.com/.well-known/openid-configuration',
+            'https://provider1.example.com/jwks.json',
+            'https://provider2.example.com/jwks.json',
+        ], $requestedUrls);
+    }
+
     private static function buildJWSWithKey(string $payload, JWK $jwk): string
     {
         return (new CompactSerializer())->serialize((new JWSBuilder(new AlgorithmManager([
@@ -385,6 +424,51 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(2, $requestCount);
         $this->assertSame('user-cache-control', $handler->getUserBadgeFrom($token)->getUserIdentifier());
         $this->assertSame(2, $requestCount);
+    }
+
+    public function testResetForcesANewDiscoveryOnTheNextAuthentication()
+    {
+        $requestedUrls = [];
+        $httpClient = new MockHttpClient(static function ($method, $url) use (&$requestedUrls): JsonMockResponse {
+            $requestedUrls[] = $url;
+
+            if (str_contains($url, 'openid-configuration')) {
+                return new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']);
+            }
+
+            return new JsonMockResponse(['keys' => [array_merge(self::getJWK()->all(), ['use' => 'sig'])]]);
+        });
+        $countConfigurationRequests = static function () use (&$requestedUrls): int {
+            return \count(array_filter($requestedUrls, static fn (string $url): bool => str_contains($url, 'openid-configuration')));
+        };
+
+        $time = time();
+        $token = self::buildJWS(json_encode([
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-reset',
+        ]));
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(new AlgorithmManager([new ES256()]), null, self::AUDIENCE, ['https://www.example.com']);
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_config');
+
+        $handler->getUserBadgeFrom($token);
+        $this->assertSame(1, $countConfigurationRequests());
+
+        // expired JWKS and document entries alone recompute the keys from the memoized document
+        $cache->deleteItems(['oidc_config', 'oidc_config.document.0']);
+        $handler->getUserBadgeFrom($token);
+        $this->assertSame(1, $countConfigurationRequests());
+
+        // after reset(), recomputing the keys fetches the discovery document again
+        $handler->reset();
+        $cache->deleteItems(['oidc_config', 'oidc_config.document.0']);
+        $handler->getUserBadgeFrom($token);
+        $this->assertSame(2, $countConfigurationRequests());
     }
 
     public function testDiscoveryCachesJwksAccordingToExpires()

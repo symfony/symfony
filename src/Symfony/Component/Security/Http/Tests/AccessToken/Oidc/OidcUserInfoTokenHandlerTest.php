@@ -15,9 +15,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpClient\Response\ResponseStream;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
@@ -175,8 +177,9 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
     public function testDiscoveryIsNotCachedWhenTheDiscoveryUrlIsUnknown()
     {
+        $payload = json_encode(['userinfo_endpoint' => 'https://oidc.example.com/userinfo']);
+
         $configResponse = $this->createStub(ResponseInterface::class);
-        $configResponse->method('toArray')->willReturn(['userinfo_endpoint' => 'https://oidc.example.com/userinfo']);
         $configResponse->method('getInfo')->willReturn(null);
 
         $userInfoResponse = $this->createStub(ResponseInterface::class);
@@ -189,13 +192,57 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
             return '.well-known/openid-configuration' === $url ? $configResponse : $userInfoResponse;
         });
+        $clientMock->method('stream')->willReturnCallback(static fn (ResponseInterface $response) => new ResponseStream((static function () use ($response, $payload) {
+            yield $response => new DataChunk(0, $payload);
+        })()));
 
+        $cache = new ArrayAdapter();
         $handler = new OidcUserInfoTokenHandler($clientMock);
-        $handler->enableDiscovery(new ArrayAdapter(), 'oidc_config');
+        $handler->enableDiscovery($cache, 'oidc_config');
 
         $handler->getUserBadgeFrom('a-secret-token');
         $handler->getUserBadgeFrom('a-secret-token');
 
+        // the instance memoizes the document, so the second authentication does not
+        // re-request it; not knowing the URL that served it still keeps it out of the cache
+        $this->assertFalse($cache->getItem('oidc_config.document')->isHit());
+        $this->assertSame([
+            '.well-known/openid-configuration',
+            'https://oidc.example.com/userinfo',
+            'https://oidc.example.com/userinfo',
+        ], $requestedUrls);
+    }
+
+    public function testResetForcesANewDiscoveryOnTheNextAuthentication()
+    {
+        $payload = json_encode(['userinfo_endpoint' => 'https://oidc.example.com/userinfo']);
+
+        $configResponse = $this->createStub(ResponseInterface::class);
+        $configResponse->method('getInfo')->willReturn(null);
+
+        $userInfoResponse = $this->createStub(ResponseInterface::class);
+        $userInfoResponse->method('toArray')->willReturn(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f']);
+
+        $requestedUrls = [];
+        $clientMock = $this->createStub(HttpClientInterface::class);
+        $clientMock->method('request')->willReturnCallback(static function (string $method, string $url) use (&$requestedUrls, $configResponse, $userInfoResponse) {
+            $requestedUrls[] = $url;
+
+            return '.well-known/openid-configuration' === $url ? $configResponse : $userInfoResponse;
+        });
+        $clientMock->method('stream')->willReturnCallback(static fn (ResponseInterface $response) => new ResponseStream((static function () use ($response, $payload) {
+            yield $response => new DataChunk(0, $payload);
+        })()));
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcUserInfoTokenHandler($clientMock);
+        $handler->enableDiscovery($cache, 'oidc_config');
+
+        $handler->getUserBadgeFrom('a-secret-token');
+        $handler->reset();
+        $handler->getUserBadgeFrom('a-secret-token');
+
+        // After reset(), the next authentication should request the discovery document again
         $this->assertSame([
             '.well-known/openid-configuration',
             'https://oidc.example.com/userinfo',
@@ -204,11 +251,13 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         ], $requestedUrls);
     }
 
-    public function testDiscoveryRefreshesAConfigurationCachedAsRawJson()
+    #[DataProvider('provideLegacyConfigurationCacheEntries')]
+    public function testDiscoveryIgnoresTheEntriesTheReplacedCodeCached(string|array $legacyEntry)
     {
+        // the bare key holds what previous releases cached there, in formats of their
+        // own, unchecked: the document is read and stored under a key of its own instead
         $cache = new ArrayAdapter();
-        // an entry written before the discovered endpoints were checked
-        $cache->get('oidc_config', static fn () => json_encode(['userinfo_endpoint' => 'http://169.254.169.254/latest/meta-data/']));
+        $cache->get('oidc_config', static fn () => $legacyEntry);
 
         $userInfoResponse = new JsonMockResponse(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f']);
         $httpClient = new MockHttpClient([
@@ -223,7 +272,14 @@ class OidcUserInfoTokenHandlerTest extends TestCase
 
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
         $this->assertSame('https://oidc.example.com/userinfo', $userInfoResponse->getRequestUrl());
-        $this->assertIsArray($cache->getItem('oidc_config')->get());
+        $this->assertSame($legacyEntry, $cache->getItem('oidc_config')->get());
+        $this->assertIsArray($cache->getItem('oidc_config.document')->get());
+    }
+
+    public static function provideLegacyConfigurationCacheEntries(): iterable
+    {
+        yield 'the decoded document' => [['userinfo_endpoint' => 'http://169.254.169.254/latest/meta-data/']];
+        yield 'the raw JSON' => [json_encode(['userinfo_endpoint' => 'http://169.254.169.254/latest/meta-data/'])];
     }
 
     public function testDiscoveryRejectsMissingUserInfoEndpoint()

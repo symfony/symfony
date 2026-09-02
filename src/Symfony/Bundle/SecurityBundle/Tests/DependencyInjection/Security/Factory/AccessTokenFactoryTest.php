@@ -178,6 +178,10 @@ class AccessTokenFactoryTest extends TestCase
             'index_7' => 0,
         ];
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
+
+        // Assert that the handler does NOT have the kernel.reset tag when discovery is NOT enabled
+        $tags = $container->getDefinition('security.access_token_handler.firewall1')->getTags();
+        $this->assertArrayNotHasKey('kernel.reset', $tags);
     }
 
     public function testOidcTokenHandlerConfigurationWithEncryption()
@@ -314,6 +318,11 @@ class AccessTokenFactoryTest extends TestCase
         ];
         $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+
+        // Assert that the handler has the kernel.reset tag when discovery is enabled
+        $tags = $container->getDefinition('security.access_token_handler.firewall1')->getTags();
+        $this->assertArrayHasKey('kernel.reset', $tags);
+        $this->assertSame(['method' => 'reset'], $tags['kernel.reset'][0]);
     }
 
     public function testOidcTokenHandlerConfigurationWithMultipleDiscoveryBaseUri()
@@ -373,6 +382,11 @@ class AccessTokenFactoryTest extends TestCase
         ];
         $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+
+        // Assert that the handler has the kernel.reset tag when discovery is enabled
+        $tags = $container->getDefinition('security.access_token_handler.firewall1')->getTags();
+        $this->assertArrayHasKey('kernel.reset', $tags);
+        $this->assertSame(['method' => 'reset'], $tags['kernel.reset'][0]);
     }
 
     #[DataProvider('provideEnforceKeyUsageVerification')]
@@ -487,6 +501,10 @@ class AccessTokenFactoryTest extends TestCase
         }
 
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
+
+        // Assert that the handler does NOT have the kernel.reset tag when discovery is NOT enabled
+        $tags = $container->getDefinition('security.access_token_handler.firewall1')->getTags();
+        $this->assertArrayNotHasKey('kernel.reset', $tags);
     }
 
     public static function getOidcUserInfoConfiguration(): iterable
@@ -535,6 +553,11 @@ class AccessTokenFactoryTest extends TestCase
         ];
         $this->assertEquals($expectedArgs, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
+
+        // Assert that the handler has the kernel.reset tag when discovery is enabled
+        $tags = $container->getDefinition('security.access_token_handler.firewall1')->getTags();
+        $this->assertArrayHasKey('kernel.reset', $tags);
+        $this->assertSame(['method' => 'reset'], $tags['kernel.reset'][0]);
     }
 
     public function testMultipleTokenHandlersSet()

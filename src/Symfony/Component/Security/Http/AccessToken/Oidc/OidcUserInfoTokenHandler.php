@@ -11,25 +11,25 @@
 
 namespace Symfony\Component\Security\Http\AccessToken\Oidc;
 
-use Psr\Cache\CacheItemInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * The token handler validates the token on the OIDC server and retrieves the user identifier.
  */
-final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
+final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface, ResetInterface
 {
     use OidcTrait;
 
-    private ?CacheInterface $discoveryCache = null;
-    private ?string $oidcConfigurationCacheKey = null;
+    private ?OidcDiscovery $discovery = null;
 
     public function __construct(
         private HttpClientInterface $client,
@@ -40,40 +40,24 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
 
     public function enableDiscovery(CacheInterface $cache, string $oidcConfigurationCacheKey): void
     {
-        $this->discoveryCache = $cache;
-        $this->oidcConfigurationCacheKey = $oidcConfigurationCacheKey;
+        // no TTL: the cache pool decides, as it did before this delegated to OidcDiscovery.
+        // ".document" keeps the key clear of the entries previous releases wrote under the
+        // bare one, in formats of their own: they expire with the pool, unread.
+        $this->discovery = new OidcDiscovery($this->client, $cache, cacheTtl: null, cacheKey: $oidcConfigurationCacheKey.'.document', checkedEndpoints: ['userinfo_endpoint']);
     }
 
     public function getUserBadgeFrom(string $accessToken): UserBadge
     {
         $userInfoEndpoint = '';
 
-        if (null !== $this->discoveryCache) {
+        if (null !== $this->discovery) {
             try {
                 // Call OIDC discovery to retrieve userinfo endpoint
                 // OIDC configuration is stored in cache
-                $discover = function (CacheItemInterface $item, bool &$save): array {
-                    $response = $this->client->request('GET', '.well-known/openid-configuration', ['max_redirects' => 0]);
-                    $config = $response->toArray();
-                    $discoveryUrl = $response->getInfo('url');
+                $oidcConfiguration = $this->discovery->getConfiguration();
 
-                    self::checkDiscoveredEndpoint($config['userinfo_endpoint'] ?? null, 'userinfo_endpoint', $discoveryUrl);
-
-                    // A cached configuration does not tell which URL served it, so store only what has been checked against that URL
-                    $save = null !== $discoveryUrl && '' !== $discoveryUrl;
-
-                    return $config;
-                };
-
-                $oidcConfiguration = $this->discoveryCache->get($this->oidcConfigurationCacheKey, $discover);
-
-                if (!\is_array($oidcConfiguration)) {
-                    // Raw JSON was cached before the discovered endpoints were checked, refresh it to get it checked
-                    $this->discoveryCache->delete($this->oidcConfigurationCacheKey);
-                    $oidcConfiguration = $this->discoveryCache->get($this->oidcConfigurationCacheKey, $discover);
-                }
-
-                // The endpoint was checked against the discovery URL before the configuration was stored
+                // The scheme was checked against the URL that served the document before
+                // the configuration was cached, so only the announcement is enforced here
                 $userInfoEndpoint = self::checkDiscoveredEndpoint($oidcConfiguration['userinfo_endpoint'] ?? null, 'userinfo_endpoint', null);
             } catch (\Throwable $e) {
                 $this->logger?->error('An error occurred while requesting OIDC configuration.', [
@@ -110,5 +94,10 @@ final class OidcUserInfoTokenHandler implements AccessTokenHandlerInterface
 
             throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
         }
+    }
+
+    public function reset(): void
+    {
+        $this->discovery?->reset();
     }
 }

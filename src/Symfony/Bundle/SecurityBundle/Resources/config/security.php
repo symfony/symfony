@@ -63,9 +63,10 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 return static function (ContainerConfigurator $container) {
     $container->parameters()
         ->set('security.role_hierarchy.roles', [])
-        // the OIDC login callback route loader is wired on this parameter, which the
-        // "oidc_login" firewall factory fills in; it stays empty when no firewall uses one
+        // the OIDC login route loader is wired on these parameters, which the
+        // "oidc_login" firewall factory fills in; they stay empty when no firewall uses one
         ->set('security.oidc_login.callback_uris', [])
+        ->set('security.oidc_login.start_paths', [])
     ;
 
     $container->services()
@@ -273,6 +274,8 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 '%security.oidc_login.callback_uris%',
                 'security.oidc_login.callback_uris',
+                '%security.oidc_login.start_paths%',
+                'security.oidc_login.start_paths',
             ])
             ->tag('routing.route_loader')
 

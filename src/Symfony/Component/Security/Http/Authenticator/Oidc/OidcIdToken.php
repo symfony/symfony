@@ -85,7 +85,7 @@ final class OidcIdToken
      *
      * @throws AuthenticationException If any claim validation fails
      */
-    public function validateClaims(array $claims, string $expectedIssuer, string $expectedAudience, ?string $expectedNonce = null): void
+    public function validateClaims(array $claims, string $expectedIssuer, string $expectedAudience, ?string $expectedNonce = null, ?int $maxAge = null): void
     {
         if (!class_exists(ClaimCheckerManager::class)) {
             throw new \LogicException('You cannot validate OIDC ID tokens since the "web-token/jwt-library" package is not installed. Try running "composer require web-token/jwt-library".');
@@ -112,6 +112,18 @@ final class OidcIdToken
 
         if (null !== $expectedNonce && (!isset($claims['nonce']) || !hash_equals($expectedNonce, (string) $claims['nonce']))) {
             throw new AuthenticationException('ID token nonce does not match.');
+        }
+
+        if (null === $maxAge) {
+            return;
+        }
+
+        if (!isset($claims['auth_time']) || !is_numeric($claims['auth_time'])) {
+            throw new AuthenticationException('ID token is missing the "auth_time" claim required when "max_age" is requested.');
+        }
+
+        if ($this->clock->now()->getTimestamp() - (int) $claims['auth_time'] > $maxAge + $this->allowedTimeDrift) {
+            throw new AuthenticationException('ID token "auth_time" exceeds the requested "max_age"; re-authentication is required.');
         }
     }
 }

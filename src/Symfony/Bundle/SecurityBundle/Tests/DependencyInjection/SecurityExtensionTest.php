@@ -1533,7 +1533,7 @@ class SecurityExtensionTest extends TestCase
         $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
         $this->assertSame(OidcSignatureVerifier::class, $verifier->getClass());
         $this->assertSame(['RS256'], $verifier->getArgument(3));
-        $this->assertSame('security.authenticator.oidc_login.signature_verifier.main', (string) $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(9));
+        $this->assertSame('security.authenticator.oidc_login.signature_verifier.main', (string) $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(10));
     }
 
     public function testOidcLoginCanSkipTheIdTokenSignatureVerification()
@@ -1556,7 +1556,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
 
         $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.signature_verifier.main'));
-        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(9));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(10));
     }
 
     public function testOidcLoginSupportsAPublicClient()
@@ -1596,12 +1596,13 @@ class SecurityExtensionTest extends TestCase
 
         $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.route_loader'));
         $this->assertSame([], $container->getParameter('security.oidc_login.callback_uris'));
+        $this->assertSame([], $container->getParameter('security.oidc_login.start_paths'));
 
         $loader = $container->getDefinition('security.authenticator.oidc_login.route_loader');
         $this->assertSame(OidcLoginRouteLoader::class, $loader->getClass());
         $this->assertArrayHasKey('routing.route_loader', $loader->getTags());
-        // it declares no route as long as no firewall configures an OIDC callback path
-        $this->assertCount(0, (new OidcLoginRouteLoader($container->getParameter('security.oidc_login.callback_uris'), 'security.oidc_login.callback_uris'))());
+        // it declares no route as long as no firewall configures the OIDC authenticator
+        $this->assertCount(0, (new OidcLoginRouteLoader($container->getParameter('security.oidc_login.callback_uris'), 'security.oidc_login.callback_uris', $container->getParameter('security.oidc_login.start_paths'), 'security.oidc_login.start_paths'))());
     }
 
     protected function getRawContainer()

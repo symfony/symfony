@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Bundle\SecurityBundle\Controller\OidcLoginStartController;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcConfidentialClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
@@ -32,6 +33,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('authentication success handler'),
                 abstract_arg('authentication failure handler'),
                 abstract_arg('options'),
+                abstract_arg('authorization params'),
                 // replaced by the firewall verifier, unless the ID token signature is not verified
                 null,
             ])
@@ -86,6 +88,14 @@ return static function (ContainerConfigurator $container) {
                 service('http_client'),
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
+            ])
+
+        // the target of the routes declared for the "start_path" of each oidc_login
+        // firewall; public, as the routes reference it by id as their controller
+        ->set('security.authenticator.oidc_login.start_controller', OidcLoginStartController::class)
+            ->public()
+            ->args([
+                service_locator([]),
             ])
     ;
 };

@@ -19,6 +19,8 @@ CHANGELOG
  * Add `oidc_login` firewall authenticator for the OpenID Connect Authorization Code Flow, along with an `oidc` user provider for the users it builds from the OIDC claims
  * Add the `id_token_signature` configuration (`required`, `algorithms`, `enforce_key_usage_verification`) to the `oidc_login` authenticator, which now verifies the ID token signature by default
  * Add the `token_endpoint_auth_method` option to the `oidc_login` authenticator: `client_secret_post`, `client_secret_basic`, or `none` to declare a public client, for which `client_secret` must not be set
+ * Add the `pkce` (`enabled`, `method`), `max_age` and `authorization_params` options to the `oidc_login` authenticator
+ * Add a `start_path` option to the `oidc_login` authenticator and declare a route there that starts the flow by redirecting to the provider, for login pages linking to it
 
 8.1
 ---

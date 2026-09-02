@@ -657,8 +657,131 @@ class OidcLoginAuthenticatorTest extends TestCase
         $this->assertIsArray($attempt);
         $this->assertSame($params['nonce'], $attempt['nonce']);
         $this->assertNotNull($attempt['code_verifier']);
+        // the challenge is BASE64URL(SHA256(verifier)) without padding, per RFC 7636, Section 4.2
+        $this->assertSame(rtrim(strtr(base64_encode(hash('sha256', $attempt['code_verifier'], true)), '+/', '-_'), '='), $params['code_challenge']);
         // the very redirect URI sent to the provider is the one kept for the token request
         $this->assertSame($params['redirect_uri'], $attempt['redirect_uri']);
+    }
+
+    public function testStartWithoutPkce()
+    {
+        $authenticator = $this->createAuthenticator(['pkce_enabled' => false]);
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $location = $authenticator->start($request)->getTargetUrl();
+        $params = [];
+        parse_str(parse_url($location, \PHP_URL_QUERY), $params);
+
+        $this->assertArrayNotHasKey('code_challenge', $params);
+        $this->assertArrayNotHasKey('code_challenge_method', $params);
+    }
+
+    public function testStartWithPlainPkce()
+    {
+        $authenticator = $this->createAuthenticator(['pkce_method' => 'plain']);
+        $request = Request::create('/protected');
+        $session = new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+
+        $location = $authenticator->start($request)->getTargetUrl();
+        $params = [];
+        parse_str(parse_url($location, \PHP_URL_QUERY), $params);
+
+        $this->assertSame('plain', $params['code_challenge_method']);
+        // with "plain", RFC 7636, Section 4.2 sends the verifier itself as the challenge
+        $attempt = $session->get('_security.oidc_login.main.attempt.'.$params['state']);
+        $this->assertSame($attempt['code_verifier'], $params['code_challenge']);
+    }
+
+    public function testAnUnknownPkceMethodIsRejected()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid PKCE method "unknown"');
+
+        $this->createAuthenticator(['pkce_method' => 'unknown']);
+    }
+
+    public function testStartForwardsAuthorizationParams()
+    {
+        $authenticator = $this->createAuthenticator(authorizationParams: ['prompt' => 'consent', 'ui_locales' => 'fr-FR']);
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $location = $authenticator->start($request)->getTargetUrl();
+        $params = [];
+        parse_str(parse_url($location, \PHP_URL_QUERY), $params);
+
+        $this->assertSame('consent', $params['prompt']);
+        $this->assertSame('fr-FR', $params['ui_locales']);
+    }
+
+    public function testManagedAuthorizationParamsAreRejected()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The authorization request parameter(s) "state", "code_challenge" are managed by the authenticator');
+
+        $this->createAuthenticator(authorizationParams: ['state' => 'fixed', 'code_challenge' => '', 'prompt' => 'consent']);
+    }
+
+    public function testStartSendsTheConfiguredMaxAge()
+    {
+        $authenticator = $this->createAuthenticator(['max_age' => 3600]);
+        $request = Request::create('/protected');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $location = $authenticator->start($request)->getTargetUrl();
+        $params = [];
+        parse_str(parse_url($location, \PHP_URL_QUERY), $params);
+
+        $this->assertSame('3600', $params['max_age']);
+    }
+
+    public function testAuthenticateEnforcesMaxAgeAgainstTheAuthTimeClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $idToken = $this->buildIdToken(['nonce' => $nonce, 'auth_time' => time() - 600]);
+
+        $this->oidcClient->expects($this->once())
+            ->method('exchangeCode')
+            ->willReturn([
+                'access_token' => 'access-123',
+                'id_token' => $idToken,
+            ]);
+
+        $authenticator = $this->createAuthenticator(['max_age' => 300]);
+        $request = $this->createCallbackRequest($state, $nonce);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('max_age');
+
+        $authenticator->authenticate($request);
+    }
+
+    public function testAuthenticateAcceptsARecentAuthTimeWithinMaxAge()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $idToken = $this->buildIdToken(['nonce' => $nonce, 'auth_time' => time() - 30]);
+
+        $this->oidcClient->expects($this->once())
+            ->method('exchangeCode')
+            ->willReturn([
+                'access_token' => 'access-123',
+                'id_token' => $idToken,
+            ]);
+
+        $this->oidcClient->expects($this->once())
+            ->method('fetchUserInfo')
+            ->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(['max_age' => 300]);
+        $request = $this->createCallbackRequest($state, $nonce);
+
+        $passport = $authenticator->authenticate($request);
+
+        $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
     }
 
     public function testAuthenticatePassesCodeVerifierToExchangeCode()
@@ -1145,7 +1268,7 @@ class OidcLoginAuthenticatorTest extends TestCase
         );
     }
 
-    private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, ?OidcSignatureVerifier $signatureVerifier = null): OidcLoginAuthenticator
+    private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, array $authorizationParams = [], ?OidcSignatureVerifier $signatureVerifier = null): OidcLoginAuthenticator
     {
         return new OidcLoginAuthenticator(
             new HttpUtils(),
@@ -1157,6 +1280,7 @@ class OidcLoginAuthenticatorTest extends TestCase
             $this->successHandler,
             $this->failureHandler,
             $options,
+            $authorizationParams,
             $signatureVerifier,
         );
     }

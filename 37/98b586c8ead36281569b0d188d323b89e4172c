@@ -1,0 +1,496 @@
+---------------------------------------------------------------------------
+
+by Tiriel at 2025-05-28T09:34:37Z
+
+I do like the feature, but thinking about an extreme example of going all-in on attributes, I wonder were it goes.
+
+Small simple example of building an app where we store informations about Events sent by users with our own schema, and we also receive informations from APIs with their own structure (you see where this is going). So we need the usual ORM attributes, some Validation, Object-Mapper, and these Form attributes. The entity becomes quite heavy on attributes.
+
+```php
+use App\Dto\Event as EventDTO;
+use App\Repository\EventRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Form\Attribute\AsFormType;
+use Symfony\Component\Form\Attribute\Type;
+use Symfony\Component\Form\Extension\Core\Type as FormType;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\Validator\Constraints as Assert;
+
+#[AsFormType]
+#[Map(target: EventDTO::class)]
+#[ORM\Entity(repositoryClass: EventRepository::class)]
+class Event
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[Map(target: 'eventName')]
+    #[Assert\Length(min: 15)]
+    #[Assert\NotBlank()]
+    #[ORM\Column(length: 255)]
+    #[Type]
+    private ?string $name = null;
+
+    #[Map(target: 'synopsis')]
+    #[Assert\NotBlank()]
+    #[ORM\Column(type: Types::TEXT)]
+    #[Type(FormType\TextareaType::class)]
+    private ?string $description = null;
+
+    // ...
+```
+
+As you can see, the business need is small, there's not much in terms of validation or mapping, and I've included only few properties.
+
+I don't know if that's a problem honestly, it's not that unreadable to me, by I do think the question should be raised.
+
+That being said, once again, this is a really nice and neat feature, great job!
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-05-28T10:06:57Z
+
+> I do like the feature, but thinking about an extreme example of going all-in on attributes, I wonder were it goes.
+>
+> Small simple example of building an app where we store informations about Events sent by users with our own schema, and we also receive informations from APIs with their own structure (you see where this is going). So we need the usual ORM attributes, some Validation, Object-Mapper, and these Form attributes. The entity becomes quite heavy on attributes.
+>
+> ```
+> use App\Dto\Event as EventDTO;
+> use App\Repository\EventRepository;
+> use Doctrine\DBAL\Types\Types;
+> use Doctrine\ORM\Mapping as ORM;
+> use Symfony\Component\Form\Attribute\AsFormType;
+> use Symfony\Component\Form\Attribute\Type;
+> use Symfony\Component\Form\Extension\Core\Type as FormType;
+> use Symfony\Component\ObjectMapper\Attribute\Map;
+> use Symfony\Component\Validator\Constraints as Assert;
+>
+> #[AsFormType]
+> #[Map(target: EventDTO::class)]
+> #[ORM\Entity(repositoryClass: EventRepository::class)]
+> class Event
+> {
+>     #[ORM\Id]
+>     #[ORM\GeneratedValue]
+>     #[ORM\Column]
+>     private ?int $id = null;
+>
+>
+>     #[Map(target: 'eventName')]
+>     #[Assert\Length(min: 15)]
+>     #[Assert\NotBlank()]
+>     #[ORM\Column(length: 255)]
+>     #[Type]
+>     private ?string $name = null;
+>
+>     #[Map(target: 'synopsis')]
+>     #[Assert\NotBlank()]
+>     #[ORM\Column(type: Types::TEXT)]
+>     #[Type(FormType\TextareaType::class)]
+>     private ?string $description = null;
+>
+>     // ...
+> ```
+>
+> As you can see, the business need is small, there's not much in terms of validation or mapping, and I've included only few properties.
+>
+> I don't know if that's a problem honestly, it's not that unreadable to me, by I do think the question should be raised.
+>
+> That being said, once again, this is a really nice and neat feature, great job!
+
+I think in your usecase if you map object to a dto then the form should probably be on said dto. WDYT ?
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2025-05-28T10:29:03Z
+
+> I think in your usecase if you map object to a dto then the form should probably be on said dto. WDYT ?
+
+I know you love teasing me :wink: . Just to keep you happy:
+1. It's a fictitious example made just for testing
+2. In this case the DTO is intended to receive data from an API and allow mapping to the entity, when the entity is the base for the frontend form.
+
+I don't pretend this usecase is universale though. Once again, it's designed to create a fake extreme example, to show what it could lead. It's more of a "let's pretend there's a need like that".
+
+And then again, I don't say I'm definitely against this, I love the feature. But I also like to raise questions ;)
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T11:53:07Z
+
+This look like a fantastic addition for simple forms, but honestly I'm not 100% sure for mid-level and complex forms.
+
+PHP attributes are excellent for declaratively adding metadata, but there are limitations and cases where attributes are not the best fit. For instance, dynamic field definition, custom business logic, injecting services, or conditional configuration. In those cases, the traditional FormType classes may still be preferable (as they are services by definition).
+
+I don’t think we should replicate all form type capabilities with attributes (because the scope and dynamic limitations), but they can certainly be useful for building simple forms quickly, and then easily switch to FormType classes when things get more complex.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-05-28T12:50:30Z
+
+@yceruto : Yes this is a totally valid point. I don't think attributes are meant to replace Forms. But should try to cover most common cases without the need to refactor it to a dedicated class. Might be worth adding a warning to the documentation of this feature the list of known limitations.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T13:53:34Z
+
+```php
+$form = $formFactory->create(UserDTO::class, $user);
+```
+It looks strange from the design PoV passing the DTO class as form type. I’m wondering if, instead of passing the data class, we can leave the form type param as `null` and let the type be guessed from the data (if AsFormType)?
+```php
+$form = $formFactory->create(null, $user); // the form type will be guessed and defined from the DTO
+```
+Maybe the same guesser mechanism could help with this? It'd be aligned with the null form type concept.
+
+---------------------------------------------------------------------------
+
+by WedgeSama at 2025-05-28T14:15:01Z
+
+@Tiriel Yes it can be used directly on entities, but even with your example, to make it more readable, a dedicated DTO for the form can still be done :wink:
+
+@yceruto I think its a good start to keep it simple yes. We just need to set the limit to which capabilities we want to replicate. I also thought of a command that can "convert" an attribute form to a traditional `FormType`, something like `make:form:from-metadata`. WDYT?
+
+And Im totally agree to something like :
+```php
+$form = $formFactory->create(null, $user);
+// or even?
+$form = $formFactory->create($user);
+```
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2025-05-28T14:21:39Z
+
+> @Tiriel Yes it can be used directly on entities, but even with your example, to make it more readable, a dedicated DTO for the form can still be done 😉
+
+In that case, what would be the benefit of using a new dedicated DTO+ attribute over a regular FormType class?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T14:39:18Z
+
+>I think its a good start to keep it simple yes. We just need to set the limit to which capabilities we want to replicate.
+
+There are implicit limitations with options and Closures, which may be mitigated in PHP 8.5, but still, adding large blocks of logic in attributes feels a bit messy to me.
+
+I think advanced features like data mappers, form events, and model/view transformers carry special complexity and responsibility tied to the form type itself, but I’m open to making them configurable using attributes, as long as we can also implement them outside the DTO.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T14:39:30Z
+
+>I also thought of a command that can "convert" an attribute form to a traditional FormType, something like make:form:from-metadata. WDYT?
+
+Yes, but what about just creating a command that generate the form type from a DTO 😅?
+It's already possible from an Entity class https://github.com/symfony/maker-bundle/blob/1.x/src/Maker/MakeForm.php
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T14:39:50Z
+
+>And Im totally agree to something like :
+>$form = $formFactory->create(null, $user);
+>// or even?
+>$form = $formFactory->create($user);
+
+even `$form = $formFactory->create(data: $user)` is fine currently
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-05-28T14:45:33Z
+
+> > And Im totally agree to something like :
+> > $form = $formFactory->create(null, $user);
+> > // or even?
+> > $form = $formFactory->create($user);
+>
+> even `$form = $formFactory->create(data: $user)` is fine currently
+
+Symfony does not guarantee named arguments on methods at the moment. So maybe better not show this on documentation / example ?
+
+---------------------------------------------------------------------------
+
+by WedgeSama at 2025-05-28T15:23:03Z
+
+@Tiriel Still one class less, less code:
+- Traditional (with DTO): Entity + DTO + FormType
+- Attributes (with DTO) : Entity + DTO
+
+@yceruto
+> which may be mitigated in PHP 8.5
+
+Yes, using the closure inside attributes in 8.5 can remove some limitations.
+
+> I think advanced features like data mappers, form events, and model/view transformers carry special complexity and responsibility tied to the form type itself, but I’m open to making them configurable using attributes, as long as we can also implement them outside the DTO.
+
+Agreed
+
+> Yes, but what about just creating a command that generate the form type from a DTO 😅?
+
+Can still be done, those 2 features are not mutually exclusive :smile:
+
+---------------------------------------------------------------------------
+
+by Tiriel at 2025-05-28T17:31:25Z
+
+> @Tiriel Still one class less, less code:
+> - Traditional (with DTO): Entity + DTO + FormType
+> - Attributes (with DTO) : Entity + DTO
+
+I don't think we're talking about the same thing and we're going deep into things not strictly related to this feature. I don't see the point of the DTO in the first traditional case. And so, the number of classes is the same.
+
+But that's beside the point. I'm not against you or the feature, I'm just saying that there are use cases where this could lead to bloated entities. And I'm not sure that advising user to put the attributes on another unnecessary class is the best solution.
+
+But then again I seem to be the only one fearing that so maybe it's not that much of a concern.
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T18:29:53Z
+
+>Still one class less, less code:
+>
+>Traditional (with DTO): Entity + DTO + FormType
+>Attributes (with DTO) : Entity + DTO
+
+In terms of number of classes, yes. But to be fair, it’s not significantly less code. We’re going to inline the form type definition within the DTO class using attributes instead, so you’ll have to write extra code for that purpose.
+
+The comparison should be in terms of coding: `Attributes (with DTO): Entity + DTO + Attributes`. It reduces the boilerplate of defining form fields and having an extra class. It makes things simpler for simple forms. Yes!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2025-05-28T18:30:41Z
+
+I loved the auto form example, but I’m afraid it would work only as a sample. In practice, you’ll need to define at least the field type to match the property’s purpose.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-05-30T00:04:23Z
+
+> I loved the auto form example, but I’m afraid it would work only as a sample. In practice, you’ll need to define at least the field type to match the property’s purpose.
+
+I'm not sure to be honest.. or, to be more precise, it happens in simple cases, and at least for these it's a real DX improvement.
+
+---------------------------------------------------------------------------
+
+by smnandre at 2025-05-30T00:09:21Z
+
+> The entity becomes quite heavy on attributes.
+
+A fair point—and one we fully anticipated! 🙂
+
+That said, I don’t believe it’s our role to prevent users from adding attributes here… but neither should we encourage using entities directly in forms. At the end of the day, everyone will adopt the approach that fits their project and philosophy best.
+
+Ultimately, this is one of the original goals of this work: to provide an _unopinionated_ way to define forms directly on the data class... whatever class that may be.
+
+---------------------------------------------------------------------------
+
+by sofigio at 2025-06-14T11:16:10Z
+
+I just hope that FormType doesn't end up being deprecated in favor of this, merging everything seems messier.
+Also because not every time you load an Entity it's to render a form... The form might be just a minor aspect of the application
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2025-06-14T11:23:02Z
+
+Hi @sofigio . Thank you for your concern . I can assure you the goal is purely DX. As always in symfony attributes do not replace anything but are there to provide an alternative DX to common use cases.
+
+Regarding entities and forms. You are totally right but again : attributes don't add the slightest of issues regarding performance. Also the main goal of this feature is to falicitate and encourage the use of DTO instead of entities within forms.
+
+@WedgeSama : if not already it might be worth updating the description to make sure that this is purely DX and doesn't replace anything. WDYT ?
+
+---------------------------------------------------------------------------
+
+by webda2l at 2025-10-07T19:46:24Z
+
+Nice, but I remain skeptical about replicating all the form features (currently your WIP Form Event & Data Transformer) directly in the class object. Even if this new approach is optional, there’s a significant risk it could lead to messy code for some users, IMO.
+For my specific needs (auto fields and embedded forms for objects/collections) I’m working on an alternative: [a2lix/AutoFormBundle (draft branch)](https://github.com/a2lix/AutoFormBundle/tree/draft). It’s a hybrid solution that combines Form and attribute-based configuration, with the goal of minimizing modifications to the entity/DTO. This way, we keep things clean and flexible by default, while still allowing overrides when needed.
+
+---------------------------------------------------------------------------
+
+by webda2l at 2025-12-12T10:45:41Z
+
+> Nice, but I remain skeptical about replicating all the form features (currently your WIP Form Event & Data Transformer) directly in the class object. Even if this new approach is optional, there’s a significant risk it could lead to messy code for some users, IMO. For my specific needs (auto fields and embedded forms for objects/collections) I’m working on an alternative: [a2lix/AutoFormBundle (draft branch)](https://github.com/a2lix/AutoFormBundle/tree/draft). It’s a hybrid solution that combines Form and attribute-based configuration, with the goal of minimizing modifications to the entity/DTO. This way, we keep things clean and flexible by default, while still allowing overrides when needed.
+
+For those interested in this feature, I’ve released my alternative implementation with the v1 of [AutoFormBundle](https://github.com/a2lix/AutoFormBundle) (and optionally v4 of TranslationFormBundle to automatically handle Gedmo/Knp translation cases).
+
+---------------------------------------------------------------------------
+
+by smnandre at 2026-01-07T12:12:20Z
+
+What would help to move this forward?
+
+It has no BC impact... and I feel the DX win is _significant_ in many cases..
+
+---------------------------------------------------------------------------
+
+by WedgeSama at 2026-03-18T14:32:37Z
+
+Sorry for the delay, was a bit busy last weeks.
+
+@webda2l The purpose of this MR wasnt to do every form features with attribute, but to add an alternative to declare form using attributes, by implementing a first basic step. And show only future DX possibilities, but with no requirement to implement it all, only what will make DX win :wink:
+
+> What would help to move this forward?
+>
+> It has no BC impact... and I feel the DX win is _significant_ in many cases..
+
+Like @smnandre said, is there anything to do to move this forward?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T06:55:23Z
+
+Thank you @WedgeSama for this work and for your patience. I reviewed the PR in depth and pushed a rework in place, building on the discussion above. The description is updated to match. Here is what changed and why, so everyone can react.
+
+**Naming.** `AsFormType` is renamed to `AsFormData` and `Type` to `FormField`. This addresses @stof's point that `AsFormType` reads like tagging a `form.type` service, and the `Field` vs `Type` debate: the class is the form's data, which is the `data_class` vocabulary every Form user already knows, and `FormField` stays self-explaining when seen alone on a property. Better names welcome, but I think this direction is right.
+
+**Everything moved to compile time**, as @GromNaN suggested. `FormPass` now reads the attributes itself, using `findTaggedResourceIds('form.data_class')`, and compiles one definition per class made of plain literals. No runtime reflection is left, invalid declarations fail the container build instead of the first request, and editing the class rebuilds the container in debug mode. Option values are restricted to scalars, arrays and enums; anything else is rejected at compile time with a message pointing to form type classes. Note that inline constraints in options are not needed anyway: on a data class, constraints belong on the properties as regular `#[Assert\...]` attributes. Compile-time reading is also what would later allow resolving `Autowire`-style option values into service references, which the runtime approach could never do.
+
+**The `framework.form.use_attribute` option is gone**, as @GromNaN and @Jean-Beru asked. Adding the attribute to an autoconfigured class is the opt-in, exactly like `#[AsMessage]`. No new configuration, no new services: the pass does everything.
+
+**The public surface shrank to the two attributes and the resource tag.** The `Metadata\` namespace, the loader abstraction, `MetadataException` and `MetadataExtension` are removed; the derived type and its identity interface are internal. The reasoning: promoting an internal class to public API later is free, while removing a shipped interface is impossible, and each of those abstractions had exactly one implementation with no second one planned. A standalone entry point for component-only users can be added the day someone asks for it, without touching anything shipped here.
+
+**Fixed along the way:**
+- An abstract class with the attribute broke container compilation ("must not be abstract"). Abstract data classes now work and can serve as parent types; there is an end-to-end test for that.
+- `debug:form App\Dto\UserDto` failed with "Could not find type" while shell completion suggests exactly that FQCN. It now works.
+- The debug command wiring used `setArgument(6, ...)`, which broke any container defining the command with fewer arguments (the reason the existing `FormPassTest` had to be padded). It now uses a named argument and the original test is restored unchanged.
+- Renaming a field while also setting `property_path` silently discarded the user's `property_path`. It is now a compile error.
+- Added the missing CHANGELOG entries and integration tests that go from a compiled container to a submitted, mapped form.
+
+The low-deps concern about `findTaggedResourceIds` no longer applies: the method exists since DI 7.3 and the component now requires `^7.4|^8.0` for dev.
+
+Behavior of the examples in the description is covered by tests. Reviews welcome, in particular on the attribute names and on the compile-time-only stance for option values.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-02T07:27:43Z
+
+Hi @nicolas-grekas .
+
+Thank you for your review.
+
+`AsFormType` or not : I feel AsFormType is closer to the developper mindset and the inconsistency your pointing out feels to me the same as `AsController` which targets a class whereas the controller is in fact the callable. It is not about what it is but what it is used for and we ARE actually defining a FormType but that will be deduced so it doesn't have its own class.
+
+Runtime vs Compiletime : Yes compile is always better for performances and such. BUT I think this si creating a need for theses classes to be autoconfigured just to enable this feature (or to be tagged manually which breaks the whole purpose IMO). What about enabling both ? If it is autoconfigured then yeeeah better performances but it could also work through reflection at runtime. I may be a dinosaur about this but I remember and still encounter regularly projects that have troubles running the clear cache command. Excluding folders is one way to avoid memory issues. It may come with a warning (on debug mode) to signal the developper that he/she could easily improve performances ?
+
+On another note, @WedgeSama : I don't remember if we tried applying DtoType style to the new syntax for console commands ? would it work or would it require additional code ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T07:37:30Z
+
+> AsFormType or not
+
+I'm open to getting more feedback on this. I get @stof's angle but also yours ("we're defining a form type, conceptually")
+
+> Runtime vs Compiletime
+
+We should clearly not provide a runtime equivalent in Form when we have everything already in place at a way more generic level in DI. This is not about perf but about design and simplicity.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T07:48:21Z
+
+Pushed a second round covering dynamic logic, description updated:
+
+- `new Reference('service_id')` is now accepted as an option value and injected natively by the container: `'choice_loader' => new Reference(TagChoiceLoader::class)`, or `'choice_label' => [new Reference(TagLabeler::class), 'label']` which compiles to a real callable. Literal `%` in option values is escaped, so only `Reference`/`Parameter` objects are dynamic.
+- `#[AsFormData(extendedBy: UserDtoExtension::class)]` declares the companion type extension from the data class side; the extension keeps full DI and no longer needs to name the class back in `getExtendedTypes()`. Checked at compile time against the `form.type_extension` services.
+- To support this, an extension returning no extended types is now understood as delegating its wiring to the container instead of being rejected at runtime.
+
+Anything more dynamic still belongs in a type extension or a regular form type class.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-02T07:49:55Z
+
+I understand but still I feel like forcing a tag on these kind of classes would not be the best DX. I don' think the ratio DX / resource discovery is worth goind only full compile time.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T07:56:23Z
+
+@Neirda24 Let me restate your concern to check I got it: a class that the container does not discover (excluded folder, outside the resource roots) does not get the feature. That part is true, and it is the same for every discovery attribute we have (`#[AsMessage]`, `#[AsEventListener]`, ...): the attribute is the opt-in, autoconfiguration is the wiring, nobody writes a tag by hand.
+
+What I want to avoid is the hybrid: compiled when discovered, reflection otherwise. Beyond the two code paths, it makes validation inconsistent: a duplicate field name or an object option value would fail the container build for discovered classes but produce a runtime 500 for the others. Same attribute, two behaviors, decided by an `exclude:` line far away from the class. That is the outcome I would call bad DX.
+
+What was genuinely missing is a clear failure: until now an undiscovered class died with 'class does not implement FormTypeInterface'. Just pushed: it now says the class uses `#[AsFormData]` but is not registered, and to make sure it is discovered by the container. If you have a concrete setup where discovery itself is not workable, please share it, that is the case that would change my mind.
+
+---------------------------------------------------------------------------
+
+by Neirda24 at 2026-09-02T08:20:55Z
+
+AsMessage for example is not needed really. semantic configuration and Handler's allow for auto discovery of what is a message and what is not and where / how to route / handle it. Otherwise AsEventListener clearly targets classes / callables that ARE already services thus autowire / autoconfigure are a huge help of course. but for DTO's and other classes taht belong to services I feel like there is always an alternative. Locking this feature behind autoconfigure / manual tag would not fit well IMO in symfony's way of things.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:29:00Z
+
+The comparison that matters here is not `#[AsMessage]` but Validator and Serializer metadata, which indeed work on any class without discovery. Those answer a different question though: "given this object in hand, what are its rules", so lazy runtime reading fits them. A form type is resolved by name before any object exists: `createForm(UserDto::class)` looks up a named service in the type registry, next to the other types, extensions and guessers, which are all container services. This feature derives such a service from the class, and deriving services is what the container does. It is also what enables `new Reference(...)` in options and `extendedBy`; a runtime metadata reader cannot inject services.
+
+In practice the requirement is: the class lives under `src/` like every other class of the app, which is the default everywhere. Closing the topic on my side.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:59:41Z
+
+Naming settled: back to `#[AsFormType]`, pushed and description updated. @Neirda24's argument convinced me: the attribute is about what the class is used as, not what it is, the same way `#[AsController]` marks a class whose methods are the controllers. We are defining a form type here, and this was also the author's original pick, which is a good hint it is the name people will expect. `#[FormField]` stays. @stof if you feel strongly about this, now is the time.
+
+---------------------------------------------------------------------------
+
+by WedgeSama at 2026-09-02T11:32:03Z
+
+> **Naming.** AsFormType is renamed to AsFormData and Type to FormField.
+
+> AsFormType or not : I feel AsFormType is closer to the developper mindset and the inconsistency your pointing out feels to me the same as AsController which targets a class whereas the controller is in fact the callable. It is not about what it is but what it is used for and we ARE actually defining a FormType but that will be deduced so it doesn't have its own class.
+
+Agreed with @Neirda24 but I see its already closed topic :ok_hand:
+
+> On another note, @WedgeSama : I don't remember if we tried applying DtoType style to the new syntax for console commands ? would it work or would it require additional code ?
+
+Yes, I did update the command to display `MetadataType` (now `DataClassType`) as a specific part and not mixed with classic types.
+
+> #[FormField(ChoiceType::class, [
+>    'choice_loader' => new Reference(TagChoiceLoader::class),
+>    'choice_label' => [new Reference(TagLabeler::class), 'label'], // compiles to a real callable
+> ])]
+
+IMHO, nice way to do the DI.
+
+> extendedBy
+
+Not sure the real utility of this option. Isnt just keep the `getExtendedTypes` in the ExtensionType enough?
+
+----
+But globally nice update of my PR :wink:
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T11:37:49Z
+
+> extendedBy
+
+I thought this would help discovery, allowing one to navigate from entity to its form extension easily
+
+---------------------------------------------------------------------------
+
+by WedgeSama at 2026-09-02T11:48:03Z
+
+> > extendedBy
+>
+> I thought this would help discovery, allowing one to navigate from entity to its form extension easily
+
+With modern IDEs, you can already navigate to extension easily. IMO, this will be confusing about how to apply ExtentionType.
+
+For now, all extended types are listed in the ExtensionType itself. With this change, information about extension will not be found in the same place but split between the ExtensionType and as many as `AsFormType` declaring `extendedBy`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T11:57:14Z
+
+Agreed, `extendedBy` is gone in the last push. Requiring `getExtendedTypes()` to name the data class keeps the information in one place and makes navigation work both ways.
+
+Bonus: the `DependencyInjectionExtension` relaxation could be reverted too, so `getExtendedTypes()` stays authoritative as before, and `FormPass` is now a purely additive diff.

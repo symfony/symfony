@@ -292,7 +292,7 @@ class JsonStreamReaderTest extends TestCase
             }
             JSON;
 
-        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+        $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
         $this->assertRead($reader, function (DummyWithIterable $read) {
             $this->assertEquals(2, iterator_count($read->dummies));

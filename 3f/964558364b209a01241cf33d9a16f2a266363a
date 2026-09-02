@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T14:39:08Z
+
+Thanks Mathieu, the design of both halves held up under review: the identity probes all came back clean (missing/empty/non-string identifier claims fail closed in both sources, the Section 5.3.2 sub match still fires with a custom identifier claim, and the provider keys the user on the validated identifier). I fixed four things while preparing the branch and force-pushed (d9209228e52, your two commits kept):
+
+- The claims-source commit missed its own use case: the discovery service still required `userinfo_endpoint` to be announced, so `user_data_source: id_token` against a provider without one failed with "The userinfo_endpoint is missing from the OIDC discovery document". The factory now only requires that endpoint when it is the claims source; the userinfo path still fails cleanly at runtime when the endpoint is absent.
+- The end-session listener ran at priority 0 and set its response unconditionally, so it silently replaced a custom logout listener's response and could drop the `Clear-Site-Data` header depending on registration order. It now runs at priority 65 (just above the default listener) and only acts when no earlier listener set a response.
+- An `end_session_endpoint` carrying a query string (e.g. `?tenant=acme`) got a second `?`; the listener now appends with the same separator logic `start()` uses.
+- Polish: dead discovery call removed, catch narrowed to `AuthenticationException`, `user_identifier_claim` turned into a real config node with an info text warning that `sub` is the only claim OIDC guarantees stable and unique, Security/Http changelog entry added.
+
+Kept as one PR: the first commit stands alone, three suites are green at both commits, and both rework the same factory surface, so splitting would only cost a rebase chain. Description updated with the behavioral details.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T14:44:23Z
+
+Restored the ux-turbo caveat in the description: Mathieu had added it by hand while the review was in flight, and my description update was based on the earlier text, so it got dropped. It is back as its own section, with the data-turbo opt-out named for the docs.

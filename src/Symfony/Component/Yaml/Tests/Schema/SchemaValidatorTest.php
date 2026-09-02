@@ -193,6 +193,93 @@ class SchemaValidatorTest extends TestCase
         $this->assertSame(3, $errors[0]['line']);
     }
 
+    public function testErrorLineFollowsNestedSequences()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'matrix' => [
+                    'type' => 'array',
+                    'items' => ['type' => 'array', 'items' => ['type' => 'integer']],
+                ],
+            ],
+        ]));
+
+        $content = "matrix:\n    - - 1\n      - not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame(3, $errors[0]['line']);
+    }
+
+    public function testErrorLineForMissingKeyReportsTheOwningBlock()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'router' => [
+                    'type' => 'object',
+                    'required' => ['resource'],
+                ],
+                'session' => ['type' => 'object'],
+            ],
+        ]));
+
+        // "resource" is missing from "router" but present in "session": the line of the
+        // node the violation belongs to must be reported, not the one of the other block.
+        $content = "router:\n    utf8: true\nsession:\n    resource: bar";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame(1, $errors[0]['line']);
+    }
+
+    public function testErrorLineForDigitMappingKey()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'codes' => [
+                    'type' => 'object',
+                    'additionalProperties' => ['type' => 'integer'],
+                ],
+            ],
+        ]));
+
+        $content = "codes:\n    404: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame(2, $errors[0]['line']);
+    }
+
+    public function testErrorLineForKeyContainingDots()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'hosts' => [
+                    'type' => 'object',
+                    'additionalProperties' => ['type' => 'integer'],
+                ],
+            ],
+        ]));
+
+        $content = "hosts:\n    example.com: 1\n    other.org: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame(3, $errors[0]['line']);
+    }
+
     public function testInvalidUtf8ThrowsRuntimeException()
     {
         // Encoding such a value to JSON fails, and the data must not be silently validated as null.

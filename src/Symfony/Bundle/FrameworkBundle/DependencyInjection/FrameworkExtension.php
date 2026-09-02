@@ -1623,6 +1623,7 @@ class FrameworkExtension extends Extension
             $container->removeDefinition('console.command.translation_pull');
             $container->removeDefinition('console.command.translation_push');
             $container->removeDefinition('console.command.translation_lint');
+            $container->removeDefinition('console.command.translation_xliff_update_sources');
 
             return;
         }
@@ -1698,6 +1699,10 @@ class FrameworkExtension extends Extension
 
         if ($container->hasDefinition('console.command.translation_extract')) {
             $container->getDefinition('console.command.translation_extract')->replaceArgument(6, $transPaths);
+        }
+
+        if ($container->hasDefinition('console.command.translation_xliff_update_sources')) {
+            $container->getDefinition('console.command.translation_xliff_update_sources')->replaceArgument(3, array_merge($config['paths'], [$config['default_path']]));
         }
 
         if (null === $defaultDir) {

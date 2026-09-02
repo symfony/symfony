@@ -7,6 +7,7 @@ CHANGELOG
  * Preserve the XLIFF `<source>` element when loading and dumping a file, instead of overwriting it with the message key
  * Add a locale-aware `Plural-Forms` header to the output of `PoFileDumper`
  * Re-add `PoEditorProvider`
+ * Add `translation:update-xliff-sources` command to fill the `<source>` tags of XLIFF files with the default locale's translations
 
 8.1
 ---

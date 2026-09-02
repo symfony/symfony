@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `RemoteTemplateEmail` to `MailtrapApiTransport`
+
 7.4
 ---
 

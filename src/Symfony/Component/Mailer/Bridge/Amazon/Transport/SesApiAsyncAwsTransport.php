@@ -14,10 +14,13 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Transport;
 use AsyncAws\Ses\Input\SendEmailRequest;
 use AsyncAws\Ses\ValueObject\Content;
 use Symfony\Component\Mailer\Envelope;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mailer\Exception\RuntimeException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
@@ -27,7 +30,7 @@ use Symfony\Component\Mime\MessageConverter;
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
+class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport implements RemoteTemplateTransportInterface
 {
     public function __toString(): string
     {
@@ -57,7 +60,13 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             throw new RuntimeException(\sprintf('Unable to send message with the "%s" transport: ', __CLASS__).$e->getMessage(), 0, $e);
         }
 
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+
         if ($email->getAttachments()) {
+            if (null !== $template) {
+                throw new InvalidArgumentException('The Amazon SES API does not support attachments when using a remote template.');
+            }
+
             return parent::getRequest($message);
         }
 
@@ -68,7 +77,19 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
             'Destination' => [
                 'ToAddresses' => $this->stringifyAddresses($this->getRecipients($email, $envelope)),
             ],
-            'Content' => [
+        ];
+        if (null !== $template) {
+            if (null !== $email->getSubject()) {
+                throw new InvalidArgumentException('Amazon SES does not support overriding the subject of a template; define the subject in the template itself.');
+            }
+            $request['Content'] = [
+                'Template' => [
+                    'TemplateName' => $template->getReference(),
+                    'TemplateData' => json_encode($template->getVariables() ?: new \stdClass(), \JSON_THROW_ON_ERROR),
+                ],
+            ];
+        } else {
+            $request['Content'] = [
                 'Simple' => [
                     'Subject' => [
                         'Data' => $email->getSubject(),
@@ -76,8 +97,8 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
                     ],
                     'Body' => [],
                 ],
-            ],
-        ];
+            ];
+        }
 
         if ($emails = $email->getCc()) {
             $request['Destination']['CcAddresses'] = $this->stringifyAddresses($emails);
@@ -116,7 +137,11 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         }
 
         if ($customHeaders = $this->getCustomHeaders($email->getHeaders())) {
-            $request['Content']['Simple']['Headers'] = $customHeaders;
+            if (null !== $template) {
+                $request['Content']['Template']['Headers'] = $customHeaders;
+            } else {
+                $request['Content']['Simple']['Headers'] = $customHeaders;
+            }
         }
 
         foreach ($email->getHeaders()->all() as $header) {

@@ -15,11 +15,14 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -30,7 +33,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
  */
-final class MailtrapApiTransport extends AbstractApiTransport
+final class MailtrapApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     private const LIVE_API_HOST = 'send.api.mailtrap.io';
     private const SANDBOX_API_HOST = 'sandbox.api.mailtrap.io';
@@ -80,16 +83,28 @@ final class MailtrapApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+
         $payload = [
             'from' => self::encodeEmail($envelope->getSender()),
             'to' => array_map(self::encodeEmail(...), $email->getTo()),
             'cc' => array_map(self::encodeEmail(...), $email->getCc()),
             'bcc' => array_map(self::encodeEmail(...), $email->getBcc()),
-            'subject' => $email->getSubject(),
-            'text' => $email->getTextBody(),
-            'html' => $email->getHtmlBody(),
-            'attachments' => $this->getAttachments($email),
         ];
+        if (null === $template) {
+            $payload['subject'] = $email->getSubject();
+            $payload['text'] = $email->getTextBody();
+            $payload['html'] = $email->getHtmlBody();
+        } else {
+            if (null !== $email->getSubject()) {
+                throw new InvalidArgumentException('Mailtrap does not support overriding the subject of a template; define the subject in the template itself.');
+            }
+            $payload['template_uuid'] = $template->getReference();
+            if ($template->getVariables()) {
+                $payload['template_variables'] = $template->getVariables();
+            }
+        }
+        $payload['attachments'] = $this->getAttachments($email);
 
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, self::HEADERS_TO_BYPASS, true)) {
@@ -97,6 +112,9 @@ final class MailtrapApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
+                if (null !== $template) {
+                    throw new InvalidArgumentException('Mailtrap does not allow a category when using a template; define the category in the template itself.');
+                }
                 if (isset($payload['category'])) {
                     throw new TransportException('Mailtrap only allows a single category per email.');
                 }

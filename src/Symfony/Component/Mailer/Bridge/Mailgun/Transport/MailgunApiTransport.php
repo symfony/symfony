@@ -18,8 +18,10 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
@@ -30,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MailgunApiTransport extends AbstractApiTransport
+class MailgunApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     private const HOST = 'api.%region_dot%mailgun.net';
 
@@ -96,14 +98,17 @@ class MailgunApiTransport extends AbstractApiTransport
             $html = stream_get_contents($html);
         }
         [$attachments, $inlines, $html] = $this->prepareAttachments($email, $html);
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
 
         $payload = [
             'from' => $envelope->getSender()->toString(),
             'to' => implode(',', $this->stringifyAddresses($this->getRecipients($email, $envelope))),
-            'subject' => $email->getSubject(),
-            'attachment' => $attachments,
-            'inline' => $inlines,
         ];
+        if (null === $template || null !== $email->getSubject()) {
+            $payload['subject'] = $email->getSubject();
+        }
+        $payload['attachment'] = $attachments;
+        $payload['inline'] = $inlines;
         if ($emails = $email->getCc()) {
             $payload['cc'] = implode(',', $this->stringifyAddresses($emails));
         }
@@ -147,12 +152,22 @@ class MailgunApiTransport extends AbstractApiTransport
             // Check if it is a valid prefix or header name according to Mailgun API
             $prefix = substr($name, 0, 2);
             if (\in_array($prefix, ['h:', 't:', 'o:', 'v:']) || \in_array($name, ['recipient-variables', 'template', 'amp-html'], true)) {
+                if ('template' === $name) {
+                    trigger_deprecation('symfony/mailgun-mailer', '8.2', 'Using the "template" email header to select a Mailgun template is deprecated, use a "%s" instead.', RemoteTemplateEmail::class);
+                }
                 $headerName = $header->getName();
             } else {
                 $headerName = 'h:'.$header->getName();
             }
 
             $payload[$headerName] = $header->getBodyAsString();
+        }
+
+        if (null !== $template) {
+            $payload['template'] = $template->getReference();
+            if ($template->getVariables()) {
+                $payload['t:variables'] = json_encode($template->getVariables(), \JSON_THROW_ON_ERROR);
+            }
         }
 
         return $payload;

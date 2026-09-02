@@ -102,6 +102,9 @@ Mailer
 ------
 
  * [AhaSend] Deprecate sending through the legacy v1 API, use a v2 API key and add your account id to the DSN
+ * [Brevo] Deprecate the "templateid" and "params" email headers, use a `RemoteTemplateEmail` instead
+ * [Mailgun] Deprecate the "template" email header, use a `RemoteTemplateEmail` instead
+ * [Mailjet] Deprecate the "X-MJ-TemplateID" email header, use a `RemoteTemplateEmail` instead
  * Deprecate sending an S/MIME message unencrypted when a recipient has no certificate (the default
    `SmimeEncryptedMessageListener::ON_MISSING_CERTIFICATE_SEND_UNENCRYPTED` behavior); it will throw in 9.0.
    Set the `on_missing_certificate` option (or the `X-SMime-Encrypt` header) to `fail`, `encrypt` or `skip`:
@@ -197,11 +200,6 @@ SecurityBundle
    `setFirewallName()` for success handlers, to the service it decorates whenever that service relies on them,
    as `DefaultAuthenticationSuccessHandler` and `DefaultAuthenticationFailureHandler` do. Without forwarding,
    the authenticator options and the session target path are lost, and a successful login redirects to `/`
-
-Mailer
-------
-
- * Deprecate the "templateid" and "params" email headers in the Brevo bridge, use a `RemoteTemplateEmail` instead
 
 Serializer
 ----------

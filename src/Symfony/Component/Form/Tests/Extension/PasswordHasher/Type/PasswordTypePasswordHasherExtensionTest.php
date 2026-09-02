@@ -12,6 +12,8 @@
 namespace Symfony\Component\Form\Tests\Extension\PasswordHasher\Type;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -19,7 +21,11 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener;
 use Symfony\Component\Form\Extension\PasswordHasher\PasswordHasherExtension;
+use Symfony\Component\Form\Extension\PasswordHasher\Type\FormTypePasswordHasherExtension;
+use Symfony\Component\Form\Extension\PasswordHasher\Type\PasswordTypePasswordHasherExtension;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\Tests\Fixtures\RepeatedPasswordField;
 use Symfony\Component\Form\Tests\Fixtures\User;
@@ -28,6 +34,7 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
 {
@@ -50,6 +57,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
     protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
         return array_merge(parent::getExtensions(), [
+            new ValidatorExtension((new ValidatorBuilder())->getValidator(), $violationMapper),
             new PasswordHasherExtension(new PasswordHasherListener($this->passwordHasher)),
         ]);
     }
@@ -210,6 +218,38 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         ;
 
         $form->submit(['plainPassword' => 'PlainPassword']);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testLegacyPasswordHashWithoutValidator()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/form 8.2: The "Symfony\Component\Form\Extension\PasswordHasher\Type\FormTypePasswordHasherExtension" class is deprecated, passwords are hashed during the "form.post_validate" event instead.');
+        $this->expectUserDeprecationMessage('Since symfony/form 8.2: The "Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener::registerPassword()" method is deprecated, use "hashPassword()" instead.');
+        $this->expectUserDeprecationMessage('Since symfony/form 8.2: The "Symfony\Component\Form\Extension\PasswordHasher\EventListener\PasswordHasherListener::hashPasswords()" method is deprecated, use "hashPassword()" instead.');
+
+        $listener = new PasswordHasherListener($this->passwordHasher);
+        $factory = Forms::createFormFactoryBuilder()
+            ->addTypeExtension(new FormTypePasswordHasherExtension($listener))
+            ->addTypeExtension(new PasswordTypePasswordHasherExtension($listener))
+            ->getFormFactory()
+        ;
+
+        $user = new User();
+
+        $form = $factory
+            ->createBuilder(FormType::class, $user)
+            ->add('plainPassword', PasswordType::class, [
+                'hash_property_path' => 'password',
+                'mapped' => false,
+            ])
+            ->getForm()
+        ;
+
+        $form->submit(['plainPassword' => 'PlainPassword']);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame('ec2d1846a8e988d344750b904739e19b', $user->getPassword());
     }
 
     public function testPasswordHashOnMappedFieldForbidden()

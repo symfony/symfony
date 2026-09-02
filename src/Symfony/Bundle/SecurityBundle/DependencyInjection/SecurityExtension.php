@@ -130,7 +130,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
         if (!class_exists(PasswordHasherExtension::class)) {
             $container->removeDefinition('form.listener.password_hasher');
-            $container->removeDefinition('form.type_extension.form.password_hasher');
             $container->removeDefinition('form.type_extension.password.password_hasher');
         }
 

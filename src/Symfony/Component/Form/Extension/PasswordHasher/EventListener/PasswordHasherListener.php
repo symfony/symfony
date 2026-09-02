@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Extension\PasswordHasher\EventListener;
 
+use Symfony\Component\Form\Event\PostValidateEvent;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormEvent;
@@ -35,8 +36,36 @@ class PasswordHasherListener
         $this->propertyAccessor ??= PropertyAccess::createPropertyAccessor();
     }
 
+    public function hashPassword(PostValidateEvent $event): void
+    {
+        if (null === $event->getData() || '' === $event->getData()) {
+            return;
+        }
+
+        $form = $event->getForm();
+
+        $this->assertNotMapped($form);
+
+        if (!$form->getRoot()->isValid()) {
+            return;
+        }
+
+        $user = $this->getUser($form);
+
+        $this->propertyAccessor->setValue(
+            $user,
+            $form->getConfig()->getOption('hash_property_path'),
+            $this->passwordHasher->hashPassword($user, $event->getData())
+        );
+    }
+
+    /**
+     * @deprecated since Symfony 8.2, use hashPassword() instead
+     */
     public function registerPassword(FormEvent $event): void
     {
+        trigger_deprecation('symfony/form', '8.2', 'The "%s()" method is deprecated, use "hashPassword()" instead.', __METHOD__);
+
         if (null === $event->getData() || '' === $event->getData()) {
             return;
         }
@@ -50,6 +79,9 @@ class PasswordHasherListener
         ];
     }
 
+    /**
+     * @deprecated since Symfony 8.2, use hashPassword() instead
+     */
     public function hashPasswords(FormEvent $event): void
     {
         $form = $event->getForm();
@@ -57,6 +89,8 @@ class PasswordHasherListener
         if (!$form->isRoot()) {
             return;
         }
+
+        trigger_deprecation('symfony/form', '8.2', 'The "%s()" method is deprecated, use "hashPassword()" instead.', __METHOD__);
 
         if ($form->isValid()) {
             foreach ($this->passwords as $password) {

@@ -66,10 +66,9 @@ return static function (ContainerConfigurator $container) {
                 '.well-known/openid-configuration',
                 abstract_arg('issuer'),
                 abstract_arg('cache TTL'),
-                // the cache key is derived from the configuration URL; these endpoints must be
-                // announced and must not downgrade to plain HTTP the transport of the discovery document
+                // the cache key is derived from the configuration URL
                 null,
-                ['authorization_endpoint', 'token_endpoint', 'userinfo_endpoint'],
+                abstract_arg('endpoints that must be announced and must not downgrade to plain HTTP the transport of the discovery document'),
             ])
 
         ->set('security.authenticator.oidc_login.client', OidcConfidentialClient::class)

@@ -22,6 +22,7 @@ CHANGELOG
  * Add `OidcSignatureVerifier` to verify the ID token signature of the OIDC login authenticator against the provider JWKS, which it now does by default
  * Add `OidcPublicClient` to run the OIDC login flow as a public client, which holds no client secret and relies on PKCE, and support `client_secret_basic` in `OidcConfidentialClient`
  * Add the `pkce_enabled`, `pkce_method` and `max_age` options and the `$authorizationParams` argument to `OidcLoginAuthenticator`, which checks the ID token `auth_time` claim when `max_age` is used
+ * Add the `user_data_source` and `user_identifier_claim` options to `OidcLoginAuthenticator` to pick where the user claims are read from and the claim the user identifier is read from
 
 8.1
 ---

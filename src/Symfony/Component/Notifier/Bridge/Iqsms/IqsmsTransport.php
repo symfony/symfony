@@ -54,7 +54,8 @@ final class IqsmsTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/messages/v2/send.json', [
+        $endpoint = \sprintf('%s://%s/messages/v2/send.json', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'json' => [
                 'messages' => [
                     [

@@ -69,7 +69,7 @@ final class SmsBiurasTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/api?', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api?', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('GET', $endpoint, [
             'query' => [

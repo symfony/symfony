@@ -59,7 +59,7 @@ final class DiscordTransport extends AbstractTransport
         $options = $message->getOptions()?->toArray() ?? [];
         $options['content'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/api/webhooks/%s/%s', $this->getEndpoint(), $this->webhookId, $this->token);
+        $endpoint = \sprintf('%s://%s/api/webhooks/%s/%s', $this->getHttpScheme(), $this->getEndpoint(), $this->webhookId, $this->token);
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);

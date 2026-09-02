@@ -65,7 +65,7 @@ final class FacebookPageTransport extends AbstractTransport
             throw new UnsupportedOptionsException(__CLASS__, FacebookPageOptions::class, $options);
         }
 
-        $endpoint = \sprintf('https://%s/%s/%s/feed', $this->getEndpoint(), $this->apiVersion, $this->pageId);
+        $endpoint = \sprintf('%s://%s/%s/%s/feed', $this->getHttpScheme(), $this->getEndpoint(), $this->apiVersion, $this->pageId);
 
         $body = ['message' => $message->getSubject()] + ($options?->toArray() ?? []);
 

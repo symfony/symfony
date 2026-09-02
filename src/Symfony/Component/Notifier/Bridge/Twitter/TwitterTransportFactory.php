@@ -40,7 +40,8 @@ final class TwitterTransportFactory extends AbstractTransportFactory
 
         return (new TwitterTransport($apiKey, $apiSecret, $accessToken, $accessSecret, $this->client, $this->dispatcher))
             ->setHost('default' === $dsn->getHost() ? null : $dsn->getHost())
-            ->setPort($dsn->getPort());
+            ->setPort($dsn->getPort())
+            ->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

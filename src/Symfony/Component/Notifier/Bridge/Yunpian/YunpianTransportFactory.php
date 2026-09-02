@@ -29,7 +29,7 @@ class YunpianTransportFactory extends AbstractTransportFactory
         $apiKey = $this->getUser($dsn);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
 
-        return (new YunpianTransport($apiKey, $this->client, $this->dispatcher))->setHost($host)->setPort($dsn->getPort());
+        return (new YunpianTransport($apiKey, $this->client, $this->dispatcher))->setHost($host)->setPort($dsn->getPort())->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

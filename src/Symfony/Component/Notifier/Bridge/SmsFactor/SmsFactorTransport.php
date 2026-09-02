@@ -68,7 +68,8 @@ final class SmsFactorTransport extends AbstractTransport
             'pushtype' => $this->pushType?->value,
         ];
 
-        $response = $this->client->request('GET', 'https://'.$this->getEndpoint().'/send', [
+        $endpoint = \sprintf('%s://%s/send', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('GET', $endpoint, [
             'query' => array_filter($query),
             'auth_bearer' => $this->tokenApi,
             'headers' => [

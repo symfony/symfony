@@ -33,7 +33,7 @@ final class ZendeskTransportFactory extends AbstractTransportFactory
         $apiToken = $this->getPassword($dsn);
         $host = $this->getHost($dsn);
 
-        return (new ZendeskTransport($emailAddress, $apiToken, $this->client, $this->dispatcher))->setHost($host);
+        return (new ZendeskTransport($emailAddress, $apiToken, $this->client, $this->dispatcher))->setHost($host)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

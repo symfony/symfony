@@ -65,7 +65,7 @@ final class PlivoTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID. Phone number must contain only numbers and optional + character.', $options['src']));
         }
 
-        $endpoint = \sprintf('https://%s/v1/Account/%s/Message/', $this->getEndpoint(), $this->authId);
+        $endpoint = \sprintf('%s://%s/v1/Account/%s/Message/', $this->getHttpScheme(), $this->getEndpoint(), $this->authId);
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authId, $this->authToken],
             'json' => array_filter($options),

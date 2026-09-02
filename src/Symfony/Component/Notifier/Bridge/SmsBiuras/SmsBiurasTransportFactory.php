@@ -35,7 +35,7 @@ final class SmsBiurasTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SmsBiurasTransport($uid, $apiKey, $from, $testMode, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SmsBiurasTransport($uid, $apiKey, $from, $testMode, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

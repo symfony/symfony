@@ -58,7 +58,7 @@ final class MessageBirdTransport extends AbstractTransport
         $options['recipients'] = [$message->getPhone()];
         $options['body'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/messages', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => ['AccessKey', $this->token],
             'body' => array_filter($options),

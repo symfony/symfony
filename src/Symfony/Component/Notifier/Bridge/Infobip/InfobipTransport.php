@@ -52,7 +52,7 @@ final class InfobipTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/sms/2/text/advanced', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/sms/2/text/advanced', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [

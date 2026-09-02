@@ -32,7 +32,7 @@ final class PagerDutyTransportFactory extends AbstractTransportFactory
         $apiToken = $this->getUser($dsn);
         $host = $this->getHost($dsn);
 
-        return (new PagerDutyTransport($apiToken, $this->client, $this->dispatcher))->setHost($host);
+        return (new PagerDutyTransport($apiToken, $this->client, $this->dispatcher))->setHost($host)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

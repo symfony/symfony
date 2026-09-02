@@ -68,7 +68,7 @@ final class ClickSendTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/v3/sms/send', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v3/sms/send', $this->getHttpScheme(), $this->getEndpoint());
 
         $options = $message->getOptions()?->toArray() ?? [];
         $options['body'] = $message->getSubject();

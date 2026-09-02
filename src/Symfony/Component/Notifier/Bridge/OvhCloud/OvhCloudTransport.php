@@ -81,7 +81,7 @@ final class OvhCloudTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/1.0/sms/%s/jobs', $this->getEndpoint(), $this->serviceName);
+        $endpoint = \sprintf('%s://%s/1.0/sms/%s/jobs', $this->getHttpScheme(), $this->getEndpoint(), $this->serviceName);
 
         $content = [
             'charset' => 'UTF-8',
@@ -149,7 +149,7 @@ final class OvhCloudTransport extends AbstractTransport
      */
     private function calculateTimeDelta(): int
     {
-        $endpoint = \sprintf('https://%s/1.0/auth/time', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/1.0/auth/time', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint);
 
         return $response->getContent() - time();

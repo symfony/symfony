@@ -56,7 +56,7 @@ final class OrangeSmsTransport extends AbstractTransport
         }
 
         $from = $message->getFrom() ?: $this->from;
-        $url = 'https://'.$this->getEndpoint().'/smsmessaging/v1/outbound/'.urlencode('tel:'.$from).'/requests';
+        $endpoint = \sprintf('%s://%s/smsmessaging/v1/outbound/%s/requests', $this->getHttpScheme(), $this->getEndpoint(), urlencode('tel:'.$from));
         $payload = [
             'outboundSMSMessageRequest' => [
                 'address' => 'tel:'.$message->getPhone(),
@@ -71,7 +71,7 @@ final class OrangeSmsTransport extends AbstractTransport
             $payload['outboundSMSMessageRequest']['senderName'] = urlencode($this->senderName);
         }
 
-        $response = $this->client->request('POST', $url, [
+        $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->getAccessToken(),
             'json' => $payload,
         ]);
@@ -89,14 +89,14 @@ final class OrangeSmsTransport extends AbstractTransport
 
     private function getAccessToken(): string
     {
-        $url = 'https://'.$this->getEndpoint().'/oauth/v3/token';
+        $endpoint = \sprintf('%s://%s/oauth/v3/token', $this->getHttpScheme(), $this->getEndpoint());
         $headers = [
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Accept' => 'application/json',
         ];
         $args = ['grant_type' => 'client_credentials'];
 
-        $response = $this->client->request('POST', $url, [
+        $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->clientID, $this->clientSecret],
             'headers' => $headers,
             'body' => $args,

@@ -56,7 +56,8 @@ final class PagerDutyTransport extends AbstractTransport
         $options['payload']['summary'] = $message->getContent();
         $options['payload']['source'] = $message->getSubject();
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v2/enqueue', [
+        $endpoint = \sprintf('%s://%s/v2/enqueue', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => $this->token,

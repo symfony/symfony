@@ -73,7 +73,7 @@ final class WhatsAppTransport extends AbstractTransport
             ...$this->messageBody($options, $message->getSubject()),
         ];
 
-        $endpoint = \sprintf('https://%s/%s/%s/messages', $this->getEndpoint(), $this->apiVersion, $this->phoneNumberId);
+        $endpoint = \sprintf('%s://%s/%s/%s/messages', $this->getHttpScheme(), $this->getEndpoint(), $this->apiVersion, $this->phoneNumberId);
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->accessToken,

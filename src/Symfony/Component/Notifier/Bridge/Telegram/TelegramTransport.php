@@ -56,9 +56,11 @@ final class TelegramTransport extends AbstractTransport
         private ?string $chatChannel = null,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
-        private readonly bool $disableHttps = false,
+        bool $disableHttps = false,
     ) {
         parent::__construct($client, $dispatcher);
+
+        $this->setSsl(!$disableHttps);
     }
 
     public function __toString(): string
@@ -67,7 +69,7 @@ final class TelegramTransport extends AbstractTransport
 
         $formattedOptions = http_build_query([
             'channel' => $this->chatChannel,
-            'sslmode' => $this->disableHttps ? 'disable' : null,
+            'ssl' => 'http' === $this->getHttpScheme() ? 'false' : null,
         ], '', '&');
 
         if ('' !== $formattedOptions) {
@@ -128,9 +130,7 @@ final class TelegramTransport extends AbstractTransport
         }
         unset($options['edit_caption']);
         $options = $this->expandOptions($options, 'contact', 'location', 'venue');
-        $protocolSchema = $this->disableHttps ? 'http' : 'https';
-
-        $endpoint = \sprintf('%s://%s/bot%s/%s', $protocolSchema, $this->getEndpoint(), $this->token, $method);
+        $endpoint = \sprintf('%s://%s/bot%s/%s', $this->getHttpScheme(), $this->getEndpoint(), $this->token, $method);
 
         $response = $this->client->request('POST', $endpoint, [
             $optionsContainer => array_filter($options),

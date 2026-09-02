@@ -78,6 +78,25 @@ final class NtfyTransportTest extends TransportTestCase
         $this->assertSame('2BYIwRmvBKcv', $sentMessage->getMessageId());
     }
 
+    public function testSendUsesPlainHttpWhenSslIsDisabled()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertStringStartsWith('http://ntfy.sh', $url);
+
+            return new MockResponse(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
+        });
+
+        (new NtfyTransport('test', false, $client))->send(new PushMessage('Hello', 'World'));
+
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
+            $this->assertStringStartsWith('http://ntfy.sh', $url);
+
+            return new MockResponse(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
+        });
+
+        $this->createTransport($client)->setSsl(false)->send(new PushMessage('Hello', 'World'));
+    }
+
     public function testSendWithPassword()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {

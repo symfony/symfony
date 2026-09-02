@@ -33,11 +33,13 @@ final class NtfyTransport extends AbstractTransport
 
     public function __construct(
         private string $topic,
-        private bool $secureHttp = true,
+        bool $ssl = true,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
+
+        $this->setSsl($ssl);
     }
 
     public function getTopic(): string
@@ -92,7 +94,8 @@ final class NtfyTransport extends AbstractTransport
             $headers['Authorization'] = 'Bearer '.$this->password;
         }
 
-        $response = $this->client->request('POST', ($this->secureHttp ? 'https' : 'http').'://'.$this->getEndpoint(), [
+        $endpoint = \sprintf('%s://%s', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => $headers,
             'json' => $options,
         ]);

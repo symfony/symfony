@@ -87,7 +87,8 @@ final class GoogleChatTransport extends AbstractTransport
 
         $threadKey = $options->getThreadKey() ?: $this->threadKey;
 
-        $url = \sprintf('https://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
+        $endpoint = \sprintf('%s://%s/v1/spaces/%s/messages?key=%s&token=%s%s',
+            $this->getHttpScheme(),
             $this->getEndpoint(),
             $this->space,
             urlencode($this->accessKey),
@@ -101,7 +102,7 @@ final class GoogleChatTransport extends AbstractTransport
             $body['thread']['threadKey'] = $threadKey;
         }
 
-        $response = $this->client->request('POST', $url, [
+        $response = $this->client->request('POST', $endpoint, [
             'json' => $body,
         ]);
 

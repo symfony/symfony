@@ -117,7 +117,8 @@ final class SmsboxTransport extends AbstractTransport
             unset($options['variable']);
         }
 
-        $response = $this->client->request('POST', \sprintf('https://%s/1.1/api.php', $this->getEndpoint()), [
+        $endpoint = \sprintf('%s://%s/1.1/api.php', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Content-Type' => 'application/x-www-form-urlencoded',
                 'Authorization' => 'App '.$this->apiKey,

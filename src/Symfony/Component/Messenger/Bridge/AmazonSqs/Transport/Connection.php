@@ -52,6 +52,7 @@ class Connection
         'queue_attributes' => null,
         'queue_tags' => null,
         'account' => null,
+        'ssl' => null,
         'sslmode' => null,
         'debug' => null,
     ];
@@ -111,7 +112,7 @@ class Connection
      * * visibility_timeout: amount of seconds the message won't be visible
      * * delete_on_rejection: Whether to delete message on rejection or allow SQS to handle retries. (Default: true).
      * * retry_delay: amount of seconds the message won't be visible before retry. (Default: 0).
-     * * sslmode: Can be "disable" to use http for a custom endpoint
+     * * ssl: Whether to use https for a custom endpoint (Default: true)
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
      */
@@ -167,7 +168,7 @@ class Connection
 
         $isAwsHost = false;
         if ('default' !== ($params['host'] ?? 'default')) {
-            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', ($options['sslmode'] ?? null) === 'disable' ? 'http' : 'https', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
+            $clientConfiguration['endpoint'] = \sprintf('%s://%s%s', self::isSslEnabled($options, $params['scheme'] ?? 'sqs') ? 'https' : 'http', $params['host'], ($params['port'] ?? null) ? ':'.$params['port'] : '');
             // Every AWS partition that serves SQS under amazonaws: aws, aws-cn and aws-eusc
             if (preg_match(';^sqs\.([^\.]++)\.amazonaws\.(?:com(?:\.cn)?|eu)$;', $params['host'], $matches)) {
                 $clientConfiguration['region'] = $matches[1];
@@ -453,6 +454,16 @@ class Connection
                 'VisibilityTimeout' => 0,
             ]);
         }
+    }
+
+    private static function isSslEnabled(array $options, string $scheme): bool
+    {
+        if (null === $ssl = $options['ssl'] ?? null) {
+            // "sslmode=disable" is the legacy spelling of "ssl=false"
+            return 'disable' !== ($options['sslmode'] ?? null);
+        }
+
+        return filter_var($ssl, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? throw new InvalidArgumentException(\sprintf('Invalid value for the "ssl" option of the "%s" DSN, expected a boolean.', $scheme));
     }
 
     private function getQueueUrl(): string

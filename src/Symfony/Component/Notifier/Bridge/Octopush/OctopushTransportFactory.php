@@ -36,7 +36,7 @@ final class OctopushTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new OctopushTransport($userLogin, $apiKey, $from, $type, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new OctopushTransport($userLogin, $apiKey, $from, $type, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

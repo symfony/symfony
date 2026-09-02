@@ -29,7 +29,11 @@ final class TelegramTransportFactoryTest extends AbstractTransportFactoryTestCas
         yield ['telegram://host.test?channel=testChannel', 'telegram://user:password@host.test?channel=testChannel'];
 
         // Tests for `sslmode` option
-        yield ['telegram://host.test?channel=testChannel&sslmode=disable', 'telegram://user:password@host.test?channel=testChannel&sslmode=disable'];
+        yield ['telegram://host.test?channel=testChannel&ssl=false', 'telegram://user:password@host.test?channel=testChannel&sslmode=disable'];
+
+        // the "ssl" option is the unified spelling of "sslmode"
+        yield ['telegram://host.test?channel=testChannel&ssl=false', 'telegram://user:password@host.test?channel=testChannel&ssl=false'];
+        yield ['telegram://host.test?channel=testChannel', 'telegram://user:password@host.test?channel=testChannel&ssl=true'];
     }
 
     public static function supportsProvider(): iterable

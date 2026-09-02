@@ -53,7 +53,7 @@ final class MailjetTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/v4/sms-send', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v4/sms-send', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,

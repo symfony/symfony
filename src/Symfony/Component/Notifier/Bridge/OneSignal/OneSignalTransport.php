@@ -86,7 +86,8 @@ final class OneSignalTransport extends AbstractTransport
         $options['headings'] ??= ['en' => $message->getSubject()];
         $options['contents'] ??= ['en' => $message->getContent()];
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/v1/notifications', [
+        $endpoint = \sprintf('%s://%s/api/v1/notifications', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
                 'Authorization' => 'Basic '.$this->apiKey,

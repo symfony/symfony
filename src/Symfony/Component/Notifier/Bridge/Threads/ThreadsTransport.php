@@ -197,7 +197,7 @@ final class ThreadsTransport extends AbstractTransport
 
     private function graphUrl(string $path): string
     {
-        return \sprintf('https://%s/%s/%s', $this->getEndpoint(), $this->apiVersion, ltrim($path, '/'));
+        return \sprintf('%s://%s/%s/%s', $this->getHttpScheme(), $this->getEndpoint(), $this->apiVersion, ltrim($path, '/'));
     }
 
     /**

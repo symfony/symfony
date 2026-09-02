@@ -56,7 +56,7 @@ final class ExpoTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, PushMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s', $this->getHttpScheme(), $this->getEndpoint());
         $options = $message->getOptions()?->toArray() ?? [];
         $options['to'] ??= $message->getRecipientId();
 

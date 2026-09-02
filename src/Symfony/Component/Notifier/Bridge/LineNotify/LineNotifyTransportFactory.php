@@ -37,6 +37,6 @@ final class LineNotifyTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new LineNotifyTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new LineNotifyTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 }

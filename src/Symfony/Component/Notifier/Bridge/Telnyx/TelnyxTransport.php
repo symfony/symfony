@@ -73,7 +73,7 @@ final class TelnyxTransport extends AbstractTransport
             }
         }
 
-        $endpoint = \sprintf('https://%s/v2/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v2/messages', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->apiKey,
             'json' => [

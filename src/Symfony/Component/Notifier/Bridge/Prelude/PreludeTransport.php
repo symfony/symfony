@@ -75,7 +75,8 @@ final class PreludeTransport extends AbstractTransport
 
         $body = array_merge($body, $options);
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v2/notify', [
+        $endpoint = \sprintf('%s://%s/v2/notify', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'json' => $body,
             'headers' => [
                 'Authorization' => 'Bearer '.$this->apiKey,

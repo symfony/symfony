@@ -112,7 +112,8 @@ final class BlueskyTransport extends AbstractTransport
             unset($options['external']);
         }
 
-        $response = $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.repo.createRecord', $this->getEndpoint()), [
+        $endpoint = \sprintf('%s://%s/xrpc/com.atproto.repo.createRecord', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authSession['accessJwt'] ?? null,
             'json' => $options,
         ]);
@@ -146,7 +147,8 @@ final class BlueskyTransport extends AbstractTransport
 
     private function authenticate(): void
     {
-        $response = $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.server.createSession', $this->getEndpoint()), [
+        $endpoint = \sprintf('%s://%s/xrpc/com.atproto.server.createSession', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'json' => [
                 'identifier' => $this->user,
                 'password' => $this->password,
@@ -177,7 +179,8 @@ final class BlueskyTransport extends AbstractTransport
         // regex based on: https://bluesky.com/specs/handle#handle-identifier-syntax
         $regex = '#[$|\W](@([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)#';
         foreach ($this->getMatchAndPosition($input, $regex) as $match) {
-            $response = $this->client->request('GET', \sprintf('https://%s/xrpc/com.atproto.identity.resolveHandle', $this->getEndpoint()), [
+            $endpoint = \sprintf('%s://%s/xrpc/com.atproto.identity.resolveHandle', $this->getHttpScheme(), $this->getEndpoint());
+            $response = $this->client->request('GET', $endpoint, [
                 'query' => [
                     'handle' => ltrim($match['match'], '@'),
                 ],
@@ -290,11 +293,12 @@ final class BlueskyTransport extends AbstractTransport
     private function uploadMedia(array $media): array
     {
         $pool = [];
+        $endpoint = \sprintf('%s://%s/xrpc/com.atproto.repo.uploadBlob', $this->getHttpScheme(), $this->getEndpoint());
 
         foreach ($media as ['file' => $file, 'description' => $description]) {
             $pool[] = [
                 'description' => $description,
-                'response' => $this->client->request('POST', \sprintf('https://%s/xrpc/com.atproto.repo.uploadBlob', $this->getEndpoint()), [
+                'response' => $this->client->request('POST', $endpoint, [
                     'auth_bearer' => $this->authSession['accessJwt'] ?? null,
                     'headers' => [
                         'Content-Type: '.$file->getContentType(),

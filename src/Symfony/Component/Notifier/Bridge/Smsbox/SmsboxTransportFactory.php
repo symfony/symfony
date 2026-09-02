@@ -45,7 +45,8 @@ final class SmsboxTransportFactory extends AbstractTransportFactory
 
         return (new SmsboxTransport($apiKey, $mode, $strategy, $sender, $this->client, $this->dispatcher))
             ->setHost($host)
-            ->setPort($port);
+            ->setPort($port)
+            ->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

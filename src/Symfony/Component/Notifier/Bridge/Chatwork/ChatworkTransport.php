@@ -67,7 +67,7 @@ class ChatworkTransport extends AbstractTransport
             ->body($message->getSubject())
             ->getMessageBody();
 
-        $endpoint = \sprintf('https://%s/v2/rooms/%s/messages', $this->getEndpoint(), $this->roomId);
+        $endpoint = \sprintf('%s://%s/v2/rooms/%s/messages', $this->getHttpScheme(), $this->getEndpoint(), $this->roomId);
         $response = $this->client->request('POST', $endpoint, [
             'body' => $messageBody,
             'headers' => [

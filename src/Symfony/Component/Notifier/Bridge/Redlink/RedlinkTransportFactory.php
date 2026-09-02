@@ -35,7 +35,7 @@ final class RedlinkTransportFactory extends AbstractTransportFactory
         $from = $dsn->getRequiredOption('from');
         $version = $dsn->getRequiredOption('version');
 
-        return (new RedlinkTransport($apiKey, $appToken, $from, $version, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new RedlinkTransport($apiKey, $appToken, $from, $version, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

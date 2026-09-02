@@ -71,7 +71,7 @@ final class ZulipTransport extends AbstractTransport
             $options['to'] = $message->getRecipientId();
         }
 
-        $endpoint = \sprintf('https://%s/api/v1/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api/v1/messages', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->email, $this->token],

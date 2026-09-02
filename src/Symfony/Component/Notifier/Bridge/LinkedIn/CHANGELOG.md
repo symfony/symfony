@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add support for posting as a LinkedIn organization via the DSN `author` option
+ * Add the `ssl` DSN option to send requests over plain HTTP
 
 5.3
 ---

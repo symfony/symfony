@@ -57,7 +57,7 @@ final class SmsmodeTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/sms/v1/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/sms/v1/messages', $this->getHttpScheme(), $this->getEndpoint());
 
         $options = $message->getOptions()?->toArray() ?? [];
         $options['body']['text'] = $message->getSubject();

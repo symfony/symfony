@@ -24,7 +24,7 @@
         "psr/log": "^1|^2|^3",
         "symfony/clock": "^7.4|^8.0",
         "symfony/http-client": "^7.4|^8.0",
-        "symfony/notifier": "^7.4|^8.0"
+        "symfony/notifier": "^8.2"
     },
     "require-dev": {
         "symfony/mime": "^7.4|^8.0"

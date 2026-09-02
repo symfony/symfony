@@ -68,7 +68,8 @@ final class MobytTransport extends AbstractTransport
         $options['recipient'] = [$message->getPhone()];
         $options['sender'] = $message->getFrom() ?: $this->from;
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/API/v1.0/REST/sms', [
+        $endpoint = \sprintf('%s://%s/API/v1.0/REST/sms', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'user_key' => $this->accountSid,
                 'Access_token' => $this->authToken,

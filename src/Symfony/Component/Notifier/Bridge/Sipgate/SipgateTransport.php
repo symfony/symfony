@@ -54,7 +54,7 @@ final class SipgateTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/v2/sessions/sms', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v2/sessions/sms', $this->getHttpScheme(), $this->getEndpoint());
 
         $options = [];
         $options['smsId'] = $this->senderId;

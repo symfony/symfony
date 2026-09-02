@@ -53,11 +53,11 @@ final class MastodonTransport extends AbstractTransport
 
     public function request(string $method, string $url, array $options): ResponseInterface
     {
-        $url = \sprintf('https://%s%s', $this->getEndpoint(), $url);
+        $endpoint = \sprintf('%s://%s%s', $this->getHttpScheme(), $this->getEndpoint(), $url);
 
         $options['auth_bearer'] = $this->accessToken;
 
-        return $this->client->request($method, $url, $options);
+        return $this->client->request($method, $endpoint, $options);
     }
 
     /**

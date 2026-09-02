@@ -77,7 +77,8 @@ final class SlackTransport extends AbstractTransport
             $apiMethod = 'chat.scheduleMessage';
         }
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/'.$apiMethod, [
+        $endpoint = \sprintf('%s://%s/api/%s', $this->getHttpScheme(), $this->getEndpoint(), $apiMethod);
+        $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options, static fn ($value): bool => !\in_array($value, ['', [], null], true)),
             'auth_bearer' => $this->accessToken,
             'headers' => [

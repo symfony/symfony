@@ -62,7 +62,7 @@ final class DiscordBotTransport extends AbstractTransport
         $options = $message->getOptions()?->toArray() ?? [];
         $options['content'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/api/channels/%s/messages', $this->getEndpoint(), $channelId);
+        $endpoint = \sprintf('%s://%s/api/channels/%s/messages', $this->getHttpScheme(), $this->getEndpoint(), $channelId);
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Authorization' => 'Bot '.$this->token,

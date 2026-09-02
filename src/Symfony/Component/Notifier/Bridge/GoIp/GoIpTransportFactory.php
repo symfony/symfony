@@ -38,7 +38,8 @@ final class GoIpTransportFactory extends AbstractTransportFactory
 
         return (new GoIpTransport($username, $password, $simSlot, $this->client, $this->dispatcher))
             ->setHost($dsn->getHost())
-            ->setPort($dsn->getPort());
+            ->setPort($dsn->getPort())
+            ->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

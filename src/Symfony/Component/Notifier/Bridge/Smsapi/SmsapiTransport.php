@@ -97,7 +97,7 @@ final class SmsapiTransport extends AbstractTransport
             $body['from'] = $from;
         }
 
-        $endpoint = \sprintf('https://%s/sms.do', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/sms.do', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'body' => $body,

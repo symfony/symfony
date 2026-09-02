@@ -59,7 +59,7 @@ final class FortySixElksTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['message'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/a1/sms', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/a1/sms', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->apiUsername, $this->apiPassword],
             'body' => array_filter($options),

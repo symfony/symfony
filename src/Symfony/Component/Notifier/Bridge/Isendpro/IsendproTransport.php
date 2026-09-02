@@ -77,7 +77,8 @@ final class IsendproTransport extends AbstractTransport
             $messageData['emetteur'] = $this->from;
         }
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/cgi-bin/sms', [
+        $endpoint = \sprintf('%s://%s/cgi-bin/sms', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
                 'Cache-Control' => 'no-cache',

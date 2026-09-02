@@ -49,7 +49,7 @@ final class PrimotextoTransport extends AbstractTransport
         $options['number'] = $message->getPhone();
         $options['message'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/v2/notification/messages/send', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v2/notification/messages/send', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'X-Primotexto-ApiKey' => $this->apiKey,

@@ -57,7 +57,7 @@ class YunpianTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
-        $endpoint = \sprintf('https://%s/v2/sms/single_send.json', self::HOST);
+        $endpoint = \sprintf('%s://%s/v2/sms/single_send.json', $this->getHttpScheme(), self::HOST);
         $response = $this->client->request('POST', $endpoint, [
             'body' => [
                 'apikey' => $this->apiKey,

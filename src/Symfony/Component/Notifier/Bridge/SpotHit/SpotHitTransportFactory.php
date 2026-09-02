@@ -35,7 +35,7 @@ final class SpotHitTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SpotHitTransport($token, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSmsLong($smsLong)->setLongNBr($smsLongNBr);
+        return (new SpotHitTransport($token, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSmsLong($smsLong)->setLongNBr($smsLongNBr)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

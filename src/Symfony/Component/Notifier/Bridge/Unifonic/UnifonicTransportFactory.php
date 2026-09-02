@@ -33,7 +33,7 @@ final class UnifonicTransportFactory extends AbstractTransportFactory
             $dsn->getOption('from'),
             $this->client,
             $this->dispatcher,
-        ))->setHost($host)->setPort($dsn->getPort());
+        ))->setHost($host)->setPort($dsn->getPort())->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

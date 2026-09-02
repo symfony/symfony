@@ -72,7 +72,7 @@ final class TurboSmsTransport extends AbstractTransport
             $from = $this->from;
         }
 
-        $endpoint = \sprintf('https://%s/message/send.json', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/message/send.json', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'json' => [

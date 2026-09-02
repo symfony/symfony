@@ -31,7 +31,7 @@ final class SmsenseTransportFactory extends AbstractTransportFactory
         $authToken = $this->getUser($dsn);
         $port = $dsn->getPort();
 
-        return (new SmsenseTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SmsenseTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

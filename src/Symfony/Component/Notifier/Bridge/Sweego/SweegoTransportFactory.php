@@ -38,7 +38,7 @@ final class SweegoTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SweegoTransport($apiKey, $region, $campaignType, $bat, $campaignId, $shortenUrls, $shortenWithProtocol, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SweegoTransport($apiKey, $region, $campaignType, $bat, $campaignId, $shortenUrls, $shortenWithProtocol, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

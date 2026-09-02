@@ -85,7 +85,8 @@ final class SmsProximaTransport extends AbstractTransport
             }
         }
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/sms/send', [
+        $endpoint = \sprintf('%s://%s/api/sms/send', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => $headers,
             'json' => $body,
         ]);

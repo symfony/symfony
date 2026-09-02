@@ -62,7 +62,7 @@ final class FreeMobileTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "%s" transport does not support "from" in "%s".', __CLASS__, SmsMessage::class));
         }
 
-        $endpoint = \sprintf('https://%s', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'query' => [

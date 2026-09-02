@@ -59,7 +59,7 @@ final class TwitterTransport extends AbstractTransport
 
     public function request(string $method, string $url, array $options): ResponseInterface
     {
-        $url = 'https://'.str_replace('api.', str_starts_with($url, '/1.1/media/') ? 'upload.' : 'api.', $this->getEndpoint()).$url;
+        $endpoint = \sprintf('%s://%s%s', $this->getHttpScheme(), str_replace('api.', str_starts_with($url, '/1.1/media/') ? 'upload.' : 'api.', $this->getEndpoint()), $url);
 
         foreach (\is_array($options['body'] ?? null) ? $options['body'] : [] as $v) {
             if (!$v instanceof DataPart) {
@@ -93,7 +93,7 @@ final class TwitterTransport extends AbstractTransport
             'sha1',
             implode('&', array_map('rawurlencode', [
                 $method,
-                $url,
+                $endpoint,
                 implode('&', array_map(static fn ($k) => rawurlencode($k).'='.rawurlencode($sign[$k]), array_keys($sign))),
             ])),
             rawurlencode($this->apiSecret).'&'.rawurlencode($this->accessSecret),
@@ -102,7 +102,7 @@ final class TwitterTransport extends AbstractTransport
 
         $options['headers'][] = 'Authorization: OAuth '.implode(', ', array_map(static fn ($k) => $k.'="'.rawurlencode($oauth[$k]).'"', array_keys($oauth)));
 
-        return $this->client->request($method, $url, $options);
+        return $this->client->request($method, $endpoint, $options);
     }
 
     protected function doSend(MessageInterface $message): SentMessage

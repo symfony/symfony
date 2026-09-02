@@ -59,7 +59,7 @@ final class PushoverTransport extends AbstractTransport
         $options['token'] = $this->appToken;
         $options['user'] = $this->userKey;
 
-        $endpoint = \sprintf('https://%s/1/messages.json', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/1/messages.json', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'body' => $options,
         ]);

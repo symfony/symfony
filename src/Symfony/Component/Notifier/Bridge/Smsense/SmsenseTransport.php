@@ -55,7 +55,7 @@ final class SmsenseTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $endpoint = \sprintf('https://%s/rest/send_sms?from=%s&message=%s&to=%s', $this->getEndpoint(), $from, $message->getSubject(), $message->getPhone());
+        $endpoint = \sprintf('%s://%s/rest/send_sms?from=%s&message=%s&to=%s', $this->getHttpScheme(), $this->getEndpoint(), $from, $message->getSubject(), $message->getPhone());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,
             'headers' => [

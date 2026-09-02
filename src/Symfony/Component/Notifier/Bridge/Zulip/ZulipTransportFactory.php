@@ -34,7 +34,7 @@ final class ZulipTransportFactory extends AbstractTransportFactory
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new ZulipTransport($email, $token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new ZulipTransport($email, $token, $channel, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

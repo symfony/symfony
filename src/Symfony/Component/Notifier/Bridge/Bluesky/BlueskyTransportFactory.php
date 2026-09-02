@@ -47,7 +47,8 @@ final class BlueskyTransportFactory extends AbstractTransportFactory
 
         return (new BlueskyTransport($user, $secret, $this->logger ?? new NullLogger(), $this->client, $this->dispatcher, $this->clock))
             ->setHost($dsn->getHost())
-            ->setPort($dsn->getPort());
+            ->setPort($dsn->getPort())
+            ->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

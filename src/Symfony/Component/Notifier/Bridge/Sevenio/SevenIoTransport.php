@@ -53,7 +53,8 @@ final class SevenIoTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $response = $this->client->request('POST', \sprintf('https://%s/api/sms', $this->getEndpoint()), [
+        $endpoint = \sprintf('%s://%s/api/sms', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'SentWith' => 'symfony/sevenio-notifier',

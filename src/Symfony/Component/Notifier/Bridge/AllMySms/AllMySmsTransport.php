@@ -62,7 +62,7 @@ final class AllMySmsTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['text'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/sms/send/', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/sms/send/', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->login, $this->apiKey],
             'json' => array_filter($options),

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T11:28:51Z
+
+I reviewed this in depth and amended a few things into your commit while rebasing on current 8.2:
+
+- `client_secret_basic` sent the credentials as `base64(client_id:client_secret)` directly. RFC 6749, Section 2.3.1 requires each part to be form-urlencoded before concatenation, and conformant providers (Keycloak, node oidc-provider) decode accordingly, so a secret containing `:`, `%`, `+` or non-ASCII failed against them. The client now pre-encodes both parts; a test pins the exact `Authorization` header for a hostile id/secret pair.
+- `OidcConfidentialClient` silently fell back to `client_secret_post` for an unknown method string; it now throws.
+- `OidcPublicClient` accepted an empty-string PKCE verifier; it is now refused like a missing one.
+- `client_secret: null` is now accepted for `token_endpoint_auth_method: none` (natural when converting an existing config to a public client), while `null` and `''` still fail the secret-based methods with a specific message. The empty-secret check lives in the array-level validator on purpose: scalar-node validators see the empty string an env placeholder resolves to while the container compiles.
+
+On your `getSecureEndpoint()` question: no rewording needed, the comment as merged in #64954 already justifies the rule by the code and tokens travelling through the endpoint, which covers public clients.

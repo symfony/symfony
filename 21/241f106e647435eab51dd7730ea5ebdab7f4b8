@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:43:54Z
+
+Thank you for the report and the fix, both are correct: I could reproduce the truncation with your test, and the conditional `feof()` check resolves it.
+
+I made three changes while preparing the branch for merge:
+
+1. I reverted the commit that removes `rewind()`. It reintroduces the same class of bug on the unbounded path: when the stream was already consumed, the EOF flag is still set when `getChunks()` starts, and since the loop now checks `feof()` before the first `stream_get_contents()` call (which is what clears the flag by seeking), it exits before reading anything. `testReadUnion` fails with `Unterminated JSON.` on your branch because of this. The `rewind()` is what clears the stale flag, so it stays.
+
+2. Dropping the `feof()` check on bounded reads removes the only thing that made them terminate when the requested length points beyond the end of the stream: `stream_get_contents()` then returns an empty string forever and the loop never ends. `Splitter::splitList()` and `splitDict()` accept caller-supplied offsets and lengths, so this is reachable. The loop now stops on an empty chunk, which turns that case into `Unterminated JSON.` as before.
+
+3. I added two `Lexer`-level tests: one that consumes the stream between chunk reads (fails on the current code with `Unterminated JSON.`, the direct reproduction of the race), and one that passes a length beyond the end of the stream (hangs without the empty-chunk guard).
+
+The bug exists on 7.4 as well and the branch is maintained, so I retargeted the PR there and rebuilt the change as a single commit on top of 7.4, keeping your authorship. For the merge up: on 8.1 and 8.2, `JsonStreamReader::create()` no longer takes the `$lazyGhostsDir` argument, so the new test's `create()` call loses it there.
+
+---------------------------------------------------------------------------
+
+by vlastv at 2026-09-02T08:54:22Z
+
+@nicolas-grekas Thank you so much for the quick review, pointing out the issues, and helping clean up the PR!

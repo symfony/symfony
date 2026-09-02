@@ -152,8 +152,17 @@ final class EnglishInflector implements InflectorInterface
         // drives (drive)
         ['sevird', 6, false, true, 'drive'],
 
-        // lives (life), wives (wife)
-        ['sevi', 4, false, true, 'ife'],
+        // knives (knife), jackknives (jackknife)
+        ['sevink', 6, true, true, 'knife'],
+
+        // wives (wife), midwives (midwife)
+        ['seviw', 5, true, true, 'wife'],
+
+        // lives (life)
+        ['sevil', 5, false, true, 'life'],
+
+        // archives (archive), explosives (explosive), hives (hive), olives (olive)
+        ['sevi', 4, true, true, 'ive'],
 
         // moves (move)
         ['sevom', 5, true, true, 'move'],

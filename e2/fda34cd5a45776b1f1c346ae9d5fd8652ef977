@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T07:07:45Z
+
+Why this is a feature on 8.2 rather than a bugfix on 8.1, and why `off()` comes with it.
+
+`on()` documented that listeners are *"automatically cleared on detach"*. Removing that line changes a
+stated contract, so it is a behavior change and belongs on the development branch. The docblock is
+corrected in the second commit; it was still promising the old behavior.
+
+The public API challenge for `off()`, run against the first commit alone:
+
+```
+after registering: fired=1
+attempt 1, remove+add:      fired=2 (still firing)
+attempt 2, candidate public methods: removeStyleClass, detach, clearRenderCache
+attempt 3, $listeners visibility: private
+```
+
+Remove-and-add no longer releases a listener, which is the point of the first commit. No other public
+method releases one either: `detach()` is `@internal`, and `removeStyleClass()` and `clearRenderCache()`
+are unrelated. `$listeners` is private, so the only way left is reflection into internals the component
+does not promise to keep. The attempt fails, which is what justifies adding the method.
+
+One note for anyone weighing the old clearing behavior on leak grounds: it was not buying deterministic
+teardown. Over 200 add/remove rounds with a self-capturing listener, the object graph leaves 6794
+objects to the cycle collector with the clear and 7553 without. The widget and context graph is already
+cyclic either way, so the collector has to run regardless.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:25:19Z
+
+Comments addressed while rebasing on top of #65424: `off()` now uses the same comparison as `EventDispatcher::removeListener()`, so a first-class callable of the same method can be released; the docblock now states that `off()` removes every registration of the listener; and a new test pins that a widget out of the tree still fires its own listeners. A test also shows that an inline closure with a different binding is not matched, so the looser comparison cannot over-remove.

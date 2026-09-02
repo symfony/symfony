@@ -86,7 +86,7 @@ final class SweegoTransport extends AbstractTransport
         $body = $this->setShortenUrls($body, $options);
         $body = $this->setShortenWithProtocol($body, $options);
 
-        $endpoint = \sprintf('https://%s/send', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/send', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Api-Key' => $this->apiKey,

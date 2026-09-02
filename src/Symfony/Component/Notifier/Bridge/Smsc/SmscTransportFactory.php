@@ -33,7 +33,7 @@ final class SmscTransportFactory extends AbstractTransportFactory
         $from = $dsn->getRequiredOption('from');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
 
-        return (new SmscTransport($login, $password, $from, $this->client, $this->dispatcher))->setHost($host);
+        return (new SmscTransport($login, $password, $from, $this->client, $this->dispatcher))->setHost($host)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

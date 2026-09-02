@@ -68,7 +68,7 @@ final class SendberryTransport extends AbstractTransport
             }
         }
 
-        $endpoint = \sprintf('https://%s/SMS/SEND', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/SMS/SEND', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'json' => [
                 'from' => $from,

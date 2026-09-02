@@ -34,11 +34,13 @@ final class MatrixTransport extends AbstractTransport
 
     public function __construct(
         #[\SensitiveParameter] private string $accessToken,
-        private bool $ssl,
+        bool $ssl = true,
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct($client, $dispatcher);
+
+        $this->setSsl($ssl);
     }
 
     public function __toString(): string
@@ -97,7 +99,17 @@ final class MatrixTransport extends AbstractTransport
 
     protected function getEndpoint(bool $full = false): string
     {
-        return rtrim(($full ? $this->getScheme().'://' : '').$this->host.($this->port ? ':'.$this->port : ''), '/');
+        $endpoint = $this->host ?? '';
+
+        if ($this->port) {
+            $endpoint = \sprintf('%s:%d', $endpoint, $this->port);
+        }
+
+        if ($full) {
+            $endpoint = \sprintf('%s://%s', $this->getHttpScheme(), $endpoint);
+        }
+
+        return rtrim($endpoint, '/');
     }
 
     private function getRoomFromAlias(string $alias): string
@@ -149,11 +161,6 @@ final class MatrixTransport extends AbstractTransport
         $response = $this->request('GET', '/_matrix/client/v3/account/whoami');
 
         return $response->toArray();
-    }
-
-    private function getScheme(): string
-    {
-        return $this->ssl ? 'https' : 'http';
     }
 
     private function request(string $method, string $uri, ?array $options = []): ResponseInterface

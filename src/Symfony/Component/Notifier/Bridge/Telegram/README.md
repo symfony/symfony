@@ -7,13 +7,13 @@ DSN example
 -----------
 
 ```
-TELEGRAM_DSN=telegram://TOKEN@default?channel=CHAT_ID&sslmode=SSLMODE
+TELEGRAM_DSN=telegram://TOKEN@default?channel=CHAT_ID&ssl=SSL
 ```
 
 where:
  - `TOKEN` is your Telegram token
  - `CHAT_ID` is your Telegram chat id
- - `SSLMODE` https is used by default. It can be changed by setting value to `disable`, http will be used
+ - `SSL` https is used by default. It can be changed by setting value to `false`, http will be used
 
 Interacting with local API server instead of official Telegram API
 ------------------------------------------------------------------
@@ -25,7 +25,7 @@ can only accept `http` traffic.
 
 Example:
 ```
-TELEGRAM_DSN=telegram://TOKEN@localhost:5001?channel=CHAT_ID&sslmode=disable
+TELEGRAM_DSN=telegram://TOKEN@localhost:5001?channel=CHAT_ID&ssl=false
 ```
 
 Caution: Disabling the use of the `https` protocol can pose a security risk.

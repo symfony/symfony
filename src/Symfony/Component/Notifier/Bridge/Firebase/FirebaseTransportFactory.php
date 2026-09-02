@@ -41,13 +41,15 @@ final class FirebaseTransportFactory extends AbstractTransportFactory
 
             return (new FirebaseTransport('', $projectId, $user, $privateKeyId, $privateKey, $this->client, $this->dispatcher))
                 ->setHost($host)
-                ->setPort($port);
+                ->setPort($port)
+                ->setSsl($this->getSsl($dsn));
         } catch (MissingRequiredOptionException) {
             trigger_deprecation('symfony/firebase-notifier', '8.2', 'Using Firebase Notifier without project_id, private_key_id and private_key options is deprecated. Update your Firebase DSN.');
 
             return (new FirebaseTransport('', '', '', '', '', $this->client, $this->dispatcher))
                 ->setHost($host)
-                ->setPort($port);
+                ->setPort($port)
+                ->setSsl($this->getSsl($dsn));
         }
     }
 

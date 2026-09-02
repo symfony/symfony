@@ -32,7 +32,7 @@ final class MastodonTransportFactory extends AbstractTransportFactory
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new MastodonTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new MastodonTransport($token, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

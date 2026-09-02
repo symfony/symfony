@@ -75,7 +75,7 @@ final class BandwidthTransport extends AbstractTransport
         if (!preg_match('/^\+[1-9]\d{1,14}$/', $options['to'][0])) {
             throw new InvalidArgumentException(\sprintf('The "To" number "%s" is not a valid phone number. The number must be in E.164 format.', $options['to'][0]));
         }
-        $endpoint = \sprintf('https://%s/api/v2/users/%s/messages', $this->getEndpoint(), $options['accountId']);
+        $endpoint = \sprintf('%s://%s/api/v2/users/%s/messages', $this->getHttpScheme(), $this->getEndpoint(), $options['accountId']);
         unset($options['accountId']);
 
         $response = $this->client->request('POST', $endpoint, [

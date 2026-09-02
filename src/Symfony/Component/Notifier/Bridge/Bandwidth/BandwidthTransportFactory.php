@@ -39,7 +39,7 @@ final class BandwidthTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new BandwidthTransport($username, $password, $from, $accountId, $applicationId, $priority, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new BandwidthTransport($username, $password, $from, $accountId, $applicationId, $priority, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

@@ -60,7 +60,7 @@ final class RocketChatTransport extends AbstractTransport
         $options['channel'] ??= $message->getRecipientId() ?: $this->chatChannel;
         $options['text'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/hooks/%s', $this->getEndpoint(), $this->accessToken);
+        $endpoint = \sprintf('%s://%s/hooks/%s', $this->getHttpScheme(), $this->getEndpoint(), $this->accessToken);
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);

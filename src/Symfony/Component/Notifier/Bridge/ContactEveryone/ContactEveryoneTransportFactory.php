@@ -31,7 +31,7 @@ final class ContactEveryoneTransportFactory extends AbstractTransportFactory
         $diffusionName = $dsn->getOption('diffusionname');
         $category = $dsn->getOption('category');
 
-        return (new ContactEveryoneTransport($token, $diffusionName, $category, $this->client, $this->dispatcher))->setHost($host)->setPort($dsn->getPort());
+        return (new ContactEveryoneTransport($token, $diffusionName, $category, $this->client, $this->dispatcher))->setHost($host)->setPort($dsn->getPort())->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

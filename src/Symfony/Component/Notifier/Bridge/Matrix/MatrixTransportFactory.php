@@ -29,7 +29,7 @@ class MatrixTransportFactory extends AbstractTransportFactory
         $token = $dsn->getRequiredOption('accessToken');
         $host = $dsn->getHost();
         $port = $dsn->getPort();
-        $ssl = $dsn->getBooleanOption('ssl', true);
+        $ssl = $this->getSsl($dsn) ?? true;
 
         return (new MatrixTransport($token, $ssl, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
     }

@@ -73,6 +73,25 @@ final class SmsapiTransportTest extends TransportTestCase
         }
     }
 
+    #[DataProvider('schemeProvider')]
+    public function testSendUsesTheConfiguredScheme(?bool $ssl, string $expectedEndpoint)
+    {
+        $client = new MockHttpClient(function (string $method, string $url) use ($expectedEndpoint): MockResponse {
+            $this->assertSame($expectedEndpoint, $url);
+
+            return new MockResponse('{"list":[{"id":"1"}]}');
+        });
+
+        self::createTransport($client)->setSsl($ssl)->send(new SmsMessage('0611223344', 'Hello!'));
+    }
+
+    public static function schemeProvider(): iterable
+    {
+        yield 'https by default' => [null, 'https://test.host/sms.do'];
+        yield 'plain http when ssl is disabled' => [false, 'http://test.host/sms.do'];
+        yield 'https when ssl is enabled' => [true, 'https://test.host/sms.do'];
+    }
+
     #[DataProvider('responseProvider')]
     public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, string $content, string $errorMessage)
     {

@@ -94,7 +94,8 @@ final class Lox24Transport extends AbstractTransport
         $body = $this->setServiceCode($body, $options);
         $body = $this->setVoiceLang($body, $options);
 
-        $response = $this->client->request('POST', \sprintf('https://%s/sms', $this->getEndpoint()), [
+        $endpoint = \sprintf('%s://%s/sms', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'X-LOX24-AUTH-TOKEN' => \sprintf('%s:%s', $this->user, $this->token),
                 'Accept' => 'application/json',

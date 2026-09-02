@@ -27,6 +27,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class KazInfoTehTransport extends AbstractTransport
 {
     protected const HOST = 'kazinfoteh.org';
+    // the vendor endpoint is only served over plain HTTP
+    protected const SSL = false;
 
     public function __construct(
         private string $username,
@@ -57,7 +59,7 @@ class KazInfoTehTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('http://%s/api', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'query' => [
                 'action' => 'sendmessage',

@@ -72,7 +72,7 @@ final class FirebaseTransport extends AbstractTransport
             throw new IncompleteDsnException(\sprintf('The "%s" transport requires project_id, private_key_id and private_key options to be specified in DSN.', self::class));
         }
 
-        $endpoint = \sprintf('https://%s/v1/projects/%s/messages:send', $this->getEndpoint(), $this->projectId);
+        $endpoint = \sprintf('%s://%s/v1/projects/%s/messages:send', $this->getHttpScheme(), $this->getEndpoint(), $this->projectId);
 
         $options = $message->getOptions()?->toArray() ?? [];
         $options['notification'] ??= [];

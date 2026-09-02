@@ -7,7 +7,7 @@ DSN example
 -----------
 
 ```
-NTFY_DSN=ntfy://[USER:PASSWORD]@default[:PORT]/TOPIC?[secureHttp=[on]]
+NTFY_DSN=ntfy://[USER:PASSWORD]@default[:PORT]/TOPIC?[ssl=[true]]
 ```
 where:
 - `URL` is the ntfy server which you are using
@@ -16,7 +16,7 @@ where:
 - `PORT` is an optional specific port.
 - `USER`and `PASSWORD` are username and password in case of access control supported by the server
 
-In case of a non-secure server, you can disable https by setting `secureHttp=off`. For example if you use a local [Ntfy Docker image](https://hub.docker.com/r/binwiederhier/ntfy) during development or testing.
+In case of a non-secure server, you can disable https by setting `ssl=false`. For example if you use a local [Ntfy Docker image](https://hub.docker.com/r/binwiederhier/ntfy) during development or testing.
 
 Sponsor
 -------

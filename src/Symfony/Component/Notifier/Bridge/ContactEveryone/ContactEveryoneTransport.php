@@ -77,7 +77,7 @@ final class ContactEveryoneTransport extends AbstractTransport
         $options['to'] = $message->getPhone();
         $options['msg'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/api/light/diffusions/sms', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api/light/diffusions/sms', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'query' => array_filter($options),
         ]);

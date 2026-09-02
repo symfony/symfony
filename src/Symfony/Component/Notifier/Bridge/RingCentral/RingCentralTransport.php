@@ -63,7 +63,7 @@ final class RingCentralTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number. Phone number must be in E.164 format.', $options['from']['phoneNumber'] ?? ''));
         }
 
-        $endpoint = \sprintf('https://%s/restapi/v1.0/account/~/extension/~/sms', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/restapi/v1.0/account/~/extension/~/sms', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->apiToken,
             'json' => array_filter($options),

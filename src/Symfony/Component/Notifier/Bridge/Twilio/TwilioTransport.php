@@ -61,7 +61,7 @@ final class TwilioTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
         }
 
-        $endpoint = \sprintf('https://%s/2010-04-01/Accounts/%s/Messages.json', $this->getEndpoint(), $this->accountSid);
+        $endpoint = \sprintf('%s://%s/2010-04-01/Accounts/%s/Messages.json', $this->getHttpScheme(), $this->getEndpoint(), $this->accountSid);
         $options = $message->getOptions()?->toArray() ?? [];
         $body = [
             'From' => $from,

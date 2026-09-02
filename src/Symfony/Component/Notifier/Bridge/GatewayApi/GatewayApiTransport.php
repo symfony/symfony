@@ -58,7 +58,7 @@ final class GatewayApiTransport extends AbstractTransport
         $options['recipients'] = [['msisdn' => $message->getPhone()]];
         $options['message'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/rest/mtsms', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/rest/mtsms', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->authToken, ''],

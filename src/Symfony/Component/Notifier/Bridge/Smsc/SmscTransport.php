@@ -67,7 +67,7 @@ final class SmscTransport extends AbstractTransport
             'time' => '0-24',
         ];
 
-        $endpoint = \sprintf('https://%s/sys/send.php', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/sys/send.php', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, ['body' => $body]);
 
         try {

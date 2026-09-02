@@ -31,7 +31,7 @@ final class SendberryTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new SendberryTransport($this->getUser($dsn), $this->getPassword($dsn), $dsn->getRequiredOption('auth_key'), $dsn->getRequiredOption('from'), $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new SendberryTransport($this->getUser($dsn), $this->getPassword($dsn), $dsn->getRequiredOption('auth_key'), $dsn->getRequiredOption('from'), $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

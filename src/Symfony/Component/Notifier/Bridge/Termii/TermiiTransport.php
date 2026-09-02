@@ -68,7 +68,7 @@ final class TermiiTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $options['from']));
         }
 
-        $endpoint = \sprintf('https://%s/api/sms/send', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api/sms/send', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'json' => array_filter($options),
         ]);

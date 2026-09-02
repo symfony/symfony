@@ -69,6 +69,28 @@ final class KazInfoTehTransportTest extends TransportTestCase
         }
     }
 
+    public static function schemeProvider(): iterable
+    {
+        // the vendor endpoint is only served over plain HTTP, hence the default
+        yield 'plain http by default' => [null, 'http://test.host/api?'];
+        yield 'https when ssl is enabled' => [true, 'https://test.host/api?'];
+        yield 'plain http when ssl is disabled' => [false, 'http://test.host/api?'];
+    }
+
+    #[DataProvider('schemeProvider')]
+    public function testSendUsesTheConfiguredScheme(?bool $ssl, string $expectedEndpoint)
+    {
+        $client = new MockHttpClient(function (string $method, string $url) use ($expectedEndpoint): MockResponse {
+            $this->assertStringStartsWith($expectedEndpoint, $url);
+
+            return new MockResponse('<?xml version="1.0" encoding="utf-8" ?><acceptreport><statuscode>0</statuscode></acceptreport>');
+        });
+
+        $transport = (new KazInfoTehTransport('username', 'password', 'sender', $client))->setHost('test.host')->setSsl($ssl);
+
+        $transport->send(new SmsMessage('77000000000', 'Hello!'));
+    }
+
     #[DataProvider('responseProvider')]
     public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, string $content, string $errorMessage)
     {

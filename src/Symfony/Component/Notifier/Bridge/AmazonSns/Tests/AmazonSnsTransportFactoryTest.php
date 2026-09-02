@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Notifier\Bridge\AmazonSns\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsTransportFactory;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
+use Symfony\Component\Notifier\Transport\Dsn;
 
 class AmazonSnsTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
@@ -43,5 +45,23 @@ class AmazonSnsTransportFactoryTest extends AbstractTransportFactoryTestCase
     public static function unsupportedSchemeProvider(): iterable
     {
         yield ['somethingElse://default'];
+    }
+
+    #[DataProvider('endpointProvider')]
+    public function testEndpointUsesTheConfiguredScheme(string $dsn, string $expectedEndpoint)
+    {
+        $transport = $this->createFactory()->create(new Dsn($dsn));
+        $snsClient = (new \ReflectionProperty($transport, 'snsClient'))->getValue($transport);
+
+        $this->assertSame($expectedEndpoint, $snsClient->getConfiguration()->get('endpoint'));
+    }
+
+    public static function endpointProvider(): iterable
+    {
+        yield 'https by default' => ['sns://host.test', 'https://host.test'];
+        yield 'ssl disabled' => ['sns://host.test?ssl=false', 'http://host.test'];
+        yield 'ssl enabled' => ['sns://host.test?ssl=true', 'https://host.test'];
+        yield 'legacy sslmode' => ['sns://host.test?sslmode=disable', 'http://host.test'];
+        yield 'ssl wins over sslmode' => ['sns://host.test?ssl=true&sslmode=disable', 'https://host.test'];
     }
 }

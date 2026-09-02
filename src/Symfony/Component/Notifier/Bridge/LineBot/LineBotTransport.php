@@ -45,7 +45,7 @@ final class LineBotTransport extends AbstractTransport
 
         $response = $this->client->request(
             'POST',
-            \sprintf('https://%s/v2/bot/message/push', $this->getEndpoint()),
+            \sprintf('%s://%s/v2/bot/message/push', $this->getHttpScheme(), $this->getEndpoint()),
             [
                 'auth_bearer' => $this->accessToken,
                 'json' => [

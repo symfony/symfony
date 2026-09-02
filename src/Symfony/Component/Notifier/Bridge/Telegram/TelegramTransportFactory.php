@@ -31,9 +31,10 @@ final class TelegramTransportFactory extends AbstractTransportFactory
         $channel = $dsn->getOption('channel');
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
-        $disableHttps = 'disable' === $dsn->getOption('sslmode');
+        // "sslmode=disable" is the legacy spelling of the "ssl=false" option
+        $ssl = $this->getSsl($dsn) ?? 'disable' !== $dsn->getOption('sslmode');
 
-        return (new TelegramTransport($token, $channel, $this->client, $this->dispatcher, $disableHttps))->setHost($host)->setPort($port);
+        return (new TelegramTransport($token, $channel, $this->client, $this->dispatcher, !$ssl))->setHost($host)->setPort($port);
     }
 
     protected function getSupportedSchemes(): array

@@ -57,7 +57,7 @@ final class ClickatellTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/rest/message', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/rest/message', $this->getHttpScheme(), $this->getEndpoint());
 
         $options = [];
         $options['from'] = $message->getFrom() ?: $this->from;

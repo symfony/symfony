@@ -75,7 +75,7 @@ final class LinkedInTransport extends AbstractTransport
             $options->author(new AuthorShare($this->accountId, $this->authorType->value));
         }
 
-        $endpoint = \sprintf('https://%s/v2/ugcPosts', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v2/ugcPosts', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->authToken,

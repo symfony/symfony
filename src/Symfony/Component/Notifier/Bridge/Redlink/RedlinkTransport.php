@@ -64,7 +64,7 @@ final class RedlinkTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        $endpoint = \sprintf('https://%s/%s/sms', $this->getEndpoint(), $this->version);
+        $endpoint = \sprintf('%s://%s/%s/sms', $this->getHttpScheme(), $this->getEndpoint(), $this->version);
 
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [

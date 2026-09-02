@@ -29,7 +29,7 @@ final class FortySixElksTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $from = $dsn->getRequiredOption('from');
 
-        return (new FortySixElksTransport($this->getUser($dsn), $this->getPassword($dsn), $from, $this->client, $this->dispatcher))->setHost($host)->setPort($dsn->getPort());
+        return (new FortySixElksTransport($this->getUser($dsn), $this->getPassword($dsn), $from, $this->client, $this->dispatcher))->setHost($host)->setPort($dsn->getPort())->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

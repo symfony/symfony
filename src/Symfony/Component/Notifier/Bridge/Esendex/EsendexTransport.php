@@ -63,7 +63,8 @@ final class EsendexTransport extends AbstractTransport
         ];
         $options['accountreference'] ??= $this->accountReference;
 
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/v1.0/messagedispatcher', [
+        $endpoint = \sprintf('%s://%s/v1.0/messagedispatcher', $this->getHttpScheme(), $this->getEndpoint());
+        $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->email, $this->password],
             'headers' => [
                 'Accept' => 'application/json',

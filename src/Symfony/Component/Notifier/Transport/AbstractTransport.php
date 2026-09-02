@@ -26,10 +26,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 abstract class AbstractTransport implements TransportInterface
 {
+    /** @var string */
     protected const HOST = 'localhost';
+    /** @var bool */
+    protected const SSL = true;
 
     protected ?string $host = null;
     protected ?int $port = null;
+    private ?bool $ssl = null;
 
     public function __construct(
         protected ?HttpClientInterface $client = null,
@@ -60,6 +64,16 @@ abstract class AbstractTransport implements TransportInterface
     public function setPort(?int $port): static
     {
         $this->port = $port;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setSsl(?bool $ssl): static
+    {
+        $this->ssl = $ssl;
 
         return $this;
     }
@@ -95,5 +109,10 @@ abstract class AbstractTransport implements TransportInterface
     protected function getDefaultHost(): string
     {
         return static::HOST;
+    }
+
+    protected function getHttpScheme(): string
+    {
+        return ($this->ssl ?? static::SSL) ? 'https' : 'http';
     }
 }

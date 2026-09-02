@@ -55,7 +55,8 @@ final class SmsSluzbaTransport extends AbstractTransport
         }
 
         $endpoint = \sprintf(
-            'https://%s/apixml30/receiver?login=%s&password=%s',
+            '%s://%s/apixml30/receiver?login=%s&password=%s',
+            $this->getHttpScheme(),
             $this->getEndpoint(),
             $this->username,
             $this->password

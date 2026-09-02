@@ -53,7 +53,7 @@ final class UnifonicTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/rest/SMS/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/rest/SMS/messages', $this->getHttpScheme(), $this->getEndpoint());
 
         $body = [
             'AppSid' => $this->appSid,

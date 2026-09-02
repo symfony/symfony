@@ -43,8 +43,8 @@ final class TelegramTransportTest extends TransportTestCase
     {
         yield ['telegram://api.telegram.org', self::createTransport()];
         yield ['telegram://api.telegram.org?channel=testChannel', self::createTransport(null, 'testChannel')];
-        yield ['telegram://api.telegram.org?sslmode=disable', self::createTransport(null, null, true)];
-        yield ['telegram://api.telegram.org?channel=testChannel&sslmode=disable', self::createTransport(null, 'testChannel', true)];
+        yield ['telegram://api.telegram.org?ssl=false', self::createTransport(null, null, true)];
+        yield ['telegram://api.telegram.org?channel=testChannel&ssl=false', self::createTransport(null, 'testChannel', true)];
     }
 
     public static function supportedMessagesProvider(): iterable

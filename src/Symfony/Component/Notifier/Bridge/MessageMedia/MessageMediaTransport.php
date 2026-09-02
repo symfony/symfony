@@ -64,7 +64,7 @@ final class MessageMediaTransport extends AbstractTransport
         $options['destination_number'] = $message->getPhone();
         $options['content'] = $message->getSubject();
 
-        $endpoint = \sprintf('https://%s/v1/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v1/messages', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('POST', $endpoint, [
             'auth_basic' => [$this->apiKey, $this->apiSecret],
             'json' => [

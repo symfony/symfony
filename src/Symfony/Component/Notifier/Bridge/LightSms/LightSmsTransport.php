@@ -106,7 +106,7 @@ final class LightSmsTransport extends AbstractTransport
         ];
         $data['signature'] = $this->generateSignature($data);
 
-        $endpoint = \sprintf('https://%s/external/get/send.php', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/external/get/send.php', $this->getHttpScheme(), $this->getEndpoint());
         $response = $this->client->request('GET', $endpoint, [
             'query' => $data,
         ]);

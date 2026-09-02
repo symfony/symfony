@@ -38,7 +38,7 @@ final class ThreadsTransportFactory extends AbstractTransportFactory
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new ThreadsTransport($accessToken, $userId, $apiVersion, $this->client, $this->dispatcher, $pollAttempts, $pollDelay))->setHost($host)->setPort($port);
+        return (new ThreadsTransport($accessToken, $userId, $apiVersion, $this->client, $this->dispatcher, $pollAttempts, $pollDelay))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

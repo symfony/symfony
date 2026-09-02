@@ -51,7 +51,7 @@ final class ZendeskTransport extends AbstractTransport
             throw new UnsupportedMessageTypeException(__CLASS__, ChatMessage::class, $message);
         }
 
-        $endpoint = \sprintf('https://%s/api/v2/tickets.json', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api/v2/tickets.json', $this->getHttpScheme(), $this->getEndpoint());
 
         $body = [
             'ticket' => [

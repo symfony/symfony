@@ -42,7 +42,7 @@ final class MicrosoftTeamsTransportFactory extends AbstractTransportFactory
             $path .= '?'.http_build_query($query, '', '&');
         }
 
-        return (new MicrosoftTeamsTransport($path, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new MicrosoftTeamsTransport($path, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

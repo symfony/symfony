@@ -62,7 +62,7 @@ final class PushyTransport extends AbstractTransport
             throw new InvalidArgumentException(\sprintf('The "%s" transport required the "to" option to be set.', __CLASS__));
         }
 
-        $endpoint = \sprintf('https://%s?api_key=%s', $this->getEndpoint(), $this->apiKey);
+        $endpoint = \sprintf('%s://%s?api_key=%s', $this->getHttpScheme(), $this->getEndpoint(), $this->apiKey);
         $response = $this->client->request('POST', $endpoint, [
             'headers' => [
                 'Accept' => 'application/json',

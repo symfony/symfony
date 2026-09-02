@@ -56,7 +56,7 @@ final class SimpleTextinTransport extends AbstractTransport
         if (!$message instanceof SmsMessage) {
             throw new UnsupportedMessageTypeException(__CLASS__, SmsMessage::class, $message);
         }
-        $endpoint = \sprintf('https://%s/v2/api/messages', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/v2/api/messages', $this->getHttpScheme(), $this->getEndpoint());
 
         $options = [];
         $options['text'] = $message->getSubject();

@@ -46,4 +46,9 @@ abstract class AbstractTransportFactory implements TransportFactoryInterface
     {
         return $dsn->getPassword() ?? throw new IncompleteDsnException('Password is not set.', $dsn->getOriginalDsn());
     }
+
+    protected function getSsl(Dsn $dsn): ?bool
+    {
+        return null === $dsn->getOption('ssl') ? null : $dsn->getBooleanOption('ssl');
+    }
 }

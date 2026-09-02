@@ -59,7 +59,7 @@ final class MattermostTransport extends AbstractTransport
         $options['message'] = $message->getSubject();
         $options['channel_id'] ??= $message->getRecipientId() ?: $this->channel;
 
-        $endpoint = \sprintf('https://%s/api/v4/posts', $this->getEndpoint());
+        $endpoint = \sprintf('%s://%s/api/v4/posts', $this->getHttpScheme(), $this->getEndpoint());
 
         $response = $this->client->request('POST', $endpoint, [
             'auth_bearer' => $this->token,

@@ -34,7 +34,7 @@ final class InfobipTransportFactory extends AbstractTransportFactory
         $host = $dsn->getHost();
         $port = $dsn->getPort();
 
-        return (new InfobipTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port);
+        return (new InfobipTransport($authToken, $from, $this->client, $this->dispatcher))->setHost($host)->setPort($port)->setSsl($this->getSsl($dsn));
     }
 
     protected function getSupportedSchemes(): array

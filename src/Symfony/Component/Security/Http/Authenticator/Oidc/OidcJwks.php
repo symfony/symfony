@@ -21,8 +21,9 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * Fetches OpenID Connect signing keys (JWKS) and derives their cache lifetime
  * from the provider's HTTP cache headers.
  *
- * The keys are filtered exactly as the "oidc" access token handler does, so that
- * both OIDC entry points accept the same key material.
+ * The "oidc" access token handler and the "oidc_login" authenticator both parse
+ * and filter JWKS responses through this class, so the two OIDC entry points
+ * accept the same key material.
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>
  *
@@ -33,7 +34,7 @@ final class OidcJwks
     /**
      * Cap the cache lifetime to 30 days to avoid keeping JWKS indefinitely.
      */
-    private const MAX_TTL = 30 * 24 * 60 * 60;
+    public const MAX_TTL = 30 * 24 * 60 * 60;
 
     /**
      * JWKS documents are small. This limits untrusted data retained by the cache,

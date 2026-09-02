@@ -273,6 +273,53 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
     }
 
+    public function testDiscoveryRejectsAnOversizedJwks()
+    {
+        $token = $this->buildJWS(json_encode(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f']));
+
+        $oversized = json_encode(['keys' => [['kty' => 'oct', 'use' => 'sig', 'k' => str_repeat('A', 1024 * 1024)]]]);
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/.well-known/jwks.json']),
+            new MockResponse($oversized, ['response_headers' => ['content-type' => 'application/json']]),
+        ]);
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
+        $handler->getUserBadgeFrom($token);
+    }
+
+    public function testDiscoveryRejectsAJwksWithoutKeys()
+    {
+        $token = $this->buildJWS(json_encode(['sub' => 'e21bf182-1538-406e-8ccb-e25a17aba39f']));
+
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/.well-known/jwks.json']),
+            new JsonMockResponse(['error' => 'temporarily_unavailable']),
+        ]);
+
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery(new ArrayAdapter(), $httpClient, 'oidc_config');
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Invalid credentials.');
+
+        $handler->getUserBadgeFrom($token);
+    }
+
     public function testGetsUserIdentifierWithMultipleDiscoveryEndpoints()
     {
         $time = time();

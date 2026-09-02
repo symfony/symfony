@@ -31,6 +31,7 @@ use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
 use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\MissingClaimException;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcJwks;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -184,27 +185,20 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
             }
 
             foreach ($jwkSetResponses as $response) {
-                $headers = $response->getHeaders();
-                if (preg_match('/max-age=(\d+)/', $headers['cache-control'][0] ?? '', $m)) {
-                    $currentTtl = (int) $m[1];
-                } elseif (0 >= $currentTtl = strtotime($headers['expires'][0] ?? '@0') - time()) {
-                    $currentTtl = null;
-                }
+                [$keys, $currentTtl] = OidcJwks::fromResponse($response, $this->enforceKeyUsageVerification);
 
                 // Apply the lowest TTL found to ensure all keys in the set are still valid
                 if (null !== $currentTtl && (null === $minTtl || $currentTtl < $minTtl)) {
                     $minTtl = $currentTtl;
                 }
 
-                $keys = $response->toArray()['keys'];
-                foreach ($this->filterSignatureKeys($keys) as $key) {
+                foreach ($keys as $key) {
                     $discoveredKeys[] = $key;
                 }
             }
 
             if (0 < ($minTtl ?? -1)) {
-                // Cap the TTL to 30 days to avoid keeping JWKS indefinitely
-                $item->expiresAfter(min($minTtl, 30 * 24 * 60 * 60));
+                $item->expiresAfter(min($minTtl, OidcJwks::MAX_TTL));
             }
 
             return $discoveredKeys;
@@ -216,37 +210,6 @@ final class OidcTokenHandler implements AccessTokenHandlerInterface, ResetInterf
 
             throw new BadCredentialsException('Invalid credentials.', $e->getCode(), $e);
         }
-    }
-
-    private function filterSignatureKeys(array $keys): array
-    {
-        return array_values(array_filter($keys, function (array $jwk): bool {
-            if ($this->enforceKeyUsageVerification) {
-                if (isset($jwk['use']) && 'sig' === $jwk['use']) {
-                    return true;
-                }
-                if (isset($jwk['key_ops']) && \is_array($jwk['key_ops'])) {
-                    return !empty(array_intersect($jwk['key_ops'], ['sign', 'verify']));
-                }
-
-                return false;
-            }
-
-            if (isset($jwk['use']) && 'enc' === $jwk['use']) {
-                return false;
-            }
-            if (isset($jwk['key_ops']) && \is_array($jwk['key_ops'])) {
-                $encOps = ['encrypt', 'decrypt', 'wrapKey', 'unwrapKey', 'deriveKey', 'deriveBits'];
-                $sigOps = ['sign', 'verify'];
-                $hasEnc = !empty(array_intersect($jwk['key_ops'], $encOps));
-                $hasSig = !empty(array_intersect($jwk['key_ops'], $sigOps));
-                if ($hasEnc && !$hasSig) {
-                    return false;
-                }
-            }
-
-            return true;
-        }));
     }
 
     private function loadAndVerifyJws(string $accessToken, JWKSet $jwkset): array

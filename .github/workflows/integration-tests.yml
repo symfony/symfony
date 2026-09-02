@@ -27,6 +27,13 @@ jobs:
       fail-fast: false
 
     services:
+      mysql:
+        image: mysql:8.4
+        ports:
+          - 13306:3306
+        env:
+          MYSQL_ROOT_PASSWORD: 'password'
+          MYSQL_DATABASE: 'messenger'
       postgres:
         image: postgres:16-alpine
         ports:
@@ -234,6 +241,8 @@ jobs:
           echo "::group::composer update"
           composer require --dev --no-update "mongodb/mongodb:^2.1@stable"
           composer update --no-progress --ansi
+          echo "AMP_SQL_MYSQL_DSN=amp-mysql://root:password@127.0.0.1:13306/messenger" >> $GITHUB_ENV
+          echo "AMP_SQL_POSTGRES_DSN=amp-postgres://postgres:password@127.0.0.1:5432/postgres" >> $GITHUB_ENV
           echo "::endgroup::"
 
           echo "::group::install phpunit"

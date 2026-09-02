@@ -2480,6 +2480,10 @@ class FrameworkExtension extends Extension
             $container->getDefinition('messenger.transport.amqp.factory')->addTag('messenger.transport_factory');
         }
 
+        if (ContainerBuilder::willBeAvailable('symfony/amp-sql-messenger', MessengerBridge\AmpSql\Transport\AmpSqlTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
+            $container->getDefinition('messenger.transport.amp_sql.factory')->addTag('messenger.transport_factory');
+        }
+
         if (ContainerBuilder::willBeAvailable('symfony/redis-messenger', MessengerBridge\Redis\Transport\RedisTransportFactory::class, ['symfony/framework-bundle', 'symfony/messenger'])) {
             $container->getDefinition('messenger.transport.redis.factory')->addTag('messenger.transport_factory');
         }

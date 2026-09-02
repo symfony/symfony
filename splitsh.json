@@ -70,6 +70,7 @@
             "prefixes": [{ "from": "src/Symfony/Component/Messenger", "to": "", "excludes": ["Bridge"] }]
         },
         "amazon-sqs-messenger": "src/Symfony/Component/Messenger/Bridge/AmazonSqs",
+        "amp-sql-messenger": "src/Symfony/Component/Messenger/Bridge/AmpSql",
         "amqp-messenger": "src/Symfony/Component/Messenger/Bridge/Amqp",
         "beanstalkd-messenger": "src/Symfony/Component/Messenger/Bridge/Beanstalkd",
         "doctrine-messenger": "src/Symfony/Component/Messenger/Bridge/Doctrine",

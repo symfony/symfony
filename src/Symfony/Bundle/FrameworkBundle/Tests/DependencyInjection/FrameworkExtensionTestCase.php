@@ -88,6 +88,7 @@ use Symfony\Component\Mailer\EventListener\InMemorySmimeCertificateRepository;
 use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Messenger\Attribute\AsMessage;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
+use Symfony\Component\Messenger\Bridge\AmpSql\Transport\AmpSqlTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\MongoDb\Transport\MongoDbTransportFactory;
@@ -1135,6 +1136,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         if (class_exists(AmqpTransportFactory::class)) {
             $expectedFactories[] = 'messenger.transport.amqp.factory';
+        }
+
+        if (class_exists(AmpSqlTransportFactory::class)) {
+            $expectedFactories[] = 'messenger.transport.amp_sql.factory';
         }
 
         if (class_exists(RedisTransportFactory::class)) {

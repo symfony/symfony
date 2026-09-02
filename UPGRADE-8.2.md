@@ -49,6 +49,11 @@ Form
    option is a string, wherever it sits in the form tree, and `form_<root id>` otherwise. Forms that do not
    use `form_attr` are unaffected: the `form_id` view variable stays `null` when nothing references it
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0 and will be removed in 9.0
+ * Deprecate the `FormTypePasswordHasherExtension` class and the `registerPassword()` and `hashPasswords()`
+   methods of `PasswordHasherListener`: the password of a field that uses the `hash_property_path` option
+   is now hashed during the `form.post_validate` event, which is dispatched only when the validator
+   extension is enabled. Wire `FormTypePasswordHasherExtension` yourself to keep hashing passwords in a
+   form system that does not use the validator extension
  * `TimezoneType` with the `intl` option enabled now offers the identifier PHP reports as canonical when ICU
    keys a zone and its legacy aliases under one display name, so `Asia/Kolkata` is offered where `Asia/Calcutta`
    used to be. The aliases stay submittable and are resolved to the offered identifier, so a stored value keeps

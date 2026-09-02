@@ -29,7 +29,6 @@ class PasswordHasherExtension extends AbstractExtension
     protected function loadTypeExtensions(): array
     {
         return [
-            new Type\FormTypePasswordHasherExtension($this->passwordHasherListener),
             new Type\PasswordTypePasswordHasherExtension($this->passwordHasherListener),
         ];
     }

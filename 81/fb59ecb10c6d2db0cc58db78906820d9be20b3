@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:25:36Z
+
+Thank you for your patience @sblondeau. I rebased the branch onto the current 8.2 and made it merge-ready:
+- actions with no bound key are skipped instead of crashing
+- items are clamped to the terminal width, so an over-wide label cannot make the render throw
+- the global `Key::setLabelOverrides()` is replaced by the instance-level `KeyBindingWidget::setKeyLabels()`, to avoid process-wide state; combo parts now resolve through the label map too (`ctrl+space` renders as Ctrl+Space)
+- the `SelectListWidget` labels now match what the actions do (Page Up/Page Down/Cancel), and multiselect mode shows a Toggle entry
+
+Each change comes with a test, and the description above is updated.

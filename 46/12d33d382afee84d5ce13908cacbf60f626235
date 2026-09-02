@@ -1,0 +1,160 @@
+---------------------------------------------------------------------------
+
+by joshtrichards at 2024-04-27T14:15:27Z
+
+Both test failures appear unrelated.
+
+---------------------------------------------------------------------------
+
+by phil-davis at 2024-04-27T17:07:29Z
+
+I had some unit test changes ready to test this solution, so I have made PR #54754 with the test changes/additions and the code cherry-picked from here. I made it to the 7.1 branch, because, as I read the rules, this is a "new feature" and so new features go to the current minor version branch.
+
+Is this a "new feature" or an "enhancement that helps adjust behavior"?
+Will we be able to get it added to the v6 series (and maybe to the v5 series, like this PR attempts)?
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-27T17:56:08Z
+
+Does the notInPath method work for this ?
+
+This will be a _big_ BC break, as  `->exclude('/var/')` will have a major behaviour change, no ?
+
+---------------------------------------------------------------------------
+
+by joshtrichards at 2024-04-27T21:28:44Z
+
+Thanks for your comments. Some initial responses below.
+
+> Does the notInPath method work for this ?
+
+Only in the same sense that `notPath` can always be used as an alternative to `exclude` if performance isn't of concern. So no. :-)
+
+> This will be a big BC break, as ->exclude('/var/') will have a major behaviour change, no ?
+
+Paths provided to `exclude` are only evaluated relative to the `in()` specified folder(s). Absolute (system) paths were never supported by `exclude`.
+
+So if someone puts a slash in front they (presumably) mean the root of their content (`in()`) directory. That's fine.
+
+If that's not what they intended, well that's never been supported (or worked - and still won't).
+
+i.e.`in($contentRoot)->exclude("/var")` will match `$contentRoot/var` just fine.
+
+So if someone is specifying `/var/` they're already likely not getting what they're expecting. Either they meant:
+
+- the system `/var/` which never worked and still won't work
+
+Or:
+
+- a folder called `var` located in their `$contentRoot` (i.e. within the root of `in($contentRoot)`) and only there
+
+That second situation is what this would fix/enable.
+
+---
+
+You can play with the regex a bit (keeping in mind the new one is only used against `exclude` values that start with `/` - which is how this is isn't breaking BC):
+
+Old and only: `#(?:^|/)(?:data|/blah|/var/)(?:/|$)#`
+
+New and supplemental: `#^(data|/blah|/var/)$#`
+
+Aside: The actual bug is in the original regex and/or in which scenarios even end up using it I suppose[1], but fixing this would not be BC. This PR does so in a reasonable way (I think!) without breaking existing code. It makes `exclude` useful outside of anything but the simplest folder structures (which is important since its main benefit over `notPath` is performance and that is likely to be of particular interest to those with big/complicated trees, but we can't use it as-is right now without risking losing deeper down paths that match undesirably).
+
+[1] https://github.com/symfony/symfony/blob/c834064b3765d5c43e25fae2fca4498c53e2aee1/src/Symfony/Component/Finder/Iterator/ExcludeDirectoryFilterIterator.php#L56-L84
+
+---------------------------------------------------------------------------
+
+by smnandre at 2024-04-27T23:31:42Z
+
+Thank you for the detailed answer. I guess adding some functional tests (testing the behaviour with the recursiveiterator) is not a bad idea :)
+
+---------------------------------------------------------------------------
+
+by phil-davis at 2024-04-28T01:39:17Z
+
+> Thank you for the detailed answer. I guess adding some functional tests (testing the behaviour with the recursiveiterator) is not a bad idea :)
+
+See the PR #54754 that has this code to the 7.1 branch, where I have expanded the test coverage. I'm happy to hear ideas for other combinations of things that should have test cases.
+
+(Note: "someone" will need to decide if this is a fix or a new feature. That will determine if this will be allowed as a "patch" fix in v5 and v6 or whether it is only released to v7)
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2024-05-02T15:52:14Z
+
+IMO this would be very nice to have as a bug fix, because the advertised behavior was broken.
+
+As an aside, we are trying to add support for this in Composer's autoloader which uses Finder to iterate files for classmaps, as this would allow skipping whole directories instead of iterating all files anyway like we do now, gaining perf, but I have no way of converting an `exclude-from-classmap: ['Tests/']` into a finder exclusion right now, as excluding `'Tests'` would exclude `src/Tests` as well, potentially wreaking havoc. Ref https://github.com/composer/class-map-generator/pull/7
+
+---------------------------------------------------------------------------
+
+by phil-davis at 2024-05-02T15:55:45Z
+
+> IMO this would be very nice to have as a bug fix, because the advertised behavior was broken.
+
+Agree. I am happy to help sort out "back-porting" the test changes to here for 5.4, and making a "mid-port" PR for major version 6. "Someone" just decide if this will be accepted as a bug fix.
+
+---------------------------------------------------------------------------
+
+by joshtrichards at 2024-05-08T21:24:15Z
+
+Added tests:
+
+- The new iterator unit tests all pass { `/foo`, `/toto/foo` }
+- The finder integration test for `/foo` passes, but there's an issue with sub-folders `/toto/foo` (they're not being excluded when the iterator is called thru Finder)
+
+Technically sub-folders don't have to work I suppose for now, but I'd like to see if I can get them to work too since it'll feel like a more correct implementation. I'll try to take a look at those in the coming days. If anyone sees the culprit, don't hesitate to speak up (I have a few guesses but don't have more time to look at it tonight).
+
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2024-08-09T15:11:14Z
+
+This looks like an important thing to fix (and we have another fix proposal in #54754). Let's ping @symfony/mergers to see if we can work on finishing this one. Thanks.
+
+---------------------------------------------------------------------------
+
+by phil-davis at 2024-08-09T15:17:10Z
+
+> This looks like an important thing to fix (and we have another fix proposal in #54754). Let's ping @symfony/mergers to see if we can work on finishing this one. Thanks.
+
+My contribution there is just to expand the test coverage to try and cover more cases. And I made the PR to a later branch, in case "those that have the power" decide that it has to go in the later branch.
+
+How to we get the attention of the Symfony maintainers?
+
+---------------------------------------------------------------------------
+
+by raveren at 2025-05-14T08:28:46Z
+
+Carson the bot is threatening to close the OP issue and there seems to be failing checks in this PR?
+
+I think this is still relevant, @joshtrichards do you feel that fixing the failing tests and code style issues is possible?
+
+---------------------------------------------------------------------------
+
+by phil-davis at 2026-02-24T22:55:36Z
+
+https://github.com/symfony/symfony/actions/runs/22363657857/job/64723726106?pr=54752
+codespell complains about the function name "testIn()" which is not even touched by this PR.
+I suppose that is an existing known CI "fail".
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-04-08T13:37:33Z
+
+@joshtrichards Could you rebase this one more time and fix the CS issue? Would be great to have this included in 8.1
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T09:41:33Z
+
+Thank you for the patience on this one, and for the clean approach: giving a meaning to the leading `/` is BC-safe, since such values could never match a relative path before, so they excluded nothing.
+
+I checked the BC question raised above by probing the previous behavior, and rebased + reworked the PR based on what came out:
+
+- As submitted, the new anchored matching applied to *every* value containing a slash, not only to `/`-prefixed ones: after `rtrim()`, the first slash can never be the last character, so the `\strlen($directory) - 1 !== $slashPos` guard was always true. That silently changed `exclude('foo/bar')` from "match at any depth" to "match at the root only". The condition is now `str_starts_with($directory, '/')`, and `testExcludeNestedPath` locks the floating behavior (it fails on the previous revision of this PR).
+- The anchored pattern now ends with `(?:/|$)` instead of `$`, so that on non-recursive iterators the content below an excluded directory is filtered out too, consistently with the floating pattern.
+- Renamed `excludedPatternAbsolute` to `excludedRootPattern`: absolute filesystem paths are not supported either way, which was precisely the confusion discussed above.
+- Moved the changelog entry to 8.2 and rebased on current 8.2.
+
+While probing this I also found two pre-existing bugs in the prune filters (`filter($closure, prune: true)`): they are not applied below the root directory, and they are skipped entirely when combined with a slash-containing `exclude()`. Fix in #65801, targeted at 6.4. This PR's restructured `accept()` matches the shape of that fix, which keeps the merge-up simple.

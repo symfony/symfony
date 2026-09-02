@@ -38,7 +38,7 @@ _sf_{{ COMMAND_NAME }}() {
     if [[ -n "${aliases[$sf_cmd]}" ]]; then
         requestComp=(${(z)aliases[$sf_cmd]})
     else
-        requestComp=("$sf_cmd")
+        requestComp=(${~sf_cmd})
     fi
 
     requestComp+=(_complete --no-interaction -szsh -a{{ VERSION }} "-c$((CURRENT-1))")

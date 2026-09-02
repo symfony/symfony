@@ -16,8 +16,6 @@ _sf_{{ COMMAND_NAME }}() {
         fi
     done
 
-    # Use newline as only separator to allow space in completion values
-    local IFS=$'\n'
     local sf_cmd="${COMP_WORDS[0]}"
 
     # for an alias, get the real script behind it
@@ -32,11 +30,23 @@ _sf_{{ COMMAND_NAME }}() {
         return 1
     fi
 
+    # The bash-completion package provides the parsing of the current command line
+    if ! declare -F _get_comp_words_by_ref > /dev/null; then
+        >&2 echo "The completion of {{ COMMAND_NAME }} requires the \"bash-completion\" package to be installed and loaded."
+
+        return 1
+    fi
+
+    # this must run with the default IFS: bash-completion 1.x, still shipped on
+    # macOS, joins every word into a single one when IFS is a newline
     local cur prev words cword
     _get_comp_words_by_ref -n := cur prev words cword
 
+    # Use newline as only separator to allow space in completion values
+    local IFS=$'\n'
+
     local completecmd=("$sf_cmd" "_complete" "--no-interaction" "-sbash" "-c$cword" "-a{{ VERSION }}")
-    for w in ${words[@]}; do
+    for w in "${words[@]}"; do
         w="${w//\\\\/\\}"
         # remove quotes from typed values
         quote="${w:0:1}"
@@ -55,7 +65,15 @@ _sf_{{ COMMAND_NAME }}() {
 
     local sfcomplete
     if sfcomplete=$(SHELL_VERBOSITY=0 ${completecmd[@]} 2>&1); then
-        local quote suggestions
+        local quote suggestions flagPrefix=''
+
+        # "=" is not a word break, so the whole "--option=value" word is completed:
+        # filter on the value and prepend the option to the suggestions
+        if [[ "$cur" == -*=* ]]; then
+            flagPrefix="${cur%%=*}="
+            cur="${cur#*=}"
+        fi
+
         quote=${cur:0:1}
 
         # Use single quotes by default if suggestions contains backslash (FQCN)
@@ -64,8 +82,11 @@ _sf_{{ COMMAND_NAME }}() {
         fi
 
         if [ "$quote" == \' ]; then
-            # single quotes: no additional escaping (does not accept ' in values)
-            suggestions=$(for s in $sfcomplete; do printf $'%q%q%q\n' "$quote" "$s" "$quote"; done)
+            # single quotes: escape the single quotes contained in the values
+            suggestions=$(for s in $sfcomplete; do
+                s=${s//\'/\'\\\'\'}
+                printf $'%q%q%q\n' "$quote" "$s" "$quote";
+            done)
         elif [ "$quote" == \" ]; then
             # double quotes: double escaping for \ $ ` "
             suggestions=$(for s in $sfcomplete; do
@@ -79,8 +100,8 @@ _sf_{{ COMMAND_NAME }}() {
             # no quotes: double escaping
             suggestions=$(for s in $sfcomplete; do printf $'%q\n' $(printf '%q' "$s"); done)
         fi
-        COMPREPLY=($(IFS=$'\n' compgen -W "$suggestions" -- $(printf -- "%q" "$cur")))
-        __ltrim_colon_completions "$cur"
+        COMPREPLY=($(IFS=$'\n' compgen -P "$flagPrefix" -W "$suggestions" -- $(printf -- "%q" "$cur")))
+        __ltrim_colon_completions "$flagPrefix$cur"
     else
         if [[ "$sfcomplete" != *"Command \"_complete\" is not defined."* ]]; then
             >&2 echo

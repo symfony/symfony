@@ -21,6 +21,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateIntervals;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimeZones;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithGenerics;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithIterable;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithPhpDoc;
@@ -269,6 +270,33 @@ class JsonStreamReaderTest extends TestCase
         );
 
         $this->assertSame('CACHED', $reader->read('true', Type::bool()));
+    }
+
+    public function testReadNestedStream()
+    {
+        $longText = str_repeat('A', 8192);
+        $json = <<<JSON
+            {
+              "customProperty": "text",
+              "dummies": [
+                {
+                  "id": 1,
+                  "name": "{$longText}"
+                },
+                {
+                  "id": 2,
+                  "name": "{$longText}"
+                }
+              ],
+              "a": ["{$longText}", "{$longText}"]
+            }
+            JSON;
+
+        $reader = JsonStreamReader::create([], $this->streamReadersDir, $this->lazyGhostsDir);
+
+        $this->assertRead($reader, function (DummyWithIterable $read) {
+            $this->assertEquals(2, iterator_count($read->dummies));
+        }, $json, Type::object(DummyWithIterable::class));
     }
 
     private function assertRead(JsonStreamReader $reader, mixed $readOrAssert, string $json, Type $type, array $options = []): void

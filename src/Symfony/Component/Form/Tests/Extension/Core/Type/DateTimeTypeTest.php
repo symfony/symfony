@@ -803,6 +803,49 @@ class DateTimeTypeTest extends BaseTypeTestCase
         ]);
     }
 
+    #[DataProvider('provideUtcEquivalentTimezones')]
+    public function testUtcEquivalentTimezoneIsAccepted(string $input, \DateTimeInterface $date, string $modelTimezone)
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, $date, [
+            'widget' => 'choice',
+            'input' => $input,
+            'model_timezone' => $modelTimezone,
+        ]);
+
+        $this->assertEquals($date, $form->getData());
+    }
+
+    public static function provideUtcEquivalentTimezones()
+    {
+        return [
+            'DateTime in +00:00 with UTC model timezone' => ['datetime', new \DateTime('2024-10-28 15:00:00', new \DateTimeZone('+00:00')), 'UTC'],
+            'DateTimeImmutable in +00:00 with UTC model timezone' => ['datetime_immutable', new \DateTimeImmutable('2024-10-28 15:00:00', new \DateTimeZone('+00:00')), 'UTC'],
+            'DateTime in Z with UTC model timezone' => ['datetime', new \DateTime('2024-10-28T15:00:00Z'), 'UTC'],
+            'DateTime in GMT with UTC model timezone' => ['datetime', new \DateTime('2024-10-28 15:00:00', new \DateTimeZone('GMT')), 'UTC'],
+            'DateTime in Etc/UTC with UTC model timezone' => ['datetime', new \DateTime('2024-10-28 15:00:00', new \DateTimeZone('Etc/UTC')), 'UTC'],
+            'DateTime in UTC with +00:00 model timezone' => ['datetime', new \DateTime('2024-10-28 15:00:00', new \DateTimeZone('UTC')), '+00:00'],
+        ];
+    }
+
+    #[DataProvider('provideZeroOffsetRegionalTimezones')]
+    public function testZeroOffsetRegionalTimezoneIsRejected(string $timezone)
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(\sprintf('Using a "DateTime" instance with a timezone ("%s") not matching the configured model timezone "UTC" is not supported.', $timezone));
+
+        $this->factory->create(static::TESTED_TYPE, new \DateTime('2024-10-28 15:00:00', new \DateTimeZone($timezone)), [
+            'model_timezone' => 'UTC',
+        ]);
+    }
+
+    public static function provideZeroOffsetRegionalTimezones()
+    {
+        return [
+            'Europe/London on a winter date' => ['Europe/London'],
+            'Africa/Abidjan' => ['Africa/Abidjan'],
+        ];
+    }
+
     protected function getTestOptions(): array
     {
         return ['widget' => 'choice'];

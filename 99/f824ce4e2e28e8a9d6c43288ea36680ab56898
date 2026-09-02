@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-05-18T20:58:03Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "8.2".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T09:25:32Z
+
+Thank you for your patience @sblondeau, and for the clean widget. I rebased the branch onto the current 8.2 and made it merge-ready:
+- header lines wider than the available columns are now truncated instead of throwing at render time
+- the widget uses `AbstractWidget::attachChild()`/`detachChild()` instead of the internal `WidgetContext` methods, so the content's parent is wired even before the tree attach
+- `setContent()` while collapsed no longer wipes the replaced widget's listeners
+- focus styling moved to `DefaultStyleSheet` rules (`::symbol:focus` and `::summary:focus` reversed, `::description` gray) instead of a hardcoded reverse style
+
+Each fix has its own test, and the description above is updated.

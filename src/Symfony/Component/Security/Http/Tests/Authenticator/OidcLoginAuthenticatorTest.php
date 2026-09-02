@@ -11,6 +11,11 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use Jose\Component\Core\AlgorithmManager;
+use Jose\Component\Core\JWK;
+use Jose\Component\Signature\Algorithm\ES256;
+use Jose\Component\Signature\JWSBuilder;
+use Jose\Component\Signature\Serializer\CompactSerializer;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +39,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerI
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -56,6 +62,7 @@ class OidcLoginAuthenticatorTest extends TestCase
             'token_endpoint' => 'https://provider.example.com/token',
             'issuer' => 'https://provider.example.com',
             'userinfo_endpoint' => 'https://provider.example.com/userinfo',
+            'jwks_uri' => 'https://provider.example.com/jwks',
         ]);
 
         $this->oidcClient = $this->createMock(OidcClient::class);
@@ -171,6 +178,72 @@ class OidcLoginAuthenticatorTest extends TestCase
         // and the OIDC user provider cannot reload a user by its identifier alone
         $this->assertFalse($passport->hasBadge(RememberMeBadge::class));
         $this->assertSame('access-123', $passport->getAttribute('oidc_token_data')['access_token']);
+    }
+
+    public function testAuthenticateVerifiesTheIdTokenSignature()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->buildSignedIdToken(['nonce' => $nonce]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'user-42']);
+
+        $authenticator = $this->createAuthenticator(signatureVerifier: $this->createSignatureVerifier());
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+    }
+
+    #[DataProvider('getUnverifiableIdTokens')]
+    public function testAuthenticateRejectsAnIdTokenTheProviderDidNotSign(string $idTokenBuilder, string $expectedMessage)
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            // the attacker owns the claims: the identity and the roles they carry
+            'id_token' => $this->$idTokenBuilder(['nonce' => $nonce, 'sub' => 'admin', 'roles' => ['ROLE_ADMIN']]),
+        ]);
+        $this->oidcClient->expects($this->never())->method('fetchUserInfo');
+
+        $authenticator = $this->createAuthenticator(signatureVerifier: $this->createSignatureVerifier());
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+    }
+
+    public static function getUnverifiableIdTokens(): iterable
+    {
+        yield 'forged signature' => ['buildForgedIdToken', 'The ID token signature is invalid.'];
+        yield 'no signature at all' => ['buildUnsecuredIdToken', 'The ID token is not signed with any of the expected algorithms ("ES256").'];
+        yield 'signature of another provider' => ['buildIdToken', 'The ID token is not signed with any of the expected algorithms ("ES256").'];
+    }
+
+    #[DataProvider('getUnverifiableIdTokens')]
+    public function testAuthenticateAcceptsAnyIdTokenWhenTheSignatureIsNotVerified(string $idTokenBuilder, string $expectedMessage)
+    {
+        // without a verifier, the transport security of the token endpoint request is the
+        // only thing standing between the provider and a forged token: this is the very
+        // behavior the "id_token_signature.required" option opts out of
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $this->$idTokenBuilder(['nonce' => $nonce, 'sub' => 'admin', 'roles' => ['ROLE_ADMIN']]),
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn(['sub' => 'admin']);
+
+        $authenticator = $this->createAuthenticator();
+        $passport = $authenticator->authenticate($this->createCallbackRequest($state, $nonce));
+
+        $this->assertSame('admin', $passport->getBadge(UserBadge::class)->getUserIdentifier());
     }
 
     public function testAuthenticateDoesNotGrantRolesFromClaims()
@@ -997,20 +1070,82 @@ class OidcLoginAuthenticatorTest extends TestCase
     private function buildIdToken(array $extraClaims = []): string
     {
         $header = rtrim(strtr(base64_encode(json_encode(['alg' => 'RS256', 'typ' => 'JWT'])), '+/', '-_'), '=');
-        $claims = array_merge([
+        $payload = rtrim(strtr(base64_encode(json_encode($this->buildIdTokenClaims($extraClaims))), '+/', '-_'), '=');
+        $signature = rtrim(strtr(base64_encode('fake-signature'), '+/', '-_'), '=');
+
+        return $header.'.'.$payload.'.'.$signature;
+    }
+
+    private function buildIdTokenClaims(array $extraClaims = []): array
+    {
+        return array_merge([
             'iss' => 'https://provider.example.com',
             'aud' => 'test-client-id',
             'sub' => 'user-42',
             'exp' => time() + 3600,
             'iat' => time(),
         ], $extraClaims);
-        $payload = rtrim(strtr(base64_encode(json_encode($claims)), '+/', '-_'), '=');
-        $signature = rtrim(strtr(base64_encode('fake-signature'), '+/', '-_'), '=');
-
-        return $header.'.'.$payload.'.'.$signature;
     }
 
-    private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null): OidcLoginAuthenticator
+    /**
+     * An ID token really signed with the key the provider publishes below.
+     */
+    private function buildSignedIdToken(array $extraClaims = []): string
+    {
+        return (new CompactSerializer())->serialize(
+            (new JWSBuilder(new AlgorithmManager([new ES256()])))
+                ->withPayload(json_encode($this->buildIdTokenClaims($extraClaims)))
+                // tip: use https://mkjwk.org/ to generate a JWK
+                ->addSignature(new JWK([
+                    'kty' => 'EC',
+                    'crv' => 'P-256',
+                    'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+                    'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+                    'd' => 'iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220',
+                ]), ['alg' => 'ES256', 'kid' => 'signing-key'])
+                ->build()
+        );
+    }
+
+    /**
+     * The very same claims, signed with nothing at all.
+     */
+    private function buildForgedIdToken(array $extraClaims = []): string
+    {
+        [$header, $payload] = explode('.', $this->buildSignedIdToken($extraClaims));
+
+        return $header.'.'.$payload.'.'.rtrim(strtr(base64_encode('forged-signature'), '+/', '-_'), '=');
+    }
+
+    /**
+     * The "alg": "none" token of RFC 7519, Section 6: a JWS with no signature at all.
+     */
+    private function buildUnsecuredIdToken(array $extraClaims = []): string
+    {
+        $encode = static fn (array $value): string => rtrim(strtr(base64_encode(json_encode($value)), '+/', '-_'), '=');
+
+        return $encode(['alg' => 'none', 'typ' => 'JWT']).'.'.$encode($this->buildIdTokenClaims($extraClaims)).'.';
+    }
+
+    private function createSignatureVerifier(): OidcSignatureVerifier
+    {
+        return new OidcSignatureVerifier(
+            $this->discovery,
+            new ArrayAdapter(),
+            new MockHttpClient(new JsonMockResponse(['keys' => [[
+                'kid' => 'signing-key',
+                'kty' => 'EC',
+                'crv' => 'P-256',
+                'x' => '0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4',
+                'y' => 'KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo',
+                'use' => 'sig',
+                'alg' => 'ES256',
+            ]]])),
+            ['ES256'],
+        );
+    }
+
+    private function createAuthenticator(array $options = [], ?UserProviderInterface $userProvider = null, ?OidcSignatureVerifier $signatureVerifier = null): OidcLoginAuthenticator
     {
         return new OidcLoginAuthenticator(
             new HttpUtils(),
@@ -1022,6 +1157,7 @@ class OidcLoginAuthenticatorTest extends TestCase
             $this->successHandler,
             $this->failureHandler,
             $options,
+            $signatureVerifier,
         );
     }
 }

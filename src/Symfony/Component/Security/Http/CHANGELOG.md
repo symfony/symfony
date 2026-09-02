@@ -19,6 +19,7 @@ CHANGELOG
  * Add `OidcLoginAuthenticator` for the OpenID Connect Authorization Code Flow (interactive login via OIDC provider)
  * Add `OidcClient` and `OidcDiscovery` protocol classes
  * Cache the discovery document of the `oidc` access token handler for one hour, where it was fetched again on every refresh of the JWKS
+ * Add `OidcSignatureVerifier` to verify the ID token signature of the OIDC login authenticator against the provider JWKS, which it now does by default
  * Add `OidcPublicClient` to run the OIDC login flow as a public client, which holds no client secret and relies on PKCE, and support `client_secret_basic` in `OidcConfidentialClient`
 
 8.1

@@ -58,49 +58,6 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(['kernel.reset' => [['method' => 'reset']]], $discoveryMain->getTags());
     }
 
-    public function testConfidentialClientIsWiredByDefault()
-    {
-        $container = new ContainerBuilder();
-
-        $config = [
-            'provider_uri' => 'https://provider.example.com',
-            'client_id' => 'my-client-id',
-            'client_secret' => 'my-client-secret',
-        ];
-
-        $factory = new OidcLoginFactory();
-        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
-
-        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
-        $this->assertInstanceOf(ChildDefinition::class, $client);
-        $this->assertSame('security.authenticator.oidc_login.client', $client->getParent());
-        $this->assertSame('my-client-secret', $client->getArgument(3));
-        $this->assertSame('client_secret_post', $client->getArgument(4));
-    }
-
-    public function testPublicClientIsWiredWhenTheTokenEndpointNeedsNoAuthentication()
-    {
-        $container = new ContainerBuilder();
-
-        $config = [
-            'provider_uri' => 'https://provider.example.com',
-            'client_id' => 'my-client-id',
-            'token_endpoint_auth_method' => 'none',
-        ];
-
-        $factory = new OidcLoginFactory();
-        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
-
-        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
-        $this->assertInstanceOf(ChildDefinition::class, $client);
-        $this->assertSame('security.authenticator.oidc_login.public_client', $client->getParent());
-        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $client->getArgument(1));
-        $this->assertSame('my-client-id', $client->getArgument(2));
-        // a public client takes neither a secret nor an authentication method
-        $this->assertArrayNotHasKey('index_3', $client->getArguments());
-        $this->assertArrayNotHasKey('index_4', $client->getArguments());
-    }
-
     public function testFirewallUserProviderIsInjected()
     {
         // the user provider loads the user, so that the token stored in the session can be
@@ -389,6 +346,135 @@ class OidcLoginFactoryTest extends TestCase
         yield 'IPv6 loopback' => ['http://[::1]:8080'];
         yield 'localhost subdomain' => ['http://keycloak.localhost'];
         yield 'test TLD' => ['http://keycloak.test'];
+    }
+
+    public function testIdTokenSignatureIsVerifiedByDefault()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertTrue($config['id_token_signature']['required']);
+        // "RS256" is the only algorithm OIDC Core 1.0 requires providers to support
+        $this->assertSame(['RS256'], $config['id_token_signature']['algorithms']);
+        $this->assertTrue($config['id_token_signature']['enforce_key_usage_verification']);
+
+        $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
+        $this->assertSame('security.authenticator.oidc_login.signature_verifier', $verifier->getParent());
+        // the firewall discovery document is where the JWKS URI is announced
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $verifier->getArgument(0));
+        $this->assertSame(['RS256'], $verifier->getArgument(3));
+        $this->assertSame(3600, $verifier->getArgument(4));
+        $this->assertTrue($verifier->getArgument(5));
+
+        $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.signature_verifier.main'), $authenticator->getArgument(9));
+    }
+
+    public function testIdTokenSignatureVerificationCanBeTurnedOff()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'id_token_signature' => ['required' => false],
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.signature_verifier.main'));
+
+        $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
+        $this->assertNull($authenticator->getArgument(9));
+    }
+
+    public function testIdTokenSignatureAlgorithmsAndKeyUsageAreConfigurable()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'discovery_cache_ttl' => 60,
+            'id_token_signature' => [
+                'algorithms' => ['ES256', 'PS256'],
+                'enforce_key_usage_verification' => false,
+            ],
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
+        $this->assertSame(['ES256', 'PS256'], $verifier->getArgument(3));
+        // the JWKS falls back to the discovery TTL when the provider advertises none
+        $this->assertSame(60, $verifier->getArgument(4));
+        $this->assertFalse($verifier->getArgument(5));
+    }
+
+    public function testASingleIdTokenSignatureAlgorithmCanBeGivenAsAString()
+    {
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'id_token_signature' => ['algorithms' => 'ES256'],
+        ], $factory);
+
+        $this->assertSame(['ES256'], $config['id_token_signature']['algorithms']);
+    }
+
+    public function testConfidentialClientIsWiredByDefault()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
+        $this->assertInstanceOf(ChildDefinition::class, $client);
+        $this->assertSame('security.authenticator.oidc_login.client', $client->getParent());
+        $this->assertSame('my-client-secret', $client->getArgument(3));
+        $this->assertSame('client_secret_post', $client->getArgument(4));
+    }
+
+    public function testPublicClientIsWiredWhenTheTokenEndpointNeedsNoAuthentication()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'token_endpoint_auth_method' => 'none',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $factory->createAuthenticator($container, 'main', $this->processConfig($config, $factory), 'userprovider');
+
+        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
+        $this->assertInstanceOf(ChildDefinition::class, $client);
+        $this->assertSame('security.authenticator.oidc_login.public_client', $client->getParent());
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $client->getArgument(1));
+        $this->assertSame('my-client-id', $client->getArgument(2));
+        // a public client takes neither a secret nor an authentication method
+        $this->assertArrayNotHasKey('index_3', $client->getArguments());
+        $this->assertArrayNotHasKey('index_4', $client->getArguments());
     }
 
     #[DataProvider('provideSecretBasedAuthMethods')]

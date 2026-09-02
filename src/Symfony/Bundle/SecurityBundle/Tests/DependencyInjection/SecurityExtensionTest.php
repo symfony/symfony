@@ -46,6 +46,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class SecurityExtensionTest extends TestCase
@@ -1509,6 +1510,53 @@ class SecurityExtensionTest extends TestCase
 
         $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
         $this->assertSame('security.user.provider.concrete.oidc', (string) $authenticator->getArgument(1));
+    }
+
+    public function testOidcLoginVerifiesTheIdTokenSignature()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_secret' => 'my-client-secret',
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $verifier = $container->getDefinition('security.authenticator.oidc_login.signature_verifier.main');
+        $this->assertSame(OidcSignatureVerifier::class, $verifier->getClass());
+        $this->assertSame(['RS256'], $verifier->getArgument(3));
+        $this->assertSame('security.authenticator.oidc_login.signature_verifier.main', (string) $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(9));
+    }
+
+    public function testOidcLoginCanSkipTheIdTokenSignatureVerification()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'client_secret' => 'my-client-secret',
+                        'id_token_signature' => ['required' => false],
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.signature_verifier.main'));
+        $this->assertNull($container->getDefinition('security.authenticator.oidc_login.main')->getArgument(9));
     }
 
     public function testOidcLoginSupportsAPublicClient()

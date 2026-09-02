@@ -85,12 +85,32 @@ class OidcLoginFactory extends AbstractFactory
             ->integerNode('discovery_cache_ttl')
                 ->defaultValue(3600)
                 ->min(0)
-                ->info('TTL in seconds for caching the OIDC discovery configuration.')
+                ->info('TTL in seconds for caching the OIDC discovery configuration, and for the provider JWKS when it advertises no cache lifetime itself.')
             ->end()
             ->integerNode('allowed_time_drift')
                 ->defaultValue(0)
                 ->min(0)
                 ->info('Allowed clock skew in seconds when validating ID token time claims.')
+            ->end()
+            ->arrayNode('id_token_signature')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('required')
+                        ->defaultTrue()
+                        ->info('When true (default), the ID token signature is verified against the provider JWKS. Setting it to false decodes the ID token without verifying it, which OIDC Core 1.0, Section 3.1.3.7, item 6 only allows because the token comes from the token endpoint over TLS: it is then only as safe as the TLS verification of the HTTP client used for that request, so never turn it off with a client configured with "verify_peer: false" or "verify_host: false", nor behind a TLS-terminating proxy.')
+                    ->end()
+                    ->arrayNode('algorithms', 'algorithm')
+                        ->beforeNormalization()->castToArray()->end()
+                        ->scalarPrototype()->end()
+                        ->defaultValue(['RS256'])
+                        ->requiresAtLeastOneElement()
+                        ->info('The signature algorithms the ID token is accepted to be signed with, among "RS256", "RS384", "RS512", "ES256", "ES384", "ES512", "PS256", "PS384" and "PS512". Defaults to "RS256", the only algorithm OIDC Core 1.0 requires providers to support; list the one your provider announces in "id_token_signing_alg_values_supported" when it signs with another. No HMAC algorithm is accepted, so that a public key can never be used as a shared secret.')
+                    ->end()
+                    ->booleanNode('enforce_key_usage_verification')
+                        ->defaultTrue()
+                        ->info('When enabled (default), only keys explicitly designated for signature (via "use":"sig" or a "key_ops" entry containing "sign"/"verify") are accepted. When disabled, keys without any usage designation are also accepted; keys explicitly restricted to encryption are still rejected.')
+                    ->end()
+                ->end()
             ->end()
             ->enumNode('token_endpoint_auth_method')
                 ->values(['client_secret_post', 'client_secret_basic', 'none'])
@@ -177,6 +197,19 @@ class OidcLoginFactory extends AbstractFactory
             ;
         }
 
+        $signatureVerifier = null;
+        if ($config['id_token_signature']['required']) {
+            $signatureVerifierId = 'security.authenticator.oidc_login.signature_verifier.'.$firewallName;
+            $container
+                ->setDefinition($signatureVerifierId, new ChildDefinition('security.authenticator.oidc_login.signature_verifier'))
+                ->replaceArgument(0, new Reference($discoveryId))
+                ->replaceArgument(3, $config['id_token_signature']['algorithms'])
+                ->replaceArgument(4, $config['discovery_cache_ttl'])
+                ->replaceArgument(5, $config['id_token_signature']['enforce_key_usage_verification'])
+            ;
+            $signatureVerifier = new Reference($signatureVerifierId);
+        }
+
         $authenticatorId = 'security.authenticator.oidc_login.'.$firewallName;
         $options = array_intersect_key($config, $this->options);
         $options['firewall_name'] = $firewallName;
@@ -192,6 +225,7 @@ class OidcLoginFactory extends AbstractFactory
             ->replaceArgument(6, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
             ->replaceArgument(7, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(8, $options)
+            ->replaceArgument(9, $signatureVerifier)
         ;
 
         $callbackUris = $container->hasParameter('security.oidc_login.callback_uris') ? (array) $container->getParameter('security.oidc_login.callback_uris') : [];

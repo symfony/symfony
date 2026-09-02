@@ -205,8 +205,8 @@ class OidcConfidentialClientTest extends TestCase
 
     public function testExchangeCodeRejectsAnInsecureTokenEndpoint()
     {
-        // the ID token signature is not verified because the token endpoint is reached over
-        // TLS: a discovery document announcing a plain HTTP endpoint takes that away
+        // the client secret and the tokens travel through the token endpoint: a discovery
+        // document announcing a plain HTTP endpoint takes their confidentiality away
         $discovery = $this->createDiscovery(['token_endpoint' => 'http://provider.example.com/token']);
 
         $this->httpClient->expects($this->never())->method('request');

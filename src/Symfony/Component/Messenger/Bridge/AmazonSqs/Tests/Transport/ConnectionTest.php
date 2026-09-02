@@ -186,6 +186,32 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testFromDsnWithSsl()
+    {
+        $httpClient = new MockHttpClient();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'endpoint' => 'http://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://localhost/queue?ssl=false', [], $httpClient)
+        );
+    }
+
+    public function testFromDsnWithSslTakingPrecedenceOverSslMode()
+    {
+        $httpClient = new MockHttpClient();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'queue'], new SqsClient(['region' => 'eu-west-1', 'endpoint' => 'https://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $httpClient)),
+            Connection::fromDsn('sqs://localhost/queue?ssl=true&sslmode=disable', [], $httpClient)
+        );
+    }
+
+    public function testFromDsnWithInvalidSsl()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid value for the "ssl" option of the "sqs" DSN, expected a boolean.');
+
+        Connection::fromDsn('sqs://localhost/queue?ssl=nope', [], new MockHttpClient());
+    }
+
     public function testFromDsnWithCustomEndpointAndPort()
     {
         $httpClient = new MockHttpClient();

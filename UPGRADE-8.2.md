@@ -150,6 +150,12 @@ Notifier
  * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
    boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
 
+RateLimiter
+-----------
+
+ * `CompoundLimiter::consume()` now stops consuming at the first limiter that rejects the request;
+   list limiters from the most specific to the most global to spare shared quotas from rejected hits
+
 Scheduler
 ---------
 

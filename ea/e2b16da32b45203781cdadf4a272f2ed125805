@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T11:28:45Z
+
+I reviewed this in depth and amended a few things into your commit while rebasing on current 8.2:
+
+- The discovery document's `jwks_uri` was read without any scheme check, unlike the endpoints the access token handler verifies. A tampered discovery document pointing at `http://` would let an attacker supply the very keys the signature check trusts. The verifier now goes through `OidcDiscovery::getSecureEndpoint('jwks_uri')`, which also covers already-cached documents.
+- JWKS fetch failures (HTTP 5xx, invalid JSON) escaped as raw HttpClient exceptions, so a broken provider produced 500s instead of authentication failures. They are now wrapped, the response body is capped at 1 MiB like the discovery fetch, and malformed entries in `keys` are skipped instead of causing a `TypeError`.
+- The description says the JWKS cache falls back to `discovery_cache_ttl`, but the argument was hard-coded to 3600. It is now wired through the factory.
+- Dropped the unrelated `.gitignore` hunk.
+
+Everything else checked out well: `alg: none` and out-of-allowlist algorithms are rejected before any network call, HMAC is structurally impossible, the unknown-kid refetch is throttled, and verification runs before claim validation.
+
+One heads-up: the SecurityBundle functional suite regenerates `Tests/Functional/app/config/schema.json`, and `git add -A` happily commits its 7000 lines. It slipped into this branch twice during my review; you may want to watch for it on your side too.

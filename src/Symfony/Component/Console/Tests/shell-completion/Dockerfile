@@ -5,7 +5,7 @@
 # For the full copyright and license information, please view
 # https://symfony.com/doc/current/contributing/code/license.html
 
-# Image used to run the shell completion tests locally, see docker-run.sh
+# Image used to run the shell completion tests locally, see docker.sh
 
 FROM php:8.4-cli-bookworm
 

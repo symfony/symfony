@@ -105,6 +105,24 @@ test_api_version() {
     esac
 }
 
+# bash-completion is not installed everywhere, for instance on macOS: the script
+# must explain it instead of sending an incomplete request to the application
+test_missing_bash_completion() {
+    local output
+
+    output="$(bash --noprofile --norc -c '
+        source "$1"
+        COMP_WORDS=(app demo:) COMP_CWORD=1 COMP_LINE="app demo:" COMP_POINT=9 COMPREPLY=()
+        _sf_app
+        printf "suggestions=%s\n" "${#COMPREPLY[@]}"
+    ' _ "$tmp/completion.bash" 2>&1)"
+
+    case "$output" in
+        *'requires the "bash-completion" package'*'suggestions=0'*) pass "[bash] missing bash-completion is reported" ;;
+        *) fail "[bash] missing bash-completion is reported" "$output" ;;
+    esac
+}
+
 for shell in $shells; do
     if ! command -v "$shell" > /dev/null; then
         skipped=$((skipped + 1))
@@ -131,6 +149,7 @@ for shell in $shells; do
 
     if [ "$shell" = "bash" ]; then
         test_api_version
+        test_missing_bash_completion
     fi
 done
 

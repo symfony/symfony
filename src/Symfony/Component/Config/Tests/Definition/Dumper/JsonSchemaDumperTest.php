@@ -121,9 +121,41 @@ class JsonSchemaDumperTest extends TestCase
         $prototype->setKeyAttribute('name');
         $root = new ArrayNode('root');
         $root->addChild($prototype);
-        yield [$prototype, [
-            '$ref' => '#/$defs/types/object',
-            'additionalProperties' => ['$ref' => '#/$defs/types/string'],
+        yield 'key-attribute map with scalar prototype also accepts a list' => [$prototype, [
+            'anyOf' => [
+                [
+                    '$ref' => '#/$defs/types/object',
+                    'additionalProperties' => ['$ref' => '#/$defs/types/string'],
+                ],
+                [
+                    '$ref' => '#/$defs/types/array',
+                    'items' => ['$ref' => '#/$defs/types/string'],
+                ],
+            ],
+        ]];
+
+        // A prototyped list with a null default is nullable, so it uses the array_null ref.
+        $listWithNullDefault = (new ArrayNodeDefinition('proto'))->defaultNull()->stringPrototype()->end()->getNode();
+        yield 'array list with null default uses the nullable ref' => [$listWithNullDefault, [
+            '$ref' => '#/$defs/types/array_null',
+            'items' => ['$ref' => '#/$defs/types/string_null'],
+            'default' => null,
+        ]];
+
+        // A prototyped map with a null default is nullable, so it uses the object_null ref.
+        $mapWithNullDefault = (new ArrayNodeDefinition('proto'))->defaultNull()->useAttributeAsKey('name')->stringPrototype()->end()->getNode();
+        yield 'array map with null default uses the nullable ref' => [$mapWithNullDefault, [
+            'anyOf' => [
+                [
+                    '$ref' => '#/$defs/types/object_null',
+                    'additionalProperties' => ['$ref' => '#/$defs/types/string_null'],
+                ],
+                [
+                    '$ref' => '#/$defs/types/array_null',
+                    'items' => ['$ref' => '#/$defs/types/string_null'],
+                ],
+            ],
+            'default' => null,
         ]];
 
         $child = new BooleanNode('node');

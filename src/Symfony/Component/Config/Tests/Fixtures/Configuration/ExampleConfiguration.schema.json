@@ -190,7 +190,7 @@
                     }
                 },
                 "string_list_default_null": {
-                    "$ref": "#/$defs/types/array",
+                    "$ref": "#/$defs/types/array_null",
                     "items": {
                         "$ref": "#/$defs/types/string_null"
                     },
@@ -206,11 +206,22 @@
                     ]
                 },
                 "parameters": {
-                    "$ref": "#/$defs/types/object_null",
-                    "additionalProperties": {
-                        "$ref": "#/$defs/types/scalar",
-                        "description": "Parameter name"
-                    }
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/types/object_null",
+                            "additionalProperties": {
+                                "$ref": "#/$defs/types/scalar",
+                                "description": "Parameter name"
+                            }
+                        },
+                        {
+                            "$ref": "#/$defs/types/array_null",
+                            "items": {
+                                "$ref": "#/$defs/types/scalar",
+                                "description": "Parameter name"
+                            }
+                        }
+                    ]
                 },
                 "connections": {
                     "$ref": "#/$defs/types/array_null",

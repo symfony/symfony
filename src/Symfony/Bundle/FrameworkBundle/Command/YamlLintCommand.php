@@ -13,6 +13,8 @@ namespace Symfony\Bundle\FrameworkBundle\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
+use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
+use Symfony\Component\Yaml\Schema\SchemaValidatorInterface;
 
 /**
  * Validates YAML files syntax and outputs encountered errors.
@@ -25,7 +27,7 @@ use Symfony\Component\Yaml\Command\LintCommand as BaseLintCommand;
 #[AsCommand(name: 'lint:yaml', description: 'Lint a YAML file and outputs encountered errors')]
 class YamlLintCommand extends BaseLintCommand
 {
-    public function __construct()
+    public function __construct(?SchemaResolverInterface $schemaResolver = null, ?SchemaValidatorInterface $schemaValidator = null, ?string $projectDir = null)
     {
         $directoryIteratorProvider = function ($directory, $default) {
             if (!is_dir($directory)) {
@@ -37,7 +39,7 @@ class YamlLintCommand extends BaseLintCommand
 
         $isReadableProvider = static fn ($fileOrDirectory, $default) => str_starts_with($fileOrDirectory, '@') || $default($fileOrDirectory);
 
-        parent::__construct(null, $directoryIteratorProvider, $isReadableProvider);
+        parent::__construct(null, $directoryIteratorProvider, $isReadableProvider, $schemaResolver, $schemaValidator, $projectDir);
     }
 
     protected function configure(): void

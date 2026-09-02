@@ -3957,6 +3957,25 @@ abstract class FrameworkExtensionTestCase extends TestCase
         });
     }
 
+    public function testYamlLintCommandUsesTheKernelConfigDir()
+    {
+        $container = $this->createContainerFromFile('default_config', ['.kernel.config_dir' => '/project/config']);
+
+        $resolver = $container->getDefinition('console.command.yaml_lint')->getArgument(0);
+
+        $this->assertSame('/project/config', $resolver->getArgument(0));
+    }
+
+    public function testYamlLintCommandWithoutKernelConfigDir()
+    {
+        $container = $this->createContainerFromFile('default_config');
+
+        $resolver = $container->getDefinition('console.command.yaml_lint')->getArgument(0);
+
+        // Without a config directory, the generated schema.json is never applied.
+        $this->assertNull($resolver->getArgument(0));
+    }
+
     protected function createContainer(array $data = [])
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([

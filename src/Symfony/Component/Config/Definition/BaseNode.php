@@ -174,6 +174,10 @@ abstract class BaseNode implements NodeInterface
      */
     public function isNullable(): bool
     {
+        if ($this->hasDefaultValue() && null === $this->getDefaultValue()) {
+            return true;
+        }
+
         foreach ($this->equivalentValues as [$from, $to]) {
             // the builder registers a null equivalence on every node; only a mapping that
             // replaces null makes it acceptable, as an identity mapping leaves it to be

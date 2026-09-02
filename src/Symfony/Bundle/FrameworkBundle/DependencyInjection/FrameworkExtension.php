@@ -230,6 +230,7 @@ use Symfony\Component\Workflow;
 use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\WorkflowInterface;
 use Symfony\Component\Yaml\Command\LintCommand as BaseYamlLintCommand;
+use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\CallbackInterface;
@@ -300,6 +301,10 @@ class FrameworkExtension extends Extension
             }
             if (!class_exists(BaseYamlLintCommand::class)) {
                 $container->removeDefinition('console.command.yaml_lint');
+            } elseif (!ContainerBuilder::willBeAvailable('symfony/yaml', SchemaResolverInterface::class, ['symfony/framework-bundle'])) {
+                $container->getDefinition('console.command.yaml_lint')->setArguments([]);
+            } elseif ($container->hasParameter('.kernel.config_dir')) {
+                $container->getDefinition('console.command.yaml_lint')->getArgument(0)->replaceArgument(0, $container->getParameter('.kernel.config_dir'));
             }
 
             if (!class_exists(BaseTranslationLintCommand::class)) {

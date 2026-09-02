@@ -1,0 +1,88 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-21T09:02:37Z
+
+Thanks for the thorough review @nicolas-grekas. I rebased on 8.2 and addressed everything.
+
+**Review body**
+- Unresolvable schema no longer crashes the run. `SchemaValidator::validate()` wraps the opis call and rethrows a `Yaml\Exception\RuntimeException`, and the command catches it per file, so a bad `--check-schema` value or a bad header reports a file error and the lint keeps going.
+- The two wrap-fragile tests collapse whitespace before asserting on the label, so they pass whatever the temp path length.
+
+**Inline comments**
+- Removed the `suggest` entry from the Yaml `composer.json`.
+- The "package not installed" case now throws a `LogicException` (new `Yaml\Exception\LogicException`), and the command precondition uses `Console\Exception\LogicException`.
+
+**Minor points**
+- (a) The `Validator` is built once and reused, and `resolveSchema()` is cached per file, so directory lints no longer rebuild the loader or resolve twice per file.
+- (b) The `$schema` header is only read from the leading comment block, so a commented `$schema` line in the middle of a document no longer selects a schema.
+- (c) Windows paths are fixed: `file://` ids use forward slashes (`file:///C:/...`) and absolute detection also accepts `C:/`. This is what made the Windows CI job red; it is green locally now.
+- (d) Added `opis/json-schema` to the FrameworkBundle `require-dev` so its tests run in the component deps jobs.
+
+**Remote schemas**
+- Instead of a doc note, I added a guard. opis does not fetch over the network by default, but a remote schema now fails fast with a clear message ("only local schema files are supported"), so linting never touches the network.
+
+CI: only the Windows job was caused by this PR and (c) fixes it. The PHPStan (DomCrawler), 8.6 (TwigBridge) and low-deps (LazyProxyArgument) failures reproduce on base.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-21T09:24:00Z
+
+Follow-up on the default schema resolution in FrameworkBundle.
+
+I extended `resolveDefaultSchema()` to cover more well-known config files, matching the JSON Schema Store catalog conventions:
+- `config/routes.yaml` and `config/routes/**/*.yaml` -> routing schema
+- `config/services.yaml` and `config/services_*.yaml` -> services schema
+- `config/serializer/**/*.yaml` -> serialization schema (only when the Serializer component is installed)
+- `config/validator/**/*.yaml` -> validation schema (only when the Validator component is installed)
+
+Two related changes:
+- The routing pattern now uses `config/routes` (Flex convention) instead of `config/routing`.
+- The generated `config/schema.json` fallback is now limited to `config/packages/**/*.yaml`, since it only describes bundle configuration. Any other file has no default schema.
+
+I also dropped the dead `class_exists(Route::class)` guard (code and test), as routing is a hard dependency of FrameworkBundle.
+
+Tests use a `#[DataProvider]` for the four component schemas, plus cases for the `config/packages` fallback and for files outside it.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-08-29T09:12:15Z
+
+Rebased on 8.2 and reworked the design, to remove the `protected` extension points and split schema resolution from validation.
+
+The component now has a `Symfony\Component\Yaml\Schema` namespace:
+
+* `SchemaResolverInterface::resolve($content, $file)` returns the schema a document must validate against, or null.
+* `FileHeaderSchemaResolver` reads the `# yaml-language-server: $schema=` and `# $schema=` header, resolving a relative location against the directory of the file.
+* `SchemaValidatorInterface` exposes `isSupported()` and `validate($data, $schema, $content)`.
+* `SchemaValidator` implements it on top of `opis/json-schema`, and is the only class that depends on the library. It no longer resolves anything, so it has no constructor and no state to configure.
+
+`LintCommand` receives a resolver and a validator through its constructor, plus the base directory schema paths are displayed relative to. All three arguments are optional and appended at the end of the signature. `protected $schema`, `createSchemaValidator()` and `getSchemaBaseDir()` are gone.
+
+FrameworkBundle ships `YamlLintSchemaResolver`, which decorates the header resolver and falls back to Symfony conventions. It no longer reaches for the kernel through `getApplication()`, and it is wired as an inline service in `console.php` so nothing is left dangling when `FrameworkExtension` removes the command.
+
+Two changes to the default resolution:
+
+* The `.yml` extension is accepted, not just `.yaml`.
+* The generated `schema.json` is only applied to files inside the `packages` directory of the project config directory. It describes the configuration of this application, so it must not be applied to a `config/packages` belonging to a bundle or to another project. The component schemas of well known files stay unanchored, since the naming convention also holds inside bundles.
+
+The config directory comes from the `.kernel.config_dir` build parameter, the same one `JsonSchemaConfigDumpPass` uses to write the file. It stays optional: when the kernel does not expose one, the generated schema is simply never applied.
+
+New unit tests cover the header resolver, the FrameworkBundle resolver (well known files, files outside the conventions, Windows paths, the decorated resolver taking precedence, `config/packages` with and without the generated file) and the container wiring with and without `.kernel.config_dir`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:27:41Z
+
+Round 3 reviewed with the branch rebased on current 8.2, opis installed, and the full Yaml, Config and FrameworkBundle suites run. The rework does what the last round asked for, and the conventions check out: all four component schemas shipped in v7.4.0, the oldest version FrameworkBundle allows, so the resolver is safe on low deps. I also confirmed the key-attribute scalar map really accepts the list form at runtime, so the `anyOf` addition in the dumper matches reality.
+
+I pushed fixes for what I found, amended into your commit:
+
+- Fabbot: the two exception messages in `SchemaValidator` needed their `%s` placeholders quoted.
+- low-deps was red on the whole `YamlLintSchemaResolverTest` class: `setUp()` skipped before setting the typed properties, and `tearDown()` runs for skipped tests too, so every test errored with "typed property must not be accessed before initialization" where symfony/yaml 7.4 is installed. The properties are now set before the skip.
+- The verbose-display tests were still wrap-fragile: collapsing whitespace does not remove the `//` prefix SymfonyStyle puts at the start of each wrapped line, so the output reads `validated // against ...` and the assertion failed on machines with long temp paths (three tests, in Yaml and FrameworkBundle). The assertions now strip the prefix.
+- `testLintThrowsWhenSchemaOptionUsedWithoutLibrary` expected `\RuntimeException`, but the command throws a Console `LogicException`. No CI job runs without opis (it is in require-dev everywhere), which is why this never showed.
+- opis stops at the first violation by default, so a file with several problems reported a single error per run and the `implode` over messages was dead code. The validator now keeps validating after the first violation (capped at 100); a file with two invalid properties reports both, each with its line. New tests cover this.
+
+I also updated the commit message and the description, which still described the pre-rework design.
+
+CI accounting for the previous run: Fabbot and low-deps were caused by the PR and are fixed above. PHPStan and Psalm failed in the PhpUnit bridge seeding, not on this PR's files. The unit jobs failed on `FigletTest`, web-token deprecations and the known AssetMapper low-deps case, all present on the base.

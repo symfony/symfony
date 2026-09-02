@@ -88,8 +88,8 @@ final class DelayedEnvelope extends Envelope
         if ($return = $headers->get('Return-Path')) {
             return $return->getAddress();
         }
-        if ($from = $headers->get('From')) {
-            return $from->getAddresses()[0];
+        if (($from = $headers->get('From')) && $addresses = $from->getAddresses()) {
+            return $addresses[0];
         }
 
         throw new LogicException('Unable to determine the sender of the message.');

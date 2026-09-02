@@ -103,12 +103,11 @@ class MessageListener implements EventSubscriberInterface
                     }
 
                     $h = $headers->get($name);
-                    if (!$h instanceof MailboxListHeader) {
+                    if (!$h instanceof MailboxListHeader || !$header instanceof MailboxListHeader) {
                         throw new RuntimeException(\sprintf('Unable to set header "%s".', $name));
                     }
 
-                    Headers::checkHeaderClass($header);
-                    foreach ($header->getAddresses() as $address) {
+                    foreach ($header->getAddressList() as $address) {
                         $h->addAddress($address);
                     }
             }

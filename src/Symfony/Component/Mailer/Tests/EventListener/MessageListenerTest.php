@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\EventListener\MessageListener;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Group;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -100,6 +101,17 @@ class MessageListenerTest extends TestCase
             ->add(new MailboxListHeader('bcc', [new Address('bcc-initial@example.com'), new Address('bcc-default@example.com'), new Address('bcc-default-1@example.com')]))
         ;
         yield 'bcc, add another bcc (unique header)' => [$initialHeaders, $defaultHeaders, $expectedHeaders];
+
+        $initialHeaders = (new Headers())
+            ->add(new MailboxListHeader('bcc', [new Address('bcc-initial@example.com')]))
+        ;
+        $defaultHeaders = (new Headers())
+            ->add(new MailboxListHeader('bcc', [new Group('Watchers', [new Address('bcc-default@example.com')])]))
+        ;
+        $expectedHeaders = (new Headers())
+            ->add(new MailboxListHeader('bcc', [new Address('bcc-initial@example.com'), new Group('Watchers', [new Address('bcc-default@example.com')])]))
+        ;
+        yield 'bcc, add a bcc holding a group (unique header)' => [$initialHeaders, $defaultHeaders, $expectedHeaders];
 
         $initialHeaders = (new Headers())
             ->add(new UnstructuredHeader('foo', 'initial'))

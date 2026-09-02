@@ -16,6 +16,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\LogicException;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Group;
 use Symfony\Component\Mime\Header\Headers;
 use Symfony\Component\Mime\Header\PathHeader;
 use Symfony\Component\Mime\Message;
@@ -79,6 +80,52 @@ class EnvelopeTest extends TestCase
         $headers->addMailboxListHeader('To', ['to@symfony.com']);
         $e = Envelope::create(new Message($headers));
         $this->assertEquals($from, $e->getSender());
+    }
+
+    public function testRecipientsFromHeadersExpandGroups()
+    {
+        if (!class_exists(Group::class)) {
+            $this->markTestSkipped('Groups require symfony/mime 8.2 or higher.');
+        }
+
+        $headers = new Headers();
+        $headers->addMailboxListHeader('From', ['from@symfony.com']);
+        $headers->addMailboxListHeader('To', [new Group('undisclosed-recipients')]);
+        $headers->addMailboxListHeader('Bcc', [new Group('Friends', [$helene = new Address('helene@symfony.com'), $thomas = new Address('thomas@symfony.com')]), $fabien = new Address('fabien@symfony.com')]);
+        $e = Envelope::create(new Message($headers));
+
+        $this->assertEquals([$helene, $thomas, $fabien], $e->getRecipients());
+    }
+
+    public function testSenderFromHeadersUsesTheFirstMailboxOfAGroup()
+    {
+        if (!class_exists(Group::class)) {
+            $this->markTestSkipped('Groups require symfony/mime 8.2 or higher.');
+        }
+
+        $headers = new Headers();
+        $headers->addMailboxListHeader('From', [new Group('Friends', [$from = new Address('from@symfony.com', 'from')])]);
+        $headers->addMailboxListHeader('To', ['to@symfony.com']);
+        $e = Envelope::create(new Message($headers));
+
+        $this->assertEquals($from, $e->getSender());
+    }
+
+    public function testSenderFromHeadersFailsWhenFromHasNoMailbox()
+    {
+        if (!class_exists(Group::class)) {
+            $this->markTestSkipped('Groups require symfony/mime 8.2 or higher.');
+        }
+
+        $headers = new Headers();
+        $headers->addMailboxListHeader('From', [new Group('Automated System')]);
+        $headers->addMailboxListHeader('To', ['to@symfony.com']);
+        $e = Envelope::create(new Message($headers));
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Unable to determine the sender of the message.');
+
+        $e->getSender();
     }
 
     public function testSenderFromHeadersFailsWithNonAsciiCharactersInLocalPart()

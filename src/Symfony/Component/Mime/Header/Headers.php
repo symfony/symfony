@@ -13,6 +13,7 @@ namespace Symfony\Component\Mime\Header;
 
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Group;
 
 /**
  * A collection of headers.
@@ -75,13 +76,13 @@ final class Headers
     }
 
     /**
-     * @param array<Address|string> $addresses
+     * @param array<Address|Group|string> $addresses
      *
      * @return $this
      */
     public function addMailboxListHeader(string $name, array $addresses): static
     {
-        return $this->add(new MailboxListHeader($name, Address::createArray($addresses)));
+        return $this->add(new MailboxListHeader($name, MailboxListHeader::createAddressList($addresses)));
     }
 
     /**

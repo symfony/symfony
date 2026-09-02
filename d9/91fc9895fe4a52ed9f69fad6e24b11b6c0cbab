@@ -1,0 +1,129 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-10-03T06:49:27Z
+
+Indeed, I see no BC path to add the nullable type to the interface.
+Maybe there's no need to change anything and you can pass a user with no roles instead?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-03T07:19:47Z
+
+We could introduce a class that decorates the existing one with a different signature and creates such an empty user when forwarding the call. Or maybe another helper in `AbstractController` doing this might also ease things?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-10-03T07:26:44Z
+
+Such a method could also be placed in the `Security` class in SecurityBundle.
+
+---------------------------------------------------------------------------
+
+by antonkomarev at 2025-10-03T18:55:30Z
+
+@aschempp there is one more possible option, to make Guest user a separate class, which implements Userinterface too. But it may require a lot of changes in legacy systems.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-10-04T11:57:30Z
+
+Given the purpose of this method and the fact that one aim of the now well-established authenticator system was to remove the concept of unauthenticated tokens (see e.g. https://github.com/symfony/symfony/pull/42050 and https://github.com/symfony/symfony/pull/42510), I don't think we should try to address this here, passing some kind of null user on the caller's side seems good enough.
+
+---------------------------------------------------------------------------
+
+by aschempp at 2025-10-08T07:07:47Z
+
+> passing some kind of null user on the caller's side seems good enough.
+
+That would be perfectly fine with me. But shouldn't the security system then return such a null user in e.g. `SecurityHelper::getUser()` as well? Which certainly would be a BC break as well 😅
+
+As an example of our current system ([Contao CMS](https://contao.org)), we have permissions on objects that can be given to certain user groups, or to guests. Our voters then decides whether there is a user in the current system and which groups it belongs to, or if the object is allowed for guests. If there's a new `NullUser` concept, we'd need to adjust all voters to check for `->getUser() === null || $user instanceof NullUser` which feels kinda wrong?
+
+Btw. would you consider this a bug (to be fixed in 7.3 possibly) or a feature to check for guest users?
+
+---------------------------------------------------------------------------
+
+by aschempp at 2025-10-08T07:11:10Z
+
+The most backward and forward compatible solution might be to create a new `UserAndGuestAuthorizationCheckerInterface` that accepts a null object. We could then deprecated the other interface …
+Since most applications will probably use the core `AuthorizationChecker`, everyone could instantly use the new method instead of the deprecated old one.
+
+Let me know if you like that idea, I can then update the PR (we can still decide on final naming later).
+
+---------------------------------------------------------------------------
+
+by aschempp at 2025-10-24T14:23:16Z
+
+> how critical is it to have this in 7.4 vs 8.1?
+
+It would help me to have it in 7.4, but I can also make it work without. I don't see how waiting until 8.1 would solve any issue though, because we can't trigger a deprecation that we want to add an argument that isn't possible 😅
+
+---
+
+I think I found a neater solution. The implementation class (`AuthorizationChecker`) is allowed to widen the argument to `null`. So we could add a new interface for the same method like below: https://3v4l.org/XYqQb
+
+```php
+interface UserAuthorizationCheckerInterface
+{
+    public function isGrantedForUser(UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool;
+}
+
+interface UserGuestAuthorizationCheckerInterface
+{
+    public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool;
+}
+
+class AuthorizationChecker implements UserAuthorizationCheckerInterface, UserGuestAuthorizationCheckerInterface
+{
+    final public function isGrantedForUser(?UserInterface $user, mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool
+    {
+        // ...
+    }
+}
+```
+
+---------------------------------------------------------------------------
+
+by aschempp at 2025-10-27T07:28:53Z
+
+The failing 8.4 (high deps) test seems "normal", since the interface added in this PR is not available in the dependency when using 8.x-dev. Everything else seems fixed after a rebase. Let me know if someone has better ideas for the interface name, otherwise this is RTM for me 😊
+
+---------------------------------------------------------------------------
+
+by aschempp at 2025-11-10T07:51:22Z
+
+Anything missing I can do to get this merged?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-11-12T18:05:14Z
+
+We decided to leave this for 8.1
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T15:03:48Z
+
+To move this forward I pushed the remaining fixes directly, in the hope it helps. Squashed to one commit, your authorship kept. Please double check. What changed on top of your work:
+
+- `isGranted()` keeps its current behavior for tokens read from the token storage: the `OfflineTokenInterface` exemption now applies only to tokens pushed by `isGrantedForUser()` itself. An app-stored userless offline token still collapses to `NullToken`; a new test pins this.
+- Dropped the deprecation of `UserAuthorizationCheckerInterface` and the UPGRADE entry, as discussed above: implementing only the user variant stays valid.
+- Fixed the upgrade hint in the Twig extension: it was appended when the new interface exists instead of when it is missing, referenced 7.4, and used a "v" prefix.
+- Restructured the mock in `SecurityExtensionTest` so the class still loads when security-core is older than 8.2 (the low-deps job installs 7.4): before, every test using it errored, not only the guest ones. Also restored `testAccessDecisionForUserWithField` to test a user, with a guarded guest variant added next to it.
+- Collapsed the two anonymous token classes in `isGrantedForUser()` into one, updated the skip messages to 8.2, and moved the changelog entries to the 8.2 sections of security-core, SecurityBundle and the Twig bridge.
+
+The interface name stays `UserGuestAuthorizationCheckerInterface` unless someone comes up with a better one.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T15:23:10Z
+
+One more round pushed on top of your work, @aschempp:
+
+- `UserGuestAuthorizationCheckerInterface` is renamed to `GuestAuthorizationCheckerInterface`, and it now extends `UserAuthorizationCheckerInterface`. PHP allows widening a parameter type in an extending interface, so the two names describe one contract instead of two unrelated ones, and a checker that accepts a guest is a user authorization checker by definition.
+- That relation closes a gap. `SecurityExtension::getFunctions()` registers `is_granted_for_user()` and `access_decision_for_user()` for `UserAuthorizationCheckerInterface` only, so a checker implementing just the guest interface got no Twig function at all, while `isGrantedForUser()` had been widened to accept it. A test covers this now.
+- The Twig extension is back to a single `instanceof` check plus a null-user check, and `AuthorizationChecker` and `Security` name one interface again. The container still aliases both names, so either can be autowired.
+- The interface docblock and `Security::isGrantedForUser()` now say what a null user means.
+- Rebased on 8.2.
+
+Checks run: `./phpunit src/Symfony/Component/Security` (429, 899 and 114 tests), `./phpunit src/Symfony/Bridge/Twig` (2114 tests, 14 skipped), `./phpunit src/Symfony/Bundle/SecurityBundle` (543 tests), all green. php-cs-fixer reports no change on the touched files. Removing the `extends` keyword makes the new Twig test fail on the missing `is_granted_for_user` registration, which is what it is there for.

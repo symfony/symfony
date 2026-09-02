@@ -97,6 +97,29 @@ class AmazonSqsReceiverTest extends TestCase
         $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
+    public function testItPassesSystemAttributesToStamp()
+    {
+        $serializer = $this->createSerializer();
+
+        $systemAttributes = [
+            'ApproximateReceiveCount' => '3',
+            'SentTimestamp' => '1638000000000',
+        ];
+
+        $sqsEnvelop = $this->createSqsEnvelope($systemAttributes);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([$sqsEnvelop]);
+
+        $receiver = new AmazonSqsReceiver($connection, $serializer);
+        $actualEnvelopes = iterator_to_array($receiver->get());
+        $this->assertCount(1, $actualEnvelopes);
+
+        /** @var AmazonSqsReceivedStamp $stamp */
+        $stamp = $actualEnvelopes[0]->last(AmazonSqsReceivedStamp::class);
+        $this->assertNotNull($stamp);
+        $this->assertSame($systemAttributes, $stamp->getSystemAttributes());
+    }
+
     public function testKeepalive()
     {
         $serializer = $this->createSerializer();
@@ -145,7 +168,7 @@ class AmazonSqsReceiverTest extends TestCase
         $receiver->ack(new Envelope(new DummyMessage('Hi'), [new AmazonSqsReceivedStamp('1')]));
     }
 
-    private function createSqsEnvelope()
+    private function createSqsEnvelope(array $systemAttributes = []): array
     {
         return [
             'id' => 1,
@@ -153,6 +176,7 @@ class AmazonSqsReceiverTest extends TestCase
             'headers' => [
                 'type' => DummyMessage::class,
             ],
+            'system_attributes' => $systemAttributes,
         ];
     }
 

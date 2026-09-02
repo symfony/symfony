@@ -155,14 +155,17 @@ final class AmpSqlTransportTest extends TestCase
 
     public function testKeepaliveExtendsClaim()
     {
-        $transport = $this->createTransport(['redeliver_timeout' => 1]);
+        $transport = $this->createTransport(['redeliver_timeout' => 4]);
 
         try {
             $transport->send(new Envelope(new DummyMessage('kept-alive')));
             $received = iterator_to_array($transport->get())[0];
-            delay(0.6);
-            $transport->keepalive($received, 1);
-            delay(0.6);
+            // the timings leave seconds of slack on each side: a loaded runner
+            // that drifts must not push the keepalive past the initial claim,
+            // nor the assertion below past the extended one
+            delay(2.0);
+            $transport->keepalive($received, 4);
+            delay(2.5);
 
             self::assertSame([], iterator_to_array($transport->get()));
             $transport->ack($received);

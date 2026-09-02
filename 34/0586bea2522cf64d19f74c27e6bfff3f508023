@@ -1,0 +1,50 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2026-08-19T15:03:32Z
+
+@nicolas-grekas Regarding default types: I did not want to support providing the default type via a child class attribute because the whole goal of this feature is the extensibility of discriminator maps without having to change them in the parent class but simply by adding the new child class/implementation. The default type is different, in my opinion, because it must be defined in the parent, thus the mapping should also be added there. Otherwise we define a parent that might not actually exist (which would, of course, result in an error message).
+
+But if you disagree on this point, I can also change it so that defaultType can be a type added via child class attribute.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T10:56:58Z
+
+Thanks for the quick rework. I verified the new design end to end: contributed classes no longer leak their property metadata into the target or its siblings, and the round-1 repro now behaves correctly.
+
+About the default type: the pushed code already accepted a contributed default when the inline mapping was empty (`_DiscriminatorMapWithContributedDefault` relies on it), while the constructor rejected the same combination when an inline mapping was present. I kept a single rule instead: `defaultType` membership is validated once, after metadata loading, against the merged map. A `defaultType` that no child contributes still fails loudly, with the exception you added to the loader. This also keeps the attribute a plain data holder, in line with the relaxed `mapping` check.
+
+While preparing the merge, I pushed the following on top of your work (squashed into your commit):
+- removed the constructor membership check, with tests for the contributed-default case
+- fixed a case where a class contributing a type for itself was silently ignored by the compiler pass
+- made `checkDiscriminatorMapType()` resolve classes through `$container->getReflectionClass()`, like its sibling check, so the target is tracked as a container resource and a missing class gives a clear error
+- added the missing `@author`, removed an unused test fixture, added a changelog line for the relaxed `DiscriminatorMap` constructor, fixed a docblock alignment
+
+I also updated the description to match the final behavior.
+
+Checks run: the Serializer test suite and the serializer-related FrameworkBundle tests pass locally, and php-cs-fixer is clean. The red CI jobs on the previous push were pre-existing failures of the 8.2 base plus an infrastructure failure of the Fabbot job, none related to this PR.
+
+---------------------------------------------------------------------------
+
+by mttsch at 2026-08-26T16:32:09Z
+
+All review comments were addressed by me for now.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T06:48:17Z
+
+Thanks for the rework, the loader-chain design is the right call and I kept it. I pushed a squashed round on top with the following changes:
+
+- fixed a silent failure in chains: a contribution whose target never declares a map was dropped without an error; it now throws the same exception as the standalone loader
+- contributions are always deferred to the end of the chain, so they survive a later loader replacing the map (a YAML map redefining an attribute-declared one lost them before)
+- `prepareLoading()` resets leftover deferred state from a failed load
+- `LoaderChainAwareInterface` now extends `LoaderInterface`
+- an identical duplicate (same type and class, inline and contributed) is now a no-op like in the compiler pass; conflicting ones still throw
+- `checkDiscriminatorMapType()` and `checkSourceMapsToTarget()` now fail with a clear message when a class cannot be found, instead of `is_a(null)` warnings
+- undiscovered contributions fail loudly when the class metadata is loaded, and the pass always wires the registry to make that check possible (see the two inline threads for details)
+- changelog line for the new interface, rebase on current 8.2
+
+Checks run locally: full Serializer suite, FrameworkBundle DependencyInjection suite, php-cs-fixer. The previous Psalm/PHPStan failures named Notifier/HttpKernel/VarExporter files that the old base carried; the rebase should clear them.
+
+The description now covers the split-declaration support and the discovery boundary for the docs.

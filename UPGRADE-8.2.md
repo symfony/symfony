@@ -198,6 +198,11 @@ SecurityBundle
    as `DefaultAuthenticationSuccessHandler` and `DefaultAuthenticationFailureHandler` do. Without forwarding,
    the authenticator options and the session target path are lost, and a successful login redirects to `/`
 
+Mailer
+------
+
+ * Deprecate the "templateid" and "params" email headers in the Brevo bridge, use a `RemoteTemplateEmail` instead
+
 Serializer
 ----------
 

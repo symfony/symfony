@@ -17,8 +17,10 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
@@ -30,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Mathieu Santostefano <msantostefano@proton.me>
  */
-final class ResendApiTransport extends AbstractApiTransport
+final class ResendApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     public function __construct(
         #[\SensitiveParameter] private readonly string $apiKey,
@@ -94,11 +96,21 @@ final class ResendApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+
         $payload = [
             'from' => $this->formatAddress($envelope->getSender()),
             'to' => $this->formatAddresses($this->getRecipients($email, $envelope)),
-            'subject' => $email->getSubject(),
         ];
+        if (null === $template || null !== $email->getSubject()) {
+            $payload['subject'] = $email->getSubject();
+        }
+        if (null !== $template) {
+            $payload['template'] = ['id' => $template->getReference()];
+            if ($template->getVariables()) {
+                $payload['template']['variables'] = $template->getVariables();
+            }
+        }
         if ($attachments = $this->prepareAttachments($email)) {
             $payload['attachments'] = $attachments;
         }

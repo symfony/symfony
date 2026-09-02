@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add a `rate_limiter` option to mailer transports
  * Add DSN param `timeout` to configure the connect/read/write timeout of SMTP transports
+ * Add `RemoteTemplateEmail`, `RemoteTemplate` and `RemoteTemplateTransportInterface` to send emails rendered by the mail provider from a template hosted on its side
  * Reorder EsmtpTransport authenticators to prefer PLAIN over obsolete LOGIN
  * Add `InMemorySmimeCertificateRepository` to provide recipient S/MIME certificates from a static map
  * Add a configurable behavior to `SmimeEncryptedMessageListener` when a recipient has no certificate (`send_unencrypted`, `fail`, `encrypt`, `skip`), overridable per message via the `X-SMime-Encrypt` header

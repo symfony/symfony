@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -79,6 +80,37 @@ class ResendApiTransportTest extends TestCase
         $this->assertEquals('custom; param1=foo; param2=bar', $payload['headers']['x-custom-params']);
         $this->assertArrayHasKey('foo', $payload['headers']);
         $this->assertEquals('bar', $payload['headers']['foo']);
+    }
+
+    public function testRemoteTemplate()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->template('tpl_123', ['firstName' => 'Fabien']);
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new ResendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(ResendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame(['id' => 'tpl_123', 'variables' => ['firstName' => 'Fabien']], $payload['template']);
+        $this->assertArrayNotHasKey('subject', $payload);
+        $this->assertArrayNotHasKey('text', $payload);
+        $this->assertArrayNotHasKey('html', $payload);
+    }
+
+    public function testRemoteTemplateWithSubject()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->subject('Hello!')
+            ->template('tpl_123');
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new ResendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(ResendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('Hello!', $payload['subject']);
+        $this->assertSame(['id' => 'tpl_123'], $payload['template']);
     }
 
     public function testSendThrowsForErrorResponse()

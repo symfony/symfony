@@ -19,6 +19,7 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -176,6 +177,22 @@ class SendgridApiTransportTest extends TestCase
         $this->assertArrayHasKey('headers', $payload);
         $this->assertArrayHasKey('foo', $payload['headers']);
         $this->assertEquals('bar', $payload['headers']['foo']);
+    }
+
+    public function testRemoteTemplate()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->template('d-12345', ['firstName' => 'Fabien']);
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('d-12345', $payload['template_id']);
+        $this->assertSame(['firstName' => 'Fabien'], $payload['personalizations'][0]['dynamic_template_data']);
+        $this->assertArrayNotHasKey('content', $payload);
+        $this->assertArrayNotHasKey('subject', $payload['personalizations'][0]);
     }
 
     public function testReplyTo()

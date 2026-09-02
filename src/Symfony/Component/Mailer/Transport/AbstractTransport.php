@@ -20,6 +20,7 @@ use Symfony\Component\Mailer\Event\FailedMessageEvent;
 use Symfony\Component\Mailer\Event\MessageEvent;
 use Symfony\Component\Mailer\Event\SentMessageEvent;
 use Symfony\Component\Mailer\Exception\LogicException;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\BodyRendererInterface;
@@ -68,6 +69,7 @@ abstract class AbstractTransport implements TransportInterface
 
         try {
             if (!$this->dispatcher) {
+                $this->ensureRemoteTemplateSupport($message);
                 $sentMessage = new SentMessage($message, $envelope);
 
                 $rateLimiter?->consume(1)->ensureAccepted();
@@ -89,6 +91,8 @@ abstract class AbstractTransport implements TransportInterface
             if ($message instanceof TemplatedEmail && !$message->isRendered()) {
                 throw new LogicException(\sprintf('You must configure a "%s" when a "%s" instance has a text or HTML template set.', BodyRendererInterface::class, get_debug_type($message)));
             }
+
+            $this->ensureRemoteTemplateSupport($message);
 
             $sentMessage = new SentMessage($message, $envelope);
 
@@ -140,6 +144,13 @@ abstract class AbstractTransport implements TransportInterface
     protected function getLogger(): LoggerInterface
     {
         return $this->logger;
+    }
+
+    private function ensureRemoteTemplateSupport(RawMessage $message): void
+    {
+        if ($message instanceof RemoteTemplateEmail && null !== $message->getRemoteTemplate() && !$this instanceof RemoteTemplateTransportInterface) {
+            throw new LogicException(\sprintf('The "%s" transport does not support sending emails rendered from a remote template.', get_debug_type($this)));
+        }
     }
 
     private function checkThrottling(): void

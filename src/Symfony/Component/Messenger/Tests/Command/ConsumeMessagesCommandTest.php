@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Tests\Command;
 
 use Amp\Parallel\Worker\ContextWorkerFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
@@ -29,6 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
+use Symfony\Component\Messenger\Event\WorkerStartedEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -37,6 +39,7 @@ use Symfony\Component\Messenger\Stamp\BusNameStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyReceiver;
 use Symfony\Component\Messenger\Tests\Fixtures\ResettableDummyReceiver;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
+use Symfony\Component\Messenger\Worker;
 
 class ConsumeMessagesCommandTest extends TestCase
 {
@@ -699,5 +702,110 @@ class ConsumeMessagesCommandTest extends TestCase
         yield [['one', 'one_second', 'second', 'SECOND'], ['(?i)second'], ['second', 'SECOND']];
         yield [['one', 'one_second', 'second', 'SECOND', 'ssecond'], ['one', 'one.*', 'second.*'], ['one', 'one_second', 'second']];
         yield [['pone'], ['.*one'], ['pone']];
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testHandleSignalWithoutRunningWorker()
+    {
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new Container(), new EventDispatcher());
+
+        $this->assertFalse($command->handleSignal(\SIGTERM));
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testFirstSignalStopsTheWorkerGracefully()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (ConsumeMessagesCommand $command) use (&$exitCodes) {
+            $exitCodes[] = $command->handleSignal(\SIGTERM);
+        });
+
+        $tester->execute(['receivers' => ['dummy-receiver']]);
+
+        $this->assertSame([false], $exitCodes);
+        $tester->assertCommandIsSuccessful();
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testSecondSignalForcesTheWorkerToQuit()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (ConsumeMessagesCommand $command) use (&$exitCodes) {
+            $exitCodes[] = $command->handleSignal(\SIGTERM);
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+            $exitCodes[] = $command->handleSignal(\SIGINT, 3);
+            $exitCodes[] = $command->handleSignal(\SIGINT, false);
+        });
+
+        $tester->execute(['receivers' => ['dummy-receiver']]);
+
+        $this->assertSame([false, 128 + \SIGINT, 3, false], $exitCodes);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testOnlySigintReceivedWhileStoppingForcesTheWorkerToQuit()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (ConsumeMessagesCommand $command) use (&$exitCodes) {
+            $exitCodes[] = $command->handleSignal(\SIGALRM);
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+            $exitCodes[] = $command->handleSignal(\SIGTERM);
+            $exitCodes[] = $command->handleSignal(\SIGQUIT);
+            $exitCodes[] = $command->handleSignal(\SIGALRM);
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+        });
+
+        $tester->execute(['receivers' => ['dummy-receiver']]);
+
+        $this->assertSame([false, false, false, false, false, 128 + \SIGINT], $exitCodes);
+    }
+
+    #[RequiresPhpExtension('pcntl')]
+    public function testSignalStaysGracefulWhenTheWorkerWasStoppedWithoutASignal()
+    {
+        $exitCodes = [];
+        $tester = $this->createSignalableCommandTester(static function (ConsumeMessagesCommand $command, Worker $worker) use (&$exitCodes) {
+            $worker->stop();
+            $exitCodes[] = $command->handleSignal(\SIGINT);
+        });
+
+        $tester->execute(['receivers' => ['dummy-receiver']]);
+
+        $this->assertSame([false], $exitCodes);
+        $tester->assertCommandIsSuccessful();
+    }
+
+    private function createSignalableCommandTester(callable $onMessage): CommandTester
+    {
+        $command = null;
+        $receiver = new DummyReceiver([[new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')])]]);
+
+        $worker = null;
+
+        $bus = self::createStub(MessageBusInterface::class);
+        $bus->method('dispatch')->willReturnCallback(static function (Envelope $envelope) use (&$command, &$worker, $onMessage) {
+            $onMessage($command, $worker);
+
+            return $envelope;
+        });
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(WorkerStartedEvent::class, static function (WorkerStartedEvent $event) use (&$worker) {
+            $worker = $event->getWorker();
+        });
+
+        $command = new ConsumeMessagesCommand(
+            new RoutableMessageBus($busLocator),
+            new ServiceLocator(['dummy-receiver' => static fn () => $receiver]),
+            $eventDispatcher
+        );
+
+        $application = new Application();
+        $application->addCommand($command);
+
+        return new CommandTester($application->get('messenger:consume'));
     }
 }

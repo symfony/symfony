@@ -15,6 +15,7 @@ CHANGELOG
  * Add an optional `extra` key to the encoded envelope passed to `SerializerInterface::decode()`, holding metadata added by the receiving transport
  * Add an optional `LoggingMiddleware` logging the processing time and memory usage of each message
  * Add the `messenger:show` command to list and inspect pending messages of a transport
+ * Make the `messenger:consume` and `messenger:failed:retry` commands exit immediately when a second `SIGINT` is received
 
 8.1
 ---

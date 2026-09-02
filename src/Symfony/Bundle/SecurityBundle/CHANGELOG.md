@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Add the `security.expression_language_provider` service to evaluate the security functions outside of authorization expressions
  * Add the `debug:roles` command to inspect the role hierarchy
  * Add `allowed_time_drift` option to the OIDC token handler configuration
  * Allow disabling the redirection on successful logout by passing `null` to the `target` option

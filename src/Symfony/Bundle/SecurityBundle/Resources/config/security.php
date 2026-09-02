@@ -33,6 +33,7 @@ use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguageProvider;
 use Symfony\Component\Security\Core\Authorization\GuestAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
@@ -153,6 +154,16 @@ return static function (ContainerConfigurator $container) {
 
         ->set('security.expression_language', ExpressionLanguage::class)
             ->args([service('cache.security_expression_language')->nullOnInvalid()])
+
+        // For the expression languages that evaluate expressions outside of an authorization check,
+        // such as the validator's and the entity value resolver's. Tagging it is pointless:
+        // authorization expressions already provide the variables that the functions read first.
+        ->set('security.expression_language_provider', ExpressionLanguageProvider::class)
+            ->args([
+                service('security.authorization_checker'),
+                service('security.token_storage'),
+                service('request_stack'),
+            ])
 
         ->set('security.authentication_utils', AuthenticationUtils::class)
             ->args([service('request_stack')])

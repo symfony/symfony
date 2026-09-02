@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\Tests\Validator;
+namespace Symfony\Component\Security\Core\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Validator\ValidatorSecurityExpressionLanguageProvider;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Authorization\ExpressionLanguageProvider;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\When;
@@ -28,7 +28,8 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Integration test: When constraint with security expression functions.
+ * Integration test: the When constraint evaluating the security functions through the services,
+ * which is how the validator expression language uses the provider.
  */
 class WhenWithSecurityTest extends TestCase
 {
@@ -58,7 +59,7 @@ class WhenWithSecurityTest extends TestCase
         $requestStack->push(new Request());
 
         $expressionLanguage = new ExpressionLanguage();
-        $expressionLanguage->registerProvider(new ValidatorSecurityExpressionLanguageProvider($authorizationChecker, $this->createStub(TokenStorageInterface::class), $requestStack));
+        $expressionLanguage->registerProvider(new ExpressionLanguageProvider($authorizationChecker, $this->createStub(TokenStorageInterface::class), $requestStack));
 
         $whenValidator = new WhenValidator($expressionLanguage);
 

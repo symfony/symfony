@@ -23,21 +23,12 @@ class AddValidatorSecurityExpressionLanguageProviderPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         $container->setDefinition('validator.expression_language', new Definition(\stdClass::class));
-        $container->setDefinition('security.authorization_checker', new Definition(\stdClass::class));
-        $container->setDefinition('security.token_storage', new Definition(\stdClass::class));
-        $container->setDefinition('request_stack', new Definition(\stdClass::class));
+        $container->setDefinition('security.expression_language_provider', new Definition(\stdClass::class));
 
         (new AddValidatorSecurityExpressionLanguageProviderPass())->process($container);
 
-        $this->assertTrue($container->hasDefinition('validator.security_expression_language_provider'));
-        $this->assertEquals([
-            new Reference('security.authorization_checker'),
-            new Reference('security.token_storage'),
-            new Reference('request_stack'),
-        ], $container->getDefinition('validator.security_expression_language_provider')->getArguments());
-
         $calls = $container->getDefinition('validator.expression_language')->getMethodCalls();
-        $this->assertEquals([['registerProvider', [new Reference('validator.security_expression_language_provider')]]], $calls);
+        $this->assertEquals([['registerProvider', [new Reference('security.expression_language_provider')]]], $calls);
     }
 
     public function testNothingIsRegisteredWithoutSecurity()
@@ -47,18 +38,16 @@ class AddValidatorSecurityExpressionLanguageProviderPassTest extends TestCase
 
         (new AddValidatorSecurityExpressionLanguageProviderPass())->process($container);
 
-        $this->assertFalse($container->hasDefinition('validator.security_expression_language_provider'));
         $this->assertSame([], $container->getDefinition('validator.expression_language')->getMethodCalls());
     }
 
     public function testNothingIsRegisteredWithoutValidator()
     {
         $container = new ContainerBuilder();
-        $container->setDefinition('security.authorization_checker', new Definition(\stdClass::class));
-        $container->setDefinition('security.token_storage', new Definition(\stdClass::class));
+        $container->setDefinition('security.expression_language_provider', new Definition(\stdClass::class));
 
         (new AddValidatorSecurityExpressionLanguageProviderPass())->process($container);
 
-        $this->assertFalse($container->hasDefinition('validator.security_expression_language_provider'));
+        $this->assertFalse($container->hasDefinition('validator.expression_language'));
     }
 }

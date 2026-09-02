@@ -12,6 +12,7 @@ CHANGELOG
  * Add `$help` parameter to `ChoiceListFactoryInterface::createView()`
  * Add the `form_id` view variable, holding the id to render on the `<form>` element of a root form when a child uses `form_attr`
  * Allow the `group_by` option of `ChoiceType` to return `TranslatableInterface` instances
+ * Add the `FormEvents::POST_VALIDATE` event, dispatched on each form of the tree after the validation of the root form
 
 8.1
 ---

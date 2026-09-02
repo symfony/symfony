@@ -9,9 +9,14 @@
 
 # Runs the fish completion of a command line and prints one logical suggestion per line.
 #
-# Usage: fish.fish <completion script> <command line>
+# Usage: fish.fish <completion script> <command line> [<alias definition>]
 
 source $argv[1]
+
+# an alias is a function wrapping the command, fish reuses its completions
+if set -q argv[3]
+    alias (string split -m1 '=' -- $argv[3])
+end
 
 # fish returns "value<TAB>description", keep the value only
 for suggestion in (complete --do-complete=$argv[2])

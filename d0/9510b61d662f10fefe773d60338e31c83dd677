@@ -1,0 +1,85 @@
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-08-06T11:15:42Z
+
+In case you want to review, I saw you participated to the previous PR
+@d-ph @silasjoisten
+
+---------------------------------------------------------------------------
+
+by d-ph at 2022-08-07T09:55:13Z
+
+Hi.
+
+Just wanted to say that I'm happy to see this feature gaining traction, and looking forward to seeing it in the stock Symfony code. Unfortunately, it's unlikely I'd review the PR in depth, however I did skim through the change, and it looks good to me.
+
+May I ask a quick question though, just to double-check: Given the following case:
+
+1. A root form `foo` listening on the postValidate event.
+2. A child form `fooChild` also listenting on the postValidate event.
+3. The form `foo` is being submitted.
+
+Then:
+
+1. `fooChild`'s postValidate is going to be called first, and then `foo`'s postValidate is going to be called second. I.e. The new events are dispatched recursively, deepest child form first?
+2. If `fooChild` adds a new FormError on itself in the postValidate listener, the `foo`'s postValidate listener will be able to see that there are validation errors by calling either: `$event->getForm()->isValid()`, or `$event->getForm()->get('fooChild')->isValid()`?
+
+Thanks.
+
+---
+
+Btw Seb33300 search for "->idValid(" on this page and consider correcting the typos, because it takes a few seconds to conclude that it's a typo. Cheers.
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2022-08-07T14:38:36Z
+
+@d-ph typo fixed. Thanks.
+
+POST_VALIDATE event happens AFTER the form validation has been processed ON ALL form items.
+
+1. Yes, child form event will be dispatched first. The root form event will be the last one to be dispatched. (same order as others form events)
+
+2. Yes, you can add a new error to the form using `$event->getForm()->addError()` inside this event. If you do so, the form will be considered invalid after that. When the event will be propagated to parent form, the parent form will also be considered as invalid. Because a form is valid only if all his children are valid.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2023-02-14T16:20:58Z
+
+I faced the same use case. I did not test this PR, but I think this can be a good feature 👍🏼
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T12:29:36Z
+
+Thanks for this, and thanks for your patience: four years without an answer on a PR that came with a doc PR is not a good look on our side.
+
+The gap is real. `ValidationListener` subscribes `POST_SUBMIT` at priority 0 and only acts when `$form->isRoot()`, so a child's `POST_SUBMIT` has already fired by the time the tree is validated. That is exactly what you described in #47046, and @lyrixx confirmed hitting it too.
+
+But only one of the two events fills that gap. Taking the four combinations:
+
+ * before validation, on the root: root `POST_SUBMIT` with priority > 0
+ * before validation, on a child: any child `POST_SUBMIT`, since children fire before the root anyway
+ * after validation, on the root: root `POST_SUBMIT` with priority < 0
+ * after validation, on a child: not expressible today
+
+So `PRE_VALIDATE` is redundant in both of its forms, and `POST_VALIDATE` is redundant on the root. What is missing is a nested form type being able to react to the validity of the whole tree.
+
+Would you rework it down to that single event? It halves the diff, and if the one event can live on `FormEvents` it also removes the need for a second event-name class. The `hasListeners()` guard you added is the right call, keep it. One thing to fix while you are in there: `$dispatchEvents` accumulates on a shared listener instance and is never reset, so it grows across forms, and across requests under a worker runtime.
+
+Last thing, for the CHANGELOG and the docs rather than the code: a child form type reacting to the whole form's validity couples a reusable type to its context, and the usual answer stays the controller or a form handler. The cases where this is genuinely the right tool are self-contained widgets that must reset themselves when the form fails, a captcha being the obvious one. Worth framing it that way so it does not become the default place people put post-validation logic.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T05:52:06Z
+
+I applied the rework discussed above, keeping @Seb33300 as the author of the commit:
+
+- `PRE_VALIDATE` is gone; `POST_VALIDATE` is the one event this PR adds.
+- The event now lives on `FormEvents` and in the `Symfony\Component\Form\Event` namespace, next to the other form events, so the extra `ValidatorFormEvents` class is not needed anymore. It is also registered in `FormEvents::ALIASES`.
+- The dispatch is now a stateless walk of the form tree in `ValidationListener::validateForm()`, children first, root last. This removes the shared `$dispatchEvents` state and its accumulation issue, and leaves `FormTypeValidatorExtension` unchanged.
+- The walk skips buttons (`ButtonBuilder::getEventDispatcher()` throws) and unsubmitted children (`$clearMissing = false`), and keeps the `hasListeners()` guard.
+- `PostValidateEvent::setData()` throws, like `PostSubmitEvent::setData()` does.
+- The tests are rewritten as functional ones on a real form factory, covering dispatch order, whole-tree validity seen from a child, errors added by a child listener being seen by parent listeners, and the skipped cases. The previous test relied on `setMethods()`, which no longer exists in current PHPUnit.
+
+The doc PR symfony/symfony-docs#17229 will need the matching update.

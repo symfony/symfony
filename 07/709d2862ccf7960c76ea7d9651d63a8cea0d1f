@@ -1,0 +1,138 @@
+---------------------------------------------------------------------------
+
+by MarcinOrlowski at 2026-09-01T13:26:51Z
+
+@nicolas-grekas Thanks for taking a look. Will make it green in a sec.
+
+Some side notes that I did not addressed to not pollute the diff with the collateral changes. None is significant, rather house-keeping o-type ones:
+
+1. Most of transports do create `$endpoint` variable and build the target endpoint into it
+
+```php
+$endpoint = \sprintf('%s://%s/a1/sms', $this->getScheme(), $this->getEndpoint());
+$response = $this->client->request('POST', $endpoint, [
+   ...
+```
+
+yet some do construct endpoint URL as part of `request()` call, which makes the code less readable, ie.
+
+```php
+$response = $this->client->request('POST', $this->getScheme().'://'.$this->getEndpoint().'/api/v1/notifications', [
+    ...
+```
+
+The fix is 1-2 extra lines per transport. Offenders:
+
+* src/Symfony/Component/Notifier/Bridge/Bluesky/BlueskyTransport.php
+* src/Symfony/Component/Notifier/Bridge/Brevo/BrevoTransport.php
+* src/Symfony/Component/Notifier/Bridge/Esendex/EsendexTransport.php
+* src/Symfony/Component/Notifier/Bridge/GoIp/GoIpTransport.php
+* src/Symfony/Component/Notifier/Bridge/Iqsms/IqsmsTransport.php
+* src/Symfony/Component/Notifier/Bridge/Isendpro/IsendproTransport.php
+* src/Symfony/Component/Notifier/Bridge/LineBot/LineBotTransport.php
+* src/Symfony/Component/Notifier/Bridge/Lox24/Lox24Transport.php
+* src/Symfony/Component/Notifier/Bridge/Mobyt/MobytTransport.php
+* src/Symfony/Component/Notifier/Bridge/Mobyt/MobytTransport.php
+* src/Symfony/Component/Notifier/Bridge/Ntfy/NtfyTransport.php
+* src/Symfony/Component/Notifier/Bridge/OneSignal/OneSignalTransport.php
+* src/Symfony/Component/Notifier/Bridge/OrangeSms/OrangeSmsTransport.php
+* src/Symfony/Component/Notifier/Bridge/PagerDuty/PagerDutyTransport.php
+* src/Symfony/Component/Notifier/Bridge/Prelude/PreludeTransport.php
+* src/Symfony/Component/Notifier/Bridge/Sevenio/SevenIoTransport.php
+* src/Symfony/Component/Notifier/Bridge/Slack/SlackTransport.php
+* src/Symfony/Component/Notifier/Bridge/SmsFactor/SmsFactorTransport.php
+* src/Symfony/Component/Notifier/Bridge/SmsProxima/SmsProximaTransport.php
+* src/Symfony/Component/Notifier/Bridge/Smsbox/SmsboxTransport.php
+* src/Symfony/Component/Notifier/Bridge/Twitter/TwitterTransport.php
+* src/Symfony/Component/Notifier/Bridge/Vonage/VonageTransport.php
+
+2. As said, most transports do name this variable `$endpoint`, but a few use `$url` which is simply inconsistent.  Not worth standalone change, but makes more sense when combined with the sweep above.
+
+Shall i A) do that as part of this PR? B) separate once this is merged?  C) ignore?
+
+Finally, docs need update too. But as this is separate repo - will do a follow up PR there once this is sorted out.
+
+---------------------------------------------------------------------------
+
+by MarcinOrlowski at 2026-09-01T14:44:01Z
+
+It seems `MockClockTest::testNow` test is bit flaky - I can look into it as separate effort and also I can separately fix these quotes Fabbot ranting about, so once these two would land, we can re-base this one and it should eventuality be all green.
+
+@nicolas-grekas ATM I am not really sure what to do next - please let me know how you wish me to proceed further.
+
+---------------------------------------------------------------------------
+
+by MarcinOrlowski at 2026-09-01T18:40:23Z
+
+All applied:
+- Renamed the Ntfy c'tor arg to `$ssl`.
+- Kept the legacy DSN spellings working in code, and removed every mention of them from the READMEs (that also covered the Telegram one you expected, including its local-API-server example).
+- Advertised the feature in each converted bridge's CHANGELOG (83 of them; FakeChat, FakeSms, JoliNotif and Mercure build no URL, so they are untouched). Left the bridge READMEs alone otherwise, since as you say it would be repetitive for a niche option.
+
+Remainings:
+- the Unit Tests job is the `MockClockTest::testNow` fixed  by #65790, which is on 6.4 but not merged up yet,
+- Fabbot's exception-message findings are the pre-existing ones you already excused (but I can cook separate PR and fix that)
+- should the `$endpoint`/`$url` variable cleanup ride along here, follow as a separate PR, or be dropped?
+
+@nicolas-grekas
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-01T18:57:02Z
+
+Fabbot's fine as is
+
+$endpoint/$url lets add consistency
+
+---------------------------------------------------------------------------
+
+by MarcinOrlowski at 2026-09-01T19:53:08Z
+
+Done:
+- Extracted inline request URLs into an `$endpoint` variable, and renamed the stray `$url`  (20 transports)
+- Improved code readability:
+  - Converted concatenation-built endpoints to `\sprintf()` across 16 transports
+  - Refactored Matrix's `getEndpoint()`
+
+---------------------------------------------------------------------------
+
+by MarcinOrlowski at 2026-09-01T20:12:37Z
+
+Windows CI run failure is not mine.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T05:24:36Z
+
+Both blockers from the last round are gone: the property is private again, `getScheme()` became `getHttpScheme()` so it no longer collides with 8.1's private method, and the 83 constraint bumps make low-deps and high-deps green. The full sweep is fine by me, `TrackingHeader` did the same thing for 11 mailer bridges in this same release.
+
+One thing I fixed while going through it, and pushed. `getSsl()` went through `Dsn::getBooleanOption()`, which is `filter_var($value, FILTER_VALIDATE_BOOLEAN)`, and that maps every value it does not recognise to `false`. On the patched branch:
+
+```
+ssl=''        -> http
+ssl='true'    -> https
+ssl='ture'    -> http
+ssl='enabled' -> http
+ssl='https'   -> http
+no option     -> https
+```
+
+So a typo in the DSN silently dropped TLS and sent the API token in clear text. For `fast` or `test` that leniency costs nothing, for this option it is the wrong default. `getSsl()` now uses `FILTER_NULL_ON_FAILURE` and throws on anything it cannot read as a boolean. The empty value stays `false` so `?ssl=%env(bool:NOTIFIER_SSL)%` keeps working. New `AbstractTransportFactoryTest` covers both halves.
+
+Also on my side: split the component CHANGELOG so the added `getHttpScheme()`, `SSL` and `getSsl()` are named, reworded one commit subject, and rewrote the description, which still documented `getScheme()` and `$secureHttp`. I added the points the docs PR has to carry at the end of it.
+
+CI: Fabbot is the nine pre-existing exception-message findings in files the sweep touches, as before. The Windows job is `NativeHttpClientTest::testTimeout*`, unrelated.
+
+One thing for later, not for this PR: `sslmode=disable` is still the spelling in `messenger/amazon-sqs` and `lock/dynamodb`. Worth unifying the same way at some point.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T05:48:19Z
+
+Rebased on 8.2, squashed to one commit, and folded in the two other places that take the same kind of DSN and still spelled it `sslmode=disable`: the Amazon SQS Messenger bridge and the DynamoDB Lock bridge. `ssl` is now one option across the three components instead of shipping for the notifier bridges only. That part is a second commit under my name, yours stays Notifier-only.
+
+`AbstractTransportFactory::getSsl()` is back to `Dsn::getBooleanOption()`. I had made it strict here because the lenient `filter_var()` mapped `?ssl=ture` to plain HTTP, but #65793 has since fixed that centrally for both Mailer and Notifier, so the deprecation and the future 9.0 throw come for free now. In the SQS and DynamoDB bridges there is no `Dsn` object and `ssl` is brand new, so an unreadable value throws there right away.
+
+Description rewritten to cover all three components, and the points the docs PR has to carry are at the end of it.
+
+Fabbot stays red on the nine pre-existing exception-message findings in files the sweep touches.

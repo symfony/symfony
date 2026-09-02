@@ -66,7 +66,7 @@ class InputOption
     private mixed $default;
 
     /**
-     * @param string|array|null                                                             $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param string|string[]|null                                                          $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param int-mask-of<InputOption::*>|null                                              $mode            The option mode: One of the VALUE_* constants
      * @param mixed                                                                         $default         The default value (must be null for self::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion

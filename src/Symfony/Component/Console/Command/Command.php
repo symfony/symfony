@@ -413,8 +413,8 @@ class Command implements SignalableCommandInterface
     /**
      * Adds an argument.
      *
-     * @param                                                                               $mode            The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param                                                                               $default         The default value (for InputArgument::OPTIONAL mode only)
+     * @param int-mask-of<InputArgument::*>|null                                            $mode            The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param mixed                                                                         $default         The default value (for InputArgument::OPTIONAL mode only)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @return $this
@@ -432,9 +432,9 @@ class Command implements SignalableCommandInterface
     /**
      * Adds an option.
      *
-     * @param                                                                               $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param                                                                               $mode            The option mode: One of the InputOption::VALUE_* constants
-     * @param                                                                               $default         The default value (must be null for InputOption::VALUE_NONE)
+     * @param string|string[]|null                                                          $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int-mask-of<InputOption::*>|null                                              $mode            The option mode: One of the InputOption::VALUE_* constants
+     * @param mixed                                                                         $default         The default value (must be null for InputOption::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @return $this

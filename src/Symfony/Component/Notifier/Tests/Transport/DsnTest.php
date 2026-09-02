@@ -12,6 +12,8 @@
 namespace Symfony\Component\Notifier\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Exception\MissingRequiredOptionException;
@@ -272,5 +274,26 @@ final class DsnTest extends TestCase
 
         yield [false, 'scheme://localhost', 'not_existant', false];
         yield [true, 'scheme://localhost', 'not_existant', true];
+        yield [false, 'scheme://localhost?enabled=', 'enabled', true];
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('getNonBooleanOptionProvider')]
+    public function testGetBooleanOptionWithANonBooleanValue(string $dsnString, string $value)
+    {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/notifier 8.2: Value "%s" of the "enabled" DSN option is not a boolean; reading it as false is deprecated and will throw in 9.0.', $value));
+
+        $dsn = new Dsn($dsnString);
+
+        $this->assertFalse($dsn->getBooleanOption('enabled'));
+    }
+
+    public static function getNonBooleanOptionProvider(): iterable
+    {
+        yield ['scheme://localhost?enabled=ture', 'ture'];
+        yield ['scheme://localhost?enabled=enabled', 'enabled'];
+        yield ['scheme://localhost?enabled=2', '2'];
+        yield ['scheme://localhost?enabled[]=1', 'array'];
     }
 }

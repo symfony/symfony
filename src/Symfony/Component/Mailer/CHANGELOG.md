@@ -16,6 +16,7 @@ CHANGELOG
  * Add `InMemoryPgpPublicKeyRepository` to provide recipient PGP public keys from a static map
  * Add a configurable behavior to `PgpMimeEncryptedMessageListener` when a recipient has no key (`fail`, `encrypt`, `skip`), overridable per message via the `X-Pgp-Encrypt` header
  * Add `TrackingHeader` for per-message open/click tracking and map it to provider-specific settings in the AhaSend, Azure, Brevo, Infobip, Mailchimp/Mandrill, MailerSend, Mailgun, Mailjet, Postmark and Sendgrid transports
+ * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0
 
 8.0
 ---

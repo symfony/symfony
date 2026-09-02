@@ -82,6 +82,14 @@ final class Dsn
 
     public function getBooleanOption(string $key, bool $default = false): bool
     {
-        return filter_var($this->getOption($key, $default), \FILTER_VALIDATE_BOOLEAN);
+        $value = $this->getOption($key, $default);
+
+        if (null !== $boolean = filter_var($value, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE)) {
+            return $boolean;
+        }
+
+        trigger_deprecation('symfony/mailer', '8.2', 'Value "%s" of the "%s" DSN option is not a boolean; reading it as false is deprecated and will throw in 9.0.', \is_string($value) ? $value : get_debug_type($value), $key);
+
+        return false;
     }
 }

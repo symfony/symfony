@@ -2518,6 +2518,25 @@
                                                             "default": null,
                                                             "description": "Service id of a custom serializer to use."
                                                         },
+                                                        "claim_check": {
+                                                            "$ref": "#/$defs/types/object_null",
+                                                            "properties": {
+                                                                "cache_pool": {
+                                                                    "$ref": "#/$defs/types/scalar",
+                                                                    "description": "Service id of the dedicated cache pool used to store claims. Pools declared under \"framework.cache.pools\" must define a \"default_lifetime\"."
+                                                                },
+                                                                "max_size": {
+                                                                    "$ref": "#/$defs/types/integer",
+                                                                    "minimum": 1,
+                                                                    "description": "Maximum encoded message size in bytes before using a claim check."
+                                                                }
+                                                            },
+                                                            "required": [
+                                                                "cache_pool",
+                                                                "max_size"
+                                                            ],
+                                                            "additionalProperties": false
+                                                        },
                                                         "options": {
                                                             "$ref": "#/$defs/types/object_null",
                                                             "additionalProperties": {

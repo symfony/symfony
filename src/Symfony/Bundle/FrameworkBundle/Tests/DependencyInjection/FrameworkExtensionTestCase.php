@@ -96,6 +96,7 @@ use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
+use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Mime\Crypto\PgpEncrypter;
 use Symfony\Component\Mime\Crypto\PgpSigner;
@@ -1435,6 +1436,32 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'customised' => new Reference('limiter.customised_worker'),
         ];
         $this->assertEquals($expectedRateLimitersByRateLimitedTransports, $rateLimitedTransports);
+    }
+
+    public function testMessengerClaimCheckSerializer()
+    {
+        if (!class_exists(ClaimCheckSerializer::class)) {
+            $this->markTestSkipped('Claim checks require symfony/messenger 8.2 or higher.');
+        }
+
+        $container = $this->createContainerFromFile('messenger_claim_check');
+
+        $transport = $container->getDefinition('messenger.transport.async');
+        $this->assertSame('.messenger.transport.async.claim_check_serializer', (string) $transport->getArgument(2));
+
+        $serializer = $container->getDefinition('.messenger.transport.async.claim_check_serializer');
+        $this->assertSame(ClaimCheckSerializer::class, $serializer->getClass());
+        $this->assertSame('messenger.default_serializer', (string) $serializer->getArgument(0));
+        $this->assertSame('app.claim_check_pool', (string) $serializer->getArgument(1));
+        $this->assertSame(200000, $serializer->getArgument(2));
+
+        $serializers = $container->getDefinition('messenger.transport.serializer_locator')->getArgument(0);
+        $this->assertSame('.messenger.transport.async.claim_check_serializer', (string) $serializers['async']);
+
+        // signing must decorate the inner serializer, never the claim check wrapper
+        $eligible = $container->getDefinition('messenger.signing_serializer')->getArgument(2)['*'];
+        $this->assertContains('messenger.default_serializer', $eligible);
+        $this->assertNotContains('.messenger.transport.async.claim_check_serializer', $eligible);
     }
 
     #[Group('legacy')]

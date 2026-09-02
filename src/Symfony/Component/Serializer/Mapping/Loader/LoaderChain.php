@@ -48,7 +48,19 @@ class LoaderChain implements LoaderInterface
         $success = false;
 
         foreach ($this->loaders as $loader) {
+            if ($loader instanceof LoaderChainAwareInterface) {
+                $loader->prepareLoading($metadata);
+            }
+        }
+
+        foreach ($this->loaders as $loader) {
             $success = $loader->loadClassMetadata($metadata) || $success;
+        }
+
+        foreach ($this->loaders as $loader) {
+            if ($loader instanceof LoaderChainAwareInterface) {
+                $loader->finalizeLoading($metadata);
+            }
         }
 
         return $success;

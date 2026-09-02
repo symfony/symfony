@@ -15,6 +15,9 @@ CHANGELOG
  * Add support for configuring serialized names and paths per group, with repeatable `#[SerializedName]` and `#[SerializedPath]` attributes, a `serialized` key in YAML and a `<serialized>` element in XML
  * Enable using `#[WithAccessors]` from the PropertyInfo component with the serializer
  * Add `AbstractNormalizer::ENABLE_DEFAULT_GROUPS` context option to opt into implicit `Default` and class-short-name groups for attributes without explicit `#[Groups]`, mirroring Validator group conventions
+ * Add `DiscriminatorMapType` to extend discriminator maps from mapped child classes
+ * Make the `mapping` argument of `DiscriminatorMap` optional and validate it together with `defaultType` at metadata loading time
+ * Add `LoaderChainAwareInterface` so that loaders in a `LoaderChain` can defer work until all loaders have run; `LoaderChain` then validates discriminator maps declared in any format
 
 8.1
 ---

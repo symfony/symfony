@@ -205,6 +205,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Translation\Bridge as TranslationBridge;
 use Symfony\Component\Translation\Command\TranslationLintCommand as BaseTranslationLintCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand as BaseXliffLintCommand;
+use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\PseudoLocalizationTranslator;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -310,6 +311,10 @@ class FrameworkExtension extends Extension
 
             if (!class_exists(BaseTranslationLintCommand::class)) {
                 $container->removeDefinition('console.command.translation_lint');
+            }
+
+            if (!class_exists(XliffUpdateSourcesCommand::class)) {
+                $container->removeDefinition('console.command.translation_xliff_update_sources');
             }
 
             if (!class_exists(RunCommandMessageHandler::class)) {

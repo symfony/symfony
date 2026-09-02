@@ -121,6 +121,7 @@ use Symfony\Component\Serializer\Normalizer\JsonSerializableNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\TranslatableNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Translation\Command\XliffUpdateSourcesCommand;
 use Symfony\Component\Translation\DependencyInjection\TranslatorPass;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -1737,11 +1738,13 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertSame('Fixtures/translations', $options['cache_vary']['scanned_directories'][3]);
 
-        $this->assertSame(
-            [__DIR__.'/Fixtures/translations', __DIR__.'/translations'],
-            $container->getParameterBag()->resolveValue($container->getDefinition('console.command.translation_xliff_update_sources')->getArgument(3)),
-            '->registerTranslatorConfiguration() passes only app-owned paths to the XLIFF source updater'
-        );
+        if (class_exists(XliffUpdateSourcesCommand::class)) {
+            $this->assertSame(
+                [__DIR__.'/Fixtures/translations', __DIR__.'/translations'],
+                $container->getParameterBag()->resolveValue($container->getDefinition('console.command.translation_xliff_update_sources')->getArgument(3)),
+                '->registerTranslatorConfiguration() passes only app-owned paths to the XLIFF source updater'
+            );
+        }
     }
 
     public function testTranslatorProvidersMergedEnabledLocales()

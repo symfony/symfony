@@ -120,34 +120,161 @@ final class SchemaValidator implements SchemaValidatorInterface
     /**
      * Best-effort resolution of the YAML line for a JSON Schema error path.
      *
-     * The path is a JSON Pointer (for example "/when@prod/framework") or a dotted
-     * property path. The line of the deepest matching key is returned, or 0 when
-     * it cannot be located.
+     * The path is a JSON Pointer, for example "/when@prod/framework" or
+     * "/monolog/handlers/0/type". Each segment is looked up among the direct
+     * children of the previous one, so a key nested deeper in the document is
+     * never mistaken for the one being looked for. The line of the deepest
+     * segment that could be located is returned, or 0 when even the first one
+     * could not be.
+     *
+     * A node written in flow notation ("{foo: bar}") holds its children on its
+     * own line, so the line of the flow container is returned for them.
      */
-    private static function locateLine(string $content, string $path): int
+    private static function locateLine(string $content, string $pointer): int
     {
-        $path = str_replace(['~1', '~0'], ['/', '~'], $path);
-        $segments = preg_split('#[/.]#', trim($path, '/.'), -1, \PREG_SPLIT_NO_EMPTY) ?: [];
-
-        $lines = explode("\n", $content);
-        $line = 0;
-        $offset = 0;
-
-        foreach ($segments as $segment) {
-            // Array indices in the path do not map to a key in the document.
-            if (ctype_digit($segment)) {
-                continue;
-            }
-
-            for ($i = $offset; $i < \count($lines); ++$i) {
-                if (preg_match('/^\s*'.preg_quote($segment, '/').'\s*:/', $lines[$i])) {
-                    $line = $i + 1;
-                    $offset = $i + 1;
-                    break;
-                }
+        $segments = [];
+        foreach (explode('/', trim($pointer, '/')) as $segment) {
+            if ('' !== $segment) {
+                $segments[] = str_replace(['~1', '~0'], ['/', '~'], $segment);
             }
         }
 
+        $lines = explode("\n", $content);
+        $line = 0;
+        // Lines the children of the current node span, and the indentation of the node itself.
+        $start = 0;
+        $end = \count($lines);
+        $indent = -1;
+
+        foreach ($segments as $segment) {
+            $located = ctype_digit($segment)
+                ? self::locateItem($lines, (int) $segment, $start, $end, $indent)
+                : self::locateKey($lines, $segment, $start, $end, $indent);
+
+            if (null === $located) {
+                // The deepest ancestor located is a better answer than a key looked up further down.
+                break;
+            }
+
+            [$line, $start, $end, $indent] = $located;
+        }
+
         return $line;
+    }
+
+    /**
+     * Locates a mapping key among the direct children of a node.
+     *
+     * @param list<string> $lines
+     *
+     * @return array{int, int, int, int}|null The 1-based line of the key, then the lines its own children span and its indentation
+     */
+    private static function locateKey(array $lines, string $key, int $start, int $end, int $indent): ?array
+    {
+        $quoted = preg_quote($key, '/');
+        $pattern = '/^\s*(?:"'.$quoted.'"|\''.$quoted.'\'|'.$quoted.')\s*:(?:\s|$)/';
+        $childIndent = null;
+
+        foreach (self::significantLines($lines, $start, $end) as $i => $lineIndent) {
+            if ($lineIndent <= $indent) {
+                // A line at the indentation of the node itself ends it.
+                break;
+            }
+
+            // Only the shallowest level in the range holds the direct children.
+            $childIndent ??= $lineIndent;
+
+            if ($lineIndent === $childIndent && preg_match($pattern, $lines[$i])) {
+                return [$i + 1, $i + 1, self::endOfNode($lines, $i + 1, $end, $lineIndent, true), $lineIndent];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Locates the nth item of a sequence among the direct children of a node.
+     *
+     * @param list<string> $lines
+     *
+     * @return array{int, int, int, int}|null The 1-based line of the item, then the lines its own children span and its indentation
+     */
+    private static function locateItem(array &$lines, int $index, int $start, int $end, int $indent): ?array
+    {
+        $itemIndent = null;
+        $found = 0;
+
+        foreach (self::significantLines($lines, $start, $end) as $i => $lineIndent) {
+            $isItem = self::isSequenceItem($lines[$i]);
+
+            // A sequence may be indented at the level of its parent key, so only a
+            // line that is not an item ends the node at that level.
+            if ($lineIndent < $indent || ($lineIndent === $indent && !$isItem)) {
+                break;
+            }
+
+            $itemIndent ??= $lineIndent;
+
+            if ($lineIndent !== $itemIndent || !$isItem || $found++ !== $index) {
+                continue;
+            }
+
+            $childrenEnd = self::endOfNode($lines, $i + 1, $end, $lineIndent, false);
+
+            // Blank out the dash so a key written on the item line ("- name: a") is
+            // seen as a child of the item, indented past it.
+            $lines[$i] = substr_replace($lines[$i], ' ', strpos($lines[$i], '-'), 1);
+
+            return [$i + 1, $i, $childrenEnd, $lineIndent];
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the line the node starting at $start and indented at $indent ends on, exclusive.
+     *
+     * @param list<string> $lines
+     */
+    private static function endOfNode(array $lines, int $start, int $end, int $indent, bool $flushSequenceContinues): int
+    {
+        foreach (self::significantLines($lines, $start, $end) as $i => $lineIndent) {
+            if ($lineIndent > $indent) {
+                continue;
+            }
+
+            if ($lineIndent === $indent && $flushSequenceContinues && self::isSequenceItem($lines[$i])) {
+                continue;
+            }
+
+            return $i;
+        }
+
+        return $end;
+    }
+
+    /**
+     * Yields the indentation of each line in the range that carries content, keyed by line index.
+     *
+     * @param list<string> $lines
+     *
+     * @return iterable<int, int>
+     */
+    private static function significantLines(array $lines, int $start, int $end): iterable
+    {
+        for ($i = $start; $i < $end; ++$i) {
+            $trimmed = ltrim($lines[$i], " \t");
+
+            if ('' === $trimmed || '#' === $trimmed[0]) {
+                continue;
+            }
+
+            yield $i => \strlen($lines[$i]) - \strlen($trimmed);
+        }
+    }
+
+    private static function isSequenceItem(string $line): bool
+    {
+        return (bool) preg_match('/^\s*-(?:\s|$)/', $line);
     }
 }

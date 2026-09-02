@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Yaml\Tests\Schema;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\RuntimeException;
 use Symfony\Component\Yaml\Schema\SchemaValidator;
@@ -78,6 +79,77 @@ class SchemaValidatorTest extends TestCase
         ]));
 
         $content = "parent:\n    child: not-an-integer";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame(2, $errors[0]['line']);
+    }
+
+    public function testErrorLineIgnoresTheSameKeyNestedInAnotherBlock()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'router' => [
+                    'type' => 'object',
+                    'required' => ['resource'],
+                ],
+                'session' => ['type' => 'object'],
+            ],
+        ]));
+
+        // "resource" is missing from "router" but present in "session": the line of the
+        // node the violation belongs to must be reported, not the one of the other block.
+        $content = "router:\n    utf8: true\nsession:\n    resource: bar";
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame(1, $errors[0]['line']);
+    }
+
+    #[TestWith(["handlers:\n    - type: a\n    - type: 8", 3])]
+    #[TestWith(["handlers:\n- type: a\n- type: 8", 3])]
+    public function testErrorLineIsResolvedFromSequenceIndex(string $content, int $line)
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'handlers' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object',
+                        'properties' => ['type' => ['type' => 'string']],
+                    ],
+                ],
+            ],
+        ]));
+
+        $validator = new SchemaValidator();
+
+        $errors = $validator->validate(Yaml::parse($content), $schema, $content);
+
+        $this->assertNotEmpty($errors);
+        $this->assertSame($line, $errors[0]['line']);
+    }
+
+    public function testErrorLineFallsBackToTheFlowContainer()
+    {
+        $schema = $this->createFile(json_encode([
+            'type' => 'object',
+            'properties' => [
+                'parent' => [
+                    'type' => 'object',
+                    'properties' => ['child' => ['type' => 'integer']],
+                ],
+            ],
+        ]));
+
+        // A node written in flow notation holds its children on its own line.
+        $content = "name: Symfony\nparent: {child: not-an-integer}";
         $validator = new SchemaValidator();
 
         $errors = $validator->validate(Yaml::parse($content), $schema, $content);

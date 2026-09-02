@@ -312,7 +312,6 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig($config, $factory);
         $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
 
-        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.route_loader'));
         $this->assertSame(['main' => '/oidc/callback'], $container->getParameter('security.oidc_login.callback_uris'));
     }
 
@@ -332,7 +331,6 @@ class OidcLoginFactoryTest extends TestCase
         $finalizedConfig = $this->processConfig($config, $factory);
         $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
 
-        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.route_loader'));
         $this->assertSame('oidc_callback_route', $finalizedConfig['check_path']);
         // no route is declared for a route name, but the parameter the route loader
         // is wired on must exist

@@ -1,0 +1,8 @@
+# mirrors what the routing recipe ships for every application
+_security_oidc_login:
+    resource: security.authenticator.oidc_login.route_loader
+    type: service
+
+_security_logout:
+    resource: security.route_loader.logout
+    type: service

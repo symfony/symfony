@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\FirewallListenerFactoryInterface;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
+use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
 use Symfony\Bundle\SecurityBundle\SecurityBundle;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\CustomProviderFactory;
 use Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Fixtures\UserProviderFactory\DummyProviderFactory;
@@ -1531,6 +1532,28 @@ class SecurityExtensionTest extends TestCase
         $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
         $this->assertSame(OidcPublicClient::class, $client->getClass());
         $this->assertCount(3, $client->getArguments());
+    }
+
+    public function testOidcLoginCallbackRouteLoaderIsAlwaysRegistered()
+    {
+        // the "security.yaml" routing recipe imports this loader unconditionally, so it
+        // must exist even in an application no firewall of which uses the OIDC authenticator
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['default' => ['memory' => null]],
+            'firewalls' => ['main' => ['form_login' => null]],
+        ]);
+
+        $container->compile();
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.route_loader'));
+        $this->assertSame([], $container->getParameter('security.oidc_login.callback_uris'));
+
+        $loader = $container->getDefinition('security.authenticator.oidc_login.route_loader');
+        $this->assertSame(OidcLoginRouteLoader::class, $loader->getClass());
+        $this->assertArrayHasKey('routing.route_loader', $loader->getTags());
+        // it declares no route as long as no firewall configures an OIDC callback path
+        $this->assertCount(0, (new OidcLoginRouteLoader($container->getParameter('security.oidc_login.callback_uris'), 'security.oidc_login.callback_uris'))());
     }
 
     protected function getRawContainer()

@@ -172,6 +172,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $this->createLogoutUrisParameter($config['firewalls'] ?? [], $container);
         } else {
             $container->removeDefinition('security.route_loader.logout');
+            $container->removeDefinition('security.authenticator.oidc_login.route_loader');
         }
 
         $this->createAuthorization($config, $container);

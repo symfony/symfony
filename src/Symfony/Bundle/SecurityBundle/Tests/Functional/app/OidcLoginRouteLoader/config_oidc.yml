@@ -1,0 +1,22 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+framework:
+    http_client: ~
+
+security:
+    providers:
+        in_memory:
+            memory: ~
+
+    firewalls:
+        oidc:
+            pattern: ^/oidc
+            provider: in_memory
+            oidc_login:
+                provider_uri: 'https://accounts.example.com'
+                client_id: client_id
+                client_secret: client_secret
+        main:
+            http_basic: ~
+            stateless: true

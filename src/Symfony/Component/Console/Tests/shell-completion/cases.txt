@@ -41,6 +41,21 @@ zsh|app demo:hello --env=|dev;prod;test
 # the option is only prepended while the cursor is inside the "--option=value" token
 all|app demo:hello --format=json alic|alice
 
+# an option with an optional value
+all|app demo:hello --g|--greeting
+all|app demo:hello --greeting |good morning;hello;hi
+all|app demo:hello -g |good morning;hello;hi
+bash,fish|app demo:hello --greeting=|--greeting=good morning;--greeting=hello;--greeting=hi
+zsh|app demo:hello --greeting=|good morning;hello;hi
+bash,fish|app demo:hello --greeting=h|--greeting=hello;--greeting=hi
+zsh|app demo:hello --greeting=h|hello;hi
+
+# an option accepting several values
+all|app demo:hello --tag |beta;stable
+all|app demo:hello --tag beta --tag |beta;stable
+bash,fish|app demo:hello --tag=b|--tag=beta
+zsh|app demo:hello --tag=b|beta
+
 # argument values
 all|app demo:hello |App\Entity\User;alice;bob;bob smith;ns:member
 bash,zsh|app demo:hello a|alice

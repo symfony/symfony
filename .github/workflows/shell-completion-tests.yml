@@ -8,7 +8,7 @@ on:
       - 'src/Symfony/Component/Console/Command/CompleteCommand.php'
       - 'src/Symfony/Component/Console/Command/DumpCompletionCommand.php'
       - 'src/Symfony/Component/Console/Completion/**'
-      - 'src/Symfony/Component/Console/Tests/Fixtures/shell-completion/**'
+      - 'src/Symfony/Component/Console/Tests/shell-completion/**'
   pull_request:
     paths:
       - '.github/workflows/shell-completion-tests.yml'
@@ -16,7 +16,7 @@ on:
       - 'src/Symfony/Component/Console/Command/CompleteCommand.php'
       - 'src/Symfony/Component/Console/Command/DumpCompletionCommand.php'
       - 'src/Symfony/Component/Console/Completion/**'
-      - 'src/Symfony/Component/Console/Tests/Fixtures/shell-completion/**'
+      - 'src/Symfony/Component/Console/Tests/shell-completion/**'
 
 defaults:
   run:
@@ -62,4 +62,4 @@ jobs:
         working-directory: src/Symfony/Component/Console
 
       - name: Run tests
-        run: src/Symfony/Component/Console/Tests/Fixtures/shell-completion/run.sh ${{ matrix.shell }}
+        run: src/Symfony/Component/Console/Tests/shell-completion/run.sh ${{ matrix.shell }}

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-foreach ([__DIR__.'/../../../vendor/autoload.php', __DIR__.'/../../../../../../../vendor/autoload.php'] as $autoload) {
+foreach ([__DIR__.'/../../vendor/autoload.php', __DIR__.'/../../../../../../vendor/autoload.php'] as $autoload) {
     if (file_exists($autoload)) {
         require $autoload;
 
@@ -39,8 +39,11 @@ $hello = (new Command('demo:hello'))
         'ns:member',
         'App\Entity\User',
     ])
+    // an option per value mode, to complete them all
     ->addOption('format', 'f', InputOption::VALUE_REQUIRED, 'Output format', null, ['json', 'xml', 'yaml'])
     ->addOption('env', 'e', InputOption::VALUE_REQUIRED, 'The environment', null, ['dev', 'prod', 'test'])
+    ->addOption('greeting', 'g', InputOption::VALUE_OPTIONAL, 'Greeting to use', null, ['hi', 'hello', 'good morning'])
+    ->addOption('tag', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Tags to add', null, ['beta', 'stable'])
     ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Do not write anything')
 ;
 $hello->setCode(function (InputInterface $input, OutputInterface $output) {

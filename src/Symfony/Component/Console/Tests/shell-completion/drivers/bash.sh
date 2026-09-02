@@ -10,17 +10,21 @@
 # Runs the bash completion of a command line and prints one logical suggestion per line.
 #
 # Usage: bash.sh <completion script> <command line>
-
-set -u
+#
+# No "set -u" here: an interactive shell does not use it, and bash-completion 1.x
+# relies on unset variables.
 
 completion_script="$1"
 command_line="$2"
 
+# the Linux locations, then Homebrew's bash-completion@2 and 1.x
 for bash_completion in \
     /usr/share/bash-completion/bash_completion \
     /etc/bash_completion \
     /opt/homebrew/etc/profile.d/bash_completion.sh \
+    /opt/homebrew/etc/bash_completion \
     /usr/local/etc/profile.d/bash_completion.sh \
+    /usr/local/etc/bash_completion \
 ; do
     if [ -f "$bash_completion" ]; then
         # shellcheck disable=SC1090

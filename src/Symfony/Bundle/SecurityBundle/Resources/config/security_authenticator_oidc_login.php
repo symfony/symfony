@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcConfidentialClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
@@ -73,12 +72,5 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('OIDC discovery'),
                 abstract_arg('client ID'),
             ])
-
-        ->set('security.authenticator.oidc_login.route_loader', OidcLoginRouteLoader::class)
-            ->args([
-                '%security.oidc_login.callback_uris%',
-                'security.oidc_login.callback_uris',
-            ])
-            ->tag('routing.route_loader')
     ;
 };

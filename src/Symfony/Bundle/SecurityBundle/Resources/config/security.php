@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Bundle\SecurityBundle\CacheWarmer\ExpressionCacheWarmer;
 use Symfony\Bundle\SecurityBundle\EventListener\FirewallListener;
 use Symfony\Bundle\SecurityBundle\Routing\LogoutRouteLoader;
+use Symfony\Bundle\SecurityBundle\Routing\OidcLoginRouteLoader;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -62,6 +63,9 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategyInterfa
 return static function (ContainerConfigurator $container) {
     $container->parameters()
         ->set('security.role_hierarchy.roles', [])
+        // the OIDC login callback route loader is wired on this parameter, which the
+        // "oidc_login" firewall factory fills in; it stays empty when no firewall uses one
+        ->set('security.oidc_login.callback_uris', [])
     ;
 
     $container->services()
@@ -262,6 +266,13 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 '%security.logout_uris%',
                 'security.logout_uris',
+            ])
+            ->tag('routing.route_loader')
+
+        ->set('security.authenticator.oidc_login.route_loader', OidcLoginRouteLoader::class)
+            ->args([
+                '%security.oidc_login.callback_uris%',
+                'security.oidc_login.callback_uris',
             ])
             ->tag('routing.route_loader')
 

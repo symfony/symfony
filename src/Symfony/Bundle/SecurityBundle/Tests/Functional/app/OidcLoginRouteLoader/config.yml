@@ -1,0 +1,13 @@
+imports:
+    - { resource: ./../config/framework.yml }
+
+security:
+    providers:
+        in_memory:
+            memory: ~
+
+    firewalls:
+        main:
+            http_basic: ~
+            logout: ~
+            stateless: true

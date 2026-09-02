@@ -85,6 +85,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     {
         $options['core_types'] = ['Symfony\Component\Form\Extension\Core\Type\FormType'];
         $options['service_types'] = ['Symfony\Bridge\Doctrine\Form\Type\EntityType'];
+        $options['data_class_types'] = [];
         $options['extensions'] = ['Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension'];
         $options['guessers'] = ['Symfony\Component\Form\Extension\Validator\ValidatorTypeGuesser'];
         $options['decorated'] = false;

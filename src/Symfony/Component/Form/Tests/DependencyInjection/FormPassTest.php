@@ -17,13 +17,23 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Form\AbstractTypeExtension;
+use Symfony\Component\Form\Attribute\AsFormType;
+use Symfony\Component\Form\Attribute\FormField;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\Form\DataClassType;
 use Symfony\Component\Form\DependencyInjection\FormPass;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Csrf\Type\FormTypeCsrfExtension;
 use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\AdminData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\CarData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\UserData;
+use Symfony\Component\Form\Tests\Fixtures\AsFormType\VehicleData;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -95,6 +105,106 @@ class FormPassTest extends TestCase
             ],
             $cmdDefinition->getArgument(1)
         );
+    }
+
+    public function testDataClassTypes()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->register(UserData::class, UserData::class)->addResourceTag('form.data_class');
+        $container->register(AdminData::class, AdminData::class)->addResourceTag('form.data_class');
+        $container->register('.abstract.'.VehicleData::class, VehicleData::class)->setAbstract(true)->addResourceTag('form.data_class');
+        $container->register(CarData::class, CarData::class)->addResourceTag('form.data_class');
+
+        $container->compile();
+
+        $userType = $container->getDefinition('.form.data_class_type.'.UserData::class);
+        $this->assertSame(DataClassType::class, $userType->getClass());
+        $this->assertSame([
+            UserData::class,
+            FormType::class,
+            'user_data',
+            [
+                'name' => [null, []],
+                'bio' => [TextareaType::class, ['label' => 'Bio']],
+                'publicName' => [null, ['property_path' => 'internalName']],
+            ],
+            ['label' => 'User'],
+        ], $userType->getArguments());
+
+        $this->assertSame(UserData::class, $container->getDefinition('.form.data_class_type.'.AdminData::class)->getArgument(1));
+        $this->assertSame(FormType::class, $container->getDefinition('.form.data_class_type.'.VehicleData::class)->getArgument(1));
+        $this->assertSame(VehicleData::class, $container->getDefinition('.form.data_class_type.'.CarData::class)->getArgument(1));
+    }
+
+    public function testDataClassTypesAreAddedToTheDebugCommand()
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->register('form.registry', FormRegistry::class);
+        $commandDefinition = new Definition(DebugCommand::class, [new Reference('form.registry')]);
+        $commandDefinition->setPublic(true);
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->setDefinition('console.command.form_debug', $commandDefinition);
+        $container->register(UserData::class, UserData::class)->addResourceTag('form.data_class');
+
+        $container->compile();
+
+        $arguments = $container->getDefinition('console.command.form_debug')->getArguments();
+        $this->assertContains([UserData::class], $arguments);
+        $this->assertContains([
+            'Symfony\Component\Form\Extension\Core\Type',
+            'Symfony\Component\Form\Tests\Fixtures\AsFormType',
+        ], $arguments);
+    }
+
+    #[DataProvider('invalidDataClassProvider')]
+    public function testInvalidDataClass(string $class, string $message)
+    {
+        $container = $this->createContainerBuilder();
+
+        $container->setDefinition('form.extension', $this->createExtensionDefinition());
+        $container->register($class, $class)->addResourceTag('form.data_class');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($message);
+
+        $container->compile();
+    }
+
+    public static function invalidDataClassProvider(): iterable
+    {
+        yield 'missing attribute' => [
+            \stdClass::class,
+            'The class "stdClass" is tagged "form.data_class" but has no #[AsFormType] attribute.',
+        ];
+
+        yield 'data_class option' => [
+            FormPassTest_DataClassOption::class,
+            'The "data_class" option cannot be set on the #[AsFormType] attribute of class "'.FormPassTest_DataClassOption::class.'", the class itself is the data class.',
+        ];
+
+        yield 'field type does not exist' => [
+            FormPassTest_BadFieldType::class,
+            'The form type "Symfony\Component\Form\Tests\DependencyInjection\NotAClass" declared on the #[FormField] attribute of property "'.FormPassTest_BadFieldType::class.'::$name" does not exist.',
+        ];
+
+        yield 'name combined with property_path' => [
+            FormPassTest_NamePathConflict::class,
+            'The "name" argument of the #[FormField] attribute of property "'.FormPassTest_NamePathConflict::class.'::$name" cannot be combined with the "property_path" option.',
+        ];
+
+        yield 'duplicate field name' => [
+            FormPassTest_DuplicateField::class,
+            'Duplicate field "email" declared on the #[FormField] attribute of property "'.FormPassTest_DuplicateField::class.'::$contact".',
+        ];
+
+        yield 'object option value' => [
+            FormPassTest_ObjectOption::class,
+            'The "choice_filter" option declared on the #[FormField] attribute of property "'.FormPassTest_ObjectOption::class.'::$name" contains a value of type "stdClass"; only scalar, array, enum and service reference values can be compiled. Use a form type class or a type extension for dynamic options.',
+        ];
     }
 
     public function testAddTaggedTypesToCsrfTypeExtension()
@@ -399,3 +509,40 @@ class WithoutExtendedTypesTypeExtension extends AbstractTypeExtension
         return [];
     }
 }
+
+#[AsFormType(options: ['data_class' => 'Foo'])]
+class FormPassTest_DataClassOption
+{
+}
+
+#[AsFormType]
+class FormPassTest_BadFieldType
+{
+    #[FormField(NotAClass::class)]
+    public ?string $name = null;
+}
+
+#[AsFormType]
+class FormPassTest_NamePathConflict
+{
+    #[FormField(name: 'other', options: ['property_path' => 'name'])]
+    public ?string $name = null;
+}
+
+#[AsFormType]
+class FormPassTest_DuplicateField
+{
+    #[FormField]
+    public ?string $email = null;
+
+    #[FormField(name: 'email')]
+    public ?string $contact = null;
+}
+
+#[AsFormType]
+class FormPassTest_ObjectOption
+{
+    #[FormField(options: ['choice_filter' => new \stdClass()])]
+    public ?string $name = null;
+}
+

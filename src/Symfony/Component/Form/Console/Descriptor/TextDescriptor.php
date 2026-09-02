@@ -44,6 +44,11 @@ class TextDescriptor extends Descriptor
             $this->output->listing(array_map($this->formatClassLink(...), $options['service_types']));
         }
 
+        if ($options['data_class_types']) {
+            $this->output->section('Data class form types');
+            $this->output->listing(array_map($this->formatClassLink(...), $options['data_class_types']));
+        }
+
         if (!$options['show_deprecated']) {
             if ($options['extensions']) {
                 $this->output->section('Type extensions');

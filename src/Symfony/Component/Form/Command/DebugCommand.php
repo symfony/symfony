@@ -42,6 +42,7 @@ class DebugCommand extends Command
         private array $extensions = [],
         private array $guessers = [],
         private ?FileLinkFormatter $fileLinkFormatter = null,
+        private array $dataClassTypes = [],
     ) {
         parent::__construct();
     }
@@ -95,6 +96,7 @@ class DebugCommand extends Command
             $object = null;
             $options['core_types'] = $this->getCoreTypes();
             $options['service_types'] = array_values(array_diff($this->types, $options['core_types']));
+            $options['data_class_types'] = $this->dataClassTypes;
             if ($input->getOption('show-deprecated')) {
                 $options['core_types'] = $this->filterTypesByDeprecated($options['core_types']);
                 $options['service_types'] = $this->filterTypesByDeprecated($options['service_types']);
@@ -105,7 +107,7 @@ class DebugCommand extends Command
                 sort($options[$k]);
             }
         } else {
-            if (!class_exists($class) || !is_subclass_of($class, FormTypeInterface::class)) {
+            if ((!class_exists($class) || !is_subclass_of($class, FormTypeInterface::class)) && !\in_array($class, $this->dataClassTypes, true)) {
                 $class = $this->getFqcnTypeClass($input, $io, $class);
             }
             $resolvedType = $this->formRegistry->getType($class);
@@ -150,7 +152,7 @@ class DebugCommand extends Command
         if (0 === $count = \count($classes)) {
             $message = \sprintf("Could not find type \"%s\" into the following namespaces:\n    %s", $shortClassName, implode("\n    ", $this->namespaces));
 
-            $allTypes = array_merge($this->getCoreTypes(), $this->types);
+            $allTypes = array_merge($this->getCoreTypes(), $this->types, $this->dataClassTypes);
             if ($alternatives = $this->findAlternatives($shortClassName, $allTypes)) {
                 if (1 === \count($alternatives)) {
                     $message .= "\n\nDid you mean this?\n    ";
@@ -238,7 +240,7 @@ class DebugCommand extends Command
     public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
     {
         if ($input->mustSuggestArgumentValuesFor('class')) {
-            $suggestions->suggestValues(array_merge($this->getCoreTypes(), $this->types));
+            $suggestions->suggestValues(array_merge($this->getCoreTypes(), $this->types, $this->dataClassTypes));
 
             return;
         }

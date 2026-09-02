@@ -59,6 +59,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBa
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Form\Attribute\AsFormType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerAction;
@@ -1195,6 +1196,21 @@ abstract class FrameworkExtensionTestCase extends TestCase
             [['serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
             $definition->getTag('messenger.message')
         );
+    }
+
+    public function testFormDataClassAttributeAutoconfiguration()
+    {
+        $container = $this->createContainerFromFile('full', [], true, false);
+        $container->compile();
+
+        $configurators = $container->getAttributeAutoconfigurators()[AsFormType::class] ?? [];
+        $this->assertCount(1, $configurators);
+
+        $definition = new ChildDefinition('');
+        $configurators[0]($definition);
+
+        $this->assertSame([[]], $definition->getTag('form.data_class'));
+        $this->assertCount(1, $definition->getTag('container.excluded'));
     }
 
     public function testDoctrineMappedClassAttributesAreForwardedToTheTag()

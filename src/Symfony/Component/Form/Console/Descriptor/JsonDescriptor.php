@@ -25,6 +25,7 @@ class JsonDescriptor extends Descriptor
     {
         $data['builtin_form_types'] = $options['core_types'];
         $data['service_form_types'] = $options['service_types'];
+        $data['data_class_form_types'] = $options['data_class_types'];
         if (!$options['show_deprecated']) {
             $data['type_extensions'] = $options['extensions'];
             $data['type_guessers'] = $options['guessers'];

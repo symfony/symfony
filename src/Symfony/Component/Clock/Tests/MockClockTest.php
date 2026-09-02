@@ -43,6 +43,7 @@ class MockClockTest extends TestCase
     public function testNow()
     {
         $before = new \DateTimeImmutable();
+        usleep(1);
         $clock = new MockClock();
         usleep(1);
         $after = new \DateTimeImmutable();

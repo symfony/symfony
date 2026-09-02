@@ -43,6 +43,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         }
 
         $fs->remove(__DIR__.'/app/config/reference.php');
+        $fs->remove(__DIR__.'/app/config/schema.json');
     }
 
     protected static function getKernelClass(): string

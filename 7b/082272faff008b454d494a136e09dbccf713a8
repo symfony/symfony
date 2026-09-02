@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T11:46:12Z
+
+Thank you for reviving this, the approach is the right one and the #62023 round trip made it simple.
+
+I pushed some changes while reviewing:
+
+- The FrameworkBundle wiring passed the same path list as `translation:debug`/`translation:extract`, which includes the translation directories of vendor packages (Validator, Form, Security) and of every bundle. Those commands only read from that list, while this one writes to every path, so a plain `bin/console translation:update-xliff-sources` rewrote XLIFF files inside `vendor/`. The command now receives `framework.translator.paths` plus the default path only.
+- Files were rewritten even when no source changed, which normalizes them as a side effect (regenerated `trans-unit` ids, injected tool header). The write is now skipped when nothing changed, with a test asserting byte-identical content on a no-op run.
+- A bare `--domains` crashed with a `TypeError`: `VALUE_OPTIONAL` on an array option yields `[null]`. The option is now `VALUE_REQUIRED` and the console rejects the flag without a value.
+- The tests asserted unwrapped SymfonyStyle output and only passed at the 120-column width CI uses; they now pin `COLUMNS` like the pull/push command tests do. Also fixed the test namespace (`Command` -> `Symfony\Component\Translation\Tests\Command`).
+- Moved the changelog entry from FrameworkBundle to the Translation component, where the command class lives.
+
+One behavior to be aware of and that I kept as is: the default locale's texts are resolved per directory, so sources in one path are never filled from default locale files located in another path.

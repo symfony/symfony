@@ -1,0 +1,165 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-07-23T17:47:58Z
+
+I like the idea of adding this to core 👍 /cc @ajgarlag
+
+---------------------------------------------------------------------------
+
+by graste at 2026-07-26T10:30:59Z
+
+I'd really welcome OIDC Connect Auth Code Flow being available and supported in Symfony directly. Implementation of an interactive login can be fiddly with the changes over time in the Security component.
+
+Drenso Oidc being mentioned is nice as that bundle does a lot of good things in being configurable. Well-known parser in Drenso OIDC is something I needed already.
+
+Custom claims and validating them is necessary. The startAuth etc methods do a lot and look like they might benefit from a few extension points. Looking forward to the follow-up PRs as well!
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-08-17T14:04:09Z
+
+Thanks a lot for this review @nicolas-grekas, it is the kind that makes a PR better. Everything is addressed, pushed as 8 commits on top of 34ce8f3, one per point.
+
+## Must fix
+
+**1. Code style.** Fixed in 7e7a58c: `ValidateEnvPlaceholdersPass` now sorts after `ResolveReferencesToAliasesPass`. Verified locally with php-cs-fixer and the repo config: 0 violations over the changed files.
+
+**2. + 3.** Both had the same cause, so one change covers them (fe049c3): the `FallbackUserLoader` was exactly what stopped the firewall user provider from loading the user. `oidc_login` now behaves like every other authenticator, `FormLoginAuthenticator` shape included: the firewall's provider loads the user, from the verified `sub`, with every claim passed as badge attributes.
+
+I did not take either of the two options you listed, because both leave a hole:
+
+- wiring the `oidc` provider automatically inside the factory does not fix the refresh: `ContextListener` only iterates the providers declared under `providers:`, so a service injected by the factory would authenticate fine and still fail on the next request;
+- validating the provider when the container compiles is not reliable, since the user class of an entity provider is not knowable from the container.
+
+What you get now:
+
+- `provider: oidc` builds the self-contained `OidcUser`. `OidcUserProvider` implements `AttributesBasedUserProviderInterface` for that, and refresh keeps working;
+- `provider: <your own>` gives your user, your roles, and a refresh that works too;
+- a provider that does not know the `sub` throws `UserNotFoundException` during authentication, which is a normal authentication failure, instead of a session that breaks on the next request.
+
+**3. `scope`.** Added, defaulting to `['openid']`, and accepting either a list or a space-separated string so that `%env(OIDC_SCOPES)%` carries them all. `openid` is always requested, since OIDC requires it for an ID token to come back.
+
+The roles opt-in is the user provider, which is what `OidcUser::getRoles()` already pointed at:
+
+```php
+final class MyOidcUserProvider implements AttributesBasedUserProviderInterface
+{
+    public function loadUserByIdentifier(string $identifier, array $attributes = []): UserInterface
+    {
+        return OidcUser::fromClaims(['roles' => $this->mapRoles($attributes)] + $attributes);
+    }
+
+    // ...
+}
+```
+
+`OidcUser::fromClaims()` is new in `Security\Core` and maps every claim it is given, `roles` included. The built-in `oidc` provider drops `roles` and `user_identifier` before calling it, so the default path cannot be escalated while the explicit one stays available. That asymmetry is deliberate. `OidcTrait::createUser()` now delegates to `fromClaims()`, so the access-token handlers are unchanged. As a side effect, `provider: oidc` became usable with `access_token`, where it threw a `BadMethodCallException` before.
+
+## Security
+
+**4. Endpoint schemes.** Fixed in d1d155e: the endpoints of the login flow go through `OidcDiscovery::getSecureEndpoint()`, which applies to `authorization_endpoint`, `token_endpoint` and `userinfo_endpoint` the same rule as the issuer (HTTPS, loopback hosts and the names reserved for testing excepted). I left the access-token handlers reading the document as they do today: requiring HTTPS on their `userinfo_endpoint` or `jwks_uri` would break existing 8.x setups pointing at a plain-HTTP IdP. A plain-HTTP `jwks_uri` deserves its own change, where it can go through a deprecation.
+
+## Bugs
+
+**5. Trailing slash from an environment variable.** Fixed in `OidcDiscovery`, as you suggested (c0e7db2): it trims the issuer and appends the well-known path to it (OIDC Discovery 1.0 §4.1), which covers the issuer comparison at the same time. The compile-time `rtrim()` is gone, it only ever saw the env placeholder.
+
+**6. Serialized discovery requests.** Fixed in d8366ef: `OidcDiscovery::prefetch()` sends the request of a document that is not cached yet without consuming its response, the callback of `CacheInterface::get()` setting `$save = false` so that nothing is computed nor stored. `computeDiscoveryKeys()` prefetches every discovery before reading any of them, as the old code did with its `$configResponses`. The new test asserting that both `.well-known` documents are requested before either JWKS fails without that loop. A prefetched response is also dropped when another process warmed the entry in between, so a long-running instance cannot consume a stale one an hour later.
+
+**7. Undocumented behavior change.** Changelog line added (7812931). I kept the 3600 seconds: leaving the lifetime to the pool means `cache.app` never expiring the document, so a `jwks_uri` rotation would not be picked up at all rather than within the hour. `OidcUserInfoTokenHandler` passes no TTL only to stay compatible with the entries it wrote before it delegated to `OidcDiscovery`.
+
+## Minor
+
+All addressed, in deeaab6 and c3fb2e6:
+
+- `isSecureIssuer()` lowercases the scheme, so `HTTPS://idp.example.com` is accepted;
+- `OidcIdToken` defaults its clock to `new Clock()`, like `OidcTokenHandler`;
+- the redundant `$this->discoveries = []` is gone, the list is built and assigned once, which also keeps a second `enableDiscovery()` call correct;
+- `PRIORITY` drops its type, like every other factory;
+- the callback route stays without a `_controller`, like the logout ones, but `supports()` now matches every request on `check_path`, the way `form_login` does with its own. Nothing reaches the controller resolution any more: a bogus callback is reported as an authentication failure;
+- `checkForProviderError()` runs after `validateState()`. Providers echo `state` back on error responses (RFC 6749 §4.1.2.1), so real error flows are unaffected, and an attacker-supplied `error_description` no longer reaches the exception stored in the session;
+- a request without a session gets a `LogicException` naming what the authenticator keeps there, instead of a `SessionNotFoundException`. To be precise, this catches the case you saw (no session on the request). A stateless firewall with sessions enabled is not detectable from the authenticator, since the request still has one and the factory does not see the firewall's `stateless` flag, so the message names it as guidance.
+
+## Elsewhere
+
+The description now shows the `providers` block, `provider: oidc` and `scope`, and its secure-by-default list mentions the announced endpoints.
+
+Local runs: Security/Http and Security/Core 1135 tests, SecurityBundle 411 tests, all green, including the 29 tests these commits add. This push also re-runs the jobs, which should tell whether the Psalm failure was a stale baseline as you suspected.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-08-17T17:41:51Z
+
+@nicolas-grekas do you prefer a full-featured PR, including all planned options? Or, as I said in description, a series of small following PRs to improve this backbone?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T06:07:46Z
+
+I think one core PR first, then maybe a second with all the follow ups in one go? it depends on their impact
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-08-18T07:29:55Z
+
+One of them was about adding `scope` support, but I've ported it here after your last comment. Most of them are about adding support for options (PKCE, prompt, max-age, authorization_params, user_data_source (userinfo or id_token), user_identifier_claim, token_endpoint_auth_method, RP-Initiated Logout, direct_redirect: true|false)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-20T16:12:18Z
+
+Thanks for the rework. I re-ran the review on 9f227cb, with probes against a mocked IdP, plus a rebase check on current 8.2.
+
+**Verified fixed**
+
+- The endpoint scheme check works: an `http://` issuer is rejected, and so is any `http://` token, authorization or userinfo endpoint announced by an https issuer. A failed `start()` leaves no state, nonce or verifier in the session.
+- The firewall's `provider` now loads the user; an unknown `sub` surfaces as a regular `UserNotFoundException`.
+- `scope`, roles from claims, and the `provider_uri` trailing slash all behave as described.
+- Still correct from the previous round: state, nonce, PKCE S256, `aud`, `azp`, `iss`, the UserInfo `sub` check, and session migration through `InteractiveAuthenticatorInterface`. `roles` and `user_identifier` claims coming from UserInfo are ignored, as they should be.
+
+**The open question: no signature verification**
+
+The probe results are unchanged: a tampered signature, an empty signature and `alg=none` are all accepted, and `alg=none` with admin claims logs in as admin. I follow the argument from OIDC Core 1.0 section 3.1.3.7 item 6: the token comes straight from the token endpoint, so TLS is the integrity guarantee. But that guarantee is exactly as strong as the `http_client` service this authenticator is wired to. `verify_peer: false`, or a TLS-terminating proxy in front of the IdP, turns this into silent acceptance of forged tokens, with no signal anywhere. And `OidcTokenHandler` in the same component does verify, so the two OIDC entry points would disagree about whether signatures matter.
+
+I can accept shipping without JWKS verification only under two conditions: the docs and the option surface state explicitly that token integrity depends on TLS verification of the injected client, and the JWKS follow-up is a commitment, not an intention. Otherwise verification should land in this PR. @Spomky your review predates this rework; the scheme check is in now, and this question is the remaining one, so your input is welcome.
+
+**To fix either way**
+
+- `validateClaims()` checks only `iss`, `aud` and `exp`. A token with `iat` or `nbf` far in the future is accepted, and so is a token carrying neither claim. `OidcTokenHandler` has `IssuedAt`/`NotBefore` checkers and an `allowed_time_drift` option; this authenticator needs the same.
+- `discovery_cache_ttl` accepts negative values; add `->min(0)`.
+- The discovery document is fetched without a size limit before being decoded and written to `cache.app`; cap it.
+- `state`, `nonce` and `code_verifier` stay in the session on the provider-error and missing-code paths; clear them there like on the success path.
+- The localhost exception still lets a discovery document announce an `http://` token endpoint, and the client secret is posted there. IdP-controlled, so low risk, but worth closing while you are in the file.
+- `OidcUser::fromClaims()` returns `self`; `static` would let subclasses keep their type.
+- Please remove the tool-credit line at the end of the PR description.
+
+Two pre-existing issues become reachable from this flow and turn into uncaught 500s: a numeric claim name breaks the named-argument unpacking in `OidcUser`, and a non-integer `updated_at` hits a `TypeError` in `setTimestamp()`. Fine as a follow-up, but they deserve an issue.
+
+On CI: the red unit jobs are pre-existing 8.2 breakage (Twig layout regression, a Doctrine timing flake, PHP 8.6 noise); none of the failures touch Security. The three Security suites pass locally on your head and after a rebase onto current 8.2.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-08-20T17:28:56Z
+
+I think future reviews will end to encourage a feature complete PR, because most of missing stuff are living in stacked branches for futures PRs of this series. Let me include all features here, to have a complete vision of the end work.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-08-31T12:31:29Z
+
+Last "big" question here, in the core PR:
+
+Do we want to allow multiple OIDC Providers on the same firewall at this moment? Or could it be considered later as an evolution?
+
+cc @nicolas-grekas @Spomky @chalasr
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-31T12:43:09Z
+
+To me we can introduce multiple providers support at a later stage.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-08-31T21:20:28Z
+
+Thank you @alexandre-daubois for you review, all comments have been addressed.

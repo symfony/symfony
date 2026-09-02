@@ -11,9 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Compiler;
 
+use Opis\JsonSchema\Validator;
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonSchemaConfigDumpPass;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Dumper\JsonSchemaDumper;
@@ -23,6 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\Yaml\Schema\SchemaValidator;
 use Symfony\Component\Yaml\Yaml;
 
 #[RequiresMethod(JsonSchemaDumper::class, 'dump')]
@@ -136,6 +139,47 @@ class JsonSchemaConfigDumpPassTest extends TestCase
         // when@test must not contain when@dev
         $this->assertArrayNotHasKey('when@dev', $schema['properties']['when@test']['properties']);
         $this->assertArrayNotHasKey('when@test', $schema['properties']['when@dev']['properties']);
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    public function testGeneratedSchemaKeepsTheListFormOfNormalizedKeyedMaps()
+    {
+        $schemaFile = $this->tempDir.'/framework_schema.json';
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        (new JsonSchemaConfigDumpPass($schemaFile, [FrameworkBundle::class => ['all' => true]]))->process($container);
+
+        // The asset-mapper recipe configures "paths" as a list, which a
+        // normalization closure turns into a map keyed by path.
+        $config = Yaml::parse(<<<YAML
+            framework:
+                asset_mapper:
+                    paths:
+                        - assets/
+            YAML);
+
+        $this->assertSame([], (new SchemaValidator())->validate($config, $schemaFile));
+    }
+
+    #[RequiresMethod(Validator::class, 'validate')]
+    public function testGeneratedSchemaRejectsTheListFormOfPlainKeyedMaps()
+    {
+        $schemaFile = $this->tempDir.'/framework_schema.json';
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', true);
+
+        (new JsonSchemaConfigDumpPass($schemaFile, [FrameworkBundle::class => ['all' => true]]))->process($container);
+
+        // A list here would configure a context entry named "0" instead of "enable_max_depth".
+        $config = Yaml::parse(<<<YAML
+            framework:
+                serializer:
+                    default_context:
+                        - enable_max_depth
+            YAML);
+
+        $this->assertNotSame([], (new SchemaValidator())->validate($config, $schemaFile));
     }
 
     public function testProcessIgnoresFileWriteErrors()

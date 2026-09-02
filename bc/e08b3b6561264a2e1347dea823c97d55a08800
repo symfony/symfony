@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T05:40:04Z
+
+Thank you Thomas. I pushed three changes on top of your commit.
+
+The SMTP transport now maps `TagHeader` too. MailerSend's relay does accept tags, through an `X-MailerSend-Tags` header holding a comma-separated list, up to 5 tags (see https://developers.mailersend.com/smtp-relay and https://www.mailersend.com/help/how-to-tag-emails). The documented example shows the value inside quotation marks, but MailerSend's own WordPress SMTP plugin sends the raw comma-separated string, so that is what we send.
+
+I dropped the truncation to 191 characters. Sendgrid is the only bridge that truncates; the others pass the value through. Silently cutting a tag makes two distinct tags collapse into one in the account's analytics with nothing to show for it, while the API returns a validation error naming the field. The 5-tag limit still throws, which matches Postmark and Mailtrap.
+
+Last, the "no tags" assertion moved out of `testTagHeaders` into its own test, so a failure says which case broke.

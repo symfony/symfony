@@ -15,8 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Attribute\RateLimit;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpKernel\RateLimiter\AppliedRateLimit;
 use Symfony\Component\RateLimiter\Event\RateLimitExceededEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -29,6 +31,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 final class RateLimitAttributeListener implements EventSubscriberInterface
 {
+    private const RATE_LIMIT_ATTRIBUTE = '_rate_limit';
+
     /**
      * @param ServiceProviderInterface<RateLimiterFactoryInterface> $limiters
      */
@@ -61,19 +65,64 @@ final class RateLimitAttributeListener implements EventSubscriberInterface
 
         $rateLimit = $this->limiters->get($attribute->limiter)->create($key)->consume($attribute->tokens);
 
+        $candidate = $attribute->exposeHeaders && null !== $rateLimit->getResetAt()
+            ? new AppliedRateLimit($rateLimit, $attribute->tokens)
+            : null;
+
         if (!$rateLimit->isAccepted()) {
+            $request->attributes->set(self::RATE_LIMIT_ATTRIBUTE, $candidate);
+
             if ($dispatcher && class_exists(RateLimitExceededEvent::class)) {
                 $dispatcher->dispatch(new RateLimitExceededEvent($rateLimit, $attribute->limiter, $key));
             }
 
             throw new TooManyRequestsHttpException(max(0, $rateLimit->getRetryAfter()->getTimestamp() - time()));
         }
+
+        if ($candidate) {
+            /** @var AppliedRateLimit|null $applied */
+            $applied = $request->attributes->get(self::RATE_LIMIT_ATTRIBUTE);
+
+            if (!$applied instanceof AppliedRateLimit || $candidate->getRemainingCalls() < $applied->getRemainingCalls()) {
+                $request->attributes->set(self::RATE_LIMIT_ATTRIBUTE, $candidate);
+            }
+        }
+    }
+
+    /**
+     * Adds the X-RateLimit-* headers to the response.
+     */
+    public function onKernelResponse(ResponseEvent $event): void
+    {
+        $applied = $event->getRequest()->attributes->get(self::RATE_LIMIT_ATTRIBUTE);
+
+        if (!$event->isMainRequest() || !$applied instanceof AppliedRateLimit) {
+            return;
+        }
+
+        $response = $event->getResponse();
+
+        $headers = [
+            'X-RateLimit-Limit' => intdiv($applied->rateLimit->getLimit(), $applied->tokens),
+            'X-RateLimit-Remaining' => max(0, (int) $applied->getRemainingCalls()),
+            'X-RateLimit-Reset' => $applied->rateLimit->getResetAt()->getTimestamp(),
+        ];
+
+        foreach (array_keys($headers) as $name) {
+            if ($response->headers->has($name)) {
+                return;
+            }
+        }
+
+        $response->setPrivate();
+        $response->headers->add($headers);
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::CONTROLLER_ARGUMENTS.'.'.RateLimit::class => 'onKernelControllerAttribute',
+            KernelEvents::RESPONSE => 'onKernelResponse',
         ];
     }
 }

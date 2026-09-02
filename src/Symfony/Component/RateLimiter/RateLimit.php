@@ -23,6 +23,7 @@ class RateLimit
         private \DateTimeImmutable $retryAfter,
         private bool $accepted,
         private int $limit,
+        private ?\DateTimeImmutable $resetAt = null,
     ) {
     }
 
@@ -58,6 +59,14 @@ class RateLimit
     public function getLimit(): int
     {
         return $this->limit;
+    }
+
+    /**
+     * Returns when the limiter is back to its full capacity, or null if the policy has no such moment.
+     */
+    public function getResetAt(): ?\DateTimeImmutable
+    {
+        return $this->resetAt;
     }
 
     public function wait(): void

@@ -7,6 +7,7 @@ CHANGELOG
  * Add `RateLimitExceededEvent`
  * Add `RateLimiterBuilder`
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
+ * Add `RateLimit::getResetAt()`
 
 8.1
 ---

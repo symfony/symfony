@@ -82,6 +82,23 @@ final class SlidingWindow implements LimiterStateInterface
         return (int) floor($this->hitCountForLastWindow * (1 - $percentOfCurrentTimeFrame) + $this->hitCount);
     }
 
+    /**
+     * Returns when the window holds no hits at all.
+     */
+    public function getFullCapacityTime(): float
+    {
+        // hits only start decaying once carried into the next window
+        if ($this->hitCount) {
+            return $this->windowEndAt + $this->intervalInSeconds * (1 - 1 / $this->hitCount);
+        }
+
+        if ($this->hitCountForLastWindow) {
+            return $this->windowEndAt - $this->intervalInSeconds / $this->hitCountForLastWindow;
+        }
+
+        return microtime(true);
+    }
+
     public function calculateTimeForTokens(int $maxSize, int $tokens): float
     {
         $remaining = $maxSize - $this->getHitCount();

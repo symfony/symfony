@@ -81,14 +81,14 @@ final class FixedWindowLimiter implements LimiterInterface
                     $window = new CalendarAlignedWindow($this->id, $this->limit, $periodStart, $periodEnd);
                 }
             } elseif (!$window instanceof Window) {
-                $window = new Window($this->id, $this->intervalInSeconds, $this->limit);
+                $window = new Window($this->id, $this->intervalInSeconds, $this->limit, $now);
             }
 
             $availableTokens = $window->getAvailableTokens($now);
 
             if (0 === $tokens) {
                 $waitDuration = $window->calculateTimeForTokens(1, $now);
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), true, $this->limit));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) ($now + $waitDuration)), true, $this->limit, $this->resetAt($window, $now)));
             } elseif ($availableTokens >= $tokens) {
                 $window->add($tokens, $now);
 
@@ -97,18 +97,18 @@ final class FixedWindowLimiter implements LimiterInterface
                     $retryAfter += $window->calculateTimeForTokens(1, $now);
                 }
 
-                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($retryAfter)), true, $this->limit));
+                $reservation = new Reservation($now, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) $retryAfter), true, $this->limit, $this->resetAt($window, $now)));
             } else {
                 $waitDuration = $window->calculateTimeForTokens($tokens, $now);
 
                 if (null !== $maxTime && $waitDuration > $maxTime) {
                     // process needs to wait longer than set interval
-                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+                    throw new MaxWaitDurationExceededException(\sprintf('The rate limiter wait time ("%d" seconds) is longer than the provided maximum time ("%d" seconds).', $waitDuration, $maxTime), new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) ($now + $waitDuration)), false, $this->limit, $this->resetAt($window, $now)));
                 }
 
                 $window->add($tokens, $now);
 
-                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
+                $reservation = new Reservation($now + $waitDuration, new RateLimit($window->getAvailableTokens($now), \DateTimeImmutable::createFromTimestamp((int) ($now + $waitDuration)), false, $this->limit, $this->resetAt($window, $now)));
             }
 
             if (0 !== $tokens) {
@@ -133,6 +133,11 @@ final class FixedWindowLimiter implements LimiterInterface
     public function getAvailableTokens(int $hitCount): int
     {
         return $this->limit - $hitCount;
+    }
+
+    private function resetAt(Window|CalendarAlignedWindow $window, float $now): \DateTimeImmutable
+    {
+        return \DateTimeImmutable::createFromTimestamp((int) ($now + $window->calculateTimeForTokens($this->limit, $now)));
     }
 
     /**

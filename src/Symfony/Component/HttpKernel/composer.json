@@ -57,6 +57,7 @@
         "symfony/dependency-injection": "<8.2",
         "symfony/flex": "<2.10",
         "symfony/http-client-contracts": "<2.5",
+        "symfony/rate-limiter": "<8.2",
         "symfony/serializer": "<7.4.15|>=8.0,<8.0.15|>=8.1,<8.1.2",
         "symfony/translation-contracts": "<2.5",
         "symfony/var-dumper": "<8.1",

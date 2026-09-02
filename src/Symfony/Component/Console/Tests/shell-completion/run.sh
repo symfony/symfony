@@ -124,27 +124,24 @@ test_missing_bash_completion() {
 }
 
 # The command may be reached through an alias, which can carry arguments. The
-# driver cannot be used here, aliases need a shell of their own.
+# completion is requested on "--ans" so that the expectation does not depend on
+# the word breaks of the shell.
 test_alias() {
-    local name="$1" definition="$2" expected="$3" actual
+    local shell="$1" name="$2" definition="$3" actual
+    local driver
 
-    actual="$(bash --noprofile --norc -c '
-        shopt -s expand_aliases
-        source "$1/drivers/bash-completion.sh"
-        source "$2"
-        alias "$3"
-        compopt() { :; }
-        COMP_WORDS=("${3%%=*}" demo : "") COMP_CWORD=3 COMP_LINE="${3%%=*} demo:" COMP_POINT=9 COMPREPLY=()
-        _sf_app
-        printf "%s\n" "${COMPREPLY[@]}"
-    ' _ "$dir" "$tmp/completion.bash" "$definition" 2> "$tmp/case.err" | normalize)"
+    case "$shell" in
+        bash) driver=(bash "$dir/drivers/bash.sh") ;;
+        zsh) driver=(zsh "$dir/drivers/zsh.zsh") ;;
+        fish) driver=(fish "$dir/drivers/fish.fish") ;;
+    esac
 
-    expected="$(printf '%s' "$expected" | tr ';' '\n' | normalize)"
+    actual="$("${driver[@]}" "$tmp/completion.$shell" "${definition%%=*} --ans" "$definition" 2> "$tmp/case.err" | normalize)"
 
-    if [ "$actual" = "$expected" ]; then
-        pass "[bash] completion through $name"
+    if [ "$actual" = '--ansi' ]; then
+        pass "[$shell] completion through $name"
     else
-        fail "[bash] completion through $name" "expected:" "$expected" "actual:" "${actual:-<none>}" "$(cat "$tmp/case.err")"
+        fail "[$shell] completion through $name" "expected:" "--ansi" "actual:" "${actual:-<none>}" "$(cat "$tmp/case.err")"
     fi
 }
 
@@ -172,11 +169,12 @@ for shell in $shells; do
         run_case "$shell" "${command_line//%app%/$dir/app}" "$expected"
     done < "$dir/cases.txt"
 
+    test_alias "$shell" 'an alias' 'sfa=app'
+    test_alias "$shell" 'an alias with arguments' 'sfb=app --no-ansi'
+
     if [ "$shell" = "bash" ]; then
         test_api_version
         test_missing_bash_completion
-        test_alias 'an alias' 'sfa=app' 'hello;other;special'
-        test_alias 'an alias with arguments' "sfb=app --no-ansi" 'hello;other;special'
     fi
 done
 

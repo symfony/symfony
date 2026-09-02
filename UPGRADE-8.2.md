@@ -113,6 +113,9 @@ Mailer
    new `DkimSignedMessageListener::PRIORITY`, `SmimeSignedMessageListener::PRIORITY` and
    `SmimeEncryptedMessageListener::PRIORITY` constants if you register listeners that must run around them.
 
+ * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
+   boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
+
 Messenger
 ---------
 
@@ -139,6 +142,8 @@ Notifier
 
  * Deprecate `NovuSubscriberRecipient::getOverrides()` and its `$overrides` constructor parameter, pass overrides to `NovuOptions` instead
  * Deprecate declaring `getAdminRecipients()` on a `NotifierInterface` implementation without implementing `AdminRecipientsProviderInterface`
+ * Deprecate reading a value that is not a boolean with `Dsn::getBooleanOption()`; it will throw in 9.0. The
+   boolean values it accepts are `1`/`0`, `true`/`false`, `on`/`off`, `yes`/`no` and the empty string, which reads as `false`
 
 Scheduler
 ---------

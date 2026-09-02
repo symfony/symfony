@@ -97,7 +97,7 @@ class OidcLoginFactory extends AbstractFactory
                 ->children()
                     ->booleanNode('required')
                         ->defaultTrue()
-                        ->info('When true (default), the ID token signature is verified against the provider JWKS. Setting it to false decodes the ID token without verifying it, which OIDC Core 1.0, Section 3.1.3.7, item 6 only allows because the token comes from the token endpoint over TLS: it is then only as safe as the TLS verification of the HTTP client used for that request, so never turn it off with a client configured with "verify_peer: false" or "verify_host: false", nor behind a TLS-terminating proxy.')
+                        ->info('When true (default), the ID token signature is verified against the provider JWKS. Setting it to false decodes the ID token without verifying it, which OIDC Core 1.0, Section 3.1.3.7, item 6 only allows because the token comes from the token endpoint over TLS: it is then only as safe as the TLS verification of the HTTP client used for that request, so never turn it off with a client configured with "verify_peer: false" or "verify_host: false", nor behind a TLS-terminating proxy. A public client ("token_endpoint_auth_method: none") cannot turn it off at all.')
                     ->end()
                     ->arrayNode('algorithms', 'algorithm')
                         ->beforeNormalization()->castToArray()->end()
@@ -132,6 +132,10 @@ class OidcLoginFactory extends AbstractFactory
             ->validate()
                 ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && null !== $v['client_secret'])
                 ->thenInvalid('The OIDC "client_secret" must not be set when "token_endpoint_auth_method" is "none", as a public client never sends it. Remove the secret, or authenticate with it by using "client_secret_post" or "client_secret_basic".')
+            ->end()
+            ->validate()
+                ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && !$v['id_token_signature']['required'])
+                ->thenInvalid('The OIDC "id_token_signature.required" option cannot be false when "token_endpoint_auth_method" is "none": without the signature check, only the TLS verification of the token request ties the ID token to the provider, which is too little for a public client that has nothing but PKCE protecting its code exchange. Keep the check enabled, or authenticate with "client_secret_post" or "client_secret_basic".')
             ->end()
         ;
     }

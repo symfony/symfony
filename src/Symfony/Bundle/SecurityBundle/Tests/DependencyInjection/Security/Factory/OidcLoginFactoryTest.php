@@ -572,6 +572,48 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame('client_secret_post', $finalizedConfig['token_endpoint_auth_method']);
     }
 
+    public function testRejectsTurningTheIdTokenSignatureVerificationOffForAPublicClient()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "id_token_signature.required" option cannot be false when "token_endpoint_auth_method" is "none"');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'token_endpoint_auth_method' => 'none',
+            'id_token_signature' => ['required' => false],
+        ], $factory);
+    }
+
+    public function testAConfidentialClientMayTurnTheIdTokenSignatureVerificationOff()
+    {
+        $factory = new OidcLoginFactory();
+
+        $finalizedConfig = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'id_token_signature' => ['required' => false],
+        ], $factory);
+
+        $this->assertFalse($finalizedConfig['id_token_signature']['required']);
+    }
+
+    public function testAPublicClientVerifiesTheIdTokenSignatureByDefault()
+    {
+        $factory = new OidcLoginFactory();
+
+        $finalizedConfig = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'token_endpoint_auth_method' => 'none',
+        ], $factory);
+
+        $this->assertTrue($finalizedConfig['id_token_signature']['required']);
+    }
+
     private function processConfig(array $config, OidcLoginFactory $factory): array
     {
         $nodeDefinition = new ArrayNodeDefinition('oidc-login');

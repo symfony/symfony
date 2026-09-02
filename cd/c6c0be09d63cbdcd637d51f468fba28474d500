@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-25T13:13:24Z
+
+Thank you @HypeMC. I reworked this a bit and pushed the result.
+
+`Worker::isStopping()` is not the right predicate. It returns `$shouldStop`, which is set by anything that calls `Worker::stop()`: `StopWorkerOnMessageLimitListener`, `OnTimeLimit`, `OnMemoryLimit`, `OnFailureLimit`, `OnCustomStopException`, `OnRestartSignal`, or a user listener. Once one of those has fired, the very *first* `SIGINT` force-quits, and the log says "Received signal 2 again" when no earlier signal existed:
+
+```
+messenger:consume --limit=1, a single kill -INT during post-stop work
+
+[1.027] Stopping worker. / Worker stopped due to maximum count of 1 messages processed
+[1.027] WorkerStoppedEvent listener START (no signal was sent yet)
+[3.939] Received signal 2 again, forcing exit.   -> exit 130
+```
+
+On 8.2 the same run is graceful and exits 0. This is not a corner case: `messenger:failed:retry` registers `StopWorkerOnMessageLimitListener(1)` per message, so its worker is always in the stopping state after each retried message. And with batch handlers or `--concurrency`, `flush(true)` after a limit-triggered stop keeps messages in flight for as long as they take, which is exactly the window where one Ctrl+C would now kill them.
+
+So the flag now tracks "a stop signal was received" on the command. `ConsumeMessagesCommand` gets a private `$shouldStop`, and `FailedMessagesRetryCommand` reuses the one it already had, which is written only in `handleSignal()`.
+
+That also means `Worker::isStopping()` is no longer needed, so I removed it along with its changelog line. All 8 of your tests still pass unchanged, plus one regression test per command. `Worker.php` is untouched and the PR adds no public API. I reworded the remaining changelog entry, since "while the worker is already stopping" described the behaviour we just fixed.
+
+Two things for the docs PR, both measured on real processes:
+
+Force quitting leaves the in-flight message neither acked nor rejected. Doctrine, Redis and MongoDB default `redeliver_timeout` to 3600s, so it is parked for up to an hour and its partial side effects are duplicated on redelivery. Under `--concurrency=N` this applies to up to N messages at once, not one: with `--concurrency=3` and two handlers running in separate child processes, both were killed and neither was settled. No child process is orphaned, they die with the parent.
+
+It cannot help a handler blocked inside a C call. PHP installs signal handlers with `SA_RESTART`, so with a handler blocked on a read both signals were ignored and the process needed `SIGKILL` after 25s. Worth one sentence so nobody expects otherwise.
+
+One question I could not answer: with `--concurrency`, is there anything you would want done to the worker pool before the parent exits, or is letting the children die with it the intended behaviour?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T15:07:54Z
+
+Thank you @HypeMC.
+
+Answering my own question: letting the children die is the intended behavior, and it turns out to be deterministic rather than incidental. amphp spawns pool workers with SIGINT ignored (only the parent ever sees Ctrl+C), and its destructors SIGKILL any still-running child when the parent exits, so nothing lingers, not even a child stuck in a blocking C call. Draining the pool instead would wait on the very handler being killed, and settling in-flight envelopes cannot be done soundly mid-handler: unsettled + `redeliver_timeout` is the transport contract for a crashed consumer, which a force quit is by request.

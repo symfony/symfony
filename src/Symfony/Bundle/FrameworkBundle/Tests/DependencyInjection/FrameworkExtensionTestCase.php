@@ -136,6 +136,7 @@ use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Component\Yaml\Schema\SchemaResolverInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -3986,6 +3987,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testYamlLintCommandUsesTheKernelConfigDir()
     {
+        if (!interface_exists(SchemaResolverInterface::class)) {
+            $this->markTestSkipped('The installed symfony/yaml has no JSON schema support.');
+        }
+
         $container = $this->createContainerFromFile('default_config', ['.kernel.config_dir' => '/project/config']);
 
         $resolver = $container->getDefinition('console.command.yaml_lint')->getArgument(0);
@@ -3995,6 +4000,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testYamlLintCommandWithoutKernelConfigDir()
     {
+        if (!interface_exists(SchemaResolverInterface::class)) {
+            $this->markTestSkipped('The installed symfony/yaml has no JSON schema support.');
+        }
+
         $container = $this->createContainerFromFile('default_config');
 
         $resolver = $container->getDefinition('console.command.yaml_lint')->getArgument(0);

@@ -145,6 +145,54 @@ test_alias() {
     fi
 }
 
+# The command may be reached through a path starting with a tilde. Only zsh expands
+# it: the bash script looks the command up without expanding the tilde.
+test_tilde_path() {
+    local home="$tmp/home" actual
+
+    mkdir -p "$home/bin"
+    ln -sf "$dir/app" "$home/bin/app"
+
+    actual="$(HOME="$home" zsh "$dir/drivers/zsh.zsh" "$tmp/completion.zsh" '~/bin/app --ans' 2> "$tmp/case.err" | normalize)"
+
+    if [ "$actual" = '--ansi' ]; then
+        pass "[zsh] completion through a tilde path"
+    else
+        fail "[zsh] completion through a tilde path" "expected:" "--ansi" "actual:" "${actual:-<none>}" "$(cat "$tmp/case.err")"
+    fi
+}
+
+# The completion must not run the code the user is typing. The payload is put in a
+# word the cursor is not on: zsh expands the word being completed on its own, for
+# every command, so that one says nothing about the completion script.
+test_no_command_execution() {
+    local shell="$1" driver payload name
+    local marker="$tmp/pwned"
+
+    case "$shell" in
+        bash) driver=(bash "$dir/drivers/bash.sh") ;;
+        zsh) driver=(zsh "$dir/drivers/zsh.zsh") ;;
+        fish) driver=(fish "$dir/drivers/fish.fish") ;;
+    esac
+
+    # a payload must not contain a space: the zsh script re-splits the words, which
+    # breaks it apart and neutralises it by accident, turning the case into a no-op
+    for payload in "\$(>$marker)" "\`>$marker\`"; do
+        name="[$shell] a command substitution on the line is not executed: $payload"
+        rm -f "$marker"
+
+        "${driver[@]}" "$tmp/completion.$shell" "app demo:hello $payload --format=" > /dev/null 2>&1
+
+        if [ -e "$marker" ]; then
+            fail "$name" "the completion executed the command substitution"
+        else
+            pass "$name"
+        fi
+    done
+
+    rm -f "$marker"
+}
+
 for shell in $shells; do
     if ! command -v "$shell" > /dev/null; then
         skipped=$((skipped + 1))
@@ -171,10 +219,15 @@ for shell in $shells; do
 
     test_alias "$shell" 'an alias' 'sfa=app'
     test_alias "$shell" 'an alias with arguments' 'sfb=app --no-ansi'
+    test_no_command_execution "$shell"
 
     if [ "$shell" = "bash" ]; then
         test_api_version
         test_missing_bash_completion
+    fi
+
+    if [ "$shell" = "zsh" ]; then
+        test_tilde_path
     fi
 done
 

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:07:16Z
+
+Thanks for the follow-up!
+
+Removing `FormTypePasswordHasherExtension` and the `registerPassword()`/`hashPasswords()` methods would be a BC break, so I amended the PR to deprecate them instead; they can be removed in 9.0.
+
+While reviewing, I noticed that `POST_VALIDATE` is dispatched by the validator extension only. In a form setup without it (standalone usage, or the framework without symfony/validator installed), this change made passwords silently not hashed anymore. To keep an upgrade path for such setups, the deprecated `FormTypePasswordHasherExtension` now registers the legacy listeners itself, so wiring it manually restores the previous behavior. This is covered by a new legacy test and documented in UPGRADE-8.2.md.
+
+I also added the changelog entry and removed the now-stale `removeDefinition()` call in `SecurityExtension`.

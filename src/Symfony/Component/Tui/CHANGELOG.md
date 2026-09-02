@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `CollapsibleWidget` for collapsible detail/summary panels
+ * Add `AbstractWidget::off()` to remove listeners registered with `AbstractWidget::on()`
  * Add `AnsiUtils::walkCells()` to iterate the cells and escape sequences of a rendered line
  * Add `AnsiUtils::sliceToWidth()` to extract a fixed-width range of columns from a line
  * Add `AbstractWidget::postRender()` to post-process a widget's finished lines, chrome included

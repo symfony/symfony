@@ -229,8 +229,11 @@ abstract class AbstractWidget
             $context->getFocusManager()->remove($this);
         }
 
-        $this->listeners = [];
-
+        // The listeners stay. They live on this widget and are dispatched
+        // from it, so there is nothing registered elsewhere to unwind, and
+        // dropping them silently unhooks the callbacks a caller registered
+        // on a widget it still holds and may add back. Releasing one is the
+        // caller's call to make, through off().
         $this->onDetach();
         $this->parent = null;
         $this->context = null;
@@ -286,7 +289,9 @@ abstract class AbstractWidget
      * Register a listener for a specific event type on this widget.
      *
      * The listener is only called when this specific widget dispatches the event.
-     * Listeners are stored locally on the widget and automatically cleared on detach.
+     * Listeners are stored locally on the widget and live as long as it does:
+     * taking the widget out of the tree and adding it back keeps them. Use
+     * {@see off()} to release one.
      *
      * @param class-string<AbstractEvent> $eventClass The event class to listen for
      * @param callable                    $listener   The listener to invoke
@@ -296,6 +301,44 @@ abstract class AbstractWidget
     final public function on(string $eventClass, callable $listener): static
     {
         $this->listeners[$eventClass][] = $listener;
+
+        return $this;
+    }
+
+    /**
+     * Remove listeners registered on this widget for a specific event type.
+     *
+     * Passing a listener removes every registration of it, comparing by
+     * identity: the callable has to be the one that was passed to {@see on()},
+     * which for an inline closure means the same instance. First-class
+     * callables of the same method on the same object do match. Passing no
+     * listener removes every listener the widget holds for the event class.
+     *
+     * @param class-string<AbstractEvent> $eventClass The event class to stop listening for
+     * @param callable|null               $listener   The listener to remove, or null for all of them
+     *
+     * @return $this
+     */
+    final public function off(string $eventClass, ?callable $listener = null): static
+    {
+        if (null === $listener) {
+            unset($this->listeners[$eventClass]);
+
+            return $this;
+        }
+
+        $remaining = [];
+        foreach ($this->listeners[$eventClass] ?? [] as $registered) {
+            if ($registered !== $listener && !($listener instanceof \Closure && $registered == $listener)) {
+                $remaining[] = $registered;
+            }
+        }
+
+        if ($remaining) {
+            $this->listeners[$eventClass] = $remaining;
+        } else {
+            unset($this->listeners[$eventClass]);
+        }
 
         return $this;
     }

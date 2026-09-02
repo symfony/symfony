@@ -17,7 +17,10 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\MailerSend\Transport\MailerSendApiTransport;
+use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -195,7 +198,7 @@ class MailerSendApiTransportTest extends TestCase
     {
         $transport = new MailerSendApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
-        $envelope = new \Symfony\Component\Mailer\Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $enabledEmail = (new Email())->from('from@example.com')->to('to@example.com');
         $enabledEmail->getHeaders()->add(new TrackingHeader(opens: true, clicks: true));
@@ -214,7 +217,7 @@ class MailerSendApiTransportTest extends TestCase
     {
         $transport = new MailerSendApiTransport('ACCESS_KEY');
         $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
-        $envelope = new \Symfony\Component\Mailer\Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
 
         $email = (new Email())->from('from@example.com')->to('to@example.com');
         $email->getHeaders()->add(new TrackingHeader(clicks: false));
@@ -222,5 +225,47 @@ class MailerSendApiTransportTest extends TestCase
 
         $this->assertArrayNotHasKey('track_opens', $payload['settings']);
         $this->assertFalse($payload['settings']['track_clicks']);
+    }
+
+    public function testTagHeaders()
+    {
+        $email = new Email();
+        $email->getHeaders()->add(new TagHeader('tag1'));
+        $email->getHeaders()->add(new TagHeader('tag2'));
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $transport = new MailerSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame(['tag1', 'tag2'], $payload['tags']);
+    }
+
+    public function testPayloadHasNoTagsWithoutTagHeader()
+    {
+        $email = new Email();
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $transport = new MailerSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayNotHasKey('tags', $payload);
+    }
+
+    public function testTagHeadersThrowsForTooManyTags()
+    {
+        $email = new Email();
+        for ($i = 0; $i < 6; ++$i) {
+            $email->getHeaders()->add(new TagHeader('tag'.$i));
+        }
+        $envelope = new Envelope(new Address('from@example.com'), [new Address('to@example.com')]);
+
+        $transport = new MailerSendApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailerSendApiTransport::class, 'getPayload');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Too many "Symfony\Component\Mailer\Header\TagHeader" instances present in the email headers. MailerSend does not accept more than 5 tags on an email.');
+        $method->invoke($transport, $email, $envelope);
     }
 }

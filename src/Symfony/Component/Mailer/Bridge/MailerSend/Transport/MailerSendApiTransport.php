@@ -16,6 +16,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\JsonException;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
@@ -126,6 +128,21 @@ final class MailerSendApiTransport extends AbstractApiTransport
             if (null !== $tracking->getClicks()) {
                 $payload['settings']['track_clicks'] = $tracking->getClicks();
             }
+        }
+
+        $tags = [];
+        foreach ($email->getHeaders()->all() as $header) {
+            if ($header instanceof TagHeader) {
+                if (5 === \count($tags)) {
+                    throw new TransportException(\sprintf('Too many "%s" instances present in the email headers. MailerSend does not accept more than 5 tags on an email.', TagHeader::class));
+                }
+
+                $tags[] = $header->getValue();
+            }
+        }
+
+        if ($tags) {
+            $payload['tags'] = $tags;
         }
 
         return $payload;

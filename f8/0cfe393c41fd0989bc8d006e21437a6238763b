@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T11:28:55Z
+
+I reviewed this and amended one thing into your commit while rebasing on current 8.2: a functional test that imports the loader the way the recipe will, through `resource: security.authenticator.oidc_login.route_loader` / `type: service`, in an application without any `oidc_login` firewall. On the current code that path fails with a `LoaderLoadException` because the route-loader service locator does not know the service, which is the exact production failure this PR prevents; your extension-level test could not catch it. A second case checks the route still appears when a firewall configures a callback path.
+
+The move itself is exactly symmetric with `security.route_loader.logout` (same registration spot, same removal branch when routing is absent, same tag and visibility), so this is good to go. The recipe PR can follow once this is merged.

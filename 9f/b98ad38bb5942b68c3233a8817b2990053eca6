@@ -1,0 +1,59 @@
+---------------------------------------------------------------------------
+
+by maxbaldanza at 2026-03-11T06:28:57Z
+
+Just seen that there's a similar PR [here](https://github.com/symfony/symfony/pull/63422) (sorry I should have checked first). The difference is I made it configurable and added it to the existing stamp whereas there we return `all` and add it to a new stamp. Not sure which version Symfony maintainers prefer.
+Feel free to close this one
+
+---------------------------------------------------------------------------
+
+by maxbaldanza at 2026-04-10T13:17:56Z
+
+> Just seen that there's a similar PR [here](https://github.com/symfony/symfony/pull/63422) (sorry I should have checked first). The difference is I made it configurable and added it to the existing stamp whereas there we return `all` and add it to a new stamp. Not sure which version Symfony maintainers prefer. Feel free to close this one
+
+@nicolas-grekas shall I close this MR in favour of https://github.com/symfony/symfony/pull/63422? Which route do you prefer?
+
+---------------------------------------------------------------------------
+
+by maxbaldanza at 2026-06-09T20:30:26Z
+
+@nicolas-grekas / @fabpot it would be great to get your feedback please 🙏  I've just rebased and targeted 8.2 instead of 8.1.
+
+---------------------------------------------------------------------------
+
+by maxbaldanza at 2026-07-23T07:32:42Z
+
+Any feedback please? 🙏
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-13T16:28:59Z
+
+Thanks for this, @maxbaldanza, and thanks for your patience. You flagged the overlap with #63422 yourself and rebased onto 8.2 unprompted, both appreciated.
+
+The feature is worth having and the shape is right. The bridge already writes system attributes on the send side, it sets `AWSTraceHeader`, but had no way to read any back, so this closes an asymmetry rather than adding a new concept. The three calls you made are the ones I would have made:
+
+ * extending `AmazonSqsReceivedStamp` instead of adding a second stamp, as #63422 did. It is already the "this came from SQS" carrier, and the new constructor argument is optional and trailing, so subclasses calling `parent::__construct($id)` are unaffected.
+ * passing the raw AWS keys through. Normalising them would invent a second vocabulary for a class that is AWS-specific by name.
+ * only adding `MessageSystemAttributeNames` to the request when the option is non-empty, so nothing changes for anyone who does not opt in.
+
+Two things before this can go in:
+
+ * The values are not validated. The connection carefully rejects unknown option *names*, `Unknown option found: [...]. Allowed options are [...]`, but any string can go into `message_system_attribute_names` and the user finds out from an opaque AWS error at receive time. Please check them against `MessageSystemAttributeName` in `fromDsn()` and fail there.
+ * I am not convinced by the `[]` default. Requesting attributes is the same API call with a marginally larger response, there is no per-attribute charge, so asking for the useful ones by default costs close to nothing, while `[]` means `getSystemAttributes()` is empty for everyone who never discovers the option. The enum also offers `All`. Keep the option for people who want to trim the list, but consider a non-empty default.
+
+One connection worth knowing about: #64569 proposes synthesising a `RedeliveryStamp` from broker-side redelivery counts. That is complementary rather than competing, and `ApproximateReceiveCount` is exactly what it would need on the SQS side. Whatever we decide there, this stays the lower-level primitive.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T09:13:24Z
+
+I reworked this while preparing it for merge, in a simpler direction than my earlier comments asked for.
+
+The `message_system_attribute_names` option is gone: the transport now always requests `All` system attributes and fills the stamp. Requesting them is the same API call with a marginally larger response, so there is nothing to save by trimming the list. This also dissolves both points from my last review: there is no user-provided list to validate anymore, and no empty default that would hide the feature.
+
+Always sending `MessageSystemAttributeNames` requires async-aws/sqs 2.1, where that request parameter was added, so the constraint is bumped from `^1.0|^2.0` to `^2.1`. SQS-compatible test servers that predate the parameter ignore it and return no attributes, so nothing breaks there; `getSystemAttributes()` just returns an empty array.
+
+I also rebased on current 8.2, resolved the conflicts with the recent `ssl` option and FIFO deduplication changes, and updated the changelog entry to name the new method.
+
+@maxbaldanza the result keeps your stamp extension and tests, with your authorship. Thank you for the feature and for your patience.

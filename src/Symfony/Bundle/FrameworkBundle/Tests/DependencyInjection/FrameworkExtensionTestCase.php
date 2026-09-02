@@ -2392,6 +2392,36 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('memcached://localhost', $connection->getArgument(0));
     }
 
+    public function testCacheDefaultMongodbProvider()
+    {
+        $container = $this->createContainerFromFile('cache_mongodb');
+
+        foreach (['cache.adapter.mongodb', 'cache.adapter.mongodb_tag_aware'] as $id) {
+            $this->assertTrue($container->hasDefinition($id), \sprintf('"%s" should be a service, not an alias.', $id));
+            $this->assertSame('cache.default_mongodb_provider', $container->getDefinition($id)->getTag('cache.pool')[0]['provider']);
+        }
+
+        $dsn = 'mongodb://localhost:27017/db?collection_name=cache';
+        $providerId = '.cache_connection.'.ContainerBuilder::hash($dsn);
+
+        $this->assertTrue($container->hasDefinition($providerId));
+
+        $connection = $container->getDefinition($providerId);
+        $this->assertSame([AbstractAdapter::class, 'createConnection'], $connection->getFactory());
+        $this->assertSame($dsn, $connection->getArgument(0));
+    }
+
+    public function testCacheMongodbPoolDeducesTheAdapterFromTheDsn()
+    {
+        $container = $this->createContainerFromFile('cache_mongodb');
+
+        $pool = $container->getDefinition('my_mongodb_pool');
+        $this->assertSame([AbstractAdapter::class, 'createAdapter'], $pool->getFactory());
+
+        $connection = $container->getDefinition((string) $pool->getArgument(0));
+        $this->assertSame('mongodb://localhost:27017/db?collection_name=pool', $connection->getArgument(0));
+    }
+
     public function testCacheDefaultValkeyProvider()
     {
         $container = $this->createContainerFromFile('cache');

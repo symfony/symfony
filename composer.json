@@ -137,7 +137,7 @@
         "async-aws/ses": "^1.0",
         "async-aws/sqs": "^1.0|^2.0",
         "async-aws/sns": "^1.0",
-        "cache/integration-tests": "^1.0.3",
+        "cache/integration-tests": "^1.0.5",
         "doctrine/collections": "^1.8|^2.0",
         "doctrine/data-fixtures": "^1.1|^2",
         "doctrine/dbal": "^4.3",

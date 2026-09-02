@@ -19,6 +19,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Symfony\Component\Cache\Adapter\MongoDbAdapter;
+use Symfony\Component\Cache\Adapter\MongoDbTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\PdoAdapter;
 use Symfony\Component\Cache\Adapter\PdoTagAwareAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
@@ -242,6 +244,40 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', [
                 'provider' => 'cache.default_pdo_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
+
+        ->set('cache.adapter.mongodb', MongoDbAdapter::class)
+            ->abstract()
+            ->args([
+                abstract_arg('MongoDB connection service'),
+                '', // namespace
+                0, // default lifetime
+                [], // options
+                service('cache.default_marshaller')->ignoreOnInvalid(),
+            ])
+            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_mongodb_provider',
+                'clearer' => 'cache.default_clearer',
+                'reset' => 'reset',
+            ])
+            ->tag('monolog.logger', ['channel' => 'cache'])
+
+        ->set('cache.adapter.mongodb_tag_aware', MongoDbTagAwareAdapter::class)
+            ->abstract()
+            ->args([
+                abstract_arg('MongoDB connection service'),
+                '', // namespace
+                0, // default lifetime
+                [], // options
+                service('cache.default_marshaller')->ignoreOnInvalid(),
+            ])
+            ->call('setLogger', [service('logger')->ignoreOnInvalid()])
+            ->tag('cache.pool', [
+                'provider' => 'cache.default_mongodb_provider',
                 'clearer' => 'cache.default_clearer',
                 'reset' => 'reset',
             ])

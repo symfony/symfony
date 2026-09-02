@@ -321,7 +321,12 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * Directories passed as argument must be relative to the ones defined with the `in()` method. For example:
      *
-     *     $finder->in(__DIR__)->exclude('ruby');
+     *     $finder->in(__DIR__)->exclude('ruby'); // excludes every directory named "ruby" at any depth
+     *
+     * By prefixing a directory with `/`, the exclusion applies only at the root of the search path:
+     *
+     *     $finder->in(__DIR__)->exclude('/ruby');    // excludes only __DIR__/ruby
+     *     $finder->in(__DIR__)->exclude('/foo/bar'); // excludes only __DIR__/foo/bar
      *
      * @param string|array $dirs A directory path or an array of directories
      *

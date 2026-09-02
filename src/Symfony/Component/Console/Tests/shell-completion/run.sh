@@ -123,6 +123,28 @@ test_missing_bash_completion() {
     esac
 }
 
+# The command may be reached through an alias, which can carry arguments. The
+# completion is requested on "--ans" so that the expectation does not depend on
+# the word breaks of the shell.
+test_alias() {
+    local shell="$1" name="$2" definition="$3" actual
+    local driver
+
+    case "$shell" in
+        bash) driver=(bash "$dir/drivers/bash.sh") ;;
+        zsh) driver=(zsh "$dir/drivers/zsh.zsh") ;;
+        fish) driver=(fish "$dir/drivers/fish.fish") ;;
+    esac
+
+    actual="$("${driver[@]}" "$tmp/completion.$shell" "${definition%%=*} --ans" "$definition" 2> "$tmp/case.err" | normalize)"
+
+    if [ "$actual" = '--ansi' ]; then
+        pass "[$shell] completion through $name"
+    else
+        fail "[$shell] completion through $name" "expected:" "--ansi" "actual:" "${actual:-<none>}" "$(cat "$tmp/case.err")"
+    fi
+}
+
 for shell in $shells; do
     if ! command -v "$shell" > /dev/null; then
         skipped=$((skipped + 1))
@@ -146,6 +168,9 @@ for shell in $shells; do
 
         run_case "$shell" "${command_line//%app%/$dir/app}" "$expected"
     done < "$dir/cases.txt"
+
+    test_alias "$shell" 'an alias' 'sfa=app'
+    test_alias "$shell" 'an alias with arguments' 'sfb=app --no-ansi'
 
     if [ "$shell" = "bash" ]; then
         test_api_version

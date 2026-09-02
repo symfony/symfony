@@ -55,7 +55,10 @@ class MonotonicClockTest extends TestCase
         usleep(10);
         $after = microtime(true);
 
-        $this->assertGreaterThanOrEqual($before + 1.499999, $now);
+        // $now is truncated to the microsecond by format('U.u') while $before is not,
+        // and a double holds barely more precision than that at current timestamps,
+        // so the bound has to sit a little further below the 1.5s that was slept
+        $this->assertGreaterThanOrEqual($before + 1.4999, $now);
         $this->assertLessThan($after, $now);
         $this->assertLessThan(1.9, $now - $before);
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());

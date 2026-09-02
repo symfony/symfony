@@ -13,13 +13,14 @@
 # candidates instead of displaying them. This keeps the test deterministic while
 # still running the real completion script.
 #
-# Usage: zsh.zsh <completion script> <command line>
+# Usage: zsh.zsh <completion script> <command line> [<alias definition>]
 
 emulate -L zsh
 setopt no_nomatch
 
 local completion_script="$1"
 local command_line="$2"
+local alias_definition="$3"
 local separator=$'\1'
 
 local -a words
@@ -61,4 +62,11 @@ compdef() { :; }
 
 source "$completion_script"
 
-"_sf_${${words[1]}:t}"
+# the function is named after the command the script was dumped for
+local completion_function="$(grep -o '^_sf_[A-Za-z0-9_]*' $completion_script | head -n1)"
+
+if [ -n "$alias_definition" ]; then
+    alias "$alias_definition"
+fi
+
+"$completion_function"

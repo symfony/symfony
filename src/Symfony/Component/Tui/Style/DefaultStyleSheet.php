@@ -12,6 +12,7 @@
 namespace Symfony\Component\Tui\Style;
 
 use Symfony\Component\Tui\Widget\CancellableLoaderWidget;
+use Symfony\Component\Tui\Widget\CollapsibleWidget;
 use Symfony\Component\Tui\Widget\EditorWidget;
 use Symfony\Component\Tui\Widget\InputWidget;
 use Symfony\Component\Tui\Widget\KeyBindingWidget;
@@ -61,6 +62,11 @@ final class DefaultStyleSheet
 
             // CancellableLoaderWidget
             CancellableLoaderWidget::class.':focus' => new Style()->withBold(),
+
+            // CollapsibleWidget
+            CollapsibleWidget::class.'::symbol:focus' => new Style()->withReverse(),
+            CollapsibleWidget::class.'::summary:focus' => new Style()->withReverse(),
+            CollapsibleWidget::class.'::description' => new Style()->withColor('gray'),
 
             // LoaderWidget
             LoaderWidget::class.'::spinner' => new Style()->withColor('cyan'),

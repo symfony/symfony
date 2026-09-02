@@ -18,9 +18,11 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -135,6 +137,55 @@ class MailtrapApiTransportTest extends TestCase
             ->text('Hello There!');
 
         $transport->send($mail);
+    }
+
+    public function testRemoteTemplate()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->template('813e39e9-49b6-4560-a5d9-b7ffb0a5486f', ['firstName' => 'Fabien']);
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new MailtrapApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailtrapApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('813e39e9-49b6-4560-a5d9-b7ffb0a5486f', $payload['template_uuid']);
+        $this->assertSame(['firstName' => 'Fabien'], $payload['template_variables']);
+        $this->assertArrayNotHasKey('subject', $payload);
+        $this->assertArrayNotHasKey('text', $payload);
+        $this->assertArrayNotHasKey('html', $payload);
+    }
+
+    public function testRemoteTemplateRejectsSubject()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->subject('Hello!')
+            ->template('813e39e9-49b6-4560-a5d9-b7ffb0a5486f');
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new MailtrapApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailtrapApiTransport::class, 'getPayload');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Mailtrap does not support overriding the subject of a template; define the subject in the template itself.');
+
+        $method->invoke($transport, $email, $envelope);
+    }
+
+    public function testRemoteTemplateRejectsCategory()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->template('813e39e9-49b6-4560-a5d9-b7ffb0a5486f');
+        $email->getHeaders()->add(new TagHeader('some-category'));
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new MailtrapApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(MailtrapApiTransport::class, 'getPayload');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Mailtrap does not allow a category when using a template; define the category in the template itself.');
+
+        $method->invoke($transport, $email, $envelope);
     }
 
     public function testSendThrowsForErrorResponse()

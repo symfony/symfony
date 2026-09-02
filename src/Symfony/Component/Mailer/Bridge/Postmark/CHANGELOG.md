@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `RemoteTemplateEmail` to `PostmarkApiTransport`
+
 6.3
 ---
 

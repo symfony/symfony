@@ -19,8 +19,10 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -30,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @see https://developers.mailersend.com/api/v1/email.html
  */
-final class MailerSendApiTransport extends AbstractApiTransport
+final class MailerSendApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     public function __construct(
         #[\SensitiveParameter] private string $key,
@@ -87,15 +89,25 @@ final class MailerSendApiTransport extends AbstractApiTransport
     private function getPayload(Email $email, Envelope $envelope): array
     {
         $sender = $envelope->getSender();
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+        $recipients = $this->getRecipients($email, $envelope);
 
         $payload = [
             'from' => array_filter([
                 'email' => $sender->getAddress(),
                 'name' => $sender->getName(),
             ]),
-            'to' => $this->prepareAddresses($this->getRecipients($email, $envelope)),
-            'subject' => $email->getSubject(),
+            'to' => $this->prepareAddresses($recipients),
         ];
+        if (null === $template || null !== $email->getSubject()) {
+            $payload['subject'] = $email->getSubject();
+        }
+        if (null !== $template) {
+            $payload['template_id'] = $template->getReference();
+            if ($variables = $template->getVariables()) {
+                $payload['personalization'] = array_map(static fn ($recipient) => ['email' => $recipient->getAddress(), 'data' => $variables], $recipients);
+            }
+        }
 
         if ($attachments = $this->prepareAttachments($email)) {
             $payload['attachments'] = $attachments;

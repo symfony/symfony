@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `RemoteTemplateEmail` to `MailgunApiTransport`
+ * Deprecate the "template" email header, use a `RemoteTemplateEmail` instead
+
 6.1
 ---
 

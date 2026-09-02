@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
@@ -130,6 +131,53 @@ class MandrillApiTransportTest extends TestCase
         $message = $transport->send($mail);
 
         $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testSendRemoteTemplate()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://mandrillapp.com/api/1.0/messages/send-template.json', $url);
+
+            $body = json_decode($options['body'], true);
+            $this->assertSame('welcome', $body['template_name']);
+            $this->assertSame([], $body['template_content']);
+            $this->assertSame([['name' => 'firstName', 'content' => 'Fabien']], $body['message']['global_merge_vars']);
+            $this->assertArrayNotHasKey('subject', $body['message']);
+            $this->assertNull($body['message']['html']);
+            $this->assertNull($body['message']['text']);
+
+            return new JsonMockResponse([['_id' => 'foobar']], [
+                'http_code' => 200,
+            ]);
+        });
+
+        $transport = new MandrillApiTransport('KEY', $client);
+
+        $mail = (new RemoteTemplateEmail())
+            ->to(new Address('saif.gmati@symfony.com', 'Saif Eddin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->template('welcome', ['firstName' => 'Fabien']);
+
+        $message = $transport->send($mail);
+
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testRemoteTemplateWithSubject()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->subject('Hello!')
+            ->template('welcome');
+        $envelope = new Envelope(new Address('fabpot@symfony.com', 'Fabien'), [new Address('saif.gmati@symfony.com', 'Saif Eddin')]);
+
+        $transport = new MandrillApiTransport('KEY');
+        $method = new \ReflectionMethod(MandrillApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('welcome', $payload['template_name']);
+        $this->assertSame('Hello!', $payload['message']['subject']);
+        $this->assertArrayNotHasKey('global_merge_vars', $payload['message']);
     }
 
     public function testSendThrowsForErrorResponse()

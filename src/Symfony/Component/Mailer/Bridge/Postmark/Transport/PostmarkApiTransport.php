@@ -16,12 +16,15 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Bridge\Postmark\Event\PostmarkDeliveryEvent;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -31,7 +34,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class PostmarkApiTransport extends AbstractApiTransport
+class PostmarkApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     private const HOST = 'api.postmarkapp.com';
     private const CODE_INACTIVE_RECIPIENT = 406;
@@ -64,7 +67,8 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/email', [
+        $endpoint = $email instanceof RemoteTemplateEmail && null !== $email->getRemoteTemplate() ? '/email/withTemplate' : '/email';
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().$endpoint, [
             'headers' => [
                 'Accept' => 'application/json',
                 'X-Postmark-Server-Token' => $this->key,
@@ -102,17 +106,33 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+
         $payload = [
             'From' => $envelope->getSender()->toString(),
             'To' => implode(',', $this->stringifyAddresses($this->getRecipients($email, $envelope))),
             'Cc' => implode(',', $this->stringifyAddresses($email->getCc())),
             'Bcc' => implode(',', $this->stringifyAddresses($email->getBcc())),
             'ReplyTo' => implode(',', $this->stringifyAddresses($email->getReplyTo())),
-            'Subject' => $email->getSubject(),
-            'TextBody' => $email->getTextBody(),
-            'HtmlBody' => $email->getHtmlBody(),
-            'Attachments' => $this->getAttachments($email),
         ];
+
+        if (null === $template) {
+            $payload['Subject'] = $email->getSubject();
+            $payload['TextBody'] = $email->getTextBody();
+            $payload['HtmlBody'] = $email->getHtmlBody();
+        } else {
+            if (null !== $email->getSubject()) {
+                throw new InvalidArgumentException('Postmark does not support overriding the subject of a template; define the subject in the template itself.');
+            }
+            if (ctype_digit($template->getReference())) {
+                $payload['TemplateId'] = (int) $template->getReference();
+            } else {
+                $payload['TemplateAlias'] = $template->getReference();
+            }
+            $payload['TemplateModel'] = $template->getVariables() ?: new \stdClass();
+        }
+
+        $payload['Attachments'] = $this->getAttachments($email);
 
         if ($tracking = TrackingHeader::fromHeaders($email->getHeaders())) {
             if (null !== $tracking->getOpens()) {

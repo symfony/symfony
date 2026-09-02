@@ -18,8 +18,10 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Header\MetadataHeader;
 use Symfony\Component\Mailer\Header\TagHeader;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
+use Symfony\Component\Mailer\Transport\RemoteTemplateTransportInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -29,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 /**
  * @author Kevin Verschaeve
  */
-class MandrillApiTransport extends AbstractApiTransport
+class MandrillApiTransport extends AbstractApiTransport implements RemoteTemplateTransportInterface
 {
     private const HOST = 'mandrillapp.com';
 
@@ -49,7 +51,8 @@ class MandrillApiTransport extends AbstractApiTransport
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/send.json', [
+        $endpoint = $email instanceof RemoteTemplateEmail && null !== $email->getRemoteTemplate() ? 'send-template' : 'send';
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/1.0/messages/'.$endpoint.'.json', [
             'json' => $this->getPayload($email, $envelope),
         ]);
 
@@ -83,16 +86,28 @@ class MandrillApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
+        $template = $email instanceof RemoteTemplateEmail ? $email->getRemoteTemplate() : null;
+
         $payload = [
             'key' => $this->key,
             'message' => [
                 'html' => $email->getHtmlBody(),
                 'text' => $email->getTextBody(),
-                'subject' => $email->getSubject(),
-                'from_email' => $envelope->getSender()->getAddress(),
-                'to' => $this->getRecipientsPayload($email, $envelope),
             ],
         ];
+        if (null === $template || null !== $email->getSubject()) {
+            $payload['message']['subject'] = $email->getSubject();
+        }
+        $payload['message']['from_email'] = $envelope->getSender()->getAddress();
+        $payload['message']['to'] = $this->getRecipientsPayload($email, $envelope);
+
+        if (null !== $template) {
+            $payload['template_name'] = $template->getReference();
+            $payload['template_content'] = [];
+            foreach ($template->getVariables() as $name => $content) {
+                $payload['message']['global_merge_vars'][] = ['name' => $name, 'content' => $content];
+            }
+        }
 
         if ($email->getHeaders()->get('X-MC-Subaccount')) {
             $payload['message']['subaccount'] = $email->getHeaders()->get('X-MC-Subaccount')->getBodyAsString();

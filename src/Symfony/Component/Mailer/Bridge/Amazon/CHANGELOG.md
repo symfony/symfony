@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add support for `RemoteTemplateEmail` to `SesApiAsyncAwsTransport`
+
 8.1
 ---
 

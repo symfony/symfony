@@ -12,13 +12,18 @@
 namespace Symfony\Component\Mailer\Bridge\Mailjet\Tests\Transport;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetApiTransport;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Header\TrackingHeader;
+use Symfony\Component\Mailer\RemoteTemplateEmail;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
@@ -26,6 +31,8 @@ use Symfony\Component\Mime\Part\DataPart;
 
 class MailjetApiTransportTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     protected const USER = 'u$er';
     protected const PASSWORD = 'pa$s';
 
@@ -302,6 +309,73 @@ class MailjetApiTransportTest extends TestCase
         $method->invoke($transport, $email, $envelope);
     }
 
+    public function testRemoteTemplate()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->template('12345', ['firstName' => 'Fabien']);
+        $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [new Address('bar@example.com', 'Bar')]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $message = $method->invoke($transport, $email, $envelope)['Messages'][0];
+
+        $this->assertSame(12345, $message['TemplateID']);
+        $this->assertTrue($message['TemplateLanguage']);
+        $this->assertSame(['firstName' => 'Fabien'], $message['Variables']);
+        $this->assertArrayNotHasKey('Subject', $message);
+        $this->assertArrayNotHasKey('TextPart', $message);
+        $this->assertArrayNotHasKey('HTMLPart', $message);
+    }
+
+    public function testRemoteTemplateWithSubject()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->subject('Hello!')
+            ->template('12345');
+        $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [new Address('bar@example.com', 'Bar')]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $message = $method->invoke($transport, $email, $envelope)['Messages'][0];
+
+        $this->assertSame('Hello!', $message['Subject']);
+        $this->assertSame(12345, $message['TemplateID']);
+    }
+
+    public function testRemoteTemplateWithNonNumericReference()
+    {
+        $email = (new RemoteTemplateEmail())
+            ->template('welcome');
+        $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [new Address('bar@example.com', 'Bar')]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The Mailjet API expects a numeric template id, "welcome" given.');
+
+        $method->invoke($transport, $email, $envelope);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
+    public function testDeprecatedTemplateIdHeader()
+    {
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/mailjet-mailer 8.2: Using the "X-MJ-TemplateID" email header to select a Mailjet template is deprecated, use a "%s" instead.', RemoteTemplateEmail::class));
+
+        $email = (new Email())->subject('Hello!');
+        $email->getHeaders()->addTextHeader('X-MJ-TemplateID', '12345');
+        $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [new Address('bar@example.com', 'Bar')]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $message = $method->invoke($transport, $email, $envelope)['Messages'][0];
+
+        $this->assertSame(12345, $message['TemplateID']);
+    }
+
+    #[IgnoreDeprecations]
+    #[Group('legacy')]
     public function testHeaderToMessage()
     {
         $email = (new Email())

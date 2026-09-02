@@ -44,6 +44,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class SecurityExtensionTest extends TestCase
@@ -1507,6 +1508,29 @@ class SecurityExtensionTest extends TestCase
 
         $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
         $this->assertSame('security.user.provider.concrete.oidc', (string) $authenticator->getArgument(1));
+    }
+
+    public function testOidcLoginSupportsAPublicClient()
+    {
+        $container = $this->getRawContainer();
+        $container->loadFromExtension('security', [
+            'providers' => ['oidc' => ['oidc' => null]],
+            'firewalls' => [
+                'main' => [
+                    'oidc_login' => [
+                        'provider_uri' => 'https://provider.example.com',
+                        'client_id' => 'my-client-id',
+                        'token_endpoint_auth_method' => 'none',
+                    ],
+                ],
+            ],
+        ]);
+
+        $container->compile();
+
+        $client = $container->getDefinition('security.authenticator.oidc_login.client.main');
+        $this->assertSame(OidcPublicClient::class, $client->getClass());
+        $this->assertCount(3, $client->getArguments());
     }
 
     protected function getRawContainer()

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T15:33:41Z
+
+Two things I noticed that have not come up yet.
+
+`splitsh.json` has no entry for the bridge, so the package would never be split or published. Nothing guards that in CI, since package-tests skips `component_bridge`. The precedent is `0f5b9b6039d`, which retrofitted Prelude.
+
+The SQLite DSN reads three slashes as a relative path. `amp-sqlite:///tmp/messages.db` resolves to `tmp/messages.db`, and an absolute path needs `amp-sqlite:////tmp/messages.db`. Everywhere else three slashes means absolute, including `sqlite:///` in the PDO cache and lock stores. `testSupports` and the Messenger `TransportFactoryTest` fixture both use the three-slash form, so the tests currently lock the behaviour in.
+
+Smaller: `createTransport()` catches `\Throwable` and rethrows a bare "DSN is invalid" with no previous exception, so a bad `sslmode` or a typo in an option loses its cause. And the two `[CI]` commits reworking `static-analysis.yml` look unrelated to the bridge. They are also why PHPStan and Psalm are red here: the refresh step wipes `composer.lock` and reinstalls from the PR's own `composer.json`, so the base and the PR are no longer analysed against the same tree. Neither job reports anything in an AmpSql file.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-08-18T21:04:26Z
+
+> Two things I noticed that have not come up yet.
+>
+> `splitsh.json` has no entry for the bridge, so the package would never be split or published. Nothing guards that in CI, since package-tests skips `component_bridge`. The precedent is `0f5b9b6039d`, which retrofitted Prelude.
+>
+> The SQLite DSN reads three slashes as a relative path. `amp-sqlite:///tmp/messages.db` resolves to `tmp/messages.db`, and an absolute path needs `amp-sqlite:////tmp/messages.db`. Everywhere else three slashes means absolute, including `sqlite:///` in the PDO cache and lock stores. `testSupports` and the Messenger `TransportFactoryTest` fixture both use the three-slash form, so the tests currently lock the behaviour in.
+>
+> Smaller: `createTransport()` catches `\Throwable` and rethrows a bare "DSN is invalid" with no previous exception, so a bad `sslmode` or a typo in an option loses its cause. And the two `[CI]` commits reworking `static-analysis.yml` look unrelated to the bridge. They are also why PHPStan and Psalm are red here: the refresh step wipes `composer.lock` and reinstalls from the PR's own `composer.json`, so the base and the PR are no longer analysed against the same tree. Neither job reports anything in an AmpSql file.
+
+All fixed

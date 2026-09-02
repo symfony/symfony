@@ -10,19 +10,28 @@
 # Runs the bash completion of a command line and prints, one per line, the value
 # readline would insert for each suggestion.
 #
-# Usage: bash.sh <completion script> <command line>
+# Usage: bash.sh <completion script> <command line> [<alias definition>]
 #
 # No "set -u" here: an interactive shell does not use it, and bash-completion 1.x
 # relies on unset variables.
 
 completion_script="$1"
 command_line="$2"
+alias_definition="$3"
 
 # shellcheck disable=SC1091
 source "$(dirname "$0")/bash-completion.sh"
 
 # shellcheck disable=SC1090
 source "$completion_script"
+
+# the function is named after the command the script was dumped for
+completion_function="$(grep -o '^_sf_[A-Za-z0-9_]*' "$completion_script" | head -n1)"
+
+if [ -n "$alias_definition" ]; then
+    shopt -s expand_aliases
+    alias "$alias_definition"
+fi
 
 # Splits the command line the way readline does: on the characters of
 # COMP_WORDBREAKS, which are words of their own, and on unquoted whitespace.
@@ -81,7 +90,7 @@ COMPREPLY=()
 # compopt is only available while a completion is running
 compopt() { :; }
 
-"_sf_${COMP_WORDS[0]##*/}" || exit $?
+"$completion_function" || exit $?
 
 # Undo the shell escaping and prepend what readline keeps, to print the value the
 # user ends up with

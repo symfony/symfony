@@ -60,6 +60,36 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEquals($retryAfter, $rateLimit->getRetryAfter());
     }
 
+    public function testResetTimeStaysConstantWithinWindow()
+    {
+        $now = time();
+        $limiter = new FixedWindowLimiter('test', 5, new \DateInterval('PT1M'), $this->storage);
+
+        // pinned to the window's end for every call within it, accepted or not
+        for ($i = 0; $i < 6; ++$i) {
+            $rateLimit = $limiter->consume();
+            $this->assertSame($now + 60, $rateLimit->getResetAt()->getTimestamp());
+        }
+    }
+
+    public function testCalendarAnchorResetTimeBoundedToPeriodEnd()
+    {
+        $utc = new \DateTimeZone('UTC');
+        $anchor = new \DateTimeImmutable('2024-01-05 00:00:00', $utc);
+
+        ClockMock::withClockMock((new \DateTimeImmutable('2026-05-10 12:00:00', $utc))->getTimestamp());
+
+        $limiter = new FixedWindowLimiter('cal', 3, new \DateInterval('P1M'), $this->storage, null, $anchor);
+
+        $rateLimit = $limiter->consume();
+        $this->assertTrue($rateLimit->isAccepted());
+        // 1 of 3 tokens used, so resetAt is the period's end
+        $this->assertEquals(
+            (new \DateTimeImmutable('2026-06-05 00:00:00', $utc))->getTimestamp(),
+            $rateLimit->getResetAt()->getTimestamp()
+        );
+    }
+
     public function testConsumeLastToken()
     {
         $now = time();

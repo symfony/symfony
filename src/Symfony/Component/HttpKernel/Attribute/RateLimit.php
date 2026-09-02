@@ -16,6 +16,10 @@ use Symfony\Component\ExpressionLanguage\Expression;
 /**
  * Rate limits the controller.
  *
+ * When several attributes apply, the `X-RateLimit-*` headers describe the limiter closest to
+ * rejecting, out of those with $exposeHeaders enabled. A rejecting limiter always wins; when it
+ * does not expose its state, the response carries no `X-RateLimit-*` headers at all.
+ *
  * @see https://symfony.com/doc/current/rate_limiter.html
  *
  * @author Ayyoub AFW-ALLAH <ayyoub.afwallah@gmail.com>
@@ -27,16 +31,18 @@ final class RateLimit
     public readonly array $methods;
 
     /**
-     * @param string                          $limiter The configured limiter name
-     * @param string|Expression|\Closure|null $key     A literal string key, an Expression, or a Closure (defaults to client IP + method + path)
-     * @param int                             $tokens  The number of tokens to consume
-     * @param string[]|string                 $methods HTTP methods to rate limit; empty means all methods
+     * @param string                          $limiter       The configured limiter name
+     * @param string|Expression|\Closure|null $key           A literal string key, an Expression, or a Closure (defaults to client IP + method + path)
+     * @param int                             $tokens        The number of tokens to consume
+     * @param string[]|string                 $methods       HTTP methods to rate limit; empty means all methods
+     * @param bool                            $exposeHeaders Whether this limiter's state may be exposed via the `X-RateLimit-*` response headers, opt-in
      */
     public function __construct(
         public readonly string $limiter,
         public readonly string|Expression|\Closure|null $key = null,
         public readonly int $tokens = 1,
         array|string $methods = [],
+        public readonly bool $exposeHeaders = false,
     ) {
         if ($this->tokens < 1) {
             throw new \InvalidArgumentException(\sprintf('The "$tokens" argument of "%s" must be greater than 0, "%d" given.', self::class, $this->tokens));

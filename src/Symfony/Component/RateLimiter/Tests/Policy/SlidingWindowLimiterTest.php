@@ -69,6 +69,35 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testResetTimeIsWhenCarriedHitsHaveFullyDecayed()
+    {
+        $limiter = new SlidingWindowLimiter('decay', 10, new \DateInterval('PT4S'), $this->storage);
+
+        $resetAt = $limiter->consume()->getResetAt()->getTimestamp();
+
+        sleep($resetAt - time() - 1);
+        $this->assertSame(9, $limiter->consume(0)->getRemainingTokens());
+
+        sleep(1);
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
+    public function testResetTimeAfterRolloverTracksTheCarriedHits()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(3);
+        sleep(13); // the window rolls over, so the 3 hits are now the carried count
+
+        $resetAt = $limiter->consume(0)->getResetAt()->getTimestamp();
+
+        sleep($resetAt - time() - 1);
+        $this->assertSame(9, $limiter->consume(0)->getRemainingTokens());
+
+        sleep(1);
+        $this->assertSame(10, $limiter->consume(0)->getRemainingTokens());
+    }
+
     public function testConsumeLastToken()
     {
         $limiter = $this->createLimiter();

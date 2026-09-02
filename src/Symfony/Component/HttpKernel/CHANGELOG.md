@@ -17,6 +17,7 @@ CHANGELOG
  * Allow union and intersection type-hints when autowiring controller arguments
  * Add the `$excludedPaths` and `$excludedHttpCodes` arguments to `ProfilerListener::__construct()` to skip profiling some requests
  * Make `#[MapRequestPayload]` deserialize any media type carrying a structured syntax suffix with the encoder of the suffix format, e.g. `application/vnd.api+json` with the `json` encoder
+ * Add the `$exposeHeaders` argument to `#[RateLimit]`
 
 8.1
 ---

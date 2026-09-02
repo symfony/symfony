@@ -24,6 +24,7 @@ class RateLimitTest extends TestCase
         $this->assertNull($rl->key);
         $this->assertSame(1, $rl->tokens);
         $this->assertSame([], $rl->methods);
+        $this->assertFalse($rl->exposeHeaders);
     }
 
     public function testTokensMustBePositive()

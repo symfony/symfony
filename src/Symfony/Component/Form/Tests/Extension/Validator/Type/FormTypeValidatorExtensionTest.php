@@ -11,9 +11,14 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\Form\Event\PostValidateEvent;
+use Symfony\Component\Form\Exception\BadMethodCallException;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\CollectionTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
@@ -343,5 +348,151 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 
         // Root form does NOT contain errors
         $this->assertCount(0, $form->getErrors(false));
+    }
+
+    public function testPostValidateEventIsDispatchedOnEachFormAfterValidation()
+    {
+        $calls = [];
+        $listener = static function (string $key) use (&$calls) {
+            return static function (PostValidateEvent $event) use ($key, &$calls) {
+                $calls[] = [$key, $event->getForm()->getName(), $event->getForm()->getRoot()->isValid()];
+            };
+        };
+
+        $builder = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->createBuilder(FormTypeTest::TESTED_TYPE)
+            ->addEventListener(FormEvents::POST_VALIDATE, $listener('root'));
+        $builder->add('name', TextTypeTest::TESTED_TYPE, ['constraints' => new NotBlank()]);
+        $builder->get('name')->addEventListener(FormEvents::POST_VALIDATE, $listener('name'));
+        $builder->add('sub', FormTypeTest::TESTED_TYPE);
+        $builder->get('sub')->add('deep', TextTypeTest::TESTED_TYPE);
+        $builder->get('sub')->addEventListener(FormEvents::POST_VALIDATE, $listener('sub'));
+        $builder->get('sub')->get('deep')->addEventListener(FormEvents::POST_VALIDATE, $listener('deep'));
+        $builder->add('save', SubmitType::class);
+
+        $form = $builder->getForm();
+        $form->submit(['name' => '', 'sub' => ['deep' => 'foo'], 'save' => '']);
+
+        $this->assertFalse($form->isValid());
+        $this->assertSame([
+            ['name', 'name', false],
+            ['deep', 'deep', false],
+            ['sub', 'sub', false],
+            ['root', 'form', false],
+        ], $calls);
+    }
+
+    public function testPostValidateEventListenersSeeAValidFormTree()
+    {
+        $calls = [];
+        $listener = static function (string $key) use (&$calls) {
+            return static function (PostValidateEvent $event) use ($key, &$calls) {
+                $calls[] = [$key, $event->getForm()->getRoot()->isValid(), $event->getData()];
+            };
+        };
+
+        $builder = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->createBuilder(FormTypeTest::TESTED_TYPE)
+            ->addEventListener(FormEvents::POST_VALIDATE, $listener('root'));
+        $builder->add('name', TextTypeTest::TESTED_TYPE, ['constraints' => new NotBlank()]);
+        $builder->get('name')->addEventListener(FormEvents::POST_VALIDATE, $listener('name'));
+
+        $form = $builder->getForm();
+        $form->submit(['name' => 'foo']);
+
+        $this->assertTrue($form->isValid());
+        $this->assertSame([
+            ['name', true, 'foo'],
+            ['root', true, ['name' => 'foo']],
+        ], $calls);
+    }
+
+    public function testErrorsAddedByPostValidateEventListenersAreSeenByParentListeners()
+    {
+        $rootIsValid = null;
+
+        $builder = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->createBuilder(FormTypeTest::TESTED_TYPE)
+            ->addEventListener(FormEvents::POST_VALIDATE, static function (PostValidateEvent $event) use (&$rootIsValid) {
+                $rootIsValid = $event->getForm()->isValid();
+            });
+        $builder->add('name', TextTypeTest::TESTED_TYPE);
+        $builder->get('name')->addEventListener(FormEvents::POST_VALIDATE, static function (PostValidateEvent $event) {
+            $event->getForm()->addError(new FormError('invalid'));
+        });
+
+        $form = $builder->getForm();
+        $form->submit(['name' => 'foo']);
+
+        $this->assertFalse($rootIsValid);
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->get('name')->isValid());
+    }
+
+    public function testPostValidateEventIsNotDispatchedOnUnsubmittedForms()
+    {
+        $calls = [];
+        $listener = static function (string $key) use (&$calls) {
+            return static function () use ($key, &$calls) {
+                $calls[] = $key;
+            };
+        };
+
+        $builder = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->createBuilder(FormTypeTest::TESTED_TYPE)
+            ->addEventListener(FormEvents::POST_VALIDATE, $listener('root'));
+        $builder->add('name', TextTypeTest::TESTED_TYPE);
+        $builder->get('name')->addEventListener(FormEvents::POST_VALIDATE, $listener('name'));
+        $builder->add('other', TextTypeTest::TESTED_TYPE);
+        $builder->get('other')->addEventListener(FormEvents::POST_VALIDATE, $listener('other'));
+
+        $form = $builder->getForm();
+        $form->submit(['name' => 'foo'], false);
+
+        $this->assertSame(['name', 'root'], $calls);
+    }
+
+    public function testPostValidateEventIsDispatchedWhenOnlyAChildListens()
+    {
+        $calls = [];
+
+        $builder = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->createBuilder(FormTypeTest::TESTED_TYPE);
+        $builder->add('name', TextTypeTest::TESTED_TYPE);
+        $builder->get('name')->addEventListener(FormEvents::POST_VALIDATE, static function (PostValidateEvent $event) use (&$calls) {
+            $calls[] = $event->getForm()->getName();
+        });
+
+        $form = $builder->getForm();
+        $form->submit(['name' => 'foo']);
+
+        $this->assertSame(['name'], $calls);
+    }
+
+    public function testPostValidateEventDataCannotBeChanged()
+    {
+        $builder = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
+            ->getFormFactory()
+            ->createBuilder(FormTypeTest::TESTED_TYPE)
+            ->addEventListener(FormEvents::POST_VALIDATE, static function (PostValidateEvent $event) {
+                $event->setData([]);
+            });
+        $form = $builder->getForm();
+
+        $this->expectException(BadMethodCallException::class);
+        $this->expectExceptionMessage('Form data cannot be changed during "form.post_validate", you should use "form.pre_submit" or "form.submit" instead.');
+
+        $form->submit([]);
     }
 }

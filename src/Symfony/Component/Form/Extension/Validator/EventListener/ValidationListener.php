@@ -12,10 +12,13 @@
 namespace Symfony\Component\Form\Extension\Validator\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\Event\PostValidateEvent;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -47,6 +50,29 @@ class ValidationListener implements EventSubscriberInterface
 
                 $this->violationMapper->mapViolation($violation, $form, $allowNonSynchronized);
             }
+
+            $this->dispatchPostValidateEvent($form);
+        }
+    }
+
+    /**
+     * Each form has its own event dispatcher, so listeners on nested forms
+     * can only be found by visiting every node of the tree.
+     */
+    private function dispatchPostValidateEvent(FormInterface $form): void
+    {
+        if ($form instanceof Button || !$form->isSubmitted()) {
+            return;
+        }
+
+        foreach ($form as $child) {
+            $this->dispatchPostValidateEvent($child);
+        }
+
+        $dispatcher = $form->getConfig()->getEventDispatcher();
+
+        if ($dispatcher->hasListeners(FormEvents::POST_VALIDATE)) {
+            $dispatcher->dispatch(new PostValidateEvent($form, $form->getData()), FormEvents::POST_VALIDATE);
         }
     }
 }

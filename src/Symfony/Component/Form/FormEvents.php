@@ -13,6 +13,7 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Event\PostSetDataEvent;
 use Symfony\Component\Form\Event\PostSubmitEvent;
+use Symfony\Component\Form\Event\PostValidateEvent;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Event\PreSubmitEvent;
 use Symfony\Component\Form\Event\SubmitEvent;
@@ -95,6 +96,19 @@ final class FormEvents
     public const POST_SET_DATA = 'form.post_set_data';
 
     /**
+     * The FormEvents::POST_VALIDATE event is dispatched after the validation of the whole form tree.
+     *
+     * It requires the validator extension to be enabled. It is dispatched on each submitted form
+     * of the tree, children before their parents.
+     *
+     * It can be used to react to the validity of the whole form tree, even from a nested form,
+     * by calling FormInterface::getRoot()->isValid().
+     *
+     * @Event("Symfony\Component\Form\Event\PostValidateEvent")
+     */
+    public const POST_VALIDATE = 'form.post_validate';
+
+    /**
      * Event aliases.
      *
      * These aliases can be consumed by RegisterListenersPass.
@@ -105,6 +119,7 @@ final class FormEvents
         PostSubmitEvent::class => self::POST_SUBMIT,
         PreSetDataEvent::class => self::PRE_SET_DATA,
         PostSetDataEvent::class => self::POST_SET_DATA,
+        PostValidateEvent::class => self::POST_VALIDATE,
     ];
 
     private function __construct()

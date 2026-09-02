@@ -17,6 +17,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
+use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Key;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -106,6 +107,30 @@ class DynamoDbStoreTest extends TestCase
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
             new DynamoDbStore('dynamodb://default/table?sslmode=disable', ['http_client' => $this->httpClient])
         );
+    }
+
+    public function testFromDsnWithSsl()
+    {
+        $this->assertEquals(
+            new DynamoDbStore(new DynamoDbClient(['region' => null, 'endpoint' => 'http://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
+            new DynamoDbStore('dynamodb://localhost/table?ssl=false', ['http_client' => $this->httpClient])
+        );
+    }
+
+    public function testFromDsnWithSslTakingPrecedenceOverSslMode()
+    {
+        $this->assertEquals(
+            new DynamoDbStore(new DynamoDbClient(['region' => null, 'endpoint' => 'https://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
+            new DynamoDbStore('dynamodb://localhost/table?ssl=true&sslmode=disable', ['http_client' => $this->httpClient])
+        );
+    }
+
+    public function testFromDsnWithInvalidSsl()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid value for the "ssl" option of the "dynamodb" DSN, expected a boolean.');
+
+        new DynamoDbStore('dynamodb://localhost/table?ssl=nope', ['http_client' => $this->httpClient]);
     }
 
     public function testFromDsnWithCustomEndpointAndPort()

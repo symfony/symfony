@@ -17,7 +17,7 @@ zsh,fish|app demo:h|demo:hello
 bash|app demo:h|hello
 
 # global option names
-all|app --|--ansi;--help;--no-ansi;--no-interaction;--quiet;--verbose;--version
+all|app --|--ansi;--help;--no-ansi;--no-interaction;--quiet;--silent;--verbose;--version
 
 # the application called through a path instead of a name (%app% is replaced by
 # the absolute path of the fixture)

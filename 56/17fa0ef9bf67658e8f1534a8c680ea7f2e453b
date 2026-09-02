@@ -1,0 +1,10 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:25:44Z
+
+Thanks for applying the review, this is merge-ready now. I rebased on current 8.2 and made two additions while preparing the merge:
+
+- Added the `claim_check` node to the functional app's `schema.json`, with the exact shape the dumper generates.
+- Pinned the signing order in `testMessengerClaimCheckSerializer`: signing decorates the inner serializer, never the claim check wrapper. The safe order currently hangs on `$serializerIds[$transportId]` keeping the raw serializer id, and the new assertions fail if that ever flips.
+
+On the open question about filesystem vs PDO for large claims: both are valid, the trap is only where the filesystem pool lives. A `cache.adapter.filesystem` pool declared under `framework.cache.pools` is written below `kernel.cache_dir`, so `cache:clear` deletes in-flight claims (probed with a real kernel; Redis and PDO pools keep theirs). Storing a 50 MB attachment on disk works when the pool is declared as a plain `FilesystemAdapter` service with an explicit directory outside the cache dir, which also keeps it out of `cache:pool:clear --all`. I kept PDO in the example and fixtures because it survives both commands without extra setup, and folded the filesystem guidance into the description for the docs.

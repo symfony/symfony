@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Serializer\Attribute\Context;
 use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
+use Symfony\Component\Serializer\Attribute\DiscriminatorMapType;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
@@ -31,12 +32,13 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  * @author Alexander M. Turek <me@derrabus.de>
  * @author Alexandre Daubois <alex.daubois@gmail.com>
  */
-class AttributeLoader implements LoaderInterface
+class AttributeLoader implements LoaderChainAwareInterface
 {
     use AccessorCollisionResolverTrait;
 
     private const KNOWN_ATTRIBUTES = [
         DiscriminatorMap::class,
+        DiscriminatorMapType::class,
         Groups::class,
         Ignore::class,
         MaxDepth::class,
@@ -45,12 +47,19 @@ class AttributeLoader implements LoaderInterface
         Context::class,
     ];
 
+    private bool $deferDiscriminatorMapValidation = false;
+
+    private array $deferredDiscriminatorMapTypes = [];
+
     /**
-     * @param array<class-string, class-string[]> $mappedClasses
+     * @param array<class-string, class-string[]>                   $mappedClasses
+     * @param array<class-string, array<string, class-string>>|null $discriminatorMapTypes The registry of classes contributed to discriminator
+     *                                                                                     maps, or null when contributions are not wired at all
      */
     public function __construct(
         private bool $allowAnyClass = true,
         private array $mappedClasses = [],
+        private ?array $discriminatorMapTypes = null,
     ) {
     }
 
@@ -59,14 +68,36 @@ class AttributeLoader implements LoaderInterface
      */
     public function getMappedClasses(): array
     {
-        return array_keys($this->mappedClasses);
+        return array_keys($this->mappedClasses + ($this->discriminatorMapTypes ?? []));
+    }
+
+    public function prepareLoading(ClassMetadataInterface $metadata): void
+    {
+        $this->deferDiscriminatorMapValidation = true;
+        unset($this->deferredDiscriminatorMapTypes[$metadata->getName()]);
+    }
+
+    public function finalizeLoading(ClassMetadataInterface $metadata): void
+    {
+        $this->deferDiscriminatorMapValidation = false;
+        $deferred = $this->deferredDiscriminatorMapTypes[$metadata->getName()] ?? [];
+        unset($this->deferredDiscriminatorMapTypes[$metadata->getName()]);
+
+        foreach ($deferred as [$type, $mappedClass]) {
+            $this->addDiscriminatorMapType($type, $mappedClass, $metadata);
+        }
+
+        $this->validateDiscriminatorMap($metadata);
     }
 
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
         $className = $classMetadata->getName();
 
-        if (!$sourceClasses = $this->mappedClasses[$className] ??= $this->allowAnyClass ? [$className] : []) {
+        $sourceClasses = $this->mappedClasses[$className] ??= $this->allowAnyClass ? [$className] : [];
+        $discriminatorMapTypes = $this->discriminatorMapTypes[$className] ?? [];
+
+        if (!$sourceClasses && !$discriminatorMapTypes) {
             return false;
         }
 
@@ -83,7 +114,28 @@ class AttributeLoader implements LoaderInterface
             $success = $this->doLoadClassMetadata($reflectionClass, $classMetadata) || $success;
         }
 
+        foreach ($discriminatorMapTypes as $type => $mappedClass) {
+            $this->addDiscriminatorMapType($type, $mappedClass, $classMetadata);
+        }
+
+        if (!$this->deferDiscriminatorMapValidation) {
+            $this->validateDiscriminatorMap($classMetadata);
+        }
+
         return $success;
+    }
+
+    private function validateDiscriminatorMap(ClassMetadataInterface $classMetadata): void
+    {
+        if (null !== $mapping = $classMetadata->getClassDiscriminatorMapping()) {
+            if (!$mapping->getTypesMapping()) {
+                throw new MappingException(\sprintf('Discriminator map for "%s" cannot be empty.', $classMetadata->getName()));
+            }
+
+            if (null !== $mapping->getDefaultType() && null === $mapping->getClassForType($mapping->getDefaultType())) {
+                throw new MappingException(\sprintf('Default type "%s" for discriminator map of "%s" must be present in mapping types.', $mapping->getDefaultType(), $classMetadata->getName()));
+            }
+        }
     }
 
     private function doLoadClassMetadata(\ReflectionClass $reflectionClass, ClassMetadataInterface $classMetadata): bool
@@ -96,8 +148,10 @@ class AttributeLoader implements LoaderInterface
         $attributesMetadata = $classMetadata->getAttributesMetadata();
 
         foreach ($this->loadAttributes($reflectionClass) as $attribute) {
+            $loaded = true;
             match (true) {
                 $attribute instanceof DiscriminatorMap => $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($attribute->typeProperty, $attribute->mapping, $attribute->defaultType)),
+                $attribute instanceof DiscriminatorMapType => $this->checkDiscriminatorMapTypeIsRegistered($attribute, $className),
                 $attribute instanceof Groups => $classGroups = $attribute->groups,
                 $attribute instanceof Context => $classContextAttribute = $attribute,
                 default => null,
@@ -215,6 +269,43 @@ class AttributeLoader implements LoaderInterface
         }
 
         return $loaded;
+    }
+
+    /**
+     * @param class-string $mappedClass
+     */
+    private function addDiscriminatorMapType(string $type, string $mappedClass, ClassMetadataInterface $classMetadata): void
+    {
+        if (!is_a($mappedClass, $classMetadata->getName(), true)) {
+            throw new MappingException(\sprintf('Class "%s" cannot add discriminator map type "%s" for "%s" because it is not a subtype of it.', $mappedClass, $type, $classMetadata->getName()));
+        }
+
+        if ($this->deferDiscriminatorMapValidation) {
+            // wait for the whole loader chain to run, so that types are added to the
+            // final discriminator map, no matter which loader declares it
+            $this->deferredDiscriminatorMapTypes[$classMetadata->getName()][] = [$type, $mappedClass];
+
+            return;
+        }
+
+        if (null === $mapping = $classMetadata->getClassDiscriminatorMapping()) {
+            throw new MappingException(\sprintf('Class "%s" cannot add discriminator map type "%s" for "%s" because the target does not declare a discriminator map.', $mappedClass, $type, $classMetadata->getName()));
+        }
+
+        $typesMapping = $mapping->getTypesMapping();
+        if (isset($typesMapping[$type]) && $typesMapping[$type] !== $mappedClass) {
+            throw new MappingException(\sprintf('Discriminator map type "%s" for "%s" is already mapped to "%s".', $type, $classMetadata->getName(), $typesMapping[$type]));
+        }
+
+        $typesMapping[$type] = $mappedClass;
+        $classMetadata->setClassDiscriminatorMapping(new ClassDiscriminatorMapping($mapping->getTypeProperty(), $typesMapping, $mapping->getDefaultType()));
+    }
+
+    private function checkDiscriminatorMapTypeIsRegistered(DiscriminatorMapType $attribute, string $className): void
+    {
+        if (null !== $this->discriminatorMapTypes && $className !== ($this->discriminatorMapTypes[$attribute->class][$attribute->type] ?? null)) {
+            throw new MappingException(\sprintf('Class "%s" cannot add discriminator map type "%s" for "%s" because it is not registered with the loader. Make sure the class is in a path scanned for services and not in an excluded one, or register it with the "discriminatorMapTypes" argument of the loader.', $className, $attribute->type, $attribute->class));
+        }
     }
 
     private function loadAttributes(\ReflectionMethod|\ReflectionClass|\ReflectionProperty $reflector): iterable

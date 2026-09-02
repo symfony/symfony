@@ -28,19 +28,11 @@ class DiscriminatorMap
      */
     public function __construct(
         public readonly string $typeProperty,
-        public readonly array $mapping,
+        public readonly array $mapping = [],
         public readonly ?string $defaultType = null,
     ) {
         if (!$typeProperty) {
             throw new InvalidArgumentException(\sprintf('Parameter "typeProperty" given to "%s" cannot be empty.', static::class));
-        }
-
-        if (!$mapping) {
-            throw new InvalidArgumentException(\sprintf('Parameter "mapping" given to "%s" cannot be empty.', static::class));
-        }
-
-        if (null !== $this->defaultType && !\array_key_exists($this->defaultType, $this->mapping)) {
-            throw new InvalidArgumentException(\sprintf('Default type "%s" given to "%s" must be present in "mapping" types.', $this->defaultType, static::class));
         }
     }
 }

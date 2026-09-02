@@ -2135,6 +2135,10 @@ class FrameworkExtension extends Extension
             });
         }
 
+        $container->registerAttributeForAutoconfiguration(SerializerMapping\DiscriminatorMapType::class, static function (ChildDefinition $definition, SerializerMapping\DiscriminatorMapType $attribute) {
+            $definition->addTag('serializer.attribute_metadata', ['for' => $attribute->class, 'type' => $attribute->type, 'discriminator_map_type' => true]);
+        });
+
         $serializerLoaders[] = new Reference('serializer.mapping.attribute_loader');
 
         $container->getDefinition('serializer.mapping.attribute_loader')

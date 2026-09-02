@@ -123,6 +123,31 @@ test_missing_bash_completion() {
     esac
 }
 
+# The command may be reached through an alias, which can carry arguments. The
+# driver cannot be used here, aliases need a shell of their own.
+test_alias() {
+    local name="$1" definition="$2" expected="$3" actual
+
+    actual="$(bash --noprofile --norc -c '
+        shopt -s expand_aliases
+        source "$1/drivers/bash-completion.sh"
+        source "$2"
+        alias "$3"
+        compopt() { :; }
+        COMP_WORDS=("${3%%=*}" demo : "") COMP_CWORD=3 COMP_LINE="${3%%=*} demo:" COMP_POINT=9 COMPREPLY=()
+        _sf_app
+        printf "%s\n" "${COMPREPLY[@]}"
+    ' _ "$dir" "$tmp/completion.bash" "$definition" 2> "$tmp/case.err" | normalize)"
+
+    expected="$(printf '%s' "$expected" | tr ';' '\n' | normalize)"
+
+    if [ "$actual" = "$expected" ]; then
+        pass "[bash] completion through $name"
+    else
+        fail "[bash] completion through $name" "expected:" "$expected" "actual:" "${actual:-<none>}" "$(cat "$tmp/case.err")"
+    fi
+}
+
 for shell in $shells; do
     if ! command -v "$shell" > /dev/null; then
         skipped=$((skipped + 1))
@@ -150,6 +175,8 @@ for shell in $shells; do
     if [ "$shell" = "bash" ]; then
         test_api_version
         test_missing_bash_completion
+        test_alias 'an alias' 'sfa=app' 'hello;other;special'
+        test_alias 'an alias with arguments' "sfb=app --no-ansi" 'hello;other;special'
     fi
 done
 

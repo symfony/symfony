@@ -7,7 +7,8 @@
 # For the full copyright and license information, please view
 # https://symfony.com/doc/current/contributing/code/license.html
 
-# Runs the bash completion of a command line and prints one logical suggestion per line.
+# Runs the bash completion of a command line and prints, one per line, the value
+# readline would insert for each suggestion.
 #
 # Usage: bash.sh <completion script> <command line>
 #
@@ -17,62 +18,62 @@
 completion_script="$1"
 command_line="$2"
 
-# the Linux locations, then Homebrew's bash-completion@2 and 1.x
-for bash_completion in \
-    /usr/share/bash-completion/bash_completion \
-    /etc/bash_completion \
-    /opt/homebrew/etc/profile.d/bash_completion.sh \
-    /opt/homebrew/etc/bash_completion \
-    /usr/local/etc/profile.d/bash_completion.sh \
-    /usr/local/etc/bash_completion \
-; do
-    if [ -f "$bash_completion" ]; then
-        # shellcheck disable=SC1090
-        source "$bash_completion"
-        break
-    fi
-done
-
-if ! declare -F _get_comp_words_by_ref > /dev/null; then
-    echo "bash-completion is not installed" >&2
-    exit 1
-fi
+# shellcheck disable=SC1091
+source "$(dirname "$0")/bash-completion.sh"
 
 # shellcheck disable=SC1090
 source "$completion_script"
 
-# Split the command line the way readline does: on unquoted whitespace, keeping the quotes.
+# Splits the command line the way readline does: on the characters of
+# COMP_WORDBREAKS, which are words of their own, and on unquoted whitespace.
+# Quotes are kept, and open quotes protect the characters they contain.
+#
+# Sets: words, cword, cur and prefix, the part of the current shell token that
+# readline keeps in place, before the word being completed.
 tokenize() {
-    local line="$1" token='' char quote='' i
-    tokens=()
+    local line="$1" word='' token='' quote='' char i
+    words=()
+
     for ((i = 0; i < ${#line}; i++)); do
         char="${line:i:1}"
+
         if [ -n "$quote" ]; then
-            token+="$char"
+            word+="$char" token+="$char"
             [ "$char" = "$quote" ] && quote=''
             continue
         fi
+
         case "$char" in
             \'|\")
                 quote="$char"
-                token+="$char"
+                word+="$char" token+="$char"
                 ;;
-            ' ')
-                tokens+=("$token")
-                token=''
+            ' '|$'\t')
+                [ -n "$word" ] && words+=("$word")
+                word='' token=''
                 ;;
             *)
-                token+="$char"
+                if [[ "$COMP_WORDBREAKS" == *"$char"* ]]; then
+                    [ -n "$word" ] && words+=("$word")
+                    words+=("$char")
+                    word='' token+="$char"
+                else
+                    word+="$char" token+="$char"
+                fi
                 ;;
         esac
     done
-    tokens+=("$token")
+
+    words+=("$word")
+    cword=$((${#words[@]} - 1))
+    cur="$word"
+    prefix="${token%"$word"}"
 }
 
 tokenize "$command_line"
 
-COMP_WORDS=("${tokens[@]}")
-COMP_CWORD=$((${#COMP_WORDS[@]} - 1))
+COMP_WORDS=("${words[@]}")
+COMP_CWORD=$cword
 COMP_LINE="$command_line"
 COMP_POINT=${#COMP_LINE}
 COMPREPLY=()
@@ -82,7 +83,9 @@ compopt() { :; }
 
 "_sf_${COMP_WORDS[0]##*/}" || exit $?
 
-# Undo the shell escaping added by the completion script to compare logical values
+# Undo the shell escaping and prepend what readline keeps, to print the value the
+# user ends up with
 for suggestion in "${COMPREPLY[@]}"; do
-    eval "printf '%s\n' $suggestion" 2> /dev/null || printf '%s\n' "$suggestion"
+    suggestion="$(eval "printf '%s' $suggestion" 2> /dev/null || printf '%s' "$suggestion")"
+    printf '%s%s\n' "$prefix" "$suggestion"
 done

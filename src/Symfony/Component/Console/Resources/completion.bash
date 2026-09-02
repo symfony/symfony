@@ -17,16 +17,24 @@ _sf_{{ COMMAND_NAME }}() {
     done
 
     local sf_cmd="${COMP_WORDS[0]}"
+    local sf_cmd_parts
 
-    # for an alias, get the real script behind it
+    # for an alias, get the real command behind it, which may carry arguments
     sf_cmd_type=$(type -t $sf_cmd)
     if [[ $sf_cmd_type == "alias" ]]; then
         sf_cmd=$(alias $sf_cmd | sed -E "s/alias $sf_cmd='(.*)'/\1/")
+        read -ra sf_cmd_parts <<< "$sf_cmd"
     elif [[ $sf_cmd_type == "file" ]]; then
-        sf_cmd=$(type -p $sf_cmd)
+        sf_cmd_parts=("$(type -p $sf_cmd)")
+    else
+        sf_cmd_parts=("$sf_cmd")
     fi
 
-    if [[ $sf_cmd_type != "function" && ! -x $sf_cmd ]]; then
+    # the command must be a function, an executable of the PATH or an executable file
+    if [[ $sf_cmd_type != "function" ]] \
+        && ! type -P "${sf_cmd_parts[0]}" > /dev/null \
+        && [[ ! -x ${sf_cmd_parts[0]} ]] \
+    ; then
         return 1
     fi
 
@@ -45,7 +53,7 @@ _sf_{{ COMMAND_NAME }}() {
     # Use newline as only separator to allow space in completion values
     local IFS=$'\n'
 
-    local completecmd=("$sf_cmd" "_complete" "--no-interaction" "-sbash" "-c$cword" "-a{{ VERSION }}")
+    local completecmd=("${sf_cmd_parts[@]}" "_complete" "--no-interaction" "-sbash" "-c$cword" "-a{{ VERSION }}")
     for w in "${words[@]}"; do
         w="${w//\\\\/\\}"
         # remove quotes from typed values
@@ -64,13 +72,12 @@ _sf_{{ COMMAND_NAME }}() {
     done
 
     local sfcomplete
-    if sfcomplete=$(SHELL_VERBOSITY=0 ${completecmd[@]} 2>&1); then
-        local quote suggestions flagPrefix=''
+    if sfcomplete=$(SHELL_VERBOSITY=0 "${completecmd[@]}" 2>&1); then
+        local quote suggestions
 
-        # "=" is not a word break, so the whole "--option=value" word is completed:
-        # filter on the value and prepend the option to the suggestions
+        # for the "--option=value" form, the suggestions are the values: readline
+        # keeps the "--option=" part, which is a word of its own for it
         if [[ "$cur" == -*=* ]]; then
-            flagPrefix="${cur%%=*}="
             cur="${cur#*=}"
         fi
 
@@ -100,8 +107,8 @@ _sf_{{ COMMAND_NAME }}() {
             # no quotes: double escaping
             suggestions=$(for s in $sfcomplete; do printf $'%q\n' $(printf '%q' "$s"); done)
         fi
-        COMPREPLY=($(IFS=$'\n' compgen -P "$flagPrefix" -W "$suggestions" -- $(printf -- "%q" "$cur")))
-        __ltrim_colon_completions "$flagPrefix$cur"
+        COMPREPLY=($(IFS=$'\n' compgen -W "$suggestions" -- $(printf -- "%q" "$cur")))
+        __ltrim_colon_completions "$cur"
     else
         if [[ "$sfcomplete" != *"Command \"_complete\" is not defined."* ]]; then
             >&2 echo

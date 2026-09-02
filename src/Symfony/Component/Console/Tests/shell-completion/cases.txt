@@ -6,23 +6,20 @@
 # Suggestions are compared as sorted logical values: descriptions are stripped and
 # shell escaping is undone by the drivers.
 #
-# In bash, ":" is part of COMP_WORDBREAKS, so the completion script trims what is
-# before the last colon of the word being completed (__ltrim_colon_completions).
-# Readline puts it back, which is why the expectations differ for bash.
+# The expectations are what the user ends up with. In bash, ":" and "=" are part
+# of COMP_WORDBREAKS, so readline only replaces what follows them: the driver
+# prepends the part it keeps in place, as readline does.
 
 # command names
-zsh,fish|app demo:|demo:hello;demo:other;demo:special
-bash|app demo:|hello;other;special
-zsh,fish|app demo:h|demo:hello
-bash|app demo:h|hello
+all|app demo:|demo:hello;demo:other;demo:special
+all|app demo:h|demo:hello
 
 # global option names
 all|app --|--ansi;--help;--no-ansi;--no-interaction;--quiet;--verbose;--version
 
 # the application called through a path instead of a name (%app% is replaced by
 # the absolute path of the fixture)
-zsh,fish|%app% demo:|demo:hello;demo:other;demo:special
-bash|%app% demo:|hello;other;special
+all|%app% demo:|demo:hello;demo:other;demo:special
 
 # option names
 all|app demo:hello --d|--dry-run
@@ -67,8 +64,7 @@ all|app demo:hello b|bob;bob smith
 
 # values containing a colon
 all|app demo:hello ns|ns:member
-zsh,fish|app demo:hello ns:|ns:member
-bash|app demo:hello ns:|member
+all|app demo:hello ns:|ns:member
 
 # values containing a backslash (FQCN)
 all|app demo:hello App|App\Entity\User

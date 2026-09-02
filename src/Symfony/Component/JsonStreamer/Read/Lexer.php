@@ -141,9 +141,13 @@ final class Lexer
 
         rewind($stream);
 
-        while (!feof($stream) && ($infiniteLength || $toReadLength > 0)) {
+        while (($infiniteLength && !feof($stream)) || $toReadLength > 0) {
             if (false === $chunk = stream_get_contents($stream, $infiniteLength ? $chunkLength : min($chunkLength, $toReadLength), $offset)) {
                 throw new RuntimeException('Failed to read JSON stream.');
+            }
+
+            if ('' === $chunk) {
+                break;
             }
 
             $toReadLength -= $l = \strlen($chunk);

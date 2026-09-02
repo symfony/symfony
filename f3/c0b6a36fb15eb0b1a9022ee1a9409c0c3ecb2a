@@ -1,0 +1,90 @@
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-08-30T01:19:12Z
+
+Thanks for the combing, really useful findings!
+
+## 1 `X-RateLimit-Reset` wrong on the accepted path
+
+I added `RateLimit::getResetAt(): ?\DateTimeImmutable` nullable for BC reasons and populated by each policy
+
+- `FixedWindowLimiter` -> the window end.
+- `SlidingWindowLimiter` -> the instant the carried hit count from the previous window has fully
+  decayed (`SlidingWindow::getFullCapacityTime()`).
+- `TokenBucketLimiter` -> time to refill to `maxBurst`.
+
+## 2 no test could catch point 1
+
+Added `testRealFixedWindowLimiterHeaderSequenceAcrossCalls` which drives a real `RateLimiterFactory` over `InMemoryStorage` across six calls. Per-policy reset-vs-retry divergence and stability tests in the RateLimiter suite. The stub-based listener tests were corrected too
+
+## 3 `no_limit` warning / negative header
+
+The listener now only records a limiter when `null !== $rateLimit->getResetAt()`.
+`NoLimiter` builds its result without a reset time therefore, `getResetAt` is null -> skipped
+
+## 4 per-client counters on cacheable responses
+
+`onKernelResponse()` now calls `$response->setPrivate()` whenever it adds the headers, and only then.
+
+## 5 default-on is a behaviour change
+
+`exposeHeaders` now defaults to `false`.
+
+I did not add a `framework.rate_limiter.expose_headers`, usually a dev would want to control headers per controller and not globally, it would be more of a global killswitch, maybe in a later pr.
+
+## 6 the `X-` prefix
+
+i'm keeping `X-RateLimit-*` because It's what most clients understand today, and becuase `draft-ietf-httpapi-ratelimit-headers-11` is still a draft. open for discussion!
+
+## 7 unit mismatch inside one response
+
+ `Retry-After` is RFC 9110 delta-seconds and can't be an epoch, for X-RateLimit-Reset I'm keeping epoch because it's what X--prefixed consumers expect, so the response does carry two time formats.
+
+ I think recognizability wins here wyt?
+
+## 8 the multi-limiter rule
+
+Written into the `#[RateLimit]` class docblock, and made structural in the listener: the rejecting limiter's result is set unconditionally in the branch that throws, and the accepted-path comparison is a plain one-liner (fewest calls left wins).
+
+## 9 smaller points
+
+- **a** — `retryAfterSeconds()` and the `RateLimitResult` import alias are gone, the seconds math is inlined at its one call site.
+- **b** — i thing a value object is fit here so i kept `AppliedRateLimit` and moved it to `HttpKernel\RateLimiter\`.
+- **c** — i kept  `_rate_limit` because: `CacheAttributeListener` stores its state
+  as `_cache`, same short underscore-prefixed shape as `_route_params` /
+  `_controller_attributes` everywhere in HttpKernel. `RequestDataCollector` collects every request attribute unfiltered today, `_cache` included, so `_rate_limit`'s naming and profiler visibility both already match existing style.
+- **d** — done, the three headers describe one limiter so if the response already carries any `X-RateLimit-*` header, the listener adds nothing and doesn't touch `Cache-Control`.
+
+## 10 changelog / upgrade notes
+
+CHANGELOG trimmed to `Add the $exposeHeaders argument to #[RateLimit]`.
+
+No UPGRADE-8.2 entry needed now that the default is opt-in.
+
+---
+
+Ready for another look :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:40:48Z
+
+Thanks for the thorough rework, this addressed all five blockers. I verified the new head:
+
+- `getResetAt()` checks out for the three policies. I re-derived the math from `Window::calculateTimeForTokens()`, `SlidingWindow::getFullCapacityTime()` and the token bucket refill, and I probed the sliding window forecast against a real limiter: observed full capacity landed within 0.1s of the forecast, both for in-window decay and for hits carried over a rollover.
+- The `no_limit`, shared-cache and opt-in behaviors are all pinned by the new tests.
+
+On the two open questions:
+
+- **`X-` prefix (6):** agreed, keep it. The IETF draft defines different header names entirely (`RateLimit` and `RateLimit-Policy` as structured fields), so adopting the standard later is an additive option, not a rename. `X-RateLimit-*` is what clients parse today.
+- **Epoch vs delta (7):** agreed, keep the epoch. Each header follows the convention of its own family: `Retry-After` is delta seconds per RFC 9110, `X-RateLimit-Reset` is an epoch like GitHub and GitLab send. The docs should state both units explicitly; I added that to the description's documentation notes.
+
+While preparing the branch for merge I squashed the two commits (your authorship preserved) and made three small changes to the tests:
+
+- `testRealFixedWindowLimiterHeaderSequenceAcrossCalls` captured `time() + 60` before the first consume, which could flake when the second ticks in between. It now captures the first response's `Reset` value, checks it is about one minute out, and asserts it stays constant across the window.
+- The HttpCache test now removes its temporary store directory.
+- I added `testCacheAttributeCannotReShareThePerClientHeaders`: `#[Cache(smaxage: ...)]` calls `setPublic()`, and privacy only wins because the cache attribute is processed at response priority 10000 while this listener runs at 0. The test pins that ordering so it cannot regress silently.
+
+I also completed the attribute docblock with the opted-out rejecting limiter rule and updated the PR description.
+
+I'll merge once CI is green.

@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-31T16:42:09Z
+
+Thanks @Spomky. I checked the two RFC 6854 examples end to end and both come out as written, and the `Sender` rule counts the mailboxes inside the groups, which is what section 2.1 asks for. Rebased on 8.2 and amended these four things:
+
+- Dropped `Group::toString()`. Nothing called it, and nothing would: API transports read `getTo()`, which flattens, so a `Group` never reaches one. It also disagreed with what the header emits for the same object, `"Friends": a@example.com;` against `Friends: a@example.com;`, and `"Câlins": …` against `=?utf-8?Q?C=C3=A2lins?=: …`, because `getAddressStrings()` goes through `createPhrase()` and quotes only when needed.
+- An empty group in `From` reached `DelayedEnvelope::getSenderFromHeaders()` as `getAddresses()[0]` on an empty array, so an `undefined array key` warning followed by a `TypeError`. It now throws the `LogicException` that method already has. This was reachable before this PR through `addMailboxListHeader('From', [])`, but the PR makes it a documented path.
+- Restored a single normalization helper. Both `Email` and `Headers` called `Address::createArray()` before; the PR left them with a copy each. It is now `MailboxListHeader::createAddressList()`, the address-list counterpart of `Address::createArray()`.
+- `testSenderFromHeadersSkipsAGroup` does not skip the group, it takes its first mailbox, so it is renamed. The `Group` docblock said RFC 5322 expected a `mailbox-list` in `Sender`, where it expected a single `mailbox`, and it now says that Symfony's `Sender` keeps taking one.
+
+The description carries the `From` constraint now: an empty group there needs a `Sender`, otherwise `generateMessageId()` throws. That is the right behaviour, it was just undocumented.
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-08-31T17:20:42Z
+
+Good to go for me, thanks @nicolas-grekas . All four are right.

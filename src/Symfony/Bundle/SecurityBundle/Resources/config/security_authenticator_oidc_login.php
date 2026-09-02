@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcConfidentialClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
+use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
@@ -31,6 +32,20 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('authentication success handler'),
                 abstract_arg('authentication failure handler'),
                 abstract_arg('options'),
+                // replaced by the firewall verifier, unless the ID token signature is not verified
+                null,
+            ])
+
+        ->set('security.authenticator.oidc_login.signature_verifier', OidcSignatureVerifier::class)
+            ->abstract()
+            ->args([
+                abstract_arg('OIDC discovery'),
+                service('cache.app'),
+                service('http_client'),
+                abstract_arg('signature algorithms'),
+                abstract_arg('default JWKS cache TTL'),
+                abstract_arg('enforce key usage verification'),
+                service('clock'),
             ])
 
         ->set('security.authenticator.oidc_login.id_token', OidcIdToken::class)

@@ -28,8 +28,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * Decodes and validates OIDC ID tokens using the web-token (JOSE) library,
  * reusing the same claim checkers as the OIDC access-token handlers.
  *
- * The signature is not verified: the ID token is received directly from the
- * token endpoint over TLS, where signature verification MAY be skipped
+ * The signature is not verified here: it is the job of {@see OidcSignatureVerifier},
+ * which the "oidc_login" authenticator uses by default, and which the ID token
+ * received directly from the token endpoint over TLS MAY do without
  * (OIDC Core 1.0, Section 3.1.3.7, item 6).
  *
  * @author Mathieu Santostefano <msantostefano@proton.me>

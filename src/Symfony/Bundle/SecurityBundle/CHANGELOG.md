@@ -17,6 +17,7 @@ CHANGELOG
  * Add support for decorating custom authentication failure and success handlers
  * Add role hierarchy graph to the profiler security panel
  * Add `oidc_login` firewall authenticator for the OpenID Connect Authorization Code Flow, along with an `oidc` user provider for the users it builds from the OIDC claims
+ * Add the `id_token_signature` configuration (`required`, `algorithms`, `enforce_key_usage_verification`) to the `oidc_login` authenticator, which now verifies the ID token signature by default
  * Add the `token_endpoint_auth_method` option to the `oidc_login` authenticator: `client_secret_post`, `client_secret_basic`, or `none` to declare a public client, for which `client_secret` must not be set
 
 8.1

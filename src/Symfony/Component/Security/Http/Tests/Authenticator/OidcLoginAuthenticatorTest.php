@@ -274,7 +274,7 @@ class OidcLoginAuthenticatorTest extends TestCase
     public function testAuthenticateIgnoresProviderSuppliedIdentifierClaim()
     {
         // a provider "userIdentifier" claim must not override the identity derived
-        // from the verified "sub"
+        // from the configured identifier claim
         $nonce = bin2hex(random_bytes(16));
         $state = bin2hex(random_bytes(16));
         $idToken = $this->buildIdToken(['nonce' => $nonce]);
@@ -295,6 +295,112 @@ class OidcLoginAuthenticatorTest extends TestCase
 
         $this->assertSame('user-42', $passport->getUser()->getUserIdentifier());
         $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+    }
+
+    public function testAuthenticateWithIdTokenDataSource()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $idToken = $this->buildIdToken([
+            'nonce' => $nonce,
+            'sub' => 'user-42',
+            'email' => 'test@example.com',
+        ]);
+
+        $this->oidcClient->expects($this->once())
+            ->method('exchangeCode')
+            ->willReturn([
+                'access_token' => 'access-123',
+                'id_token' => $idToken,
+            ]);
+
+        $this->oidcClient->expects($this->never())
+            ->method('fetchUserInfo');
+
+        $authenticator = $this->createAuthenticator(['user_data_source' => 'id_token']);
+        $request = $this->createCallbackRequest($state, $nonce);
+
+        $passport = $authenticator->authenticate($request);
+
+        $this->assertSame('user-42', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+    }
+
+    public function testAuthenticateWithCustomUserIdentifierClaim()
+    {
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $idToken = $this->buildIdToken(['nonce' => $nonce]);
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $idToken,
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn([
+            'sub' => 'user-42',
+            'email' => 'test@example.com',
+        ]);
+
+        $authenticator = $this->createAuthenticator(['user_identifier_claim' => 'email']);
+        $request = $this->createCallbackRequest($state, $nonce);
+
+        $passport = $authenticator->authenticate($request);
+
+        $this->assertSame('test@example.com', $passport->getBadge(UserBadge::class)->getUserIdentifier());
+        // the user provider receives that identifier, and the built-in one keeps it
+        $this->assertSame('test@example.com', $passport->getUser()->getUserIdentifier());
+    }
+
+    public function testAuthenticateRejectsANonStringUserIdentifierClaim()
+    {
+        // providers do send numeric values in custom claims; a non-string identifier
+        // must fail authentication cleanly instead of escaping as a TypeError
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $idToken = $this->buildIdToken(['nonce' => $nonce]);
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $idToken,
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn([
+            'sub' => 'user-42',
+            'uid' => 12345,
+        ]);
+
+        $authenticator = $this->createAuthenticator(['user_identifier_claim' => 'uid']);
+        $request = $this->createCallbackRequest($state, $nonce);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The "uid" claim is missing or invalid in the OIDC response.');
+
+        $authenticator->authenticate($request);
+    }
+
+    public function testAuthenticateRejectsUserInfoSubMismatchWithACustomUserIdentifierClaim()
+    {
+        // the "sub" binding of OIDC Core 1.0, Section 5.3.2 is what ties the UserInfo
+        // document to the authenticated user: it holds whatever claim the identifier
+        // is read from, so a swapped document cannot define the identity
+        $nonce = bin2hex(random_bytes(16));
+        $state = bin2hex(random_bytes(16));
+        $idToken = $this->buildIdToken(['nonce' => $nonce]);
+
+        $this->oidcClient->method('exchangeCode')->willReturn([
+            'access_token' => 'access-123',
+            'id_token' => $idToken,
+        ]);
+        $this->oidcClient->method('fetchUserInfo')->willReturn([
+            'sub' => 'other-user',
+            'email' => 'victim@example.com',
+        ]);
+
+        $authenticator = $this->createAuthenticator(['user_identifier_claim' => 'email']);
+        $request = $this->createCallbackRequest($state, $nonce);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('The "sub" claim from the UserInfo endpoint does not match the ID token.');
+
+        $authenticator->authenticate($request);
     }
 
     public function testAuthenticateLoadsTheUserFromTheFirewallUserProvider()

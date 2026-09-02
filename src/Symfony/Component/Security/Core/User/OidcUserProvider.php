@@ -47,7 +47,9 @@ final class OidcUserProvider implements AttributesBasedUserProviderInterface
             throw $exception;
         }
 
-        return OidcUser::fromClaims($this->filterPrivilegedClaims($attributes));
+        // the identifier is the one the caller validated, which the OIDC authenticator reads
+        // from the claim its firewall configures, and not a claim picked from the attributes
+        return OidcUser::fromClaims(['user_identifier' => $identifier] + $this->filterPrivilegedClaims($attributes));
     }
 
     public function refreshUser(UserInterface $user): OidcUser

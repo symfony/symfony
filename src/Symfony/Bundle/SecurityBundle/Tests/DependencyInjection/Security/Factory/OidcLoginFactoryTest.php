@@ -47,14 +47,12 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertEquals(new Reference('security.authenticator.oidc_login.discovery.main'), $authenticator->getArgument(3));
         $this->assertSame('my-client-id', $authenticator->getArgument(5));
 
-        // the endpoints checked against the transport of the discovery document stay wired: the
-        // per-firewall child definition only replaces the issuer and the cache TTL, so it
-        // inherits this argument from the abstract definition
-        $discovery = $container->getDefinition('security.authenticator.oidc_login.discovery');
-        $this->assertSame(['authorization_endpoint', 'token_endpoint', 'userinfo_endpoint'], $discovery->getArgument(6));
+        // the endpoints checked against the transport of the discovery document stay wired
+        // on the per-firewall child definition, which computes them from the claims source
+        $discoveryMain = $container->getDefinition('security.authenticator.oidc_login.discovery.main');
+        $this->assertSame(['authorization_endpoint', 'token_endpoint', 'userinfo_endpoint'], $discoveryMain->getArgument(6));
 
         // the per-firewall discovery definition carries the kernel.reset tag with method reset
-        $discoveryMain = $container->getDefinition('security.authenticator.oidc_login.discovery.main');
         $this->assertSame(['kernel.reset' => [['method' => 'reset']]], $discoveryMain->getTags());
     }
 
@@ -107,6 +105,44 @@ class OidcLoginFactoryTest extends TestCase
 
         $options = $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(8);
         $this->assertSame(['openid profile email'], $options['scope']);
+    }
+
+    public function testEndSessionListenerRegistration()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'check_path' => '/oidc/callback',
+            'enable_end_session' => true,
+            'post_logout_redirect_path' => '/logged-out',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.end_session_listener.main'));
+    }
+
+    public function testEndSessionListenerNotRegisteredByDefault()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'check_path' => '/oidc/callback',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.end_session_listener.main'));
     }
 
     public function testGetKey()
@@ -775,6 +811,72 @@ class OidcLoginFactoryTest extends TestCase
         ], $factory);
 
         $this->assertTrue($finalizedConfig['id_token_signature']['required']);
+    }
+
+    public function testClaimsSourceAndUserIdentifierDefaults()
+    {
+        $factory = new OidcLoginFactory();
+
+        $finalizedConfig = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+        ], $factory);
+
+        $this->assertSame('userinfo', $finalizedConfig['user_data_source']);
+        $this->assertSame('sub', $finalizedConfig['user_identifier_claim']);
+    }
+
+    public function testClaimsMayBeSourcedFromTheIdToken()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'user_data_source' => 'id_token',
+            'user_identifier_claim' => 'email',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $options = $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(8);
+        $this->assertSame('id_token', $options['user_data_source']);
+        $this->assertSame('email', $options['user_identifier_claim']);
+    }
+
+    public function testUserinfoEndpointRequiredWithTheUserinfoClaimsSource()
+    {
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertSame(['authorization_endpoint', 'token_endpoint', 'userinfo_endpoint'], $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(6));
+    }
+
+    public function testUserinfoEndpointNotRequiredWithTheIdTokenClaimsSource()
+    {
+        // a provider putting the claims in the ID token does not necessarily announce
+        // any UserInfo endpoint, so the discovery must not require one then
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'user_data_source' => 'id_token',
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertSame(['authorization_endpoint', 'token_endpoint'], $container->getDefinition('security.authenticator.oidc_login.discovery.main')->getArgument(6));
     }
 
     private function processConfig(array $config, OidcLoginFactory $factory): array

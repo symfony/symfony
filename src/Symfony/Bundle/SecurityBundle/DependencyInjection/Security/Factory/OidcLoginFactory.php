@@ -97,6 +97,15 @@ class OidcLoginFactory extends AbstractFactory
                 ->min(0)
                 ->info('Allowed clock skew in seconds when validating ID token time claims.')
             ->end()
+            ->enumNode('user_data_source')
+                ->values(['userinfo', 'id_token'])
+                ->defaultValue('userinfo')
+                ->info('Where the user claims are read from: "userinfo" (default) fetches them from the UserInfo endpoint; "id_token" reads them from the validated ID token instead, for providers that put the requested claims there, some of which expose no UserInfo endpoint at all, which is then not required to be announced.')
+            ->end()
+            ->scalarNode('user_identifier_claim')
+                ->defaultValue('sub')
+                ->info('The claim the user identifier is read from. "sub" (default) is the only claim OIDC guarantees stable and unique for the user. Only pick another claim, e.g. "email", when the provider guarantees its value unique, verified and stable too: whoever controls the value of that claim at the provider owns the matching account here.')
+            ->end()
             ->arrayNode('id_token_signature')
                 ->addDefaultsIfNotSet()
                 ->children()
@@ -150,6 +159,14 @@ class OidcLoginFactory extends AbstractFactory
                     ->thenInvalid('The OIDC "authorization_params" option cannot set "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method" nor "max_age": the authenticator manages these; use the dedicated "scope" and "max_age" options.')
                 ->end()
             ->end()
+            ->booleanNode('enable_end_session')
+                ->defaultFalse()
+                ->info('Enable RP-Initiated Logout via the OIDC end_session_endpoint.')
+            ->end()
+            ->scalarNode('post_logout_redirect_path')
+                ->defaultValue('/')
+                ->info('Path or route to redirect to after OIDC logout.')
+            ->end()
         ;
 
         // the client type is what "token_endpoint_auth_method" really selects, so the
@@ -202,6 +219,15 @@ class OidcLoginFactory extends AbstractFactory
             $loader->load('security_authenticator_oidc_login.php');
         }
 
+        // these endpoints must be announced and must not downgrade to plain HTTP the
+        // transport of the discovery document; the UserInfo endpoint is only required
+        // when it is the source of the user claims, as a provider putting them in the
+        // ID token does not necessarily expose one
+        $checkedEndpoints = ['authorization_endpoint', 'token_endpoint'];
+        if ('userinfo' === $config['user_data_source']) {
+            $checkedEndpoints[] = 'userinfo_endpoint';
+        }
+
         $discoveryId = 'security.authenticator.oidc_login.discovery.'.$firewallName;
         $container
             ->setDefinition($discoveryId, new ChildDefinition('security.authenticator.oidc_login.discovery'))
@@ -209,6 +235,7 @@ class OidcLoginFactory extends AbstractFactory
             // place a "provider_uri" coming from an environment variable can be normalized
             ->replaceArgument(3, $config['provider_uri'])
             ->replaceArgument(4, $config['discovery_cache_ttl'])
+            ->replaceArgument(6, $checkedEndpoints)
             ->addTag('kernel.reset', ['method' => 'reset'])
         ;
 
@@ -255,6 +282,8 @@ class OidcLoginFactory extends AbstractFactory
         $options = array_intersect_key($config, $this->options);
         $options['firewall_name'] = $firewallName;
         $options['scope'] = $config['scope'];
+        $options['user_data_source'] = $config['user_data_source'];
+        $options['user_identifier_claim'] = $config['user_identifier_claim'];
         $options['pkce_enabled'] = $config['pkce']['enabled'];
         $options['pkce_method'] = $config['pkce']['method'];
         if (isset($config['max_age'])) {
@@ -274,6 +303,16 @@ class OidcLoginFactory extends AbstractFactory
             ->replaceArgument(9, $config['authorization_params'])
             ->replaceArgument(10, $signatureVerifier)
         ;
+
+        if ($config['enable_end_session']) {
+            $endSessionListenerId = 'security.authenticator.oidc_login.end_session_listener.'.$firewallName;
+            $container
+                ->setDefinition($endSessionListenerId, new ChildDefinition('security.authenticator.oidc_login.end_session_listener'))
+                ->replaceArgument(0, new Reference($discoveryId))
+                ->replaceArgument(2, $config['post_logout_redirect_path'])
+                ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
+            ;
+        }
 
         $callbackUris = $container->hasParameter('security.oidc_login.callback_uris') ? (array) $container->getParameter('security.oidc_login.callback_uris') : [];
         // a "check_path" holding a route name instead of a path gets no route declared

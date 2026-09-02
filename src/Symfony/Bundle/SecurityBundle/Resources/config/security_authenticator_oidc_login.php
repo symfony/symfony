@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
+use Symfony\Component\Security\Http\EventListener\OidcEndSessionListener;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -66,10 +67,9 @@ return static function (ContainerConfigurator $container) {
                 '.well-known/openid-configuration',
                 abstract_arg('issuer'),
                 abstract_arg('cache TTL'),
-                // the cache key is derived from the configuration URL; these endpoints must be
-                // announced and must not downgrade to plain HTTP the transport of the discovery document
+                // the cache key is derived from the configuration URL
                 null,
-                ['authorization_endpoint', 'token_endpoint', 'userinfo_endpoint'],
+                abstract_arg('endpoints that must be announced and must not downgrade to plain HTTP the transport of the discovery document'),
             ])
 
         ->set('security.authenticator.oidc_login.client', OidcConfidentialClient::class)
@@ -96,6 +96,15 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->args([
                 service_locator([]),
+            ])
+
+        ->set('security.authenticator.oidc_login.end_session_listener', OidcEndSessionListener::class)
+            ->abstract()
+            ->args([
+                abstract_arg('OIDC discovery'),
+                service('security.http_utils'),
+                abstract_arg('post-logout redirect path'),
+                service('logger')->nullOnInvalid(),
             ])
     ;
 };

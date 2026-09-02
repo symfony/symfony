@@ -29,6 +29,9 @@ trait KeybindingsTrait
 {
     private ?Keybindings $keybindings = null;
 
+    /** @var array<string, string>|null */
+    private ?array $keybindingLabels = null;
+
     /** @var (\Closure(string): bool)|null */
     private ?\Closure $onInput = null;
 
@@ -57,7 +60,33 @@ trait KeybindingsTrait
      */
     public function setKeybindings(?Keybindings $keybindings): static
     {
-        $this->keybindings = $keybindings;
+        if ($this->keybindings !== $keybindings) {
+            $this->keybindings = $keybindings;
+            $this->invalidate();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function getKeybindingLabels(): array
+    {
+        return $this->keybindingLabels ?? static::getDefaultKeybindingLabels();
+    }
+
+    /**
+     * @param array<string, string>|null $labels
+     *
+     * @return $this
+     */
+    public function setKeybindingLabels(?array $labels): static
+    {
+        if ($this->keybindingLabels !== $labels) {
+            $this->keybindingLabels = $labels;
+            $this->invalidate();
+        }
 
         return $this;
     }
@@ -77,9 +106,27 @@ trait KeybindingsTrait
      *
      * Override in widgets that define their own actions.
      *
+     * The first key in each action's array is the primary binding and is
+     * the one displayed by KeyBindingWidget. Additional keys are functional
+     * aliases (e.g. Emacs-style alternatives) and are not shown by default.
+     *
      * @return array<string, string[]>
      */
     protected static function getDefaultKeybindings(): array
+    {
+        return [];
+    }
+
+    /**
+     * Return the default display labels for this widget's keybindings.
+     *
+     * Override to define which actions are shown in KeyBindingWidget,
+     * in what order, and with what human-readable labels.
+     * Actions absent from the returned array are not displayed.
+     *
+     * @return array<string, string>
+     */
+    protected static function getDefaultKeybindingLabels(): array
     {
         return [];
     }

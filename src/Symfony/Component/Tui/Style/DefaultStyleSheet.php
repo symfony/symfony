@@ -14,6 +14,7 @@ namespace Symfony\Component\Tui\Style;
 use Symfony\Component\Tui\Widget\CancellableLoaderWidget;
 use Symfony\Component\Tui\Widget\EditorWidget;
 use Symfony\Component\Tui\Widget\InputWidget;
+use Symfony\Component\Tui\Widget\KeyBindingWidget;
 use Symfony\Component\Tui\Widget\LoaderWidget;
 use Symfony\Component\Tui\Widget\MarkdownWidget;
 use Symfony\Component\Tui\Widget\SelectListWidget;
@@ -50,6 +51,13 @@ final class DefaultStyleSheet
             // Layout aliases (used by <columns>/<column> tag aliases)
             '.columns' => new Style(direction: Direction::Horizontal, gap: 2),
             '.column' => new Style(),
+
+            // KeyBindingWidget
+            KeyBindingWidget::class => new Style(padding: Padding::from([0, 1]), border: Border::all(1)),
+            KeyBindingWidget::class.'::key' => new Style(background: 'gray', bold: true),
+            KeyBindingWidget::class.'::action' => new Style(color: 'gray'),
+            KeyBindingWidget::class.'::global-key' => new Style(background: 'blue', bold: true),
+            KeyBindingWidget::class.'::global-action' => new Style(color: 'gray'),
 
             // CancellableLoaderWidget
             CancellableLoaderWidget::class.':focus' => new Style()->withBold(),

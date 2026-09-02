@@ -55,6 +55,24 @@ final class Key
     public const F11 = 'f11';
     public const F12 = 'f12';
 
+    private const LABELS = [
+        self::ESCAPE => 'Esc',
+        self::ENTER => '↵',
+        self::TAB => 'Tab',
+        self::SPACE => 'Space',
+        self::BACKSPACE => '⌫',
+        self::DELETE => 'Del',
+        self::INSERT => 'Ins',
+        self::HOME => 'Home',
+        self::END => 'End',
+        self::PAGE_UP => '⇞',
+        self::PAGE_DOWN => '⇟',
+        self::UP => '▲',
+        self::DOWN => '▼',
+        self::LEFT => '◀',
+        self::RIGHT => '▶',
+    ];
+
     public static function ctrl(string $key): string
     {
         return 'ctrl+'.strtolower($key);
@@ -88,5 +106,22 @@ final class Key
     public static function ctrlShiftAlt(string $key): string
     {
         return 'ctrl+shift+alt+'.strtolower($key);
+    }
+
+    /**
+     * Return a human-readable display label for a key identifier,
+     * e.g. "▲" for Key::UP or "Ctrl+C" for Key::ctrl('c').
+     */
+    public static function label(string $key): string
+    {
+        return self::LABELS[$key] ?? implode('+', array_map(
+            static fn (string $part) => match ($part) {
+                'ctrl' => 'Ctrl',
+                'shift' => 'Shift',
+                'alt' => 'Alt',
+                default => self::LABELS[$part] ?? mb_strtoupper($part),
+            },
+            explode('+', $key),
+        ));
     }
 }

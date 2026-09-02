@@ -1172,11 +1172,68 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ['x/x', 'exclude_filter', true], // from CustomFilterIterator::accept() (regular filter)
             ['x/x', 'list_dir_open', ['d']],
             ['x/x/d', 'is_dir', true],
-            ['x/x/d', 'exclude_filter', true],
+            ['x/x/d', 'exclude_filter', true], // from ExcludeDirectoryFilterIterator::accept() (prune directory filter)
+            ['x/x/d', 'exclude_filter', true], // from CustomFilterIterator::accept() (regular filter)
             ['x/x/d', 'list_dir_open', ['u2.php']],
             ['x/x/d/u2.php', 'is_dir', false],
             ['x/x/d/u2.php', 'exclude_filter', true],
         ], $this->vfsLog);
+    }
+
+    public function testFilterPruneNestedDirectory()
+    {
+        $this->setupVfsProvider([
+            'x' => [
+                'a.php' => '',
+                'n' => [
+                    'd' => [
+                        'u.php' => '',
+                    ],
+                    'z.php' => '',
+                ],
+            ],
+        ]);
+
+        $finder = $this->buildFinder();
+        $finder
+            ->in($this->vfsScheme.'://x')
+            ->filter(static fn (\SplFileInfo $file): bool => 'd' !== $file->getFilename(), true);
+
+        $this->assertSameVfsIterator([
+            'x/a.php',
+            'x/n',
+            'x/n/z.php',
+        ], $finder->getIterator());
+    }
+
+    public function testFilterPruneWithExcludedPath()
+    {
+        $this->setupVfsProvider([
+            'x' => [
+                'a.php' => '',
+                'd' => [
+                    'u.php' => '',
+                ],
+                'g' => [
+                    'h' => [
+                        'v.php' => '',
+                    ],
+                    'w.php' => '',
+                ],
+            ],
+        ]);
+
+        $finder = $this->buildFinder();
+        $finder
+            ->in($this->vfsScheme.'://x')
+            ->exclude('g/h')
+            ->filter(static fn (\SplFileInfo $file): bool => 'd' !== $file->getFilename(), true);
+
+        $this->assertSameVfsIterator([
+            'x/a.php',
+            'x/g',
+            'x/g/w.php',
+        ], $finder->getIterator());
     }
 
     public function testFollowLinks()

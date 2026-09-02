@@ -316,7 +316,7 @@ final class BlueskyTransport extends AbstractTransport
                 $result = $response->toArray(false);
 
                 if (300 <= $response->getStatusCode()) {
-                    throw new TransportException('Unable to embed medias.', $response);
+                    throw new TransportException('Unable to embed media.', $response);
                 }
 
                 $embeds[] = [

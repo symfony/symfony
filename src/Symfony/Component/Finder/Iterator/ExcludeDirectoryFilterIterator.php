@@ -118,6 +118,7 @@ class ExcludeDirectoryFilterIterator extends \FilterIterator implements \Recursi
         $children->excludedDirs = $this->excludedDirs;
         $children->excludedPattern = $this->excludedPattern;
         $children->excludedRootPattern = $this->excludedRootPattern;
+        $children->pruneFilters = $this->pruneFilters;
 
         return $children;
     }

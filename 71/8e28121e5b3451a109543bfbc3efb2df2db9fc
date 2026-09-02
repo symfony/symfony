@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T15:52:06Z
+
+Thank you @Orkin for coming back to this with a real abstraction, this settles a discussion that spanned several PRs.
+
+I reworked the branch a bit while reviewing:
+- rebased on current 8.2 and resolved the conflicts with the new tracking-header feature of the Brevo and Sendgrid bridges;
+- the Brevo transport now throws an `InvalidArgumentException` when the template reference is not numeric, instead of silently casting it to `0`;
+- added the missing changelog entries in the three bridges, scoped to the API transports (this addresses @stof's comment about the earlier Sendgrid entry);
+- moved the unserialize hardening test into `RemoteTemplateEmailTest`, following the way `EmailTest` covers the same guard in the Mime component.
+
+All the touched test suites are green locally and the style checks pass.
+
+---------------------------------------------------------------------------
+
+by Orkin at 2026-09-02T15:55:49Z
+
+@nicolas-grekas if this solution is fine as is, I can work on mailer client side to support it

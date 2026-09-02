@@ -8,6 +8,7 @@ CHANGELOG
  * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `acceptSignatureHash()` and `verifySignatureHash()`
  * Add `OidcUser::fromClaims()` to build a user from the claims returned by an OIDC provider
  * Add `OidcUserProvider`, which builds the OIDC users of the `oidc_login` authenticator from those claims
+ * Add `GuestAuthorizationCheckerInterface` and allow passing a null user to `AuthorizationChecker::isGrantedForUser()` to check guest permissions
 
 8.1
 ---

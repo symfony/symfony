@@ -12,8 +12,10 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -43,6 +45,15 @@ class AuthorizationCheckerTest extends TestCase
         $this->accessDecisionManager->expects($this->once())->method('decide')->with($this->isInstanceOf(NullToken::class))->willReturn(false);
 
         $authorizationChecker->isGranted('ROLE_FOO');
+    }
+
+    public function testVoteWithStoredOfflineTokenWithoutUser()
+    {
+        $this->tokenStorage->setToken(new class extends AbstractToken implements OfflineTokenInterface {});
+
+        $this->accessDecisionManager->expects($this->once())->method('decide')->with($this->callback(static fn ($token) => $token instanceof NullToken))->willReturn(false);
+
+        $this->assertFalse($this->authorizationChecker->isGranted('ROLE_FOO'));
     }
 
     #[DataProvider('isGrantedProvider')]
@@ -90,6 +101,19 @@ class AuthorizationCheckerTest extends TestCase
             ->willReturn($decide);
 
         $this->assertSame($decide, $this->authorizationChecker->isGrantedForUser($user, 'ROLE_FOO'));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testIsGrantedForGuest(bool $decide)
+    {
+        $this->accessDecisionManager
+            ->expects($this->once())
+            ->method('decide')
+            ->with($this->callback(static fn (OfflineTokenInterface $token) => null === $token->getUser() && [] === $token->getRoleNames()), ['ROLE_FOO'])
+            ->willReturn($decide);
+
+        $this->assertSame($decide, $this->authorizationChecker->isGrantedForUser(null, 'ROLE_FOO'));
     }
 
     public static function isGrantedForUserProvider(): array

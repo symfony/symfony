@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T15:14:17Z
+
+Two things.
+
+**The vertical junctions are wrong once the header scrolls.** `computeVerticalRightChars()` decides `$isSeparator` from the full `3 × tabCount` rows, but `renderVertical()` slices the visible window afterwards, so the first and last *visible* rows get interior junctions instead of edge ones. Six tabs in a 20x9 context:
+
+```
+active=0                      active=5
+╭───────────────────          ╭────┤──────────────   <- ┬ expected
+│ T0  content0                │ T3 │content5
+╰────┐                        ╰────┤
+╭────┤                        ╭────┤
+│ T1 │                        │ T4 │
+╰────┤                        ╰────┤
+╭────┤                        ╭────┘
+│ T2 │                        │ T5
+╰────┤──────────────          ╰───────────────────
+     ^ ┴ expected
+```
+
+Both edges are affected whenever `3 × tabCount > rows`. `testVerticalTopAndBottomSeparatorsFillToRightEdge` misses it because its header fits. Computing the characters after the slice, from the window bounds, covers both.
+
+**The "Done" above does not match the code.** Line 361 still reads `Direction::Horizontal === $this->headerDirection`; what landed is `setHeaderDirection()`, from the other comment. If the setter is the intended answer rather than `getStyle()->getDirection()`, worth saying so, since `Style::getDirection()` means layout flow rather than header placement.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T06:47:47Z
+
+I pushed the two remaining points and rebased on current 8.2:
+
+- The scrolled-header junctions are fixed in a new commit: the right-side characters are now computed from the visible window instead of the full `3 × tabCount` rows, so the first and last visible rows always get edge junctions (`┬`, `┴` or `─`). Test added with the three window positions (active at the top edge, at the bottom edge, and last tab).
+- On using `Style::getDirection()` for the header: that property is consumed by the Renderer as the layout flow of children, so reusing it for header placement would give it two meanings. `setHeaderDirection()` and the constructor argument stay the way to choose where the header sits.
+
+The red `minimal-exts / lowest-php` job on the previous run was a Windows `ProcessTest` flake, unrelated to this PR.

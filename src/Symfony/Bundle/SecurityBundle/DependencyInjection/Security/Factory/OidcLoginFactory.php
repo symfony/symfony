@@ -82,6 +82,11 @@ class OidcLoginFactory extends AbstractFactory
                 ->defaultValue('/oidc/callback')
                 ->info('The firewall path where the OIDC provider redirects after authentication. Must match a redirect URI registered with the provider. A route is declared for this path by the "security.authenticator.oidc_login.route_loader" service, which the application must import (see the OIDC login documentation), as it does for the logout routes. A route name is accepted too, in which case no route is declared for it.')
             ->end()
+            ->scalarNode('start_path')
+                ->cannotBeEmpty()
+                ->defaultValue('/oidc/start')
+                ->info('The path where the route loader declares a route that starts the flow by redirecting to the provider; link to it e.g. from the login page of a firewall offering several ways to log in. A route name is accepted too, in which case no route is declared for it.')
+            ->end()
             ->integerNode('discovery_cache_ttl')
                 ->defaultValue(3600)
                 ->min(0)
@@ -117,6 +122,34 @@ class OidcLoginFactory extends AbstractFactory
                 ->defaultValue('client_secret_post')
                 ->info('Authentication method for the token endpoint. "none" declares a public client (a SPA, a mobile or a native application), which holds no secret and relies on PKCE to protect the code exchange.')
             ->end()
+            ->arrayNode('pkce')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->booleanNode('enabled')
+                        ->defaultTrue()
+                        ->info('Whether to use PKCE (Proof Key for Code Exchange, RFC 7636), which any current provider should support; only disable it for one that rejects the "code_challenge" parameter.')
+                    ->end()
+                    ->enumNode('method')
+                        ->values(['S256', 'plain'])
+                        ->defaultValue('S256')
+                        ->info('The PKCE code challenge method. RFC 7636, Section 4.2 mandates "S256" for every client able to compute it, so only ever pick "plain" for a provider that supports nothing else.')
+                    ->end()
+                ->end()
+            ->end()
+            ->integerNode('max_age')
+                ->min(0)
+                ->info('Maximum elapsed seconds since the end-user authentication, sent as the "max_age" authorization parameter; the ID token must then carry an "auth_time" claim, which is checked against this value, "allowed_time_drift" included.')
+            ->end()
+            ->arrayNode('authorization_params')
+                ->useAttributeAsKey('name')
+                ->scalarPrototype()->end()
+                ->defaultValue([])
+                ->info('Additional parameters of the authorization request (e.g. "prompt", "display", "ui_locales", "acr_values", "login_hint").')
+                ->validate()
+                    ->ifTrue(static fn ($v): bool => (bool) array_intersect_key($v, array_flip(['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age'])))
+                    ->thenInvalid('The OIDC "authorization_params" option cannot set "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method" nor "max_age": the authenticator manages these; use the dedicated "scope" and "max_age" options.')
+                ->end()
+            ->end()
         ;
 
         // the client type is what "token_endpoint_auth_method" really selects, so the
@@ -132,6 +165,10 @@ class OidcLoginFactory extends AbstractFactory
             ->validate()
                 ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && null !== $v['client_secret'])
                 ->thenInvalid('The OIDC "client_secret" must not be set when "token_endpoint_auth_method" is "none", as a public client never sends it. Remove the secret, or authenticate with it by using "client_secret_post" or "client_secret_basic".')
+            ->end()
+            ->validate()
+                ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && !$v['pkce']['enabled'])
+                ->thenInvalid('The OIDC "pkce.enabled" option cannot be false when "token_endpoint_auth_method" is "none": a public client sends no secret, so PKCE is the only thing binding the authorization code to it.')
             ->end()
             ->validate()
                 ->ifTrue(static fn ($v): bool => 'none' === $v['token_endpoint_auth_method'] && !$v['id_token_signature']['required'])
@@ -218,6 +255,11 @@ class OidcLoginFactory extends AbstractFactory
         $options = array_intersect_key($config, $this->options);
         $options['firewall_name'] = $firewallName;
         $options['scope'] = $config['scope'];
+        $options['pkce_enabled'] = $config['pkce']['enabled'];
+        $options['pkce_method'] = $config['pkce']['method'];
+        if (isset($config['max_age'])) {
+            $options['max_age'] = $config['max_age'];
+        }
 
         $container
             ->setDefinition($authenticatorId, new ChildDefinition('security.authenticator.oidc_login'))
@@ -229,7 +271,8 @@ class OidcLoginFactory extends AbstractFactory
             ->replaceArgument(6, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
             ->replaceArgument(7, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(8, $options)
-            ->replaceArgument(9, $signatureVerifier)
+            ->replaceArgument(9, $config['authorization_params'])
+            ->replaceArgument(10, $signatureVerifier)
         ;
 
         $callbackUris = $container->hasParameter('security.oidc_login.callback_uris') ? (array) $container->getParameter('security.oidc_login.callback_uris') : [];
@@ -239,6 +282,15 @@ class OidcLoginFactory extends AbstractFactory
             $callbackUris[$firewallName] = $config['check_path'];
         }
         $container->setParameter('security.oidc_login.callback_uris', $callbackUris);
+
+        $startPaths = $container->hasParameter('security.oidc_login.start_paths') ? (array) $container->getParameter('security.oidc_login.start_paths') : [];
+        if ('/' === $config['start_path'][0]) {
+            $startPaths[$firewallName] = $config['start_path'];
+        }
+        $container->setParameter('security.oidc_login.start_paths', $startPaths);
+
+        $startControllerLocator = $container->getDefinition('security.authenticator.oidc_login.start_controller')->getArgument(0);
+        $startControllerLocator->setValues([$firewallName => new Reference($authenticatorId)] + $startControllerLocator->getValues());
 
         return $authenticatorId;
     }

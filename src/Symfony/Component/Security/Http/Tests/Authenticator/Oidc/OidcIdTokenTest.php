@@ -320,6 +320,73 @@ class OidcIdTokenTest extends TestCase
         return new OidcIdToken(new MockClock());
     }
 
+    public function testValidateClaimsChecksMaxAgeWithTheInjectedClock()
+    {
+        $claims = [
+            'iss' => 'https://provider.example.com',
+            'aud' => 'my-client-id',
+            'exp' => 1750003600,
+            'iat' => 1750000000,
+            'auth_time' => 1749999700,
+        ];
+
+        // the user authenticated exactly max_age seconds before the injected clock's now...
+        (new OidcIdToken(new MockClock('@1750000000')))->validateClaims($claims, 'https://provider.example.com', 'my-client-id', null, 300);
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('max_age');
+
+        // ...and one second too early for a clock one second later
+        (new OidcIdToken(new MockClock('@1750000001')))->validateClaims($claims, 'https://provider.example.com', 'my-client-id', null, 300);
+    }
+
+    public function testValidateClaimsMaxAgeAllowsTimeDrift()
+    {
+        $claims = [
+            'iss' => 'https://provider.example.com',
+            'aud' => 'my-client-id',
+            'exp' => 1750003600,
+            'iat' => 1750000000,
+            'auth_time' => 1749999698,
+        ];
+
+        // 302 seconds elapsed, accepted with max_age 300 and a 2-second drift allowance
+        (new OidcIdToken(new MockClock('@1750000000'), 2))->validateClaims($claims, 'https://provider.example.com', 'my-client-id', null, 300);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testValidateClaimsMissingAuthTimeWhenMaxAgeRequested()
+    {
+        $claims = [
+            'iss' => 'https://provider.example.com',
+            'aud' => 'my-client-id',
+            'exp' => 1750003600,
+            'iat' => 1750000000,
+        ];
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('auth_time');
+
+        (new OidcIdToken(new MockClock('@1750000000')))->validateClaims($claims, 'https://provider.example.com', 'my-client-id', null, 300);
+    }
+
+    public function testValidateClaimsRejectsANonNumericAuthTime()
+    {
+        $claims = [
+            'iss' => 'https://provider.example.com',
+            'aud' => 'my-client-id',
+            'exp' => 1750003600,
+            'iat' => 1750000000,
+            'auth_time' => 'yesterday',
+        ];
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('auth_time');
+
+        (new OidcIdToken(new MockClock('@1750000000')))->validateClaims($claims, 'https://provider.example.com', 'my-client-id', null, 300);
+    }
+
     private function buildJwt(array $claims = []): string
     {
         return (new CompactSerializer())->serialize(

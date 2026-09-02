@@ -42,13 +42,21 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 {
     private const MAX_CONCURRENT_ATTEMPTS = 5;
 
+    // parameters of the authorization request the authenticator computes itself, so
+    // that no configuration can weaken them; "max_age" is owned too, as sending it
+    // obliges this client to check the "auth_time" claim of the resulting ID token
+    private const MANAGED_PARAMS = ['response_type', 'client_id', 'redirect_uri', 'scope', 'state', 'nonce', 'code_challenge', 'code_challenge_method', 'max_age'];
+
     private array $options;
 
     /**
-     * @param OidcSignatureVerifier|null $signatureVerifier Verifies the ID token signature against the provider JWKS, or null
-     *                                                      to decode the token without verifying it, which OIDC Core 1.0,
-     *                                                      Section 3.1.3.7, item 6 only allows as long as the token endpoint
-     *                                                      request verifies TLS
+     * @param array<string, string>      $authorizationParams Additional parameters of the authorization request, e.g.
+     *                                                        "prompt" or "ui_locales"; the protocol parameters the
+     *                                                        authenticator manages itself are rejected
+     * @param OidcSignatureVerifier|null $signatureVerifier   Verifies the ID token signature against the provider JWKS,
+     *                                                        or null to decode the token without verifying it, which
+     *                                                        OIDC Core 1.0, Section 3.1.3.7, item 6 only allows as long
+     *                                                        as the token endpoint request verifies TLS
      */
     public function __construct(
         private readonly HttpUtils $httpUtils,
@@ -60,13 +68,24 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         private readonly AuthenticationSuccessHandlerInterface $successHandler,
         private readonly AuthenticationFailureHandlerInterface $failureHandler,
         array $options,
+        private readonly array $authorizationParams = [],
         private readonly ?OidcSignatureVerifier $signatureVerifier = null,
     ) {
         $this->options = array_merge([
             'check_path' => '/oidc/callback',
             'firewall_name' => 'main',
             'scope' => ['openid'],
+            'pkce_enabled' => true,
+            'pkce_method' => 'S256',
         ], $options);
+
+        if (!\in_array($this->options['pkce_method'], ['S256', 'plain'], true)) {
+            throw new \InvalidArgumentException(\sprintf('Invalid PKCE method "%s": RFC 7636 defines "S256" and "plain" only.', $this->options['pkce_method']));
+        }
+
+        if ($managed = array_intersect_key($authorizationParams, array_flip(self::MANAGED_PARAMS))) {
+            throw new \InvalidArgumentException(\sprintf('The authorization request parameter(s) "%s" are managed by the authenticator and cannot be set through $authorizationParams.', implode('", "', array_keys($managed))));
+        }
     }
 
     public function supports(Request $request): bool
@@ -90,7 +109,29 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
 
         $state = bin2hex(random_bytes(32));
         $nonce = bin2hex(random_bytes(32));
-        $codeVerifier = $this->generateCodeVerifier();
+
+        $params = [
+            'response_type' => 'code',
+            'client_id' => $this->clientId,
+            'redirect_uri' => $redirectUri,
+            'scope' => implode(' ', $this->getScopes()),
+            'state' => $state,
+            'nonce' => $nonce,
+        ];
+
+        $codeVerifier = null;
+        if ($this->options['pkce_enabled']) {
+            $codeVerifier = $this->generateCodeVerifier();
+
+            $params['code_challenge'] = $this->deriveCodeChallenge($codeVerifier);
+            $params['code_challenge_method'] = $this->options['pkce_method'];
+        }
+
+        if (null !== ($this->options['max_age'] ?? null)) {
+            $params['max_age'] = (string) $this->options['max_age'];
+        }
+
+        $params = array_merge($params, $this->authorizationParams);
 
         // each pending attempt lives under its own session key, carrying the state, so
         // that concurrent logins started from several tabs write distinct entries instead
@@ -107,17 +148,6 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             'code_verifier' => $codeVerifier,
             'redirect_uri' => $redirectUri,
         ]);
-
-        $params = [
-            'response_type' => 'code',
-            'client_id' => $this->clientId,
-            'redirect_uri' => $redirectUri,
-            'scope' => implode(' ', $this->getScopes()),
-            'state' => $state,
-            'nonce' => $nonce,
-            'code_challenge' => rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '='),
-            'code_challenge_method' => 'S256',
-        ];
 
         $authorizationUrl = $authorizationEndpoint
             .(str_contains($authorizationEndpoint, '?') ? '&' : '?')
@@ -179,8 +209,9 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             throw new AuthenticationException('Missing OIDC nonce in session.');
         }
 
-        // same for the PKCE verifier: exchanging the code without it would downgrade PKCE
-        if (!\is_string($codeVerifier) || '' === $codeVerifier) {
+        // same for the PKCE verifier when PKCE is enabled: exchanging the code
+        // without it would downgrade PKCE
+        if ($this->options['pkce_enabled'] && (!\is_string($codeVerifier) || '' === $codeVerifier)) {
             throw new AuthenticationException('Missing PKCE code verifier in session.');
         }
 
@@ -207,6 +238,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
             $this->discovery->getConfiguration()['issuer'] ?? '',
             $this->clientId,
             $nonce,
+            $this->options['max_age'] ?? null,
         );
 
         $claims = $this->fetchUserClaims($tokenData['access_token'], $idTokenClaims);
@@ -278,7 +310,7 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
      *
      * @return array<string, mixed>
      */
-    private function exchangeAuthorizationCode(string $redirectUri, string $code, string $codeVerifier): array
+    private function exchangeAuthorizationCode(string $redirectUri, string $code, ?string $codeVerifier): array
     {
         $tokenData = $this->oidcClient->exchangeCode($code, $redirectUri, $codeVerifier);
 
@@ -338,8 +370,17 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
     private function generateCodeVerifier(): string
     {
         // A 32-byte (256-bit) verifier, hex-encoded to 64 characters, as recommended
-        // by RFC 7636 Appendix B. The S256 challenge below is the only base64url step.
+        // by RFC 7636 Appendix B
         return bin2hex(random_bytes(32));
+    }
+
+    private function deriveCodeChallenge(string $codeVerifier): string
+    {
+        return match ($this->options['pkce_method']) {
+            // BASE64URL(SHA256(verifier)) without padding, per RFC 7636, Section 4.2
+            'S256' => rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '='),
+            'plain' => $codeVerifier,
+        };
     }
 
     private function getSession(Request $request): SessionInterface

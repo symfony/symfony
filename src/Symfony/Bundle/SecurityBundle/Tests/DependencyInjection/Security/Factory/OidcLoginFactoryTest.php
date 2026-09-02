@@ -123,6 +123,79 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(-25, $factory->getPriority());
     }
 
+    public function testDefaultConfiguration()
+    {
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'check_path' => '/oidc/callback',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+
+        $this->assertSame('/oidc/callback', $finalizedConfig['check_path']);
+        $this->assertSame(['openid'], $finalizedConfig['scope']);
+        $this->assertTrue($finalizedConfig['pkce']['enabled']);
+        $this->assertSame('S256', $finalizedConfig['pkce']['method']);
+        $this->assertSame(3600, $finalizedConfig['discovery_cache_ttl']);
+        $this->assertSame([], $finalizedConfig['authorization_params']);
+        $this->assertArrayNotHasKey('max_age', $finalizedConfig);
+    }
+
+    public function testMaxAgeAndAuthorizationParamsArePassedToTheAuthenticator()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'check_path' => '/oidc/callback',
+            'max_age' => 3600,
+            'authorization_params' => ['prompt' => 'consent', 'ui_locales' => 'fr'],
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
+
+        $this->assertSame(3600, $authenticator->getArgument(8)['max_age']);
+        $this->assertSame(['prompt' => 'consent', 'ui_locales' => 'fr'], $authenticator->getArgument(9));
+    }
+
+    public function testAuthorizationParamsCannotSetTheManagedParameters()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "authorization_params" option cannot set');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'authorization_params' => ['code_challenge' => ''],
+        ], $factory);
+    }
+
+    public function testPkceMethodRejectsUnknownValue()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'pkce' => ['method' => 'S512'],
+        ], $factory);
+    }
+
     public function testRequiredOptions()
     {
         $factory = new OidcLoginFactory();
@@ -294,6 +367,47 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame([], $container->getParameter('security.oidc_login.callback_uris'));
     }
 
+    public function testStartRouteIsRegistered()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $this->assertSame(['main' => '/oidc/start'], $container->getParameter('security.oidc_login.start_paths'));
+
+        $locator = $container->getDefinition('security.authenticator.oidc_login.start_controller')->getArgument(0);
+        $this->assertEquals(['main' => new Reference('security.authenticator.oidc_login.main')], $locator->getValues());
+    }
+
+    public function testStartRouteNameIsNotRegistered()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'start_path' => 'oidc_start_route',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $this->assertSame([], $container->getParameter('security.oidc_login.start_paths'));
+        // the controller still serves the firewall, as the named route may point to it
+        $locator = $container->getDefinition('security.authenticator.oidc_login.start_controller')->getArgument(0);
+        $this->assertEquals(['main' => new Reference('security.authenticator.oidc_login.main')], $locator->getValues());
+    }
+
     public function testRejectsNonHttpsProviderUri()
     {
         $factory = new OidcLoginFactory();
@@ -348,6 +462,27 @@ class OidcLoginFactoryTest extends TestCase
         yield 'test TLD' => ['http://keycloak.test'];
     }
 
+    public function testPkceCanBeDisabled()
+    {
+        // e.g. for a provider that does not support PKCE yet
+        $container = new ContainerBuilder();
+        $factory = new OidcLoginFactory();
+
+        $config = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'pkce' => ['enabled' => false, 'method' => 'plain'],
+        ], $factory);
+        $factory->createAuthenticator($container, 'main', $config, 'userprovider');
+
+        $this->assertFalse($config['pkce']['enabled']);
+
+        $options = $container->getDefinition('security.authenticator.oidc_login.main')->getArgument(8);
+        $this->assertFalse($options['pkce_enabled']);
+        $this->assertSame('plain', $options['pkce_method']);
+    }
+
     public function testIdTokenSignatureIsVerifiedByDefault()
     {
         $container = new ContainerBuilder();
@@ -374,7 +509,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertTrue($verifier->getArgument(5));
 
         $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
-        $this->assertEquals(new Reference('security.authenticator.oidc_login.signature_verifier.main'), $authenticator->getArgument(9));
+        $this->assertEquals(new Reference('security.authenticator.oidc_login.signature_verifier.main'), $authenticator->getArgument(10));
     }
 
     public function testIdTokenSignatureVerificationCanBeTurnedOff()
@@ -393,7 +528,7 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.signature_verifier.main'));
 
         $authenticator = $container->getDefinition('security.authenticator.oidc_login.main');
-        $this->assertNull($authenticator->getArgument(9));
+        $this->assertNull($authenticator->getArgument(10));
     }
 
     public function testIdTokenSignatureAlgorithmsAndKeyUsageAreConfigurable()
@@ -570,6 +705,34 @@ class OidcLoginFactoryTest extends TestCase
         ], $factory);
 
         $this->assertSame('client_secret_post', $finalizedConfig['token_endpoint_auth_method']);
+    }
+
+    public function testRejectsAPublicClientWithoutPkce()
+    {
+        $factory = new OidcLoginFactory();
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The OIDC "pkce.enabled" option cannot be false when "token_endpoint_auth_method" is "none"');
+
+        $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'token_endpoint_auth_method' => 'none',
+            'pkce' => ['enabled' => false],
+        ], $factory);
+    }
+
+    public function testAPublicClientKeepsPkceEnabledByDefault()
+    {
+        $factory = new OidcLoginFactory();
+
+        $finalizedConfig = $this->processConfig([
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'token_endpoint_auth_method' => 'none',
+        ], $factory);
+
+        $this->assertTrue($finalizedConfig['pkce']['enabled']);
     }
 
     public function testRejectsTurningTheIdTokenSignatureVerificationOffForAPublicClient()

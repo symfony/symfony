@@ -1529,12 +1529,15 @@ class Process implements \IteratorAggregate
 
         static $comSpec;
 
-        if (!$comSpec && $comSpec = (new ExecutableFinder())->find('cmd.exe')) {
+        if (!$comSpec) {
+            // use an absolute path to prevent CreateProcess() from looking for "cmd" in the current directory
+            $comSpec = (new ExecutableFinder())->find('cmd.exe') ?: (getenv('SystemRoot') ?: 'C:\Windows').'\System32\cmd.exe';
+
             // Escape according to CommandLineToArgvW rules
             $comSpec = '"'.preg_replace('{(\\\\*+)"}', '$1$1\"', $comSpec).'"';
         }
 
-        $cmd = ($comSpec ?? 'cmd').' /V:ON /E:ON /D /C ('.str_replace("\n", ' ', $cmd).')';
+        $cmd = $comSpec.' /V:ON /E:ON /D /C ('.str_replace("\n", ' ', $cmd).')';
         foreach ($this->processPipes->getFiles() as $offset => $filename) {
             $cmd .= ' '.$offset.'>"'.$filename.'"';
         }

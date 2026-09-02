@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcPublicClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
 use Symfony\Component\Security\Http\Authenticator\OidcLoginAuthenticator;
+use Symfony\Component\Security\Http\EventListener\OidcEndSessionListener;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
 
 return static function (ContainerConfigurator $container) {
@@ -95,6 +96,15 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->args([
                 service_locator([]),
+            ])
+
+        ->set('security.authenticator.oidc_login.end_session_listener', OidcEndSessionListener::class)
+            ->abstract()
+            ->args([
+                abstract_arg('OIDC discovery'),
+                service('security.http_utils'),
+                abstract_arg('post-logout redirect path'),
+                service('logger')->nullOnInvalid(),
             ])
     ;
 };

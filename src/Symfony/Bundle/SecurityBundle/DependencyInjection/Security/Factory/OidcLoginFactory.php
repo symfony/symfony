@@ -159,6 +159,14 @@ class OidcLoginFactory extends AbstractFactory
                     ->thenInvalid('The OIDC "authorization_params" option cannot set "response_type", "client_id", "redirect_uri", "scope", "state", "nonce", "code_challenge", "code_challenge_method" nor "max_age": the authenticator manages these; use the dedicated "scope" and "max_age" options.')
                 ->end()
             ->end()
+            ->booleanNode('enable_end_session')
+                ->defaultFalse()
+                ->info('Enable RP-Initiated Logout via the OIDC end_session_endpoint.')
+            ->end()
+            ->scalarNode('post_logout_redirect_path')
+                ->defaultValue('/')
+                ->info('Path or route to redirect to after OIDC logout.')
+            ->end()
         ;
 
         // the client type is what "token_endpoint_auth_method" really selects, so the
@@ -295,6 +303,16 @@ class OidcLoginFactory extends AbstractFactory
             ->replaceArgument(9, $config['authorization_params'])
             ->replaceArgument(10, $signatureVerifier)
         ;
+
+        if ($config['enable_end_session']) {
+            $endSessionListenerId = 'security.authenticator.oidc_login.end_session_listener.'.$firewallName;
+            $container
+                ->setDefinition($endSessionListenerId, new ChildDefinition('security.authenticator.oidc_login.end_session_listener'))
+                ->replaceArgument(0, new Reference($discoveryId))
+                ->replaceArgument(2, $config['post_logout_redirect_path'])
+                ->addTag('kernel.event_subscriber', ['dispatcher' => 'security.event_dispatcher.'.$firewallName])
+            ;
+        }
 
         $callbackUris = $container->hasParameter('security.oidc_login.callback_uris') ? (array) $container->getParameter('security.oidc_login.callback_uris') : [];
         // a "check_path" holding a route name instead of a path gets no route declared

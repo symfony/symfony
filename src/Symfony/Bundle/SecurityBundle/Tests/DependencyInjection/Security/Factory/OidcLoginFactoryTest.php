@@ -107,6 +107,44 @@ class OidcLoginFactoryTest extends TestCase
         $this->assertSame(['openid profile email'], $options['scope']);
     }
 
+    public function testEndSessionListenerRegistration()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'check_path' => '/oidc/callback',
+            'enable_end_session' => true,
+            'post_logout_redirect_path' => '/logged-out',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $this->assertTrue($container->hasDefinition('security.authenticator.oidc_login.end_session_listener.main'));
+    }
+
+    public function testEndSessionListenerNotRegisteredByDefault()
+    {
+        $container = new ContainerBuilder();
+
+        $config = [
+            'provider_uri' => 'https://provider.example.com',
+            'client_id' => 'my-client-id',
+            'client_secret' => 'my-client-secret',
+            'check_path' => '/oidc/callback',
+        ];
+
+        $factory = new OidcLoginFactory();
+        $finalizedConfig = $this->processConfig($config, $factory);
+        $factory->createAuthenticator($container, 'main', $finalizedConfig, 'userprovider');
+
+        $this->assertFalse($container->hasDefinition('security.authenticator.oidc_login.end_session_listener.main'));
+    }
+
     public function testGetKey()
     {
         $factory = new OidcLoginFactory();

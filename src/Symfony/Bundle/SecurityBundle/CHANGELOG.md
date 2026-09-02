@@ -22,6 +22,7 @@ CHANGELOG
  * Add the `pkce` (`enabled`, `method`), `max_age` and `authorization_params` options to the `oidc_login` authenticator
  * Add a `start_path` option to the `oidc_login` authenticator and declare a route there that starts the flow by redirecting to the provider, for login pages linking to it
  * Add `user_data_source` and `user_identifier_claim` options to the `oidc_login` authenticator
+ * Add `enable_end_session` and `post_logout_redirect_path` options to the `oidc_login` authenticator for RP-Initiated Logout
 
 8.1
 ---

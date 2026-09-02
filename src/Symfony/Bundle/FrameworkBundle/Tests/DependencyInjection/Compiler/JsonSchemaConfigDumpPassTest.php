@@ -142,6 +142,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     }
 
     #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
     public function testGeneratedSchemaKeepsTheListFormOfNormalizedKeyedMaps()
     {
         $schemaFile = $this->tempDir.'/framework_schema.json';
@@ -163,6 +164,7 @@ class JsonSchemaConfigDumpPassTest extends TestCase
     }
 
     #[RequiresMethod(Validator::class, 'validate')]
+    #[RequiresMethod(SchemaValidator::class, 'validate')]
     public function testGeneratedSchemaRejectsTheListFormOfPlainKeyedMaps()
     {
         $schemaFile = $this->tempDir.'/framework_schema.json';

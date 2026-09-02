@@ -103,10 +103,9 @@ final class JsonSchemaDumper
                     $schema['minProperties'] = $node->getMinNumberOfElements();
                 }
 
-                // A key-attribute map also accepts the equivalent list form, which the Config
-                // layer normalizes back into a map. Only scalar prototypes are exposed as a
-                // list, where each item is the attribute value.
-                if (!$node->getPrototype() instanceof ArrayNode) {
+                // A normalization closure rewrites the input before the key-attribute
+                // rules apply, so such a map also accepts the equivalent list form.
+                if ($node->hasNormalizationClosures() && !$node->getPrototype() instanceof ArrayNode) {
                     $listSchema = [
                         '$ref' => $node->isNullable() ? '#/$defs/types/array_null' : '#/$defs/types/array',
                         'items' => $prototypeSchema,

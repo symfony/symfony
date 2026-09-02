@@ -206,22 +206,11 @@
                     ]
                 },
                 "parameters": {
-                    "anyOf": [
-                        {
-                            "$ref": "#/$defs/types/object_null",
-                            "additionalProperties": {
-                                "$ref": "#/$defs/types/scalar",
-                                "description": "Parameter name"
-                            }
-                        },
-                        {
-                            "$ref": "#/$defs/types/array_null",
-                            "items": {
-                                "$ref": "#/$defs/types/scalar",
-                                "description": "Parameter name"
-                            }
-                        }
-                    ]
+                    "$ref": "#/$defs/types/object_null",
+                    "additionalProperties": {
+                        "$ref": "#/$defs/types/scalar",
+                        "description": "Parameter name"
+                    }
                 },
                 "connections": {
                     "$ref": "#/$defs/types/array_null",

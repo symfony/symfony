@@ -236,6 +236,14 @@ abstract class BaseNode implements NodeInterface
     }
 
     /**
+     * Tells whether closures are used to normalize the value.
+     */
+    public function hasNormalizationClosures(): bool
+    {
+        return (bool) $this->normalizationClosures;
+    }
+
+    /**
      * Sets the list of types supported by normalization.
      *
      * @param list<ExprBuilder::TYPE_*> $types

@@ -121,15 +121,25 @@ class JsonSchemaDumperTest extends TestCase
         $prototype->setKeyAttribute('name');
         $root = new ArrayNode('root');
         $root->addChild($prototype);
-        yield 'key-attribute map with scalar prototype also accepts a list' => [$prototype, [
+        yield 'key-attribute map with scalar prototype' => [$prototype, [
+            '$ref' => '#/$defs/types/object',
+            'additionalProperties' => ['$ref' => '#/$defs/types/string'],
+        ]];
+
+        $mapWithNormalization = (new ArrayNodeDefinition('proto'))
+            ->useAttributeAsKey('name')
+            ->stringPrototype()->end()
+            ->beforeNormalization()->ifArray()->then(static fn ($v) => $v)->end()
+            ->getNode();
+        yield 'key-attribute map with a normalization closure also accepts a list' => [$mapWithNormalization, [
             'anyOf' => [
                 [
-                    '$ref' => '#/$defs/types/object',
-                    'additionalProperties' => ['$ref' => '#/$defs/types/string'],
+                    '$ref' => '#/$defs/types/object_null',
+                    'additionalProperties' => ['$ref' => '#/$defs/types/string_null'],
                 ],
                 [
-                    '$ref' => '#/$defs/types/array',
-                    'items' => ['$ref' => '#/$defs/types/string'],
+                    '$ref' => '#/$defs/types/array_null',
+                    'items' => ['$ref' => '#/$defs/types/string_null'],
                 ],
             ],
         ]];
@@ -145,16 +155,8 @@ class JsonSchemaDumperTest extends TestCase
         // A prototyped map with a null default is nullable, so it uses the object_null ref.
         $mapWithNullDefault = (new ArrayNodeDefinition('proto'))->defaultNull()->useAttributeAsKey('name')->stringPrototype()->end()->getNode();
         yield 'array map with null default uses the nullable ref' => [$mapWithNullDefault, [
-            'anyOf' => [
-                [
-                    '$ref' => '#/$defs/types/object_null',
-                    'additionalProperties' => ['$ref' => '#/$defs/types/string_null'],
-                ],
-                [
-                    '$ref' => '#/$defs/types/array_null',
-                    'items' => ['$ref' => '#/$defs/types/string_null'],
-                ],
-            ],
+            '$ref' => '#/$defs/types/object_null',
+            'additionalProperties' => ['$ref' => '#/$defs/types/string_null'],
             'default' => null,
         ]];
 

@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T13:12:03Z
+
+Thanks for the quick follow-up! I reworked the PR while reviewing it and force-pushed the result (8bcda6cbeaa, rebased on current 8.2). The `pkce`, `max_age` and `authorization_params` options are kept; here is what changed and why.
+
+**Removed `PkceMethodInterface`, `S256PkceMethod`, `PlainPkceMethod` and the `security.oidc.pkce_method` tag.** RFC 7636 and the IANA "PKCE Code Challenge Methods" registry define exactly two methods, unchanged since 2015, and OAuth 2.1 deprecates `plain`; there is no third method with a server to talk to. The pluggability also did not work as shipped: an autoconfigured implementation was tagged without an `index` attribute, so the locator keyed it by class name and never called `getName()`; `pkce.method: my-method` then threw "Unknown PKCE method" at runtime. A closed `enumNode(['S256', 'plain'])` covers the real use case with no carried API, and the challenge derivation is now a private `match` in the authenticator. If a third method ever gets registered, adding it there is a one-liner.
+
+**Removed `prompt`.** It was a pure passthrough, so `authorization_params: { prompt: consent }` does the same. The enum also rejected valid protocol values: multi-values like `login consent`, and `create` from the Prompt Create spec. Through the bag, all of these flow.
+
+**Kept `max_age` as a first-class option**, because it is not a passthrough: sending it obliges the client to check the `auth_time` claim (OIDC Core 1.0, Section 3.1.2.1). Two fixes to the enforcement: it now uses the injected clock and `allowed_time_drift` like every other time check (it used `time()` and a bare comparison, which rejected valid logins under clock divergence), and a missing or non-numeric `auth_time` fails closed. `max_age` is also on the reserved list below, so the request parameter and the check can never diverge.
+
+**`authorization_params` no longer overrides the first-class parameters, it refuses them.** As submitted, the bag protected `response_type`, `client_id`, `redirect_uri`, `scope`, `state` and `nonce`, but not `code_challenge`/`code_challenge_method`: `authorization_params: { code_challenge: '' }` sent an empty challenge to the provider while the client still believed PKCE was on, and it compiled fine for a public client, silently defeating this PR's own compile-time rule. The reserved keys now fail config validation with a message pointing at the dedicated option, and the authenticator constructor enforces the same for direct component users. A config error beats a silent drop.
+
+**Removed `direct_redirect`.** Two reasons. First, the base API already covers the headline scenario: with two entry-point-capable authenticators on one firewall, SecurityBundle requires the `entry_point` key anyway, so the choice already exists and works:
+
+```yaml
+firewalls:
+    main:
+        form_login:
+            login_path: login
+        oidc_login:
+            # ...
+        entry_point: form_login
+```
+
+Second, the option was a dead end: with `direct_redirect: false` nothing could produce the provider redirect anymore. The entry point went to `login_path`, the callback route fails without a `state`, no start route exists, and the flag short-circuited `start()` itself, so even a controller calling it looped back to the login page. What is actually missing for multi-login firewalls is a hosted start path that a login page can link to; that deserves its own design, and I would take it as a follow-up.
+
+I updated the description to match. Combined suites are green locally, including together with #65813, which touches the same `validate()` chain; whichever merges second gets a trivial keep-both-blocks conflict.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-09-02T13:18:22Z
+
+@nicolas-grekas removing `direct_redirect` imply the developers need to customize the login form template to include OIDC links to operate redirection to IdP. Is that something we should document clearly, right?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T13:41:09Z
+
+Good point, and documenting it would not have been enough: the recipe we would have documented was "write a controller that calls `start()` on `security.authenticator.oidc_login.<firewall>`", and that service id is wiring, not API. So instead of documenting a workaround, I folded the missing piece into this PR (f0ac2c059): the route loader now declares a `_oidc_login_start_<firewall>` route at the new `start_path` (default `/oidc/start`), served by a small public controller that delegates to the firewall authenticator's `start()`.
+
+The login template then needs one line, with `entry_point` pointing at the form:
+
+```twig
+<a href="{{ path('_oidc_login_start_main') }}">Sign in with the provider</a>
+```
+
+`start_path` follows the `check_path` conventions (a route name declares nothing), a start path cannot be shared between two firewalls since the route carries the firewall name, and the whole thing is covered by a functional test that drives `GET /oidc/start` against a mocked discovery and asserts the provider redirect, PKCE challenge included. Description updated. The docs will have to mention that the start path must stay anonymously accessible when `access_control` rules cover the firewall.

@@ -480,6 +480,9 @@
                                             {% if authenticator.supports is same as(false) %}
                                                 <div class="empty">
                                                     <p>This authenticator did not support the request.</p>
+                                                    {% if authenticator.unsupportedReasons is defined and authenticator.unsupportedReasons|length %}
+                                                        <p>Reason: {{ authenticator.unsupportedReasons|join(', ') }}</p>
+                                                    {% endif %}
                                                 </div>
                                             {% elseif authenticator.authenticated is null %}
                                                 <div class="empty">

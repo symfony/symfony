@@ -30,6 +30,7 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * Authenticator for the OpenID Connect Authorization Code Flow.
@@ -95,7 +96,13 @@ final class OidcLoginAuthenticator extends AbstractAuthenticator implements Auth
         // every request on the callback path is handled here: the route declared for it
         // carries no controller, so one passing through would end up reported as a routing
         // error instead of the authentication failure it is
-        return $this->httpUtils->checkRequestPath($request, $this->options['check_path']);
+        if (!$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            $request->attributes->get(SecurityRequestAttributes::UNSUPPORTED_REASONS)?->add(\sprintf('the request path "%s" does not match the "check_path" option "%s"', $request->getPathInfo(), $this->options['check_path']));
+
+            return false;
+        }
+
+        return true;
     }
 
     public function start(Request $request, ?AuthenticationException $authException = null): Response

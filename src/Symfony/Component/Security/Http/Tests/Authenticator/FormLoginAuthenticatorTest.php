@@ -21,12 +21,14 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PasswordUpgradeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Security\Http\Tests\Authenticator\Fixtures\PasswordUpgraderProvider;
 
 class FormLoginAuthenticatorTest extends TestCase
@@ -269,6 +271,30 @@ class FormLoginAuthenticatorTest extends TestCase
     {
         yield ['application/json', false];
         yield ['application/x-www-form-urlencoded', true];
+    }
+
+    #[DataProvider('provideUnsupportedReasons')]
+    public function testUnsupportedReasons(array $options, Request $request, array $expectedReasons)
+    {
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+        $this->setUpAuthenticator($options);
+
+        $this->assertSame([] === $expectedReasons, $this->authenticator->supports($request));
+        $this->assertSame($expectedReasons, $reasons->all());
+    }
+
+    public static function provideUnsupportedReasons(): iterable
+    {
+        yield 'not a POST' => [[], Request::create('/login_check', 'GET'), ['the request method is "GET", and the "post_only" option requires POST']];
+        yield 'other path' => [[], Request::create('/other', 'POST'), ['the request path "/other" does not match the "check_path" option "/login_check"']];
+        yield 'not a form' => [['form_only' => true], Request::create('/login_check', 'POST', server: ['CONTENT_TYPE' => 'application/json']), ['the "Content-Type" header is "application/json", and the "form_only" option requires a form one']];
+
+        $request = Request::create('/login_check', 'POST');
+        $request->headers->remove('Content-Type');
+        yield 'no content type' => [['form_only' => true], $request, ['the "Content-Type" header is missing, and the "form_only" option requires a form one']];
+
+        yield 'post_only disabled' => [['post_only' => false], Request::create('/login_check', 'GET'), []];
+        yield 'supported' => [['form_only' => true], Request::create('/login_check', 'POST'), []];
     }
 
     private function setUpAuthenticator(array $options = [])

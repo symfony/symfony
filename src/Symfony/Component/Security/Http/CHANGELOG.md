@@ -24,6 +24,7 @@ CHANGELOG
  * Add the `pkce_enabled`, `pkce_method` and `max_age` options and the `$authorizationParams` argument to `OidcLoginAuthenticator`, which checks the ID token `auth_time` claim when `max_age` is used
  * Add the `user_data_source` and `user_identifier_claim` options to `OidcLoginAuthenticator` to pick where the user claims are read from and the claim the user identifier is read from
  * Add `OidcEndSessionListener` for RP-Initiated Logout via the OIDC `end_session_endpoint`
+ * Add `UnsupportedReasons`, held by the `SecurityRequestAttributes::UNSUPPORTED_REASONS` request attribute while the profiler is enabled, so that `supports()` can tell why an authenticator did not support a request
 
 8.1
 ---

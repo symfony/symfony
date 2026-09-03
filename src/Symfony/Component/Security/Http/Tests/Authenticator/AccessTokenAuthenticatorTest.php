@@ -21,8 +21,10 @@ use Symfony\Component\Security\Http\AccessToken\AccessTokenExtractorInterface;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
 use Symfony\Component\Security\Http\Authenticator\AccessTokenAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class AccessTokenAuthenticatorTest extends TestCase
 {
@@ -190,5 +192,22 @@ class AccessTokenAuthenticatorTest extends TestCase
             ['Bearer Not Valid', null],
             ['Bearer (NotOK123)', null],
         ];
+    }
+
+    public function testUnsupportedReasons()
+    {
+        $authenticator = new AccessTokenAuthenticator($this->createStub(AccessTokenHandlerInterface::class), new HeaderAccessTokenExtractor());
+
+        $request = Request::create('/test');
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame([\sprintf('the "%s" extractor found no access token in the request', HeaderAccessTokenExtractor::class)], $reasons->all());
+
+        $request = Request::create('/test', server: ['HTTP_AUTHORIZATION' => 'Bearer VALID_ACCESS_TOKEN']);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertNull($authenticator->supports($request));
+        $this->assertSame([], $reasons->all());
     }
 }

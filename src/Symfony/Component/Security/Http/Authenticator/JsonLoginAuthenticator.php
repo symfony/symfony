@@ -32,6 +32,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -63,14 +64,20 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
 
     public function supports(Request $request): ?bool
     {
+        $reasons = $request->attributes->get(SecurityRequestAttributes::UNSUPPORTED_REASONS);
+
         if (
             !str_contains($request->getRequestFormat() ?? '', 'json')
             && !str_contains($request->getContentTypeFormat() ?? '', 'json')
         ) {
+            $reasons?->add(($contentType = $request->headers->get('Content-Type')) ? \sprintf('neither the request format "%s" nor the "Content-Type" header "%s" is a JSON one', $request->getRequestFormat(), $contentType) : \sprintf('the request format "%s" is not a JSON one, and the request has no "Content-Type" header', $request->getRequestFormat()));
+
             return false;
         }
 
         if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            $reasons?->add(\sprintf('the request path "%s" does not match the "check_path" option "%s"', $request->getPathInfo(), $this->options['check_path']));
+
             return false;
         }
 

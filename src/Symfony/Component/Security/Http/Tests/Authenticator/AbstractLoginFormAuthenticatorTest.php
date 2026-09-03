@@ -17,9 +17,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class AbstractLoginFormAuthenticatorTest extends TestCase
 {
@@ -92,6 +94,29 @@ class AbstractLoginFormAuthenticatorTest extends TestCase
             ]),
             false,
         ];
+    }
+
+    public function testUnsupportedReasons()
+    {
+        $authenticator = new ConcreteFormAuthenticator('/login');
+
+        $request = Request::create('/login', 'GET');
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame(['the request method is "GET", and only POST is supported'], $reasons->all());
+
+        $request = Request::create('/somepath', 'POST');
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame(['the request path "/somepath" does not match the login URL "/login"'], $reasons->all());
+
+        $request = Request::create('/login', 'POST');
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertTrue($authenticator->supports($request));
+        $this->assertSame([], $reasons->all());
     }
 }
 

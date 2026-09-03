@@ -19,10 +19,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\RememberMeAuthenticator;
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 use Symfony\Component\Security\Http\RememberMe\ResponseListener;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class RememberMeAuthenticatorTest extends TestCase
 {
@@ -110,5 +112,37 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->expectException(AuthenticationException::class);
 
         $this->authenticator->authenticate($request);
+    }
+
+    #[DataProvider('provideUnsupportedReasons')]
+    public function testUnsupportedReasons(Request $request, ?bool $supports, array $expectedReasons)
+    {
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertSame($supports, $this->authenticator->supports($request));
+        $this->assertSame($expectedReasons, $reasons->all());
+    }
+
+    public static function provideUnsupportedReasons(): iterable
+    {
+        yield 'no cookie' => [Request::create('/'), false, ['the request has no "_remember_me_cookie" cookie']];
+        yield 'empty cookie' => [Request::create('/', 'GET', [], ['_remember_me_cookie' => '']), false, ['the "_remember_me_cookie" cookie is empty or not a scalar']];
+        yield 'array cookie' => [Request::create('/', 'GET', [], ['_remember_me_cookie' => ['a' => 'b']]), false, ['the "_remember_me_cookie" cookie is empty or not a scalar']];
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']);
+        $request->attributes->set(ResponseListener::COOKIE_ATTR_NAME, new Cookie('_remember_me_cookie', null));
+        yield 'cookie being cleared' => [$request, false, ['the "_remember_me_cookie" cookie is being cleared by this request']];
+
+        yield 'supported' => [Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']), null, []];
+    }
+
+    public function testUnsupportedReasonWhenATokenIsStored()
+    {
+        $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'credentials'), 'main'));
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($this->authenticator->supports($request));
+        $this->assertSame(['a token is already stored, so the request is already authenticated'], $reasons->all());
     }
 }

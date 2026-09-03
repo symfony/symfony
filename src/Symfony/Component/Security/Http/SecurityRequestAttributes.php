@@ -21,4 +21,11 @@ final class SecurityRequestAttributes
     public const ACCESS_DENIED_ERROR = '_security.403_error';
     public const AUTHENTICATION_ERROR = '_security.last_error';
     public const LAST_USERNAME = '_security.last_username';
+
+    /**
+     * Holds an UnsupportedReasons collector while an authenticator's supports() method runs, when the profiler is enabled.
+     *
+     * @see Authenticator\Debug\UnsupportedReasons
+     */
+    public const UNSUPPORTED_REASONS = '_security.unsupported_reasons';
 }

@@ -18,10 +18,12 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\JsonLoginAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
 
@@ -164,6 +166,24 @@ class JsonLoginAuthenticatorTest extends TestCase
         });
 
         $this->assertSame(['error' => 'Session locked after 3 failed attempts.'], json_decode($response->getContent(), true));
+    }
+
+    #[DataProvider('provideUnsupportedReasons')]
+    public function testUnsupportedReasons(array $options, Request $request, array $expectedReasons)
+    {
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+        $this->setUpAuthenticator($options);
+
+        $this->assertSame([] === $expectedReasons, $this->authenticator->supports($request));
+        $this->assertSame($expectedReasons, $reasons->all());
+    }
+
+    public static function provideUnsupportedReasons(): iterable
+    {
+        yield 'not JSON' => [[], Request::create('/api/login', 'POST', server: ['CONTENT_TYPE' => 'text/plain']), ['neither the request format "html" nor the "Content-Type" header "text/plain" is a JSON one']];
+        yield 'no content type' => [[], Request::create('/api/login'), ['the request format "html" is not a JSON one, and the request has no "Content-Type" header']];
+        yield 'other path' => [['check_path' => '/api/login'], Request::create('/other', 'POST', server: ['CONTENT_TYPE' => 'application/json']), ['the request path "/other" does not match the "check_path" option "/api/login"']];
+        yield 'supported' => [['check_path' => '/api/login'], Request::create('/api/login', 'POST', server: ['CONTENT_TYPE' => 'application/json']), []];
     }
 
     private function setUpAuthenticator(array $options = [])

@@ -14,9 +14,11 @@ namespace Symfony\Component\VarDumper\Tests\Server;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\PhpProcess;
 use Symfony\Component\Process\Process;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\ContextProvider\ContextProviderInterface;
 use Symfony\Component\VarDumper\Server\Connection;
+use Symfony\Component\VarDumper\Tests\Fixtures\ClassStringFixture;
 
 class ConnectionTest extends TestCase
 {
@@ -39,7 +41,58 @@ class ConnectionTest extends TestCase
             },
         ]);
 
-        $dumped = null;
+        $this->assertStringMatchesFormat(<<<'DUMP'
+            (3) "foo"
+            [
+              "timestamp" => %d.%d
+              "foo_provider" => [
+                (3) "foo"
+              ]
+            ]
+            %d
+
+            DUMP,
+            $this->dumpThroughServer($connection, $data)
+        );
+    }
+
+    public function testDumpClassString()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('Skip transient test on Windows');
+        }
+
+        class_exists(ClassStringFixture::class);
+
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar(ClassStringFixture::class);
+        $connection = new Connection(self::VAR_DUMPER_SERVER);
+
+        $this->assertStringMatchesFormat(<<<'DUMP'
+            (%d) "Symfony\Component\VarDumper\Tests\Fixtures\ClassStringFixture (count=%d)"
+            [
+              "timestamp" => %d.%d
+            ]
+            %d
+
+            DUMP,
+            $this->dumpThroughServer($connection, $data)
+        );
+    }
+
+    public function testNoServer()
+    {
+        $cloner = new VarCloner();
+        $data = $cloner->cloneVar('foo');
+        $connection = new Connection(self::VAR_DUMPER_SERVER);
+        $start = microtime(true);
+        $this->assertFalse($connection->write($data));
+        $this->assertLessThan(4, microtime(true) - $start);
+    }
+
+    private function dumpThroughServer(Connection $connection, Data $data): string
+    {
+        $dumped = '';
         $process = $this->getServerProcess();
         $process->start(function ($type, $buffer) use ($process, &$dumped, $connection, $data) {
             if (Process::ERR === $type) {
@@ -55,29 +108,8 @@ class ConnectionTest extends TestCase
         $process->wait();
 
         $this->assertTrue($process->isSuccessful());
-        $this->assertStringMatchesFormat(<<<'DUMP'
-            (3) "foo"
-            [
-              "timestamp" => %d.%d
-              "foo_provider" => [
-                (3) "foo"
-              ]
-            ]
-            %d
 
-            DUMP,
-            $dumped
-        );
-    }
-
-    public function testNoServer()
-    {
-        $cloner = new VarCloner();
-        $data = $cloner->cloneVar('foo');
-        $connection = new Connection(self::VAR_DUMPER_SERVER);
-        $start = microtime(true);
-        $this->assertFalse($connection->write($data));
-        $this->assertLessThan(4, microtime(true) - $start);
+        return $dumped;
     }
 
     private function getServerProcess(): Process

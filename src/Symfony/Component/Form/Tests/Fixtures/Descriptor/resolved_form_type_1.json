@@ -37,6 +37,7 @@
         "parent": {
             "Symfony\\Component\\Form\\Extension\\Core\\Type\\FormType": [
                 "action",
+                "allow_array_submission",
                 "allow_file_upload",
                 "attr",
                 "attr_translation_parameters",

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `#[AsFormType]` and `#[FormField]` attributes to derive a form type from the properties of a data class
+ * Add the `allow_array_submission` option to let `PRE_SUBMIT` listeners turn a submitted array into data the form accepts
  * Add support for grouping and nested steps in `FormFlowType`
  * Deprecate the `regions` option of `TimezoneType`, it has had no effect since 5.0
  * Add `PolymorphicCollectionType` for collections whose entries do not all share the same type

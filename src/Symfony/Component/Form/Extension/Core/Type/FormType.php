@@ -182,6 +182,7 @@ class FormType extends BaseType
             'post_max_size_message' => 'The uploaded file was too large. Please try to upload a smaller file.',
             'upload_max_size_message' => $uploadMaxSizeMessage, // internal
             'allow_file_upload' => false,
+            'allow_array_submission' => false,
             'help' => null,
             'help_attr' => [],
             'help_html' => false,

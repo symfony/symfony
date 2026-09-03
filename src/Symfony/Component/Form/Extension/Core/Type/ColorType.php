@@ -38,9 +38,10 @@ class ColorType extends AbstractType
         }
 
         $translator = $this->translator;
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($translator): void {
+        $allowArraySubmission = $options['allow_array_submission'];
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event) use ($translator, $allowArraySubmission): void {
             $value = $event->getData();
-            if (null === $value || '' === $value) {
+            if (null === $value || '' === $value || ($allowArraySubmission && \is_array($value))) {
                 return;
             }
 

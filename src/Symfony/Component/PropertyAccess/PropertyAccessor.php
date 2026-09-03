@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -72,11 +73,12 @@ class PropertyAccessor implements PropertyAccessorInterface
      * Should not be used by application code. Use
      * {@link PropertyAccess::createPropertyAccessor()} instead.
      *
-     * @param int $magicMethodsFlags A bitwise combination of the MAGIC_* constants
-     *                               to specify the allowed magic methods (__get, __set, __call)
-     *                               or self::DISALLOW_MAGIC_METHODS for none
-     * @param int $throw             A bitwise combination of the THROW_* constants
-     *                               to specify when exceptions should be thrown
+     * @param int  $magicMethodsFlags A bitwise combination of the MAGIC_* constants
+     *                                to specify the allowed magic methods (__get, __set, __call)
+     *                                or self::DISALLOW_MAGIC_METHODS for none
+     * @param int  $throw             A bitwise combination of the THROW_* constants
+     *                                to specify when exceptions should be thrown
+     * @param bool $wildcardReads     Whether "[*]" expands to every element of a collection when reading
      */
     public function __construct(
         private int $magicMethodsFlags = self::MAGIC_GET | self::MAGIC_SET,
@@ -84,6 +86,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         ?CacheItemPoolInterface $cacheItemPool = null,
         ?PropertyReadInfoExtractorInterface $readInfoExtractor = null,
         ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null,
+        private bool $wildcardReads = false,
     ) {
         $this->ignoreInvalidIndices = 0 === ($throw & self::THROW_ON_INVALID_INDEX);
         $this->cacheItemPool = $cacheItemPool instanceof NullAdapter ? null : $cacheItemPool; // Replace the NullAdapter by the null value
@@ -104,7 +107,7 @@ class PropertyAccessor implements PropertyAccessorInterface
 
         $propertyPath = $this->getPropertyPath($propertyPath);
 
-        $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
+        $propertyValues = $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices, true);
 
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
     }
@@ -128,6 +131,10 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         $propertyPath = $this->getPropertyPath($propertyPath);
+
+        if ($this->wildcardReads && $this->hasWildcard($propertyPath)) {
+            throw new InvalidArgumentException(\sprintf('Cannot write to the property path "%s" because it contains a wildcard.', $propertyPath));
+        }
 
         $zval = [
             self::VALUE => $objectOrArray,
@@ -155,6 +162,8 @@ class PropertyAccessor implements PropertyAccessorInterface
                     $property = $propertyPath->getElement($i);
 
                     if ($propertyPath->isIndex($i)) {
+                        $property = $this->unescapeWildcard($property);
+
                         if ($overwrite = !isset($zval[self::REF])) {
                             $ref = &$zval[self::REF];
                             $ref = $zval[self::VALUE];
@@ -219,7 +228,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             if ($objectOrArray instanceof \stdClass && str_contains($propertyPath, '.') && property_exists($objectOrArray, $propertyPath)) {
                 $this->readProperty($zval, $propertyPath, $this->ignoreInvalidProperty);
             } else {
-                $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices);
+                $this->readPropertiesUntil($zval, $propertyPath, $propertyPath->getLength(), $this->ignoreInvalidIndices, true);
             }
 
             return true;
@@ -231,6 +240,10 @@ class PropertyAccessor implements PropertyAccessorInterface
     public function isWritable(object|array $objectOrArray, string|PropertyPathInterface $propertyPath): bool
     {
         $propertyPath = $this->getPropertyPath($propertyPath);
+
+        if ($this->wildcardReads && $this->hasWildcard($propertyPath)) {
+            return false;
+        }
 
         try {
             $zval = [
@@ -275,21 +288,29 @@ class PropertyAccessor implements PropertyAccessorInterface
      * @throws UnexpectedTypeException if a value within the path is neither object nor array
      * @throws NoSuchIndexException    If a non-existing index is accessed
      */
-    private function readPropertiesUntil(array $zval, PropertyPathInterface $propertyPath, int $lastIndex, bool $ignoreInvalidIndices = true): array
+    private function readPropertiesUntil(array $zval, PropertyPathInterface $propertyPath, int $lastIndex, bool $ignoreInvalidIndices = true, bool $expandWildcards = false, int $startIndex = 0): array
     {
         if (!\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE])) {
-            throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, 0);
+            throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, $startIndex);
         }
 
         // Add the root object to the list
         $propertyValues = [$zval];
 
-        for ($i = 0; $i < $lastIndex; ++$i) {
+        for ($i = $startIndex; $i < $lastIndex; ++$i) {
             $property = $propertyPath->getElement($i);
             $isIndex = $propertyPath->isIndex($i);
             $isNullSafe = $propertyPath->isNullSafe($i);
 
+            if ($this->wildcardReads && $expandWildcards && $isIndex && '*' === $property) {
+                $propertyValues[] = [self::VALUE => $this->expandWildcard($zval, $propertyPath, $i + 1, $lastIndex, $ignoreInvalidIndices)];
+
+                break;
+            }
+
             if ($isIndex) {
+                $property = $this->unescapeWildcard($property);
+
                 // Create missing nested arrays on demand
                 if (($zval[self::VALUE] instanceof \ArrayAccess && !$zval[self::VALUE]->offsetExists($property))
                     || (\is_array($zval[self::VALUE]) && !isset($zval[self::VALUE][$property]) && !\array_key_exists($property, $zval[self::VALUE]))
@@ -345,6 +366,49 @@ class PropertyAccessor implements PropertyAccessorInterface
         }
 
         return $propertyValues;
+    }
+
+    /**
+     * Reads the rest of the path from every element of a collection.
+     *
+     * @throws NoSuchIndexException If the value cannot be iterated over
+     */
+    private function expandWildcard(array $zval, PropertyPathInterface $propertyPath, int $nextIndex, int $lastIndex, bool $ignoreInvalidIndices): array
+    {
+        if (!is_iterable($zval[self::VALUE])) {
+            throw new NoSuchIndexException(\sprintf('Cannot expand the wildcard in path "%s" because the value of type "%s" is not iterable.', $propertyPath, get_debug_type($zval[self::VALUE])));
+        }
+
+        $values = [];
+
+        foreach ($zval[self::VALUE] as $value) {
+            if ($nextIndex < $lastIndex) {
+                $branch = $this->readPropertiesUntil([self::VALUE => $value], $propertyPath, $lastIndex, $ignoreInvalidIndices, true, $nextIndex);
+                $value = $branch[\count($branch) - 1][self::VALUE];
+            }
+
+            $values[] = $value;
+        }
+
+        return $values;
+    }
+
+    private function hasWildcard(PropertyPathInterface $propertyPath): bool
+    {
+        for ($i = 0, $length = $propertyPath->getLength(); $i < $length; ++$i) {
+            if ($propertyPath->isIndex($i) && '*' === $propertyPath->getElement($i)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function unescapeWildcard(string $index): string
+    {
+        $backslashes = strspn($index, '\\');
+
+        return $this->wildcardReads && 0 < $backslashes && $backslashes === \strlen($index) - 1 && '*' === $index[$backslashes] ? substr($index, 1) : $index;
     }
 
     /**

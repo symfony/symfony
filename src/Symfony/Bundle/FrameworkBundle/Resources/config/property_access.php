@@ -25,6 +25,7 @@ return static function (ContainerConfigurator $container) {
                 service('cache.property_access')->ignoreOnInvalid(),
                 service(PropertyReadInfoExtractorInterface::class)->nullOnInvalid(),
                 service(PropertyWriteInfoExtractorInterface::class)->nullOnInvalid(),
+                abstract_arg('wildcard reads, set by the extension'),
             ])
 
         ->alias(PropertyAccessorInterface::class, 'property_accessor')

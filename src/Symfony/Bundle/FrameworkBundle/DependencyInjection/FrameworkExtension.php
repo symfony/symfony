@@ -2010,6 +2010,7 @@ class FrameworkExtension extends Extension
             ->getDefinition('property_accessor')
             ->replaceArgument(0, $magicMethods)
             ->replaceArgument(1, $throw)
+            ->replaceArgument(5, $config['wildcard_reads'])
         ;
     }
 

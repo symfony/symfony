@@ -39,6 +39,23 @@ class PropertyAccessorBuilderTest extends TestCase
         $this->assertFalse($this->builder->disableMagicGet()->isMagicGetEnabled());
     }
 
+    public function testWildcardReadsAreDisabledByDefault()
+    {
+        $this->assertFalse($this->builder->isWildcardReadsEnabled());
+    }
+
+    public function testEnableWildcardReads()
+    {
+        $this->assertSame($this->builder, $this->builder->enableWildcardReads());
+        $this->assertTrue($this->builder->isWildcardReadsEnabled());
+    }
+
+    public function testDisableWildcardReads()
+    {
+        $this->assertSame($this->builder, $this->builder->enableWildcardReads()->disableWildcardReads());
+        $this->assertFalse($this->builder->isWildcardReadsEnabled());
+    }
+
     public function testEnableMagicSet()
     {
         $this->assertSame($this->builder, $this->builder->enableMagicSet());

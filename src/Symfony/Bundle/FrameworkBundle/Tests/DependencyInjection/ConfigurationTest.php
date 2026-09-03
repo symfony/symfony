@@ -1219,6 +1219,7 @@ class ConfigurationTest extends TestCase
                 'magic_set' => true,
                 'throw_exception_on_invalid_index' => false,
                 'throw_exception_on_invalid_property_path' => true,
+                'wildcard_reads' => false,
             ],
             'type_info' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Type::class),

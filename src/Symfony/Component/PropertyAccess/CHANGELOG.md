@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `PropertyAccessorBuilder::enableWildcardReads()` to read every element of a collection through a `[*]` path
+
 8.1
 ---
 

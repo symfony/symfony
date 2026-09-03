@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T16:33:37Z
+
+Keeping the check on the raw argument, as you scoped it. Moving it after `canonicalize()` would fire on `'.'`, `'./'`, `'a/..'` and anything else canonicalizing to `''`, and for those the message's advice would be wrong: `isBasePath('.', './file')` is `false` today because the base is relative, and `"/"` answers a different question. That is a behaviour decision of its own, so I left #62131 open and turned the closing keyword into a reference.
+
+One correction, applied to the description and to `UPGRADE-8.2.md`: the empty base does not only match absolute paths, it matches every path whose canonical form is `''`, and none of those is absolute.
+
+```
+ofPath   canonical   isAbsolute   base=''   base='/'
+''       ''          false        true      true
+'.'      ''          false        true      true
+'a/..'   ''          false        true      true
+```
+
+Those rows are now in the data provider, so both tests stay pinned on the real rule rather than on the absolute/relative story.
+
+Thanks for the careful scoping, and for pinning the equivalence on the same provider.

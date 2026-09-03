@@ -33,6 +33,7 @@ use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapTransportFactory;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport\MicrosoftGraphTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postal\Transport\PostalTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\PufferPost\Transport\PufferPostTransportFactory;
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
@@ -76,6 +77,7 @@ final class Transport
         MandrillTransportFactory::class,
         PostalTransportFactory::class,
         PostmarkTransportFactory::class,
+        PufferPostTransportFactory::class,
         MailtrapTransportFactory::class,
         MicrosoftGraphTransportFactory::class,
         ResendTransportFactory::class,

@@ -80,6 +80,10 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Postmark\Transport\PostmarkTransportFactory::class,
             'package' => 'symfony/postmark-mailer',
         ],
+        'pufferpost' => [
+            'class' => Bridge\PufferPost\Transport\PufferPostTransportFactory::class,
+            'package' => 'symfony/puffer-post-mailer',
+        ],
         'mailtrap' => [
             'class' => Bridge\Mailtrap\Transport\MailtrapTransportFactory::class,
             'package' => 'symfony/mailtrap-mailer',

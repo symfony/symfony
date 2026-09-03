@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T16:03:55Z
+
+The issue exists in 6.4 also, isn't it? Let's rebase/retarget then.
+
+---------------------------------------------------------------------------
+
+by lazerg at 2026-09-03T16:14:58Z
+
+I checked 6.4 and 7.4 before retargeting.
+
+The crash needs a `Stub` subclass to survive into the payload. On 6.4 and 7.4, `VarCloner::doClone()` always creates a plain `Stub` in the object branch, so caster stubs like `ClassStub` or `LinkStub` get flattened before anything is serialized. I cloned 26 values on each branch (closures, exceptions with traces, reflection objects, enums, resources, cut strings and arrays, with several maxItems/maxString settings) and serialized each one. Only `Data` and `Stub` ever appear in the result, so the allow-list is never short.
+
+8.1 is different because of the class-string support added in #64082. There `VarCloner` assigns a `ClassDumpStub` straight to `$stub`, and that one does reach `Data`. The same sweep on 8.1 fails, and only on that case. It is also the branch the reporter hit, and the CHANGELOG lists the feature under 8.1.
+
+If you have a 6.4 reproducer I missed, I will retarget.

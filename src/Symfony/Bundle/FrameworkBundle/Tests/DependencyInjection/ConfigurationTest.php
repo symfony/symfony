@@ -1291,6 +1291,7 @@ class ConfigurationTest extends TestCase
                 'default_memcached_provider' => 'memcached://localhost',
                 'default_doctrine_dbal_provider' => 'database_connection',
                 'default_pdo_provider' => ContainerBuilder::willBeAvailable('doctrine/dbal', Connection::class, ['symfony/framework-bundle']) && class_exists(DoctrineAdapter::class) ? 'database_connection' : null,
+                'default_mongodb_provider' => 'mongodb://localhost/app',
                 'prefix_seed' => '_%kernel.project_dir%.%kernel.container_class%',
             ],
             'workflows' => [

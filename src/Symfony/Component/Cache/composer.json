@@ -29,9 +29,10 @@
         "symfony/var-exporter": "^8.1"
     },
     "require-dev": {
-        "cache/integration-tests": "^1.0.3",
+        "cache/integration-tests": "^1.0.5",
         "doctrine/dbal": "^4.3",
         "predis/predis": "^1.1|^2.0",
+        "psr/clock": "^1.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
         "symfony/clock": "^7.4|^8.0",
         "symfony/config": "^7.4|^8.0",

@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T16:14:54Z
+
+Added a second commit: patterns that describe one constant host are now matched by a hash lookup, so a list of customer domains builds no regexp at all. Numbers are in the description.

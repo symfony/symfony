@@ -37,6 +37,12 @@ DoctrineBridge
    Also note that `DoctrineDbalPingConnectionMiddleware` does not reset closed entity managers as its deprecated
    counterpart did: workers already reset them between messages
 
+Filesystem
+----------
+
+ * Deprecate passing an empty string as the base path to `Path::isBasePath()`, pass `"/"` instead.
+   Both answer identically today, an empty base path being treated as the root
+
 Form
 ----
 

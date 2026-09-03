@@ -12,7 +12,10 @@
 namespace Symfony\Component\Filesystem\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Filesystem\Path;
 
 /**
@@ -22,6 +25,8 @@ use Symfony\Component\Filesystem\Path;
  */
 class PathTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     protected array $storedEnv = [];
 
     protected function setUp(): void
@@ -1004,6 +1009,41 @@ class PathTest extends TestCase
     public function testIsBasePath(string $path, string $ofPath, bool $result)
     {
         $this->assertSame($result, Path::isBasePath($path, $ofPath));
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    #[DataProvider('provideEmptyBasePathTests')]
+    public function testEmptyBasePathIsDeprecated(string $ofPath, bool $result)
+    {
+        $this->expectUserDeprecationMessage('Since symfony/filesystem 8.2: Passing an empty string as the base path to "Symfony\\Component\\Filesystem\\Path::isBasePath()" is deprecated, pass "/" instead.');
+
+        $this->assertSame($result, Path::isBasePath('', $ofPath));
+    }
+
+    /**
+     * "/" is offered as the replacement, so it has to answer exactly like the empty base path does.
+     */
+    #[DataProvider('provideEmptyBasePathTests')]
+    public function testRootIsEquivalentToTheEmptyBasePath(string $ofPath, bool $result)
+    {
+        $this->assertSame($result, Path::isBasePath('/', $ofPath));
+    }
+
+    public static function provideEmptyBasePathTests(): \Generator
+    {
+        yield ['/file', true];
+        yield ['/', true];
+        yield ['/base/path', true];
+        yield ['', true];
+        yield ['.', true];
+        yield ['./', true];
+        yield ['a/..', true];
+        yield ['file', false];
+        yield ['./file', false];
+        yield ['../file', false];
+        yield ['base/path', false];
+        yield ['C:/file', false];
     }
 
     public static function provideJoinTests(): \Generator

@@ -326,6 +326,20 @@ END'],
         static::createFromString('Symfony')->trimEnd("\xE9");
     }
 
+    public static function provideLcfirst(): array
+    {
+        return array_merge(
+            parent::provideLcfirst(),
+            [
+                // French
+                ['éveil', 'Éveil'],
+
+                // Random symbols
+                ['i̇IIıi', 'İIIıi'],
+            ]
+        );
+    }
+
     public static function provideLower(): array
     {
         return array_merge(
@@ -418,6 +432,20 @@ END'],
             // Default casing rules
             ['en', 'Ijssel', 'ijssel'],
         ];
+    }
+
+    public static function provideUcfirst(): array
+    {
+        return array_merge(
+            parent::provideUcfirst(),
+            [
+                // French
+                ['Éveil', 'éveil'],
+
+                // Random symbols
+                ['Σσς', 'σσς'],
+            ]
+        );
     }
 
     public static function provideUpper(): array

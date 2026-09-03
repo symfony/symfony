@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `AbstractString::ucfirst()` and `AbstractString::lcfirst()` methods
+
 8.0
 ---
 

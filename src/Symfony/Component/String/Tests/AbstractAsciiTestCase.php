@@ -502,6 +502,29 @@ abstract class AbstractAsciiTestCase extends TestCase
         ];
     }
 
+    #[DataProvider('provideLcfirst')]
+    public function testLcfirst(string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->lcfirst();
+
+        $this->assertNotSame(static::createFromString($origin), $instance);
+        $this->assertEquals(static::createFromString($expected), $instance);
+        $this->assertSame($expected, (string) $instance);
+    }
+
+    public static function provideLcfirst()
+    {
+        return [
+            ['', ''],
+            ['hello world', 'Hello world'],
+            ['hELLO WORLD', 'HELLO WORLD'],
+            ['symfony', 'Symfony'],
+            ['symfony', 'symfony'],
+            [' Symfony', ' Symfony'],
+            ['1symfony', '1symfony'],
+        ];
+    }
+
     #[DataProvider('provideLower')]
     public function testLower(string $expected, string $origin)
     {
@@ -521,6 +544,29 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['symfony', 'symfony'],
             ['symfony', 'Symfony'],
             ['symfony', 'sYmFOny'],
+        ];
+    }
+
+    #[DataProvider('provideUcfirst')]
+    public function testUcfirst(string $expected, string $origin)
+    {
+        $instance = static::createFromString($origin)->ucfirst();
+
+        $this->assertNotSame(static::createFromString($origin), $instance);
+        $this->assertEquals(static::createFromString($expected), $instance);
+        $this->assertSame($expected, (string) $instance);
+    }
+
+    public static function provideUcfirst()
+    {
+        return [
+            ['', ''],
+            ['Hello world', 'hello world'],
+            ['HELLO WORLD', 'HELLO WORLD'],
+            ['Symfony', 'symfony'],
+            ['Symfony', 'Symfony'],
+            [' symfony', ' symfony'],
+            ['1symfony', '1symfony'],
         ];
     }
 

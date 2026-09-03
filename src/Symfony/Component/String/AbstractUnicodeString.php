@@ -218,6 +218,14 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
+    public function lcfirst(): static
+    {
+        $str = clone $this;
+        $str->string = preg_replace_callback('/^./u', static fn (array $m): string => 'İ' === $m[0] ? 'i̇' : mb_strtolower($m[0], 'UTF-8'), $str->string);
+
+        return $str;
+    }
+
     public function lower(): static
     {
         $str = clone $this;
@@ -477,6 +485,14 @@ abstract class AbstractUnicodeString extends AbstractString
 
         $suffix = implode('|', array_map('preg_quote', (array) $suffix));
         $str->string = preg_replace("{(?:$suffix)$}iuD", '', $this->string);
+
+        return $str;
+    }
+
+    public function ucfirst(): static
+    {
+        $str = clone $this;
+        $str->string = preg_replace_callback('/^./u', static fn (array $m): string => mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8'), $str->string);
 
         return $str;
     }

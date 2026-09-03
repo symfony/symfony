@@ -390,6 +390,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $this->string;
     }
 
+    abstract public function lcfirst(): static;
+
     abstract public function length(): int;
 
     abstract public function lower(): static;
@@ -655,6 +657,8 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
         return $ellipsisLength ? $str->trimEnd()->append($ellipsis) : $str;
     }
+
+    abstract public function ucfirst(): static;
 
     abstract public function upper(): static;
 

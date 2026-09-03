@@ -197,6 +197,14 @@ class ByteString extends AbstractString
         return $str;
     }
 
+    public function lcfirst(): static
+    {
+        $str = clone $this;
+        $str->string = lcfirst($str->string);
+
+        return $str;
+    }
+
     public function length(): int
     {
         return \strlen($this->string);
@@ -449,6 +457,14 @@ class ByteString extends AbstractString
     {
         $str = clone $this;
         $str->string = ltrim($str->string, $chars);
+
+        return $str;
+    }
+
+    public function ucfirst(): static
+    {
+        $str = clone $this;
+        $str->string = ucfirst($str->string);
 
         return $str;
     }

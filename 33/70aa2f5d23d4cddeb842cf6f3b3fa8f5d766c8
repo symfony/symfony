@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-22T08:31:31Z
+
+I reworked this as an opt-in feature on 8.2, through a new `allow_array_submission` option that defaults to `false`.
+
+Moving the check after `PRE_SUBMIT` unconditionally changes what every deployed listener on a scalar field can receive, and any client can trigger that by posting `field[]=x`. On the current code the stored failure is thrown before the event is dispatched, so such listeners never see arrays at all. The reordering itself is what made the `TimeType` `TypeError`, the `FileType` silent acceptance and the `ColorType` error reachable, and a core patch can only fix the core listeners, not third-party ones. That ruled out shipping the reordering as a 6.4 bugfix.
+
+The option mirrors `allow_file_upload`, which already gates the sibling branch of the same check. With the option left to its default, behavior is unchanged, including the `ChoiceType` message that the earlier revision modified.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-09-03T06:55:55Z
+
+Given that we have to adapt some core types to the new option I'd expect custom form types and form types provided by third-party packages to be affected the same. What do you think about constraining the `allow_array_submission` to `false` by default and types wanting to add support for it need to explicitly allow `true` as value as well (I haven't checked if you can expand the allowed values in a child type, that would have to be confirmed)?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T07:05:52Z
+
+To answer the part you had not checked: yes, a child type can expand the allowed values. I tried your proposal, with `$resolver->setAllowedValues('allow_array_submission', false);` added to `FormType`:
+
+| case | result |
+| --- | --- |
+| `TextType` with `allow_array_submission => true` | `The option "allow_array_submission" with value true is invalid. Accepted values are: false.` |
+| a child type calling `$resolver->addAllowedValues('allow_array_submission', true);` | accepted |
+| a `FormType` type extension calling the same | accepted, for every type at once |
+
+So the mechanism works. I would still rather not use it, for three reasons.
+
+**The opt-in list would be nearly every type.** The option only has an effect on a non-compound form, which is 33 of the 39 core types. Only four of them register a `PRE_SUBMIT` listener at all: `ChoiceType`, `ColorType`, `FileType` and `TimeType`. `ChoiceType` already guards its data with `is_array()`, and this PR adapts the other three. `TrimListener` and `CsrfValidationListener` are guarded too, and `ResizeFormListener` only runs on compound forms. The remaining 29 types need no adaptation at all, so declaring support would be pure boilerplate for them, and the same holds for the custom and third-party types that have no `PRE_SUBMIT` listener either.
+
+**We already ship an option with the same contract.** `allow_file_upload` also lets an array reach `PRE_SUBMIT` listeners, and it has never been constrained per type. On current 8.2:
+
+```php
+$form = $factory->create(TimeType::class, null, ['widget' => 'single_text', 'allow_file_upload' => true]);
+$form->submit(['name' => 'a.txt', 'tmp_name' => '/tmp/x', 'error' => 0, 'type' => 'text/plain', 'size' => 1]);
+// TypeError: preg_match(): Argument #2 ($subject) must be of type string, array given
+```
+
+The `is_string()` checks this PR adds to `TimeType` fix that case as well.
+
+**The constraint is one class away from being lifted.** A type extension on `FormType` calling `addAllowedValues('allow_array_submission', true)` re-opens the value everywhere, as the table above shows. That is what people would write the first time a third-party type they need has not declared support, and after that the constraint guards nothing while everyone still pays the boilerplate.
+
+What limits the risk without the constraint is that the option is per field: it is set by the same person who adds the listener for that field, and it only defers a check that runs again right after `PRE_SUBMIT`. When no listener turned the array into something the form accepts, the submission still fails with `Submitted data was expected to be text or number, array given.`
+
+The docs should say that the listener has to be registered with a priority above 0, so that it runs before the listeners the type itself registers.

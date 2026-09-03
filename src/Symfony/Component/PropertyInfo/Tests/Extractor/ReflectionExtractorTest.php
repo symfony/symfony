@@ -17,11 +17,13 @@ use Symfony\Component\PropertyInfo\PropertyReadInfo;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AdderRemoverDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\AsymmetricVisibility;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\ChildDummyWithSelfReturningAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithGetterSetter;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithNonAsciiStaticAccessor;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithSelfReturningAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticConstructorAndAccessor;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithStaticMutator;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\MultiParameterAdderDummy;
@@ -645,6 +647,46 @@ class ReflectionExtractorTest extends TestCase
 
         $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readAccessor->getType());
         $this->assertSame('positive', $readAccessor->getName());
+    }
+
+    /**
+     * @dataProvider selfReturningAccessorProvider
+     */
+    public function testGetReadAccessorDoesNotPreferAMethodReturningTheDeclaringClass(string $class, string $property, string $expectedAccessor)
+    {
+        $readAccessor = $this->extractor->getReadInfo($class, $property, ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame($expectedAccessor, $readAccessor->getName());
+    }
+
+    public static function selfReturningAccessorProvider()
+    {
+        return [
+            'self' => [DummyWithSelfReturningAccessor::class, 'negative', 'isNegative'],
+            'static' => [DummyWithSelfReturningAccessor::class, 'positive', 'isPositive'],
+            'implemented interface' => [DummyWithSelfReturningAccessor::class, 'halved', 'isHalved'],
+            'union member' => [DummyWithSelfReturningAccessor::class, 'incremented', 'isIncremented'],
+            'parent' => [ChildDummyWithSelfReturningAccessor::class, 'tripled', 'isTripled'],
+            'unrelated class' => [DummyWithSelfReturningAccessor::class, 'truncated', 'truncated'],
+        ];
+    }
+
+    public function testGetReadAccessorPrefersThePropertyOverTheMethodReturningTheDeclaringClass()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithSelfReturningAccessor::class, 'rounded', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_PROPERTY, $readAccessor->getType());
+        $this->assertSame('rounded', $readAccessor->getName());
+    }
+
+    public function testGetReadAccessorTriesTheMethodReturningTheDeclaringClassLast()
+    {
+        $readAccessor = $this->extractor->getReadInfo(DummyWithSelfReturningAccessor::class, 'doubled', ['enable_getter_setter_extraction' => true]);
+
+        $this->assertSame(PropertyReadInfo::TYPE_METHOD, $readAccessor->getType());
+        $this->assertSame('doubled', $readAccessor->getName());
+        $this->assertFalse($readAccessor->isStatic());
     }
 
     /**

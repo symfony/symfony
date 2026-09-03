@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\UnsupportedReasonProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 
@@ -32,7 +33,7 @@ use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointExceptio
  *
  * @final
  */
-class LdapAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
+class LdapAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface, UnsupportedReasonProviderInterface
 {
     public function __construct(
         private AuthenticatorInterface $authenticator,
@@ -47,6 +48,11 @@ class LdapAuthenticator implements AuthenticationEntryPointInterface, Interactiv
     public function supports(Request $request): ?bool
     {
         return $this->authenticator->supports($request);
+    }
+
+    public function getUnsupportedReason(Request $request): ?string
+    {
+        return $this->authenticator instanceof UnsupportedReasonProviderInterface ? $this->authenticator->getUnsupportedReason($request) : null;
     }
 
     public function authenticate(Request $request): Passport

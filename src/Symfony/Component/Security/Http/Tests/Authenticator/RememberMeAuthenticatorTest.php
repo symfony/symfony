@@ -65,6 +65,50 @@ class RememberMeAuthenticatorTest extends TestCase
         yield [$request, false];
     }
 
+    #[DataProvider('provideUnsupportedReasons')]
+    public function testUnsupportedReasonNamesTheFailingCondition(Request $request, ?string $expected)
+    {
+        $this->assertSame($expected, $this->authenticator->getUnsupportedReason($request));
+    }
+
+    public static function provideUnsupportedReasons(): iterable
+    {
+        yield 'no cookie' => [Request::create('/'), 'the request has no "_remember_me_cookie" cookie'];
+
+        $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']);
+        $request->attributes->set(ResponseListener::COOKIE_ATTR_NAME, new Cookie('_remember_me_cookie', null));
+        yield 'cookie being cleared' => [$request, 'the "_remember_me_cookie" cookie is being cleared by this request'];
+
+        yield 'empty cookie' => [
+            Request::create('/', 'GET', [], ['_remember_me_cookie' => '0']),
+            'the "_remember_me_cookie" cookie is empty or not a scalar',
+        ];
+
+        yield 'supported' => [Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme']), null];
+    }
+
+    public function testUnsupportedReasonWhenAlreadyAuthenticated()
+    {
+        $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'credentials'), 'main'));
+
+        $this->assertSame(
+            'a token is already stored, so this request is already authenticated',
+            $this->authenticator->getUnsupportedReason(Request::create('/', 'GET', [], ['_remember_me_cookie' => 'rememberme'])),
+        );
+    }
+
+    /**
+     * supports() and getUnsupportedReason() evaluate the same conditions separately, so they must
+     * be kept in step: a declined request always has a reason, and a supported one never does.
+     * supports() returns null, not true, when it supports the request, since this authenticator
+     * supports lazy firewalls.
+     */
+    #[DataProvider('provideSupportsData')]
+    public function testUnsupportedReasonAgreesWithSupports(Request $request, ?bool $support)
+    {
+        $this->assertSame(false === $support, null !== $this->authenticator->getUnsupportedReason($request));
+    }
+
     public function testAuthenticate()
     {
         $rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Show why an authenticator did not support the request in the security profiler panel
  * Add the `debug:roles` command to inspect the role hierarchy
  * Add `allowed_time_drift` option to the OIDC token handler configuration
  * Allow disabling the redirection on successful logout by passing `null` to the `target` option

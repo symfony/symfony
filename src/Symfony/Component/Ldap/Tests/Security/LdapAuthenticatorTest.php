@@ -19,6 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\UnsupportedReasonProviderInterface;
 
 class LdapAuthenticatorTest extends TestCase
 {
@@ -42,4 +43,30 @@ class LdapAuthenticatorTest extends TestCase
         $this->assertNotNull($badge);
         $this->assertSame('serviceId', $badge->getLdapServiceId());
     }
+
+    public function testGetUnsupportedReasonIsForwarded()
+    {
+        $request = new Request();
+
+        $decorated = $this->createMock(ExplainingAuthenticator::class);
+        $decorated
+            ->expects($this->once())
+            ->method('getUnsupportedReason')
+            ->with($request)
+            ->willReturn('the "X-Tenant" header is missing')
+        ;
+
+        $this->assertSame('the "X-Tenant" header is missing', (new LdapAuthenticator($decorated, 'serviceId'))->getUnsupportedReason($request));
+    }
+
+    public function testGetUnsupportedReasonIsNullWhenTheDecoratedAuthenticatorCannotExplain()
+    {
+        $decorated = $this->createStub(AuthenticatorInterface::class);
+
+        $this->assertNull((new LdapAuthenticator($decorated, 'serviceId'))->getUnsupportedReason(new Request()));
+    }
+}
+
+interface ExplainingAuthenticator extends AuthenticatorInterface, UnsupportedReasonProviderInterface
+{
 }

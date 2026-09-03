@@ -479,7 +479,12 @@
                                         <div id="authenticator-{{ i }}" class="font-normal">
                                             {% if authenticator.supports is same as(false) %}
                                                 <div class="empty">
-                                                    <p>This authenticator did not support the request.</p>
+                                                    <p>
+                                                        This authenticator did not support the request.
+                                                        {%- if authenticator.unsupportedReason is defined and authenticator.unsupportedReason %}
+                                                            <br>Reason: {{ authenticator.unsupportedReason }}.
+                                                        {%- endif %}
+                                                    </p>
                                                 </div>
                                             {% elseif authenticator.authenticated is null %}
                                                 <div class="empty">

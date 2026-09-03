@@ -19,6 +19,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\UnsupportedReasonProviderInterface;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
 use Symfony\Component\VarDumper\Caster\ClassStub;
@@ -28,9 +29,10 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  */
-final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
+final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface, UnsupportedReasonProviderInterface
 {
     private ?bool $supports = false;
+    private ?string $unsupportedReason = null;
     private ?Passport $passport = null;
     private ?float $duration = null;
     private ClassStub|string $stub;
@@ -45,6 +47,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     {
         return [
             'supports' => $this->supports,
+            'unsupportedReason' => $this->unsupportedReason,
             'passport' => $this->passport,
             'duration' => $this->duration,
             'stub' => $this->stub ??= class_exists(ClassStub::class) ? new ClassStub($this->authenticator::class) : $this->authenticator::class,
@@ -62,7 +65,18 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
 
     public function supports(Request $request): ?bool
     {
-        return $this->supports = $this->authenticator->supports($request);
+        $this->unsupportedReason = null;
+
+        if (false === $this->supports = $this->authenticator->supports($request)) {
+            $this->unsupportedReason = $this->getUnsupportedReason($request);
+        }
+
+        return $this->supports;
+    }
+
+    public function getUnsupportedReason(Request $request): ?string
+    {
+        return $this->authenticator instanceof UnsupportedReasonProviderInterface ? $this->authenticator->getUnsupportedReason($request) : null;
     }
 
     public function authenticate(Request $request): Passport

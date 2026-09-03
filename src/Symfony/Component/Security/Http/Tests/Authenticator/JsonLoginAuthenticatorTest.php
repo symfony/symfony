@@ -66,6 +66,72 @@ class JsonLoginAuthenticatorTest extends TestCase
         yield [Request::create('/login', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json']), false];
     }
 
+    public function testUnsupportedReasonNamesTheContentType()
+    {
+        $this->setUpAuthenticator();
+
+        $this->assertSame(
+            'neither the request format "html" nor the "Content-Type" header "application/text" is a JSON one',
+            $this->authenticator->getUnsupportedReason(Request::create('/login', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/text'])),
+        );
+    }
+
+    public function testUnsupportedReasonWhenTheContentTypeHeaderIsMissing()
+    {
+        $this->setUpAuthenticator();
+
+        $this->assertSame(
+            'the request format "html" is not a JSON one, and the request has no "Content-Type" header',
+            $this->authenticator->getUnsupportedReason(Request::create('/login', 'GET')),
+        );
+    }
+
+    public function testUnsupportedReasonNamesTheCheckPath()
+    {
+        $this->setUpAuthenticator(['check_path' => '/api/login']);
+
+        $this->assertSame(
+            'the request path "/login" does not match the "check_path" option "/api/login"',
+            $this->authenticator->getUnsupportedReason(Request::create('/login', 'GET', [], [], [], ['HTTP_CONTENT_TYPE' => 'application/json'])),
+        );
+    }
+
+    /**
+     * supports() and getUnsupportedReason() evaluate the same conditions separately, so they must
+     * be kept in step over every combination of the options: a declined request always has a
+     * reason, an accepted one never does.
+     */
+    #[DataProvider('provideRequestsForReasonAgreement')]
+    public function testUnsupportedReasonAgreesWithSupports(array $options, Request $request)
+    {
+        $this->setUpAuthenticator($options);
+
+        $this->assertSame(
+            false === $this->authenticator->supports($request),
+            null !== $this->authenticator->getUnsupportedReason($request),
+        );
+    }
+
+    public static function provideRequestsForReasonAgreement(): iterable
+    {
+        foreach ([[], ['check_path' => '/api/login']] as $options) {
+            foreach (['/api/login', '/login'] as $path) {
+                foreach ([null, 'json'] as $format) {
+                    foreach ([null, 'application/json', 'application/text', 'text/html'] as $contentType) {
+                        $server = null === $contentType ? [] : ['HTTP_CONTENT_TYPE' => $contentType];
+                        $request = Request::create($path, 'GET', [], [], [], $server);
+
+                        if (null !== $format) {
+                            $request->setRequestFormat($format);
+                        }
+
+                        yield \sprintf('check_path: %s, %s, format: %s, Content-Type: %s', $options['check_path'] ?? 'none', $path, $format ?? 'default', $contentType ?? 'none') => [$options, $request];
+                    }
+                }
+            }
+        }
+    }
+
     public function testAuthenticate()
     {
         $this->setUpAuthenticator();

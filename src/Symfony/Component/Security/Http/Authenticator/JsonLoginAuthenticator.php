@@ -43,7 +43,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @final
  */
-class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
+class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface, UnsupportedReasonProviderInterface
 {
     private array $options;
     private PropertyAccessorInterface $propertyAccessor;
@@ -75,6 +75,26 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         }
 
         return true;
+    }
+
+    public function getUnsupportedReason(Request $request): ?string
+    {
+        if (
+            !str_contains($request->getRequestFormat() ?? '', 'json')
+            && !str_contains($request->getContentTypeFormat() ?? '', 'json')
+        ) {
+            $contentType = $request->headers->get('Content-Type');
+
+            return $contentType
+                ? \sprintf('neither the request format "%s" nor the "Content-Type" header "%s" is a JSON one', $request->getRequestFormat(), $contentType)
+                : \sprintf('the request format "%s" is not a JSON one, and the request has no "Content-Type" header', $request->getRequestFormat());
+        }
+
+        if (isset($this->options['check_path']) && !$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            return \sprintf('the request path "%s" does not match the "check_path" option "%s"', $request->getPathInfo(), $this->options['check_path']);
+        }
+
+        return null;
     }
 
     public function authenticate(Request $request): Passport

@@ -17,9 +17,75 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\UnsupportedReasonProviderInterface;
 
 class TraceableAuthenticatorTest extends TestCase
 {
+    public function testUnsupportedReasonIsCollected()
+    {
+        $request = new Request();
+
+        $authenticator = $this->createMock(ExplainingAuthenticator::class);
+        $authenticator->method('supports')->willReturn(false);
+        $authenticator->expects($this->once())
+            ->method('getUnsupportedReason')
+            ->with($request)
+            ->willReturn('the moon is not full');
+
+        $traceable = new TraceableAuthenticator($authenticator);
+
+        $this->assertFalse($traceable->supports($request));
+        $this->assertSame('the moon is not full', $traceable->getInfo()['unsupportedReason']);
+    }
+
+    public function testUnsupportedReasonIsNullWhenTheAuthenticatorCannotExplain()
+    {
+        $authenticator = $this->createStub(AuthenticatorInterface::class);
+        $authenticator->method('supports')->willReturn(false);
+
+        $traceable = new TraceableAuthenticator($authenticator);
+
+        $this->assertFalse($traceable->supports(new Request()));
+        $this->assertArrayHasKey('unsupportedReason', $traceable->getInfo());
+        $this->assertNull($traceable->getInfo()['unsupportedReason']);
+    }
+
+    public function testUnsupportedReasonIsNotAskedForWhenTheRequestIsSupported()
+    {
+        $authenticator = $this->createMock(ExplainingAuthenticator::class);
+        $authenticator->method('supports')->willReturn(true);
+        $authenticator->expects($this->never())->method('getUnsupportedReason');
+
+        $traceable = new TraceableAuthenticator($authenticator);
+
+        $this->assertTrue($traceable->supports(new Request()));
+        $this->assertArrayHasKey('unsupportedReason', $traceable->getInfo());
+        $this->assertNull($traceable->getInfo()['unsupportedReason']);
+    }
+
+    public function testUnsupportedReasonIsForwardedByTheDecorator()
+    {
+        $request = new Request();
+
+        $authenticator = $this->createMock(ExplainingAuthenticator::class);
+        $authenticator->expects($this->once())
+            ->method('getUnsupportedReason')
+            ->with($request)
+            ->willReturn('the moon is not full');
+
+        $traceable = new TraceableAuthenticator($authenticator);
+
+        $this->assertInstanceOf(UnsupportedReasonProviderInterface::class, $traceable);
+        $this->assertSame('the moon is not full', $traceable->getUnsupportedReason($request));
+    }
+
+    public function testUnsupportedReasonIsNullWhenTheDecoratedAuthenticatorCannotExplain()
+    {
+        $traceable = new TraceableAuthenticator($this->createStub(AuthenticatorInterface::class));
+
+        $this->assertNull($traceable->getUnsupportedReason(new Request()));
+    }
+
     public function testGetInfo()
     {
         $request = new Request();
@@ -59,4 +125,8 @@ class TraceableAuthenticatorTest extends TestCase
         $this->assertIsArray($traceable->getInfo()['badges']);
         $this->assertSame([], $traceable->getInfo()['badges']);
     }
+}
+
+interface ExplainingAuthenticator extends AuthenticatorInterface, UnsupportedReasonProviderInterface
+{
 }

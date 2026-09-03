@@ -271,6 +271,85 @@ class FormLoginAuthenticatorTest extends TestCase
         yield ['application/x-www-form-urlencoded', true];
     }
 
+    #[DataProvider('provideUnsupportedReasons')]
+    public function testUnsupportedReasonNamesTheFailingCondition(array $options, Request $request, string $expected)
+    {
+        $this->setUpAuthenticator($options);
+
+        $this->assertSame($expected, $this->authenticator->getUnsupportedReason($request));
+    }
+
+    public static function provideUnsupportedReasons(): iterable
+    {
+        yield 'method' => [
+            ['check_path' => '/login_check', 'post_only' => true],
+            Request::create('/login_check', 'GET'),
+            'the request method is "GET", and the "post_only" option requires POST',
+        ];
+
+        yield 'path' => [
+            ['check_path' => '/login_check', 'post_only' => true],
+            Request::create('/elsewhere', 'POST'),
+            'the request path "/elsewhere" does not match the "check_path" option "/login_check"',
+        ];
+
+        yield 'format' => [
+            ['check_path' => '/login_check', 'post_only' => true, 'form_only' => true],
+            Request::create('/login_check', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/json']),
+            'the "Content-Type" header "application/json" is not a form one, and the "form_only" option requires one',
+        ];
+
+        // an unmapped content type has no format at all, so the header is what must be named
+        yield 'unmapped format' => [
+            ['check_path' => '/login_check', 'post_only' => true, 'form_only' => true],
+            Request::create('/login_check', 'POST', [], [], [], ['CONTENT_TYPE' => 'application/text']),
+            'the "Content-Type" header "application/text" is not a form one, and the "form_only" option requires one',
+        ];
+
+        yield 'missing content type' => [
+            ['check_path' => '/login_check', 'post_only' => false, 'form_only' => true],
+            Request::create('/login_check', 'GET'),
+            'the request has no "Content-Type" header, and the "form_only" option requires a form one',
+        ];
+    }
+
+    /**
+     * supports() and getUnsupportedReason() evaluate the same conditions separately, so they must
+     * be kept in step over every combination of the options: a declined request always has a
+     * reason, an accepted one never does.
+     */
+    #[DataProvider('provideRequestsForReasonAgreement')]
+    public function testUnsupportedReasonAgreesWithSupports(array $options, Request $request)
+    {
+        $this->setUpAuthenticator($options);
+
+        $this->assertSame(
+            false === $this->authenticator->supports($request),
+            null !== $this->authenticator->getUnsupportedReason($request),
+        );
+    }
+
+    public static function provideRequestsForReasonAgreement(): iterable
+    {
+        foreach ([true, false] as $postOnly) {
+            foreach ([true, false] as $formOnly) {
+                foreach (['POST', 'GET'] as $method) {
+                    foreach (['/login_check', '/elsewhere'] as $path) {
+                        foreach ([null, 'application/x-www-form-urlencoded', 'application/json', 'application/text'] as $contentType) {
+                            $options = ['check_path' => '/login_check', 'post_only' => $postOnly, 'form_only' => $formOnly];
+                            $server = null === $contentType ? [] : ['CONTENT_TYPE' => $contentType];
+
+                            yield \sprintf('post_only: %s, form_only: %s, %s %s, Content-Type: %s', var_export($postOnly, true), var_export($formOnly, true), $method, $path, $contentType ?? 'none') => [
+                                $options,
+                                Request::create($path, $method, [], [], [], $server),
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private function setUpAuthenticator(array $options = [])
     {
         $this->authenticator = new FormLoginAuthenticator(new HttpUtils(), $this->userProvider, $this->successHandler, $this->failureHandler, $options);

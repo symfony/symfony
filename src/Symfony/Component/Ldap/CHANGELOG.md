@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add the `$ldapUsersOnly` argument to `CheckLdapCredentialsListener`, to bind only `LdapUser` instances against the LDAP server
+ * Make `LdapAuthenticator` forward `UnsupportedReasonProviderInterface::getUnsupportedReason()` to the decorated authenticator
 
 8.0
 ---

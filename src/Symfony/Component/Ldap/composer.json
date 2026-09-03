@@ -22,10 +22,11 @@
     },
     "require-dev": {
         "symfony/security-core": "^8.0",
-        "symfony/security-http": "^7.4|^8.0"
+        "symfony/security-http": "^8.2"
     },
     "conflict": {
-        "symfony/security-core": "<8.0"
+        "symfony/security-core": "<8.0",
+        "symfony/security-http": "<8.2"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Ldap\\": "" },

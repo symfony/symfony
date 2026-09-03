@@ -39,7 +39,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  *
  * @final
  */
-class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
+class FormLoginAuthenticator extends AbstractLoginFormAuthenticator implements UnsupportedReasonProviderInterface
 {
     private array $options;
     private HttpKernelInterface $httpKernel;
@@ -73,6 +73,27 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
         return ($this->options['post_only'] ? $request->isMethod('POST') : true)
             && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
             && ($this->options['form_only'] ? 'form' === $request->getContentTypeFormat() : true);
+    }
+
+    public function getUnsupportedReason(Request $request): ?string
+    {
+        if ($this->options['post_only'] && !$request->isMethod('POST')) {
+            return \sprintf('the request method is "%s", and the "post_only" option requires POST', $request->getMethod());
+        }
+
+        if (!$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            return \sprintf('the request path "%s" does not match the "check_path" option "%s"', $request->getPathInfo(), $this->options['check_path']);
+        }
+
+        if ($this->options['form_only'] && 'form' !== $request->getContentTypeFormat()) {
+            $contentType = $request->headers->get('Content-Type');
+
+            return $contentType
+                ? \sprintf('the "Content-Type" header "%s" is not a form one, and the "form_only" option requires one', $contentType)
+                : 'the request has no "Content-Type" header, and the "form_only" option requires a form one';
+        }
+
+        return null;
     }
 
     public function authenticate(Request $request): Passport

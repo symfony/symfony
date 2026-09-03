@@ -41,7 +41,7 @@ use Symfony\Component\Security\Http\RememberMe\ResponseListener;
  *
  * @final
  */
-class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
+class RememberMeAuthenticator implements InteractiveAuthenticatorInterface, UnsupportedReasonProviderInterface
 {
     public function __construct(
         private RememberMeHandlerInterface $rememberMeHandler,
@@ -69,6 +69,27 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
         $this->logger?->debug('Remember-me cookie detected.');
 
         // the `null` return value indicates that this authenticator supports lazy firewalls
+        return null;
+    }
+
+    public function getUnsupportedReason(Request $request): ?string
+    {
+        if (null !== $this->tokenStorage->getToken()) {
+            return 'a token is already stored, so this request is already authenticated';
+        }
+
+        if (($cookie = $request->attributes->get(ResponseListener::COOKIE_ATTR_NAME)) && null === $cookie->getValue()) {
+            return \sprintf('the "%s" cookie is being cleared by this request', $this->cookieName);
+        }
+
+        if (!$request->cookies->has($this->cookieName)) {
+            return \sprintf('the request has no "%s" cookie', $this->cookieName);
+        }
+
+        if (!\is_scalar($request->cookies->all()[$this->cookieName] ?: null)) {
+            return \sprintf('the "%s" cookie is empty or not a scalar', $this->cookieName);
+        }
+
         return null;
     }
 

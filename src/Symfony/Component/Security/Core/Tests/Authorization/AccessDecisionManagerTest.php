@@ -12,9 +12,11 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
@@ -23,6 +25,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AccessDecisionManagerTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function provideBadVoterResults(): array
     {
         return [
@@ -112,6 +116,8 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, [1337], 'bar'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testCacheableVotersWithMultipleAttributes()
     {
         $token = new NullToken();
@@ -212,6 +218,8 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertFalse($manager->decide($token, ['foo'], 'bar'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testCacheableVotersWithMultipleAttributesAndNonString()
     {
         $token = new NullToken();
@@ -237,37 +245,22 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['foo', 1337], 'bar', true));
     }
 
-    protected static function getVoters($grants, $denies, $abstains): array
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testPassingMultipleAttributesIsDeprecated()
     {
-        $voters = [];
-        for ($i = 0; $i < $grants; ++$i) {
-            $voters[] = self::getVoter(VoterInterface::ACCESS_GRANTED);
-        }
-        for ($i = 0; $i < $denies; ++$i) {
-            $voters[] = self::getVoter(VoterInterface::ACCESS_DENIED);
-        }
-        for ($i = 0; $i < $abstains; ++$i) {
-            $voters[] = self::getVoter(VoterInterface::ACCESS_ABSTAIN);
-        }
+        $manager = new AccessDecisionManager([$this->getExpectedVoter(VoterInterface::ACCESS_GRANTED)]);
 
-        return $voters;
+        $this->expectUserDeprecationMessage('Since symfony/security-core 8.2: Passing more than one Security attribute to "Symfony\\Component\\Security\\Core\\Authorization\\AccessDecisionManager::decide()" is deprecated, pass a single attribute instead. For an "access_control" rule, move the roles to "allow_if" or to the role hierarchy. The "$allowMultipleAttributes" argument will be removed in 9.0.');
+
+        $this->assertTrue($manager->decide(new NullToken(), ['ROLE_FOO', 'ROLE_BAR'], null, true));
     }
 
-    protected static function getVoter($vote)
+    public function testPassingASingleAttributeIsNotDeprecated()
     {
-        return new class($vote) implements VoterInterface {
-            private int $vote;
+        $manager = new AccessDecisionManager([$this->getExpectedVoter(VoterInterface::ACCESS_GRANTED)]);
 
-            public function __construct(int $vote)
-            {
-                $this->vote = $vote;
-            }
-
-            public function vote(TokenInterface $token, $subject, array $attributes)
-            {
-                return $this->vote;
-            }
-        };
+        $this->assertTrue($manager->decide(new NullToken(), ['ROLE_FOO'], null, true));
     }
 
     private function getExpectedVoter(int $vote): VoterInterface

@@ -12,6 +12,8 @@
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -275,6 +277,8 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $traceableAccessDecisionManager->decide(new NullToken(), ['attr1', 'attr2']);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     #[DataProvider('allowMultipleAttributesProvider')]
     public function testAllowMultipleAttributes(array $attributes, bool $allowMultipleAttributes)
     {

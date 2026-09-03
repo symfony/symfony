@@ -36,6 +36,9 @@ class TraceableAccessDecisionManager implements AccessDecisionManagerInterface
     ) {
     }
 
+    /**
+     * @param bool $allowMultipleAttributes This argument is deprecated since Symfony 8.2 and will be removed in 9.0
+     */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool|AccessDecision|null $accessDecision = null, bool $allowMultipleAttributes = false): bool
     {
         if (\is_bool($accessDecision)) {

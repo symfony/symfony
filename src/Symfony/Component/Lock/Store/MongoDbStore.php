@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Store;
 
+use Composer\InstalledVersions;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
 use MongoDB\Collection;
@@ -360,7 +361,35 @@ class MongoDbStore implements PersistingStoreInterface
 
     private function getManager(): Manager
     {
-        return $this->manager ??= new Manager($this->uri, $this->options['uriOptions'], $this->options['driverOptions']);
+        return $this->manager ??= new Manager($this->uri, $this->options['uriOptions'], self::addDriverInfo($this->options['driverOptions']));
+    }
+
+    /**
+     * Identifies the component in the driver handshake, so that the server
+     * knows which part of the application opened the connection. A driver name
+     * set by the application is kept and appended to.
+     */
+    private static function addDriverInfo(array $driverOptions): array
+    {
+        try {
+            $version = (class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('symfony/lock') : null) ?? 'unknown';
+        } catch (\OutOfBoundsException) {
+            $version = 'unknown';
+        }
+
+        $driver = $driverOptions['driver'] ?? [];
+        $name = 'symfony-mongodb-lock';
+
+        if (isset($driver['name'])) {
+            $name .= '/'.$driver['name'];
+        }
+        if (isset($driver['version'])) {
+            $version .= '/'.$driver['version'];
+        }
+
+        $driverOptions['driver'] = ['name' => $name, 'version' => $version] + $driver;
+
+        return $driverOptions;
     }
 
     /**

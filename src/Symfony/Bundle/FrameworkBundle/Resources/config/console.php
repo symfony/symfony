@@ -45,6 +45,10 @@ use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
 use Symfony\Component\Form\Command\DebugCommand;
+use Symfony\Component\KeyManagement\Command\DecryptCommand;
+use Symfony\Component\KeyManagement\Command\EncryptCommand;
+use Symfony\Component\KeyManagement\Command\GenerateDataKeyCommand;
+use Symfony\Component\KeyManagement\Command\RewrapDataKeysCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -410,6 +414,31 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('secrets.vault'),
                 service('secrets.local_vault')->ignoreOnInvalid(),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.key_management_encrypt', EncryptCommand::class)
+            ->args([
+                tagged_locator('key_management.client', 'key'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.key_management_decrypt', DecryptCommand::class)
+            ->args([
+                tagged_locator('key_management.client', 'key'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.key_management_generate_data_key', GenerateDataKeyCommand::class)
+            ->args([
+                tagged_locator('key_management.client', 'key'),
+            ])
+            ->tag('console.command')
+
+        ->set('console.command.key_management_rewrap_data_keys', RewrapDataKeysCommand::class)
+            ->args([
+                service('key_management.store')->nullOnInvalid(),
+                tagged_locator('key_management.client', 'key'),
             ])
             ->tag('console.command')
 

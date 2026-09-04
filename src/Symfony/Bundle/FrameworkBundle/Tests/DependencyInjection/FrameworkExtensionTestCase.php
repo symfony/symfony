@@ -51,6 +51,7 @@ use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgument
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
@@ -2621,6 +2622,540 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('cache.taggable', $iterator->getTag());
         $this->assertSame('pool', $iterator->getIndexAttribute());
         $this->assertTrue($iterator->needsIndexes());
+    }
+
+    #[DataProvider('provideKmsCommandIds')]
+    public function testKmsCommandIsWiredWithTaggedLocator(string $serviceId)
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', ['secret' => 's3cr3t']);
+        });
+
+        $this->assertTrue($container->hasDefinition($serviceId));
+
+        $locator = $container->getDefinition($serviceId)->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+
+        $iterator = $locator->getTaggedIteratorArgument();
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $iterator);
+        $this->assertSame('key_management.client', $iterator->getTag());
+        $this->assertSame('key', $iterator->getIndexAttribute());
+    }
+
+    public static function provideKmsCommandIds(): iterable
+    {
+        yield ['console.command.key_management_encrypt'];
+        yield ['console.command.key_management_decrypt'];
+        yield ['console.command.key_management_generate_data_key'];
+    }
+
+    /**
+     * The host of a "...+fly://" DSN is looked up under the "key" attribute of the tag, the same
+     * one the clients are indexed by. Left implicit, the index would be "flysystem", the last
+     * segment of the tag name, and a service tagged as documented would only ever be found when
+     * its id happens to equal the host.
+     */
+    public function testKmsFlysystemFactoryIsWiredWithTaggedLocator()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory::class)) {
+            $this->markTestSkipped('symfony/flysystem-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+            ]);
+        });
+
+        $locator = $container->getDefinition('key_management.factory.flysystem')->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+
+        $iterator = $locator->getTaggedIteratorArgument();
+        $this->assertSame('key_management.flysystem', $iterator->getTag());
+        $this->assertSame('key', $iterator->getIndexAttribute());
+    }
+
+    /**
+     * A client the application built itself is named in the configuration through a "service://"
+     * DSN, and is registered as a definition rather than as an alias. What an alias would silently
+     * drop is what is asserted here: the tag the console commands and the profiler find a client by,
+     * the envelope encrypter, and the named argument aliases.
+     */
+    public function testKmsClientCanBeAServiceTheApplicationRegistered()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.my_kms', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['legacy' => 'service://app.my_kms']],
+            ]);
+        });
+
+        $definition = $container->getDefinition('key_management.legacy');
+        $this->assertSame('current', $definition->getFactory(), 'the client is taken as it is instead of being built from a DSN.');
+        $this->assertSame('app.my_kms', (string) $definition->getArgument(0)[0]);
+        $this->assertSame([['key' => 'legacy']], $definition->getTag('key_management.client'));
+
+        $this->assertSame('key_management.legacy', (string) $container->getDefinition('key_management.envelope_encrypter.legacy')->getArgument(0));
+        $this->assertSame('key_management.legacy', (string) $container->getAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class.' $legacyKeyManagement'));
+        $this->assertSame('key_management.legacy', (string) $container->getAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class), 'the only client registered is the default one, wherever it comes from.');
+    }
+
+    public function testKmsClientAsAServiceRequiresAServiceId()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The DSN of the KMS client "legacy" must name a service id after "service://".');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['legacy' => 'service://']],
+            ]);
+        });
+    }
+
+    /**
+     * The scheme is resolved when the container is built, so a DSN whose value is unknown until
+     * runtime is handed to the factory registry whatever it holds: an application that puts
+     * "service://" in an environment variable gets an unsupported scheme, not a reference.
+     */
+    public function testKmsClientFromAnEnvVarIsAlwaysBuiltFromADsn()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['app' => '%env(KMS_DSN)%']],
+            ]);
+        });
+
+        $factory = $container->getDefinition('key_management.app')->getFactory();
+        $this->assertSame('key_management.factory', (string) $factory[0]);
+        $this->assertSame('fromString', $factory[1]);
+    }
+
+    public function testKmsFactoryTheApplicationRegistersIsAutoconfigured()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']],
+            ]);
+        });
+
+        $autoconfigured = $container->getAutoconfiguredInstanceof();
+        $this->assertArrayHasKey(\Symfony\Component\KeyManagement\Factory\KmsFactoryInterface::class, $autoconfigured);
+        $this->assertSame(['key_management.factory' => [[]]], $autoconfigured[\Symfony\Component\KeyManagement\Factory\KmsFactoryInterface::class]->getTags(), 'a backend the application brings extends the schemes a DSN can use without being tagged by hand.');
+    }
+
+    public function testKmsStoreConfigCreatesTheStoreAndItsEncrypter()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                    'store' => [
+                        'connection' => 'app.dbal',
+                        'client' => 'app',
+                        'key_id' => 'alias/app-key',
+                        'table' => 'deks',
+                        'max_age' => 3600,
+                    ],
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.store'));
+        $arguments = $container->getDefinition('key_management.store')->getArguments();
+        $this->assertSame('app.dbal', (string) $arguments[0]);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
+        $this->assertSame('key_management.client', $arguments[1]->getTaggedIteratorArgument()->getTag(), 'a data key can be rewrapped under any tagged client, not only under a configured one.');
+        $this->assertSame('key', $arguments[1]->getTaggedIteratorArgument()->getIndexAttribute());
+        $this->assertSame('app', $arguments[2]);
+        $this->assertSame('alias/app-key', $arguments[3]);
+        $this->assertSame('deks', $arguments[4]);
+        $this->assertSame(3600, $arguments[6]);
+        $this->assertSame([['method' => 'forget']], $container->getDefinition('key_management.store')->getTag('kernel.reset'), 'the retained plaintexts must not survive a unit of work in a long-running process.');
+
+        $encrypter = $container->getDefinition('key_management.stored_envelope_encrypter')->getArguments();
+        $this->assertSame('key_management.store', (string) $encrypter[0]);
+        $this->assertSame('key_management.envelope_encrypter.app', (string) $encrypter[1], 'the default client provides the fallback that reads self-contained envelopes.');
+    }
+
+    /**
+     * The store writes a table of its own, so Doctrine has to be told about it or a schema update
+     * ignores it and a migration diff proposes to drop it.
+     */
+    public function testKmsStoreBringsTheListenerThatPutsItsTableInTheSchema()
+    {
+        if (!class_exists(\Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener::class) || !class_exists(\Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                    'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key'],
+                ],
+            ]);
+        });
+
+        $definition = $container->getDefinition('key_management.store.schema_listener');
+
+        $this->assertSame(\Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener::class, $definition->getClass());
+        $this->assertSame([['event' => 'postGenerateSchema']], $definition->getTag('doctrine.event_listener'));
+        $this->assertSame(['key_management.store'], array_map(strval(...), $definition->getArgument(0)->getValues()));
+    }
+
+    /**
+     * A store that seals payloads under one key forever is what the default must not produce, so
+     * the configuration carries the age the store itself would have applied.
+     */
+    public function testKmsStoreRotatesOnTheDefaultAgeWhenTheConfigurationIsSilent()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                    'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key'],
+                ],
+            ]);
+        });
+
+        $this->assertSame(
+            \Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore::DEFAULT_MAX_AGE_SECONDS,
+            $container->getDefinition('key_management.store')->getArgument(6),
+        );
+    }
+
+    public function testKmsWithoutAStoreRegistersNoSchemaListener()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']],
+            ]);
+        });
+
+        $this->assertFalse($container->hasDefinition('key_management.store.schema_listener'));
+    }
+
+    public function testKmsBringsTheListenerFillingTheBlindIndexColumns()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener::class)) {
+            $this->markTestSkipped('symfony/doctrine-orm-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']],
+            ]);
+        });
+
+        $definition = $container->getDefinition('key_management.blind_index_listener');
+
+        $this->assertSame(\Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener::class, $definition->getClass());
+        $this->assertSame([['event' => 'onFlush']], $definition->getTag('doctrine.event_listener'));
+        $this->assertSame([['key_management.blind_index' => [[]]]], array_map(
+            static fn (ChildDefinition $child): array => $child->getTags(),
+            array_values(array_intersect_key($container->getAutoconfiguredInstanceof(), [\Symfony\Component\KeyManagement\BlindIndex::class => true])),
+        ), 'a blind index the application registers is found by the listener without being tagged by hand.');
+    }
+
+    public function testKmsStoreIsWhatTheEnvelopeInterfacesResolveTo()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                    'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key'],
+                ],
+            ]);
+        });
+
+        $this->assertSame('key_management.store', (string) $container->getAlias(\Symfony\Component\KeyManagement\DataKeyStoreInterface::class));
+        $this->assertSame('key_management.store', (string) $container->getAlias(\Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface::class));
+        $this->assertSame('key_management.stored_envelope_encrypter', (string) $container->getAlias(\Symfony\Component\KeyManagement\EnvelopeEncrypterInterface::class), 'configuring a store is what makes it the encrypter the application gets.');
+        $this->assertSame('key_management.stored_envelope_encrypter', (string) $container->getAlias(\Symfony\Component\KeyManagement\EnvelopeDecrypterInterface::class));
+        $this->assertSame('key_management.envelope_encrypter.app', (string) $container->getAlias(\Symfony\Component\KeyManagement\EnvelopeEncrypterInterface::class.' $appEnvelopeEncrypter'), 'the per-client encrypter stays reachable under its own name.');
+        $this->assertSame('key_management.stored_envelope_encrypter', (string) $container->getAlias(\Symfony\Component\KeyManagement\EnvelopeEncrypterInterface::class.' $storedEnvelopeEncrypter'));
+    }
+
+    public function testProfilerTracesTheClientsAndTheirEnvelopeEncrypters()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'profiler' => ['enabled' => true],
+                'key_management' => ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.data_collector'));
+        $this->assertSame(['app'], $container->getDefinition('key_management.data_collector')->getArgument(0));
+
+        $client = $container->getDefinition('debug.key_management.app');
+        $this->assertSame([\Symfony\Component\KeyManagement\Debug\TraceableKms::class, 'wrap'], $client->getFactory(), 'the decorator mirrors the capabilities of the client it wraps rather than claiming them all.');
+        $this->assertSame('key_management.app', $client->getDecoratedService()[0]);
+        $this->assertSame('app', $client->getArgument(2));
+
+        $encrypter = $container->getDefinition('debug.key_management.envelope_encrypter.app');
+        $this->assertSame(\Symfony\Component\KeyManagement\Debug\TraceableEnvelopeEncrypter::class, $encrypter->getClass());
+        $this->assertSame('key_management.envelope_encrypter.app', $encrypter->getDecoratedService()[0]);
+    }
+
+    public function testProfilerLeavesTheKeyManagementServicesAloneWhenItIsDisabled()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']],
+            ]);
+        });
+
+        $this->assertFalse($container->hasDefinition('key_management.data_collector'));
+        $this->assertFalse($container->hasDefinition('debug.key_management.app'));
+    }
+
+    public function testProfilerWrapsTheDataKeyStoreInsteadOfDecoratingIt()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore::class)) {
+            $this->markTestSkipped('symfony/doctrine-dbal-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'profiler' => ['enabled' => true],
+                'key_management' => [
+                    'clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                    'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'alias/app-key'],
+                ],
+            ]);
+        });
+
+        $traced = $container->getDefinition('debug.key_management.store');
+        $this->assertSame(\Symfony\Component\KeyManagement\Debug\TraceableDataKeyStore::class, $traced->getClass());
+        $this->assertNull($traced->getDecoratedService(), 'decorating would move the "kernel.reset" tag onto a decorator with no forget() to offer, and the retained plaintexts would survive a unit of work.');
+        $this->assertSame([['method' => 'forget']], $container->getDefinition('key_management.store')->getTag('kernel.reset'));
+
+        $this->assertSame('debug.key_management.store', (string) $container->getAlias(\Symfony\Component\KeyManagement\DataKeyStoreInterface::class));
+        $this->assertSame('key_management.store', (string) $container->getAlias(\Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface::class), 'the rewrapping half keeps resolving to the store itself.');
+        $this->assertSame('debug.key_management.store', (string) $container->getDefinition('key_management.stored_envelope_encrypter')->getArgument(0));
+        $this->assertSame('key_management.stored_envelope_encrypter', $container->getDefinition('debug.key_management.stored_envelope_encrypter')->getDecoratedService()[0]);
+    }
+
+    public function testKmsWithoutAStoreKeepsTheSelfContainedEncrypter()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['clients' => ['app' => 'sodium://?keys[app]=Q0VkRUNVTk5VTkRJVUVDU1U=']],
+            ]);
+        });
+
+        $this->assertSame('key_management.envelope_encrypter.app', (string) $container->getAlias(\Symfony\Component\KeyManagement\EnvelopeEncrypterInterface::class));
+        $this->assertFalse($container->hasAlias(\Symfony\Component\KeyManagement\DataKeyStoreInterface::class));
+    }
+
+    public function testKmsStoreRejectsAClientThatIsNotRegistered()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS client "gone" set on "framework.key_management.store" is not registered');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => ['app' => 'sodium://?keys[app]=AAAA'],
+                    'store' => ['connection' => 'app.dbal', 'client' => 'gone', 'key_id' => 'k'],
+                ],
+            ]);
+        });
+    }
+
+    /**
+     * A store names the client wrapping its data keys, so a store configured without any client is
+     * a configuration that cannot work. It used to be accepted and silently dropped, along with
+     * everything else the section declared, since no client meant returning before reaching it.
+     */
+    public function testKmsStoreWithoutAnyClientIsRefused()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The KMS client "app" set on "framework.key_management.store" is not registered');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->register('app.dbal', \stdClass::class);
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'store' => ['connection' => 'app.dbal', 'client' => 'app', 'key_id' => 'k'],
+                ],
+            ]);
+        });
+    }
+
+    public function testKmsDefaultClientWithoutAnyClientIsRefused()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Default KMS client "app" is not registered in framework.key_management.clients.');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => ['default_client' => 'app'],
+            ]);
+        });
+    }
+
+    /**
+     * Enabling the section without configuring a client stays valid: the factories, the commands and
+     * the blind index listener are what an application registering its clients as services of its
+     * own uses, and it gets no default client since it declared none.
+     */
+    public function testKmsWithoutAnyClientRegistersTheFactoriesAndNoDefault()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => true,
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.factory'));
+        $this->assertFalse($container->hasAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class));
+    }
+
+    public function testTheRewrapCommandGetsTheStoreAndTheClients()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', ['secret' => 's3cr3t']);
+        });
+
+        $arguments = $container->getDefinition('console.command.key_management_rewrap_data_keys')->getArguments();
+        $this->assertSame('key_management.store', (string) $arguments[0]);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $arguments[1]);
+    }
+
+    public function testKmsClientsConfigCreatesTaggedServicesAndAliases()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => [
+                        'app' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                        'vault' => 'vault-transit://t@vault.local:8200/v1/',
+                    ],
+                    'default_client' => 'app',
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.app'));
+        $this->assertTrue($container->hasDefinition('key_management.vault'));
+        $this->assertTrue($container->hasDefinition('key_management.envelope_encrypter.app'));
+        $this->assertTrue($container->hasDefinition('key_management.envelope_encrypter.vault'));
+
+        $appTags = $container->getDefinition('key_management.app')->getTag('key_management.client');
+        $this->assertSame([['key' => 'app']], $appTags);
+
+        $alias = $container->getAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class);
+        $this->assertSame('key_management.app', (string) $alias);
+
+        $envelopeAlias = $container->getAlias(\Symfony\Component\KeyManagement\EnvelopeEncrypterInterface::class);
+        $this->assertSame('key_management.envelope_encrypter.app', (string) $envelopeAlias);
+    }
+
+    public function testKmsSingleClientBecomesDefaultAutomatically()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => ['only' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U='],
+                ],
+            ]);
+        });
+
+        $this->assertSame('key_management.only', (string) $container->getAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class));
+    }
+
+    public function testKmsScalarShorthandIsExpandedToDefaultClient()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.default'));
+        $this->assertSame('key_management.default', (string) $container->getAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class));
+    }
+
+    public function testKmsClientsAreReachableViaTargetAttribute()
+    {
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => [
+                    'clients' => [
+                        'app' => 'sodium://?keys[main]=Q0VkRUNVTk5VTkRJVUVDU1U=',
+                        'vault' => 'vault-transit://t@vault.local:8200/v1/',
+                    ],
+                    'default_client' => 'app',
+                ],
+            ]);
+        });
+
+        // `#[Target('vault')] EncrypterInterface $foo` resolves through this alias chain.
+        $this->assertTrue($container->hasAlias('.'.\Symfony\Component\KeyManagement\EncrypterInterface::class.' $vault'));
+        $this->assertTrue($container->hasAlias('.'.\Symfony\Component\KeyManagement\EnvelopeEncrypterInterface::class.' $vault'));
+
+        // The named-argument fallback (`EncrypterInterface $vaultKeyManagement`) keeps working.
+        $this->assertSame('key_management.vault', (string) $container->getAlias(\Symfony\Component\KeyManagement\EncrypterInterface::class.' $vaultKeyManagement'));
+    }
+
+    public function testKmsAwsBridgeIsWiredWhenInstalled()
+    {
+        if (!class_exists(\Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory::class)) {
+            $this->markTestSkipped('symfony/aws-key-management is not installed.');
+        }
+
+        $container = $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'secret' => 's3cr3t',
+                'key_management' => 'aws-kms://default?region=eu-west-1',
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('key_management.default'));
+        $this->assertTrue($container->hasDefinition('key_management.factory.aws_kms'));
     }
 
     public function testSessionCookieSecureAuto()

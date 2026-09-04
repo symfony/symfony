@@ -35,6 +35,16 @@
         "intl": "src/Symfony/Component/Intl",
         "json-path": "src/Symfony/Component/JsonPath",
         "json-streamer": "src/Symfony/Component/JsonStreamer",
+        "key-management": {
+            "prefixes": [{ "from": "src/Symfony/Component/KeyManagement", "to": "", "excludes": ["Bridge"] }]
+        },
+        "aws-key-management": "src/Symfony/Component/KeyManagement/Bridge/AwsKms",
+        "azure-keyvault-key-management": "src/Symfony/Component/KeyManagement/Bridge/AzureKeyVault",
+        "doctrine-dbal-key-management": "src/Symfony/Component/KeyManagement/Bridge/DoctrineDbal",
+        "doctrine-orm-key-management": "src/Symfony/Component/KeyManagement/Bridge/DoctrineOrm",
+        "flysystem-key-management": "src/Symfony/Component/KeyManagement/Bridge/Flysystem",
+        "google-cloud-key-management": "src/Symfony/Component/KeyManagement/Bridge/GoogleCloudKms",
+        "vault-key-management": "src/Symfony/Component/KeyManagement/Bridge/Vault",
         "ldap": "src/Symfony/Component/Ldap",
         "lock": {
             "prefixes": [{ "from": "src/Symfony/Component/Lock", "to": "", "excludes": ["Bridge"] }]

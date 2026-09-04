@@ -23,6 +23,7 @@ use PhpParser\Parser;
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Client\ClientInterface;
+use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 use Symfony\Bridge\Twig\Extension\CsrfExtension;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -109,6 +110,22 @@ use Symfony\Component\JsonStreamer\Mapping\PropertyMetadata;
 use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
 use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\KeyManagement\BlindIndex;
+use Symfony\Component\KeyManagement\Bridge\DoctrineDbal\DataKeyStore;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\EventListener\BlindIndexListener;
+use Symfony\Component\KeyManagement\Bridge\DoctrineOrm\SchemaListener\DataKeyStoreSchemaListener;
+use Symfony\Component\KeyManagement\DataKeyStoreInterface;
+use Symfony\Component\KeyManagement\Debug\TraceableDataKeyStore;
+use Symfony\Component\KeyManagement\Debug\TraceableEnvelopeEncrypter;
+use Symfony\Component\KeyManagement\Debug\TraceableKms;
+use Symfony\Component\KeyManagement\DecrypterInterface;
+use Symfony\Component\KeyManagement\EncrypterInterface;
+use Symfony\Component\KeyManagement\EnvelopeDecrypterInterface;
+use Symfony\Component\KeyManagement\EnvelopeEncrypter;
+use Symfony\Component\KeyManagement\EnvelopeEncrypterInterface;
+use Symfony\Component\KeyManagement\Factory\KmsFactoryInterface;
+use Symfony\Component\KeyManagement\RewrappableDataKeyStoreInterface;
+use Symfony\Component\KeyManagement\StoredEnvelopeEncrypter;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -247,6 +264,12 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
  */
 class FrameworkExtension extends Extension
 {
+    /**
+     * Prefix of a "framework.key_management.clients" DSN naming a client the application registered
+     * itself, rather than one the factory registry has to build.
+     */
+    private const string KEY_MANAGEMENT_SERVICE_SCHEME = 'service://';
+
     private array $configsEnabled = [];
 
     /**
@@ -320,6 +343,13 @@ class FrameworkExtension extends Extension
             if (!class_exists(RunCommandMessageHandler::class)) {
                 $container->removeDefinition('console.messenger.application');
                 $container->removeDefinition('console.messenger.execute_command_handler');
+            }
+
+            if (!interface_exists(EncrypterInterface::class)) {
+                $container->removeDefinition('console.command.key_management_encrypt');
+                $container->removeDefinition('console.command.key_management_decrypt');
+                $container->removeDefinition('console.command.key_management_generate_data_key');
+                $container->removeDefinition('console.command.key_management_rewrap_data_keys');
             }
         }
 
@@ -504,6 +534,10 @@ class FrameworkExtension extends Extension
 
         if ($this->readConfigEnabled('lock', $container, $config['lock'])) {
             $this->registerLockConfiguration($config['lock'], $container, $loader);
+        }
+
+        if ($this->readConfigEnabled('key_management', $container, $config['key_management'])) {
+            $this->registerKeyManagementConfiguration($config['key_management'], $container, $loader);
         }
 
         if ($this->readConfigEnabled('semaphore', $container, $config['semaphore'])) {
@@ -1023,6 +1057,12 @@ class FrameworkExtension extends Extension
 
         if ($this->isInitializedConfigEnabled('serializer')) {
             $loader->load('serializer_debug.php');
+        }
+
+        if ($this->isInitializedConfigEnabled('key_management')) {
+            $loader->load('key_management_debug.php');
+
+            $this->registerKeyManagementDebugConfiguration($container);
         }
 
         $container->setParameter('profiler_listener.only_exceptions', $config['only_exceptions']);
@@ -2340,6 +2380,224 @@ class FrameworkExtension extends Extension
 
             $container->getDefinition('type_info.type_context_factory')->replaceArgument(1, $config['aliases']);
         }
+    }
+
+    /**
+     * A client an application built itself is named in "clients" like any other, through a
+     * "service://<id>" DSN. That scheme is resolved here, when the container is built, so it never
+     * reaches the factory registry: an application that hides it behind an environment variable
+     * gets an unsupported scheme at runtime instead, since nothing can be referenced from a value
+     * that is unknown until then.
+     *
+     * What the scheme registers is a definition rather than an alias, and that is the point: the
+     * client keeps the tag the console commands look it up by, the profiler decorates it, and it
+     * gets an envelope encrypter and named argument aliases like a client built from a DSN. An
+     * alias would carry no tag and be invisible to all three.
+     */
+    private function registerKeyManagementConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
+    {
+        if (!interface_exists(EncrypterInterface::class)) {
+            throw new LogicException('Key management support cannot be enabled as the component is not installed. Try running "composer require symfony/key-management".');
+        }
+
+        $loader->load('key_management.php');
+
+        $bridgeFactories = [
+            'key_management.factory.flysystem' => [\Symfony\Component\KeyManagement\Bridge\Flysystem\FlysystemKmsFactory::class, 'symfony/flysystem-key-management'],
+            'key_management.factory.vault_transit' => [\Symfony\Component\KeyManagement\Bridge\Vault\TransitKmsFactory::class, 'symfony/vault-key-management'],
+            'key_management.factory.aws_kms' => [\Symfony\Component\KeyManagement\Bridge\AwsKms\AwsKmsFactory::class, 'symfony/aws-key-management'],
+            'key_management.factory.azure_key_vault' => [\Symfony\Component\KeyManagement\Bridge\AzureKeyVault\AzureKeyVaultFactory::class, 'symfony/azure-keyvault-key-management'],
+            'key_management.factory.google_cloud_kms' => [\Symfony\Component\KeyManagement\Bridge\GoogleCloudKms\GoogleCloudKmsFactory::class, 'symfony/google-cloud-key-management'],
+        ];
+        foreach ($bridgeFactories as $serviceId => [$factoryClass, $package]) {
+            if (!ContainerBuilder::willBeAvailable($package, $factoryClass, ['symfony/framework-bundle', 'symfony/key-management'])) {
+                $container->removeDefinition($serviceId);
+            }
+        }
+
+        $container->registerForAutoconfiguration(KmsFactoryInterface::class)
+            ->addTag('key_management.factory');
+
+        if (!interface_exists(DenormalizerInterface::class)) {
+            $container->removeDefinition('serializer.normalizer.key_management_envelope');
+        }
+
+        $container->registerForAutoconfiguration(BlindIndex::class)
+            ->addTag('key_management.blind_index');
+
+        // A blind index is written by hand next to the value it indexes, on every write path, and a
+        // row whose tag was forgotten is a row no search returns. The listener fills the properties
+        // an entity marks with #[BlindIndexed] instead; RegisterBlindIndexesPass hands it the
+        // indexes the application registered, and removes it when there is none.
+        if (ContainerBuilder::willBeAvailable('symfony/doctrine-orm-key-management', BlindIndexListener::class, ['symfony/framework-bundle', 'symfony/key-management'])) {
+            $container->register('key_management.blind_index_listener', BlindIndexListener::class)
+                ->setArguments([new ServiceLocatorArgument([])])
+                ->addTag('doctrine.event_listener', ['event' => 'onFlush']);
+        }
+
+        $clients = $config['clients'] ?? [];
+
+        $defaultName = $config['default_client'] ?? (1 === \count($clients) ? array_key_first($clients) : null);
+        if (null !== $defaultName && !isset($clients[$defaultName])) {
+            throw new LogicException(\sprintf('Default KMS client "%s" is not registered in framework.key_management.clients.', $defaultName));
+        }
+
+        foreach ($clients as $name => $dsn) {
+            $serviceId = 'key_management.'.$name;
+
+            $definition = $container->register($serviceId, EncrypterInterface::class)
+                ->addTag('key_management.client', ['key' => $name]);
+
+            if (str_starts_with($dsn, self::KEY_MANAGEMENT_SERVICE_SCHEME)) {
+                if ('' === $referencedId = substr($dsn, \strlen(self::KEY_MANAGEMENT_SERVICE_SCHEME))) {
+                    throw new InvalidArgumentException(\sprintf('The DSN of the KMS client "%s" must name a service id after "%s".', $name, self::KEY_MANAGEMENT_SERVICE_SCHEME));
+                }
+
+                $definition->setFactory('current')
+                    ->setArguments([[new Reference($referencedId)]]);
+            } else {
+                $definition->setFactory([new Reference('key_management.factory'), 'fromString'])
+                    ->setArguments([$dsn]);
+            }
+
+            $envelopeId = 'key_management.envelope_encrypter.'.$name;
+            $container->register($envelopeId, EnvelopeEncrypter::class)
+                ->setArguments([new Reference($serviceId)]);
+
+            $container->registerAliasForArgument($serviceId, EncrypterInterface::class, $name.'KeyManagement', $name);
+            $container->registerAliasForArgument($serviceId, DecrypterInterface::class, $name.'KeyManagement', $name);
+            $container->registerAliasForArgument($envelopeId, EnvelopeEncrypterInterface::class, $name.'EnvelopeEncrypter', $name);
+            $container->registerAliasForArgument($envelopeId, EnvelopeDecrypterInterface::class, $name.'EnvelopeEncrypter', $name);
+        }
+
+        if (null !== $defaultName) {
+            $container->setAlias(EncrypterInterface::class, 'key_management.'.$defaultName);
+            $container->setAlias(DecrypterInterface::class, 'key_management.'.$defaultName);
+            $container->setAlias(EnvelopeEncrypterInterface::class, 'key_management.envelope_encrypter.'.$defaultName);
+            $container->setAlias(EnvelopeDecrypterInterface::class, 'key_management.envelope_encrypter.'.$defaultName);
+        }
+
+        if (isset($config['store']['client'])) {
+            $this->registerKeyManagementStore($config['store'], array_keys($clients), $defaultName, $container);
+        }
+    }
+
+    /**
+     * Configuring a store is what an application does to stop carrying a wrapped data key in every
+     * payload, so the store-backed encrypter becomes the one the envelope interfaces resolve to.
+     * Nothing is lost by that: it is given the default client's encrypter as a fallback, so it
+     * reads the payloads written before it as well as the ones it writes. The per-client encrypters
+     * stay reachable under their own name for whoever wants the other regime explicitly.
+     *
+     * The clients it can rewrap a data key under are the tagged ones rather than the configured
+     * ones, so a client contributed by a bundle is a rewrap target as well. The one it wraps with
+     * is still checked against the configuration, where a typo can be reported against a name.
+     *
+     * @param list<string> $clientNames
+     */
+    private function registerKeyManagementStore(array $config, array $clientNames, ?string $defaultName, ContainerBuilder $container): void
+    {
+        if (!ContainerBuilder::willBeAvailable('symfony/doctrine-dbal-key-management', DataKeyStore::class, ['symfony/framework-bundle', 'symfony/key-management'])) {
+            throw new LogicException('Configuring "framework.key_management.store" requires the "symfony/doctrine-dbal-key-management" package. Try running "composer require symfony/doctrine-dbal-key-management".');
+        }
+
+        if (!\in_array($config['client'], $clientNames, true)) {
+            throw new LogicException(\sprintf('The KMS client "%s" set on "framework.key_management.store" is not registered in "framework.key_management.clients".', $config['client']));
+        }
+
+        $container->register('key_management.store', DataKeyStore::class)
+            ->setArguments([
+                new Reference($config['connection']),
+                new ServiceLocatorArgument(new TaggedIteratorArgument('key_management.client', 'key', true)),
+                $config['client'],
+                $config['key_id'],
+                $config['table'],
+                32,
+                $config['max_age'],
+            ])
+            ->addTag('kernel.reset', ['method' => 'forget']);
+
+        $container->register('key_management.stored_envelope_encrypter', StoredEnvelopeEncrypter::class)
+            ->setArguments([
+                new Reference('key_management.store'),
+                null !== $defaultName ? new Reference('key_management.envelope_encrypter.'.$defaultName) : null,
+            ]);
+
+        $container->setAlias(DataKeyStoreInterface::class, 'key_management.store');
+        $container->setAlias(RewrappableDataKeyStoreInterface::class, 'key_management.store');
+        $container->setAlias(EnvelopeEncrypterInterface::class, 'key_management.stored_envelope_encrypter');
+        $container->setAlias(EnvelopeDecrypterInterface::class, 'key_management.stored_envelope_encrypter');
+
+        $container->registerAliasForArgument('key_management.stored_envelope_encrypter', EnvelopeEncrypterInterface::class, 'storedEnvelopeEncrypter');
+        $container->registerAliasForArgument('key_management.stored_envelope_encrypter', EnvelopeDecrypterInterface::class, 'storedEnvelopeEncrypter');
+
+        // The store writes its own table, so Doctrine has to know about it: without this, an
+        // application discovers it by having "doctrine:schema:update" ignore it and a migration
+        // diff propose to drop it. DoctrineBundle registers the listeners of the Lock, Messenger,
+        // Cache, Session and RememberMe stores itself and knows nothing of this one, so the store
+        // that was just registered brings its own. Its base class is checked first because the
+        // listener extends one the DoctrineBridge owns: loading it without that package around is
+        // a fatal error, not a false answer from class_exists().
+        if (
+            ContainerBuilder::willBeAvailable('symfony/doctrine-bridge', AbstractSchemaListener::class, ['symfony/framework-bundle'])
+            && ContainerBuilder::willBeAvailable('symfony/doctrine-orm-key-management', DataKeyStoreSchemaListener::class, ['symfony/framework-bundle', 'symfony/key-management'])
+        ) {
+            $container->register('key_management.store.schema_listener', DataKeyStoreSchemaListener::class)
+                ->setArguments([new IteratorArgument([new Reference('key_management.store')])])
+                ->addTag('doctrine.event_listener', ['event' => 'postGenerateSchema']);
+        }
+    }
+
+    /**
+     * Clients and their envelope encrypters are registered from the DSNs the application
+     * configured, so what traces them is registered here rather than declared in a file. Only
+     * those clients are traced: this method runs while extensions load, before the application's
+     * own tags are visible, so a client the application tags itself is picked up by the console
+     * commands and the store but is not decorated for the profiler panel.
+     *
+     * The clients are decorated, since the tag the console commands look them up by must follow.
+     * The store is wrapped instead: its "kernel.reset" tag would move to the decorator, which has
+     * no `forget()` to offer, and the retained plaintexts would then survive a unit of work.
+     * Wrapping leaves that tag where it belongs and points at the traced store what an application
+     * gets through autowiring. The rewrapping half keeps resolving to the store itself, which is
+     * what {@see TraceableDataKeyStore} deliberately does not claim.
+     */
+    private function registerKeyManagementDebugConfiguration(ContainerBuilder $container): void
+    {
+        $collector = new Reference('key_management.data_collector');
+        $clients = [];
+
+        foreach ($container->findTaggedServiceIds('key_management.client') as $id => $tags) {
+            $clients[] = $name = $tags[0]['key'];
+
+            $container->register('debug.'.$id, TraceableKms::class)
+                ->setFactory([TraceableKms::class, 'wrap'])
+                ->setArguments([new Reference('debug.'.$id.'.inner'), $collector, $name])
+                ->setDecoratedService($id);
+
+            $envelopeId = 'key_management.envelope_encrypter.'.$name;
+            if ($container->hasDefinition($envelopeId)) {
+                $container->register('debug.'.$envelopeId, TraceableEnvelopeEncrypter::class)
+                    ->setArguments([new Reference('debug.'.$envelopeId.'.inner'), $collector, $name])
+                    ->setDecoratedService($envelopeId);
+            }
+        }
+
+        $container->getDefinition('key_management.data_collector')->setArgument(0, $clients);
+
+        if (!$container->hasDefinition('key_management.store')) {
+            return;
+        }
+
+        $container->register('debug.key_management.store', TraceableDataKeyStore::class)
+            ->setArguments([new Reference('key_management.store'), $collector, 'store']);
+
+        $container->setAlias(DataKeyStoreInterface::class, 'debug.key_management.store');
+        $container->getDefinition('key_management.stored_envelope_encrypter')->replaceArgument(0, new Reference('debug.key_management.store'));
+
+        $container->register('debug.key_management.stored_envelope_encrypter', TraceableEnvelopeEncrypter::class)
+            ->setArguments([new Reference('debug.key_management.stored_envelope_encrypter.inner'), $collector, 'stored'])
+            ->setDecoratedService('key_management.stored_envelope_encrypter');
     }
 
     private function registerLockConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void

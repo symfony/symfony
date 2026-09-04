@@ -21,6 +21,9 @@ CHANGELOG
  * Add `framework.mailer.smime_encrypter.certificates`, `on_missing_certificate` and `encrypt_for_sender` options
  * Add `framework.mailer.pgp_signer` and `framework.mailer.pgp_encrypter` options to sign and encrypt messages with PGP/MIME
  * Add `framework.cache.default_provider` to configure `cache.app` with a DSN
+ * Add a `framework.key_management` section to configure KMS clients, and `framework.key_management.store` to keep wrapped data keys in a table so payloads refer to them instead of carrying them
+ * Add support for `service://<id>` DSNs in `framework.key_management.clients` to name a KMS client the application built itself
+ * Trace the KMS clients, the envelope encrypters and the data key store when the profiler is enabled, and aggregate what they did in `key_management.data_collector`
  * Add `framework.messenger.reject_redelivered_messages` to allow disabling the `RejectRedeliveredMessageMiddleware`
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
  * Add `--dispatchers` option to `debug:event-dispatcher` command

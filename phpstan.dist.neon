@@ -52,3 +52,8 @@ parameters:
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$regexp$#'
             path: src/Symfony/Component/String/*
+        # $emptyDefaults mirrors the same hook on CurlHttpClient, NativeHttpClient and AmpHttpClient,
+        # which HttpClientTrait reads through isset() so decorators without the property stay unaffected
+        -
+            message: '#^Static property Symfony\\Component\\HttpClient\\RecorderHttpClient\:\:\$emptyDefaults \(array\) in isset\(\) is not nullable\.$#'
+            path: src/Symfony/Component/HttpClient/HttpClientTrait.php

@@ -3104,6 +3104,25 @@ class FrameworkExtension extends Extension
                 $container->registerAliasForArgument('httplug.'.$name, HttpAsyncClient::class, $name);
             }
         }
+
+        if ($this->readConfigEnabled('http_client.recorder', $container, $config['recorder'])) {
+            $loader->load('http_client_recorder.php');
+
+            $container->getDefinition('http_client.recorder')
+                ->replaceArgument(5, $container->getDefinition('http_client.transport')->getArgument(0));
+
+            $recorder = $config['recorder'];
+            $container->getDefinition('http_client.recorder.redactor')
+                ->setArguments([$recorder['redact']['headers'], $recorder['redact']['query'], $recorder['redact']['body']]);
+
+            if ($recorder['redactor']) {
+                $container->setAlias('http_client.recorder.redactor', $recorder['redactor']);
+            }
+
+            if ($recorder['matcher']) {
+                $container->setAlias('http_client.recorder.matcher', $recorder['matcher']);
+            }
+        }
     }
 
     private function registerCachingHttpClient(array $options, array $defaultOptions, string $name, ContainerBuilder $container): void

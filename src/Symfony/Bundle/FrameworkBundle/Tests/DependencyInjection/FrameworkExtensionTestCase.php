@@ -69,6 +69,8 @@ use Symfony\Component\HttpClient\CachingHttpClient;
 use Symfony\Component\HttpClient\Exception\ChunkCacheItemNotFoundException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
+use Symfony\Component\HttpClient\Recorder\RecorderConfigurationInterface;
+use Symfony\Component\HttpClient\RecorderHttpClient;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -3243,6 +3245,66 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertNotNull($decoratedService, 'The mock transport must decorate "http_client.transport".');
         $this->assertSame('http_client.transport', $decoratedService[0]);
         $this->assertSame(\PHP_INT_MAX, $decoratedService[2]);
+    }
+
+    public function testHttpClientRecorder()
+    {
+        $container = $this->createContainerFromFile('http_client_recorder');
+
+        $this->assertTrue($container->hasDefinition('http_client.recorder'));
+        $definition = $container->getDefinition('http_client.recorder');
+        $this->assertSame(RecorderHttpClient::class, $definition->getClass());
+
+        $decoratedService = $definition->getDecoratedService();
+        $this->assertNotNull($decoratedService, 'The recorder must decorate "http_client.transport".');
+        $this->assertSame('http_client.transport', $decoratedService[0]);
+        $this->assertNull($decoratedService[1]);
+        $this->assertSame(\PHP_INT_MAX - 1, $decoratedService[2]);
+
+        $arguments = $definition->getArguments();
+        $this->assertCount(6, $arguments);
+        $this->assertInstanceOf(Reference::class, $arguments[0]);
+        $this->assertSame('.inner', (string) $arguments[0]);
+        $this->assertInstanceOf(Reference::class, $arguments[1]);
+        $this->assertSame('http_client.recorder.store', (string) $arguments[1]);
+        $this->assertInstanceOf(Reference::class, $arguments[2]);
+        $this->assertSame('http_client.recorder.configuration', (string) $arguments[2]);
+        $this->assertInstanceOf(Reference::class, $arguments[3]);
+        $this->assertSame('http_client.recorder.matcher', (string) $arguments[3]);
+        $this->assertInstanceOf(Reference::class, $arguments[4]);
+        $this->assertSame('http_client.recorder.redactor', (string) $arguments[4]);
+
+        // the recorder gets the same default options as the transport
+        $this->assertSame($container->getDefinition('http_client.transport')->getArgument(0), $arguments[5]);
+        $this->assertSame('bar', $arguments[5]['headers']['X-Foo'] ?? null);
+
+        $this->assertTrue($container->hasAlias(RecorderConfigurationInterface::class));
+
+        $this->assertSame([['X-Custom-Secret'], ['sig'], ['pin']], $container->getDefinition('http_client.recorder.redactor')->getArguments());
+
+        $matcherDefinition = $container->getDefinition('http_client.recorder.matcher');
+        $matcherArguments = $matcherDefinition->getArguments();
+        $this->assertCount(1, $matcherArguments);
+        $this->assertInstanceOf(Reference::class, $matcherArguments[0]);
+        $this->assertSame('http_client.recorder.redactor', (string) $matcherArguments[0]);
+    }
+
+    public function testHttpClientRecorderCustomServices()
+    {
+        $container = $this->createContainerFromFile('http_client_recorder_custom_services');
+
+        $this->assertTrue($container->hasAlias('http_client.recorder.matcher'));
+        $this->assertSame('my_matcher', (string) $container->getAlias('http_client.recorder.matcher'));
+
+        $this->assertTrue($container->hasAlias('http_client.recorder.redactor'));
+        $this->assertSame('my_redactor', (string) $container->getAlias('http_client.recorder.redactor'));
+    }
+
+    public function testHttpClientRecorderIsDisabledByDefault()
+    {
+        $container = $this->createContainerFromFile('http_client_default_options');
+
+        $this->assertFalse($container->hasDefinition('http_client.recorder'));
     }
 
     public function testHttpClientRootClientNotMockedByDefault()

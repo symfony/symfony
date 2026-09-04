@@ -1,3 +1,3 @@
 [codespell]
-# "smove" is the name of a Redis command
-ignore-words-list = smove
+# "smove" is the name of a Redis command, "caf" comes from the "café" test fixtures
+ignore-words-list = smove,caf

@@ -109,7 +109,7 @@ trait HttpClientTrait
                     $options['body'] = self::dechunk($options['body']);
                 }
 
-                $options['normalized_headers']['content-length'] = [substr_replace($h ?: 'Content-Length: ', \strlen($options['body']), 16)];
+                $options['normalized_headers']['content-length'] = [substr_replace($h ?: 'Content-Length: ', (string) \strlen($options['body']), 16)];
             }
         }
 

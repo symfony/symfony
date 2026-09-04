@@ -1339,6 +1339,7 @@ class ConfigurationTest extends TestCase
             'http_client' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(HttpClient::class),
                 'scoped_clients' => [],
+                'recorder' => ['enabled' => false, 'matcher' => null, 'redactor' => null, 'redact' => ['headers' => [], 'query' => [], 'body' => []]],
             ],
             'mailer' => [
                 'dsn' => null,

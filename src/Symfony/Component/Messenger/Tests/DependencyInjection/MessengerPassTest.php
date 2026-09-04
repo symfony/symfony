@@ -925,6 +925,56 @@ class MessengerPassTest extends TestCase
         ], $container->getDefinition('console.command.messenger_debug')->getArgument(0));
     }
 
+    public function testItAddsRoutingToTheDebugCommand()
+    {
+        $container = $this->getContainerBuilder('message_bus');
+
+        $container->register('messenger.senders_locator')->addArgument([
+            DummyCommand::class => ['first_sender'],
+            'Symfony\Component\Messenger\Tests\Fixtures\*' => ['third_sender'],
+        ]);
+
+        $container->register('messenger.transport.first_sender', DummyReceiver::class)
+            ->addTag('messenger.receiver', ['alias' => 'first_sender']);
+        $container->register('messenger.transport.second_sender', DummyReceiver::class)
+            ->addTag('messenger.receiver', ['alias' => 'second_sender']);
+        $container->register('messenger.transport.third_sender', DummyReceiver::class)
+            ->addTag('messenger.receiver', ['alias' => 'third_sender']);
+        $container->register(DummyMessage::class, DummyMessage::class)
+            ->addResourceTag('messenger.message', ['transport' => ['second_sender']]);
+        $container->register('app.dummy_command_message', DummyCommand::class)
+            ->addResourceTag('messenger.message', ['transport' => 'third_sender']);
+        $container->register('messenger.failure.send_failed_message_to_failure_transport_listener')
+            ->setArguments([null, null, [
+                'first_sender' => 'third_sender',
+                'second_sender' => 'third_sender',
+            ]]);
+
+        $container->register('console.command.messenger_debug', DebugCommand::class)
+            ->addArgument([]);
+
+        (new MessengerPass())->process($container);
+
+        $commandDefinition = $container->getDefinition('console.command.messenger_debug');
+        $this->assertSame([
+            DummyCommand::class => ['first_sender'],
+            'Symfony\Component\Messenger\Tests\Fixtures\*' => ['third_sender'],
+        ], $commandDefinition->getArgument(1));
+        $this->assertSame([
+            'first_sender' => 'messenger.transport.first_sender',
+            'second_sender' => 'messenger.transport.second_sender',
+            'third_sender' => 'messenger.transport.third_sender',
+        ], $commandDefinition->getArgument(2));
+        $this->assertSame([
+            DummyMessage::class => ['second_sender'],
+            DummyCommand::class => ['third_sender'],
+        ], $commandDefinition->getArgument(3));
+        $this->assertSame([
+            'first_sender' => 'third_sender',
+            'second_sender' => 'third_sender',
+        ], $commandDefinition->getArgument(4));
+    }
+
     public function testCreatesSigningSerializerChildrenFromMapping()
     {
         $container = $this->getContainerBuilder('message_bus');

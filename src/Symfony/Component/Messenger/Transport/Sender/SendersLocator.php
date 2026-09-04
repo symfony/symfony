@@ -38,49 +38,53 @@ class SendersLocator implements SendersLocatorInterface
     public function getSenders(Envelope $envelope): iterable
     {
         if ($envelope->all(TransportNamesStamp::class)) {
-            foreach ($envelope->last(TransportNamesStamp::class)->getTransportNames() as $senderAlias) {
-                yield from $this->getSenderFromAlias($senderAlias);
-            }
-
-            return;
+            $senderAliases = $envelope->last(TransportNamesStamp::class)->getTransportNames();
+        } else {
+            $senderAliases = self::getSenderAliases($envelope->getMessage()::class, $this->sendersMap);
         }
 
-        $seen = [];
-        $found = false;
+        foreach ($senderAliases as $senderAlias) {
+            yield from $this->getSenderFromAlias($senderAlias);
+        }
+    }
 
-        foreach (HandlersLocator::listTypes($envelope) as $type) {
-            if (str_ends_with($type, '*') && $seen) {
+    /**
+     * @param array<string, list<string>> $sendersMap
+     *
+     * @return list<string>
+     *
+     * @internal
+     */
+    public static function getSenderAliases(string $messageClass, array $sendersMap): array
+    {
+        $senderAliases = [];
+
+        foreach (HandlersLocator::listTypesForClass($messageClass) as $type) {
+            if (str_ends_with($type, '*') && $senderAliases) {
                 // the '*' acts as a fallback, if other senders already matched
                 // with previous types, skip the senders bound to the fallback
                 continue;
             }
 
-            foreach ($this->sendersMap[$type] ?? [] as $senderAlias) {
-                if (!\in_array($senderAlias, $seen, true)) {
-                    $seen[] = $senderAlias;
-
-                    yield from $this->getSenderFromAlias($senderAlias);
-                    $found = true;
+            foreach ($sendersMap[$type] ?? [] as $senderAlias) {
+                if (!\in_array($senderAlias, $senderAliases, true)) {
+                    $senderAliases[] = $senderAlias;
                 }
             }
         }
 
-        // Let the configuration-driven map upper override message attributes,
-        // this allows environment-specific configuration overriding hardcoded
-        // transport name.
-        if ($found) {
-            return;
+        // Let the configuration-driven map override message attributes. This allows
+        // environment-specific configuration to override hardcoded transport names.
+        if ($senderAliases) {
+            return $senderAliases;
         }
 
-        foreach ($this->getTransportNamesFromAttribute($envelope) as $senderAlias) {
-            yield from $this->getSenderFromAlias($senderAlias);
-        }
+        return self::getTransportNamesFromAttribute($messageClass);
     }
 
-    private function getTransportNamesFromAttribute(Envelope $envelope): array
+    private static function getTransportNamesFromAttribute(string $messageClass): array
     {
         $transports = [];
-        $messageClass = $envelope->getMessage()::class;
 
         foreach ([$messageClass] + class_parents($messageClass) + class_implements($messageClass) as $class) {
             foreach ((new \ReflectionClass($class))->getAttributes(AsMessage::class, \ReflectionAttribute::IS_INSTANCEOF) as $refAttr) {

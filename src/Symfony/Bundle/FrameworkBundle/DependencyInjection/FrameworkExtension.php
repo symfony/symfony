@@ -823,9 +823,9 @@ class FrameworkExtension extends Extension
         $container->registerForAutoconfiguration(Constraint::class)
             ->addTag('container.excluded', ['source' => 'because it\'s a validation constraint']);
         $container->registerAttributeForAutoconfiguration(AsMessage::class, static function (ChildDefinition $definition, AsMessage $attribute): void {
-            $definition->addTag('container.excluded', ['source' => 'because it\'s a messenger message']);
-            $definition->addTag('messenger.message', [
-                'serializedTypeName' => $attribute->serializedTypeName,
+            $definition->addResourceTag('messenger.message', [
+                'transport' => $attribute->transport,
+                'serializedTypeName' => $attribute->serializedTypeName ?? null,
                 'serializedTypeNameAliases' => $attribute->serializedTypeNameAliases ?? [],
             ]);
         });

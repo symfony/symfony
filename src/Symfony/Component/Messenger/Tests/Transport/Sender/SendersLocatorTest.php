@@ -17,6 +17,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
+use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithAttribute;
@@ -28,6 +29,21 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SendersLocatorTest extends TestCase
 {
+    #[TestWith([DummyMessage::class, [DummyMessage::class => ['first'], '*' => ['fallback']], ['first']])]
+    #[TestWith([DummyMessage::class, [DummyMessage::class => ['first', 'second']], ['first', 'second']])]
+    #[TestWith([ChildDummyMessage::class, [DummyMessage::class => ['parent']], ['parent']])]
+    #[TestWith([DummyMessage::class, ['Symfony\\Component\\Messenger\\Tests\\Fixtures\\*' => ['namespace'], '*' => ['fallback']], ['namespace']])]
+    #[TestWith([SecondMessage::class, [DummyMessage::class => ['first'], '*' => ['fallback']], ['fallback']])]
+    #[TestWith([DummyMessageWithAttribute::class, [], ['first_sender', 'second_sender']])]
+    #[TestWith([DummyMessageWithParentWithAttribute::class, [], ['third_sender', 'first_sender', 'second_sender']])]
+    #[TestWith([DummyMessageWithInterfaceWithAttribute::class, [], ['first_sender', 'third_sender', 'second_sender']])]
+    #[TestWith([DummyMessageWithAttribute::class, [DummyMessageInterface::class => ['configured']], ['configured']])]
+    #[TestWith([DummyMessageWithAttribute::class, ['*' => ['fallback']], ['fallback']])]
+    public function testItGetsSenderAliasesForMessageClass(string $messageClass, array $sendersMap, array $expectedAliases)
+    {
+        $this->assertSame($expectedAliases, SendersLocator::getSenderAliases($messageClass, $sendersMap));
+    }
+
     public function testItReturnsTheSenderBasedOnTheMessageClass()
     {
         $sender = $this->createStub(SenderInterface::class);

@@ -1,0 +1,155 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-12T17:00:47Z
+
+Thanks for this, and thanks for your patience with how long it took to get a review.
+
+The problem is real: `CompoundRateLimiterFactory::create()` passes the same key to every child, so a global limiter cannot sit beside a per-user one.
+
+Simplest way forward: drop `key_provider` and `KeyProviderInterface` and keep `key` alone. They are one mechanism, a static key is a provider returning a constant, and two options plus a documented precedence between them is surface we do not need. Your own use case is a constant string, and `key` can grow to accept a callable later if anyone asks. That is fine as a first step.
+
+If you would rather solve it in one go, the better shape is to declare the override where the problem actually is, on the compound limiter, leaving the limiter definitions untouched and reusable:
+
+```yaml
+framework:
+    rate_limiter:
+        global_quota:
+            policy: fixed_window
+            limit: 5000
+            interval: '1 hour'
+
+        api:
+            policy: compound
+            limiters:
+                per_user: ~
+                global_quota: { key: 'global' }
+```
+
+`limiters` would keep accepting the current list of names next to this map, and `CompoundRateLimiterFactory` would call `create()` with the declared key where there is one.
+
+That also avoids the one thing that bothers me about a per-limiter `key`: outside compound limiters it is a footgun, since `$factory->create($request->getClientIp())` on a limiter configured with `key: 'global'` silently drops the IP, with nothing at the call site to say so.
+
+Either works for me, tell me which you prefer.
+
+---------------------------------------------------------------------------
+
+by NicolasJourdan at 2026-08-13T08:15:41Z
+
+> Thanks for this, and thanks for your patience with how long it took to get a review.
+>
+> The problem is real: `CompoundRateLimiterFactory::create()` passes the same key to every child, so a global limiter cannot sit beside a per-user one.
+>
+> Simplest way forward: drop `key_provider` and `KeyProviderInterface` and keep `key` alone. They are one mechanism, a static key is a provider returning a constant, and two options plus a documented precedence between them is surface we do not need. Your own use case is a constant string, and `key` can grow to accept a callable later if anyone asks. That is fine as a first step.
+>
+> If you would rather solve it in one go, the better shape is to declare the override where the problem actually is, on the compound limiter, leaving the limiter definitions untouched and reusable:
+>
+> ```yaml
+> framework:
+>     rate_limiter:
+>         global_quota:
+>             policy: fixed_window
+>             limit: 5000
+>             interval: '1 hour'
+>
+>         api:
+>             policy: compound
+>             limiters:
+>                 per_user: ~
+>                 global_quota: { key: 'global' }
+> ```
+>
+> `limiters` would keep accepting the current list of names next to this map, and `CompoundRateLimiterFactory` would call `create()` with the declared key where there is one.
+>
+> That also avoids the one thing that bothers me about a per-limiter `key`: outside compound limiters it is a footgun, since `$factory->create($request->getClientIp())` on a limiter configured with `key: 'global'` silently drops the IP, with nothing at the call site to say so.
+>
+> Either works for me, tell me which you prefer.
+
+Thanks for the review @nicolas-grekas :ok_hand:
+
+Going with the second option (the override declared on the compound's `limiters`) rather than on individual limiter definitions. It feels simpler and more flexible: no new interface, and standalone limiters stay untouched and reusable elsewhere.
+
+I updated the PR description accordingly, code and tests are up to date on the branch. :+1:
+
+Status: Needs Review
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-17T16:10:57Z
+
+Thanks for turning this around so quickly, the shape is what I had in mind. I checked it end to end through a compiled container and the keys survive as expected: `per_user-user-alice`, `per_user-user-bob` and a single `global_quota-global` taking both hits.
+
+Here is what would make it mergeable for us.
+
+**One thing that needs solving first, and not by you.** `CompoundLimiter::consume()` consumes from every sub-limiter unconditionally and never refunds. That is pre-existing, it behaves the same on 8.2 today, but your feature changes what it costs. Right now a rejected consume can only burn the caller's own counters. With a shared key it burns everyone's:
+
+```
+per-user limit 1, global limit 10, global_quota keyed 'global'
+one client sends 20 requests
+  1 accepted, 19 rejected by its own per-user limit
+  global window still ends at 10/10
+  the next honest user is refused
+```
+
+So a client that is already being throttled drains the shared quota. I would rather fix `consume()` to stop at the first rejection, in its own PR against a lower branch, and let this land on top. I can take that one if you prefer; it is not really yours to carry.
+
+**Then, on this PR:**
+
+- `create('alice')->reset()` deletes `global_quota-global` as well as `per_user-alice`, so any one user's reset wipes the shared window while other users' limits survive. It follows from what `reset()` promises, but it needs to be said out loud in the docs, and it is worth deciding whether a fixed-key sub-limiter should be exempt.
+- An unknown limiter name in `keys` is a silent no-op at the component level, and `testCreateIgnoresKeysOfUnknownFactories` pins that. I would rather it threw, and the test inverted. Config level already catches typos, but only for the option name.
+- The exception for an unknown name reports "requires at least one sub-limiter to be configured", which is the pre-existing wording and now misleading. Please name the offending limiter.
+- `testRateLimiterCompoundPolicy` moves from numeric to string keys. That is a real change in the dumped container, harmless, but worth a line in the description so a reader does not have to work it out.
+- Both CHANGELOG entries run long, one line naming the new surface is enough, and the FrameworkBundle one does not mention the new `limiters` map form.
+
+**One correction to the description.** It says this is impossible without workarounds. It is reachable today, and I would rather the description said what the PR really buys:
+
+```php
+final class ApiLimiterFactory implements RateLimiterFactoryInterface
+{
+    public function __construct(
+        private RateLimiterFactoryInterface $perUser,
+        private RateLimiterFactoryInterface $global,
+    ) {
+    }
+
+    public function create(?string $key = null): LimiterInterface
+    {
+        return new CompoundLimiter([$this->perUser->create($key), $this->global->create('global')]);
+    }
+}
+```
+
+Same semantics, drain included. What that cannot do is come from `framework.rate_limiter` configuration, which is where compound limiters are actually declared, and that is the gap worth closing.
+
+For the docs, the points to carry are the reset behaviour above, and that a fixed-key sub-limiter is shared across every caller of the compound.
+
+---------------------------------------------------------------------------
+
+by NicolasJourdan at 2026-08-19T15:34:26Z
+
+@nicolas-grekas
+
+On `consume()`: agreed, that's not for this PR. I couldn't find an existing issue or PR tracking it. Is there one already, or should I open one?
+
+Everything else is addressed on this PR: the unknown-limiter-name behavior now throws instead of silently ignoring, the exception message names the offending limiter, both CHANGELOG entries are down to one line, and the description no longer claims this is impossible today.
+
+On `reset()`: I'd rather not decide this one unilaterally. `CompoundLimiter` only ever sees the resolved `LimiterInterface` instances. By the time it's constructed, the information about which sub-limiter had a fixed key is gone, it lives in `CompoundRateLimiterFactory::create()`. Exempting fixed-key sub-limiters from `reset()` means threading that information through, which means changing `CompoundLimiter`'s public constructor signature, a class people instantiate directly today. That's a bigger surface than this PR currently touches.
+
+So: either we document the current behavior as-is (a compound's `reset()` clears every sub-limiter, including shared ones, worth calling out explicitly since it's the one place a single caller can wipe state shared with every other caller), in symfony/symfony-docs or in `reset()`'s own docblock, whichever you'd rather, or we take the API change here. Your call, happy to do either, just didn't want to bake in an assumption on a question you left open.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-02T08:40:01Z
+
+To answer the open questions:
+
+**The `consume()` fix.** There was no issue or PR tracking it, so I opened #65796. One correction to what I wrote earlier: I said that fix belonged on a lower branch. Looking at the history, consuming all limiters on a rejected hit was a deliberate choice (#38353, to keep the result independent from limiter order), and the security login throttler relies on the same semantics in its own loop. Reverting a deliberate behavior is a behavior change, not a bugfix, so #65796 targets 8.2 and this PR should land right after it. I verified the pair end to end: with a per-user limit of 1 and a shared quota of 10, a client hammering 20 requests gets 1 through, and the next honest user is still accepted. On this branch alone, the same run exhausts the shared window and locks the honest user out, which is why the merge order matters.
+
+**`reset()`.** Documenting the behavior as-is, no exemption. Your analysis is right: exempting fixed-key sub-limiters means threading that knowledge into `CompoundLimiter`, which is public API carried for the whole major, for a case that is better served by documentation. And an exemption would leave no way at all to clear the shared window through the compound, while the current behavior at least keeps every window reachable. Anyone needing a narrower reset can reset the sub-limiters through their own factories. I added the points to carry to the docs at the end of the description.
+
+Status: reviewed
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T08:21:33Z
+
+Rebased on 8.2 now that #65796 is merged. One change during the rebase: the `symfony/rate-limiter: ^8.2` bump un-skips `testRateLimiterBuilderDefault` and `testRateLimiterBuilderThrowsWhenLockIsNotConfigured` in the low-deps job, and both assumed `framework.lock` is disabled by default, which is only true inside the monorepo. They now disable it explicitly.

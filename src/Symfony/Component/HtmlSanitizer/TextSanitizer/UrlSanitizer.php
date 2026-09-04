@@ -103,7 +103,18 @@ final class UrlSanitizer
             $url['scheme'] = 'https';
         }
 
-        return UriString::build($url);
+        // In absence of a scheme and of an authority, RFC 3986 forbids a colon in the
+        // first path segment, which would otherwise be read as a scheme. league/uri
+        // enforces this in UriString::build(), but only since version 7.
+        if (!$url['scheme'] && null === $url['host'] && preg_match('#^[^/:]*+:#', $url['path'])) {
+            return null;
+        }
+
+        try {
+            return UriString::build($url);
+        } catch (SyntaxError) {
+            return null;
+        }
     }
 
     /**

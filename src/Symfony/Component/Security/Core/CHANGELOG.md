@@ -10,6 +10,7 @@ CHANGELOG
  * Add `OidcUser::fromClaims()` to build a user from the claims returned by an OIDC provider
  * Add `OidcUserProvider`, which builds the OIDC users of the `oidc_login` authenticator from those claims
  * Add `GuestAuthorizationCheckerInterface` and allow passing a null user to `AuthorizationChecker::isGrantedForUser()` to check guest permissions
+ * Add a `current_user()` function to `ExpressionLanguageProvider` and optional authorization checker, token storage and request stack arguments to its constructor
 
 8.1
 ---

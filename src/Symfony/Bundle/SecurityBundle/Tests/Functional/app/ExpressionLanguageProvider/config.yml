@@ -1,0 +1,25 @@
+imports:
+    - { resource: ../config/framework.yml }
+
+services:
+    test.security.expression_language_provider:
+        alias: security.expression_language_provider
+        public: true
+
+    test.request_stack:
+        alias: request_stack
+        public: true
+
+    test.security.token_storage:
+        alias: security.token_storage
+        public: true
+
+security:
+    providers:
+        main:
+            memory:
+                users:
+                    chalasr: { password: the-password, roles: ['ROLE_FOO'] }
+    firewalls:
+        main:
+            security: false

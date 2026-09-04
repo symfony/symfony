@@ -11,7 +11,6 @@
 
 namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
-use Symfony\Bundle\FrameworkBundle\Validator\ValidatorSecurityExpressionLanguageProvider;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -24,19 +23,11 @@ class AddValidatorSecurityExpressionLanguageProviderPass implements CompilerPass
 {
     public function process(ContainerBuilder $container): void
     {
-        if (!$container->has('validator.expression_language') || !$container->has('security.authorization_checker')) {
+        if (!$container->has('validator.expression_language') || !$container->has('security.expression_language_provider')) {
             return;
         }
 
-        $container->register('validator.security_expression_language_provider', ValidatorSecurityExpressionLanguageProvider::class)
-            ->setArguments([
-                new Reference('security.authorization_checker'),
-                new Reference('security.token_storage'),
-                new Reference('request_stack'),
-            ])
-            ->setPublic(false);
-
         $container->findDefinition('validator.expression_language')
-            ->addMethodCall('registerProvider', [new Reference('validator.security_expression_language_provider')]);
+            ->addMethodCall('registerProvider', [new Reference('security.expression_language_provider')]);
     }
 }

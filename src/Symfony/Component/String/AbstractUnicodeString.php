@@ -218,8 +218,17 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    public function lower(): static
+    /**
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
+     */
+    public function lower(/* ?string $regexp = null */): static
     {
+        $regexp = 1 <= \func_num_args() ? func_get_arg(0) : null;
+
+        if (null !== $regexp) {
+            return $this->replaceMatches($regexp, static fn (array $m): string => mb_strtolower(str_replace('İ', 'i̇', $m[0]), 'UTF-8'));
+        }
+
         $str = clone $this;
         $str->string = mb_strtolower(str_replace('İ', 'i̇', $str->string), 'UTF-8');
 
@@ -227,18 +236,25 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @param string $locale In the format language_region (e.g. tr_TR)
+     * @param string      $locale In the format language_region (e.g. tr_TR)
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
      */
-    public function localeLower(string $locale): static
+    public function localeLower(string $locale /* , ?string $regexp = null */): static
     {
+        $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
         if (null !== $transliterator = $this->getLocaleTransliterator($locale, 'Lower')) {
+            if (null !== $regexp) {
+                return $this->replaceMatches($regexp, static fn (array $m): string => $transliterator->transliterate($m[0]));
+            }
+
             $str = clone $this;
             $str->string = $transliterator->transliterate($str->string);
 
             return $str;
         }
 
-        return $this->lower();
+        return $this->lower($regexp);
     }
 
     public function match(string $regexp, int $flags = 0, int $offset = 0): array
@@ -376,8 +392,18 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    public function title(bool $allWords = false): static
+    /**
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string;
+     *                            when set, every match is converted and $allWords is ignored
+     */
+    public function title(bool $allWords = false /* , ?string $regexp = null */): static
     {
+        $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
+        if (null !== $regexp) {
+            return $this->replaceMatches($regexp, static fn (array $m): string => mb_convert_case($m[0], \MB_CASE_TITLE, 'UTF-8'));
+        }
+
         $str = clone $this;
 
         $limit = $allWords ? -1 : 1;
@@ -388,18 +414,25 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @param string $locale In the format language_region (e.g. tr_TR)
+     * @param string      $locale In the format language_region (e.g. tr_TR)
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
      */
-    public function localeTitle(string $locale): static
+    public function localeTitle(string $locale /* , ?string $regexp = null */): static
     {
+        $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
         if (null !== $transliterator = $this->getLocaleTransliterator($locale, 'Title')) {
+            if (null !== $regexp) {
+                return $this->replaceMatches($regexp, static fn (array $m): string => $transliterator->transliterate($m[0]));
+            }
+
             $str = clone $this;
             $str->string = $transliterator->transliterate($str->string);
 
             return $str;
         }
 
-        return $this->title();
+        return $this->title(false, $regexp);
     }
 
     public function trim(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static
@@ -481,8 +514,17 @@ abstract class AbstractUnicodeString extends AbstractString
         return $str;
     }
 
-    public function upper(): static
+    /**
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
+     */
+    public function upper(/* ?string $regexp = null */): static
     {
+        $regexp = 1 <= \func_num_args() ? func_get_arg(0) : null;
+
+        if (null !== $regexp) {
+            return $this->replaceMatches($regexp, static fn (array $m): string => mb_strtoupper($m[0], 'UTF-8'));
+        }
+
         $str = clone $this;
         $str->string = mb_strtoupper($str->string, 'UTF-8');
 
@@ -490,18 +532,25 @@ abstract class AbstractUnicodeString extends AbstractString
     }
 
     /**
-     * @param string $locale In the format language_region (e.g. tr_TR)
+     * @param string      $locale In the format language_region (e.g. tr_TR)
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
      */
-    public function localeUpper(string $locale): static
+    public function localeUpper(string $locale /* , ?string $regexp = null */): static
     {
+        $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
+
         if (null !== $transliterator = $this->getLocaleTransliterator($locale, 'Upper')) {
+            if (null !== $regexp) {
+                return $this->replaceMatches($regexp, static fn (array $m): string => $transliterator->transliterate($m[0]));
+            }
+
             $str = clone $this;
             $str->string = $transliterator->transliterate($str->string);
 
             return $str;
         }
 
-        return $this->upper();
+        return $this->upper($regexp);
     }
 
     public function width(bool $ignoreAnsiDecoration = true): int

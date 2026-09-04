@@ -392,7 +392,10 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
 
     abstract public function length(): int;
 
-    abstract public function lower(): static;
+    /**
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
+     */
+    abstract public function lower(/* ?string $regexp = null */): static;
 
     /**
      * Matches the string using a regular expression.
@@ -506,7 +509,11 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return false;
     }
 
-    abstract public function title(bool $allWords = false): static;
+    /**
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string;
+     *                            when set, every match is converted and $allWords is ignored
+     */
+    abstract public function title(bool $allWords = false /* , ?string $regexp = null */): static;
 
     public function toByteString(?string $toEncoding = null): ByteString
     {
@@ -656,7 +663,10 @@ abstract class AbstractString implements \Stringable, \JsonSerializable
         return $ellipsisLength ? $str->trimEnd()->append($ellipsis) : $str;
     }
 
-    abstract public function upper(): static;
+    /**
+     * @param string|null $regexp A pattern matching the parts to convert, or null to convert the whole string
+     */
+    abstract public function upper(/* ?string $regexp = null */): static;
 
     /**
      * Returns the printable length on a terminal.

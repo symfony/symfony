@@ -47,3 +47,8 @@ parameters:
         -
             message: '#^PHPDoc tag @param references unknown parameter\: \$fetchSize$#'
             path: src/Symfony/Component/Messenger/*
+        # the $regexp argument is a commented-out argument of the case conversion methods, documented
+        # with @param so that DebugClassLoader reports the implementations that do not declare it
+        -
+            message: '#^PHPDoc tag @param references unknown parameter\: \$regexp$#'
+            path: src/Symfony/Component/String/*

@@ -131,7 +131,7 @@ class MongoDbAdapterDsnTest extends TestCase
     {
         $driverOptions = (new \ReflectionMethod(MongoDbAdapter::class, 'addDriverInfo'))->invoke(null, []);
 
-        $this->assertSame('sfcache', $driverOptions['driver']['name']);
+        $this->assertSame('symfony-mongodb-cache', $driverOptions['driver']['name']);
         $this->assertNotSame('', $driverOptions['driver']['version']);
     }
 
@@ -140,9 +140,17 @@ class MongoDbAdapterDsnTest extends TestCase
         $driverOptions = (new \ReflectionMethod(MongoDbAdapter::class, 'addDriverInfo'))
             ->invoke(null, ['driver' => ['name' => 'myapp', 'version' => '1.2', 'platform' => 'my platform']]);
 
-        $this->assertSame('sfcache/myapp', $driverOptions['driver']['name']);
+        $this->assertSame('symfony-mongodb-cache/myapp', $driverOptions['driver']['name']);
         $this->assertStringEndsWith('/1.2', $driverOptions['driver']['version']);
         $this->assertSame('my platform', $driverOptions['driver']['platform']);
+    }
+
+    public function testDriverInfoIsNotAccumulatedAcrossCalls()
+    {
+        $addDriverInfo = new \ReflectionMethod(MongoDbAdapter::class, 'addDriverInfo');
+        $options = ['driver' => ['name' => 'myapp', 'version' => '1.2']];
+
+        $this->assertSame($addDriverInfo->invoke(null, $options), $addDriverInfo->invoke(null, $options));
     }
 
     public function testInvalidScheme()

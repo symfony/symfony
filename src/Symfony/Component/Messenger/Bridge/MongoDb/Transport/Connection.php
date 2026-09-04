@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\MongoDb\Transport;
 
+use Composer\InstalledVersions;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Client;
@@ -46,17 +47,32 @@ class Connection
         private readonly int $redeliverTimeout = 3600,
         private readonly ?ClockInterface $clock = null,
     ) {
-        $this->uniqueId = uniqid('consumer_', true);
+        $this->uniqueId = 'consumer_'.bin2hex(random_bytes(16));
     }
 
     public static function fromDsn(#[\SensitiveParameter] string $dsn, array $options = [], ?Client $client = null, ?ClockInterface $clock = null): self
     {
         [$configuration, $uri] = self::buildConfiguration($dsn, $options);
 
-        $client ??= new Client($uri);
+        $client ??= new Client($uri, [], self::driverInfo());
         $collection = $client->getCollection($configuration['database'], $configuration['collection_name']);
 
         return new self($collection, $configuration['queue_name'], $configuration['redeliver_timeout'], $clock);
+    }
+
+    /**
+     * Identifies the component in the driver handshake, so that the server
+     * knows which part of the application opened the connection.
+     */
+    private static function driverInfo(): array
+    {
+        try {
+            $version = (class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('symfony/mongodb-messenger') : null) ?? 'unknown';
+        } catch (\OutOfBoundsException) {
+            $version = 'unknown';
+        }
+
+        return ['driver' => ['name' => 'symfony-mongodb-messenger', 'version' => $version]];
     }
 
     /**

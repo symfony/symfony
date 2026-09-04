@@ -221,10 +221,14 @@ trait MongoDbTrait
 
     private static function addDriverInfo(array $driverOptions): array
     {
-        $driver = $driverOptions['driver'] ?? [];
+        try {
+            $version = (class_exists(InstalledVersions::class) ? InstalledVersions::getPrettyVersion('symfony/cache') : null) ?? 'unknown';
+        } catch (\OutOfBoundsException) {
+            $version = 'unknown';
+        }
 
-        $name = 'sfcache';
-        $version = self::getVersion();
+        $driver = $driverOptions['driver'] ?? [];
+        $name = 'symfony-mongodb-cache';
 
         if (isset($driver['name'])) {
             $name .= '/'.$driver['name'];
@@ -236,19 +240,6 @@ trait MongoDbTrait
         $driverOptions['driver'] = ['name' => $name, 'version' => $version] + $driver;
 
         return $driverOptions;
-    }
-
-    private static function getVersion(): string
-    {
-        if (!class_exists(InstalledVersions::class)) {
-            return 'unknown';
-        }
-
-        try {
-            return InstalledVersions::getPrettyVersion('symfony/cache') ?? 'unknown';
-        } catch (\OutOfBoundsException) {
-            return 'unknown';
-        }
     }
 
     /**

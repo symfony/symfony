@@ -2279,6 +2279,67 @@ class RequestTest extends TestCase
         $request->getHost();
     }
 
+    public function testTrustedHostsWithManyPatterns()
+    {
+        $hostPatterns = [];
+        for ($i = 0; $i < 5000; ++$i) {
+            $hostPatterns[] = '^customer-'.$i.'\.[a-z]+\.example\.com$';
+        }
+        Request::setTrustedHosts($hostPatterns);
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'customer-0.eu.example.com');
+        $this->assertSame('customer-0.eu.example.com', $request->getHost());
+        $request->headers->set('host', 'customer-4999.eu.example.com');
+        $this->assertSame('customer-4999.eu.example.com', $request->getHost());
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'evil.com');
+
+        $this->expectException(SuspiciousOperationException::class);
+        $this->expectExceptionMessage('Untrusted Host "evil.com".');
+
+        $request->getHost();
+    }
+
+    public function testTrustedHostsWithManyConstantPatterns()
+    {
+        $hostPatterns = [];
+        for ($i = 0; $i < 5000; ++$i) {
+            $hostPatterns[] = '^customer-'.$i.'\.example\.com$';
+        }
+        Request::setTrustedHosts($hostPatterns);
+
+        $trustedHostsRegexps = new \ReflectionProperty(Request::class, 'trustedHostsRegexps');
+        $trustedHostsRegexps->setAccessible(true);
+        $this->assertSame([], $trustedHostsRegexps->getValue());
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'customer-0.example.com');
+        $this->assertSame('customer-0.example.com', $request->getHost());
+        $request->headers->set('host', 'CUSTOMER-4999.EXAMPLE.COM');
+        $this->assertSame('customer-4999.example.com', $request->getHost());
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'evil.com');
+
+        $this->expectException(SuspiciousOperationException::class);
+        $this->expectExceptionMessage('Untrusted Host "evil.com".');
+
+        $request->getHost();
+    }
+
+    public function testTrustedHostsWithMetaCharactersAreMatchedAsRegexps()
+    {
+        Request::setTrustedHosts(['^a.example\.com$', '^customer-\d+\.example\.org$']);
+
+        $request = Request::create('/');
+        $request->headers->set('host', 'axexample.com');
+        $this->assertSame('axexample.com', $request->getHost());
+        $request->headers->set('host', 'customer-42.example.org');
+        $this->assertSame('customer-42.example.org', $request->getHost());
+    }
+
     public function testFactory()
     {
         Request::setFactory(static fn (array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) => new NewRequest());

@@ -61,6 +61,7 @@
         "microsoft-graph-mailer": "src/Symfony/Component/Mailer/Bridge/MicrosoftGraph",
         "postal-mailer": "src/Symfony/Component/Mailer/Bridge/Postal",
         "postmark-mailer": "src/Symfony/Component/Mailer/Bridge/Postmark",
+        "puffer-post-mailer": "src/Symfony/Component/Mailer/Bridge/PufferPost",
         "resend-mailer": "src/Symfony/Component/Mailer/Bridge/Resend",
         "scaleway-mailer": "src/Symfony/Component/Mailer/Bridge/Scaleway",
         "sendgrid-mailer": "src/Symfony/Component/Mailer/Bridge/Sendgrid",

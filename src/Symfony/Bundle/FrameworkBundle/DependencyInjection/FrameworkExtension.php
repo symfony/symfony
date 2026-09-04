@@ -3249,6 +3249,7 @@ class FrameworkExtension extends Extension
             MailerBridge\MicrosoftGraph\Transport\MicrosoftGraphTransportFactory::class => ['symfony/microsoft-graph-mailer', 'mailer.transport_factory.microsoftgraph'],
             MailerBridge\Postal\Transport\PostalTransportFactory::class => ['symfony/postal-mailer', 'mailer.transport_factory.postal'],
             MailerBridge\Postmark\Transport\PostmarkTransportFactory::class => ['symfony/postmark-mailer', 'mailer.transport_factory.postmark'],
+            MailerBridge\PufferPost\Transport\PufferPostTransportFactory::class => ['symfony/puffer-post-mailer', 'mailer.transport_factory.pufferpost'],
             MailerBridge\Mailtrap\Transport\MailtrapTransportFactory::class => ['symfony/mailtrap-mailer', 'mailer.transport_factory.mailtrap'],
             MailerBridge\Resend\Transport\ResendTransportFactory::class => ['symfony/resend-mailer', 'mailer.transport_factory.resend'],
             MailerBridge\Scaleway\Transport\ScalewayTransportFactory::class => ['symfony/scaleway-mailer', 'mailer.transport_factory.scaleway'],

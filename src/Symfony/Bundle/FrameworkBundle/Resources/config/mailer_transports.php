@@ -29,6 +29,7 @@ use Symfony\Component\Mailer\Bridge\Mailtrap\Transport\MailtrapTransportFactory;
 use Symfony\Component\Mailer\Bridge\MicrosoftGraph\Transport\MicrosoftGraphTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postal\Transport\PostalTransportFactory;
 use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\PufferPost\Transport\PufferPostTransportFactory;
 use Symfony\Component\Mailer\Bridge\Resend\Transport\ResendTransportFactory;
 use Symfony\Component\Mailer\Bridge\Scaleway\Transport\ScalewayTransportFactory;
 use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
@@ -71,6 +72,7 @@ return static function (ContainerConfigurator $container) {
         'null' => NullTransportFactory::class,
         'postal' => PostalTransportFactory::class,
         'postmark' => PostmarkTransportFactory::class,
+        'pufferpost' => PufferPostTransportFactory::class,
         'mailtrap' => MailtrapTransportFactory::class,
         'resend' => ResendTransportFactory::class,
         'scaleway' => ScalewayTransportFactory::class,

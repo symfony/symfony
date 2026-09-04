@@ -149,6 +149,10 @@
                     }
 
                     var ajaxToolbarPanel = document.querySelector('.sf-toolbar-block-ajax');
+                    if (!ajaxToolbarPanel) {
+                        return;
+                    }
+
                     if (requestStack.length) {
                         ajaxToolbarPanel.style.display = '';
                     } else {

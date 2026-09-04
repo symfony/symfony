@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 class UnstructuredHeaderTest extends TestCase
@@ -252,5 +253,36 @@ class UnstructuredHeaderTest extends TestCase
     {
         $header = new UnstructuredHeader('Subject', 'test');
         $this->assertEquals('test', $header->getBody());
+    }
+
+    /**
+     * @dataProvider provideInvalidNames
+     */
+    public function testInvalidNameIsRejected(string $name)
+    {
+        $this->expectException(RfcComplianceException::class);
+
+        new UnstructuredHeader($name, 'value');
+    }
+
+    public static function provideInvalidNames()
+    {
+        yield [""];
+        yield ["X-A\r\nX-Injected: value"];
+        yield ["X-A\nX-Injected: value"];
+        yield ["X-A\rX-Injected: value"];
+        yield ["X-A: value\r\nX-Injected"];
+        yield ["X A"];
+        yield ["X-A\t"];
+        yield ["X-\x00A"];
+        yield ["X-\x7fA"];
+        yield ["X-\xc3\xa9"];
+    }
+
+    public function testValidNamesAreAccepted()
+    {
+        foreach (['Subject', 'X-Custom-Header', 'x-lower', '!#$%&\'*+-.^_`|~', 'Header-With-Digits-123', 'h:X-Mailgun-Tag', 'o:tag', 'v:my-var'] as $name) {
+            $this->assertSame($name, (new UnstructuredHeader($name, 'value'))->getName());
+        }
     }
 }

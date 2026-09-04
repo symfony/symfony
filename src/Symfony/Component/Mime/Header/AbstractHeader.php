@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Header;
 
 use Symfony\Component\Mime\Encoder\QpMimeHeaderEncoder;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * An abstract base MIME Header.
@@ -31,6 +32,10 @@ abstract class AbstractHeader implements HeaderInterface
 
     public function __construct(string $name)
     {
+        if (!preg_match('/^[\x21-\x7E]++$/D', $name)) {
+            throw new RfcComplianceException(sprintf('The header name "%s" contains characters that are not allowed in a header name.', $name));
+        }
+
         $this->name = $name;
     }
 

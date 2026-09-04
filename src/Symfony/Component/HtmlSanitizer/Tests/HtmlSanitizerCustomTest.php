@@ -646,4 +646,24 @@ class HtmlSanitizerCustomTest extends TestCase
     {
         return (new HtmlSanitizer($config))->sanitize($input);
     }
+
+    public function testAllowRelativeLinksRejectsColonInFirstPathSegment()
+    {
+        $config = (new HtmlSanitizerConfig())
+            ->allowElement('a', ['href'])
+            ->allowRelativeLinks()
+        ;
+
+        foreach ([':', '::', ':link.php'] as $href) {
+            $this->assertSame(
+                '<a>Hello world</a>',
+                $this->sanitize($config, \sprintf('<a href="%s">Hello world</a>', $href))
+            );
+        }
+
+        $this->assertSame(
+            '<a href="./:link.php">Hello world</a>',
+            $this->sanitize($config, '<a href="./:link.php">Hello world</a>')
+        );
+    }
 }

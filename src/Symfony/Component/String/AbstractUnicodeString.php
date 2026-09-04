@@ -421,18 +421,22 @@ abstract class AbstractUnicodeString extends AbstractString
     {
         $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
 
+        // only a few locales ship a Title transliterator; everywhere else the generic
+        // titlecasing has to give the same result, on the matches as on the whole string
         if (null !== $transliterator = $this->getLocaleTransliterator($locale, 'Title')) {
-            if (null !== $regexp) {
-                return $this->replaceMatches($regexp, static fn (array $m): string => $transliterator->transliterate($m[0]));
-            }
-
-            $str = clone $this;
-            $str->string = $transliterator->transliterate($str->string);
-
-            return $str;
+            $titleCase = static fn (string $string): string => $transliterator->transliterate($string);
+        } else {
+            $titleCase = static fn (string $string): string => mb_convert_case($string, \MB_CASE_TITLE, 'UTF-8');
         }
 
-        return $this->title(false, $regexp);
+        if (null !== $regexp) {
+            return $this->replaceMatches($regexp, static fn (array $m): string => $titleCase($m[0]));
+        }
+
+        $str = clone $this;
+        $str->string = $titleCase($str->string);
+
+        return $str;
     }
 
     public function trim(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static

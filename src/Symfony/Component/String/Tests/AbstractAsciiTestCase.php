@@ -625,6 +625,8 @@ abstract class AbstractAsciiTestCase extends TestCase
             ['Hello world', 'hello world', '/^./'],
             ['Hello World', 'hello world', '/\b./'],
             ['Hello world', 'hELLO world', '/^\w+/'],
+            ['Hello World', 'hello world', '/.+/'],
+            ['Hello World', 'hELLO wORLD', '/.+/'],
             [' hello world', ' hello world', '/^./'],
             ['', '', '/^./'],
         ];

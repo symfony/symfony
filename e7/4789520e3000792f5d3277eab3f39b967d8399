@@ -1,0 +1,91 @@
+---------------------------------------------------------------------------
+
+by ckrack at 2026-05-01T10:02:33Z
+
+The CI failures seem unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-08-18T12:29:21Z
+
+Thanks for your patience, and for applying the earlier requests.
+
+First the good news, because it is the part that matters most for a debug command: the routing resolution is right. I ran eleven message classes through the command and then through a real `dispatch()` against in-memory transports, in two configurations, one with a `*` route and one without. All twenty-two comparisons matched: subclass inheriting the parent route, interface route, two transports for one message, unrouted-but-handled falling back to `*`, namespace wildcard beating `*`, config beating `#[AsMessage]`, `*` beating `#[AsMessage]`, attribute inherited from a parent class, and multi-transport attributes. The command does not lie, which is the hard part.
+
+What I would like to change is the packaging. I think this belongs inside `debug:messenger` rather than in a second command.
+
+The per-message mode is the genuinely new capability. Nothing today resolves a concrete FQCN through parents, interfaces, wildcard precedence and the attribute fallback: `debug:container --tag messenger.message` prints nothing because resource tags are excluded, and `debug:container messenger.senders_locator` shows only `Array (5 element(s))`. That is worth having. But `debug:messenger` already loops bus, then message, then handlers, so the row to hang it off already exists:
+
+```
+App\BaseMessage
+    handled by App\Handler
+    routed to async
+```
+
+That answers "what happens when I dispatch this" in one place, which is the question people actually have.
+
+For the reverse question, which transports carry what, I would keep a listing but render it as rules rather than as a flat list of map keys. As it stands the listing prints `App\Marker` and a bare `*` with no indication of what they are, and a reader cannot tell an interface from a class from a fallback:
+
+```
+Transports
+----------
+async
+    App\BaseMessage
+    App\Foo\*        (namespace)
+    App\Marker       (interface, matches implementors)
+failed
+    *               (fallback for messages with no other route)
+```
+
+`debug:config framework messenger.routing` does print the same map, but it is not discoverable and it explains none of this, so I would rather have it here.
+
+One structural detail if you take this on: `routing` is configured as a sibling of `buses` under `framework.messenger`, not per bus. So the transports section has to be printed once, outside the `foreach ($mapping as $bus => ...)` loop, otherwise the output implies routing varies per bus.
+
+For the deep view I would use an option rather than a second argument, since `bus` already occupies the first slot and detection would be ambiguous:
+
+```
+php bin/console debug:messenger --message='App\Message\FooMessage'
+```
+
+And whatever we print, it should say that `TransportNamesStamp` can override routing at dispatch time. No static view can see that, so anyone using `RedispatchMessage` would otherwise read the output as authoritative when it is not.
+
+Three things that need fixing regardless of the packaging:
+
+- The Messenger CHANGELOG entry is in the released `7.4` section. Messenger has no `8.2` section yet, so one needs creating. The FrameworkBundle entry is correctly placed.
+- The low-deps failure is caused by the PR. `FrameworkExtensionTestCase::testAsMessageAutoconfigurationUsesResourceTag` calls `new AsMessage(transport: ..., serializedTypeName: ...)`, but FrameworkBundle allows `symfony/messenger ^7.4.10|^8.0.10`, where that parameter does not exist, so it fails with `Unknown named parameter $serializedTypeName`.
+- On rebase, take care with the `addResourceTag()` one-liner. Base now also tags `serializedTypeNameAliases`, and a naive resolution drops it.
+
+Smaller ones: `complete()` offers `*` and namespace wildcards as filter values, but choosing `*` then throws "class does not exist"; the private `displayMessageRouting()` sits before the public `complete()`, and we put private methods last; a transport with no routes renders a full warning block; and the `Note:` line repeats on every run.
+
+One idea I am deliberately leaving out of scope, in case you like it as a follow-up. `SendersLocator::getSenders()` owns the real precedence but interleaves "which aliases apply" with "fetch the sender from the locator". If the alias half were split into its own method, the command could call the same code the runtime calls, and the two could not drift. Your implementation agrees with it today, so this is an improvement rather than a fix, and it does not need to block this PR.
+
+Happy to do the fold myself if you would rather not, just say so.
+
+---------------------------------------------------------------------------
+
+by wikando-ck at 2026-09-03T18:37:52Z
+
+@nicolas-grekas I've rebased and implemented the changes you mentioned.
+I've decided to do the refactoring, it's much cleaner to have a shared base and no chance of divergence.
+
+I've also noticed that we were lacking information about failure transports - so this was another addition.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T08:48:42Z
+
+Thanks for folding this into `debug:messenger`, and for doing the extraction as well.
+
+I checked the routing against a real container before touching anything: eleven message classes through `--message`, then the same classes through `dispatch()` against in-memory transports, in two configurations, one with a `*` route and one without. Every comparison matched, including the namespace wildcard beating `*`, configuration beating `#[AsMessage]`, and an attribute inherited from a parent class.
+
+I rebased, squashed the twelve commits into one (one of them removed a command another one added), and fixed three things:
+
+* `registerDebugCommandRouting()` keyed the attribute map by service id instead of by class. A message class registered under an id of its own, such as `app.my_message: {class: App\Message\Foo}`, made the whole command die with `TypeError: Unsupported operand types: array + bool`, because `class_parents('app.my_message')` returns `false`. `registerTypeMapping()` just above already resolves the class, so this now does the same.
+* The per-message rules came from that same compile-time map, so an `#[AsMessage]` class that is not a registered service, one in an excluded path or in a library, printed `routed to audit` and then `No routing rules apply to this message.` The per-message view resolves the attributes by reflection now. The map stays for the global listing, which is the only place that has to enumerate attribute-routed messages.
+* `--message='\App\Message\Foo'` answered `not handled` and `not routed`. `class_exists()` accepts the leading backslash but the senders map is not keyed with it, so the value is trimmed now.
+
+Each of those has a test that fails without its fix. I also dropped a duplicate blank line after the `[INFO]` block.
+
+Two smaller notes for the record. `$attribute->serializedTypeName ?? null` is not cosmetic: that property landed in 8.1 and FrameworkBundle allows `symfony/messenger ^7.4.10`, so the current code reads an undefined property there. And moving to `addResourceTag()` changes the autowiring error text from `excluded because it's a messenger message` to `excluded by tag "messenger.message"`, which is what `form.data_class` and `object_mapper.map` already produce.
+
+The description is rewritten as documentation and ends with the points a symfony-docs pull request should carry. A documentation pull request is still needed.

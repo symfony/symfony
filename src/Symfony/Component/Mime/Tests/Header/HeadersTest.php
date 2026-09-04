@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests\Header;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Address;
@@ -356,9 +357,7 @@ class HeadersTest extends TestCase
         $this->assertSame('<some@path>', $headers->get('Return-Path')->getBodyAsString());
     }
 
-    /**
-     * @dataProvider provideHeaderMethods
-     */
+    #[DataProvider('provideHeaderMethods')]
     public function testInvalidHeaderNameIsRejected(string $method, array $arguments)
     {
         $this->expectException(RfcComplianceException::class);

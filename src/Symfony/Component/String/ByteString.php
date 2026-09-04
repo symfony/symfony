@@ -397,7 +397,7 @@ class ByteString extends AbstractString
         $regexp = 2 <= \func_num_args() ? func_get_arg(1) : null;
 
         if (null !== $regexp) {
-            return $this->replaceMatches($regexp, static fn (array $m): string => ucfirst(strtolower($m[0])));
+            return $this->replaceMatches($regexp, static fn (array $m): string => ucwords(strtolower($m[0])));
         }
 
         $str = clone $this;

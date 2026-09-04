@@ -48,37 +48,33 @@ class CompoundLimiterTest extends TestCase
 
         sleep(1); // reset limiter1's window
 
-        $rateLimit = $limiter->consume(3);
+        $rateLimit = $limiter->consume(4);
         $this->assertEquals(0, $rateLimit->getRemainingTokens(), 'Limiter 2 consumed exactly the remaining tokens');
         $this->assertTrue($rateLimit->isAccepted(), 'All accept the request (exact limit on limiter 2)');
 
+        sleep(1); // reset limiter1's window again, limiter2 is now the binding one
+
         $rateLimit = $limiter->consume(1);
-        $this->assertEquals(0, $rateLimit->getRemainingTokens(), 'Limiter 2 had remaining tokens left');
         $this->assertFalse($rateLimit->isAccepted(), 'Limiter 2 did not accept the request');
+        $this->assertEquals(3, $limiter1->consume(0)->getRemainingTokens(), 'Limiter 1 was consumed before limiter 2 rejected the request');
+        $this->assertEquals(8, $limiter3->consume(0)->getRemainingTokens(), 'Limiter 3 was not consumed once limiter 2 rejected the request');
 
-        sleep(1); // reset limiter1's window again,  to make sure that the limiter2 overrides limiter1
-
-        // make sure to consume all allowed by limiter1, limiter2 already had 0 remaining
-        $rateLimit = $limiter->consume(4);
-        $this->assertEquals(
-            0,
-            $rateLimit->getRemainingTokens(),
-            'Limiter 1 consumed the remaining tokens (accept), Limiter 2 did not have any remaining (not accept)'
-        );
-        $this->assertFalse($rateLimit->isAccepted(), 'Limiter 2 reached the limit already');
-
-        sleep(10); // reset limiter2's window (also limiter1)
-
-        $rateLimit = $limiter->consume(3);
-        $this->assertEquals(0, $rateLimit->getRemainingTokens(), 'Limiter 3 had exactly 3 tokens   (accept)');
-        $this->assertTrue($rateLimit->isAccepted());
-
-        $rateLimit = $limiter->consume(1);
-        $this->assertFalse($rateLimit->isAccepted(), 'Limiter 3 reached the limit previously');
-
-        sleep(30); // reset limiter3's window (also limiter1 and limiter2)
+        sleep(30); // reset all windows
 
         $this->assertTrue($limiter->consume()->isAccepted());
+    }
+
+    public function testConsumeStopsAtTheFirstRejection()
+    {
+        $limiter1 = $this->createLimiter(1, new \DateInterval('PT10S'));
+        $limiter2 = $this->createLimiter(10, new \DateInterval('PT10S'));
+        $limiter = new CompoundLimiter([$limiter1, $limiter2]);
+
+        $this->assertTrue($limiter->consume()->isAccepted());
+        $this->assertFalse($limiter->consume()->isAccepted(), 'Limiter 1 rejects the second hit');
+        $this->assertFalse($limiter->consume()->isAccepted());
+
+        $this->assertEquals(9, $limiter2->consume(0)->getRemainingTokens(), 'Rejected hits must not consume the next limiters');
     }
 
     public function testReserve()

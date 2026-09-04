@@ -40,11 +40,11 @@ final class CompoundLimiter implements LimiterInterface
         foreach ($this->limiters as $limiter) {
             $rateLimit = $limiter->consume($tokens);
 
-            if (
-                null === $minimalRateLimit
-                || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()
-                || ($minimalRateLimit->isAccepted() && !$rateLimit->isAccepted())
-            ) {
+            if (!$rateLimit->isAccepted()) {
+                return $rateLimit;
+            }
+
+            if (null === $minimalRateLimit || $rateLimit->getRemainingTokens() < $minimalRateLimit->getRemainingTokens()) {
                 $minimalRateLimit = $rateLimit;
             }
         }

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `RateLimitExceededEvent`
+ * `CompoundLimiter::consume()` now stops consuming at the first limiter that rejects the request
  * Add `RateLimiterBuilder`
  * Allow `\DateInterval` for the `interval` and `rate.interval` options of `RateLimiterFactory`
  * Add `RateLimit::getResetAt()`

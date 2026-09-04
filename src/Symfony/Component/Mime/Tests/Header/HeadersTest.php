@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Header\DateHeader;
 use Symfony\Component\Mime\Header\Headers;
@@ -353,5 +354,27 @@ class HeadersTest extends TestCase
 
         $headers->addPathHeader('Return-Path', new Address('some@path', 'any ignored name'));
         $this->assertSame('<some@path>', $headers->get('Return-Path')->getBodyAsString());
+    }
+
+    /**
+     * @dataProvider provideHeaderMethods
+     */
+    public function testInvalidHeaderNameIsRejected(string $method, array $arguments)
+    {
+        $this->expectException(RfcComplianceException::class);
+
+        (new Headers())->$method("X-A\r\nX-Injected: value", ...$arguments);
+    }
+
+    public static function provideHeaderMethods()
+    {
+        yield ['addTextHeader', ['value']];
+        yield ['addParameterizedHeader', ['value', ['param' => 'foo']]];
+        yield ['addMailboxListHeader', [['fabien@symfony.com']]];
+        yield ['addMailboxHeader', ['fabien@symfony.com']];
+        yield ['addPathHeader', ['fabien@symfony.com']];
+        yield ['addDateHeader', [new \DateTimeImmutable()]];
+        yield ['addIdHeader', ['some@id']];
+        yield ['addHeader', ['value']];
     }
 }

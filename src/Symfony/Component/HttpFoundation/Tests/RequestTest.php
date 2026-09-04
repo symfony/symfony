@@ -2344,7 +2344,6 @@ b'])]
         Request::setTrustedHosts($hostPatterns);
 
         $trustedHostsRegexps = new \ReflectionProperty(Request::class, 'trustedHostsRegexps');
-        $trustedHostsRegexps->setAccessible(true);
         $this->assertSame([], $trustedHostsRegexps->getValue());
 
         $request = Request::create('/');

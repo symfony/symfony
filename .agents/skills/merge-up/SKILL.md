@@ -70,6 +70,26 @@ For each consecutive pair `(SOURCE, TARGET)` in `BRANCHES`:
 ```bash
 git checkout <TARGET>
 composer up
+```
+
+Read the merge-up notes of the incoming pull requests first. The bot copies the whole
+pull request description into the merge commit, so the authors' own instructions for
+this merge are already in the local history, and many descriptions end with a
+"Merge-up to `<branch>`" paragraph naming the properties to add, the style the target
+branch expects, or the resolved code itself:
+
+```bash
+git log --merges --format=%H <TARGET>..<SOURCE> \
+  | xargs -I{} git log -1 --format=%B {} \
+  | grep -inE 'merge(d| )?-?up|adapt|on [0-9]+\.[0-9]'
+```
+
+Prefer the resolution a note gives over an equivalent one of your own: it is what the
+author wrote the change for and usually ran on the target branch already, and a merge
+commit is the wrong place for a refactor. A note also covers files that merge cleanly,
+which is why this runs before the merge and not only when git reports a conflict.
+
+```bash
 git merge <SOURCE>
 ```
 

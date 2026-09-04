@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mime\Tests\Header;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\UnstructuredHeader;
@@ -255,9 +256,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertEquals('test', $header->getBody());
     }
 
-    /**
-     * @dataProvider provideInvalidNames
-     */
+    #[DataProvider('provideInvalidNames')]
     public function testInvalidNameIsRejected(string $name)
     {
         $this->expectException(RfcComplianceException::class);

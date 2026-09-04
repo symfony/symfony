@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-02T17:12:59Z
+
+The CI is failing for reasons unrelated to my changes, it seems to me.
+
+---------------------------------------------------------------------------
+
+by ostrolucky at 2026-09-02T19:14:22Z
+
+Why not defining such function in `Symfony\Component\Security\Core\Authorization\ExpressionLanguageProvider` and reference the provider in doctrinebundle so that it's available in entity value resolvers?
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-02T19:43:41Z
+
+> Why not defining such function in `Symfony\Component\Security\Core\Authorization\ExpressionLanguageProvider` and reference the provider in doctrinebundle so that it's available in entity value resolvers?
+
+I've corrected it.
+
+---------------------------------------------------------------------------
+
+by seb-jean at 2026-09-04T08:23:04Z
+
+@nicolas-grekas , thank you for your feedback. I’ve made the corrections to both PRs.

@@ -389,14 +389,15 @@ abstract class AbstractUnicodeString extends AbstractString
      */
     public function localeTitle(string $locale): static
     {
-        if (null !== $transliterator = $this->getLocaleTransliterator($locale, 'Title')) {
-            $str = clone $this;
-            $str->string = $transliterator->transliterate($str->string);
+        $str = clone $this;
 
-            return $str;
+        if (null !== $transliterator = $this->getLocaleTransliterator($locale, 'Title')) {
+            $str->string = $transliterator->transliterate($str->string);
+        } else {
+            $str->string = mb_convert_case($str->string, \MB_CASE_TITLE, 'UTF-8');
         }
 
-        return $this->title();
+        return $str;
     }
 
     public function trim(string $chars = " \t\n\r\0\x0B\x0C\u{A0}\u{FEFF}"): static

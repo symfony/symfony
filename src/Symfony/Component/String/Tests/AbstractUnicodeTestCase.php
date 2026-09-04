@@ -408,6 +408,10 @@ END'],
 
             // Default casing rules
             ['en', 'Ijssel', 'ijssel'],
+
+            // Every word is titlecased, with or without a locale transliterator
+            ['nl', 'Hello World', 'hELLO wORLD'],
+            ['en', 'Hello World', 'hELLO wORLD'],
         ];
     }
 

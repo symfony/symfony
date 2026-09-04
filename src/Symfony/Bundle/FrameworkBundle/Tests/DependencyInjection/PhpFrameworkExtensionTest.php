@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\OutOfBoundsException;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mailer\Bridge\Brevo\Webhook\BrevoRequestParser;
 use Symfony\Component\Mailer\Bridge\Postmark\Webhook\PostmarkRequestParser;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
@@ -315,14 +316,65 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $definition = $container->getDefinition('limiter.compound');
         $this->assertSame(CompoundRateLimiterFactory::class, $definition->getClass());
-        $this->assertEquals(
-            [
-                'limiter.first',
-                'limiter.second',
-            ],
-            $definition->getArgument(0)->getValues()
-        );
+        $this->assertEquals([
+            'first' => new Reference('limiter.first'),
+            'second' => new Reference('limiter.second'),
+        ], $definition->getArgument(0)->getValues());
+        $this->assertSame([], $definition->getArgument(1));
         $this->assertSame('limiter.compound', (string) $container->getAlias(RateLimiterFactoryInterface::class.' $compoundLimiter'));
+    }
+
+    public function testRateLimiterCompoundPolicyWithKeys()
+    {
+        if (!class_exists(CompoundRateLimiterFactory::class)) {
+            $this->markTestSkipped('CompoundRateLimiterFactory is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'lock' => true,
+                'rate_limiter' => [
+                    'per_user' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
+                    'global_quota' => ['policy' => 'fixed_window', 'limit' => 5000, 'interval' => '1 hour'],
+                    'api' => [
+                        'policy' => 'compound',
+                        'limiters' => [
+                            'per_user' => null,
+                            'global_quota' => ['key' => 'global'],
+                        ],
+                    ],
+                ],
+            ]);
+        });
+
+        $definition = $container->getDefinition('limiter.api');
+        $this->assertSame(CompoundRateLimiterFactory::class, $definition->getClass());
+        $this->assertEquals([
+            'per_user' => new Reference('limiter.per_user'),
+            'global_quota' => new Reference('limiter.global_quota'),
+        ], $definition->getArgument(0)->getValues());
+        $this->assertSame(['global_quota' => 'global'], $definition->getArgument(1));
+    }
+
+    public function testRateLimiterCompoundPolicyWithSingleStringLimiter()
+    {
+        if (!class_exists(CompoundRateLimiterFactory::class)) {
+            $this->markTestSkipped('CompoundRateLimiterFactory is not available.');
+        }
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'first' => ['policy' => 'fixed_window', 'limit' => 10, 'interval' => '1 hour'],
+                    'compound' => ['policy' => 'compound', 'limiters' => 'first'],
+                ],
+            ]);
+        });
+
+        $this->assertEquals(
+            ['first' => new Reference('limiter.first')],
+            $container->getDefinition('limiter.compound')->getArgument(0)->getValues()
+        );
     }
 
     public function testRateLimiterCompoundPolicyNoLimiters()
@@ -348,6 +400,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
 
         $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Compound rate limiter "compound" references unknown limiter(s) "invalid1", "invalid2".');
         $this->createContainerFromClosure(static function ($container) {
             $container->loadFromExtension('framework', [
                 'rate_limiter' => [
@@ -555,6 +608,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'lock' => false,
                 'rate_limiter' => true,
             ]);
         });
@@ -668,6 +722,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 
         $this->createContainerFromClosure(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
+                'lock' => false,
                 'rate_limiter' => [
                     'builder' => ['lock_factory' => 'lock.factory'],
                 ],

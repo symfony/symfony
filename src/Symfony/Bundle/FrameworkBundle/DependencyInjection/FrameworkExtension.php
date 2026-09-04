@@ -3786,16 +3786,22 @@ class FrameworkExtension extends Extension
                 throw new LogicException(\sprintf('Compound rate limiter "%s" requires at least one sub-limiter.', $name));
             }
 
-            if (array_diff($limiterConfig['limiters'], $limiters)) {
-                throw new LogicException(\sprintf('Compound rate limiter "%s" requires at least one sub-limiter to be configured.', $name));
+            if ($unknownLimiters = array_diff(array_keys($limiterConfig['limiters']), $limiters)) {
+                throw new LogicException(\sprintf('Compound rate limiter "%s" references unknown limiter(s) "%s".', $name, implode('", "', $unknownLimiters)));
+            }
+
+            $factories = $keys = [];
+            foreach ($limiterConfig['limiters'] as $subName => $subConfig) {
+                $factories[$subName] = new Reference('limiter.'.$subName);
+
+                if (null !== $subConfig['key']) {
+                    $keys[$subName] = $subConfig['key'];
+                }
             }
 
             $container->register($limiterId = 'limiter.'.$name, CompoundRateLimiterFactory::class)
                 ->addTag('rate_limiter', ['name' => $name])
-                ->addArgument(new IteratorArgument(array_map(
-                    static fn (string $name) => new Reference('limiter.'.$name),
-                    $limiterConfig['limiters']
-                )))
+                ->setArguments([new IteratorArgument($factories), $keys])
             ;
 
             $container->registerAliasForArgument($limiterId, RateLimiterFactoryInterface::class, $name.'.limiter', $name);

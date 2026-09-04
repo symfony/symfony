@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by lazerg at 2026-09-03T16:39:34Z
+
+The x86 / minimal-exts / lowest-php failure is a Redis flake in Messenger (`RedisExtIntegrationTest::testPendingMessagesAreNotReturnedAsDuplicatesBeforeAck`, "Could not acknowledge redis message"), unrelated to this change. The same job passed on the previous push of this branch, and PropertyInfo, PropertyAccess and Serializer are all green in the failing run.

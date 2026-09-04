@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add argument `$regexp` to `lower()`, `upper()`, `title()`, `localeLower()`, `localeUpper()` and `localeTitle()` to convert only the matching parts
+
 8.0
 ---
 

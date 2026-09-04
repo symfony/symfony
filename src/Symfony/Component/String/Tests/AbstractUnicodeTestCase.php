@@ -93,6 +93,56 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
+    #[DataProvider('provideLocaleLowerWithRegexp')]
+    #[RequiresPhpExtension('intl')]
+    public function testLocaleLowerWithRegexp(string $locale, string $expected, string $origin, string $regexp)
+    {
+        $this->assertSame($expected, (string) static::createFromString($origin)->localeLower($locale, $regexp));
+    }
+
+    public static function provideLocaleLowerWithRegexp(): array
+    {
+        return [
+            // Turkish, the dotless i is only reachable with the locale
+            ['tr', 'ıSTANBUL', 'ISTANBUL', '/^./'],
+            ['en', 'iSTANBUL', 'ISTANBUL', '/^./'],
+
+            // Dutch, the IJ digraph is two characters
+            ['nl', 'ijSSEL', 'IJSSEL', '/^IJ|^./'],
+        ];
+    }
+
+    #[DataProvider('provideLocaleUpperWithRegexp')]
+    #[RequiresPhpExtension('intl')]
+    public function testLocaleUpperWithRegexp(string $locale, string $expected, string $origin, string $regexp)
+    {
+        $this->assertSame($expected, (string) static::createFromString($origin)->localeUpper($locale, $regexp));
+    }
+
+    public static function provideLocaleUpperWithRegexp(): array
+    {
+        return [
+            ['tr', 'İstanbul', 'istanbul', '/^./'],
+            ['en', 'Istanbul', 'istanbul', '/^./'],
+        ];
+    }
+
+    #[DataProvider('provideLocaleTitleWithRegexp')]
+    #[RequiresPhpExtension('intl')]
+    public function testLocaleTitleWithRegexp(string $locale, string $expected, string $origin, string $regexp)
+    {
+        $this->assertSame($expected, (string) static::createFromString($origin)->localeTitle($locale, $regexp));
+    }
+
+    public static function provideLocaleTitleWithRegexp(): array
+    {
+        return [
+            // Dutch, titlecasing 'ij' gives 'IJ' with the locale and 'Ij' without it
+            ['nl', 'IJssel is', 'ijssel is', '/^ij/'],
+            ['en', 'Ijssel is', 'ijssel is', '/^ij/'],
+        ];
+    }
+
     public static function provideCreateFromCodePoint(): array
     {
         return [
@@ -348,6 +398,24 @@ END'],
         );
     }
 
+    public static function provideLowerWithRegexp(): array
+    {
+        return array_merge(
+            parent::provideLowerWithRegexp(),
+            [
+                // French
+                ['éVEIL', 'ÉVEIL', '/^./'],
+
+                // Dutch, the IJ digraph is two characters
+                ['iJSSEL', 'IJSSEL', '/^./'],
+                ['ijSSEL', 'IJSSEL', '/^IJ|^./'],
+
+                // Random symbols
+                ['i̇IIıi', 'İIIıi', '/^./'],
+            ]
+        );
+    }
+
     public static function provideLocaleLower(): array
     {
         return [
@@ -445,6 +513,22 @@ END'],
         );
     }
 
+    public static function provideUpperWithRegexp(): array
+    {
+        return array_merge(
+            parent::provideUpperWithRegexp(),
+            [
+                // French
+                ['Éveil', 'éveil', '/^./'],
+
+                // Dutch, the IJ digraph is two characters
+                ['Ijssel', 'ijssel', '/^./'],
+                ['IJssel', 'ijssel', '/^ij|^./'],
+                ['Invoer', 'invoer', '/^ij|^./'],
+            ]
+        );
+    }
+
     public static function provideTitle(): array
     {
         return array_merge(
@@ -468,6 +552,20 @@ END'],
 
                 ['Última Prueba', 'última prueba', true],
                 ['ÚLTIMA PRUEBA', 'úLTIMA pRUEBA', true],
+            ]
+        );
+    }
+
+    public static function provideTitleWithRegexp(): array
+    {
+        return array_merge(
+            parent::provideTitleWithRegexp(),
+            [
+                // French
+                ['Éveil', 'éveil', '/^./'],
+
+                // The titlecase form of a digraph differs from its uppercase form
+                ['ǲenan', 'ǳenan', '/^./'],
             ]
         );
     }

@@ -4,6 +4,7 @@ CHANGELOG
 8.2
 ---
 
+ * Deprecate passing more than one Security attribute to `AccessDecisionManager::decide()`, the `$allowMultipleAttributes` argument will be removed in 9.0
  * Allow using wildcards as placeholders in the keys of the `RoleHierarchy` map
  * Add argument `$parameters` to `SignatureHasher::computeSignatureHash()`, `acceptSignatureHash()` and `verifySignatureHash()`
  * Add `OidcUser::fromClaims()` to build a user from the claims returned by an OIDC provider

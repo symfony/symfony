@@ -51,6 +51,7 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
 
     /**
      * @param bool $allowMultipleAttributes Whether to allow passing multiple values to the $attributes array
+     *                                      This argument is deprecated since Symfony 8.2 and will be removed in 9.0
      */
     public function decide(TokenInterface $token, array $attributes, mixed $object = null, bool|AccessDecision|null $accessDecision = null, bool $allowMultipleAttributes = false): bool
     {
@@ -60,8 +61,12 @@ final class AccessDecisionManager implements AccessDecisionManagerInterface
         }
 
         // Special case for AccessListener, which passes all attributes of the matched access_control rule at once
-        if (\count($attributes) > 1 && !$allowMultipleAttributes) {
-            throw new InvalidArgumentException(\sprintf('Passing more than one Security attribute to "%s()" is not supported.', __METHOD__));
+        if (\count($attributes) > 1) {
+            if (!$allowMultipleAttributes) {
+                throw new InvalidArgumentException(\sprintf('Passing more than one Security attribute to "%s()" is not supported.', __METHOD__));
+            }
+
+            trigger_deprecation('symfony/security-core', '8.2', 'Passing more than one Security attribute to "%s()" is deprecated, pass a single attribute instead. For an "access_control" rule, move the roles to "allow_if" or to the role hierarchy. The "$allowMultipleAttributes" argument will be removed in 9.0.', __METHOD__);
         }
 
         $accessDecision ??= end($this->accessDecisionStack) ?: new AccessDecision();

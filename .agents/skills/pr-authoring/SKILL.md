@@ -42,6 +42,7 @@ description: >
 - Shape the commits before pushing: a message that matches its diff, and a structure that carries meaning, such as a failing test followed by the fix.
 - Write the description for someone who never saw the request: what the change does, the public API it adds, the options and their defaults, and the traps. Fill the header table, and give the title the component prefix.
 - Say which checks you ran and what they returned. State what you did not cover just as plainly.
+- A change on a maintained branch gets merged up. When a higher branch needs a different shape, end the description with a `Merge-up to <branch>:` paragraph giving the declarations to add, the style that branch expects, or the resolved code itself, and say whether you ran it there. The merge-up skill reads those paragraphs back out of the merge commit, so writing one saves the merger from rediscovering the resolution.
 
 ## Opening it
 

@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-03T16:37:12Z
+
+Removed `getVoter()` and `getVoters()` here, since the file is being touched anyway. Your reading is right: nothing extends `AccessDecisionManagerTest`, nothing in it calls them, and the strategy tests use the same-named helpers they inherit from `Security\Core\Test\AccessDecisionStrategyTestCase`. Calling them would indeed fatal.
+
+I also swapped `getGrantingVoter()` for the `getExpectedVoter(VoterInterface::ACCESS_GRANTED)` that was already in the class, which keeps the private helpers together at the end.
+
+I checked the alignment claim by running `SecurityExtension` over every `access_control` shape and reading back the attribute count handed to `AccessMap::add()`:
+
+```
+roles: single             attrs=1  component-dep=no   config-dep=[]
+roles: two (array)        attrs=2  component-dep=YES  config-dep=[many-roles]
+roles: two (comma string) attrs=2  component-dep=YES  config-dep=[many-roles]
+allow_if only             attrs=1  component-dep=no   config-dep=[]
+roles single + allow_if   attrs=2  component-dep=YES  config-dep=[roles+allow_if]
+roles two + allow_if      attrs=3  component-dep=YES  config-dep=[roles+allow_if,many-roles]
+requires_channel only     attrs=0  component-dep=no   config-dep=[]
+```
+
+Every row that reaches the new deprecation also carries one from #65056, so it holds.
+
+The consequence worth naming, now in the description: #65056 fires once at container build, this one fires on every matched request, so it is the one users will actually see. Its wording names a method and an argument a SecurityBundle user never calls, which is a bit odd for that audience but correct for the one that populates `AccessMap` directly.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-09-03T19:18:16Z
+
+Thanks for taking the file the rest of the way, and for running the `SecurityExtension` matrix. I re-ran `Security\Core` on your version, 431 green, and confirmed the two helpers were dead here: the strategy tests get their own `getVoters()`/`getVoter()` from `AccessDecisionStrategyTestCase`, so removing them changes nothing for those.
+
+On the wording, you are right that a SecurityBundle user reading `$allowMultipleAttributes` has nothing to act on. Two ways out, and I have no strong preference:
+
+1. Leave it. The noise is bounded to exactly the rules #65056 already flags at build time, and the same one-line split clears both. The message stays a component message about a component API.
+2. Append a pointer, something like `If this comes from an "access_control" rule, split it into one entry per attribute.` Actionable for the audience that will actually see it, at the cost of a `security-core` deprecation naming SecurityBundle configuration.
+
+If you would rather serve that audience properly than point at it, `AccessListener` could carry its own runtime deprecation and pass an internal marker so `decide()` stays quiet for it, but that buys a piece of internal API for one release. Happy to push whichever you prefer, or to leave the branch alone since you have it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T09:04:52Z
+
+Went with the pointer, with one correction to its advice: splitting a rule into one entry per attribute does not work, because `AccessMap::getPatterns()` returns the first matching rule only. I ran both shapes through `AccessListener` with a `RoleVoter`:
+
+```
+one rule,  roles [ROLE_A, ROLE_B], user has ROLE_A: GRANTED
+one rule,  roles [ROLE_A, ROLE_B], user has ROLE_B: GRANTED
+two rules, same path, one role each, user has ROLE_A: GRANTED
+two rules, same path, one role each, user has ROLE_B: DENIED
+```
+
+So the message now says what the bundle's own deprecation says: move the roles to `allow_if` or to the role hierarchy. I fixed the same sentence in the description. The internal-marker variant is not worth a piece of API for one release, and the double message is bounded to rules the bundle already flags at build time.
+
+Rebased on the current 8.2 tip. Security\Core 431, Security\Http 930, SecurityBundle 543, all green. The Windows job was red on `ProcessTest::testIncrementalOutputDoesNotRequireAnotherCall` and two `AmpHttpClientTest` idle timeouts, and the four Security suites passed there.

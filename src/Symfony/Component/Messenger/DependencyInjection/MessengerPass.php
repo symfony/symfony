@@ -53,8 +53,8 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $this->registerHandlers($container, $busIds);
-
         $this->registerTypeMapping($container);
+        $this->registerDebugCommandRouting($container);
     }
 
     private function registerHandlers(ContainerBuilder $container, array $busIds): void
@@ -499,5 +499,51 @@ class MessengerPass implements CompilerPassInterface
         }
 
         $container->getDefinition('messenger.transport.symfony_serializer')->setArgument(3, $typeToClassMap);
+    }
+
+    private function registerDebugCommandRouting(ContainerBuilder $container): void
+    {
+        if (!$container->hasDefinition('console.command.messenger_debug') || !$container->hasDefinition('messenger.senders_locator')) {
+            return;
+        }
+
+        $sendersMap = $container->getDefinition('messenger.senders_locator')->getArgument(0);
+        if (!\is_array($sendersMap)) {
+            $sendersMap = [];
+        }
+
+        $senderAliases = [];
+        foreach ($container->findTaggedServiceIds('messenger.receiver') as $id => $tags) {
+            foreach ($tags as $tag) {
+                if (isset($tag['alias'])) {
+                    $senderAliases[$tag['alias']] = $id;
+                }
+            }
+        }
+
+        $attributeMessages = [];
+        foreach ($container->findTaggedResourceIds('messenger.message', false) as $id => $tags) {
+            $class = $container->getDefinition($id)->getClass();
+            foreach ($tags as $tag) {
+                foreach ((array) ($tag['transport'] ?? []) as $transport) {
+                    $attributeMessages[$class][] = $transport;
+                }
+            }
+        }
+
+        $failureTransports = [];
+        if ($container->hasDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')) {
+            $failureTransports = $container->getDefinition('messenger.failure.send_failed_message_to_failure_transport_listener')->getArguments()[2] ?? [];
+            if (!\is_array($failureTransports)) {
+                $failureTransports = [];
+            }
+        }
+
+        $container->getDefinition('console.command.messenger_debug')
+            ->setArgument(1, $sendersMap)
+            ->setArgument(2, $senderAliases)
+            ->setArgument(3, $attributeMessages)
+            ->setArgument(4, $failureTransports)
+        ;
     }
 }

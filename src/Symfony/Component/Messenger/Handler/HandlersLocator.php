@@ -63,8 +63,14 @@ class HandlersLocator implements HandlersLocatorInterface
      */
     public static function listTypes(Envelope $envelope): array
     {
-        $class = $envelope->getMessage()::class;
+        return self::listTypesForClass($envelope->getMessage()::class);
+    }
 
+    /**
+     * @internal
+     */
+    public static function listTypesForClass(string $class): array
+    {
         return self::$typeCache[$class] ??= [$class => $class]
             + class_parents($class)
             + class_implements($class)

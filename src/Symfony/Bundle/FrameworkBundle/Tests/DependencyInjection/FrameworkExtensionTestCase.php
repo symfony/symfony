@@ -98,6 +98,7 @@ use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
+use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 use Symfony\Component\Messenger\Transport\Serialization\ClaimCheckSerializer;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Mime\Crypto\PgpEncrypter;
@@ -1195,7 +1196,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $configurators[0]($definition, new AsMessage(serializedTypeName: 'my.type', serializedTypeNameAliases: ['my.legacy.type']));
 
         $this->assertSame(
-            [['serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
+            [['transport' => null, 'serializedTypeName' => 'my.type', 'serializedTypeNameAliases' => ['my.legacy.type']]],
             $definition->getTag('messenger.message')
         );
     }
@@ -1288,7 +1289,9 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testMessengerMultipleFailureTransports()
     {
-        $container = $this->createContainerFromFile('messenger_multiple_failure_transports');
+        $container = $this->createContainerFromFile('messenger_multiple_failure_transports', [], true, false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
 
         $failureTransport1Definition = $container->getDefinition('messenger.transport.failure_transport_1');
         $failureTransport1Tags = $failureTransport1Definition->getTag('messenger.receiver')[0];
@@ -1324,11 +1327,19 @@ abstract class FrameworkExtensionTestCase extends TestCase
             return array_shift($values);
         }, $failureTransports);
         $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+        if (method_exists(SendersLocator::class, 'getSenderAliases')) {
+            $this->assertSame([
+                'transport_1' => 'failure_transport_1',
+                'transport_3' => 'failure_transport_3',
+            ], $container->getDefinition('console.command.messenger_debug')->getArgument(4));
+        }
     }
 
     public function testMessengerMultipleFailureTransportsWithGlobalFailureTransport()
     {
-        $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global');
+        $container = $this->createContainerFromFile('messenger_multiple_failure_transports_global', [], true, false);
+        $container->addCompilerPass(new MessengerPass());
+        $container->compile();
 
         $this->assertEquals('messenger.transport.failure_transport_global', (string) $container->getAlias('messenger.failure_transports.default'));
 
@@ -1367,6 +1378,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
             return array_shift($values);
         }, $failureTransports);
         $this->assertEquals($expectedTransportsByFailureTransports, $failureTransportsReferences);
+        if (method_exists(SendersLocator::class, 'getSenderAliases')) {
+            $this->assertSame([
+                'transport_1' => 'failure_transport_1',
+                'transport_2' => 'failure_transport_global',
+                'transport_3' => 'failure_transport_3',
+                'failure_transport_global' => 'failure_transport_global',
+                'failure_transport_1' => 'failure_transport_global',
+                'failure_transport_3' => 'failure_transport_global',
+            ], $container->getDefinition('console.command.messenger_debug')->getArgument(4));
+        }
     }
 
     public function testMessengerTransports()
@@ -1524,6 +1545,23 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $sendersMapping = $senderLocatorDefinition->getArgument(0);
         $this->assertEquals(['amqp'], $sendersMapping[DummyMessage::class]);
+    }
+
+    public function testAsMessageAutoconfigurationUsesResourceTag()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', []);
+        });
+
+        $this->assertArrayHasKey(AsMessage::class, $container->getAttributeAutoconfigurators());
+        $this->assertCount(1, $container->getAttributeAutoconfigurators()[AsMessage::class]);
+
+        $definition = new ChildDefinition('foo');
+        $autoconfigurator = $container->getAttributeAutoconfigurators()[AsMessage::class][0];
+        $autoconfigurator($definition, new AsMessage(transport: ['async']));
+
+        $this->assertSame([['transport' => ['async'], 'serializedTypeName' => null, 'serializedTypeNameAliases' => []]], $definition->getTag('messenger.message'));
+        $this->assertSame([['source' => 'by tag "messenger.message"']], $definition->getTag('container.excluded'));
     }
 
     public function testMessengerTransportConfiguration()

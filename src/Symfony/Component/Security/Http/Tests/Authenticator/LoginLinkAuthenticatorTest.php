@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\LoginLinkAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -25,6 +26,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
 use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkAuthenticationException;
 use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class LoginLinkAuthenticatorTest extends TestCase
 {
@@ -116,6 +118,23 @@ class LoginLinkAuthenticatorTest extends TestCase
         $passport = $this->authenticator->authenticate($request);
 
         $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
+    }
+
+    #[DataProvider('provideUnsupportedReasons')]
+    public function testUnsupportedReasons(array $options, Request $request, array $expectedReasons)
+    {
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+        $this->setUpAuthenticator($options);
+
+        $this->assertSame([] === $expectedReasons, $this->authenticator->supports($request));
+        $this->assertSame($expectedReasons, $reasons->all());
+    }
+
+    public static function provideUnsupportedReasons(): iterable
+    {
+        yield 'other path' => [['check_route' => '/validate_link'], Request::create('/login?hash=abc123'), ['the request path "/login" does not match the "check_route" option "/validate_link"']];
+        yield 'not a POST' => [['check_route' => '/validate_link', 'check_post_only' => true], Request::create('/validate_link?hash=abc123'), ['the request method is "GET", and the "check_post_only" option requires POST']];
+        yield 'supported' => [['check_route' => '/validate_link'], Request::create('/validate_link?hash=abc123'), []];
     }
 
     private function setUpAuthenticator(array $options = [])

@@ -21,6 +21,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\EntryPoint\Exception\NotAnEntryPointException;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 
 /**
@@ -31,6 +32,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 final class TraceableAuthenticator implements AuthenticatorInterface, InteractiveAuthenticatorInterface, AuthenticationEntryPointInterface
 {
     private ?bool $supports = false;
+    private array $unsupportedReasons = [];
     private ?Passport $passport = null;
     private ?float $duration = null;
     private ClassStub|string $stub;
@@ -45,6 +47,7 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
     {
         return [
             'supports' => $this->supports,
+            'unsupportedReasons' => $this->unsupportedReasons,
             'passport' => $this->passport,
             'duration' => $this->duration,
             'stub' => $this->stub ??= class_exists(ClassStub::class) ? new ClassStub($this->authenticator::class) : $this->authenticator::class,
@@ -62,7 +65,14 @@ final class TraceableAuthenticator implements AuthenticatorInterface, Interactiv
 
     public function supports(Request $request): ?bool
     {
-        return $this->supports = $this->authenticator->supports($request);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        try {
+            return $this->supports = $this->authenticator->supports($request);
+        } finally {
+            $request->attributes->remove(SecurityRequestAttributes::UNSUPPORTED_REASONS);
+            $this->unsupportedReasons = $reasons->all();
+        }
     }
 
     public function authenticate(Request $request): Passport

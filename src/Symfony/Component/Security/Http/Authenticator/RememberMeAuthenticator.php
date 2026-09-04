@@ -27,6 +27,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
 use Symfony\Component\Security\Http\RememberMe\ResponseListener;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * The RememberMe *Authenticator* performs remember me authentication.
@@ -53,16 +54,30 @@ class RememberMeAuthenticator implements InteractiveAuthenticatorInterface
 
     public function supports(Request $request): ?bool
     {
+        $reasons = $request->attributes->get(SecurityRequestAttributes::UNSUPPORTED_REASONS);
+
         // do not overwrite already stored tokens (i.e. from the session)
         if (null !== $this->tokenStorage->getToken()) {
+            $reasons?->add('a token is already stored, so the request is already authenticated');
+
             return false;
         }
 
         if (($cookie = $request->attributes->get(ResponseListener::COOKIE_ATTR_NAME)) && null === $cookie->getValue()) {
+            $reasons?->add(\sprintf('the "%s" cookie is being cleared by this request', $this->cookieName));
+
             return false;
         }
 
-        if (!$request->cookies->has($this->cookieName) || !\is_scalar($request->cookies->all()[$this->cookieName] ?: null)) {
+        if (!$request->cookies->has($this->cookieName)) {
+            $reasons?->add(\sprintf('the request has no "%s" cookie', $this->cookieName));
+
+            return false;
+        }
+
+        if (!\is_scalar($request->cookies->all()[$this->cookieName] ?: null)) {
+            $reasons?->add(\sprintf('the "%s" cookie is empty or not a scalar', $this->cookieName));
+
             return false;
         }
 

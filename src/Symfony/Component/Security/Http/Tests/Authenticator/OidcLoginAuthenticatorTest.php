@@ -37,6 +37,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcClient;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcIdToken;
 use Symfony\Component\Security\Http\Authenticator\Oidc\OidcSignatureVerifier;
@@ -46,6 +47,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\Oidc\OidcDiscovery;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AllowMockObjectsWithoutExpectations]
 class OidcLoginAuthenticatorTest extends TestCase
@@ -102,6 +104,23 @@ class OidcLoginAuthenticatorTest extends TestCase
         $authenticator = $this->createAuthenticator();
 
         $this->assertFalse($authenticator->supports(Request::create('/other-path?code=abc')));
+    }
+
+    public function testUnsupportedReasons()
+    {
+        $authenticator = $this->createAuthenticator();
+
+        $request = Request::create('/other-path?code=abc');
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame(['the request path "/other-path" does not match the "check_path" option "/oidc/callback"'], $reasons->all());
+
+        $request = Request::create('/oidc/callback?code=abc');
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertTrue($authenticator->supports($request));
+        $this->assertSame([], $reasons->all());
     }
 
     public function testSupportsTheCallbackPathWithoutAnyParameter()

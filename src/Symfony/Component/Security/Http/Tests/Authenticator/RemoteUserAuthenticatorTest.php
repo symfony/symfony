@@ -18,7 +18,9 @@ use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
+use Symfony\Component\Security\Http\Authenticator\Debug\UnsupportedReasons;
 use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class RemoteUserAuthenticatorTest extends TestCase
 {
@@ -69,6 +71,37 @@ class RemoteUserAuthenticatorTest extends TestCase
 
         $userProvider = new InMemoryUserProvider();
         yield [$userProvider, new RemoteUserAuthenticator($userProvider, new TokenStorage(), 'main', 'CUSTOM_USER_PARAMETER'), 'CUSTOM_USER_PARAMETER'];
+    }
+
+    public function testUnsupportedReasons()
+    {
+        $tokenStorage = new TokenStorage();
+        $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), $tokenStorage, 'main');
+
+        $request = $this->createRequest([]);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame(['User key was not found: "REMOTE_USER".'], $reasons->all());
+
+        $request = $this->createRequest(['REMOTE_USER' => '']);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame(['no user identifier was found in the request'], $reasons->all());
+
+        $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
+        $request = $this->createRequest(['REMOTE_USER' => 'username']);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertFalse($authenticator->supports($request));
+        $this->assertSame(['the user "username" already has a pre-authenticated token for this firewall'], $reasons->all());
+
+        $request = $this->createRequest(['REMOTE_USER' => 'another_username']);
+        $request->attributes->set(SecurityRequestAttributes::UNSUPPORTED_REASONS, $reasons = new UnsupportedReasons());
+
+        $this->assertTrue($authenticator->supports($request));
+        $this->assertSame([], $reasons->all());
     }
 
     private function createRequest(array $server)

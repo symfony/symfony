@@ -70,9 +70,27 @@ class FormLoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function supports(Request $request): bool
     {
-        return ($this->options['post_only'] ? $request->isMethod('POST') : true)
-            && $this->httpUtils->checkRequestPath($request, $this->options['check_path'])
-            && ($this->options['form_only'] ? 'form' === $request->getContentTypeFormat() : true);
+        $reasons = $request->attributes->get(SecurityRequestAttributes::UNSUPPORTED_REASONS);
+
+        if ($this->options['post_only'] && !$request->isMethod('POST')) {
+            $reasons?->add(\sprintf('the request method is "%s", and the "post_only" option requires POST', $request->getMethod()));
+
+            return false;
+        }
+
+        if (!$this->httpUtils->checkRequestPath($request, $this->options['check_path'])) {
+            $reasons?->add(\sprintf('the request path "%s" does not match the "check_path" option "%s"', $request->getPathInfo(), $this->options['check_path']));
+
+            return false;
+        }
+
+        if ($this->options['form_only'] && 'form' !== $request->getContentTypeFormat()) {
+            $reasons?->add(\sprintf('the "Content-Type" header is %s, and the "form_only" option requires a form one', ($contentType = $request->headers->get('Content-Type')) ? '"'.$contentType.'"' : 'missing'));
+
+            return false;
+        }
+
+        return true;
     }
 
     public function authenticate(Request $request): Passport

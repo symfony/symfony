@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -48,7 +49,13 @@ class AccessTokenAuthenticator implements AuthenticatorInterface
 
     public function supports(Request $request): ?bool
     {
-        return null === $this->accessTokenExtractor->extractAccessToken($request) ? false : null;
+        if (null === $this->accessTokenExtractor->extractAccessToken($request)) {
+            $request->attributes->get(SecurityRequestAttributes::UNSUPPORTED_REASONS)?->add(\sprintf('the "%s" extractor found no access token in the request', get_debug_type($this->accessTokenExtractor)));
+
+            return false;
+        }
+
+        return null;
     }
 
     public function authenticate(Request $request): Passport

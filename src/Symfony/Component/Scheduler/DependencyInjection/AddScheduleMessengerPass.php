@@ -61,10 +61,19 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                 $serviceDefinition = $container->getDefinition($serviceId);
                 $scheduleName = $tagAttributes['schedule'] ?? 'default';
 
-                if ($commandTags = $serviceDefinition->getTag('console.command')) {
+                $commandTags = $serviceDefinition->getTag('console.command');
+                $method = $tagAttributes['method'] ?? '__invoke';
+                $commandTag = array_find($commandTags, static fn ($tag) => $method === ($tag['method'] ?? '__invoke'));
+
+                // with no method-level #[AsCommand], the class-level command applies to all tasks
+                if (null === $commandTag && !array_any($commandTags, static fn ($tag) => isset($tag['method']))) {
+                    $commandTag = $commandTags[0] ?? null;
+                }
+
+                if (null !== $commandTag) {
                     /** @var AsCommand|null $attribute */
                     $attribute = ($container->getReflectionClass($serviceDefinition->getClass())->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-                    $aliases = explode('|', $commandTags[0]['command'] ?? $attribute?->name ?? '');
+                    $aliases = explode('|', $commandTag['command'] ?? $attribute?->name ?? '');
                     if ('' === $commandName = array_shift($aliases)) {
                         $commandName = array_shift($aliases) ?? '';
                     }

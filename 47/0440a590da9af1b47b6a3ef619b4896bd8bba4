@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by JeroenMoonen at 2026-09-03T18:42:42Z
+
+Thanks, all four fixed and pushed, with regression tests for the envelope, Bcc-only, Cc-only and non-`X-` header cases.
+
+Vendor questions: the API accepts a display name, but `from` must match a verified sender, so the envelope sender was wrong here. The `X-` allow-list is enforced, so extra reply-to addresses are now dropped rather than forged into a header.
+
+This bridge is canonical. `pufferpost/symfony-mailer` is abandoned in its favour, and its templated sending moved here as `X-PufferPost-*` headers. Committing to maintaining it long term.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-09-04T07:27:26Z
+
+Thanks, the four fixes check out. I reproduced each one and then reverted it to confirm a test catches it: the envelope redirect, Cc and Bcc on the first message only, the bare `from` taken from the `From` header, and the `X-` allow-list are all pinned. `addressList()` dropping copy recipients the envelope no longer carries is a nice touch.
+
+One thing to change in the template support that came with this round, and I have prepared the change rather than describing it, since your fork belongs to an organisation and GitHub does not let maintainers push to those (the API claims otherwise, but the push is refused).
+
+**The component already has this abstraction.** `RemoteTemplateEmail`, `RemoteTemplate` and `RemoteTemplateTransportInterface` landed in Mailer 8.2, and Mailtrap, Mailgun, Mandrill, MailerSend and Sendgrid already use them. Three things follow from the header approach:
+
+`AbstractTransport::send()` refuses a `RemoteTemplateEmail` unless the transport implements the marker interface, so the bridge told users it had no template support while having it:
+
+```
+PufferPost   LogicException: The "…\PufferPostApiTransport" transport does not support sending
+             emails rendered from a remote template.
+Mailtrap     SENT
+```
+
+A template-only send was impossible, because `Email::ensureBodyValid()` demands a body that the transport then discarded:
+
+```
+template-only send THREW LogicException: A message must have a text or an HTML part or attachments.
+```
+
+And where `RemoteTemplateEmail` refuses a body next to a template, the headers dropped it silently, which is the failure mode that loses a message without telling anyone.
+
+**What the prepared commit does.** The transport implements `RemoteTemplateTransportInterface` and reads the template through `getRemoteTemplate()`, mapping `getReference()` to `templateId` and `getVariables()` to `data`. `X-PufferPost-Template-Id` and `X-PufferPost-Data` are gone; `-Metadata`, `-Unsubscribe-Group`, `-Locale` and `-Timezone` stay as headers, since nothing in the component covers those.
+
+```php
+$email = (new RemoteTemplateEmail())
+    ->from('shop@example.com')
+    ->to('jane@example.com')
+    ->template('tpl_welcome', ['name' => 'Jane']);
+
+// {"messages":[{"to":"jane@example.com","from":"shop@example.com",
+//               "templateId":"tpl_welcome","data":{"name":"Jane"}}]}
+```
+
+`symfony/mailer` goes from `^7.4|^8.0` to `^8.2`, because the class is new in 8.2; Mailtrap and MailerSend declare the same. A subject set alongside a template now throws instead of being dropped, following Mailtrap's precedent. If your API does accept a subject override, drop that guard, it is three lines.
+
+Also folded in: the README still said several reply-to addresses are sent as a raw `Reply-To` header, which this round made false, and the option docblock said the headers are "removed" when they are only skipped when building the API's header map.
+
+To pull it in:
+
+```
+git remote add nicolas-grekas https://github.com/nicolas-grekas/symfony.git
+git fetch nicolas-grekas pufferpost-remote-template
+git reset --hard nicolas-grekas/pufferpost-remote-template
+git push --force-with-lease
+```
+
+It is your commit, rebased on the current 8.2. Mailer is green on PHP 8.4 and 8.5 (1323 tests), FrameworkBundle DI too, and the bridge suite is at 29 tests with the template cases converted.
+
+On your other answers: canonical package, retirement of `pufferpost/symfony-mailer` and the maintenance commitment are all noted. The decision on adopting a new bridge is not mine alone, so I will leave that to the team.
+
+---------------------------------------------------------------------------
+
+by JeroenMoonen at 2026-09-04T08:14:21Z
+
+Pulled in, thanks. You were right that the component already had this.
+
+Keep the subject guard: the API accepts a subject next to a template but renders the template's own, so the supplied one is silently discarded.

@@ -210,6 +210,42 @@ class UrlSanitizerTest extends TestCase
         ];
 
         yield [
+            'input' => ':',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => '::',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => ':link.php',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => null,
+        ];
+
+        yield [
+            'input' => './:link.php',
+            'allowedSchemes' => ['https'],
+            'allowedHosts' => null,
+            'forceHttps' => false,
+            'allowRelative' => true,
+            'expected' => './:link.php',
+        ];
+
+        yield [
             'input' => 'https://untrusted.com/link.php',
             'allowedSchemes' => ['https'],
             'allowedHosts' => ['trusted.com'],

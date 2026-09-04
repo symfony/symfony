@@ -400,13 +400,15 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             array_splice($accessorMethods, false === $getterPosition ? \count($accessorMethods) : $getterPosition + 1, 0, [$getsetter]);
         }
 
-        $staticGetsetter = null;
+        $deferredGetsetter = null;
 
         foreach ($accessorMethods as $methodName) {
             if ($reflClass->hasMethod($methodName) && ($m = $reflClass->getMethod($methodName))->getModifiers() & $this->methodReflectionFlags && !$m->getNumberOfRequiredParameters() && !\in_array((string) $m->getReturnType(), ['void', 'never'], true)) {
-                if ($allowGetterSetter && $methodName === $getsetter && $m->isStatic()) {
-                    // a static method named after the property, e.g. a named constructor, must not win over any instance-based candidate; try it last
-                    $staticGetsetter = $m;
+                if ($allowGetterSetter && $methodName === $getsetter && ($m->isStatic() || $this->isDeclaringClassType($m->getReturnType(), $m->getDeclaringClass()))) {
+                    // a method named after the property that hands back an object of the same class,
+                    // e.g. a named constructor or a derived value, cannot report the state of the
+                    // object being read; it must not win over any instance-based candidate; try it last
+                    $deferredGetsetter = $m;
                     continue;
                 }
 
@@ -426,8 +428,8 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, 'get'.$camelProp, PropertyReadInfo::VISIBILITY_PUBLIC, false, false);
         }
 
-        if ($staticGetsetter) {
-            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisibilityForMethod($staticGetsetter), true, false);
+        if ($deferredGetsetter) {
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $getsetter, $this->getReadVisibilityForMethod($deferredGetsetter), $deferredGetsetter->isStatic(), false);
         }
 
         return null;
@@ -773,6 +775,27 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return $name;
+    }
+
+    private function isDeclaringClassType(?\ReflectionType $reflectionType, \ReflectionClass $declaringClass): bool
+    {
+        if ($reflectionType instanceof \ReflectionUnionType || $reflectionType instanceof \ReflectionIntersectionType) {
+            foreach ($reflectionType->getTypes() as $type) {
+                if ($this->isDeclaringClassType($type, $declaringClass)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if (!$reflectionType instanceof \ReflectionNamedType || $reflectionType->isBuiltin()) {
+            return false;
+        }
+
+        $name = $this->resolveTypeName($reflectionType->getName(), $declaringClass);
+
+        return 'static' === $name || is_a($declaringClass->name, $name, true);
     }
 
     private function isNullableProperty(string $class, string $property): bool

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `#[UseRecord]` attribute and the `http-recorder-directory` parameter of `SymfonyExtension` to record/replay HTTP calls made through `RecorderHttpClient` in tests
+
 8.1
 ---
 

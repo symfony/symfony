@@ -1,0 +1,12 @@
+framework:
+    http_client:
+        recorder:
+            enabled: true
+            matcher: my_matcher
+            redactor: my_redactor
+
+services:
+    my_matcher:
+        class: Symfony\Component\HttpClient\Recorder\Matcher\DefaultMatcher
+    my_redactor:
+        class: Symfony\Component\HttpClient\Recorder\Redactor\DefaultRedactor

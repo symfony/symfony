@@ -17,10 +17,9 @@ use Symfony\Component\Tui\Focus\FocusManager;
 use Symfony\Component\Tui\Input\Key;
 use Symfony\Component\Tui\Input\Keybindings;
 use Symfony\Component\Tui\Render\RenderContext;
-use Symfony\Component\Tui\Style\Direction;
 
 /**
- * Tab container widget with horizontal/vertical headers.
+ * Tab container widget with headers above, below, or beside the active content.
  *
  * Only the active tab content is attached to the widget tree; inactive tabs
  * are detached so they are fully disabled (focus, input hit-testing).
@@ -33,6 +32,40 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
 {
     use FocusableTrait;
     use KeybindingsTrait;
+
+    private const array HORIZONTAL_BORDER_CHARS = [
+        'top' => [
+            'outer_left' => '╭',
+            'outer_right' => '╮',
+            'inner_left' => '┘',
+            'inner_right' => '└',
+            'junction' => '┴',
+        ],
+        'bottom' => [
+            'outer_left' => '╰',
+            'outer_right' => '╯',
+            'inner_left' => '┐',
+            'inner_right' => '┌',
+            'junction' => '┬',
+        ],
+    ];
+
+    private const array VERTICAL_BORDER_CHARS = [
+        'left' => [
+            'outer_top' => '╭',
+            'outer_bottom' => '╰',
+            'inner_cross' => '┤',
+            'inner_up' => '┘',
+            'inner_down' => '┐',
+        ],
+        'right' => [
+            'outer_top' => '╮',
+            'outer_bottom' => '╯',
+            'inner_cross' => '├',
+            'inner_up' => '└',
+            'inner_down' => '┌',
+        ],
+    ];
 
     /** @var list<TabItem> */
     private array $tabs;
@@ -48,7 +81,7 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
      */
     public function __construct(
         array $tabs = [],
-        private Direction $headerDirection = Direction::Horizontal,
+        private TabPosition $position = TabPosition::Top,
         ?Keybindings $keybindings = null,
     ) {
         $this->tabs = $tabs;
@@ -182,10 +215,10 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
     /**
      * @return $this
      */
-    public function setHeaderDirection(Direction $headerDirection): static
+    public function setPosition(TabPosition $position): static
     {
-        if ($this->headerDirection !== $headerDirection) {
-            $this->headerDirection = $headerDirection;
+        if ($this->position !== $position) {
+            $this->position = $position;
             $this->invalidate();
         }
 
@@ -315,7 +348,7 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
             return;
         }
 
-        if (Direction::Horizontal === $this->headerDirection) {
+        if (TabPosition::Top === $this->position || TabPosition::Bottom === $this->position) {
             if ($kb->matches($data, 'cursor_left')) {
                 $this->setActiveTab(($this->activeIndex - 1 + $count) % $count);
 
@@ -358,11 +391,10 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
             return [];
         }
 
-        if (Direction::Horizontal === $this->headerDirection) {
-            return $this->renderHorizontal($columns, $rows, $context);
-        }
-
-        return $this->renderVertical($columns, $rows, $context);
+        return match ($this->position) {
+            TabPosition::Top, TabPosition::Bottom => $this->renderHorizontal($columns, $rows, $context),
+            TabPosition::Left, TabPosition::Right => $this->renderVertical($columns, $rows, $context),
+        };
     }
 
     /**
@@ -436,19 +468,32 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
             $bottom .= $segments[$i]['bottom'];
         }
 
-        $top = $this->padLine(AnsiUtils::truncateToWidth($top, $columns, ''), $columns);
+        $top = AnsiUtils::truncateToWidth($top, $columns, '');
         $middle = $this->padLine(AnsiUtils::truncateToWidth($middle, $columns, ''), $columns);
-        $bottom = $this->padLineWithFill(AnsiUtils::truncateToWidth($bottom, $columns, ''), $columns, '─');
+        $bottom = AnsiUtils::truncateToWidth($bottom, $columns, '');
+
+        if (TabPosition::Bottom === $this->position) {
+            $top = $this->padLineWithFill($top, $columns, '─');
+            $bottom = $this->padLine($bottom, $columns);
+        } else {
+            $top = $this->padLine($top, $columns);
+            $bottom = $this->padLineWithFill($bottom, $columns, '─');
+        }
 
         $contentRows = max(0, $rows - 3);
         $contentLines = $contentRows > 0 ? $this->renderActiveContent($context->withRows($contentRows)) : [];
 
-        $lines = [$top, $middle, $bottom];
-        foreach (\array_slice($contentLines, 0, $contentRows) as $line) {
-            $lines[] = $this->padLine(AnsiUtils::truncateToWidth($line, $columns, ''), $columns);
+        $headerLines = [$top, $middle, $bottom];
+        $contentLines = array_map(
+            fn (string $line): string => $this->padLine(AnsiUtils::truncateToWidth($line, $columns, ''), $columns),
+            \array_slice($contentLines, 0, $contentRows),
+        );
+
+        if (TabPosition::Bottom === $this->position) {
+            return [...$contentLines, ...$headerLines];
         }
 
-        return $lines;
+        return [...$headerLines, ...$contentLines];
     }
 
     /**
@@ -456,6 +501,8 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
      */
     private function renderVertical(int $columns, int $rows, RenderContext $context): array
     {
+        $headerAtRight = TabPosition::Right === $this->position;
+        $chars = self::VERTICAL_BORDER_CHARS[$this->position->value];
         $headerWidth = $this->computeVerticalHeaderWidth($columns);
         $contentColumns = max(0, $columns - $headerWidth);
         $tabCount = \count($this->tabs);
@@ -464,14 +511,14 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         $startTab = max(0, min($this->activeIndex - $visibleTabCount + 1, $tabCount - $visibleTabCount));
         $visibleHeaderCount = $rows < 3 ? $rows : 3 * $visibleTabCount;
 
-        // Compute the right-side character for each visible header row.
-        // A continuous │ line runs on the right, broken only at the active label row.
+        // Compute the inner-edge character for each visible header row.
+        // A continuous │ line runs beside the content, broken only at the active label row.
         // Tab box borders (top/bottom) connect to this line with junction characters,
-        // just like horizontal tabs connect their side borders to the bottom ─ line.
+        // just like horizontal tabs connect their side borders to the content separator.
         $activeLabelRow = 3 * $this->activeIndex + 1;
         $firstRow = 3 * $startTab;
         $lastRow = $firstRow + $visibleHeaderCount - 1;
-        $rightChars = $this->computeVerticalRightChars($activeLabelRow, $firstRow, $lastRow);
+        $innerChars = $this->computeVerticalInnerChars($activeLabelRow, $firstRow, $lastRow);
 
         // Each tab is a 3-row box: top border, label, bottom border.
         $headerLines = [];
@@ -479,9 +526,9 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         for ($r = $firstRow; $r <= $lastRow; ++$r) {
             $i = intdiv($r, 3);
             $headerLines[] = match ($r % 3) {
-                0 => $this->buildVerticalHeaderBorderLine($headerWidth, '╭', $rightChars[$r]),
+                0 => $this->buildVerticalHeaderBorderLine($headerWidth, $chars['outer_top'], $innerChars[$r]),
                 1 => $this->buildVerticalHeaderLabelLine($this->tabs[$i], $i === $this->activeIndex, $headerWidth),
-                2 => $this->buildVerticalHeaderBorderLine($headerWidth, '╰', $rightChars[$r]),
+                2 => $this->buildVerticalHeaderBorderLine($headerWidth, $chars['outer_bottom'], $innerChars[$r]),
             };
         }
         $headerCount = \count($headerLines);
@@ -495,17 +542,22 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         $innerRows = max(0, $rows - 2);
         $contentLines = $contentColumns > 0 && $innerRows > 0 ? $this->renderActiveContent($context->withSize($contentColumns, $innerRows)) : [];
 
-        $firstLine = $this->padLineWithFill($firstHeaderLine, $columns, '─');
-        $lastLine = $this->padLineWithFill($lastHeaderLine, $columns, '─');
+        if ($headerAtRight) {
+            $firstLine = $this->padLineWithLeftFill($firstHeaderLine, $columns, '─');
+            $lastLine = $this->padLineWithLeftFill($lastHeaderLine, $columns, '─');
+        } else {
+            $firstLine = $this->padLineWithFill($firstHeaderLine, $columns, '─');
+            $lastLine = $this->padLineWithFill($lastHeaderLine, $columns, '─');
+        }
 
         $innerCount = min($innerRows, max($headerCount - 2, \count($contentLines)));
 
         $lines = [$firstLine];
         for ($i = 0; $i < $innerCount; ++$i) {
-            $left = $headerLines[$i + 1] ?? str_repeat(' ', $headerWidth);
-            $right = $contentLines[$i] ?? '';
-            $right = $this->padLine(AnsiUtils::truncateToWidth($right, $contentColumns, ''), $contentColumns);
-            $lines[] = $left.$right;
+            $header = $headerLines[$i + 1] ?? str_repeat(' ', $headerWidth);
+            $content = $contentLines[$i] ?? '';
+            $content = $this->padLine(AnsiUtils::truncateToWidth($content, $contentColumns, ''), $contentColumns);
+            $lines[] = $headerAtRight ? $content.$header : $header.$content;
         }
 
         if (\count($lines) < $rows) {
@@ -516,23 +568,17 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
     }
 
     /**
-     * Compute the right-side character for each visible header row,
+     * Compute the inner-edge character for each visible header row,
      * keyed by absolute row number.
      *
-     * A continuous │ line runs on the right edge of the tab header, broken
-     * at the active tab's label row. Border rows (top/bottom of each tab box)
-     * connect to this line with junction characters:
-     *  - ┬ top separator with line going down
-     *  - ┴ bottom separator with line going up
-     *  - ┤ border crossing a continuous line
-     *  - ┘ line ending (above active opening)
-     *  - ┐ line starting (below active opening)
-     *  - ─ separator continuation when the active tab sits at the edge
+     * A continuous │ line runs beside the content, broken at the active tab's
+     * label row. Border rows connect to this line with junction characters.
      *
      * @return array<int, string>
      */
-    private function computeVerticalRightChars(int $activeLabelRow, int $firstRow, int $lastRow): array
+    private function computeVerticalInnerChars(int $activeLabelRow, int $firstRow, int $lastRow): array
     {
+        $borderChars = self::VERTICAL_BORDER_CHARS[$this->position->value];
         $chars = [];
 
         for ($r = $firstRow; $r <= $lastRow; ++$r) {
@@ -568,11 +614,11 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
                 // Inner border row: the rows around the active label row can
                 // never both miss, so one of the three junctions always applies
                 if ($connectUp && $connectDown) {
-                    $chars[$r] = '┤';
+                    $chars[$r] = $borderChars['inner_cross'];
                 } elseif ($connectUp) {
-                    $chars[$r] = '┘';
+                    $chars[$r] = $borderChars['inner_up'];
                 } else {
-                    $chars[$r] = '┐';
+                    $chars[$r] = $borderChars['inner_down'];
                 }
             }
         }
@@ -595,35 +641,38 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
      */
     private function buildHorizontalTabSegment(TabItem $tab, bool $active): array
     {
+        $chars = self::HORIZONTAL_BORDER_CHARS[$this->position->value];
         $label = ' '.$tab->getLabel().' ';
         $contentWidth = max(1, AnsiUtils::visibleWidth($label));
 
-        $top = $this->applyElement('separator', '╭').$this->applyElement('separator', str_repeat('─', $contentWidth)).$this->applyElement('separator', '╮');
+        $outer = $this->applyElement('separator', $chars['outer_left']).$this->applyElement('separator', str_repeat('─', $contentWidth)).$this->applyElement('separator', $chars['outer_right']);
         $middleLabel = $this->padLine(AnsiUtils::truncateToWidth($active ? $this->applyElement('tab-active', $label) : $this->applyElement('tab', $label), $contentWidth, ''), $contentWidth);
         $middle = $this->applyElement('separator', '│').$middleLabel.$this->applyElement('separator', '│');
-
         if ($active) {
-            $bottom = $this->applyElement('separator', '┘').$this->applyElement('separator', str_repeat(' ', $contentWidth)).$this->applyElement('separator', '└');
+            $inner = $this->applyElement('separator', $chars['inner_left']).$this->applyElement('separator', str_repeat(' ', $contentWidth)).$this->applyElement('separator', $chars['inner_right']);
         } else {
-            $bottom = $this->applyElement('separator', '┴').$this->applyElement('separator', str_repeat('─', $contentWidth)).$this->applyElement('separator', '┴');
+            $inner = $this->applyElement('separator', $chars['junction']).$this->applyElement('separator', str_repeat('─', $contentWidth)).$this->applyElement('separator', $chars['junction']);
         }
 
-        return [
-            'top' => $top,
-            'middle' => $middle,
-            'bottom' => $bottom,
-        ];
+        if (TabPosition::Bottom === $this->position) {
+            return ['top' => $inner, 'middle' => $middle, 'bottom' => $outer];
+        }
+
+        return ['top' => $outer, 'middle' => $middle, 'bottom' => $inner];
     }
 
-    private function buildVerticalHeaderBorderLine(int $width, string $leftChar, string $rightChar): string
+    private function buildVerticalHeaderBorderLine(int $width, string $outerChar, string $innerChar): string
     {
         if ($width <= 0) {
             return '';
         }
 
         if (1 === $width) {
-            return $this->applyElement('separator', $leftChar);
+            return $this->applyElement('separator', $outerChar);
         }
+
+        $leftChar = TabPosition::Right === $this->position ? $innerChar : $outerChar;
+        $rightChar = TabPosition::Right === $this->position ? $outerChar : $innerChar;
 
         return $this->applyElement('separator', $leftChar).$this->applyElement('separator', str_repeat('─', $width - 2)).$this->applyElement('separator', $rightChar);
     }
@@ -639,17 +688,17 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         }
 
         $innerWidth = $width - 2;
-        $left = $this->applyElement('separator', '│');
-        $right = $active ? ' ' : $this->applyElement('separator', '│');
+        $outer = $this->applyElement('separator', '│');
+        $inner = $active ? ' ' : $this->applyElement('separator', '│');
         if (0 === $innerWidth) {
-            return $left.$right;
+            return TabPosition::Right === $this->position ? $inner.$outer : $outer.$inner;
         }
 
         $label = ' '.$tab->getLabel().' ';
         $styled = $active ? $this->applyElement('tab-active', $label) : $this->applyElement('tab', $label);
-        $inner = $this->padLine(AnsiUtils::truncateToWidth($styled, $innerWidth, ''), $innerWidth);
+        $label = $this->padLine(AnsiUtils::truncateToWidth($styled, $innerWidth, ''), $innerWidth);
 
-        return $left.$inner.$right;
+        return TabPosition::Right === $this->position ? $inner.$label.$outer : $outer.$label.$inner;
     }
 
     private function computeVerticalHeaderWidth(int $columns): int
@@ -725,5 +774,15 @@ class TabsWidget extends AbstractWidget implements FocusableInterface, WidgetCon
         }
 
         return $line.$this->applyElement('separator', str_repeat($fill, $fillCount));
+    }
+
+    private function padLineWithLeftFill(string $line, int $width, string $fill): string
+    {
+        $fillCount = max(0, $width - AnsiUtils::visibleWidth($line));
+        if (0 === $fillCount) {
+            return $line;
+        }
+
+        return $this->applyElement('separator', str_repeat($fill, $fillCount)).$line;
     }
 }

@@ -15,11 +15,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Event\TabChangeEvent;
 use Symfony\Component\Tui\Render\RenderContext;
-use Symfony\Component\Tui\Style\Direction;
 use Symfony\Component\Tui\Terminal\VirtualTerminal;
 use Symfony\Component\Tui\Tui;
 use Symfony\Component\Tui\Widget\InputWidget;
 use Symfony\Component\Tui\Widget\TabItem;
+use Symfony\Component\Tui\Widget\TabPosition;
 use Symfony\Component\Tui\Widget\TabsWidget;
 use Symfony\Component\Tui\Widget\TextWidget;
 
@@ -209,12 +209,30 @@ class TabsWidgetTest extends TestCase
         $this->assertStringContainsString('one line', $lines[3]);
     }
 
+    public function testHeaderCanBeRenderedBelowContent()
+    {
+        $tabs = new TabsWidget([
+            new TabItem('first', 'First', new TextWidget("first line\nsecond line")),
+            new TabItem('second', 'Second', new TextWidget('other line')),
+        ], position: TabPosition::Bottom);
+
+        $tui = new Tui(terminal: new VirtualTerminal(80, 24));
+        $tui->add($tabs);
+
+        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $tabs->render(new RenderContext(30, 20)));
+
+        $this->assertSame('first line', trim($lines[0]));
+        $this->assertSame('second line', trim($lines[1]));
+        $this->assertStringContainsString('First', $lines[3]);
+        $this->assertStringContainsString('Second', $lines[3]);
+    }
+
     public function testVerticalRenderDoesNotPadToContextHeight()
     {
         $tabs = new TabsWidget([
             new TabItem('first', 'First', new TextWidget('one line')),
             new TabItem('second', 'Second', new TextWidget('other line')),
-        ], Direction::Vertical);
+        ], TabPosition::Left);
 
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
@@ -234,7 +252,7 @@ class TabsWidgetTest extends TestCase
         $tabs = new TabsWidget([
             new TabItem('first', 'First', new TextWidget('one line')),
             new TabItem('second', 'Second', new TextWidget('other line')),
-        ], Direction::Vertical);
+        ], TabPosition::Left);
 
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
@@ -287,13 +305,31 @@ class TabsWidgetTest extends TestCase
         $this->assertSame('─', mb_substr($plainBottom, $headerWidth, 1, 'UTF-8'));
     }
 
+    public function testHeaderCanBeRenderedToTheRightOfContent()
+    {
+        $tabs = new TabsWidget([
+            new TabItem('first', 'First', new TextWidget('one line')),
+            new TabItem('second', 'Second', new TextWidget('other line')),
+        ], TabPosition::Right);
+
+        $tui = new Tui(terminal: new VirtualTerminal(80, 24));
+        $tui->add($tabs);
+
+        $lines = array_map(AnsiUtils::stripAnsiCodes(...), $tabs->render(new RenderContext(30, 20)));
+
+        $this->assertStringContainsString('one line', $lines[1]);
+        $this->assertStringContainsString('First', $lines[1]);
+        $this->assertGreaterThan(mb_strpos($lines[1], 'one line'), mb_strpos($lines[1], 'First'));
+        $this->assertStringContainsString('Second', $lines[4]);
+    }
+
     public function testVerticalTabBoxStructureVariesByActiveTab()
     {
         $tabs = new TabsWidget([
             new TabItem('a', 'A', new TextWidget('x')),
             new TabItem('b', 'B', new TextWidget('y')),
             new TabItem('c', 'C', new TextWidget('z')),
-        ], Direction::Vertical);
+        ], TabPosition::Left);
 
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
@@ -360,7 +396,7 @@ class TabsWidgetTest extends TestCase
         $tabs = new TabsWidget([
             new TabItem('first', 'A', new TextWidget('content')),
             new TabItem('second', 'B', new TextWidget('other')),
-        ], Direction::Vertical);
+        ], TabPosition::Left);
 
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
@@ -428,7 +464,7 @@ class TabsWidgetTest extends TestCase
             $items[] = new TabItem((string) $i, 'T'.$i, new TextWidget('content'.$i));
         }
 
-        $tabs = new TabsWidget($items, Direction::Vertical);
+        $tabs = new TabsWidget($items, TabPosition::Left);
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
         $tabs->setActiveTab(5);
@@ -448,7 +484,7 @@ class TabsWidgetTest extends TestCase
             $items[] = new TabItem((string) $i, 'T'.$i, new TextWidget('content'.$i));
         }
 
-        $tabs = new TabsWidget($items, Direction::Vertical);
+        $tabs = new TabsWidget($items, TabPosition::Left);
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
 
@@ -484,7 +520,7 @@ class TabsWidgetTest extends TestCase
     {
         $tabs = new TabsWidget([
             new TabItem('first', 'First', new TextWidget('content')),
-        ], Direction::Vertical);
+        ], TabPosition::Left);
 
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
@@ -496,7 +532,7 @@ class TabsWidgetTest extends TestCase
         }
     }
 
-    public function testHeaderDirectionCanBeChanged()
+    public function testPositionCanBeChanged()
     {
         $tabs = new TabsWidget([
             new TabItem('first', 'First', new TextWidget('A')),
@@ -506,7 +542,7 @@ class TabsWidgetTest extends TestCase
         $tui = new Tui(terminal: new VirtualTerminal(80, 24));
         $tui->add($tabs);
 
-        $tabs->setHeaderDirection(Direction::Vertical);
+        $tabs->setPosition(TabPosition::Right);
         $tabs->handleInput("\x1b[B");
 
         $this->assertSame('second', $tabs->getActiveTabId());

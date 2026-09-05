@@ -401,6 +401,7 @@ class AddConsoleCommandPassTest extends TestCase
         self::assertTrue($container->has('invokable_signalable_command.command'));
         self::assertSame('The command description', $command->getDescription());
         self::assertSame('The %command.name% command help content.', $command->getHelp());
+        self::assertSame([15], $command->getCommand()->getSubscribedSignals());
     }
 }
 
@@ -456,7 +457,7 @@ class InvokableSignalableCommand implements SignalableCommandInterface
 
     public function getSubscribedSignals(): array
     {
-        return [];
+        return [15];
     }
 
     public function handleSignal(int $signal, false|int $previousExitCode = 0): int|false

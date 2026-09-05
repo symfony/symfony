@@ -50,8 +50,11 @@ class InvokableCommand implements SignalableCommandInterface
         private ?ArgumentResolverInterface $argumentResolver = null,
     ) {
         $this->code = $code;
-        $this->signalableCommand = $code instanceof SignalableCommandInterface ? $code : null;
         $this->invokable = new \ReflectionFunction($this->getClosure($code));
+
+        // the container wraps the service in a closure; a closure bound to the command itself must not handle its signals
+        $code = $this->invokable->getClosureThis();
+        $this->signalableCommand = $code instanceof SignalableCommandInterface && !$code instanceof Command ? $code : null;
     }
 
     /**

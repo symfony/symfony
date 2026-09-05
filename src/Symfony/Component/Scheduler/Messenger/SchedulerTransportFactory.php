@@ -28,6 +28,7 @@ class SchedulerTransportFactory implements TransportFactoryInterface
     public function __construct(
         private readonly ContainerInterface $scheduleProviders,
         private readonly ClockInterface $clock = new Clock(),
+        private readonly bool $useMessengerRouting = false,
     ) {
     }
 
@@ -46,7 +47,7 @@ class SchedulerTransportFactory implements TransportFactoryInterface
         /** @var ScheduleProviderInterface $scheduleProvider */
         $scheduleProvider = $this->scheduleProviders->get($scheduleName);
 
-        return new SchedulerTransport(new MessageGenerator($scheduleProvider, $scheduleName, $this->clock));
+        return new SchedulerTransport(new MessageGenerator($scheduleProvider, $scheduleName, $this->clock), $this->useMessengerRouting);
     }
 
     public function supports(string $dsn, array $options): bool

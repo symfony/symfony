@@ -2102,6 +2102,12 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('scheduler')
                     ->info('Scheduler configuration')
                     ->{$enableIfStandalone('symfony/scheduler', Schedule::class)}()
+                    ->children()
+                        ->booleanNode('use_messenger_routing')
+                            ->defaultNull()
+                            ->info('Whether scheduled messages are automatically wrapped in a "RedispatchMessage" so they go through the Messenger senders configured for their class instead of being handled synchronously by the scheduler worker. A "transports" option set explicitly on a task always takes precedence.')
+                        ->end()
+                    ->end()
                 ->end()
             ->end()
         ;

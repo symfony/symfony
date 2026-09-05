@@ -21,6 +21,7 @@ class SchedulerTransport implements TransportInterface
 {
     public function __construct(
         private readonly MessageGeneratorInterface $messageGenerator,
+        private readonly bool $useMessengerRouting = false,
     ) {
     }
 
@@ -32,7 +33,9 @@ class SchedulerTransport implements TransportInterface
         foreach ($this->messageGenerator->getMessages() as $context => $message) {
             $stamp = new ScheduledStamp($context);
 
-            if ($message instanceof RedispatchMessage) {
+            if ($this->useMessengerRouting && !$message instanceof RedispatchMessage) {
+                $message = new RedispatchMessage(Envelope::wrap($message, [$stamp]));
+            } elseif ($message instanceof RedispatchMessage) {
                 $message = new RedispatchMessage(
                     Envelope::wrap($message->envelope, [$stamp]),
                     $message->transportNames,

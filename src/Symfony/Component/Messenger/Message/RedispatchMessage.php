@@ -29,7 +29,12 @@ final class RedispatchMessage implements \Stringable
     public function __toString(): string
     {
         $message = $this->envelope instanceof Envelope ? $this->envelope->getMessage() : $this->envelope;
+        $description = $message instanceof \Stringable ? (string) $message : $message::class;
 
-        return \sprintf('%s via %s', $message instanceof \Stringable ? (string) $message : $message::class, implode(', ', (array) $this->transportNames));
+        if (!$transportNames = array_filter((array) $this->transportNames)) {
+            return $description;
+        }
+
+        return \sprintf('%s via %s', $description, implode(', ', $transportNames));
     }
 }

@@ -1287,6 +1287,32 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertFalse($container->hasDefinition('messenger.listener.reset_services'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacySchedulerUseMessengerRoutingNotSet()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+
+        $container = $this->createContainerFromFile('scheduler_use_messenger_routing_legacy');
+
+        $this->assertFalse($container->getParameter('.scheduler.use_messenger_routing'));
+    }
+
+    public function testSchedulerUseMessengerRoutingRejectsEnvVar()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%"). Set a static boolean instead.');
+
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', [
+                'messenger' => true,
+                'scheduler' => [
+                    'use_messenger_routing' => '%env(bool:SCHEDULER_USE_MESSENGER_ROUTING)%',
+                ],
+            ]);
+        });
+    }
+
     public function testMessengerMultipleFailureTransports()
     {
         $container = $this->createContainerFromFile('messenger_multiple_failure_transports', [], true, false);

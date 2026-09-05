@@ -1438,6 +1438,7 @@ class ConfigurationTest extends TestCase
             ],
             'scheduler' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(SchedulerTransportFactory::class),
+                'use_messenger_routing' => null,
             ],
             'exceptions' => [],
             'webhook' => [

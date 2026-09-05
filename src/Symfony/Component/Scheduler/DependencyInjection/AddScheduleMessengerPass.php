@@ -36,6 +36,8 @@ class AddScheduleMessengerPass implements CompilerPassInterface
             $container->removeDefinition('scheduler.event_listener');
         }
 
+        $useMessengerRouting = $container->hasParameter('.scheduler.use_messenger_routing') && $container->getParameter('.scheduler.use_messenger_routing');
+
         $receivers = [];
         foreach ($container->findTaggedServiceIds('messenger.receiver') as $serviceId => $tags) {
             $receivers[$serviceId] = true;
@@ -107,6 +109,8 @@ class AddScheduleMessengerPass implements CompilerPassInterface
 
                 if ($tagAttributes['transports'] ?? null) {
                     $message = new Definition(RedispatchMessage::class, [$message, $tagAttributes['transports']]);
+                } elseif ($useMessengerRouting) {
+                    $message = new Definition(RedispatchMessage::class, [$message]);
                 }
 
                 $taskArguments = [

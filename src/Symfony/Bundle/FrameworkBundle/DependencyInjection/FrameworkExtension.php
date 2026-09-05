@@ -590,7 +590,7 @@ class FrameworkExtension extends Extension
             if (!$messengerEnabled) {
                 throw new LogicException('Scheduler support cannot be enabled as the Messenger component is not '.(interface_exists(MessageBusInterface::class) ? 'enabled.' : 'installed. Try running "composer require symfony/messenger".'));
             }
-            $this->registerSchedulerConfiguration($container, $loader);
+            $this->registerSchedulerConfiguration($config['scheduler'], $container, $loader);
         } else {
             $container->removeDefinition('cache.scheduler');
             $container->removeDefinition('console.command.scheduler_debug');
@@ -2458,7 +2458,7 @@ class FrameworkExtension extends Extension
         }
     }
 
-    private function registerSchedulerConfiguration(ContainerBuilder $container, PhpFileLoader $loader): void
+    private function registerSchedulerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader): void
     {
         if (!class_exists(SchedulerTransportFactory::class)) {
             throw new LogicException('Scheduler support cannot be enabled as the Scheduler component is not installed. Try running "composer require symfony/scheduler".');
@@ -2469,6 +2469,25 @@ class FrameworkExtension extends Extension
         if (!$this->hasConsole()) {
             $container->removeDefinition('console.command.scheduler_debug');
         }
+
+        if (null === $config['use_messenger_routing']) {
+            trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.scheduler.use_messenger_routing" configuration option is deprecated, it will default to "true" in version 9.0.');
+        }
+
+        $useMessengerRouting = $config['use_messenger_routing'] ?? false;
+
+        if (\is_string($useMessengerRouting)) {
+            $usedEnvs = [];
+            $container->resolveEnvPlaceholders($useMessengerRouting, null, $usedEnvs);
+
+            if ($usedEnvs) {
+                throw new InvalidArgumentException(\sprintf('The "framework.scheduler.use_messenger_routing" option is consumed at compile time and cannot use env vars (got "%%env(%s)%%"). Set a static boolean instead.', implode('", "', array_keys($usedEnvs))));
+            }
+        }
+
+        // the leading dot marks it as internal: it is consumed at build time only
+        // and dropped from the compiled container by RemoveBuildParametersPass
+        $container->setParameter('.scheduler.use_messenger_routing', $useMessengerRouting);
     }
 
     private function registerMessengerConfiguration(array $config, ContainerBuilder $container, PhpFileLoader $loader, bool $validationEnabled, bool $lockEnabled): void

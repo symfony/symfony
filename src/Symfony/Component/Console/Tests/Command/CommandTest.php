@@ -514,6 +514,14 @@ class CommandTest extends TestCase
         $this->assertTrue($command->isHidden());
     }
 
+    public function testTheAttributeCannotBeOnBothTheClassAndItsInvokeMethod()
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Console\Tests\Command\AttributeOnBothCommand" class and its "__invoke()" method cannot both have the "Symfony\Component\Console\Attribute\AsCommand" attribute.');
+
+        new Command(code: new AttributeOnBothCommand());
+    }
+
     public function testMethodCommandNameMustNotRepeatTheClassLevelName()
     {
         $this->expectException(LogicException::class);
@@ -603,6 +611,16 @@ class HiddenGroupCommands
 {
     #[AsCommand(name: 'one')]
     public function one(): int
+    {
+        return Command::SUCCESS;
+    }
+}
+
+#[AsCommand(name: 'both')]
+class AttributeOnBothCommand
+{
+    #[AsCommand(name: 'both-invoke')]
+    public function __invoke(): int
     {
         return Command::SUCCESS;
     }

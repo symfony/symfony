@@ -214,14 +214,18 @@ class AddConsoleCommandPass implements CompilerPassInterface
     private function getCommandAttribute(\ReflectionClass|\ReflectionMethod $reflection): ?AsCommand
     {
         /** @var AsCommand|null $attribute */
-        if ($attribute = ($reflection->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()) {
-            return $attribute;
-        }
+        $attribute = ($reflection->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
 
         if ($reflection instanceof \ReflectionMethod && '__invoke' === $reflection->getName()) {
-            return ($reflection->getDeclaringClass()->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+            $classAttribute = $reflection->getDeclaringClass()->getAttributes(AsCommand::class)[0] ?? null;
+
+            if ($attribute && $classAttribute) {
+                throw new InvalidArgumentException(\sprintf('The "%s" class and its "__invoke()" method cannot both have the "%s" attribute.', $reflection->class, AsCommand::class));
+            }
+
+            $attribute ??= $classAttribute?->newInstance();
         }
 
-        return null;
+        return $attribute;
     }
 }

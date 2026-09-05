@@ -556,27 +556,27 @@
             </trans-unit>
             <trans-unit id="143">
                 <source>This value is not valid XML.</source>
-                <target state="needs-review-translation">Aquest valor no és un XML vàlid.</target>
+                <target>Aquest valor no és un XML vàlid.</target>
             </trans-unit>
             <trans-unit id="144">
                 <source>This value does not conform to the expected XSD schema.</source>
-                <target state="needs-review-translation">Aquest valor no s'ajusta a l'esquema XSD esperat.</target>
+                <target>Aquest valor no s'ajusta a l'esquema XSD esperat.</target>
             </trans-unit>
             <trans-unit id="145">
                 <source>This XML payload is too large ({{ size }} bytes): it exceeds the limit of {{ limit }} bytes.</source>
-                <target state="needs-review-translation">Aquesta càrrega XML és massa gran ({{ size }} bytes): supera el límit de {{ limit }} bytes.</target>
+                <target>Aquesta càrrega XML és massa gran ({{ size }} bytes): supera el límit de {{ limit }} bytes.</target>
             </trans-unit>
             <trans-unit id="146">
                 <source>This value is not a valid cron expression.</source>
-                <target state="needs-review-translation">Aquest valor no és una expressió cron vàlida.</target>
+                <target>Aquest valor no és una expressió cron vàlida.</target>
             </trans-unit>
             <trans-unit id="147">
                 <source>The referenced entity does not exist.</source>
-                <target state="needs-review-translation">L'entitat referenciada no existeix.</target>
+                <target>L'entitat referenciada no existeix.</target>
             </trans-unit>
             <trans-unit id="148" resname="This is not a valid ULID.">
                 <source>This value is not a valid ULID.</source>
-                <target state="needs-review-translation">Aquest valor no és un ULID vàlid.</target>
+                <target>Aquest valor no és un ULID vàlid.</target>
             </trans-unit>
         </body>
     </file>

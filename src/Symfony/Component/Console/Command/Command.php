@@ -732,10 +732,16 @@ class Command implements SignalableCommandInterface
         /** @var AsCommand|null $attribute */
         $attribute = ($reflection->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
 
-        if (!$attribute && '__invoke' === $reflection->getName()) {
+        if ('__invoke' === $reflection->getName()) {
+            $classAttribute = $class->getAttributes(AsCommand::class)[0] ?? null;
+
+            if ($attribute && $classAttribute) {
+                throw new LogicException(\sprintf('The "%s" class and its "__invoke()" method cannot both have the "%s" attribute.', $class->getName(), AsCommand::class));
+            }
+
             /** @var AsCommand|null $attribute */
-            $attribute = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-        } elseif ($attribute && '__invoke' !== $reflection->getName() && $prefix = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()->name) {
+            $attribute ??= $classAttribute?->newInstance();
+        } elseif ($attribute && $prefix = ($class->getAttributes(AsCommand::class)[0] ?? null)?->newInstance()->name) {
             // the class-level name prefixes the names declared on methods
             $hidden = str_starts_with($prefix, '|');
             if ($prefix = explode('|', ltrim($prefix, '|'))[0]) {

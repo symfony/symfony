@@ -312,6 +312,21 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertTrue($loader->get('hidden-group:two')->isHidden());
     }
 
+    public function testProcessRejectsTheAttributeOnBothTheClassAndItsInvokeMethod()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(AttributeOnBothCommand::class);
+        $definition->addTag('console.command');
+        $definition->addTag('console.command', ['method' => '__invoke']);
+        $container->setDefinition(AttributeOnBothCommand::class, $definition);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "Symfony\Component\Console\Tests\DependencyInjection\AttributeOnBothCommand" class and its "__invoke()" method cannot both have the "Symfony\Component\Console\Attribute\AsCommand" attribute.');
+
+        new AddConsoleCommandPass()->process($container);
+    }
+
     public function testProcessRejectsAMethodCommandRepeatingTheClassLevelName()
     {
         $container = new ContainerBuilder();
@@ -540,6 +555,16 @@ class HiddenGroupCommands
 
     #[AsCommand(name: 'two', hidden: true)]
     public function two(): int
+    {
+        return Command::SUCCESS;
+    }
+}
+
+#[AsCommand(name: 'both')]
+class AttributeOnBothCommand
+{
+    #[AsCommand(name: 'both-invoke')]
+    public function __invoke(): int
     {
         return Command::SUCCESS;
     }

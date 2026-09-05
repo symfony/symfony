@@ -1,0 +1,5 @@
+framework:
+    asset_mapper:
+        paths: ['assets/']
+        metadata_dir: '%kernel.build_dir%/asset_mapper'
+    assets: false

@@ -40,6 +40,10 @@ class AssetMapperTestAppKernel extends Kernel
                 'public_prefix' => 'assets',
             ];
 
+            if (Kernel::VERSION_ID >= 80200) {
+                $assetMapper['metadata_dir'] = '%kernel.project_dir%/public/assets';
+            }
+
             if ('reachable_entries' === $this->getEnvironment()) {
                 $assetMapper['importmap_entries'] = 'reachable';
             }

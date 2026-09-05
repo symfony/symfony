@@ -1518,8 +1518,18 @@ class FrameworkExtension extends Extension
             ->setArgument(0, $publicDirectory)
         ;
 
+        if (null === $metadataDir = $config['metadata_dir']) {
+            // Only nag applications that actually map assets: with no path declared, nothing is
+            // ever compiled, so there is no metadata to place and nothing to decide.
+            if ($paths) {
+                trigger_deprecation('symfony/framework-bundle', '8.2', 'Not setting the "framework.asset_mapper.metadata_dir" configuration option is deprecated. Set it explicitly: it currently defaults to the public assets directory, and will default to "%s" in 9.0.', '%kernel.build_dir%/asset_mapper');
+            }
+
+            $metadataDir = $publicAssetsDirectory;
+        }
+
         $container->getDefinition('asset_mapper.compiled_asset_mapper_config_reader')
-            ->setArgument(0, $publicAssetsDirectory);
+            ->setArgument(0, $metadataDir);
 
         if (!$config['server']) {
             $container->removeDefinition('asset_mapper.dev_server_subscriber');

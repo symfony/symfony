@@ -34,12 +34,16 @@ class ImportMapTestAppKernel extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
         $loader->load(static function (ContainerBuilder $container) {
+            $assetMapperConfig = ['paths' => ['assets']];
+
+            if (Kernel::VERSION_ID >= 80200) {
+                $assetMapperConfig['metadata_dir'] = '%kernel.project_dir%/public/assets';
+            }
+
             $container->loadFromExtension('framework', [
                 'http_client' => true,
                 'assets' => null,
-                'asset_mapper' => [
-                    'paths' => ['assets'],
-                ],
+                'asset_mapper' => $assetMapperConfig,
                 'test' => true,
             ]);
         });

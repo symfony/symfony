@@ -26,7 +26,9 @@ CHANGELOG
  * Add `framework.messenger.reject_redelivered_messages` to allow disabling the `RejectRedeliveredMessageMiddleware`
  * Add `uri_signer.expiration` option that allows configuring the default URI signer expiration
  * Add `--dispatchers` option to `debug:event-dispatcher` command
+ * Add `framework.asset_mapper.metadata_dir` option to choose where `asset-map:compile` writes its metadata
  * Deprecate the `framework.ide` config option, use the `SYMFONY_IDE` env var instead
+ * Deprecate not setting `framework.asset_mapper.metadata_dir`; it will default to `%kernel.build_dir%/asset_mapper` in 9.0
  * Allow prefixing entries with `!` in `framework.workflows.<name>.events_to_dispatch` to permanently disable an event; e.g. `events_to_dispatch: ['!workflow.announce']` fires every event except `workflow.announce`. The GuardEvent can never be disabled; `!workflow.guard` is rejected at config compile time. Mixing allow-list and block-list entries in the same list is rejected at config compile time too.
  * Add support for the HttpClient `max_connect_duration` option to the `http_client` configuration
  * Report `.env` variables that the container never uses in `debug:container --env-vars`

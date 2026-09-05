@@ -25,6 +25,7 @@ class PropertyAccessorBuilder
     private int $magicMethods = PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET;
     private bool $throwExceptionOnInvalidIndex = false;
     private bool $throwExceptionOnInvalidPropertyPath = true;
+    private bool $wildcardReads = false;
     private ?CacheItemPoolInterface $cacheItemPool = null;
     private ?PropertyReadInfoExtractorInterface $readInfoExtractor = null;
     private ?PropertyWriteInfoExtractorInterface $writeInfoExtractor = null;
@@ -222,6 +223,41 @@ class PropertyAccessorBuilder
     }
 
     /**
+     * Enables reading every element of a collection through a "[*]" wildcard.
+     *
+     * With wildcards enabled, "[\*]" reads the literal "*" index and writing through
+     * a path holding a wildcard throws.
+     *
+     * @return $this
+     */
+    public function enableWildcardReads(): static
+    {
+        $this->wildcardReads = true;
+
+        return $this;
+    }
+
+    /**
+     * Disables the "[*]" wildcard, making it read the literal "*" index.
+     *
+     * @return $this
+     */
+    public function disableWildcardReads(): static
+    {
+        $this->wildcardReads = false;
+
+        return $this;
+    }
+
+    /**
+     * @return bool whether "[*]" expands to every element of a collection when reading
+     */
+    public function isWildcardReadsEnabled(): bool
+    {
+        return $this->wildcardReads;
+    }
+
+    /**
      * Sets a cache system.
      *
      * @return $this
@@ -286,6 +322,6 @@ class PropertyAccessorBuilder
             $throw |= PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH;
         }
 
-        return new PropertyAccessor($this->magicMethods, $throw, $this->cacheItemPool, $this->readInfoExtractor, $this->writeInfoExtractor);
+        return new PropertyAccessor($this->magicMethods, $throw, $this->cacheItemPool, $this->readInfoExtractor, $this->writeInfoExtractor, $this->wildcardReads);
     }
 }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Input;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
@@ -20,6 +21,88 @@ use Symfony\Component\Console\Input\InputOption;
 
 class ArrayInputTest extends TestCase
 {
+    public function testGetUnparsedTokens()
+    {
+        $definition = new InputDefinition([new InputArgument('command', InputArgument::REQUIRED), new InputOption('verbose', 'v', InputOption::VALUE_NONE)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArrayInput(['command' => 'docker', '--verbose' => true, 'compose', '--file' => 'app.yaml', 'up']);
+        $input->bind($definition);
+
+        $this->assertSame('docker', $input->getArgument('command'));
+        $this->assertTrue($input->getOption('verbose'));
+        $this->assertSame(['compose', '--file=app.yaml', 'up'], $input->getUnparsedTokens());
+    }
+
+    public function testGetUnparsedTokensFillsPositionalParametersInOrder()
+    {
+        $definition = new InputDefinition([new InputArgument('command', InputArgument::REQUIRED)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArrayInput(['docker', 'compose', 'up']);
+        $input->bind($definition);
+
+        $this->assertSame('docker', $input->getArgument('command'));
+        $this->assertSame(['compose', 'up'], $input->getUnparsedTokens());
+    }
+
+    public function testGetUnparsedTokensStartAtAPositionalDoubleDash()
+    {
+        $definition = new InputDefinition([new InputArgument('command'), new InputArgument('name', InputArgument::OPTIONAL)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArrayInput(['deploy', '--', 'prod']);
+        $input->bind($definition);
+
+        $this->assertSame(['command' => 'deploy', 'name' => null], $input->getArguments());
+        $this->assertSame(['--', 'prod'], $input->getUnparsedTokens());
+    }
+
+    public function testPositionalParametersFillTheFirstFreeArgument()
+    {
+        $definition = new InputDefinition([new InputArgument('command'), new InputArgument('command_name', InputArgument::OPTIONAL)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArrayInput(['command_name' => 'docker', 'help']);
+        $input->bind($definition);
+
+        $this->assertSame(['command' => 'help', 'command_name' => 'docker'], $input->getArguments());
+        $this->assertSame([], $input->getUnparsedTokens());
+    }
+
+    public function testPositionalParametersAppendToAnArrayArgument()
+    {
+        $definition = new InputDefinition([new InputArgument('names', InputArgument::IS_ARRAY)]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArrayInput(['a', 'b', 'c']);
+        $input->bind($definition);
+
+        $this->assertSame(['a', 'b', 'c'], $input->getArgument('names'));
+        $this->assertSame([], $input->getUnparsedTokens());
+    }
+
+    public function testGetUnparsedTokensIsEmptyWhenEverythingParses()
+    {
+        $definition = new InputDefinition([new InputArgument('name')]);
+        $definition->setIgnoreExtraArguments(true);
+
+        $input = new ArrayInput(['name' => 'foo']);
+        $input->bind($definition);
+
+        $this->assertSame([], $input->getUnparsedTokens());
+    }
+
+    public function testIgnoreExtraArgumentsDoesNotIgnoreUnknownOptions()
+    {
+        $definition = new InputDefinition();
+        $definition->setIgnoreExtraArguments(true);
+
+        $this->expectException(InvalidOptionException::class);
+
+        (new ArrayInput(['--nope' => 1]))->bind($definition);
+    }
+
     public function testGetFirstArgument()
     {
         $input = new ArrayInput([]);
@@ -63,6 +146,30 @@ class ArrayInputTest extends TestCase
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name')]));
 
         $this->assertSame(['name' => 'foo'], $input->getArguments(), '->parse() parses required arguments');
+    }
+
+    public function testPositionalParametersFillTheArgumentSlots()
+    {
+        $definition = new InputDefinition([new InputArgument('command'), new InputArgument('name', InputArgument::OPTIONAL), new InputArgument('names', InputArgument::IS_ARRAY)]);
+
+        $input = new ArrayInput(['foo', 'bar', 'a', 'b'], $definition);
+        $this->assertSame(['command' => 'foo', 'name' => 'bar', 'names' => ['a', 'b']], $input->getArguments());
+
+        $input = new ArrayInput(['command' => 'foo', 'bar'], $definition);
+        $this->assertSame(['command' => 'foo', 'name' => 'bar', 'names' => []], $input->getArguments());
+
+        $input = new ArrayInput(['name' => 'bar', 'foo', 'a'], $definition);
+        $this->assertSame(['command' => 'foo', 'name' => 'bar', 'names' => ['a']], $input->getArguments());
+
+        $input = new ArrayInput(['name' => 'foo', 'bar'], new InputDefinition([new InputArgument('name')]));
+        $this->assertSame(['name' => 'foo'], $input->getArguments(), 'a positional value without a free slot is ignored when its index is in range');
+    }
+
+    public function testAPositionalDoubleDashIsSkipped()
+    {
+        $input = new ArrayInput(['--', 'foo'], new InputDefinition([new InputArgument('name')]));
+
+        $this->assertSame(['name' => 'foo'], $input->getArguments());
     }
 
     #[DataProvider('provideOptions')]
@@ -137,6 +244,11 @@ class ArrayInputTest extends TestCase
                 ['foo' => 'foo'],
                 new InputDefinition([new InputArgument('name')]),
                 'The "foo" argument does not exist.',
+            ],
+            [
+                ['foo', 'bar'],
+                new InputDefinition([new InputArgument('name')]),
+                'The "1" argument does not exist.',
             ],
             [
                 ['--foo' => null],

@@ -76,8 +76,8 @@ use Symfony\Contracts\Service\ResetInterface;
 class Application implements ResetInterface
 {
     private array $commands = [];
-    private bool $wantHelps = false;
     private ?Command $runningCommand = null;
+    private ?CommandChain $commandChain = null;
     private ?CommandLoaderInterface $commandLoader = null;
     private bool $catchExceptions = true;
     private bool $catchErrors = false;
@@ -118,6 +118,15 @@ class Application implements ResetInterface
     public function getDispatcher(): ?EventDispatcherInterface
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Returns the commands resolved for the current invocation and their bound
+     * inputs, or null when no command is running.
+     */
+    public function getCommandChain(): ?CommandChain
+    {
+        return $this->commandChain;
     }
 
     /**
@@ -295,12 +304,13 @@ class Application implements ResetInterface
         }
 
         $name = $this->getCommandName($input);
+        $wantHelps = false;
         if ($input->hasParameterOption(['--help', '-h'], true)) {
             if (!$name) {
                 $name = 'help';
                 $input = new ArrayInput(['command_name' => $this->defaultCommand]);
             } else {
-                $this->wantHelps = true;
+                $wantHelps = true;
             }
         }
 
@@ -320,7 +330,11 @@ class Application implements ResetInterface
             // the command name MUST be the first element of the input
             $command = $this->find($name);
         } catch (\Throwable $e) {
-            if (($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) && 1 === \count($alternatives = $e->getAlternatives()) && $input->isInteractive()) {
+            if ($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException && ($input instanceof ArgvInput || $input instanceof ArrayInput) && $this->getTreeDescendants($name)) {
+                // the name is a namespace: an implicit node roots the walk, and lists when invoked bare
+                $command = new Command($name);
+                $command->setApplication($this);
+            } elseif (($e instanceof CommandNotFoundException && !$e instanceof NamespaceNotFoundException) && 1 === \count($alternatives = $e->getAlternatives()) && $input->isInteractive()) {
                 $alternative = $alternatives[0];
 
                 $style = new SymfonyStyle($input, $output);
@@ -375,9 +389,47 @@ class Application implements ResetInterface
             $command = $command->getCommand();
         }
 
+        $chain = null;
+        if ($input instanceof ArgvInput || $input instanceof ArrayInput) {
+            try {
+                $resolved = $this->resolveCommandTree($command, $input);
+            } catch (CommandNotFoundException $e) {
+                if (null !== $this->dispatcher) {
+                    $event = new ConsoleErrorEvent($input, $output, $e);
+                    $this->dispatcher->dispatch($event, ConsoleEvents::ERROR);
+
+                    if (0 === $event->getExitCode()) {
+                        return 0;
+                    }
+
+                    $e = $event->getError();
+                }
+
+                throw $e;
+            }
+
+            if ($resolved) {
+                [$command, $input, $chain] = $resolved;
+            }
+        }
+
+        if ($wantHelps) {
+            $helpCommand = $this->get('help');
+            if ($helpCommand instanceof LazyCommand) {
+                $helpCommand = $helpCommand->getCommand();
+            }
+            if ($helpCommand instanceof HelpCommand) {
+                $helpCommand->setCommand($command);
+            }
+            $command = $helpCommand;
+        }
+
+        $previousChain = $this->commandChain;
         $this->runningCommand = $command;
+        $this->commandChain = $chain ?? new CommandChain([[$command, $input]]);
         $exitCode = $this->doRunCommand($command, $input, $output);
         $this->runningCommand = null;
+        $this->commandChain = $previousChain;
 
         return $exitCode;
     }
@@ -642,15 +694,6 @@ class Application implements ResetInterface
 
         $command = $this->commands[$name];
 
-        if ($this->wantHelps) {
-            $this->wantHelps = false;
-
-            $helpCommand = $this->get('help');
-            $helpCommand->setCommand($command);
-
-            return $helpCommand;
-        }
-
         return $command;
     }
 
@@ -772,14 +815,10 @@ class Application implements ResetInterface
             $message = \sprintf('Command "%s" is not defined.', $name);
 
             if ($alternatives = $this->findAlternatives($name, $allCommands)) {
-                $wantHelps = $this->wantHelps;
-                $this->wantHelps = false;
-
                 // remove hidden commands
                 if ($alternatives = array_filter($alternatives, fn ($name) => !$this->get($name)->isHidden())) {
                     $message .= \sprintf("\n\nDid you mean %s?\n    %s", 1 === \count($alternatives) ? 'this' : 'one of these', implode("\n    ", $alternatives));
                 }
-                $this->wantHelps = $wantHelps;
             }
 
             throw new CommandNotFoundException($message, array_values($alternatives));
@@ -1417,5 +1456,181 @@ class Application implements ResetInterface
                 $this->addCommand($this->container->get($id));
             }
         }
+    }
+
+    /**
+     * Resolves a spaced sub-command invocation through the tree derived from registered names.
+     *
+     * Returns the leaf command, the input it must run with and the resolved chain,
+     * or null when the resolved command has no registered descendants and the
+     * regular, flat pipeline applies.
+     *
+     * @return array{0: Command, 1: InputInterface, 2: CommandChain}|null
+     */
+    private function resolveCommandTree(Command $command, ArgvInput|ArrayInput $input): ?array
+    {
+        $path = $command->getName();
+        if ($this->singleCommand || !$path || !$this->getTreeDescendants($path)) {
+            return null;
+        }
+
+        $tokens = $input instanceof ArgvInput ? $input->getRawTokens() : null;
+        $node = $this->has($path) ? $command : null;
+        $isRoot = true;
+        $applicationOptions = [];
+        $levels = [];
+
+        while (true) {
+            $definition = new InputDefinition();
+            if ($node) {
+                $definition->setOptions($node->getNativeDefinition()->getOptions());
+                $definition->addOptions($this->getDefinition()->getOptions());
+            } else {
+                $definition->setOptions($this->getDefinition()->getOptions());
+            }
+            if ($isRoot) {
+                $definition->setArguments($this->getDefinition()->getArguments());
+            }
+            $definition->setIgnoreExtraArguments(true);
+
+            $levelInput = null === $tokens ? clone $input : new ArgvInput(['', ...$tokens]);
+            $levelInput->bind($definition);
+            $unparsed = $levelInput->getUnparsedTokens();
+            $consumed = null === $tokens ? [] : \array_slice($tokens, 0, \count($tokens) - \count($unparsed));
+
+            if (!$unparsed || '--' === end($consumed) || '--' === $unparsed[0]) {
+                // no sub-command given, or "--" marked the remaining tokens as this node's own arguments
+                break;
+            }
+
+            $segment = array_shift($unparsed);
+            $childPath = $path.':'.$segment;
+            // an alias of the current node is not a sub-command
+            $has = $this->has($childPath) && $this->get($childPath)->getName() !== $path;
+
+            if (!$has && !$this->getTreeDescendants($childPath)) {
+                if (!$node?->getNativeDefinition()->getArguments()) {
+                    throw $this->createUnknownSegmentException($segment, $path);
+                }
+
+                // the segment names no sub-command: it starts the node's own arguments
+                break;
+            }
+
+            $applicationOptions = [...$applicationOptions, ...$this->getApplicationOptionTokens($levelInput)];
+            if ($node) {
+                $levels[] = [$node instanceof LazyCommand ? $node->getCommand() : $node, $levelInput];
+            }
+
+            if ($has) {
+                $node = $this->get($childPath);
+                $childPath = $node->getName();
+            } else {
+                $node = null;
+            }
+
+            $path = $childPath;
+            $tokens = $unparsed;
+            $isRoot = false;
+
+            if ($has && !$this->getTreeDescendants($childPath)) {
+                break;
+            }
+        }
+
+        if ($isRoot) {
+            return null;
+        }
+
+        if ($this->has($path)) {
+            $command = $this->get($path);
+            if ($command instanceof LazyCommand) {
+                $command = $command->getCommand();
+            }
+        } else {
+            // implicit node: no command is registered at this level, its default behavior applies
+            $command = new Command($path);
+            $command->setApplication($this);
+        }
+
+        $leafInput = new ArgvInput(['', $path, ...$applicationOptions, ...$tokens]);
+        $leafInput->setInteractive($input->isInteractive());
+        if (\is_resource($stream = $input->getStream())) {
+            $leafInput->setStream($stream);
+        }
+
+        $levels[] = [$command, $leafInput];
+
+        return [$command, $leafInput, new CommandChain($levels)];
+    }
+
+    /**
+     * Lists the registered command names below the given path, "$path:" excluded.
+     *
+     * @return list<string>
+     */
+    private function getTreeDescendants(string $path): array
+    {
+        $names = array_keys($this->commands);
+        if ($this->commandLoader) {
+            $names = array_merge($names, $this->commandLoader->getNames());
+        }
+
+        $prefix = $path.':';
+        $descendants = [];
+        foreach ($names as $name) {
+            if (str_starts_with($name, $prefix) && $prefix !== $name && (!isset($this->commands[$name]) || $this->commands[$name]->getName() !== $path)) {
+                $descendants[] = $name;
+            }
+        }
+
+        return $descendants;
+    }
+
+    private function createUnknownSegmentException(string $segment, string $path): CommandNotFoundException
+    {
+        $message = \sprintf('There is no command "%s" under "%s".', $segment, str_replace(':', ' ', $path));
+
+        $children = [];
+        $prefixLength = \strlen($path) + 1;
+        foreach ($this->getTreeDescendants($path) as $name) {
+            $childSegment = explode(':', substr($name, $prefixLength))[0];
+            $children[$childSegment] = $path.':'.$childSegment;
+        }
+
+        $alternatives = array_values(array_intersect_key($children, array_flip($this->findAlternatives($segment, array_keys($children)))));
+        if ($alternatives) {
+            $message .= \sprintf("\n\nDid you mean one of these?\n    %s", implode("\n    ", $alternatives));
+        }
+
+        return new CommandNotFoundException($message, $alternatives);
+    }
+
+    /**
+     * Re-emits the application options bound at a tree level as tokens, so that the leaf input carries them too.
+     *
+     * @return list<string>
+     */
+    private function getApplicationOptionTokens(InputInterface $input): array
+    {
+        $tokens = [];
+        foreach ($this->getDefinition()->getOptions() as $option) {
+            $name = $option->getName();
+            if (($value = $input->getOption($name)) === $option->getDefault()) {
+                continue;
+            }
+
+            if (!$option->acceptValue()) {
+                $tokens[] = $value ? '--'.$name : '--no-'.$name;
+            } elseif (null === $value) {
+                $tokens[] = '--'.$name;
+            } else {
+                foreach ((array) $value as $v) {
+                    $tokens[] = '--'.$name.'='.$v;
+                }
+            }
+        }
+
+        return $tokens;
     }
 }

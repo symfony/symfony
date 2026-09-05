@@ -400,13 +400,11 @@ class ApplicationTest extends TestCase
         $this->assertEquals($foo, $application->get('afoobar'), '->get() returns a command by alias');
 
         $application = new Application();
-        $application->addCommand($foo = new \FooCommand());
-        // simulate --help
-        $r = new \ReflectionObject($application);
-        $p = $r->getProperty('wantHelps');
-        $p->setValue($application, true);
-        $command = $application->get('foo:bar');
-        $this->assertInstanceOf(HelpCommand::class, $command, '->get() returns the help command if --help is provided as the input');
+        $application->setAutoExit(false);
+        $application->addCommand(new \FooCommand());
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'foo:bar', '--help' => true], ['decorated' => false]);
+        $this->assertStringContainsString('Display help for the given command.', $tester->getDisplay(), 'the help command runs if --help is provided as the input');
     }
 
     public function testHasGetWithCommandLoader()

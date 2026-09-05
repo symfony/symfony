@@ -19,6 +19,7 @@ use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\ExceptionInterface;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
+use Symfony\Component\Console\Helper\DescriptorHelper;
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Symfony\Component\Console\Helper\HelperInterface;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -188,6 +189,13 @@ class Command implements SignalableCommandInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (null !== $this->name && ($application = $this->getApplication()) && $application->all($this->name)) {
+            // a command with sub-commands and no code of its own lists them, like a bare namespace
+            (new DescriptorHelper())->describe($output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output, $application, ['namespace' => $this->name]);
+
+            return 1;
+        }
+
         throw new LogicException('You must override the execute() method in the concrete command class.');
     }
 
@@ -356,6 +364,7 @@ class Command implements SignalableCommandInterface
         $this->fullDefinition = new InputDefinition();
         $this->fullDefinition->setOptions($this->definition->getOptions());
         $this->fullDefinition->addOptions($this->application->getDefinition()->getOptions());
+        $this->fullDefinition->setIgnoreExtraArguments($this->definition->ignoresExtraArguments());
 
         if ($mergeArgs) {
             $this->fullDefinition->setArguments($this->application->getDefinition()->getArguments());

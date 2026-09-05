@@ -13,12 +13,21 @@ namespace Symfony\Component\Console\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
+use Symfony\Component\Console\CommandChain;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Tests\Fixtures\MethodBasedTestCommand;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -26,6 +35,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 
@@ -284,11 +294,47 @@ class AddConsoleCommandPassTest extends TestCase
         /** @var ContainerCommandLoader $loader */
         $loader = $container->get('console.command_loader');
 
-        $this->assertSame(['group:one', 'group:1', 'group:sub:two', 'group:tagged', 'group:t'], $loader->getNames());
-        $this->assertFalse($container->has(GroupedCommands::class.'.command'), 'A class-level attribute without __invoke() only names the prefix.');
+        $this->assertSame(['group', 'group:one', 'group:1', 'group:sub:two', 'group:tagged', 'group:t'], $loader->getNames());
+        $this->assertTrue($container->has(GroupedCommands::class.'.command'), 'A class-level attribute without __invoke() registers the group command.');
         $this->assertTrue($loader->get('group:one')->isHidden());
         $this->assertSame(['group:1'], $loader->get('group:one')->getAliases());
         $this->assertSame('Sub two', $loader->get('group:sub:two')->getDescription());
+
+        $group = $loader->get('group');
+        $this->assertSame('A group without code of its own', $group->getDescription());
+        $option = $group->getDefinition()->getOption('context');
+        $this->assertSame('c', $option->getShortcut());
+        $this->assertTrue($option->isValueRequired());
+        $this->assertSame('default', $option->getDefault());
+        $suggestions = new CompletionSuggestions();
+        $option->complete(CompletionInput::fromTokens([], 0), $suggestions);
+        $this->assertSame(['a', 'b'], array_map(static fn (Suggestion $s) => $s->getValue(), $suggestions->getValueSuggestions()));
+        $this->assertSame('B', $suggestions->getValueSuggestions()[1]->getDescription());
+        $this->assertStringContainsString("'context'", new PhpDumper($container)->dump(), 'The listed options are dumped as scalars.');
+    }
+
+    public function testProcessedGroupRunsAsACommandTree()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(DockerCommands::class);
+        $definition->addTag('console.command');
+        $definition->addTag('console.command', ['method' => 'up']);
+        $container->setDefinition(DockerCommands::class, $definition);
+
+        new AddConsoleCommandPass()->process($container);
+        $container->compile();
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCommandLoader($container->get('console.command_loader'));
+
+        $output = new BufferedOutput();
+        $this->assertSame(0, $application->run(new ArgvInput(['cli.php', 'docker', '-c', 'prod', 'compose', 'up']), $output));
+        $this->assertSame('prod', $output->fetch());
+
+        $this->assertSame(1, $application->run(new ArgvInput(['cli.php', 'docker']), $output));
+        $this->assertStringContainsString('docker:compose:up', $output->fetch());
     }
 
     public function testProcessHidesTheMethodCommandsOfAHiddenClassLevelName()
@@ -307,7 +353,8 @@ class AddConsoleCommandPassTest extends TestCase
         /** @var ContainerCommandLoader $loader */
         $loader = $container->get('console.command_loader');
 
-        $this->assertSame(['hidden-group:one', 'hidden-group:two'], $loader->getNames());
+        $this->assertSame(['hidden-group', 'hidden-group:one', 'hidden-group:two'], $loader->getNames());
+        $this->assertTrue($loader->get('hidden-group')->isHidden());
         $this->assertTrue($loader->get('hidden-group:one')->isHidden());
         $this->assertTrue($loader->get('hidden-group:two')->isHidden());
     }
@@ -523,7 +570,7 @@ class DescriptionWithPercentageSignsCommand
     }
 }
 
-#[AsCommand(name: 'group', description: 'A group without code of its own')]
+#[AsCommand(name: 'group', description: 'A group without code of its own', options: [new InputOption('context', 'c', InputOption::VALUE_REQUIRED, 'The context', 'default', ['a', new Suggestion('b', 'B')])])]
 class GroupedCommands
 {
     #[AsCommand(name: 'one', aliases: ['1'], hidden: true)]
@@ -540,6 +587,18 @@ class GroupedCommands
 
     public function three(): int
     {
+        return Command::SUCCESS;
+    }
+}
+
+#[AsCommand(name: 'docker', description: 'Manage containers', options: [new InputOption('context', 'c', InputOption::VALUE_REQUIRED)])]
+class DockerCommands
+{
+    #[AsCommand(name: 'compose:up')]
+    public function up(CommandChain $chain, OutputInterface $output): int
+    {
+        $output->write($chain->getInput('docker')->getOption('context'));
+
         return Command::SUCCESS;
     }
 }

@@ -15,6 +15,10 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
@@ -61,12 +65,10 @@ class AddConsoleCommandPass implements CompilerPassInterface
             }
 
             foreach ($commands as $method => $tags) {
-                if ('__invoke' === $method && 1 < \count($commands) && !$r->hasMethod('__invoke') && !$r->isSubclassOf(Command::class)) {
-                    // the class-level attribute only names the prefix of the method-level commands
-                    continue;
-                }
+                // a class-level attribute without __invoke() registers the command grouping the method-level ones
+                $group = '__invoke' === $method && 1 < \count($commands) && !$r->hasMethod('__invoke') && !$r->isSubclassOf(Command::class);
 
-                $this->registerCommand($container, $r, $id, $class, $tags, $definition, $serviceIds, $lazyCommandMap, $lazyCommandRefs, '__invoke' === $method ? null : $prefix);
+                $this->registerCommand($container, $r, $id, $class, $tags, $definition, $serviceIds, $lazyCommandMap, $lazyCommandRefs, '__invoke' === $method ? null : $prefix, $group);
             }
         }
 
@@ -79,9 +81,11 @@ class AddConsoleCommandPass implements CompilerPassInterface
         $container->setParameter('console.command.ids', $serviceIds);
     }
 
-    private function registerCommand(ContainerBuilder $container, \ReflectionClass $reflection, string $id, string $class, array $tags, Definition $definition, array &$serviceIds, array &$lazyCommandMap, array &$lazyCommandRefs, ?string $prefix = null): void
+    private function registerCommand(ContainerBuilder $container, \ReflectionClass $reflection, string $id, string $class, array $tags, Definition $definition, array &$serviceIds, array &$lazyCommandMap, array &$lazyCommandRefs, ?string $prefix = null, bool $group = false): void
     {
-        if (!$reflection->isSubclassOf(Command::class)) {
+        if ($group) {
+            $definition = $container->register($id .= '.command', $class = Command::class);
+        } elseif (!$reflection->isSubclassOf(Command::class)) {
             $method = $tags[0]['method'] ?? '__invoke';
 
             if (!$reflection->hasMethod($method)) {
@@ -182,6 +186,12 @@ class AddConsoleCommandPass implements CompilerPassInterface
 
         $definition->addMethodCall('setName', [$commandName]);
 
+        if ($group) {
+            foreach ($attribute?->options ?? [] as $option) {
+                $definition->addMethodCall('addOption', $this->getOptionCall($option));
+            }
+        }
+
         if ($aliases) {
             $definition->addMethodCall('setAliases', [$aliases]);
         }
@@ -227,5 +237,35 @@ class AddConsoleCommandPass implements CompilerPassInterface
         }
 
         return $attribute;
+    }
+
+    /**
+     * @return array{string, ?string, int, string, mixed, array}
+     */
+    private function getOptionCall(InputOption $option): array
+    {
+        $mode = ($option->acceptValue() ? ($option->isValueRequired() ? InputOption::VALUE_REQUIRED : InputOption::VALUE_OPTIONAL) : InputOption::VALUE_NONE)
+            | ($option->isArray() ? InputOption::VALUE_IS_ARRAY : 0)
+            | ($option->isNegatable() ? InputOption::VALUE_NEGATABLE : 0)
+            | ($option->isDeprecated() ? InputOption::DEPRECATED : 0)
+            | ($option->isHidden() ? InputOption::HIDDEN : 0);
+        $default = $option->acceptValue() || $option->isNegatable() ? $option->getDefault() : null;
+
+        return [$option->getName(), $option->getShortcut(), $mode, $option->getDescription(), $default, $this->getSuggestedValues($option)];
+    }
+
+    /**
+     * Turns the suggested values of an option into what the container can dump.
+     */
+    private function getSuggestedValues(InputOption $option): array
+    {
+        if (!$option->hasCompletion()) {
+            return [];
+        }
+
+        $suggestions = new CompletionSuggestions();
+        $option->complete(CompletionInput::fromTokens([], 0), $suggestions);
+
+        return array_map(static fn (Suggestion $suggestion) => '' === $suggestion->getDescription() ? $suggestion->getValue() : new Definition(Suggestion::class, [$suggestion->getValue(), $suggestion->getDescription()]), $suggestions->getValueSuggestions());
     }
 }

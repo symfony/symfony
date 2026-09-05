@@ -15,7 +15,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
@@ -583,6 +585,87 @@ class CommandTest extends TestCase
 
         $this->assertSame('define', $command->getDescription());
         $this->assertSame('define', $command->getHelp());
+    }
+
+    public function testAttributeListedOptionsComeAfterTheParameters()
+    {
+        $invokable = new #[AsCommand(name: 'foo', options: [new InputOption('flag', 'f', InputOption::VALUE_NONE, 'Flag')])] class {
+            public function __invoke(#[Argument] string $name = '', #[Option] bool $dryRun = false): int
+            {
+                return 0;
+            }
+        };
+
+        $definition = new Command(null, $invokable)->getDefinition();
+
+        $this->assertSame(['name'], array_keys($definition->getArguments()));
+        $this->assertSame(['dry-run', 'flag'], array_keys($definition->getOptions()));
+        $this->assertSame('f', $definition->getOption('flag')->getShortcut());
+        $this->assertSame('Flag', $definition->getOption('flag')->getDescription());
+    }
+
+    public function testAttributeListedOptionsOnAMethodCommand()
+    {
+        $object = new class {
+            #[AsCommand(name: 'foo', options: [new InputOption('flag')])]
+            public function run(#[Argument] string $name = ''): int
+            {
+                return 0;
+            }
+        };
+
+        $definition = new Command(null, $object->run(...))->getDefinition();
+
+        $this->assertSame(['name'], array_keys($definition->getArguments()));
+        $this->assertSame(['flag'], array_keys($definition->getOptions()));
+    }
+
+    public function testAttributeListedOptionsOnACommandSubclass()
+    {
+        $command = new #[AsCommand(name: 'foo', options: [new InputOption('flag')])] class extends Command {
+            protected function configure(): void
+            {
+                $this->addOption('configured');
+            }
+        };
+
+        $this->assertSame(['flag', 'configured'], array_keys($command->getDefinition()->getOptions()));
+    }
+
+    public function testAttributeListedOptionsOnAnInvokableCommandSubclass()
+    {
+        $command = new #[AsCommand(name: 'foo', options: [new InputOption('flag')])] class extends Command {
+            public function __invoke(#[Argument] string $name = ''): int
+            {
+                return 0;
+            }
+        };
+
+        $this->assertSame(['name'], array_keys($command->getDefinition()->getArguments()));
+        $this->assertSame(['flag'], array_keys($command->getDefinition()->getOptions()));
+    }
+
+    public function testAttributeListedOptionMustNotRepeatAParameter()
+    {
+        $invokable = new #[AsCommand(name: 'foo', options: [new InputOption('flag', null, InputOption::VALUE_REQUIRED)])] class {
+            public function __invoke(#[Option] bool $flag = false): int
+            {
+                return 0;
+            }
+        };
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('An option named "flag" already exists.');
+
+        new Command(null, $invokable)->getDefinition();
+    }
+
+    public function testAttributeListedOptionsMustBeInputOptions()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "options" of the "foo" command must be "Symfony\Component\Console\Input\InputOption" instances, "string" given.');
+
+        new AsCommand(name: 'foo', options: ['flag']);
     }
 
     public function testDefaultCommand()

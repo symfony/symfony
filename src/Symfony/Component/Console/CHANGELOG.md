@@ -4,6 +4,8 @@ CHANGELOG
 8.2
 ---
 
+ * Allow `#[AsCommand]` to list `InputOption`s to add after the ones the parameters of the command declare
+ * Register a class-level `#[AsCommand]` without `__invoke()` as the command grouping its method-level ones
  * Resolve spaced sub-command invocations through the tree derived from registered command names, with per-level options and `--` binding the remaining tokens to the current command
  * List the sub-commands of a command invoked bare when it has no code of its own, on the error output and with exit code 1 like a bare namespace
  * Walk namespaces without a registered root command the same way: `cache clear` runs `cache:clear`

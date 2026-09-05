@@ -109,6 +109,13 @@ class Command implements SignalableCommandInterface
             $this->code = new InvokableCommand($this, $this(...));
         }
 
+        if (!$this->code) {
+            // a command with code gets the options listed in its attribute after the ones its parameters declare
+            foreach ($attribute?->options ?? [] as $option) {
+                $this->definition->addOption($option);
+            }
+        }
+
         $this->configure();
     }
 

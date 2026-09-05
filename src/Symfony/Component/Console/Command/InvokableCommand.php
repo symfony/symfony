@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
 use Symfony\Component\Console\ArgumentResolver\ArgumentResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Interact;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
@@ -105,6 +106,16 @@ class InvokableCommand implements SignalableCommandInterface
                     $definition->addOption($option->toInputOption());
                 }
             }
+        }
+
+        // the options listed in the attribute come after the ones the parameters declare
+        $attribute = ($this->invokable->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        if (!$attribute && '__invoke' === $this->invokable->getName()) {
+            $attribute = ($this->invokable->getClosureScopeClass()?->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
+        }
+
+        foreach ($attribute?->options ?? [] as $option) {
+            $definition->addOption($option);
         }
     }
 

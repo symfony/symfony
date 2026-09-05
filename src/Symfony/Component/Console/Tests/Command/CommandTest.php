@@ -20,6 +20,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Helper\FormatterHelper;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
@@ -354,6 +355,28 @@ class CommandTest extends TestCase
         $this->expectExceptionMessage('The "--bar" option does not exist.');
 
         $tester->execute(['--bar' => true]);
+    }
+
+    public function testIgnoreExtraArguments()
+    {
+        $unparsedTokens = null;
+        $command = new Command('docker');
+        $command->getDefinition()->setIgnoreExtraArguments();
+        $command->setCode(static function (InputInterface $input) use (&$unparsedTokens): int {
+            $unparsedTokens = $input->getUnparsedTokens();
+
+            return 0;
+        });
+
+        $application = new Application();
+        $application->setAutoExit(false);
+        $application->setCatchExceptions(false);
+        $application->addCommand($command);
+
+        $statusCode = $application->run(new ArgvInput(['cli.php', 'docker', 'compose', 'up', '--detach']), new NullOutput());
+
+        $this->assertSame(0, $statusCode);
+        $this->assertSame(['compose', 'up', '--detach'], $unparsedTokens);
     }
 
     public function testRunWithApplication()
